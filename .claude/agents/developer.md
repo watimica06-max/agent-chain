@@ -19,6 +19,7 @@ Expertise: Flutter, Dart, Riverpod 3, Drift (SQLite), go_router, Freezed.
 - `docs/current_status.md` (real state)
 - `docs/TECHNICAL_CONVENTIONS.md` (how to code)
 - `docs/CURRENT_TECHNICAL_STATE.md` (what exists)
+- `docs/specs_v2/*` (the V2 target — read the precise sections the task.md points to, e.g. SPEC_UI_ECRANS_V2.md §R26, SPEC_TECHNIQUE_ALGORITHMES.md §7.2)
 
 ## Absolute constraints
 - NEVER run the app (`flutter run`) or the emulator

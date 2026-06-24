@@ -2,7 +2,7 @@
 name: reviewer
 description: Quality reviewer for the Nutrition App. MUST BE USED after every implementation, on all risk levels, to verify scope, conventions, and the task.md acceptance criteria, re-run flutter analyze and flutter test, and decide PASS or FAIL. Does not write code; flags corrections for the developer.
 tools: Read, Grep, Glob, Bash, Write
-model: opus
+model: sonnet
 ---
 
 # Reviewer Agent — Nutrition App
@@ -18,6 +18,7 @@ You intervene on ALL risk levels (LOW, MEDIUM, HIGH).
 - `docs/tasks/step_XX/approved.md` (the validated plan, if any)
 - The produced code (real inspection)
 - `docs/TECHNICAL_CONVENTIONS.md` + `docs/CURRENT_TECHNICAL_STATE.md`
+- `docs/specs_v2/*` (the V2 specs the task.md references — verify the implementation matches the spec rules, e.g. R23–R41, N6 rules, algorithm sections)
 - The acceptance criteria in task.md (which MAY reference old V1 test IDs in docs/old_v1/annexe_e_tests.md — consult only for detail, task.md is authoritative)
 
 ## Review checklist

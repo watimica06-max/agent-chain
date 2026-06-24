@@ -20,11 +20,25 @@ The user (the Product Owner) does not code. Their only role during development i
 | `docs/current_status.md` | ALWAYS at startup — real state of the code |
 | `docs/TECHNICAL_CONVENTIONS.md` | ALWAYS before coding — how to code (timeless) |
 | `docs/CURRENT_TECHNICAL_STATE.md` | ALWAYS before coding — what exists today |
+| `docs/specs_v2/*` | The V2 target specs — read the precise sections a `task.md` points to |
 | `docs/development_log.md` | For the detailed history of a step |
-| `docs/tasks/step_XX/` | For the current task |
+| `docs/tasks/step_XX/` | For the current task (steps 01–35) |
 | `docs/old_v1/*` | V1 reference snapshot — consult ONLY when a task.md points to a specific section |
 
 **Absolute rule**: before any coding action, read `current_status.md` + `TECHNICAL_CONVENTIONS.md` + `CURRENT_TECHNICAL_STATE.md`. Never code without this context.
+
+### The V2 specs (`docs/specs_v2/`) — source of truth for WHAT to build
+
+V2 is built from a complete specification set in `docs/specs_v2/`. Each `task.md` points to
+the precise sections it implements (e.g. "see SPEC_UI_ECRANS_V2.md §R26 and
+SPEC_TECHNIQUE_ALGORITHMES.md §6.3"). The hierarchy of truth:
+
+1. `SPEC_UI_ECRANS_V2.md` — screens, UI rules R1–R41, Zones 1–11 (absolute authority on screens/edge cases)
+2. `ROADMAP_V2.md` §Amendments — product decisions AM-1→AM-8, C1→C5 (supersede when in conflict)
+3. The other specs — coherent implementation detail
+4. To code a service: `SPEC_TECHNIQUE_ALGORITHMES.md` + the real V1 repo code (never the V1 annexes)
+
+The V1 annexes in `docs/old_v1/` are historical only — never a build target.
 
 ### Status of the `docs/old_v1/` documents — READ CAREFULLY
 
@@ -161,25 +175,32 @@ This is why domain-service unit tests are a prerequisite: without them, the revi
 
 ## Model assignment per agent and per task
 
-The account is Claude Max — quality-maximal strategy is used.
+Cost-efficient strategy: **Opus only on HIGH-risk tasks**, Sonnet everywhere else.
+Sonnet 4.6 covers ~90% of development work at high quality, and the real safety net
+(flutter analyze + flutter test + reviewer) stays active regardless of the model. Opus
+is reserved for the tasks where a mistake is expensive: migrations, critical calculations,
+orchestrator chains, deletion cascade.
 
 ### Default models (set in each agent's frontmatter)
-| Agent | Model | Why |
-|-------|-------|-----|
-| Orchestrator (this CLAUDE.md session) | Sonnet 4.6 | Routing, file reading, dispatch — no deep reasoning needed |
-| Manager | Opus 4.8 | Designs the approach, generates contextual questions, validates plans — the architectural reasoning lives here |
-| Developer | Sonnet 4.6 (default) | Covers ~90% of coding work at high quality |
-| Reviewer | Opus 4.8 | Final safety net — Opus 4.8 is ~4x less likely to let code flaws pass than the previous generation |
+| Agent | Default model | Why |
+|-------|---------------|-----|
+| Orchestrator (this CLAUDE.md session) | Sonnet 4.6 | Routing, file reading, dispatch |
+| Manager | Sonnet 4.6 | Sufficient for plan validation on MEDIUM; escalated to Opus on HIGH |
+| Developer | Sonnet 4.6 | Covers ~90% of coding work; escalated to Opus on HIGH |
+| Reviewer | Sonnet 4.6 | Sufficient on LOW/MEDIUM; escalated to Opus on HIGH |
 
-### Per-task escalation of the developer
-The developer's frontmatter default is Sonnet. For **HIGH-risk tasks**, the orchestrator must invoke the developer with **Opus** instead, because the task itself (migrations, critical calculations, orchestrator chains, deletion cascade) demands deeper reasoning.
-
-When dispatching the developer on a HIGH-risk task, use the Agent tool's `model` parameter to override to `opus`. On LOW and MEDIUM tasks, let the developer run on its default Sonnet.
+### Per-task escalation to Opus (HIGH risk only)
+On a **HIGH-risk task**, the orchestrator invokes the manager, the developer AND the
+reviewer with **Opus** (via the Agent tool's `model` parameter, overriding their Sonnet
+default). On LOW and MEDIUM tasks, all agents run on their default Sonnet.
 
 Summary:
-- LOW    → developer Sonnet, reviewer Opus
-- MEDIUM → developer Sonnet, manager Opus, reviewer Opus
+- LOW    → developer Sonnet, reviewer Sonnet
+- MEDIUM → developer Sonnet, manager Sonnet, reviewer Sonnet
 - HIGH   → developer Opus, manager Opus, reviewer Opus
+
+If, in practice, Sonnet lets a flaw pass on a specific MEDIUM task, the user can ask to
+re-run that task's review on Opus. Opus is opt-in per task, not the default.
 
 ---
 
