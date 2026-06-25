@@ -240,3 +240,41 @@ If a spec is ambiguous or an architectural decision is not covered by the docume
 - Modify `TECHNICAL_CONVENTIONS.md` without explicitly flagging it to the user
 - Invent an architecture not covered by the specs
 - Continue after a PASS without displaying the manual test list
+
+---
+
+## RULE 24 — Windows notification flag for manual approvals
+
+When Claude Code is about to execute a bash command that requires manual approval
+(any command that modifies the filesystem outside normal code files, installs packages,
+runs emulator commands, or any HIGH risk action), write a notification flag BEFORE
+requesting approval:
+
+```bash
+# Write the flag BEFORE asking for approval
+echo "Waiting for bash approval: <brief description of command>" > APPROVAL_NEEDED.flag
+# ... then proceed with the command that needs approval
+# The flag is automatically deleted after the user approves and the command runs
+```
+
+After the command completes (approved or rejected), delete the flag:
+```bash
+del APPROVAL_NEEDED.flag 2>nul || rm -f APPROVAL_NEEDED.flag
+```
+
+This allows the background watcher (notify_watcher.py) to send a Windows notification
+to the developer when manual action is required.
+
+**Commands that MUST trigger the flag:**
+- Any `flutter pub get` or package installation
+- Any `gradle` build commands
+- Any file deletion
+- Any git operations
+- Any emulator launch commands (though emulator use is prohibited per Rule 23)
+- Anything with `--force` or destructive flags
+
+**Commands that do NOT need the flag:**
+- `flutter analyze`
+- Reading files (`cat`, `head`, `grep`, `find`)
+- Creating new source files
+- Standard `dart run build_runner build`
