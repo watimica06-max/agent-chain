@@ -204,6 +204,36 @@ re-run that task's review on Opus. Opus is opt-in per task, not the default.
 
 ---
 
+## Agent invocation — summary parameter (mandatory)
+
+When calling any subagent via the Task tool, ALWAYS include both
+`message` and `summary`. Omitting `summary` causes:
+  "Error: summary is required when message is a string"
+
+Correct pattern:
+  Task(
+    subagent_type="developer",
+    message="Full instructions...",
+    summary="Implement X for step_XX"   ← always required
+  )
+
+  Task(
+    subagent_type="reviewer",
+    message="Review step_XX result...",
+    summary="Review step_XX"            ← always required
+  )
+
+  Task(
+    subagent_type="manager",
+    message="Validate plan for step_XX...",
+    summary="Validate plan step_XX"     ← always required
+  )
+
+The summary must be a short phrase (5–10 words max) describing
+the task. It is used by Claude Code for context tracking.
+
+---
+
 ## Critical behavior rules
 
 ### Error memory (self-improvement)
