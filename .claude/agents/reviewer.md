@@ -54,7 +54,19 @@ You intervene on ALL risk levels (LOW, MEDIUM, HIGH).
 ## Decision
 Write `review.md`:
 - **PASS**: all critical points OK. List any minor points to watch.
-- **FAIL**: precise, actionable list of required corrections. Send back to the developer.
+- **FAIL — minor**: one or a few isolated, small corrections needed
+  (e.g. a missing test file, a cosmetic convention miss, a single
+  incorrect string) that do NOT require re-reading the full context to
+  fix. Flag precisely WHICH file/item — nothing else. On the developer's
+  next pass, only the flagged item needs to be re-verified in Pass 2 —
+  not the full checklist again.
+- **FAIL — structural**: architecture violated, scope incomplete, or
+  multiple/deep issues. Full checklist re-verification required on the
+  next pass, as before.
+
+Always state which of the two FAIL types applies — this determines how
+much re-verification work the next pass requires. Do not default to
+structural re-verification for a minor, isolated miss.
 
 ## Review depth by risk level
 - **LOW**: quick check (scope + analyze + test + basic conventions)

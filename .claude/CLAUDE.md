@@ -173,31 +173,81 @@ This is why domain-service unit tests are a prerequisite: without them, the revi
 
 ---
 
-## Model assignment per agent and per task
+## Model + effort assignment per agent and per task
 
 Cost-efficient strategy: **Opus only on HIGH-risk tasks**, Sonnet everywhere else.
-Sonnet 4.6 covers ~90% of development work at high quality, and the real safety net
-(flutter analyze + flutter test + reviewer) stays active regardless of the model. Opus
-is reserved for the tasks where a mistake is expensive: migrations, critical calculations,
-orchestrator chains, deletion cascade.
+Sonnet (resolved via the generic `sonnet` alias in each agent's frontmatter — always
+the latest available Sonnet version, currently Sonnet 5) covers ~90% of development
+work at high quality, and the real safety net (flutter analyze + flutter test +
+reviewer) stays active regardless of the model. Opus is reserved for the tasks where
+a mistake is expensive: migrations, critical calculations, orchestrator chains,
+deletion cascade.
 
-### Default models (set in each agent's frontmatter)
-| Agent | Default model | Why |
-|-------|---------------|-----|
-| Orchestrator (this CLAUDE.md session) | Sonnet 4.6 | Routing, file reading, dispatch |
-| Manager | Sonnet 4.6 | Sufficient for plan validation on MEDIUM; escalated to Opus on HIGH |
-| Developer | Sonnet 4.6 | Covers ~90% of coding work; escalated to Opus on HIGH |
-| Reviewer | Sonnet 4.6 | Sufficient on LOW/MEDIUM; escalated to Opus on HIGH |
+Since Sonnet 5, a second independent lever exists alongside model choice: the
+`effort` parameter (low/medium/high/xhigh/max), settable in frontmatter or passed
+per-invocation by the orchestrator. Two levers, not one — model controls raw
+capability, effort controls how much the model reasons before answering.
 
-### Per-task escalation to Opus (HIGH risk only)
-On a **HIGH-risk task**, the orchestrator invokes the manager, the developer AND the
-reviewer with **Opus** (via the Agent tool's `model` parameter, overriding their Sonnet
-default). On LOW and MEDIUM tasks, all agents run on their default Sonnet.
+### Default models + effort (set in each agent's frontmatter)
+| Agent | Default model | Default effort | Why |
+|-------|---------------|-----------------|-----|
+| Orchestrator (this CLAUDE.md session) | sonnet (alias) | high | Routing, file reading, dispatch |
+| Manager | sonnet (alias) | high (fixed in frontmatter — manager never runs on LOW, so no conditional needed) | Judgment/consistency-checking role, not generation — see Recommendation 6.1 below |
+| Developer | sonnet (alias) | conditional — see table below | Covers ~90% of coding work; escalated to Opus+xhigh on HIGH |
+| Reviewer | sonnet (alias) | conditional — see table below | Checklist verification is largely deterministic — does not need max effort by default |
+
+### Per-task model + effort table (orchestrator passes BOTH as invocation parameters)
+
+The orchestrator already overrides `model` via the Agent tool's `model` parameter on
+HIGH-risk tasks (existing mechanism). The SAME mechanism now also passes `effort` —
+no new tooling required, just an additional parameter on the same Task() call.
+
+| Role | Risk LOW | Risk MEDIUM | Risk HIGH |
+|------|----------|--------------|-----------|
+| Manager | — (does not intervene) | sonnet, effort: high | opus, effort: high |
+| Developer | sonnet, effort: medium | sonnet, effort: high | opus, effort: xhigh |
+| Reviewer | sonnet, effort: medium | sonnet, effort: medium | opus, effort: high |
+
+Rationale: LOW-risk developer work (CRUD, simple wiring) does not proportionally
+benefit from high effort. HIGH-risk developer work (migrations, critical
+calculations, orchestrator chains — the exact profile matching Anthropic's own
+guidance for xhigh: "long autonomous coding, complex debugging, real analysis")
+gets the deepest reasoning available. Reviewer stays at medium on LOW/MEDIUM
+because its checklist is deterministic — it verifies known criteria, it does not
+need to explore or discover.
+
+Example invocation (developer, MEDIUM risk):
+```
+Task(
+  subagent_type="developer",
+  model="sonnet",
+  effort="high",
+  message="...",
+  summary="Implement X for step_XX"
+)
+```
+
+Example invocation (developer, HIGH risk — both overrides applied):
+```
+Task(
+  subagent_type="developer",
+  model="opus",
+  effort="xhigh",
+  message="...",
+  summary="Implement X for step_XX"
+)
+```
 
 Summary:
-- LOW    → developer Sonnet, reviewer Sonnet
-- MEDIUM → developer Sonnet, manager Sonnet, reviewer Sonnet
-- HIGH   → developer Opus, manager Opus, reviewer Opus
+- LOW    → developer (sonnet, medium), reviewer (sonnet, medium)
+- MEDIUM → developer (sonnet, high), manager (sonnet, high), reviewer (sonnet, medium)
+- HIGH   → developer (opus, xhigh), manager (opus, high), reviewer (opus, high)
+
+> Note: the `effort` frontmatter/invocation parameter is a recent Claude Code
+> capability. If the installed Claude Code version does not support it, the
+> parameter is silently ignored (falls back to the model's default effort) —
+> no error, no blocker. Verify support before assuming the calibration above is
+> actually active.
 
 If, in practice, Sonnet lets a flaw pass on a specific MEDIUM task, the user can ask to
 re-run that task's review on Opus. Opus is opt-in per task, not the default.
