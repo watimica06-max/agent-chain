@@ -68,6 +68,16 @@ Always state which of the two FAIL types applies — this determines how
 much re-verification work the next pass requires. Do not default to
 structural re-verification for a minor, isolated miss.
 
+## Registry update (required before writing PASS)
+Before writing PASS to `review.md`: append one row to
+`docs/process/CALIBRATION_RISK_LEVEL.md` — action type(s) per the CHECK 0
+matrix (`ARCHIVE_MATRICE_ACTIONS_RISQUE.md`), risk predicted, risk
+actually used, model/effort used, number of correction cycles observed
+(manager + reviewer combined) to reach this PASS. This is part of the
+PASS action itself, not a separate follow-up — a PASS is not complete
+until this row exists. Leave the "Bug post-PASS" column as "—" (filled
+in retroactively only if a later step reveals a bug in this one).
+
 ## Review depth by risk level
 - **LOW**: quick check (scope + analyze + test + basic conventions)
 - **MEDIUM**: standard check (full checklist)
