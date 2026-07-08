@@ -69,14 +69,48 @@ much re-verification work the next pass requires. Do not default to
 structural re-verification for a minor, isolated miss.
 
 ## Registry update (required before writing PASS)
-Before writing PASS to `review.md`: append one row to
-`docs/process/CALIBRATION_RISK_LEVEL.md` — action type(s) per the CHECK 0
-matrix (`ARCHIVE_MATRICE_ACTIONS_RISQUE.md`), risk predicted, risk
-actually used, model/effort used, number of correction cycles observed
-(manager + reviewer combined) to reach this PASS. This is part of the
-PASS action itself, not a separate follow-up — a PASS is not complete
-until this row exists. Leave the "Bug post-PASS" column as "—" (filled
-in retroactively only if a later step reveals a bug in this one).
+Before writing PASS to `review.md`, update
+`docs/process/CALIBRATION_RISK_LEVEL.md`:
+- **If a placeholder row already exists for this step** (added when the
+  task file was authored — risk predicted filled in, other columns
+  showing "À observer"): find it by step name and UPDATE it in place —
+  fill in risk actually used, model/effort used, correction cycles
+  observed. Do NOT append a duplicate row.
+- **If no row exists yet for this step**: append a new one with all
+  columns filled (action type(s) per the CHECK 0 matrix, risk predicted
+  = same as risk used if no placeholder existed, risk actually used,
+  model/effort, correction cycles).
+
+**The "Écart / note" column must follow this fixed 4-point structure**
+(added 2026-07-08 — free-form prose produced inconsistent depth across
+steps and never explicitly checked for over-classification). Do not
+skip any of the 4 points, even briefly — one clause each is enough when
+there's nothing notable, but the point must be addressed:
+
+1. **Verification performed** — which checks were independently re-run
+   (`flutter analyze`, `flutter test`, and for HIGH specifically
+   anything beyond that — e.g. `flutter build apk` for platform-config
+   changes), not just trusting the developer's own report.
+2. **Value added by this risk level's process** — what did the
+   investigation phase (MEDIUM/HIGH) or manager validation (HIGH)
+   specifically catch, if anything — a wrong premise, a missing call
+   site, a real bug. If nothing was caught, say so explicitly ("nothing
+   found beyond the plan") rather than omitting this point.
+3. **Counterfactual check, explicit, every time** — would the NEXT
+   LOWER risk level's process plausibly have caught the same thing (or
+   missed it)? Answer directly: "a lower level would likely have missed
+   this" (supports the level as necessary) / "a lower level would
+   likely have caught this too" (flags possible over-classification) /
+   "unclear, nothing was tested that would distinguish them." This is
+   the only point that specifically surfaces over-classification — do
+   not skip it just because the step went smoothly.
+4. **Prediction match** — does the outcome confirm the risk predicted
+   by the CHECK 0 matrix, or diverge from it, and why.
+
+This is part of the PASS action itself, not a separate follow-up — a
+PASS is not complete until this row is correct. Leave the "Bug
+post-PASS" column as "—" (filled in retroactively only if a later step
+reveals a bug in this one).
 
 ## Review depth by risk level
 - **LOW**: quick check (scope + analyze + test + basic conventions)
