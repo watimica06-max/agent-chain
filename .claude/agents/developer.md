@@ -61,6 +61,19 @@ silently re-deriving a new plan under the old risk classification. A
 wrong premise usually means the risk level itself needs re-triage, not
 just the plan.
 
+**For any new write path (local DB or external service): confirm a
+real downstream reader exists and actually uses it — do not treat
+"the write compiles and is called correctly" as sufficient.** (Added
+2026-07-08, after 5 confirmed cases this project: `isConnected()`
+written but never called, HRV imported but never consumed downstream,
+`FastingConfig.mealToSkip` persisted but read nowhere, `hc_stub_screen.dart`
+orphaned with no route pushing to it, and `accountProfiles` written by
+`step_44_fix`'s own design but — separately — never actually reaching
+Firestore in practice. Grep for every reader of whatever you're
+writing; if none exists, or if a downstream consumer is only planned
+for later, say so explicitly in `plan.md` rather than letting it read
+as already-wired.
+
 Write your plan in `plan.md`:
 - Answers to the investigation points
 - Exact list of files to create

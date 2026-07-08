@@ -54,6 +54,22 @@ You intervene on ALL risk levels (LOW, MEDIUM, HIGH).
 ## Decision
 Write `review.md`:
 - **PASS**: all critical points OK. List any minor points to watch.
+- **PASS — pending live verification** (added 2026-07-08): use this
+  instead of a plain PASS whenever the task's acceptance criteria
+  include a real external-service write (Firestore, any cloud API)
+  that automated tests (fakes/mocks) structurally cannot confirm
+  reached the live service. All automated checks (`flutter analyze`,
+  `flutter test`) still pass normally — but explicitly flag that the
+  live-service portion is unverified by anything in this review, not
+  just by omission. **Also add an entry to `docs/HUMAN_ACTIONS.md`**
+  (not just this step's own manual-test list) naming the exact
+  Console/live check needed and a suggested verification window (e.g.
+  "within 48h") — this is what makes the pending check visible and
+  time-bound rather than silently waiting in a task file nobody
+  re-reads. Confirmed necessary after `step_44_fix`: full automated
+  PASS, reviewer-independent re-verification, and still a real write
+  (`accountProfiles`) silently never reached Firestore, undiscovered
+  for days until a live bug report.
 - **FAIL — minor**: one or a few isolated, small corrections needed
   (e.g. a missing test file, a cosmetic convention miss, a single
   incorrect string) that do NOT require re-reading the full context to
