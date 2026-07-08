@@ -33,6 +33,20 @@ Before proposing a plan, inspect the real code to answer the raised points:
 - Real state of routes and providers
 - Check the known pitfalls listed in CURRENT_TECHNICAL_STATE.md
 
+**Audit task.md's own factual claims against the real code — do not
+treat them as pre-verified just because they're written down.** (Added
+2026-07-08, after 3 confirmed cases across step_38/41/42_fix: a wrong
+repository method name, an incomplete list of call sites — 3 cited,
+7 real — and a technically-wrong suggested fix, `isConnected()` instead
+of `hasPermission()`. All three were caught here, before planning, with
+zero manager↔developer iteration needed as a result.) Specifically
+verify: every file/method name the task.md cites actually exists as
+named; every enumerated list of sites-to-modify is complete, not just
+a sample; any suggested technical approach in the task.md is confirmed
+correct by reading the real code, not assumed correct because it's
+written in the task file. Report any correction found as part of
+`plan.md`, not silently.
+
 Write your plan in `plan.md`:
 - Answers to the investigation points
 - Exact list of files to create
