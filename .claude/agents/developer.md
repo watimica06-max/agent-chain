@@ -47,6 +47,20 @@ correct by reading the real code, not assumed correct because it's
 written in the task file. Report any correction found as part of
 `plan.md`, not silently.
 
+**This includes the task.md's core technical premise, not just its
+detail-level claims.** (Broadened 2026-07-08, after `step_45_fix`'s
+original version — premise: "reuse `MealSplitService`, already
+correct" — turned out entirely wrong: that service only drives UI
+previews, never the real persisted targets, which come from a
+different service `MealSplitService` doesn't even import. Caught via a
+real `blocked.md`, not silently proceeded on.) If investigation reveals
+the task.md's stated approach targets the wrong service/mechanism
+entirely — not just a wrong name or an incomplete list within an
+otherwise-correct approach — STOP and write `blocked.md` rather than
+silently re-deriving a new plan under the old risk classification. A
+wrong premise usually means the risk level itself needs re-triage, not
+just the plan.
+
 Write your plan in `plan.md`:
 - Answers to the investigation points
 - Exact list of files to create
