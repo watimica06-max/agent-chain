@@ -41,6 +41,35 @@ explicitly states "investigation only" / "report only" / "no fix", or
   apparent simplicity.
 - No `plan.md`, no `result.md`, no manager/reviewer cycle — a single
   developer pass producing `REPORT.md` is the complete deliverable.
+- **Corrected 2026-07-09 — the previous "never use a worktree" rule
+  below was wrong and could never work; replaced.** Confirmed by
+  Claude Code directly: background-job investigations are
+  auto-isolated into `.claude/worktrees/<job-name>/` by the harness
+  itself, **before** this skill even loads — this is mechanical
+  platform behavior tied to how the job was launched, not a choice the
+  agent makes, and cannot be prevented by any instruction in this
+  file. (Confirmed recurring across multiple prior investigations —
+  `step52-permission-launcher`, `edit-tool-failures`,
+  `firestore-enum-serialization` — each requiring a manual merge
+  afterward.)
+
+  **The fix is automatic merge-back, not prevention.** If, when this
+  skill activates, the working directory is already under
+  `.claude/worktrees/` (confirms auto-isolation happened): after
+  writing `REPORT.md` and committing it on the worktree branch, **you
+  must merge that branch into `master` yourself, automatically, as
+  the final step** — do not leave this as a manual action for the
+  Product Owner, and do not attempt `git push`/open a PR (this repo
+  has no configured remote — that path silently strands the report on
+  an unmerged branch, exactly what caused this bug to go unnoticed
+  across several investigations). From the main checkout root
+  (`C:\Dev\nutrition_app`, not the worktree path), run:
+  ```
+  git merge --no-ff <worktree-branch-name> -m "Merge investigation: <short-name>"
+  ```
+  Confirm afterward that `docs/investigations/<short-descriptive-name>/`
+  is now visible on `master` in the main checkout before considering
+  the investigation complete.
 - If the investigation's findings warrant a real fix afterward, that
   becomes its own separate, properly-numbered `docs/tasks/step_XX_fix/`
   task file at that point — never retroactively renumber the
