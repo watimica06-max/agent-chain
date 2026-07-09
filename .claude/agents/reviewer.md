@@ -49,7 +49,7 @@ You intervene on ALL risk levels (LOW, MEDIUM, HIGH).
 - [ ] `flutter test` passes (re-run it yourself)
 - [ ] If new domain service: unit tests present
 - [ ] No undocumented TODO, no leftover debugPrint
-- [ ] Documentation updated (current_status, development_log, current state)
+- [ ] Documentation updated (`current_status.md` overwritten in full, not appended — no `development_log.md` entry, removed 2026-07-09; `CURRENT_TECHNICAL_STATE.md` if applicable)
 
 ## Decision
 Write `review.md`:
@@ -86,18 +86,34 @@ structural re-verification for a minor, isolated miss.
 
 ## Registry update (required before writing PASS)
 Before writing PASS to `review.md`, update
-`docs/process/CALIBRATION_RISK_LEVEL.md`:
-- **If a placeholder row already exists for this step** (added when the
-  task file was authored — risk predicted filled in, other columns
-  showing "À observer"): find it by step name and UPDATE it in place —
-  fill in risk actually used, model/effort used, correction cycles
-  observed. Do NOT append a duplicate row.
-- **If no row exists yet for this step**: append a new one with all
-  columns filled (action type(s) per the CHECK 0 matrix, risk predicted
-  = same as risk used if no placeholder existed, risk actually used,
-  model/effort, correction cycles).
+`docs/process/CALIBRATION_RISK_LEVEL.md`.
 
-**The "Écart / note" column must follow this fixed 4-point structure**
+**Format (restructured 2026-07-09 — block per step, not a table row)**:
+each step is a `### step_XX` heading followed by short bullet lines
+(Type d'action, Risk prédit/réel, Cycles de correction, Bug post-PASS,
+Modèle/effort, Note). See any existing entry for the exact shape — copy
+it, don't reinvent.
+
+- **If a placeholder block already exists for this step** (added when
+  the task file was authored — `### step_XX` heading present, risk
+  predicted filled in, other fields showing "à observer"): find it by
+  its heading and UPDATE it in place — fill in risk actually used,
+  model/effort used, correction cycles observed. Do NOT create a
+  duplicate `### step_XX` block.
+- **If no block exists yet for this step**: append a new one, in the
+  same position it would naturally sort (end of the "Registre de
+  calibration" section, before the closing note), with all fields
+  filled (action type(s) per the CHECK 0 matrix, risk predicted = same
+  as risk used if no placeholder existed, risk actually used,
+  model/effort, correction cycles).
+- **Never write this file as a single giant line.** Each field is its
+  own short bullet line — this is the whole reason for the 2026-07-09
+  restructure (see CLAUDE.md "Reliable Edit-failure fallback" for why).
+  If editing an existing block, follow the Edit-failure fallback
+  procedure if a match fails — re-read the exact block first, don't
+  reconstruct it from memory.
+
+**The "Note" field must follow this fixed 4-point structure**
 (added 2026-07-08 — free-form prose produced inconsistent depth across
 steps and never explicitly checked for over-classification). Do not
 skip any of the 4 points, even briefly — one clause each is enough when

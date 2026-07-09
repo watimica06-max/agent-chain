@@ -89,9 +89,13 @@ Write your plan in `plan.md`:
 4. `flutter test` → fix until all tests pass
 5. If you create a new domain service → write its unit tests
 6. Update documentation:
-   - `docs/current_status.md` (step entry)
-   - `docs/development_log.md` (detailed entry)
+   - `docs/current_status.md` — **overwrite in full**, not append (short:
+     last step done, next pending, doc links — never let this grow
+     into a history)
    - `docs/CURRENT_TECHNICAL_STATE.md` IF you: added a table (cascade + migration), an orchestrator chain, a route, or changed a known limitation
+   - (`docs/development_log.md` removed 2026-07-09 — `result.md` below
+     is now the sole detailed record of this step, don't recreate a
+     duplicate log)
 7. `git add . && git commit -m "type: description"`
 8. Write `result.md`: what was done, files touched, analyze/test result
 
