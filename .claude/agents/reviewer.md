@@ -51,25 +51,65 @@ You intervene on ALL risk levels (LOW, MEDIUM, HIGH).
 - [ ] No undocumented TODO, no leftover debugPrint
 - [ ] Documentation updated (`current_status.md` overwritten in full, not appended — no `development_log.md` entry, removed 2026-07-09; `CURRENT_TECHNICAL_STATE.md` if applicable)
 
+## Manual test tracking — docs/test_humain_todo.md (required before PASS, added 2026-07-09)
+
+Before writing PASS, create or merge into `docs/test_humain_todo.md`
+the manual tests this step's acceptance criteria require. This
+replaces the old chat-blocking stop — the Product Owner now tests in
+her own time, in batches, from this one file.
+
+- **If the file doesn't exist or is empty**: create it, organized by
+  feature area (not by step number) — e.g. all sign-out/deletion tests
+  under one heading, all sync-related tests under another.
+- **If the file already has content**: MERGE, don't append. Read the
+  existing file first. For each new test this step requires:
+  - If an existing entry already covers the same feature area and this
+    step's test is a natural extension of it (e.g. a prior entry says
+    "tester la déconnexion connectée" and this step adds the
+    not-connected branch), fold it into that SAME entry as an
+    additional numbered check, not a new separate entry.
+  - If it's genuinely unrelated to anything already listed, add a new
+    entry under the right feature heading (create the heading if
+    needed).
+  - The result must read as one coherent guide someone could follow
+    start to finish — not a chronological log of what was appended
+    when. Reorganize headings/grouping if the file's own structure has
+    drifted from this goal, don't just keep bolting on.
+- Each entry: a short feature-area heading, then the precise numbered
+  steps to test it (mirroring the old chat-displayed format), plus
+  which `step_XX_fix` it originated from (for traceability if a bug is
+  found later).
+- **Never mark an entry "done" in place** — once the Product Owner
+  confirms it OK, it gets REMOVED from the file entirely (see
+  CLAUDE.md's "When the user later reports back" section). This file
+  always reflects only what's currently NOT yet manually verified.
+
 ## Decision
 Write `review.md`:
 - **PASS**: all critical points OK. List any minor points to watch.
-- **PASS — pending live verification** (added 2026-07-08): use this
-  instead of a plain PASS whenever the task's acceptance criteria
-  include a real external-service write (Firestore, any cloud API)
-  that automated tests (fakes/mocks) structurally cannot confirm
-  reached the live service. All automated checks (`flutter analyze`,
-  `flutter test`) still pass normally — but explicitly flag that the
-  live-service portion is unverified by anything in this review, not
-  just by omission. **Also add an entry to `docs/HUMAN_ACTIONS.md`**
-  (not just this step's own manual-test list) naming the exact
-  Console/live check needed and a suggested verification window (e.g.
-  "within 48h") — this is what makes the pending check visible and
-  time-bound rather than silently waiting in a task file nobody
-  re-reads. Confirmed necessary after `step_44_fix`: full automated
-  PASS, reviewer-independent re-verification, and still a real write
-  (`accountProfiles`) silently never reached Firestore, undiscovered
-  for days until a live bug report.
+- **PASS — pending live verification** (added 2026-07-08, corrected
+  2026-07-13): use this instead of a plain PASS whenever the task's
+  acceptance criteria include a real external-service write (Firestore,
+  any cloud API) that automated tests (fakes/mocks) structurally cannot
+  confirm reached the live service. All automated checks (`flutter
+  analyze`, `flutter test`) still pass normally — but explicitly flag
+  that the live-service portion is unverified by anything in this
+  review, not just by omission. **Write the verification entry into
+  `docs/test_humain_todo.md`** (NOT `docs/HUMAN_ACTIONS.md` — that file
+  is reserved for actions the agent literally cannot perform itself:
+  Firebase Console setup, API keys, keystore, store accounts, GDPR.
+  A live-Firestore-write check is a manual TEST, same family as every
+  other entry in `test_humain_todo.md`, so it follows the exact same
+  merge procedure below — fold it into an existing entry for the same
+  feature area if one exists, or add a new one). Confirmed necessary
+  after `step_44_fix`: full automated PASS, reviewer-independent
+  re-verification, and still a real write (`accountProfiles`) silently
+  never reached Firestore, undiscovered for days until a live bug
+  report. (Between 2026-07-08 and 2026-07-13 these entries were briefly
+  written to `HUMAN_ACTIONS.md` instead, which mixed real one-time human
+  actions with recurring test items and caused 17 stale verification
+  blocks to accumulate there unmerged — corrected back to
+  `test_humain_todo.md`, do not repeat that mistake.)
 - **FAIL — minor**: one or a few isolated, small corrections needed
   (e.g. a missing test file, a cosmetic convention miss, a single
   incorrect string) that do NOT require re-reading the full context to
@@ -112,6 +152,20 @@ it, don't reinvent.
   If editing an existing block, follow the Edit-failure fallback
   procedure if a match fails — re-read the exact block first, don't
   reconstruct it from memory.
+
+**Two-tier depth (added 2026-07-09 — the method has converged enough
+that full detail on every routine step is no longer worth the reviewer
+effort; keep it where it earns its cost):**
+- **Minimal line** — if the type is 🔒 locked in the matrix, 0
+  correction cycles, and nothing notable occurred: write only
+  `### step_XX — 🔒 [type], 0 cycle, RAS` plus the risk
+  predicted/used and model/effort. Skip the 4-point Note structure
+  below entirely.
+- **Full detail** (the structure below, unchanged) — required whenever
+  ANY of: the type is 🟡 provisional, at least 1 correction cycle
+  occurred, risk predicted diverged from risk used, or anything else
+  notable happened. When in doubt, use full detail — the minimal line
+  is the exception, not the default.
 
 **The "Note" field must follow this fixed 4-point structure**
 (added 2026-07-08 — free-form prose produced inconsistent depth across
