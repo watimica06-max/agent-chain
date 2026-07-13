@@ -24,6 +24,7 @@ The user (the Product Owner) does not code. Their only role during development i
 | `docs/tasks/step_XX/result.md` | For the detailed history of a specific step — the authoritative record, not duplicated elsewhere |
 | `docs/tasks/step_XX/` | For the current task (steps 01–35) |
 | `docs/old_v1/*` | V1 reference snapshot — consult ONLY when a task.md points to a specific section |
+| `docs/process/RISK_CLASSIFICATION_GUIDE.md` | ONLY when you need to create/scope a new task file autonomously (e.g. a prerequisite discovered mid-investigation, like `step_79_fix`) — never needed when following an already-authored task.md, which already states its own risk level |
 
 **`development_log.md` removed 2026-07-09** — it duplicated each step's own
 `result.md` (the real, authoritative source) and grew unboundedly,
@@ -152,20 +153,36 @@ Full cycle with contextual investigation directed by the manager.
 
 ---
 
-### Final phase — Stop for manual testing (all levels)
+### Final phase — PASS proceeds directly (changed 2026-07-09)
 
-Once the reviewer is PASS:
-1. Display a concise summary of what was done
-2. Display the precise, numbered list of manual tests to run on the emulator
-3. STOP and wait for the user's reply
+Once the reviewer is PASS, the step is done — no synchronous stop, no
+waiting for the user's reply. `/start` can proceed directly to the
+next pending step without interruption.
 
-### User reply
-- **"OK"** → mark the step done, the user can type `/start` for the next step
-- **"Bug: [description]"** → invoke the developer to fix (cycle targeted on the bug), then re-test
+Before marking the step done, the reviewer writes/merges
+`docs/test_humain_todo.md` (see reviewer.md for the exact merge
+procedure) with whatever manual tests this step's acceptance criteria
+require. This is what makes the deferred manual verification durable
+and trackable — not a chat-blocking gate anymore.
+
+Display a concise one-line summary of what was done and move on.
+
+### When the user later reports back on manual testing
+
+The user will periodically test a batch of items from
+`docs/test_humain_todo.md` in their own time (not per-step) and report
+back, e.g. "testé 1-5, tout OK" or "testé 3, bug: [description]":
+- **Confirmed OK** → remove that entry from `docs/test_humain_todo.md`
+  entirely (it's verified, no longer todo)
+- **Bug reported** → remove the entry, invoke the developer to fix
+  (cycle targeted on the bug, same as before), do NOT re-add the
+  original entry until the fix is re-verified
 
 ### Reviewer failure loop
-- If the reviewer returns FAIL: back to the developer with the corrections, max 3 iterations
-- Beyond 3 FAIL iterations: stop, write `blocked.md`, ask the Product Owner for help
+- If the reviewer returns FAIL: back to the developer with the
+  corrections, max 3 iterations
+- Beyond 3 FAIL iterations: stop, write `blocked.md`, ask the Product
+  Owner for help
 
 ---
 
@@ -448,7 +465,9 @@ If a spec is ambiguous or an architectural decision is not covered by the docume
 - Forget to commit after a validated step
 - Modify `TECHNICAL_CONVENTIONS.md` without explicitly flagging it to the user
 - Invent an architecture not covered by the specs
-- Continue after a PASS without displaying the manual test list
+- Continue after a PASS without writing/merging `docs/test_humain_todo.md`
+  first (changed 2026-07-09 — PASS no longer waits for a chat reply,
+  but the manual-test tracking itself is still mandatory)
 
 ---
 
