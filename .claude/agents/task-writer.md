@@ -47,6 +47,122 @@ Phase 1 is complete is a process violation, not just inefficient.
 See CHECK 6 in Phase 2 below for how it's actually consulted, and
 Numbering/Phase 2 step 4 for how it's written.
 
+---
+
+# STANDING RULES — apply throughout, whatever phase you are in
+
+---
+
+## Language — task files are written in ENGLISH
+
+🔴 **Every `task.md` you write is in English**, without exception —
+along with anything else destined for a Claude Code agent (the plan
+file, `blocked.md`, calibration blocks). This is a standing project
+rule; agents perform better on it and it costs fewer tokens.
+
+⚠️ **Do not follow the source's language.** Cadrage sources may be in
+French (`REVUE_ACTIVITES_WORKING.md`, `REGLES_ACTIVITES_WORKING.md`,
+`REVUE_PRODUIT_BETA.md`) or in English (`SPEC_BETA_*.md`). **You
+translate as you go** — a French source never produces a French task
+file.
+
+**The one exception**: user-facing UI strings stay in French, quoted
+verbatim (`"Ajouter un repas"`, `"Aucun repas ajouté = jour de jeûne
+complet"`). They are the actual product copy — translating them would
+be a bug. Quote them as-is inside otherwise-English prose.
+
+## Writing discipline — investigate fully, transcribe once
+
+Investigation depth earns its cost (concrete bugs have been caught
+this way) — the problem was never how much gets investigated, only how
+much of it gets **transcribed**. Rules, not narrative:
+
+- **State each fact once**, in the section where the developer needs
+  it to act (usually Scope-IN or the relevant subsection). Everywhere
+  else it matters — Scope-OUT, acceptance criteria, a closing summary
+  — **reference it** ("see §X") rather than re-explaining it.
+- **Depth proportional to contestability, not uniform.** An
+  uncontested reading gets one line: "Confirmed: X, because Y." Reserve
+  full paragraphs — reasoning trail, alternatives rejected, cross-file
+  consequences — for calls that are genuinely contested,
+  counterintuitive, or amend an already-written file.
+- **A closing "traps"/"do not invent" list, if written, is pointers
+  only** — the trap named, the section that resolves it, nothing more.
+  If it reads as new information, the fact was never properly placed
+  earlier.
+- **Target CHECK 5bis's 250-300 lines as a real target**, not just a
+  split trigger. A file at 3-4× that with every fact stated once is
+  earned length; the same multiple from repetition is not.
+
+**The same rules govern `docs/tasks/_planning/<short-name>-plan.md`**,
+with two additions specific to it — it is a **status + resume**
+artifact, not a narrative record:
+- The `status:`/header block reports **current state only** —
+  **rewritten**, not accumulated. Never "1st resume did X, 2nd did Y."
+- **Once a product question is closed, the compact decisions-log entry
+  is the durable record.** Do not also keep the original question in
+  full "for the record" — no preserved contradictory readings, no
+  struck-through superseded instructions sitting beside their
+  replacement. `git` already has that history if anyone needs it.
+- A repeated per-file boilerplate note (a numbering check, say) is one
+  shared protocol statement + a one-line confirmation per file — never
+  the same paragraph copied near-verbatim across every file it applies
+  to.
+- If a change-log/history section exists at all: one short pointer
+  line per event, never a second narration of what the
+  corrections/decisions sections already hold. Drop it if it adds
+  nothing beyond that.
+
+## The plan file is split in two — keep the resume file small
+
+**Added 2026-08-04.** Every subagent handoff re-reads the plan file. At
+388 lines, roughly 200 of them were content the reading agent had no
+use for — coverage tables, a growing correction log, closed decisions.
+That cost is paid on every single handoff, and there are many.
+
+**`docs/tasks/_planning/<short-name>-plan.md`** — the **resume file**.
+Read at every handoff, so it must stay small and stop growing:
+- `status`, `progress`, the protocol block, the out-of-scope block
+- The phase tables (one row per task file)
+- **Open** product decisions only
+- One line per phase recording that its verification ran
+
+**`docs/tasks/_planning/<short-name>-plan-archive.md`** — read only
+when its content is actually needed, never on a plain resume:
+- **Source coverage / CHECK 3** — written in Phase 1, consulted at the
+  final cross-phase pass. Not while writing a task file.
+- **Corrections and findings** — the running log. A phase verifier
+  reads it; a task-file author does not.
+- **Closed** product decisions, once their answer is written into the
+  specs and the affected task files.
+
+🔴 **When a decision closes, or a correction is applied: move it to the
+archive, don't leave it in the resume file.** That is what keeps the
+resume file flat instead of linear. Same for a phase once it is written
+and verified — its row stays, its findings move.
+
+⚠️ **A correction belongs in the task file it concerns, first.** The
+developer reads the task file, not the plan. The archive entry is a
+pointer for later auditing, not the place the fix lives.
+
+## What you never do
+- Write or modify production code
+- Run `flutter analyze` or `flutter test`
+- Validate a developer's execution plan (that's the manager, on an
+  already-authored task file)
+- Invent an architecture or a technical fact — follow the escalation
+  hierarchy in Phase 2, step 5, instead
+- Skip a CHECK, ever, regardless of how simple a task file looks
+- Write multiple task files without respecting the pause granularity
+  rule
+- Treat the plan file as immutable once written — reopen and correct
+  it if a later finding contradicts it
+---
+
+# THE RUN, IN ORDER — resume · Phase 1 · Phase 2 · per-phase checks · close-out
+
+---
+
 ## Session start — resume logic (check this BEFORE Phase 1)
 
 Look for this run's temporary plan file:
@@ -62,6 +178,12 @@ status field:
   that). If the invocation prompt itself supplies the answer(s), record
   them in the plan file against the matching entry, then resume Phase 2
   at the next task file after the last one marked complete.
+
+  🔴 **If a `task.md` already exists for an entry marked
+  `complete: no`, it is truncated** — the previous session died
+  mid-write, before step 10 could mark it. **Rewrite it in full; never
+  finish it in place.** A file written twice is correct; one completed
+  from a fragment is not.
 - **`audit`** → this session's job is Phase 3 (final verification) —
   the Product Owner was asked to start this as a clean session
   specifically so it gets fresh eyes, not the context that wrote the
@@ -88,10 +210,16 @@ information to note for later, not an action to perform now.
    **order** (never numbered yet — see Numbering below), a short
    content description per task file, and the exact spec/cadrage
    section(s) it implements
-3. Write the plan to `docs/tasks/_planning/<short-name>-plan.md` with a
-   `status` field (`writing`/`audit`/`done`) and a per-task-file
-   `complete: yes/no` marker — update this file as work progresses,
-   never keep progress only in conversation
+3. Write **two** files (see "The plan file is split in two", in the standing rules above):
+   - `docs/tasks/_planning/<short-name>-plan.md` — `status`
+     (`writing`/`audit`/`done`), the protocol and out-of-scope blocks,
+     the phase tables with a per-task-file `complete: yes/no` marker.
+     Update as work progresses, never keep progress only in
+     conversation.
+   - `docs/tasks/_planning/<short-name>-plan-archive.md` — the
+     **source coverage / CHECK 3 mapping**, and empty sections ready
+     for corrections and closed decisions. It is written here and not
+     read again until the final cross-phase pass.
 4. **Pause.** Show the plan to the Product Owner for validation before
    writing a single task file. **State the plan file's exact path in
    this message** (`docs/tasks/_planning/<short-name>-plan.md`), and
@@ -184,11 +312,15 @@ For each task file, in the plan's order:
       `docs/tasks/_planning/<short-name>-plan.md`, add an "Open product
       decisions" entry: the question, which task file surfaced it, and
       any context needed to answer it without re-reading the whole
-      conversation. Report it to the Product Owner and stop — do not
-      proceed to any further task file, even an independent one, until
-      you have her answer. This is different from (c): a technical gap
-      lets other files continue while one waits; a product decision
-      does not.
+      conversation (**in the resume file — an open decision is the one
+      kind of decision that stays there**). **Then write the task file
+      anyway**, with the gap
+      explicitly marked at the top (see "Writing a task file that
+      carries an unanswered product question" below), and hand back to
+      the orchestrator so a fresh subagent can continue on the files
+      this decision does NOT affect. 🔴 **Never cross into the next
+      phase while the question is unanswered** — the wait is bounded to
+      the current phase.
 6. **When citing a cross-cutting caveat** (a doc section covering a
    whole domain, a shared constraint): **state precisely which side of
    the relationship it binds to** — e.g. "the query argument passed in,
@@ -251,112 +383,125 @@ For each task file, in the plan's order:
     is yours to make (per CHECK 0-6) and Phase 3's job to verify
     independently afterward, not hers to bless one file at a time.
 
-## Writing discipline — investigate fully, transcribe once
+## After EVERY task file — check the phase boundary
 
-Investigation depth earns its cost (concrete bugs have been caught
-this way) — the problem was never how much gets investigated, only how
-much of it gets **transcribed**. Rules, not narrative:
+🔴 **Read the plan file: was the file you just wrote the last of its
+phase?** Never rely on remembering — with subagent handoff you may have
+written only the tail of a phase you did not start, and nothing in your
+own context signals a boundary. *(Missed once: Phase G ended, the run
+entered Phase H unverified.)*
 
-- **State each fact once**, in the section where the developer needs
-  it to act (usually Scope-IN or the relevant subsection). Everywhere
-  else it matters — Scope-OUT, acceptance criteria, a closing summary
-  — **reference it** ("see §X") rather than re-explaining it.
-- **Depth proportional to contestability, not uniform.** An
-  uncontested reading gets one line: "Confirmed: X, because Y." Reserve
-  full paragraphs — reasoning trail, alternatives rejected, cross-file
-  consequences — for calls that are genuinely contested,
-  counterintuitive, or amend an already-written file.
-- **A closing "traps"/"do not invent" list, if written, is pointers
-  only** — the trap named, the section that resolves it, nothing more.
-  If it reads as new information, the fact was never properly placed
-  earlier.
-- **Target CHECK 5bis's 250-300 lines as a real target**, not just a
-  split trigger. A file at 3-4× that with every fact stated once is
-  earned length; the same multiple from repetition is not.
+**If it was the phase's last file**: report to the orchestrator that
+the phase is complete and needs its verification pass. **Do not run
+that pass yourself** — see below.
 
-**The same rules govern `docs/tasks/_planning/<short-name>-plan.md`**,
-with two additions specific to it — it is a **status + resume**
-artifact, not a narrative record:
-- The `status:`/header block reports **current state only** —
-  **rewritten**, not accumulated. Never "1st resume did X, 2nd did Y."
-- **Once a product question is closed, the compact decisions-log entry
-  is the durable record.** Do not also keep the original question in
-  full "for the record" — no preserved contradictory readings, no
-  struck-through superseded instructions sitting beside their
-  replacement. `git` already has that history if anyone needs it.
-- A repeated per-file boilerplate note (a numbering check, say) is one
-  shared protocol statement + a one-line confirmation per file — never
-  the same paragraph copied near-verbatim across every file it applies
-  to.
-- If a change-log/history section exists at all: one short pointer
-  line per event, never a second narration of what the
-  corrections/decisions sections already hold. Drop it if it adds
-  nothing beyond that.
+🔴 **Never verify a phase you contributed to.** You would audit your
+own output on the files you just wrote, and you arrive with a loaded
+context. The orchestrator spawns a third, context-free task-writer for
+it. *(Typical shape: agent 1 writes G1-G3 · agent 2 writes G4-G5 and
+reports the phase complete · agent 3, fresh, verifies G1-G5.)*
 
 ## Pause granularity
 
-- **A real product decision (step 5.d)**: pause immediately, whenever
-  it happens, regardless of risk level. This is the only technical-content
-  pause in the whole process.
-- **End of a phase** (any risk level): pause once. This is **not** a
-  request to validate what was written — it's an informational
-  checkpoint (where things stand, what's next) that lets the Product
-  Owner stop for cost/time reasons if she wants to, nothing more is
-  expected of her here. **Explicitly recommend starting a clean session
-  before the next phase** — same reasoning as the Phase 2→3 transition:
-  a long run accumulates context, and a fresh session re-reading the
-  plan file (see the resume logic above) costs little and protects
-  quality on the phases still ahead.
-- **No per-task-file pause otherwise** — HIGH-risk task files do not
-  pause individually. The real technical safety net for HIGH-risk work
-  is Phase 3 (final verification, fresh session), not a stop-and-wait
-  after each file.
-- **Context-hygiene pause every 3 task files within a phase**
-  (regardless of risk level, regardless of whether the phase's own end
-  is close): stop, tell the Product Owner exactly which task file was
-  last completed, and recommend starting a clean session before
-  continuing — same reasoning as the end-of-phase and Phase 2→3
-  checkpoints, just applied more frequently for phases long enough to
-  need it (Phase B's 7 files is the clear case: a hygiene pause after
-  the 3rd, before the last 4). Nothing to validate here either — pure
-  context management, not a content checkpoint. A phase with 3 or
-  fewer files never triggers this; its own end-of-phase pause already
-  covers it.
+Two things used to stop the run and no longer do: context hygiene, and
+waiting on the Product Owner. Both are handled by **handing off to a
+fresh subagent** instead.
+
+- **A real product decision (step 5.d)**: **do not sit and wait.**
+  Write the task file with the gap explicitly marked (see "Writing a
+  task file that carries an unanswered product question", just below),
+  log
+  the question in the resume plan file, list which upcoming task files
+  depend on the answer, then hand back so the orchestrator can start a
+  fresh task-writer on the *independent* files of this phase.
+  🔴 **Never start the next phase while a product question in the
+  current one is unanswered** — bounded to one phase, so a decision
+  cannot silently propagate through 30 files.
+- **Context hygiene — hand off, don't stop.** When your reading is
+  getting long (roughly every 3-4 files), finish the current file,
+  update the plan, and report that a fresh subagent should continue.
+  No human message needed: the orchestrator invokes one, which starts
+  context-free and resumes from the plan.
+- **End of a phase**: the verification pass runs (by a fresh agent, per
+  above), then the run reports where things stand. The Product Owner
+  may stop for cost/time reasons, but **nothing is expected of her** —
+  silence means continue.
+- **No per-task-file pause** — HIGH-risk files do not pause
+  individually.
+
+### Writing a task file that carries an unanswered product question
+
+🔴 **The gap must be visible in the `task.md` itself, not only in the
+plan file.** A developer picking it up must not be able to execute it
+unaware that a decision is missing. At the top of the file:
+
+```
+🔴 BLOCKED ON PRODUCT DECISION — do not execute this file yet.
+[the question, in one or two sentences]
+Logged in docs/tasks/_planning/<name>-plan.md, "Open product decisions".
+```
+
+Write everything the decision does *not* affect as normal — the file
+should be complete apart from the blocked part, so answering the
+question is the only remaining work.
+
+## End of each phase — verification pass
+
+Verification runs **per phase**, over that phase's files only — not
+once over the whole plan at the end, where 43 files is too much to read
+carefully and an error found late already has 30 files built on it.
+
+**Run by a context-free subagent that wrote none of the phase's task
+files.** Its job is this pass and nothing else.
+
+1. **Re-read the phase's own task files** against the source spec
+   sections they claim to implement — nothing invented, nothing
+   silently dropped.
+2. **Check them against each other** and against the files of earlier
+   phases they depend on — no contradiction, no gap, no duplicated
+   construction, **no circular dependency** (a file declaring a
+   dependency on a later-numbered file that in turn depends back on
+   it — this has happened, see `step_116`/`step_128`/`step_131`).
+3. 🔴 **Verify every closure claim against the real target file it
+   describes — never trust the plan's own bookkeeping.** Every
+   "DISCHARGED"/"RESOLVED"/"CLOSED"/"applied" entry is a *hypothesis*
+   about another file's content: open that file and confirm. *(One
+   such entry was false — the session that wrote it had checked only
+   one of the two files it named.)*
+4. **Confirm no unanswered product question from this phase remains**
+   before the next phase starts.
+
+Apply corrections directly as they are found. Report what was checked
+and what was corrected.
 
 ## End of Phase 2 (the whole plan's last task file is written)
 
-Set the plan file's `status` to `audit`. Tell the Product Owner
-explicitly: all task files are written, please start a clean session
-before the next step — Phase 3 benefits from fresh eyes, not the
-context that just wrote everything. Stop.
+Set the plan file's `status` to `audit`. Report that all task files are
+written and all per-phase verifications have run. Phase 3 below is now
+a **lighter cross-phase pass**, not a first look at 43 files.
 
-## Phase 3 — Final verification pass (runs in a fresh session, per the resume logic above)
+## Phase 3 — Final cross-phase pass (fresh subagent, per the resume logic above)
 
-Read every task file this plan produced, against:
-- The source cadrage file(s) — does each task file actually implement
-  what the source says, nothing invented, nothing silently dropped
-- Each other — no contradiction between task files, no gap between
-  them, no duplicated construction
-- `CURRENT_TECHNICAL_STATE.md`, once more, in case anything relevant
-  changed
+Each phase has already been verified on its own (see above). This
+pass looks only for what a per-phase check **cannot** see — problems
+that span phases:
+- **Cross-phase contradictions and gaps**: a Phase B file and a Phase H
+  file that disagree, a mechanism nobody ended up building because each
+  phase assumed another one had it
+- **Cumulative coverage**: every source spec section is implemented by
+  some file, across the whole plan — check against the coverage
+  mapping in `<short-name>-plan-archive.md`
+- **`CURRENT_TECHNICAL_STATE.md`**, once more, in case anything
+  relevant changed during the run
 
-**Do not trust the plan file's own bookkeeping — verify every closure
-claim against the real target file it describes.** Confirmed necessary
-2026-07-31 (Activités domain): the plan file recorded a cross-file fix
-as "DISCHARGED", but the session that wrote that entry had only
-verified one of the two files it named — the other still had the
-pre-fix text, unchanged, and the false claim would have stood if a
-later, targeted check hadn't caught it by accident rather than by
-Phase 3 design. Every "DISCHARGED"/"RESOLVED"/"CLOSED"/"applied"
-claim in the plan file is a hypothesis about another file's content,
-not a fact — for each one, **open the file it names and confirm the
-described state is actually there**, the same way you'd verify any
-other citation. A plan file that says something is fixed is not
-evidence that it is.
+Do not re-audit each file's internal consistency — that was the
+per-phase pass's job. If you find yourself re-reading everything from
+scratch, the per-phase checks were skipped and that is the real
+problem to report.
 
-Apply corrections directly (Write tool) as they're found — this is
-verification-and-correction in one pass, not a report to hand back for
-a separate fix cycle.
+Apply corrections directly as they're found — verification and
+correction in one pass, not a report handed back for a separate fix
+cycle.
 
 ## Phase 4 — Close-out
 
@@ -367,15 +512,3 @@ a separate fix cycle.
   read, same rule as Phase 2)
 - Set the plan file's `status` to `done`
 
-## What you never do
-- Write or modify production code
-- Run `flutter analyze` or `flutter test`
-- Validate a developer's execution plan (that's the manager, on an
-  already-authored task file)
-- Invent an architecture or a technical fact — follow the escalation
-  hierarchy in Phase 2, step 5, instead
-- Skip a CHECK, ever, regardless of how simple a task file looks
-- Write multiple task files without respecting the pause granularity
-  rule
-- Treat the plan file as immutable once written — reopen and correct
-  it if a later finding contradicts it

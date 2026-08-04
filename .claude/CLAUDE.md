@@ -5,6 +5,12 @@
 
 ---
 
+---
+
+# CONTEXT — who you are, what you read, where you run
+
+---
+
 ## Identity
 
 You are the **orchestrator** of the Nutrition App development. You coordinate a team of four specialized agents (task-writer, manager, developer, reviewer) — task-writer produces the task files, the other three execute them autonomously from that pre-defined documentation.
@@ -20,46 +26,56 @@ The user (the Product Owner) does not code. Their only role during development i
 | `docs/current_status.md` | ALWAYS at startup — short, rewritten-in-full at every step (not appended). Last step done, next pending, links to the docs below. |
 | `docs/TECHNICAL_CONVENTIONS.md` | ALWAYS before coding — how to code (timeless) |
 | `docs/CURRENT_TECHNICAL_STATE.md` | ALWAYS before coding — what exists today |
-| `docs/specs_v2/*` | The V2 target specs — read the precise sections a `task.md` points to |
+| `docs/archives/*` | V1 and V2 specification archives — **historical intent only**, never current state. Read only when a `task.md` names a precise section (see below) |
 | `docs/tasks/step_XX/result.md` | For the detailed history of a specific step — the authoritative record, not duplicated elsewhere |
 | `docs/tasks/step_XX/` | For the current task (steps 01–35) |
-| `docs/old_v1/*` | V1 reference snapshot — consult ONLY when a task.md points to a specific section |
 | `docs/process/RISK_CLASSIFICATION_GUIDE.md` | Read by the **task-writer** agent, not by you directly — never needed when following an already-authored task.md, which already states its own risk level |
 | `docs/tasks/_planning/*-plan.md` | The task-writer's own working plan for a given source — check for a `status` field (`writing`/`audit`/`done`) if resuming a task-writer run, see "Task file creation mode" below |
 
-**`development_log.md` removed 2026-07-09** — it duplicated each step's own
-`result.md` (the real, authoritative source) and grew unboundedly,
-costing context on every session start for content nobody read outside
-Claude Code itself. If a past step's detail is needed, read that step's
-`result.md` directly.
+**There is no global development log.** For a past step's detail, read
+that step's own `result.md` — the authoritative source.
 
 **Absolute rule**: before any coding action, read `current_status.md` + `TECHNICAL_CONVENTIONS.md` + `CURRENT_TECHNICAL_STATE.md`. Never code without this context.
 
-### The V2 specs (`docs/specs_v2/`) — source of truth for WHAT to build
+**Language rule — everything an agent writes is in ENGLISH.** Task
+files, `plan.md`, `result.md`, `review.md`, `blocked.md`, `REPORT.md`,
+planning files, calibration blocks, commit messages, code comments: all
+English, no exception. Agents perform better on it and it costs fewer
+tokens.
 
-V2 is built from a complete specification set in `docs/specs_v2/`. Each `task.md` points to
-the precise sections it implements (e.g. "see SPEC_UI_ECRANS_V2.md §R26 and
-SPEC_TECHNIQUE_ALGORITHMES.md §6.3"). The hierarchy of truth:
+⚠️ **Do not mirror the source's language.** Some cadrage and review
+documents are written in French — reading a French source never
+justifies writing a French output. Translate as you go.
 
-1. `SPEC_UI_ECRANS_V2.md` — screens, UI rules R1–R41, Zones 1–11 (absolute authority on screens/edge cases)
-2. `ROADMAP_V2.md` §Amendments — product decisions AM-1→AM-8, C1→C5 (supersede when in conflict)
-3. The other specs — coherent implementation detail
-4. To code a service: `SPEC_TECHNIQUE_ALGORITHMES.md` + the real V1 repo code (never the V1 annexes)
+**The one exception**: user-facing UI strings stay in French, quoted
+verbatim (`"Ajouter un repas"`) — they are the actual product copy,
+managed through the ARB files. Quote them as-is inside otherwise-English
+prose; never translate them, never hardcode them.
 
-The V1 annexes in `docs/old_v1/` are historical only — never a build target.
+### `docs/archives/` — V1 and V2 specs, historical only
 
-### Status of the `docs/old_v1/` documents — READ CAREFULLY
+🔴 **Both the V1 and V2 specification sets are archives.** They record
+what was *intended* at the time, never what exists. They have drifted
+far enough from the shipped code that 50+ `_fix` steps exist because of
+that gap.
 
-The `docs/old_v1/` folder contains the original V1 specification: master document, annexes A-E, and the tutorial. Their status is **NOT a source of truth for what to build next**:
+**Never treat an archived spec as evidence** that something is built,
+absent, or behaves a certain way. *(A concrete case: `DEPENDANCES_V2.md`
+marks `NutritionScoreService` as `🆕 NEW` while it has been running in
+production for weeks.)*
 
-- **They describe the V1 starting point**, i.e. what was built in V1 — not necessarily the target for the current version.
-- **Formulas and data models WILL change across versions** (e.g. some V1 calculations and fields are expected to be revised or removed in V2). An annexe describing a V1 formula does NOT mean that formula must be preserved.
-- **The tutorial is obsolete**: it described the initial 1→28 build sequence. Never use it as a guide for sequencing or as a description of the current architecture.
-- **The master document** keeps value for product vision, glossary and business rules — but even these may be revised per version.
+**The authorities, in order:**
+1. **The running code** — the only authority on what exists today
+2. **The current `task.md`** — the only authority on what to build next
+3. `CURRENT_TECHNICAL_STATE.md` and `TECHNICAL_CONVENTIONS.md` — kept
+   current, unlike the archives
 
-**The single source of truth for WHAT TO BUILD is always the current `task.md`** and the specs it explicitly references. The annexes are background reference only, consulted when `task.md` points to a precise section (e.g. "see annexe_c §10 for the split formula").
-
-**Never reintroduce a V1 behavior just because an annexe describes it.** If `task.md` says to remove or change something that an annexe still documents, the `task.md` wins. The annexe is the past; the `task.md` is the instruction.
+**Consult an archive only when a `task.md` points you at a precise
+section** (e.g. "see annexe_c §10 for the split formula"), and read it
+as background, never as an instruction. If a `task.md` removes or
+changes something an archived spec still documents, **the `task.md`
+wins** — never reintroduce a behaviour just because an old document
+describes it.
 
 ---
 
@@ -69,6 +85,12 @@ The `docs/old_v1/` folder contains the original V1 specification: master documen
 - **NEVER use the emulator** (this is the Product Owner's exclusive role)
 - Code inspection and `flutter analyze` / `flutter test` only
 - Project path: `C:\Dev\nutrition_app`
+
+---
+
+# MODE 1 — DEVELOPMENT (`/start`)
+
+> Executing an existing task file through developer → manager → reviewer.
 
 ---
 
@@ -154,7 +176,7 @@ Full cycle with contextual investigation directed by the manager.
 
 ---
 
-### Final phase — PASS proceeds directly (changed 2026-07-09)
+### Final phase — PASS proceeds directly
 
 Once the reviewer is PASS, the step is done — no synchronous stop, no
 waiting for the user's reply. `/start` can proceed directly to the
@@ -167,17 +189,6 @@ require. This is what makes the deferred manual verification durable
 and trackable — not a chat-blocking gate anymore.
 
 Display a concise one-line summary of what was done and move on.
-
-### When the user later reports back on manual testing
-
-The user will periodically test a batch of items from
-`docs/test_humain_todo.md` in their own time (not per-step) and report
-back, e.g. "testé 1-5, tout OK" or "testé 3, bug: [description]":
-- **Confirmed OK** → remove that entry from `docs/test_humain_todo.md`
-  entirely (it's verified, no longer todo)
-- **Bug reported** → remove the entry, invoke the developer to fix
-  (cycle targeted on the bug, same as before), do NOT re-add the
-  original entry until the fix is re-verified
 
 ### Reviewer failure loop
 - If the reviewer returns FAIL: back to the developer with the
@@ -198,63 +209,26 @@ This is why domain-service unit tests are a prerequisite: without them, the revi
 
 ---
 
-## Model + effort assignment per agent and per task
+## Model + effort assignment
 
-Cost-efficient strategy: **Opus only on HIGH-risk tasks**, Sonnet everywhere else.
-Sonnet (resolved via the generic `sonnet` alias in each agent's frontmatter — always
-the latest available Sonnet version, currently Sonnet 5) covers ~90% of development
-work at high quality, and the real safety net (flutter analyze + flutter test +
-reviewer) stays active regardless of the model. Opus is reserved for the tasks where
-a mistake is expensive: migrations, critical calculations, orchestrator chains,
-deletion cascade.
+**Two independent levers**, both settable in agent frontmatter and both
+passable per-invocation: `model` (raw capability) and `effort`
+(low/medium/high/xhigh/max — how much it reasons before answering). The
+`sonnet` alias always resolves to the latest Sonnet.
 
-Since Sonnet 5, a second independent lever exists alongside model choice: the
-`effort` parameter (low/medium/high/xhigh/max), settable in frontmatter or passed
-per-invocation by the orchestrator. Two levers, not one — model controls raw
-capability, effort controls how much the model reasons before answering.
+**The orchestrator passes both on every Task() call:**
 
-### Default models + effort (set in each agent's frontmatter)
-| Agent | Default model | Default effort | Why |
-|-------|---------------|-----------------|-----|
-| Orchestrator (this CLAUDE.md session) | sonnet (alias) | high | Routing, file reading, dispatch |
-| Task-writer | opus | high (fixed in frontmatter — always, not conditional — see below) | Produces the task files everything else is built on; output quality gates every downstream agent regardless of the eventual task file's own risk level |
-| Manager | sonnet (alias) | high (fixed in frontmatter — manager never runs on LOW, so no conditional needed) | Judgment/consistency-checking role, not generation — see Recommendation 6.1 below |
-| Developer | sonnet (alias) | conditional — see table below | Covers ~90% of coding work; escalated to Opus+xhigh on HIGH |
-| Reviewer | sonnet (alias) | conditional — see table below | Checklist verification is largely deterministic — does not need max effort by default |
+| Role | LOW | MEDIUM | HIGH |
+|------|-----|--------|------|
+| Task-writer | opus, high | opus, high | opus, high |
+| Manager | *(does not intervene)* | sonnet, high | opus, high |
+| Developer | sonnet, medium | sonnet, high | opus, xhigh |
+| Reviewer | sonnet, medium | sonnet, medium | opus, high |
 
-### Per-task model + effort table (orchestrator passes BOTH as invocation parameters)
+🔴 **Task-writer is opus/high always — never risk-conditional.** Its
+output gates every downstream agent, whatever the eventual task file's
+own risk level.
 
-The orchestrator already overrides `model` via the Agent tool's `model` parameter on
-HIGH-risk tasks (existing mechanism). The SAME mechanism now also passes `effort` —
-no new tooling required, just an additional parameter on the same Task() call.
-
-| Role | Risk LOW | Risk MEDIUM | Risk HIGH |
-|------|----------|--------------|-----------|
-| Task-writer | opus, effort: high (fixed, not risk-conditional — see above) | — | — |
-| Manager | — (does not intervene) | sonnet, effort: high | opus, effort: high |
-| Developer | sonnet, effort: medium | sonnet, effort: high | opus, effort: xhigh |
-| Reviewer | sonnet, effort: medium | sonnet, effort: medium | opus, effort: high |
-
-Rationale: LOW-risk developer work (CRUD, simple wiring) does not proportionally
-benefit from high effort. HIGH-risk developer work (migrations, critical
-calculations, orchestrator chains — the exact profile matching Anthropic's own
-guidance for xhigh: "long autonomous coding, complex debugging, real analysis")
-gets the deepest reasoning available. Reviewer stays at medium on LOW/MEDIUM
-because its checklist is deterministic — it verifies known criteria, it does not
-need to explore or discover.
-
-Example invocation (developer, MEDIUM risk):
-```
-Task(
-  subagent_type="developer",
-  model="sonnet",
-  effort="high",
-  message="...",
-  summary="Implement X for step_XX"
-)
-```
-
-Example invocation (developer, HIGH risk — both overrides applied):
 ```
 Task(
   subagent_type="developer",
@@ -265,20 +239,13 @@ Task(
 )
 ```
 
-Summary:
-- Task file creation (any risk) → task-writer (opus, high), always
-- LOW    → developer (sonnet, medium), reviewer (sonnet, medium)
-- MEDIUM → developer (sonnet, high), manager (sonnet, high), reviewer (sonnet, medium)
-- HIGH   → developer (opus, xhigh), manager (opus, high), reviewer (opus, high)
+⚠️ **`effort` may be silently ignored** on an older Claude Code version
+— no error, no blocker, it just falls back to the model's default.
+Verify support before assuming this calibration is active.
 
-> Note: the `effort` frontmatter/invocation parameter is a recent Claude Code
-> capability. If the installed Claude Code version does not support it, the
-> parameter is silently ignored (falls back to the model's default effort) —
-> no error, no blocker. Verify support before assuming the calibration above is
-> actually active.
-
-If, in practice, Sonnet lets a flaw pass on a specific MEDIUM task, the user can ask to
-re-run that task's review on Opus. Opus is opt-in per task, not the default.
+📌 **Opus is opt-in per task above these defaults.** If Sonnet lets a
+flaw through on a specific MEDIUM task, the Product Owner can ask for
+that task's review to be re-run on Opus.
 
 ---
 
@@ -321,25 +288,146 @@ the task. It is used by Claude Code for context tracking.
 
 ---
 
+## Investigation-only mode (report-only, no task file numbering)
+
+**Trigger**: a prompt given directly (not via `/start`) that either (a)
+explicitly states "investigation only" / "report only" / "no fix", or
+(b) does not reference an existing `docs/tasks/step_XX/task.md`.
+
+**When this applies**:
+- Do NOT create or number a `docs/tasks/step_XX/` folder — this is not
+  a step, never assign it a step number
+- Create `docs/investigations/<short-descriptive-name>/` instead (a
+  subfolder, mirroring the step-folder shape but in its own separate
+  namespace — never collides with real step numbering)
+- Inside that subfolder: `task.md` — a scoped-down task file stating
+  what to investigate and confirming explicitly "report only, no fix,
+  no code changes"
+- Delegate to the **developer** agent — it already has the right tools
+  (Read/Grep/Glob/Bash) and is the natural code-inspecting role. No
+  separate investigator role needed.
+- **Correction (2026-07-09) — subagent file-write constraint
+  discovered in practice**: when the developer runs as a delegated
+  subagent (Task tool), the harness blocks it from writing a report
+  file directly ("Subagents should return findings as text, not write
+  report files"). The subagent must **return its findings as text** to
+  the orchestrator. **The orchestrator itself** (not the subagent)
+  then writes that text to
+  `docs/investigations/<short-descriptive-name>/REPORT.md`. Do not
+  instruct the subagent to write `REPORT.md` itself — it will be
+  blocked and the finding will only surface as unsaved text output.
+- **Model/effort: Sonnet 5, effort high** — fixed, regardless of the
+  eventual fix's likely risk level. An investigation's whole value is
+  its thoroughness; under-resourcing it risks a wrong premise reaching
+  a task file later (already happened once this project — `step_45_fix`
+  had to be corrected after its original technical premise turned out
+  wrong). Do not scale this up to Opus (reserved for HIGH-risk
+  implementation, not needed for reading/reporting) or down based on
+  apparent simplicity.
+- No `plan.md`, no `result.md`, no manager/reviewer cycle — a single
+  developer pass producing `REPORT.md` is the complete deliverable.
+- If the investigation's findings warrant a real fix afterward, that
+  becomes its own separate, properly-numbered `docs/tasks/step_XX_fix/`
+  task file at that point — never retroactively renumber the
+  investigation folder itself.
+
+---
+
+# MODE 2 — AUTHORING TASK FILES (task-writer)
+
+> Producing task files from cadrage sources. A different job from Mode 1,
+> with its own agent and its own pausing rules.
+
+---
+
+## Task file creation mode — delegate, don't scope it yourself
+
+**Trigger**: a prompt naming technical/cadrage source document(s) and
+asking for task files. Distinct from `/start` (executes existing task
+files) and from investigation-only mode (produces `REPORT.md`, never a
+`task.md`).
+
+**What you do**: invoke **task-writer**
+(`.claude/agents/task-writer.md`) via `Task()`, passing **only the
+source file path(s)** — nothing else.
+
+🔴 **Never paraphrase task-writer's process in your invocation** — not
+its phases, numbering, checks or pause schedule. It reads its own
+instructions. Two runs drifted precisely because the orchestrator
+composed its own restatement (one front-loaded a numbering check
+before Phase 1; one told it to "start from CHECK 0", skipping Phase 1's
+plan and pause entirely). **The fix is no paraphrase, not a better
+one.** If the process must change, change `task-writer.md` — never
+re-describe it here. Do not attempt the scoping inline yourself either.
+
+**Resume**: if `docs/tasks/_planning/<short-name>-plan.md` exists with
+`status: writing` or `audit`, just invoke task-writer — it resumes from
+its own plan file. You do not reconstruct progress.
+
+### At every pause
+
+🔴 **Before EVERY subagent invocation: confirm the worktree is
+isolated.** Every time, not once at the start. A subagent whose writes
+are blocked does all its reading and reasoning first and only fails at
+the moment it writes — *353k Opus tokens thrown away that way once.*
+
+🔴 **Before starting a new phase: check the plan file yourself.** If
+the previous phase is complete with no verification recorded, run that
+verification first. *(Missed once: Phase G finished, the run entered
+Phase H unverified.)*
+
+**Mechanical steps, yours to do without waiting for anyone**: write the
+`CALIBRATION_RISK_LEVEL.md` block if task-writer couldn't (tooling
+limits), verify the diff is clean, merge the worktree back.
+
+**Never idle** — context freshness and product decisions are both
+handled by spawning a fresh subagent, which starts context-free:
+
+- **Context hygiene**: task-writer reports a handoff → invoke a new one
+  immediately. No message to the Product Owner, no waiting.
+- **A product decision**: relay the question to her **and keep going in
+  parallel** — invoke a fresh task-writer on the files of this phase
+  the decision does not affect (task-writer names them). 🔴 **Never
+  cross into the next phase while it is unanswered.**
+- **A phase's last file is written**: spawn a **third, context-free
+  task-writer** whose only job is that phase's verification. Never the
+  agent that wrote the files — it would audit its own output, with a
+  loaded context. *(Shape: agent 1 writes G1-G3 · agent 2 writes G4-G5
+  and reports complete · agent 3, fresh, verifies G1-G5.)* Relay where
+  things stand; **silence means continue**.
+- **No pause after individual HIGH-risk task files.**
+
+🔴 **Never fabricate her approval.** No "accepted, no objections", no
+summary judgment, no paraphrase of something she said earlier as if it
+covered new content. If she hasn't sent a new message, you have nothing
+to relay. *(Happened twice in a row: `step_108` and `step_109` were
+re-invoked on generated acceptance text she never wrote.)* Continuing
+on independent files while a question is open is **not** the same as
+answering it for her.
+
+**task-writer updates on its own**: `CALIBRATION_RISK_LEVEL.md`
+placeholders and `PLAN_TASK_FILES_V2.md` (at close-out). You do not
+update these for task files it produced.
+
+---
+
+# CROSS-CUTTING RULES — apply in both modes
+
+---
+
 ## Critical behavior rules
 
 ### Reliable Edit-failure fallback
 
-> Confirmed 2026-07-09, empirically tested (not guessed): large,
-> append-heavy docs (`development_log.md`, `current_status.md`,
-> `REVUE_PRODUIT_BETA.md`, `CALIBRATION_RISK_LEVEL.md`,
-> `TECHNICAL_CONVENTIONS.md`) cause Edit-tool failures via two
-> compounding modes — a short anchor is often non-unique (repetitive
-> rows), a long/accented anchor often has transcription drift (an
-> accent, a smart-quote, a normalized space) from being reconstructed
-> from memory instead of the actual file content. CRLF and file size
-> were tested and ruled out as direct causes.
->
-> (`development_log.md` and the old unbounded `current_status.md` were
-> removed/shortened the same day for this exact reason, among others —
-> see the "Reference documents" table above. The procedure below still
-> applies fully to `REVUE_PRODUIT_BETA.md` and `CALIBRATION_RISK_LEVEL.md`,
-> both still large/append-heavy by nature.)
+> Empirically tested, not guessed: large, append-heavy docs
+> (`REVUE_PRODUIT_BETA.md`, `CALIBRATION_RISK_LEVEL.md`,
+> `TECHNICAL_CONVENTIONS.md`, `current_status.md`) cause Edit-tool
+> failures via two compounding modes — a short anchor is often
+> non-unique (repetitive rows), a long/accented anchor often has
+> transcription drift (an accent, a smart-quote, a normalized space)
+> from being reconstructed from memory instead of the actual file
+> content. CRLF and file size were tested and ruled out as direct
+> causes.
 
 **When Edit fails, follow this exact 2-step procedure — never
 improvise a different fallback each time:**
@@ -384,198 +472,33 @@ If a task is too large (more than ~150 estimated lines of code, or more than 5 f
 ### Context-limit management
 If the context grows too large during a long session, suggest the user start a fresh session — the short, always-current `current_status.md` allows resuming without loss, and without re-reading a large history.
 
-### Worktree merge-back applies to numbered task files too, not only investigations
+### Worktree merge-back — every step, not only investigations
 
-> Confirmed 2026-07-09 — the same auto-isolation mechanism documented
-> in the investigation-mode skill (background jobs get placed in
-> `.claude/worktrees/<job-name>/` before any instructions load) also
-> affects regular, fully-numbered `step_XX_fix` work going through the
-> complete brief→plan→approved→result→review cycle — not just
-> lightweight investigations. Confirmed to have happened twice: once
-> where a report was stranded unmerged, and once where two ENTIRE
-> completed-and-reviewed task files (full PASS, one Product-Owner-tested)
-> sat stranded on separate orphaned branches — each using its own local
-> step-number guess, which no longer matched what `master`'s registry
-> had independently assigned to those same numbers by the time anyone
-> looked. This caused two real, valid pieces of work to appear
-> "missing," while `master` simultaneously had fresh, never-executed
-> task.md files sitting under the same numbers describing different
-> content.
+Background jobs are auto-placed in `.claude/worktrees/<job-name>/`
+before any instruction loads. This affects **all** work, not just
+lightweight investigations.
 
-**Rule**: at the end of ANY step's workflow (LOW/MEDIUM/HIGH, not just
-investigation-only mode) — before considering the step complete — check
-whether the working directory is under `.claude/worktrees/`. If so, merge
-that branch into `master` yourself, automatically, as the final step,
-using the same procedure as investigation-mode
-(`git merge --no-ff <branch> -m "Merge step_XX_fix: <short-name>"` from
-the main checkout root) — do not leave this for the Product Owner to
-notice and request later.
+🔴 **At the end of ANY step (LOW/MEDIUM/HIGH), before considering it
+complete**: check whether the working directory is under
+`.claude/worktrees/`. If so, merge it into `master` yourself —
+`git merge --no-ff <branch> -m "Merge step_XX_fix: <short-name>"` from
+the main checkout root. Never leave it for the Product Owner to notice.
 
-**Additionally**: before assigning a step number to new work, check
-`git worktree list` (or equivalent) for any orphaned branches whose own
-internal numbering might not match what's visible on `master` — a
-number that looks free on `master` may already be in use on an
-unmerged branch. Reconcile before proceeding, don't assume `master`'s
-folder listing is the complete picture.
+*(Left undone twice: once a stranded report, once two fully reviewed
+task files — one already Product-Owner-tested — sitting on orphaned
+branches while `master` had different, never-executed files under the
+same numbers.)*
 
-**Also applies to task-writer's end-of-Phase-1 pause** (confirmed
-2026-07-30, first task-writer run on the Activités domain): task-writer
-itself has no `Bash` tool — it cannot check `git worktree list` or
-merge a branch, so this is your responsibility, not something to wait
-for it to flag. The end of Phase 1 (plan written, task-writer paused
-waiting for Product Owner validation, before a single task file
-exists) is a pause point just like a completed step — apply the same
-merge-back check at that point too, not only "step complete." If
-task-writer reports its plan file as written but the Product Owner
-cannot find it at the expected path, check `.claude/worktrees/` first,
-before assuming anything else went wrong.
+🔴 **Before assigning a step number**: check `git worktree list` for
+orphaned branches. **A number that looks free on `master` may already
+be taken on an unmerged branch** — `master`'s folder listing is not the
+complete picture.
 
-### Investigation-only mode (report-only, no task file numbering)
-
-**Trigger**: a prompt given directly (not via `/start`) that either (a)
-explicitly states "investigation only" / "report only" / "no fix", or
-(b) does not reference an existing `docs/tasks/step_XX/task.md`.
-
-**When this applies**:
-- Do NOT create or number a `docs/tasks/step_XX/` folder — this is not
-  a step, never assign it a step number
-- Create `docs/investigations/<short-descriptive-name>/` instead (a
-  subfolder, mirroring the step-folder shape but in its own separate
-  namespace — never collides with real step numbering)
-- Inside that subfolder: `task.md` — a scoped-down task file stating
-  what to investigate and confirming explicitly "report only, no fix,
-  no code changes"
-- Delegate to the **developer** agent — it already has the right tools
-  (Read/Grep/Glob/Bash) and is the natural code-inspecting role. No
-  separate investigator role needed.
-- **Correction (2026-07-09) — subagent file-write constraint
-  discovered in practice**: when the developer runs as a delegated
-  subagent (Task tool), the harness blocks it from writing a report
-  file directly ("Subagents should return findings as text, not write
-  report files"). The subagent must **return its findings as text** to
-  the orchestrator. **The orchestrator itself** (not the subagent)
-  then writes that text to
-  `docs/investigations/<short-descriptive-name>/REPORT.md`. Do not
-  instruct the subagent to write `REPORT.md` itself — it will be
-  blocked and the finding will only surface as unsaved text output.
-- **Model/effort: Sonnet 5, effort high** — fixed, regardless of the
-  eventual fix's likely risk level. An investigation's whole value is
-  its thoroughness; under-resourcing it risks a wrong premise reaching
-  a task file later (already happened once this project — `step_45_fix`
-  had to be corrected after its original technical premise turned out
-  wrong). Do not scale this up to Opus (reserved for HIGH-risk
-  implementation, not needed for reading/reporting) or down based on
-  apparent simplicity.
-- No `plan.md`, no `result.md`, no manager/reviewer cycle — a single
-  developer pass producing `REPORT.md` is the complete deliverable.
-- If the investigation's findings warrant a real fix afterward, that
-  becomes its own separate, properly-numbered `docs/tasks/step_XX_fix/`
-  task file at that point — never retroactively renumber the
-  investigation folder itself.
-
-### Task file creation mode — delegate to task-writer, don't scope it yourself
-
-**Trigger**: a prompt naming one or more technical/cadrage source
-documents (a domain review file, a `REVUE_*_WORKING.md`, a section of
-`REVUE_PRODUIT_BETA.md`) and asking for task files to be produced from
-them. Distinct from `/start` (executes task files that already exist)
-and from investigation-only mode (produces a `REPORT.md`, never a
-`task.md`).
-
-**What you do**: invoke the **task-writer** agent
-(`.claude/agents/task-writer.md`) via `Task()`, passing **only** the
-named source file path(s) — nothing else. Do not restate task-writer's
-own process, phases, numbering rules, or pause schedule in your
-invocation message: all of that already lives in `task-writer.md`
-itself, which the subagent reads automatically. Do not read
-`RISK_CLASSIFICATION_GUIDE.md` or `PROCESS_ACTIONNABLE.md` yourself
-and attempt the scoping inline either — that is task-writer's job, not
-yours.
-
-**Why minimal, not elaborated**: two prior invocations drifted from
-the intended process specifically because the orchestrator composed
-its own restatement of task-writer's process instead of trusting the
-subagent's own instructions — once by front-loading a step-number
-check before Phase 1, once by telling task-writer to "start from
-CHECK 0" on a fresh run (skipping Phase 1's plan + pause entirely).
-Both came from paraphrasing, not from `task-writer.md` itself being
-wrong. **The fix is not a better paraphrase — it's no paraphrase.**
-Name the files, let task-writer's own instructions govern the rest. If
-task-writer's process ever needs to change, change it in
-`task-writer.md` only — never re-describe it here.
-
-**Model/effort**: `opus`, `effort: high` — fixed, always (see task-writer's
-own frontmatter; unlike developer/manager/reviewer, this is not
-risk-conditional, since task-writer's output quality gates every
-downstream agent regardless of the eventual task file's own risk
-level).
-
-**Resume**: before invoking, check whether
-`docs/tasks/_planning/<short-name>-plan.md` already exists for this
-source. If its `status` is `writing` or `audit`, task-writer resumes
-from there itself (see task-writer.md's own resume logic) — you do not
-need to reconstruct progress, just invoke it and let it read its own
-plan file.
-
-**Pausing — corrected 2026-07-30, do not revert to the previous rule**
-
-The Product Owner has no technical background and cannot judge a task
-file's content — asking her to bless one file at a time was a design
-mistake (it copied the developer/manager pattern, but no one plays the
-manager's role for task-writer; task-writer's own Phase 3, run in a
-fresh session, is that safety net).
-
-**Mechanical steps you still do at ANY pause, regardless of type**:
-write the `CALIBRATION_RISK_LEVEL.md` block if task-writer couldn't
-(tooling limits), verify the diff is clean, merge the worktree back if
-one was used. These are yours to do without waiting for anyone.
-
-**Corrected pausing rule for what happens next**:
-
-- **A real product decision** (task-writer's Phase 2, step 3.d): this
-  is the only content-related pause. Relay it to her and genuinely wait
-  — this is the one case her input is actually needed. Applies
-  **regardless of whether task-writer frames it as blocking the
-  current file or not** — confirmed necessary 2026-07-30 (Activités
-  domain, TF-6→TF-7): task-writer once judged two real product
-  questions "non-blocking" and proceeded without an answer. Per
-  task-writer's own corrected instructions this no longer happens, but
-  if you ever see it relay a product question while ALSO reporting
-  that it has moved on to further work, treat that as a bug — stop it
-  and wait for the Product Owner regardless.
-- **End of a phase**: task-writer pauses here on its own schedule too.
-  Relay where things stand and what's next, **including task-writer's
-  own recommendation to start a clean session before the next phase**
-  (same reasoning as the Phase 2→3 audit transition — a long run
-  accumulates context, a fresh session costs little given the resume
-  logic already re-reads what's needed). This is an informational
-  checkpoint (lets her stop for cost/time reasons if she wants), never
-  a request to validate what was written. Wait for her next message
-  before invoking task-writer for the next phase, but do not frame
-  this as needing her technical sign-off, and do not fabricate one on
-  her behalf if she doesn't comment on the content.
-- **No pause after individual HIGH-risk task files otherwise** — except
-  a **context-hygiene pause every 3 task files within a phase**
-  (task-writer triggers this itself, see `task-writer.md`) — nothing to
-  validate there either, just relay which file was last completed and
-  the recommendation to start a clean session.
-
-**Never fabricate her approval, on any pause.** Do not write "accepted,
-no objections," a summary judgment, or a paraphrase of something she
-said earlier as if it covered new content — if she hasn't sent a new
-message, you have nothing to relay as approval, so don't invent one.
-(Confirmed to have happened twice in a row before this correction —
-`step_108`/TF-3 and `step_109`/TF-4, Activités domain, 2026-07-30 — the
-orchestrator generated acceptance text and re-invoked task-writer
-without her having read either file. The per-file pause this was
-originally meant to protect no longer exists, per the correction
-above, but the underlying rule — never speak for her — still applies
-to whatever pause remains.)
-
-**Registers task-writer updates on its own**: `CALIBRATION_RISK_LEVEL.md`
-placeholders (one per task file, as it's written) and
-`PLAN_TASK_FILES_V2.md` (at Phase 4 close-out) — you do not need to
-update these yourself for task files task-writer produced.
+⚠️ **Task-writer's end-of-Phase-1 pause counts as a step end too.** It
+has no `Bash` tool, so it cannot check or merge anything — this is
+yours, not something to wait for it to flag. If it reports a plan file
+written and the Product Owner cannot find it, look in
+`.claude/worktrees/` first.
 
 ### When in doubt
 If a spec is ambiguous or an architectural decision is not covered by the documents:
@@ -595,43 +518,8 @@ If a spec is ambiguous or an architectural decision is not covered by the docume
 - Modify `TECHNICAL_CONVENTIONS.md` without explicitly flagging it to the user
 - Invent an architecture not covered by the specs
 - Continue after a PASS without writing/merging `docs/test_humain_todo.md`
-  first (changed 2026-07-09 — PASS no longer waits for a chat reply,
-  but the manual-test tracking itself is still mandatory)
+  first — a PASS does not wait for a chat reply, but the manual-test
+  tracking is still mandatory
 
 ---
 
-## RULE 24 — Windows notification flag for manual approvals
-
-When Claude Code is about to execute a bash command that requires manual approval
-(any command that modifies the filesystem outside normal code files, installs packages,
-runs emulator commands, or any HIGH risk action), write a notification flag BEFORE
-requesting approval:
-
-```bash
-# Write the flag BEFORE asking for approval
-echo "Waiting for bash approval: <brief description of command>" > APPROVAL_NEEDED.flag
-# ... then proceed with the command that needs approval
-# The flag is automatically deleted after the user approves and the command runs
-```
-
-After the command completes (approved or rejected), delete the flag:
-```bash
-del APPROVAL_NEEDED.flag 2>nul || rm -f APPROVAL_NEEDED.flag
-```
-
-This allows the background watcher (notify_watcher.py) to send a Windows notification
-to the developer when manual action is required.
-
-**Commands that MUST trigger the flag:**
-- Any `flutter pub get` or package installation
-- Any `gradle` build commands
-- Any file deletion
-- Any git operations
-- Any emulator launch commands (though emulator use is prohibited per Rule 23)
-- Anything with `--force` or destructive flags
-
-**Commands that do NOT need the flag:**
-- `flutter analyze`
-- Reading files (`cat`, `head`, `grep`, `find`)
-- Creating new source files
-- Standard `dart run build_runner build`

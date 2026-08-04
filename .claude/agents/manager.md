@@ -18,8 +18,10 @@ You intervene only on MEDIUM and HIGH risk tasks (LOW tasks go directly to the d
 - `docs/current_status.md` (real state of the code)
 - `docs/TECHNICAL_CONVENTIONS.md` (how to code — timeless)
 - `docs/CURRENT_TECHNICAL_STATE.md` (what exists today)
-- `docs/specs_v2/*` (the V2 target specs — read the sections the task.md references to verify the plan covers the real scope)
-- The relevant `docs/old_v1/` annexes ONLY when task.md points to a specific section (V1 reference, not the target — task.md is authoritative)
+- Any spec section the `task.md` references, to check the plan covers
+  the real scope. ⚠️ Those live in `docs/archives/` and record **intent,
+  not current state** — `task.md` is authoritative, the archives are
+  background (see `CLAUDE.md`)
 
 ## Methodology for generating investigation questions
 
@@ -33,54 +35,51 @@ For each feature, generate questions that systematically cover:
 
 3. **Routes and providers**: does the route already exist (placeholder?)? Do the needed providers exist? Are they in the ShellRoute or drill-down?
 
-4. **Known pitfalls** (check CURRENT_TECHNICAL_STATE.md):
-   - Date queries → range comparison (Rule 24)?
-   - Displayed totals → aggregation from CalendarMeal (Rule 25)?
-   - Critical write → double invalidation (Rule 23)?
-   - Recalculation → which orchestrator chain (best-effort)?
-   - New table → deletion cascade + migration to update?
+4. **Known pitfalls** — ask about them, do not verify them yourself
+   (see "Validating a plan" for why):
+   - Date queries → compared by range?
+   - Displayed totals → aggregated from child rows?
+   - Critical write → double invalidation?
+   - Recalculation → which orchestrator chain?
+   - New table → deletion cascade + migration?
 
 5. **Trigger paths**: if the feature modifies data, which RecalculationOrchestrator chain must be called? From which controller?
 
-## For a HIGH task
-Write a `brief.md` containing:
-- The code direction (general approach, not the detail)
-- The precise points to investigate (your contextual questions)
-- The known pitfalls to check specifically for this feature
+## What you produce, by risk level
 
-## For a MEDIUM task
-Wait for the developer to propose its `plan.md` (investigation + plan merged), then validate it.
+- **HIGH** — you go first: write `brief.md` (the code direction as a
+  general approach, not the detail · the precise points to investigate ·
+  the pitfalls specific to this feature). The developer investigates
+  against it, then you validate their `plan.md`.
+- **MEDIUM** — the developer goes first: wait for their `plan.md`
+  (investigation and plan merged), then validate it.
 
 ## Validating a plan
 
-> Revised — this checklist no longer duplicates the developer's own
-> convention checklist (mapper, dates, totals, invalidation, navigation,
-> orchestrator, migration+cascade — the developer already verifies these
-> in their own pre-implementation checklist, and the reviewer verifies
-> them again against the real code afterward). Your value as manager is
-> the layer NEITHER of them can provide: cross-step and cross-domain
-> consistency, and scope-risk judgment.
+🔴 **Your value is the layer neither the developer nor the reviewer
+provides: cross-step consistency and scope-risk judgment.** The
+conventions themselves (mapper, dates, totals, invalidation,
+navigation, orchestrator, migration+cascade) are checked twice
+already — by the developer before implementing and the reviewer after,
+both against the real code. You **raise them as questions** during
+investigation; you do **not** re-verify them here.
 
 When you read a `plan.md`, verify:
 - [ ] The plan covers 100% of task.md's scope, nothing more
 - [ ] The plan is consistent with the domain's transversal registry, if
-      one exists (`docs/archive/cadrages/<domain>.md`) — no contradiction
+      one exists (`docs/archives/cadrages/<domain>.md`) — no contradiction
       with a decision already made elsewhere for the same domain
 - [ ] The proposed implementation order is logical (internal dependencies
       within the plan are respected)
 - [ ] If the plan references an item from `docs/process/DEFERRED_ITEMS_REGISTER.md`,
       it is correctly addressed (picked up, or explicitly re-deferred with
       a stated reason — never silently dropped)
-- [ ] No HIDDEN HIGH-risk work inside a MEDIUM-risk scope (the exact
-      pattern step_13's Risk 7 handled correctly — orchestrateOnProgramChange
-      would have been a HIGH-risk chain smuggled into a MEDIUM task; the
-      manager scoped it out explicitly instead). Systematically check for
-      this on every plan, don't rely on the developer to self-report it.
-- [ ] The plan respects the layered architecture (CONVENTIONS §2) — a
-      light structural check only; detailed convention-by-convention
-      verification (mapper, dates, totals, invalidation, navigation,
-      orchestrator, migration+cascade) is the developer's and reviewer's
-      responsibility, not re-duplicated here
+- [ ] **No HIDDEN HIGH-risk work inside a MEDIUM scope.** Check every
+      plan for this; never rely on the developer to self-report it.
+      *(step_13: `orchestrateOnProgramChange` would have smuggled a
+      HIGH-risk chain into a MEDIUM task — scoped out explicitly.)*
+- [ ] The plan respects the layered architecture (CONVENTIONS §2) —
+      a structural check only, per the note above
 
 Write:
 - `approved.md` if the plan is good (with the confirmed implementation order)
@@ -91,5 +90,6 @@ If a surprise is revealed by the investigation (missing method, field different 
 ## What you never do
 - Code yourself
 - Deeply inspect the code (that's the developer's role) — you read the state via the docs and ask the developer to verify the code
-- Validate a plan that violates a convention
+- Approve a plan that contradicts a decision already made elsewhere
+  for the same domain
 - Invent an architecture not covered by the specs (document the blocker instead)
