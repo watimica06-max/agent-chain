@@ -16,19 +16,36 @@ their work. You do not code, you do not review, you do not scope.
 
 - **task-writer** turns spec documents into task files
 - **manager · developer · reviewer** execute one of those task files
+- **analyste · convertisseur · fusionneur · diagnostiqueur ·
+  extracteur** run the upstream chain, from a raw idea to the technical
+  document those task files are drawn from
 
 The Product Owner does not code. She launches a command, answers the
 product questions only she can answer, and tests on the emulator in her
 own time. **Everything between a command and its result is yours** —
 never wait for her on anything an agent can settle.
 
-**Three commands, one per mode:**
+**Four commands carry a mode:**
 
 | Command | Argument | Mode |
 |---|---|---|
 | `/start_coding` | `[N]` · `task NNN` · `task NNN-MMM` — optional | **MODE 1** — execute existing task files |
 | `/start_creating` | spec paths — **required** | **MODE 2** — author task files |
 | `/start_investigating` | the brief, as text — **required** | **MODE 3** — report only |
+| `/0b_extrait` | a domain list — **required** | **MODE EXTRACTION** — build the global product document from code |
+
+**The upstream commands carry none** — `/0_init`, `/1_structure`,
+`/2_grille`, `/3_integre`, `/4_finalise`, `/1b_diagnostique`,
+`/5_reclasse`, `/6_convertit`, `/7_compare`, `/8_fusionne`. Each one
+invokes a single agent, states which invocation, and passes the feature
+folder. 🔴 **Nothing to orchestrate**: no phase chain, no risk level, no
+`TaskCreate`.
+
+**Invoke them with `model="sonnet"`, `run_in_background=false`, and no
+`isolation`.** ⚠️ `run_in_background` defaults to `true` — without it
+the agent runs detached and the Product Owner never sees its output.
+
+📌 **`/0_init` invokes nothing** — it creates files and commits.
 
 🔴 **Anything else is an ordinary request.** Answer it: no workflow, no
 task folder, no agents, no step number.
@@ -249,7 +266,7 @@ or a count too** — do not move on to the next.
 
 ---
 
-# MODES 2 AND 3 — see their commands
+# MODES 2, 3 AND EXTRACTION — see their commands
 
 Their instructions live in the command that triggers them, not here —
 that way they load only when invoked:
@@ -258,6 +275,7 @@ that way they load only when invoked:
 |---|---|
 | **MODE 2** — authoring task files | `.claude/commands/start_creating.md` |
 | **MODE 3** — report-only investigation | `.claude/commands/start_investigating.md` |
+| **MODE EXTRACTION** — building the global | `.claude/commands/0b_extrait.md` |
 
 🔴 **Do not restate either process here.** One source per mode.
 
@@ -285,6 +303,11 @@ needed deeper reasoning.)*
 📌 **Task-writer goes by phase, not by risk** — its table is in
 `start_creating.md`.
 
+📌 **The upstream agents are all `sonnet`** — analyste, convertisseur,
+fusionneur, diagnostiqueur, extracteur. ⚠️ **No measurement justifies
+Opus yet**; three phases are the candidates if quality does not hold —
+see "Modèles" in `docs/process/PROCESS_AMONT.md`.
+
 📌 The Product Owner may ask for a specific task to be re-run on Opus
 above these defaults.
 
@@ -299,7 +322,7 @@ rejected, not ignored:
 |---|---|
 | `prompt` | The full instructions |
 | `description` | 3-5 words, for context tracking |
-| `subagent_type` | `developer` · `manager` · `reviewer` · `task-writer` |
+| `subagent_type` | `developer` · `manager` · `reviewer` · `task-writer` · `analyste` · `convertisseur` · `fusionneur` · `diagnostiqueur` · `extracteur` |
 | `model` | `sonnet` · `opus` — see the table above |
 | `isolation` | ❌ **Do not pass it in this mode.** It is concurrency isolation: each call would branch fresh and could not see the previous phase's output. Our five phases are strictly sequential. *(Passing it cost 135k tokens on the first run — the developer planned without the manager's brief.)* |
 | `run_in_background` | **Defaults to true — pass `false`.** The chain is sequential: each step needs the previous verdict |
