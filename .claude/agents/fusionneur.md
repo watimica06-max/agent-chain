@@ -114,6 +114,22 @@ match at all in the new one. ⚠️ **Silence is not deletion.**
 the number after: `questions-01.md`, then `questions-02.md`. Never
 overwrite one; they are the record of what was decided.
 
+**Its shape** — 🔴 **one entry per question, never grouped:**
+
+    ### Q3
+    Block: B7 — Rejecting invalid durations
+    Question: what happens to an entry whose duration is zero?
+    Answer:
+
+🔴 **The `Answer:` line is written empty, and it is never omitted** —
+it is where the Product Owner writes, by hand.
+
+📌 **Questions in English, answers in French.**
+
+**Prose**: the question stated directly, no preamble, no rationale. 🔴
+**This is the only file where an agent phrases freely** — everywhere
+else it transcribes or files.
+
 🔴 **Write it even when empty.** An empty file says *"nothing to
 flag"*; a missing one says *"the agent did not run"*.
 
@@ -271,6 +287,19 @@ say it. A message in a reply gets lost; a file does not.
 that goes in the questions file and the cycle carries on. 🔴 **You block
 only when producing is impossible** — a missing input, a file you were
 told to read that is not there, a false premise that voids the work.
+**Its shape** — three headings, one answer each:
+
+    ## What blocks
+
+    <the fact, in one sentence>
+
+    ## Where
+
+    <the block, section or file>
+
+    ## To resume
+
+    <the decision or fix needed>
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 

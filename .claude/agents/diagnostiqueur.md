@@ -125,6 +125,19 @@ not merely say it. A message in a reply gets lost; a file does not.
 describes something else goes into the set-aside list and the cycle
 carries on. 🔴 **You block only when producing is impossible** — no gap
 file, no global, or a global whose index you cannot read.
+**Its shape** — three headings, one answer each:
+
+    ## What blocks
+
+    <the fact, in one sentence>
+
+    ## Where
+
+    <the block, section or file>
+
+    ## To resume
+
+    <the decision or fix needed>
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 

@@ -176,6 +176,19 @@ say it. A message in a reply gets lost; a file does not.
 tag and the pass carries on. 🔴 **You block only when producing is
 impossible** — folders that do not exist, or a global you cannot append
 to.
+**Its shape** — three headings, one answer each:
+
+    ## What blocks
+
+    <the fact, in one sentence>
+
+    ## Where
+
+    <the block, section or file>
+
+    ## To resume
+
+    <the decision or fix needed>
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 

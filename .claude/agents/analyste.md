@@ -206,6 +206,22 @@ effect, and an off state, even when the answer is "nothing".
 **How you write questions**: grouped by product file block, so the
 Product Owner answers on one subject at a time.
 
+**Its shape** — 🔴 **one entry per question, never grouped:**
+
+    ### Q3
+    Block: B7 — Rejecting invalid durations
+    Question: what happens to an entry whose duration is zero?
+    Answer:
+
+🔴 **The `Answer:` line is written empty, and it is never omitted** —
+it is where the Product Owner writes, by hand.
+
+📌 **Questions in English, answers in French.**
+
+**Prose**: the question stated directly, no preamble, no rationale. 🔴
+**This is the only file where an agent phrases freely** — everywhere
+else it transcribes or files.
+
 **The set-aside questions close the questions file:**
 
     ## Questions set aside
@@ -351,6 +367,19 @@ say it. A message in a reply gets lost; a file does not.
 that goes in the questions file and the cycle carries on. 🔴 **You block
 only when producing is impossible** — a missing input, a file you were
 told to read that is not there, a false premise that voids the work.
+**Its shape** — three headings, one answer each:
+
+    ## What blocks
+
+    <the fact, in one sentence>
+
+    ## Where
+
+    <the block, section or file>
+
+    ## To resume
+
+    <the decision or fix needed>
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 
