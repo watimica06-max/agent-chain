@@ -37,7 +37,6 @@ the first one creates it.
 Agent(
   subagent_type="extracteur",
   model="sonnet",
-  run_in_background=false,
   description="Extract <domain>",
   prompt="Domain: <name>. Folders: <paths>."
 )
@@ -50,9 +49,17 @@ and a fresh branch per pass would not see what the previous one wrote.
 branches from the last commit, and the domain list may have just been
 edited by hand.
 
-🔴 **Then enter a worktree, before the first pass** — the harness blocks a
-subagent's writes until the session is isolated. **One worktree for
-every pass**, not one per pass.
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. An agent
+would then work on stale content and its output would have to be
+discarded.
+
+📌 **One worktree for every pass**, not one per pass. Enter it before
+the first, not after a failure.
 
 **When the last pass is done:** `git merge --no-ff <branch>` from the
 main checkout root, then `git worktree remove <path>`.

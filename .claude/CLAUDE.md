@@ -303,7 +303,7 @@ rejected, not ignored:
 | `subagent_type` | `developer` · `manager` · `reviewer` · `task-writer` · `analyste` · `convertisseur` · `fusionneur` · `diagnostiqueur` · `extracteur` · `cadreur` · `verificateur` · `detailleur` · `realisateur` · `relecteur` · `controleur` |
 | `model` | `sonnet` · `opus` — see the table above |
 | `isolation` | ❌ **Do not pass it in this mode.** It is concurrency isolation: each call would branch fresh and could not see the previous phase's output. Our five phases are strictly sequential. *(Passing it cost 135k tokens on the first run — the developer planned without the manager's brief.)* |
-| `run_in_background` | **Defaults to true — pass `false`.** The chain is sequential: each step needs the previous verdict |
+| `run_in_background` | ⚠️ **May not exist.** In this environment the tool always runs async and notifies on completion — do not pass it, wait for the notification |
 | `name` | Optional; makes the agent addressable while running |
 
 ❌ No `effort`, no `mode`, no `team_name`.
@@ -312,7 +312,6 @@ rejected, not ignored:
 Agent(
   subagent_type="developer",
   model="opus",
-  run_in_background=false,
   description="Implement step_XX",
   prompt="Full instructions..."
 )
@@ -328,11 +327,15 @@ Agent(
 fresh, and a phase would not see what the previous one wrote.
 
 ⚠️ **Entering a worktree yourself is a different matter.** The harness
-blocks a subagent's writes until the session is isolated, whatever
-`run_in_background` says. **Where an agent must write, enter the
-worktree first** — waiting for the failure costs a full invocation,
+blocks a subagent's writes until the session is isolated. **Where an
+agent must write, enter the worktree first** — waiting for the failure costs a full invocation,
 since the agent does the whole job before discovering it cannot save
 it.
+
+🔴 **Create it from local `HEAD`** — `git worktree add <path> HEAD` —
+and register it. ⚠️ **Never let the tooling branch it**: its default
+base is `origin/master`, which can sit behind local, and the agent
+would work on stale content.
 
 🔴 **Merge before handing back, always.** `git merge --no-ff <branch>`
 from the main checkout root, then `git worktree remove <path>`.

@@ -41,14 +41,16 @@ instructions.
 Agent(
   subagent_type="<agent>",
   model="sonnet",
-  run_in_background=false,
   description="<phase> <feature>",
   prompt="Feature folder: docs/features/<name>/. <Which invocation>."
 )
 ```
 
-❌ No `effort` parameter exists — it is static frontmatter in the
-agent file. ❌ **Never pass `isolation`** — the phases are sequential
+❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
+either** — in this environment the Agent tool always runs async and
+notifies on completion. Do not pass it; wait for the notification.
+
+❌ **Never pass `isolation`** — the phases are sequential
 and each reads what the previous one wrote.
 
 ---
@@ -67,9 +69,18 @@ checkout.)*
 
 📌 **Nothing to commit is a normal outcome** — carry on.
 
-🔴 **Then enter a worktree, before invoking the agent** — not after it
-fails. The harness blocks a subagent's writes until the session is
-isolated, whatever `run_in_background` says. *(Measured on three
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. An agent
+would then work on stale content and its output would have to be
+discarded. *(Seen once: a whole invocation lost that way.)*
+
+📌 **Enter the worktree before invoking the agent**, not after it
+fails — the harness blocks a subagent's writes until the session is
+isolated. *(Measured on three
 phases: the agent does the full job, cannot write, and the whole
 invocation is redone.)*
 
