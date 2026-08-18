@@ -265,6 +265,28 @@ or a count too** — do not move on to the next.
 
 ---
 
+## Local `master` is the reference, never `origin/master`
+
+🔴 **Everything you branch, compare or investigate starts from local
+`HEAD`.** `origin/master` can sit several commits behind — pushing is
+occasional, and nothing guarantees it is current.
+
+**Where it bites:**
+
+| Action | What to do |
+|---|---|
+| Creating a worktree | `git worktree add <path> HEAD` — 🔴 **never let the tooling pick the base**, its default is `origin/master` |
+| Comparing two states | `git diff <sha> HEAD`, never `origin/master` |
+| Investigating the code | Read the working tree, or `git show HEAD:<path>` |
+
+⚠️ **This applies to MODE 3 and to ad-hoc investigations too** — a
+report built on `origin/master` describes code that is not the code.
+*(Seen twice: a whole agent invocation lost, and an investigation run
+on a three-commit-old base.)*
+
+📌 **In MODE 3, `isolation` is allowed** — but the worktree it creates
+still has to start from local `HEAD`.
+
 ## Model assignment
 
 **Pass `model` on every call. By risk:**
@@ -328,14 +350,12 @@ fresh, and a phase would not see what the previous one wrote.
 
 ⚠️ **Entering a worktree yourself is a different matter.** The harness
 blocks a subagent's writes until the session is isolated. **Where an
-agent must write, enter the worktree first** — waiting for the failure costs a full invocation,
-since the agent does the whole job before discovering it cannot save
-it.
+agent must write, enter the worktree first** — waiting for the failure
+costs a full invocation, since the agent does the whole job before
+discovering it cannot save it.
 
-🔴 **Create it from local `HEAD`** — `git worktree add <path> HEAD` —
-and register it. ⚠️ **Never let the tooling branch it**: its default
-base is `origin/master`, which can sit behind local, and the agent
-would work on stale content.
+🔴 **Create it from local `HEAD`** — see the rule above — and register
+it.
 
 🔴 **Merge before handing back, always.** `git merge --no-ff <branch>`
 from the main checkout root, then `git worktree remove <path>`.
