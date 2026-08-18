@@ -22,8 +22,8 @@ explain it — the downstream chain investigates.
 
 | Referred to as | On disk |
 |---|---|
-| the gap file | `ecarts.md` |
-| the product file | `produit.md` |
+| the gap file | `ecarts-constates.md` |
+| the product file | `desc-produit.md` |
 
 **The global** is `docs/PRODUIT_GLOBAL.md`, outside the feature folder.
 
@@ -71,7 +71,7 @@ button is, where it sits, what it does.
 
 ## What you produce
 
-**`produit.md`** — the confirmed gaps only, in the product file format.
+**`desc-produit.md`** — the confirmed gaps only, in the product file format.
 🔴 **A bug-fix cycle starts on an empty folder** — if the file already
 exists, stop and say so rather than overwriting it.
 

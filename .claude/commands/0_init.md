@@ -1,6 +1,6 @@
 ---
 description: Create the upstream scaffolding for a brand-new application
-allowed-tools: Read, Glob, Write, Bash
+allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
 Create, and nothing else:
@@ -15,3 +15,6 @@ for a new application, and overwriting the global would lose every
 domain in it.
 
 Then commit alone: `docs: init upstream scaffolding`.
+
+📌 **No agent, no worktree** — this command writes in place and
+commits.

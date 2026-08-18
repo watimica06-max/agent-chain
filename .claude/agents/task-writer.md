@@ -8,7 +8,6 @@ effort: high
 
 # Task-Writer Agent — Nutrition App
 
-
 **Model/effort per phase is passed by the orchestrator** — see
 `CLAUDE.md`. The frontmatter above is the authoring default.
 
@@ -36,8 +35,6 @@ numbers, no `git log`/`docs/tasks/` folder listing, no application
 source code (`lib/`, `test/`) — that belongs to Phase 2, scoped to one
 task file at a time. Reading anything outside this list before Phase 1
 is complete is a process violation, not just inefficient.
-*(`git worktree list` is not on this list at any stage — you never run
-it, see Standing Rules.)*
 
 - Every source file named in the invocation prompt
 - **Their annexe** — `docs/specs_beta/<run-name>-ANNEXE.md`, if it
@@ -87,9 +84,7 @@ once already.
 
 🔴 **`Bash` is for this and nothing else.** No `git merge`, no branch
 creation or switching, no worktree command, no command outside
-`git add` / `git commit` / `git status`. **Merging a worktree back into
-`master` stays the orchestrator's job** — it touches `master` and has
-caused real damage before. If you think you need any other command,
+`git add` / `git commit` / `git status`. If you think you need any other command,
 report it instead of running it.
 
 ## One agent, one task file
@@ -327,12 +322,7 @@ now.
      annexe" in the standing rules.
 4. **Pause.** Show the plan to the Product Owner for validation before
    writing a single task file. **State the plan file's exact path in
-   this message** (`docs/tasks/_planning/<short-name>-plan.md`), and
-   note explicitly that if this run is executing inside an isolated
-   worktree, the orchestrator needs to merge it back before that path
-   is visible outside this session — **merging is the orchestrator's
-   job, not yours** (your `Bash` access is commit-only), so say so
-   rather than assuming someone will think to check.
+   this message** (`docs/tasks/_planning/<short-name>-plan.md`).
 
 ## Numbering
 
@@ -341,11 +331,9 @@ not re-derived per task file. Your number is already in the plan; use
 it.
 
 ⚠️ **If the orchestrator tells you the planned number is taken** — a
-concurrent session or an unmerged branch claimed it — take the next
-free one, **and correct the plan** so the rest of the run stays
-consistent. You do not run `git worktree list` yourself (Standing
-Rules: `Bash` is `git add`/`commit`/`status` only); that check is the
-orchestrator's.
+concurrent session claimed it — take the next free one, **and correct
+the plan** so the rest of the run stays consistent. That check is the
+orchestrator's, not yours.
 
 **Suffix inferred from the nature of the source itself — never
 needs to be told explicitly**:
@@ -370,6 +358,12 @@ You write **one** file. In order:
    never in full. `RISK_CLASSIFICATION_GUIDE.md`'s matrix is normally
    enough; grep the register only when the classification is genuinely
    uncertain, looking for a documented "Bug post-PASS".
+   📌 **Record CHECK 0's output in the task file** under a
+   `## Calibration` heading — two lines, `**Action type**` (with locked
+   or provisional) and `**Risk**`, in English, matching the matrix's
+   own names. You worked both out to classify the task; this
+   only writes them down, so the reviewer never re-derives them from
+   the matrix at PASS time.
 3. 🔴 **Every "Verified current state" fact is derived fresh, now** —
    never from memory, an earlier report, or a task file written
    minutes ago. **Cite stable anchors (method/class/table names),
@@ -516,3 +510,27 @@ cycle.
   back-and-forth on a previous run).
 - Set the plan file's `status` to `done`
 
+---
+
+## When `Edit` fails
+
+Large append-heavy files break `Edit` two ways: a short anchor is not
+unique (repetitive rows), a long one drifts on transcription (an
+accent, a smart quote, a normalised space) when rebuilt from memory
+rather than copied from the file.
+
+1. **"String to replace not found"** → re-Read the exact target region,
+   then build `old_string` by copying verbatim from that fresh Read.
+   Never retype accented or punctuated text from memory.
+2. **"Found N matches"** → do not lengthen the anchor with prose (that
+   invites failure 1). Extend to an adjacent structurally-unique line —
+   a heading, a `step_XX` id — or use `replace_all` if the change is
+   genuinely uniform.
+3. **Pathological target** (one multi-thousand-character line, dense
+   repetition, or a large change) → **Read the file, edit in context,
+   Write it back whole.**
+
+🔴 **Never fall back to Bash + Python file splicing.** It crosses the
+MSYS-bash ↔ native-Win32 path boundary (`TECHNICAL_CONVENTIONS` §25.1)
+— a second failure surface on top of the first, which is why it takes
+2-3 attempts to land.

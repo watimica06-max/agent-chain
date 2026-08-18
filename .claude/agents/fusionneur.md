@@ -36,9 +36,9 @@ produce.**
 
 | Referred to as | On disk |
 |---|---|
-| the product file | `produit.md` |
+| the product file | `desc-produit.md` |
 | the merge plan | `plan-fusion.md` |
-| the questions file | `questions.md` |
+| a questions file | `questions-01.md`, `questions-02.md`… |
 | the merge report | `rapport-fusion.md` |
 
 **The global** is `docs/PRODUIT_GLOBAL.md`, outside the feature folder.
@@ -47,12 +47,15 @@ produce.**
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Compare and question | The final product file · the global | The merge plan · the questions file |
-| 2 | Apply | The merge plan · the answered questions file · the global | The updated global · the merge report |
+| 1 | Compare and question | The final product file · the global | The merge plan · the next questions file |
+| 2 | Apply | The merge plan · **the questions file you wrote**, answered · the global | The updated global · the merge report |
 
 📌 **With no question raised, invocation 2 follows immediately.**
 
-⚠️ **Nothing else**: not the technical document, not the code.
+🔴 **Load only what your invocation lists.** Not one file more.
+
+⚠️ **Nothing else**: not the technical document, not the grid, not the
+code.
 
 ---
 
@@ -107,8 +110,12 @@ match at all in the new one. ⚠️ **Silence is not deletion.**
 | The merge plan | Section by section, block by block: for each sentence, replacement · nothing · insertion. Sentences awaiting an answer marked pending, with their question identifier |
 | The questions file | Identifier, block concerned, question, empty `Answer:` field |
 
-🔴 **Write the questions file even when empty.** An empty file says
-*"nothing to flag"*; a missing one says *"the agent did not run"*.
+🔴 **Write the next questions file** — count the existing ones and use
+the number after: `questions-01.md`, then `questions-02.md`. Never
+overwrite one; they are the record of what was decided.
+
+🔴 **Write it even when empty.** An empty file says *"nothing to
+flag"*; a missing one says *"the agent did not run"*.
 
 📌 **The merge plan is what invocation 2 applies** — without it, the
 comparison would be redone from scratch.

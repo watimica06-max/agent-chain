@@ -25,10 +25,10 @@ grid obtains the decision; you check it is complete.**
 
 | Referred to as | On disk |
 |---|---|
-| the product file | `produit.md` |
-| the reclassified file | `reclasse.md` |
-| the questions file | `questions.md` |
-| the technical document | `technique.md` |
+| the product file | `desc-produit.md` |
+| the reclassified file | `desc-par-nature.md` |
+| a questions file | `questions-01.md`, `questions-02.md`… |
+| the technical document | `spec-technique.md` |
 
 ⚠️ **Nothing outside that folder** — you never open the global.
 
@@ -36,15 +36,18 @@ grid obtains the decision; you check it is complete.**
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Reclassifying | The product file | The reclassified file · the questions file |
-| 2 | Producing | The reclassified file · the updated product file · the questions file | The technical document |
+| 1 | Reclassifying | The product file | The reclassified file · the next questions file |
+| 2 | Producing | The reclassified file · the updated product file · **the questions file you wrote** | The technical document |
 
 📌 **The reclassified file does not carry the answers** — hence the
 three inputs.
 
+🔴 **Load only what your invocation lists.** Not one file more — an
+input listed against the other invocation stays unopened.
+
 ⚠️ **Never** the code, `CURRENT_TECHNICAL_STATE.md` *(the Cadreur reads
-it)*, nor the global product document *(the Analyste and the Fusionneur
-do)*.
+it)*, the grid, nor the global product document *(the Analyste and the
+Fusionneur do)*.
 
 ---
 
@@ -107,8 +110,12 @@ the end.
 | Reclassified file | Every element under its nature; the problematic ones marked pending, with the identifier of the question blocking them |
 | Questions file | One question per problem, carrying the identifier of the element it blocks |
 
-🔴 **Write the questions file even when empty.** An empty file says
-*"nothing to flag"*; a missing one says *"the agent did not run"*.
+🔴 **Write the next questions file** — count the existing ones and use
+the number after: `questions-01.md`, then `questions-02.md`. Never
+overwrite one; they are the record of what was decided.
+
+🔴 **Write it even when empty.** An empty file says *"nothing to
+flag"*; a missing one says *"the agent did not run"*.
 
 🔴 **You do not rewrite block content here.** You file it.
 
@@ -159,10 +166,10 @@ on the next round. That is normal, not a failure.
 
 ## INVOCATION 2 — Producing
 
-🔴 **First, check the round-trip is closed**: every entry of the
-questions file has its `Answer:` field filled **and** carries the
-Analyste's `[integrated: Bn]` mark. **One incomplete entry → do not
-produce, and say which entry.**
+🔴 **First, check the round-trip is closed**: every entry of **the
+questions file invocation 1 wrote** has its `Answer:` field filled
+**and** carries the Analyste's `[integrated: Bn]` mark. **One
+incomplete entry → do not produce, and say which entry.**
 
 **Then take the reclassified file** — the filing is not redone — and
 the updated product file, which carries the answers. Apply those

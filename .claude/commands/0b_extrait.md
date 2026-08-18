@@ -1,6 +1,6 @@
 ---
 description: Build the global product document from existing code, domain by domain
-allowed-tools: Read, Grep, Glob, Bash, Agent
+allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent
 argument-hint: [domain list file, or a single domain name]
 ---
 
@@ -31,10 +31,31 @@ the first one creates it.
 
 ## The sequence
 
-**Each pass is one invocation of the `extracteur` subagent**, with
-`model="sonnet"`, `run_in_background=false`, and 🔴 **no `isolation`** —
-every pass writes into the same global, and a fresh branch per pass
-would not see what the previous one wrote.
+**Each pass is one invocation of the `extracteur` subagent:**
+
+```
+Agent(
+  subagent_type="extracteur",
+  model="sonnet",
+  run_in_background=false,
+  description="Extract <domain>",
+  prompt="Domain: <name>. Folders: <paths>."
+)
+```
+
+❌ **Never pass `isolation`** — every pass writes into the same global,
+and a fresh branch per pass would not see what the previous one wrote.
+
+🔴 **Commit anything uncommitted under `docs/` first** — a worktree
+branches from the last commit, and the domain list may have just been
+edited by hand.
+
+🔴 **Then enter a worktree, before the first pass** — the harness blocks a
+subagent's writes until the session is isolated. **One worktree for
+every pass**, not one per pass.
+
+**When the last pass is done:** `git merge --no-ff <branch>` from the
+main checkout root, then `git worktree remove <path>`.
 
 **1. Application pass** — what the code carries without belonging to a
 domain. 🔴 **Name its folders in the prompt**, as for a domain; the
