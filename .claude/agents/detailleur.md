@@ -32,6 +32,9 @@ confirmed by grep before being written.
 | the technical document | `spec-technique.md` |
 | a spec sheet | `code/<lot>/fiche-executable.md` |
 
+**You write** one `code/<lot>/fiche-executable.md` per lot of your
+block. 📌 **Its shape is below**; read it before you start.
+
 ## What you read
 
 - **`code/sequence.md`** — 🔴 **the orchestration names your block in
@@ -202,13 +205,8 @@ sheets describe what was built.
 
 ## When you cannot produce
 
-🔴 **Write `code/<lot>/blocked_detailleur.md`** — do not merely say it.
-
-| Block | Contents |
-|---|---|
-| What blocks | The fact observed, not your reading of it |
-| Where | The lot and the section concerned |
-| What is needed to resume | A decision, an upstream fix, a missing input |
+🔴 **Write `code/<lot>/blocked_detailleur.md`** — do not
+merely say it.
 
 ⚠️ **Blocking is not choosing.** 🔴 **You block on an ambiguous
 rule** — one you cannot turn into a criterion — **on a grep that

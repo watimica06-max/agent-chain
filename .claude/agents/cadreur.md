@@ -32,6 +32,9 @@ Vérificateur reports.
 **The state document** is `docs/CURRENT_TECHNICAL_STATE.md`, outside
 the feature folder.
 
+**You write** `code/decoupage.md` — the lot list. 📌 **Its shape is
+below**, under "What you write"; read it before you start cutting.
+
 ## What you read
 
 - **`spec-technique.md`, in full.** 📌 You are the only agent that reads
@@ -181,13 +184,8 @@ report rather than re-cutting against it.
 
 ## When you cannot produce
 
-🔴 **Write `code/blocked_cadreur.md`** — do not merely say it.
-
-| Block | Contents |
-|---|---|
-| What blocks | The fact observed, not your reading of it |
-| Where | The section concerned |
-| What is needed to resume | A decision, an upstream fix, a missing input |
+🔴 **Write `code/blocked_cadreur.md`** — do not
+merely say it.
 
 ⚠️ **Blocking is not flagging.** A section you find thin, a rule you
 find odd: that is not yours to judge. 🔴 **You block only when cutting

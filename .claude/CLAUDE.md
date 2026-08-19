@@ -3,6 +3,17 @@
 > Read automatically at every session. Defines the orchestrator's
 > behaviour and how it drives the agent team.
 
+🔴 **Local `HEAD` is the reference, in every session and every task —
+never `origin/master`.** It sits several commits behind: pushing is
+occasional. This holds for a command, a free-form request, an
+investigation, a comparison, a worktree. *(Seen three times: an agent
+invocation lost, an investigation run on a stale base, an edit made
+against outdated code.)*
+
+**Concretely** — `git worktree add <path> HEAD`, `git diff <sha> HEAD`,
+`git show HEAD:<path>`. 🔴 **Never let tooling pick a base**: its
+default is `origin/master`.
+
 ---
 
 # CONTEXT — who you are, what you read, where you run
@@ -35,7 +46,7 @@ never wait for her on anything an agent can settle.
 | `/start_coding` | `[N]` · `task NNN` · `task NNN-MMM` — optional | **MODE 1** — execute existing task files |
 | `/start_creating` | spec paths — **required** | **MODE 2** — author task files |
 | `/start_investigating` | the brief, as text — **required** | **MODE 3** — report only |
-| `/0_init` · `/0b_extrait` · `/1_structure` · `/1b_diagnostique` · `/2_grille` · `/3_finalise` · `/5_reclasse` · `/6_convertit` · `/7_compare` · `/8_fusionne` | see each | **Upstream** — one agent per command |
+| `/0_init` · `/0b_extrait` · `/1_structure` · `/1b_diagnostique` · `/2_grille` · `/5_reclasse` · `/6_convertit` · `/7_compare` · `/8_fusionne` | see each | **Upstream** — one agent per command |
 | `/9_decoupe` · `/10_code` | a feature name | **Downstream** — several agents, chained |
 
 📌 **Each upstream command carries its own mode**, like `/start_creating`
@@ -265,28 +276,6 @@ or a count too** — do not move on to the next.
 
 ---
 
-## Local `master` is the reference, never `origin/master`
-
-🔴 **Everything you branch, compare or investigate starts from local
-`HEAD`.** `origin/master` can sit several commits behind — pushing is
-occasional, and nothing guarantees it is current.
-
-**Where it bites:**
-
-| Action | What to do |
-|---|---|
-| Creating a worktree | `git worktree add <path> HEAD` — 🔴 **never let the tooling pick the base**, its default is `origin/master` |
-| Comparing two states | `git diff <sha> HEAD`, never `origin/master` |
-| Investigating the code | Read the working tree, or `git show HEAD:<path>` |
-
-⚠️ **This applies to MODE 3 and to ad-hoc investigations too** — a
-report built on `origin/master` describes code that is not the code.
-*(Seen twice: a whole agent invocation lost, and an investigation run
-on a three-commit-old base.)*
-
-📌 **In MODE 3, `isolation` is allowed** — but the worktree it creates
-still has to start from local `HEAD`.
-
 ## Model assignment
 
 **Pass `model` on every call. By risk:**
@@ -354,8 +343,8 @@ agent must write, enter the worktree first** — waiting for the failure
 costs a full invocation, since the agent does the whole job before
 discovering it cannot save it.
 
-🔴 **Create it from local `HEAD`** — see the rule above — and register
-it.
+🔴 **Create it from local `HEAD`** — see the rule at the top of this
+file — and register it.
 
 🔴 **Merge before handing back, always.** `git merge --no-ff <branch>`
 from the main checkout root, then `git worktree remove <path>`.

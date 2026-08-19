@@ -30,6 +30,9 @@ name.
 | the report | `code/<lot>/compte-rendu.md` |
 | the verdict | `code/<lot>/verdict.md` |
 
+**You write** `code/<lot>/verdict.md`. 📌 **Its shape is below**; read
+it before you start.
+
 ## What you read
 
 - **`code/<lot>/fiche-executable.md`** — what was promised
@@ -149,13 +152,8 @@ it.
 
 ## When you cannot produce
 
-🔴 **Write `code/<lot>/blocked_relecteur.md`** — do not merely say it.
-
-| Block | Contents |
-|---|---|
-| What blocks | The fact observed, not your reading of it |
-| Where | The lot, and the symbol or file concerned |
-| What is needed to resume | A decision, an upstream fix, a missing input |
+🔴 **Write `code/<lot>/blocked_relecteur.md`** — do not
+merely say it.
 
 ⚠️ **Blocking is not failing a lot.** A missing test, a divergent
 symbol, a broken convention: those are a FAIL, and the cycle carries

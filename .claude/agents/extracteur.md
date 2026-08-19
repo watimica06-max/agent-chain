@@ -138,9 +138,10 @@ goes at the top of the file**, before the domains.
 
 **Section order inside a domain**: the order they appear in the code.
 
-**One final rewiring pass** — 🔴 **no domain given**: you read
-`docs/PRODUIT_GLOBAL.md` in full, resolve every `<<REF:name>>` tag left
-by earlier passes, and touch nothing else.
+**One final rewiring pass** — 🔴 **no domain given**: grep
+`docs/PRODUIT_GLOBAL.md` for `<<REF:name>>`, load only the sections
+carrying one, resolve them, and touch nothing else. ⚠️ **Never read it
+whole** — it runs past 250 KB.
 
 ---
 
@@ -163,19 +164,14 @@ them by script.
 
 ## When you cannot produce
 
-🔴 **Write `blocked_extracteur.md` next to the global** — do not merely
-say it. A message in a reply gets lost; a file does not.
-
-| Block | Contents |
-|---|---|
-| What blocks | The fact observed, not your reading of it |
-| Where | The section, block or file concerned |
-| What is needed to resume | A decision, an upstream fix, a missing input |
+🔴 **Write `blocked_extracteur.md` next to the global** — do not
+merely say it.
 
 ⚠️ **Blocking is not tagging.** Anything you cannot interpret gets a
 tag and the pass carries on. 🔴 **You block only when producing is
 impossible** — folders that do not exist, or a global you cannot append
 to.
+
 **Its shape** — three headings, one answer each:
 
     ## What blocks

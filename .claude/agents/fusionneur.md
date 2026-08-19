@@ -38,7 +38,7 @@ produce.**
 |---|---|
 | the product file | `desc-produit.md` |
 | the merge plan | `plan-fusion.md` |
-| a questions file | `questions-01.md`, `questions-02.md`… |
+| a questions file | `questions-<agent>-NN.md` at the root, `questions/<agent>/` once filed |
 | the merge report | `rapport-fusion.md` |
 
 **The global** is `docs/PRODUIT_GLOBAL.md`, outside the feature folder.
@@ -48,6 +48,9 @@ produce.**
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
 | 1 | Compare and question | The final product file · the global | The merge plan · the next questions file |
+
+🔴 **Grep the global's `^#` index, never read it whole** — it runs past
+250 KB.
 | 2 | Apply | The merge plan · **the questions file you wrote**, answered · the global | The updated global · the merge report |
 
 📌 **With no question raised, invocation 2 follows immediately.**
@@ -66,6 +69,10 @@ code.
 ⚠️ **Skip the product file's closing section** — `## Questions set
 aside`, or `## Gaps set aside` on a bug-fix cycle. It records what was
 ruled out, it holds no product content and never enters the global.
+
+🔴 **Never open a questions file written before you** — those belong to
+the loops that ran earlier. ⚠️ **Invocation 2 reads the one you wrote,
+and it alone.**
 
 ### Three levels of location
 
@@ -107,22 +114,40 @@ match at all in the new one. ⚠️ **Silence is not deletion.**
 
 | File | Contents |
 |---|---|
-| The merge plan | Section by section, block by block: for each sentence, replacement · nothing · insertion. Sentences awaiting an answer marked pending, with their question identifier |
+| The merge plan | Section by section, block by block: for each sentence, replacement · nothing · insertion. Sentences awaiting an answer marked pending, with the file and question blocking them |
 | The questions file | Identifier, block concerned, question, empty `Answer:` field |
 
-🔴 **Write the next questions file** — count the existing ones and use
-the number after: `questions-01.md`, then `questions-02.md`. Never
-overwrite one; they are the record of what was decided.
+🔴 **Write the next questions file** — see below.
 
-**Its shape** — 🔴 **one entry per question, never grouped:**
+### Where questions files live
 
-    ### Q3
+**At the feature folder's root**: `questions-fusionneur-01.md`,
+`questions-fusionneur-02.md`… — the ones this cycle is working on.
+
+**Filed away**: `questions/<agent>/` — one folder per agent.
+
+🔴 **Three steps, before you write anything:**
+
+1. **File away every root questions file whose prefix is not
+   `fusionneur`** — move it to `questions/<its agent>/`
+2. **Find your last file at the root.** None there → look in
+   `questions/fusionneur/`
+3. **Write at the root**, taking the highest number found and adding
+   one
+
+### The shape of every entry
+
+🔴 **One entry per question, four lines, no exception.** Numbering
+restarts at Q1 in each file:
+
+    ### Q1
     Block: B7 — Rejecting invalid durations
     Question: what happens to an entry whose duration is zero?
     Answer:
 
 🔴 **The `Answer:` line is written empty, and it is never omitted** —
-it is where the Product Owner writes, by hand.
+it is where the Product Owner writes, by hand. **An entry without it is
+unusable.**
 
 📌 **Questions in English, answers in French.**
 
@@ -145,7 +170,7 @@ block, one line per sentence:
       bottom right"
     - INSERT: "Tapping it opens the activity entry screen."
     - KEEP: "It is hidden while the list is loading."
-    - PENDING Q2: "A long press duplicates the last entry."
+    - PENDING questions-fusionneur-04 Q2: "A long press duplicates the last entry."
     - DELETE: "It shows a badge when unread." (answer to Q1)
 
     ## Steps panel                                    [new section]
@@ -168,16 +193,23 @@ rather than looking for it.
 ## Between the two — the round-trip
 
 The questions file goes to the Product Owner, who fills the `Answer:`
-fields by hand. The Analyste integrates them and marks each entry
-`[integrated: Bn]`, then hands back.
+fields by hand. The Analyste integrates them, then hands back.
 
-🔴 **A question whose answer is recorded is never asked again.**
+🔴 **A question whose answer is recorded is never asked again** —
+re-asking would send the Product Owner back over what he has settled.
 
 ---
 
 ## INVOCATION 2 — Apply
 
-**Inputs**: the merge plan · the answered questions file · the global.
+**Inputs**: the merge plan · **the questions file invocation 1 wrote**,
+answered · the global.
+
+📌 **Look for it at the root first, then in `questions/fusionneur/`** —
+another agent may have filed it away since.
+
+🔴 **File it away when you are done** — move every root questions file
+to `questions/<its agent>/`. The cycle ends with a clean root.
 
 **Apply the merge plan**, in targeted edits.
 
@@ -208,14 +240,14 @@ global says what is — *"a button at the bottom of the page"*.
 ⚠️ "New", "from now on", "instead of", "we add" — that vocabulary has
 no place in the global.
 
-🔴 **Never carry a block's number into the global.** There, a block has
-its title alone.
+🔴 **Never carry a block's number or its `NEW` marker into the
+global.** There, a block has its title alone.
 
 ### The merge report
 
 **Written after applying, never before.**
 
-| Block | Contents |
+| Field | Contents |
 |---|---|
 | New sections | Created from scratch |
 | Merged sections | What was replaced, what was kept |
@@ -274,19 +306,14 @@ in.
 
 ## When you cannot produce
 
-🔴 **Write `blocked_fusionneur.md` in the feature folder** — do not merely
-say it. A message in a reply gets lost; a file does not.
-
-| Block | Contents |
-|---|---|
-| What blocks | The fact observed, not your reading of it |
-| Where | The section, block or file concerned |
-| What is needed to resume | A decision, an upstream fix, a missing input |
+🔴 **Write `blocked_fusionneur.md` in the feature folder** — do not
+merely say it.
 
 ⚠️ **Blocking is not flagging.** A gap, a contradiction, a question:
 that goes in the questions file and the cycle carries on. 🔴 **You block
 only when producing is impossible** — a missing input, a file you were
 told to read that is not there, a false premise that voids the work.
+
 **Its shape** — three headings, one answer each:
 
     ## What blocks
@@ -309,7 +336,7 @@ told to read that is not there, a false premise that voids the work.
 - 🔴 **Delete a rule by omission**
 - 🔴 **Replace a whole block when only a few sentences change**
 - 🔴 **Keep the vocabulary of change in the global**
-- 🔴 **Carry over a block number**
+- 🔴 **Carry over a block number or a `NEW` marker**
 - Touch the technical document, or the code
 
 ## When `Edit` fails

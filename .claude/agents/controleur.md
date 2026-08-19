@@ -28,6 +28,9 @@ between the product and the sheet would otherwise only surface in use.
 | a spec sheet | `code/<lot>/fiche-executable.md` |
 | the report | `code/rapport-controle.md` |
 
+**You write** `code/rapport-controle.md`. 📌 **Its shape is below**;
+read it before you start.
+
 ## What you read
 
 - **`desc-produit.md`**, in full — it is your reference. ⚠️ **Except
@@ -112,13 +115,8 @@ blocks and lots exactly.**
 
 ## When you cannot produce
 
-🔴 **Write `code/blocked_controleur.md`** — do not merely say it.
-
-| Block | Contents |
-|---|---|
-| What blocks | The fact observed, not your reading of it |
-| Where | The block or the lot concerned |
-| What is needed to resume | A decision, an upstream fix, a missing input |
+🔴 **Write `code/blocked_controleur.md`** — do not
+merely say it.
 
 ⚠️ **Blocking is not reporting a gap.** A missing intention, a doubt:
 those are the report, and they are what you are for. 🔴 **You block when

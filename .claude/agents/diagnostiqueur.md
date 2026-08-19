@@ -27,12 +27,15 @@ explain it — the downstream chain investigates.
 
 **The global** is `docs/PRODUIT_GLOBAL.md`, outside the feature folder.
 
+**You write** `desc-produit.md` — the confirmed gaps only. 📌 **Its
+shape is below**; read it before you start.
+
 ## What you read
 
 - **The gap file** — written offline by the Product Owner, **under the
   global's titles**, section and block
-- **The global** — the index first, then the sections the gap file
-  names
+- **The global** — 🔴 **grep its `^#` index, never read it whole**, it
+  runs past 250 KB; then load only the sections the gap file names
 
 ⚠️ **Nothing else**: not the code, not `CURRENT_TECHNICAL_STATE.md`,
 not the technical document.
@@ -108,6 +111,11 @@ in. ⚠️ **No justification.**
 🔴 **No block number carried into anything downstream** — the number is
 local to this file.
 
+🔴 **Append `NEW` to every block's title line** — every block here is
+new, and the Analyste's grid pass greps that marker.
+
+    ### B1 — Add button    NEW
+
 ---
 
 ## When you cannot produce
@@ -115,16 +123,11 @@ local to this file.
 🔴 **Write `blocked_diagnostiqueur.md` in the feature folder** — do
 not merely say it. A message in a reply gets lost; a file does not.
 
-| Block | Contents |
-|---|---|
-| What blocks | The fact observed, not your reading of it |
-| Where | The section, block or file concerned |
-| What is needed to resume | A decision, an upstream fix, a missing input |
-
 ⚠️ **Blocking is not setting aside.** A gap whose title is missing or
 describes something else goes into the set-aside list and the cycle
 carries on. 🔴 **You block only when producing is impossible** — no gap
 file, no global, or a global whose index you cannot read.
+
 **Its shape** — three headings, one answer each:
 
     ## What blocks

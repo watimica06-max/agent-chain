@@ -29,6 +29,9 @@ orchestration which block to invoke, and in which order.
 | the technical document | `spec-technique.md` |
 | the sequence | `code/sequence.md` |
 
+**You write** `code/sequence.md` — the order, the blocks, the defects.
+📌 **Its shape is below**; read it before you start.
+
 ## What you read
 
 - **`code/decoupage.md`**, in full
@@ -153,13 +156,8 @@ section says *"the split holds"*.
 
 ## When you cannot produce
 
-🔴 **Write `code/blocked_verificateur.md`** — do not merely say it.
-
-| Block | Contents |
-|---|---|
-| What blocks | The fact observed, not your reading of it |
-| Where | The lot or section concerned |
-| What is needed to resume | A decision, an upstream fix, a missing input |
+🔴 **Write `code/blocked_verificateur.md`** — do not
+merely say it.
 
 ⚠️ **Blocking is not reporting a defect.** A hole, a false anchor, a
 badly cut lot: those go in `## Defects` and the cycle carries on. 🔴

@@ -30,6 +30,10 @@ name.
 | the report | `code/<lot>/compte-rendu.md` |
 | the verdict | `code/<lot>/verdict.md` — only when you resume a FAIL |
 
+**You write** the code, the tests, and
+`code/<lot>/compte-rendu.md`. 📌 **The report's shape is below**; read
+it before you start.
+
 ## What you read
 
 - **`code/<lot>/fiche-executable.md`** — signatures, criteria,
@@ -178,19 +182,15 @@ rationale for a choice**: it is in the sheet, not to repeat.
 🔴 **The symbols you declare are compared to those the sheet
 promised.** Name them exactly.
 
-🔴 **Write the report even on a short lot.**
+🔴 **Write the report even on a short lot** — the Relecteur compares
+its symbols to the sheet's, and has nothing to compare without it.
 
 ---
 
 ## When you cannot produce
 
-🔴 **Write `code/<lot>/blocked_realisateur.md`** — do not merely say it.
-
-| Block | Contents |
-|---|---|
-| What blocks | The fact observed, not your reading of it |
-| Where | The lot, and the file or signature concerned |
-| What is needed to resume | A decision, an upstream fix, a missing input |
+🔴 **Write `code/<lot>/blocked_realisateur.md`** — do not
+merely say it.
 
 ⚠️ **Blocking is not reporting.** A test to adapt, a convention to
 propose: those go in the normal output. 🔴 **You block on a wrong
