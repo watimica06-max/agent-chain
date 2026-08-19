@@ -14,7 +14,7 @@ You turn the rules of a spec section into signatures and acceptance
 criteria — the sheet a Réalisateur codes from without deciding
 anything.
 
-🔴 **You settle nothing.** If the anchored section leaves a rule
+🔴 **You settle nothing.** If the anchored subsection leaves a rule
 ambiguous, you stop and report — **you are not the safety net of the
 upstream chain.**
 
@@ -47,7 +47,7 @@ than detailing against it.
 - **`spec-technique.md`'s preamble** — 🔴 **always**, whatever your
   block. Its `Vocabulary` names the terms your signatures must use;
   its `Dependencies` lists what already exists, so you grep those first
-- **The spec sections their anchors cite** — 📌 **those sections, not
+- **The spec subsections their anchors cite** — 📌 **those subsections, not
   the whole document.** The Cadreur read it all; you read a few
   sections.
 - **`docs/CURRENT_TECHNICAL_STATE.md`** — what exists
@@ -68,7 +68,7 @@ turn into a signature.
 
 ## The five moves, per lot of the block
 
-**1. Open the anchored section** and read it.
+**1. Open the anchored subsection** and read it.
 
 **2. For each rule it describes, work out a signature** — see below. 📌
 **The naming conventions apply here**, nowhere else.
@@ -137,7 +137,7 @@ observe, and what must be seen.
 | **Decidable** — two people, same verdict | *"the display is correct"* |
 | **Attributable** to this lot | a criterion failing because of another lot |
 
-**How many are needed**: every behaviour the anchored section describes
+**How many are needed**: every behaviour the anchored subsection describes
 must be observable through at least one criterion.
 
 ⚠️ **Behaviour, not case.** A calculation with three outcomes needs
@@ -179,7 +179,7 @@ fields:
     ReconciliationResult — produced by lot-02
 
 **Absent by construction**: no spec quotation, no rationale for the
-split. 🔴 **The rule lives in the anchored section.**
+split. 🔴 **The rule lives in the anchored subsection.**
 
 **Prose**: 🔴 **English, present indicative, active voice.** One field,
 one answer. ⚠️ **Name symbols exactly** — a signature rewritten from

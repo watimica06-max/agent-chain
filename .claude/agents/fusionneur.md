@@ -70,6 +70,9 @@ code.
 aside`, or `## Gaps set aside` on a bug-fix cycle. It records what was
 ruled out, it holds no product content and never enters the global.
 
+🔴 **Never `idees.md`** — the raw text the upstream chain spent its
+whole loop correcting.
+
 🔴 **Never open a questions file written before you** — those belong to
 the loops that ran earlier. ⚠️ **Invocation 2 reads the one you wrote,
 and it alone.**

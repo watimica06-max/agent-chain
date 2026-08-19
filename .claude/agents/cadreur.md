@@ -61,19 +61,26 @@ about to change.
 `Out of scope` names what this feature does not touch** — never cut a
 lot for anything listed there.
 
-**3. Section by section, cut.** 🔴 **Split by what the section
+**3. Subsection by subsection, cut.** 🔴 **Split by what the subsection
 describes building** — one lot per identifiable thing, whether another
 part consumes it or not.
 
-| Section | One lot per |
+📌 **Most subsections give one lot.** The Convertisseur already grouped
+by what gets built; a subsection describing one screen area, one
+service, one entity is one lot.
+
+**A subsection gives several only when it names several things to
+build:**
+
+| The subsection describes | Several lots when |
 |---|---|
-| §1 Model, §2 Persistence | Entity, with its table and its migration |
-| §3 Calculation | Rule, or group of rules sharing their inputs |
-| §4 Transition, §7 Background work | Mechanism |
-| §5 External source, §6 Synchronisation | Source, or domain synchronised |
-| §8 Journey, §9 Screen | Screen, with what it displays |
-| §10 Text | Set of labels one screen uses |
-| §11 Access, §12 Lifecycle | Rule |
+| §1 Model, §2 Persistence | It names several entities |
+| §3 Calculation | Its rules do not share their inputs |
+| §4 Transition, §7 Background work | It names several mechanisms |
+| §5 External source, §6 Synchronisation | It names several sources |
+| §8 Journey, §9 Screen | It names several screen areas built apart |
+| §10 Text | Its labels serve screens built apart |
+| §11 Access, §12 Lifecycle | It names several rules on different data |
 
 **4. For each lot, name what it needs and what it builds**, then grep
 each of those names in the state document.
@@ -89,7 +96,12 @@ hundreds of kilobytes, and you only need the names your lots use.
 | Found, and the lot changes it | **Modification** |
 | Found, and the lot only uses it | **Need**, pre-existing |
 | Not found, and another lot builds it | **Need**, produced by that lot |
-| Not found, and this lot builds it | **Production** |
+| Not found, but the preamble's `Dependencies` marks it *existing* | **Need**, pre-existing |
+| Not found anywhere | **Production** |
+
+⚠️ **The state document is not exhaustive** — it holds what an agent
+could otherwise rebuild, not every symbol in the codebase. **On what
+already exists, the preamble wins over its silence.**
 
 ⚠️ **On a fix or an evolution a lot often produces nothing**: it only
 modifies.
@@ -110,9 +122,12 @@ satisfy it.
 
 **Three constraints narrow it:**
 
-🔴 **A lot never spans two sections of the technical document.** A
-section is a nature — model, calculation, screen. A lot that mixes
-carries two, and belongs to no layer.
+🔴 **A lot anchors on one subsection and one only** — `§3.1`, never
+`§3`, and never two of them. A lot spanning two carries two natures or
+two things to build, and belongs to no layer.
+
+📌 **A subsection can give several lots** when it describes several
+things to build. **Never the reverse.**
 
 🔴 **Two lots never touch the same symbol**, neither in production nor
 in modification. 📌 **The same file is allowed** — that is not a
@@ -132,13 +147,13 @@ to calibrate a lot's size, never to group.
 | Screens | **3-4** | Providers, routes, ARB keys, navigation |
 
 📌 **How to use it**: a lot so large that four of its kind would not
-fit in a block is too large. Ten services from one section hold
-together; from six sections they make six lots.
+fit in a block is too large. Ten services from one subsection hold
+together; from six subsections they make six lots.
 
 ⚠️ **Indicative ceilings, not targets.**
 
-📌 **A section carrying one element gives a lot of one element.**
-Grouping it with another section would break the first constraint.
+📌 **A subsection carrying one element gives a lot of one element.**
+Grouping it with another would break the first constraint.
 
 ---
 
@@ -221,7 +236,7 @@ whose sections are not numbered, or one still carrying an
 ## What you never do
 
 - 🔴 **Copy a rule from the technical document**
-- 🔴 **Produce a lot that spans two sections**
+- 🔴 **Anchor a lot on two subsections, or on a bare `§3`**
 - 🔴 **Read the code** — you read the state document, not the files
 - 🔴 **Write a signature or an acceptance criterion** — that is the
   Détailleur

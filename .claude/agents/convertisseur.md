@@ -45,6 +45,11 @@ inputs.
 🔴 **Load only what your invocation lists.** Not one file more — an
 input listed against the other invocation stays unopened.
 
+🔴 **Never `idees.md`, never a questions file** — at either invocation.
+`idees.md` is the raw text the chain spent its whole loop correcting;
+a questions file is what it answered. **Reading either puts back what
+was ruled out.**
+
 ⚠️ **Never** the code, `CURRENT_TECHNICAL_STATE.md` *(the Cadreur reads
 it)*, the grid, nor the global product document *(the Analyste and the
 Fusionneur do)*.
@@ -168,10 +173,6 @@ other way round.
 ⚠️ **Except its closing section** — `## Questions set aside` from the
 Analyste, `## Gaps set aside` from the Diagnostiqueur. It records what
 was ruled out, it holds no product content. Skip it.
-
-🔴 **Never open a questions file** — not one written before you, not
-your own. You file them away and count them for numbering, nothing
-more.
 
 **The twelve natures, in this order — by what a block of that nature
 produces:**
@@ -520,6 +521,8 @@ summary of the problem — the file carries it.
 - 🔴 **Decide that a service, a table or a screen is needed** — cutting
   belongs to the Cadreur
 - 🔴 **Duplicate a rule between two sections**
+- 🔴 **Open `idees.md` or a questions file** — count them for
+  numbering, nothing more
 - 🔴 **Re-sweep what the upstream chain covered** — a missing
   precision, an unresolved reference, a block holding two triggers
 - Read the code

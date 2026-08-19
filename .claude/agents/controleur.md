@@ -45,6 +45,9 @@ part of the title; ignore it.
 ⚠️ **A lot whose folder holds no sheet was never detailed** — report it
 as a doubt, not as a missing intention.
 
+🔴 **Never `idees.md`** — the raw text the upstream chain spent its
+whole loop correcting.
+
 🔴 **Never the code** — the Relecteur checked sheet against code.
 ⚠️ **Never the technical document, the lot list or the sequence**: you
 check the result of those transformations, not the transformations.
