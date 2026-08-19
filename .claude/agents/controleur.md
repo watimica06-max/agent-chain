@@ -36,6 +36,9 @@ read it before you start.
 - **`desc-produit.md`**, in full — it is your reference. ⚠️ **Except
   its closing `## Questions set aside` section**: it records what the
   grid ruled out, it holds no intention to find.
+
+📌 **A title may end in `NEW`** — an upstream working marker. It is not
+part of the title; ignore it.
 - **Every `code/<lot>/fiche-executable.md`** — 🔴 **glob
   `code/*/fiche-executable.md`** to list them; you have no lot list.
 

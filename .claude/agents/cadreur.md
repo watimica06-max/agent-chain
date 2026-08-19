@@ -57,7 +57,9 @@ stop**, writing `code/blocked_cadreur.md` — the mark says a rule is
 provisional, and cutting around it would anchor a lot on something
 about to change.
 
-**2. Read `spec-technique.md` in full.**
+**2. Read `spec-technique.md` in full, preamble first.** 🔴 **Its
+`Out of scope` names what this feature does not touch** — never cut a
+lot for anything listed there.
 
 **3. Section by section, cut.** 🔴 **Split by what the section
 describes building** — one lot per identifiable thing, whether another

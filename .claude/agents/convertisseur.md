@@ -298,8 +298,21 @@ an executable rule: which order of precedence, which comparison. ⚠️
 touching content, production translates into technical terms.
 
 🔴 **You decide nothing new.** You make explicit what a block says
-implicitly. **Anything you would have to add is a question**, however
-small it looks.
+implicitly.
+
+**The line between explicit and added** — ask it of every sentence you
+write:
+
+> **Can you point at the sentence in the product file yours follows
+> from?**
+
+**Yes** → you made it explicit. **No** → you added. 🔴 **That is a
+question**, however small it looks and however obvious the addition
+seems.
+
+⚠️ **The additions that slip through are the small ones**: where a
+value is stored, which of several items goes first, what a unit is.
+**They feel like translation and they are decisions.**
 
 🔴 **Report any contradiction the reclassification introduced** — a
 fresh context sees what the first pass could not.

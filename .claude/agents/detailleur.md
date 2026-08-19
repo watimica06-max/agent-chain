@@ -44,6 +44,9 @@ block. 📌 **Its shape is below**; read it before you start.
 your block means the split was not corrected — stop and report rather
 than detailing against it.
 - **`code/decoupage.md`**, restricted to those lots
+- **`spec-technique.md`'s preamble** — 🔴 **always**, whatever your
+  block. Its `Vocabulary` names the terms your signatures must use;
+  its `Dependencies` lists what already exists, so you grep those first
 - **The spec sections their anchors cite** — 📌 **those sections, not
   the whole document.** The Cadreur read it all; you read a few
   sections.
