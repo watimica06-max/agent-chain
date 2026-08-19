@@ -71,91 +71,20 @@ state.
 **Plus the global** — 🔴 **grep its `^#` index, never read it whole**,
 it runs past 250 KB. 🔴 **Do not open the grid.**
 
-### When you read a questions file
+### When you read the idea file
 
-**The Product Owner filled the `Answer:` fields by hand, in French.**
-🔴 **You decide nothing** — you transcribe, translate and file.
-
-**How you load the product file** — 🔴 **never in full:**
-
-1. **Grep `NEW`** — strip the marker from every title line it returns.
-   🔴 **A targeted edit per line, not a load** — the marker is on the
-   title, its block stays closed
-2. **Grep `^###`** — the list of block titles, nothing more
-3. **Load only the blocks the answers name** by identifier
-4. **Edit those blocks in place**
-
-⚠️ **Open one more block only if a title is ambiguous** and you cannot
-tell from it whether that block already covers the subject.
-
-⚠️ **A split loads more** — see below.
-
-**Three passes over the answers:**
-
-**a. Each answer goes to a block — which one is the question.**
-
-🔴 **Before writing it, ask two things of the answer:**
-
-**What fires what it describes?** **What does it produce?**
-
-⚠️ **Compare both to the block's own.** A different trigger, or a
-different output, is another subject.
-
-🔴 **Read what fires it, not its grammatical subject.** A sentence
-opening on what the user sees can still be fired by a failure, a
-timer, or an event elsewhere.
-
-📌 **Same trigger, same output → it belongs to the block.**
-
-| The answer | What you do |
-|---|---|
-| Same trigger, same output | It merges into the block, as a sentence |
-| Same trigger and output, and it contradicts a sentence | It **replaces** that sentence, never sits beside it |
-| A different trigger, or a different output | 🔴 **It becomes a block of its own**, with the nature its trigger and output give it |
-| It says the block already holds several | 🔴 **Split it** — one block per trigger |
-
-⚠️ **The question's identifier says where the answer applies, not
-where it lives.** An answer to a question about B7 becomes its own
-block when its nature differs.
-
-**When you split:**
-
-1. The original keeps its number and the subject its title names
-2. The new blocks take the next free numbers, each with its own nature
-3. 🔴 **Grep the original's number across the product file** and load
-   every block citing it — the split moved what they point at. Update
-   each to name the block that now holds the subject.
-
-⚠️ **If the block carries a `**Clarification needed:**` line on that
-subject, remove it** — the question is settled.
-
-🔴 **Mark every entry you integrated** — append `[integrated: B7]` to
-it in the questions file, naming every block you wrote into.
-
-**b. Every block you split — does each half now have one trigger and
-one output?** 🔴 **A half that still holds two goes through pass a
-again.**
-
-**c. Does any answer bring a subject no block covers?** 🔴 **Answer on
-the title list from step 2**, not by loading blocks.
-
-📌 **The question is not "which answers were left over"** — an answer
-can enrich a block *and* introduce a new subject. Ask it of every
-answer.
-
-🔴 **If pass c finds nothing, do not open the global's index.** There
-is no title to look up.
-
-**If pass c finds something**, the three moves below apply to it.
-
-### The three moves, on each passage of the idea file
+**Three moves, on each passage:**
 
 **1. Decompose.** 🔴 **What the Product Owner writes is a flow, not a
 list.** One sentence can hold five subjects.
 
-🔴 **A subject is one trigger and one output** — same test as at
-integration, see above. **Two triggers, or two outputs, is two
-subjects.**
+🔴 **A subject is one trigger and one output.** Read the passage
+asking: what fires this, and what does it produce? **Two triggers, or
+two outputs, is two subjects.**
+
+🔴 **Read what fires it, not its grammatical subject.** A sentence
+opening on what the user sees can still be fired by a failure, a
+timer, or an event elsewhere.
 
 **2. Grep the global's index for a title covering this subject.** Found
 → reuse it verbatim. Not found → create one.
@@ -202,6 +131,79 @@ that is expected — invocation 2 says what is still missing.
 `docs/process/GRILLE_CADRAGE_PRODUIT.md` · the global — 🔴 **grep its
 `^#` index, never read it whole**, it runs past 250 KB. ⚠️ **Not the
 raw idea.**
+
+### When you read a questions file
+
+**The Product Owner filled the `Answer:` fields by hand, in French.**
+🔴 **You decide nothing** — you transcribe, translate and file.
+
+**How you load the product file** — 🔴 **never in full:**
+
+1. **Grep `NEW`** — strip the marker from every title line it returns.
+   🔴 **A targeted edit per line, not a load** — the marker is on the
+   title, its block stays closed
+2. **Grep `^###`** — the list of block titles, nothing more
+3. **Load only the blocks the answers name** by identifier
+4. **Edit those blocks in place**
+
+⚠️ **Open one more block only if a title is ambiguous** and you cannot
+tell from it whether that block already covers the subject.
+
+⚠️ **A split loads more** — see below.
+
+**Three passes over the answers:**
+
+**a. Each answer goes to a block — which one is the question.**
+
+🔴 **Before writing it, ask two things of the answer:**
+
+**What fires what it describes?** **What does it produce?**
+
+⚠️ **Compare both to the block's own** — same test as above. A
+different trigger, or a different output, is another subject.
+
+📌 **Same trigger, same output → it belongs to the block.**
+
+| The answer | What you do |
+|---|---|
+| Same trigger, same output | It merges into the block, as a sentence |
+| Same trigger and output, and it contradicts a sentence | It **replaces** that sentence, never sits beside it |
+| A different trigger, or a different output | 🔴 **It becomes a block of its own**, with the nature its trigger and output give it |
+| It says the block already holds several | 🔴 **Split it** — one block per trigger |
+
+⚠️ **The question's identifier says where the answer applies, not
+where it lives.** An answer to a question about B7 becomes its own
+block when its nature differs.
+
+**When you split:**
+
+1. The original keeps its number and the subject its title names
+2. The new blocks take the next free numbers, each with its own nature
+3. 🔴 **Grep the original's number across the product file** and load
+   every block citing it — the split moved what they point at. Update
+   each to name the block that now holds the subject.
+
+⚠️ **If the block carries a `**Clarification needed:**` line on that
+subject, remove it** — the question is settled.
+
+🔴 **Mark every entry you integrated** — append `[integrated: B7]` to
+it in the questions file, naming every block you wrote into.
+
+**b. Every block you split — does each half now have one trigger and
+one output?** 🔴 **A half that still holds two goes through pass a
+again.**
+
+**c. Does any answer bring a subject no block covers?** 🔴 **Answer on
+the title list from step 2**, not by loading blocks.
+
+📌 **The question is not "which answers were left over"** — an answer
+can enrich a block *and* introduce a new subject. Ask it of every
+answer.
+
+🔴 **If pass c finds nothing, do not open the global's index.** There
+is no title to look up.
+
+**If pass c finds something**, the three moves below apply to it.
 
 ### Which blocks you close
 
@@ -442,10 +444,9 @@ told to read that is not there, a false premise that voids the work.
 ## What you never do
 
 - 🔴 **Run the grid as a questionnaire**
-- 🔴 **Settle a product matter** in the Product Owner's place
-- 🔴 **Put two natures on a block**, or two features in one file
+- 🔴 **Leave a block holding two triggers**, or two features in one
+  file
 - 🔴 **Write in the global** — that is the Fusionneur
-- 🔴 **Leave a block holding two triggers** — split it
 - 🔴 **Close a block no answer touched and no `NEW` marks** — it was
   closed on an earlier turn
 - 🔴 **Create a block without `NEW`** — invocation 2 would never close
