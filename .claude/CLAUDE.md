@@ -14,6 +14,11 @@ against outdated code.)*
 `git show HEAD:<path>`. 🔴 **Never let tooling pick a base**: its
 default is `origin/master`.
 
+🔴 **Never restore a file from git history, and never read that history
+to explain what a run found.** A file the Product Owner deleted was
+deleted on purpose; a command's job is to produce, not to work out why
+its input is missing.
+
 ---
 
 # CONTEXT — who you are, what you read, where you run
@@ -356,6 +361,13 @@ disk forever.
 
 ## What you never do
 
+- 🔴 **Open anything in `docs/process/`** — `PROCESS_AMONT.md`,
+  `PROCESS_AVAL.md`, `MODELE_CIBLE_V3.md` and their like are the
+  Product Owner's own documents. They describe why the agents are
+  built as they are, including rules that were considered and dropped.
+  **Reading one puts discarded reasoning into your context.**
+  ⚠️ **The one exception is `GRILLE_CADRAGE_PRODUIT.md`**, which the
+  Analyste loads by name.
 - **Open `CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`**
   — in any mode. *(The first was read whole 5 times in a 26-step
   sample, 53-60 KB each; the second is ~276 KB and is read by no one:

@@ -143,6 +143,10 @@ is a contiguous slice of the sequence.
 ⚠️ **Indicative ceilings, not targets, and estimates rather than
 measurements.**
 
+🔴 **They count lots, not their weight.** A merged lot carrying five
+subsections weighs several — **count it as one per subsection it
+anchors on.**
+
 ---
 
 ## What you write
@@ -211,6 +215,8 @@ unreadable** — there is nothing to check.
 
 ## What you never do
 
+- 🔴 **Open anything in `docs/process/`** — those are the Product
+  Owner's documents, not yours
 - 🔴 **Correct a split** — you constate, the Cadreur takes it back
 - 🔴 **Read an unanchored subsection.** Needing one to understand a lot
   means the split is bad — a defect to report, not to fix.
