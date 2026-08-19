@@ -87,7 +87,12 @@ first, in the lot list's own order.
 pre-existing.
 
 **c.** Repeat until no lot is left. 🔴 **A lot that never becomes
-eligible sits in a cycle** — that is a blocker.
+eligible sits in a cycle** — a defect, not a blocker.
+
+**On a cycle**: name the lots and the symbols that loop in
+`## Defects`, and 🔴 **leave `## Order` and `## Blocks` empty** —
+without an order there is nothing to group. The Cadreur re-cuts, you
+run again.
 
 📌 **This is not scheduling** — the order follows mechanically, it is
 not decided. Two lots eligible at the same time keep the lot list's
@@ -168,9 +173,9 @@ section says *"the split holds"*.
 merely say it.
 
 ⚠️ **Blocking is not reporting a defect.** A hole, a false anchor, a
-badly cut lot: those go in `## Defects` and the cycle carries on. 🔴
-**You block on a cycle** — a dependency loop makes any order
-impossible — **or when the lot list is missing or unreadable.**
+badly cut lot, a dependency loop: those go in `## Defects` and the
+round-trip carries on. 🔴 **You block when the lot list is missing or
+unreadable** — there is nothing to check.
 
 **Its shape** — three headings, one answer each:
 
@@ -197,7 +202,8 @@ impossible — **or when the lot list is missing or unreadable.**
   means the split is bad — a defect to report, not to fix.
   ⚠️ **The preamble is not a numbered subsection**; read it
 - 🔴 **Write a signature, an acceptance criterion, or code**
-- 🔴 **Let a cycle through** — that is a blocker, not a defect
+- 🔴 **Derive an order despite a cycle** — report it and leave the
+  order empty
 - 🔴 **Decide an order that does not follow from the declarations**
 
 ## When `Edit` fails
