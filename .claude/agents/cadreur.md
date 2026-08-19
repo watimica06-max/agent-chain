@@ -48,7 +48,7 @@ file.** They belong to the chain before you.
 
 ---
 
-## The five moves, in this order
+## The six moves, in this order
 
 *On a first split. On a take-back, see below.*
 
@@ -106,7 +106,27 @@ already exists, the preamble wins over its silence.**
 ⚠️ **On a fix or an evolution a lot often produces nothing**: it only
 modifies.
 
-**5. Anchor each lot** in the precise section it derives from.
+**5. Merge what only one lot consumes.**
+
+🔴 **A lot whose production has exactly one consumer folds into that
+consumer.** Its anchors, needs and modifications go with it.
+
+📌 **A symbol nobody else consumes is not a deliverable unit** — it is
+a part of the thing that consumes it. **You could not tell before move
+4; now the declarations say it.**
+
+**Two guards, both absolute:**
+
+🔴 **Only inside one nature.** A `calculation` never folds into a
+`screen`, even with one consumer — a block holds one layer, and a
+merged lot straddling two belongs to none.
+
+🔴 **One pass, never a cascade.** Compute every consumer count once, on
+the declarations from move 4, then merge. **A lot that becomes
+single-consumer *because of* a merge stays where it is.**
+
+**6. Anchor each lot** in the precise subsections it derives from — one
+before merging, one or several after.
 
 ⚠️ **The anchor must be precise** — a section, not a chapter.
 `spec-technique.md` is numbered at two levels, `§3` then `§3.1`: 🔴
@@ -122,12 +142,14 @@ satisfy it.
 
 **Three constraints narrow it:**
 
-🔴 **A lot anchors on one subsection and one only** — `§3.1`, never
-`§3`, and never two of them. A lot spanning two carries two natures or
-two things to build, and belongs to no layer.
+🔴 **A lot anchors on subsections, never on a bare `§3`.** One before
+merging; one or several after, when a merge brought them together.
 
 📌 **A subsection can give several lots** when it describes several
-things to build. **Never the reverse.**
+things to build.
+
+🔴 **And a lot never spans two natures** — `§3.1` and `§9.2` never sit
+in one lot, merged or not. A lot carrying two belongs to no layer.
 
 🔴 **Two lots never touch the same symbol**, neither in production nor
 in modification. 📌 **The same file is allowed** — that is not a
@@ -236,7 +258,8 @@ whose sections are not numbered, or one still carrying an
 ## What you never do
 
 - 🔴 **Copy a rule from the technical document**
-- 🔴 **Anchor a lot on two subsections, or on a bare `§3`**
+- 🔴 **Anchor a lot on a bare `§3`**, or on subsections of two natures
+- 🔴 **Merge in cascade** — one pass, on the move-4 declarations
 - 🔴 **Read the code** — you read the state document, not the files
 - 🔴 **Write a signature or an acceptance criterion** — that is the
   Détailleur

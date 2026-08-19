@@ -50,7 +50,7 @@ report.
 
 ## The four moves, in this order
 
-**1. Cross the declarations**, and note two kinds of defect:
+**1. Cross the declarations**, and note three kinds of defect:
 
 **A hole** — a need no lot produces and the state document does not
 carry. 📌 The cycle is not detected here; it surfaces at move 3.
@@ -58,15 +58,21 @@ carry. 📌 The cycle is not detected here; it surfaces at move 3.
 **An overlap** — two lots naming the same symbol, whether they produce
 or modify it.
 
+**A production with one consumer** — 🔴 **a lot that should have been
+merged.** The Cadreur folds those in; one left is a defect. ⚠️ **Unless
+the two lots differ in nature** — that merge is forbidden, and the lot
+stays.
+
 ⚠️ **A modification creates a dependency too.** A lot consuming a
 symbol another one modifies comes after it. **Record it**, it feeds
 move 3.
 
 **2. Open each anchored subsection**, one by one, and confront:
 
-🔴 **Is the anchor a single subsection?** `§3.1`, never `§3`, never two
-of them. **Two anchors on one lot is a defect** — the lot spans two
-things to build.
+🔴 **Are the anchors subsections of one nature?** `§3.1`, never `§3`.
+**Several anchors are legitimate** — the Cadreur merges a lot whose
+production had one consumer. 🔴 **Anchors across two natures are a
+defect**: the lot belongs to no layer.
 
 🔴 **Does the anchor point where it claims?** Does the subsection
 actually treat what the lot announces.
@@ -81,7 +87,7 @@ contaminates a whole block.
 **3. Derive the order** from the declared dependencies:
 
 **a.** Take the lots whose needs are all pre-existing — they come
-first, in the lot list's own order.
+first.
 
 **b.** Then, repeatedly: any lot whose needs are now all produced or
 pre-existing.
@@ -95,8 +101,16 @@ without an order there is nothing to group. The Cadreur re-cuts, you
 run again.
 
 📌 **This is not scheduling** — the order follows mechanically, it is
-not decided. Two lots eligible at the same time keep the lot list's
-order between them.
+not decided.
+
+🔴 **Between lots eligible at the same time, take the one whose layer
+matches the lot you just placed.** Nothing matching → the lot list's
+own order. **The tie-break is mechanical**, so two runs give the same
+sequence.
+
+⚠️ **That is what keeps a block from holding one lot.** Eligible lots
+interleaved by layer force a block to close at every switch, and a
+block of one amortises nothing.
 
 **4. Group into blocks**, walking the order from the first lot:
 
