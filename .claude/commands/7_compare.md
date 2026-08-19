@@ -54,7 +54,21 @@ and each reads what the previous one wrote.
 
 ## Git, in this mode
 
-🔴 **Commit the feature folder first**, before creating the worktree:
+🔴 **Before invoking, move every root `questions-*.md` whose prefix is
+not `fusionneur`:**
+
+    git mv docs/features/<name>/questions-<other>-NN.md \
+           docs/features/<name>/questions/<other>/
+
+⚠️ **`git mv`, never a read-and-rewrite** — the agent must not open
+those files, and neither should you.
+
+🔴 **And every `questions-fusionneur-NN.md` but the highest** — the
+last one stays at the root, it carries the numbering.
+
+📌 **Create `questions/<agent>/` if it does not exist.**
+
+🔴 **Then commit the feature folder**, before creating the worktree:
 
     git add docs/features/<name>/ && git commit -m "chore: answers"
 

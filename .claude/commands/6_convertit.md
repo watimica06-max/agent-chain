@@ -54,7 +54,7 @@ and each reads what the previous one wrote.
 
 ## Git, in this mode
 
-🔴 **Commit the feature folder first**, before creating the worktree:
+🔴 **Commit the feature folder**, before creating the worktree:
 
     git add docs/features/<name>/ && git commit -m "chore: answers"
 

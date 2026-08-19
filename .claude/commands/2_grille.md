@@ -9,8 +9,8 @@ Act as the orchestrator, in **upstream mode**.
 **This command invokes `analyste`, invocation 2 — Blind spots.**
 
 📌 **It runs as many times as needed.** Each run writes the next
-questions file — `questions-01.md`, then `questions-02.md`. **An empty
-one ends the loop**; then run `/3_finalise`.
+`questions-analyste-NN.md`. **An empty one ends the loop**; then run
+`/5_reclasse`.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
@@ -58,7 +58,21 @@ and each reads what the previous one wrote.
 
 ## Git, in this mode
 
-🔴 **Commit the feature folder first**, before creating the worktree:
+🔴 **Before invoking, move every root `questions-*.md` whose prefix is
+not `analyste`:**
+
+    git mv docs/features/<name>/questions-<other>-NN.md \
+           docs/features/<name>/questions/<other>/
+
+⚠️ **`git mv`, never a read-and-rewrite** — the agent must not open
+those files, and neither should you.
+
+🔴 **And every `questions-analyste-NN.md` but the highest** — the
+last one stays at the root, it carries the numbering.
+
+📌 **Create `questions/<agent>/` if it does not exist.**
+
+🔴 **Then commit the feature folder**, before creating the worktree:
 
     git add docs/features/<name>/ && git commit -m "chore: answers"
 

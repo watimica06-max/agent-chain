@@ -121,19 +121,15 @@ match at all in the new one. ⚠️ **Silence is not deletion.**
 
 ### Where questions files live
 
-**At the feature folder's root**: `questions-fusionneur-01.md`,
-`questions-fusionneur-02.md`… — the ones this cycle is working on.
+**At the feature folder's root**: `questions-fusionneur-NN.md`.
+🔴 **The orchestration filed away every other agent's file before
+invoking you** — what remains at the root is yours.
 
-**Filed away**: `questions/<agent>/` — one folder per agent.
+**Your number**: the highest `questions-fusionneur-NN.md` found at the
+root, or in `questions/fusionneur/` if the root holds none, plus one.
 
-🔴 **Three steps, before you write anything:**
-
-1. **File away every root questions file whose prefix is not
-   `fusionneur`** — move it to `questions/<its agent>/`
-2. **Find your last file at the root.** None there → look in
-   `questions/fusionneur/`
-3. **Write at the root**, taking the highest number found and adding
-   one
+🔴 **One file per invocation, carrying all your questions.** The number
+advances once per invocation, never per question.
 
 ### The shape of every entry
 
@@ -207,9 +203,6 @@ answered · the global.
 
 📌 **Look for it at the root first, then in `questions/fusionneur/`** —
 another agent may have filed it away since.
-
-🔴 **File it away when you are done** — move every root questions file
-to `questions/<its agent>/`. The cycle ends with a clean root.
 
 **Apply the merge plan**, in targeted edits.
 

@@ -92,14 +92,27 @@ tell from it whether that block already covers the subject.
 
 **Three passes over the answers:**
 
-**a. Each answer enriches the block its identifier names.**
+**a. Each answer goes to a block — which one is the question.**
+
+🔴 **Before writing it, ask two things of the answer:**
+
+**What fires what it describes?** **What does it produce?**
+
+⚠️ **Compare both to the block's own.** A different trigger, or a
+different output, is another subject.
+
+🔴 **Read what fires it, not its grammatical subject.** A sentence
+opening on what the user sees can still be fired by a failure, a
+timer, or an event elsewhere.
+
+📌 **Same trigger, same output → it belongs to the block.**
 
 | The answer | What you do |
 |---|---|
-| Adds a precision of the block's own nature | It merges into the block, as a sentence |
-| Contradicts a sentence | It **replaces** that sentence, never sits beside it |
-| Carries another nature | 🔴 **It becomes a block of its own**, with that nature — an event-fired mechanism answered on a `screen` block becomes a `transition` block |
-| Says the block holds several subjects | 🔴 **Split it** — one block per nature |
+| Same trigger, same output | It merges into the block, as a sentence |
+| Same trigger and output, and it contradicts a sentence | It **replaces** that sentence, never sits beside it |
+| A different trigger, or a different output | 🔴 **It becomes a block of its own**, with the nature its trigger and output give it |
+| It says the block already holds several | 🔴 **Split it** — one block per trigger |
 
 ⚠️ **The question's identifier says where the answer applies, not
 where it lives.** An answer to a question about B7 becomes its own
@@ -119,10 +132,9 @@ subject, remove it** — the question is settled.
 🔴 **Mark every entry you integrated** — append `[integrated: B7]` to
 it in the questions file, naming every block you wrote into.
 
-**b. Every block you touched — does it still hold one subject only?**
-
-🔴 **On every block, whatever the answer was.** A block carrying two
-natures after integration is split, by the rule above.
+**b. Every block you split — does each half now have one trigger and
+one output?** 🔴 **A half that still holds two goes through pass a
+again.**
 
 **c. Does any answer bring a subject no block covers?** 🔴 **Answer on
 the title list from step 2**, not by loading blocks.
@@ -139,8 +151,11 @@ is no title to look up.
 ### The three moves, on each passage of the idea file
 
 **1. Decompose.** 🔴 **What the Product Owner writes is a flow, not a
-list.** One sentence can hold five subjects. Work out how many are
-there before filing anything.
+list.** One sentence can hold five subjects.
+
+🔴 **A subject is one trigger and one output** — same test as at
+integration, see above. **Two triggers, or two outputs, is two
+subjects.**
 
 **2. Grep the global's index for a title covering this subject.** Found
 → reuse it verbatim. Not found → create one.
@@ -154,11 +169,6 @@ questions file addresses blocks by number.
 
 🔴 **The number is local to the feature file and never passes into the
 global.** There, a block carries its title alone.
-
-🔴 **One nature per block, and it must match the content.** An
-`external source` subject does not stay in a `screen` block, even when
-the Product Owner described it while talking about that screen — it
-becomes its own block.
 
 **When you do not understand** — a passage of the idea file, or an
 answer: 🔴 **flag it in place, never because you spotted a gap** — the
@@ -226,22 +236,17 @@ and **that is what ends the loop.**
 
 ### Where questions files live
 
-*Invocation 2 only — invocation 1 writes no questions file and files
-nothing away.*
+*Invocation 2 only — invocation 1 writes none.*
 
-**At the feature folder's root**: `questions-analyste-01.md`,
-`questions-analyste-02.md`… — the ones this cycle is working on.
+**At the feature folder's root**: `questions-analyste-NN.md`.
+🔴 **The orchestration filed away every other agent's file before
+invoking you** — what remains at the root is yours.
 
-**Filed away**: `questions/<agent>/` — one folder per agent.
+**Your number**: the highest `questions-analyste-NN.md` found at the
+root, or in `questions/analyste/` if the root holds none, plus one.
 
-🔴 **Three steps, before you write anything:**
-
-1. **File away every root questions file whose prefix is not
-   `analyste`** — move it to `questions/<its agent>/`
-2. **Find your last file at the root.** None there → look in
-   `questions/analyste/`
-3. **Write at the root**, taking the highest number found and adding
-   one
+🔴 **One file per invocation, carrying all your questions.** The number
+advances once per invocation, never per question.
 
 ### The shape of every entry
 
@@ -358,7 +363,8 @@ every `NEW` before writing**, so only this turn's are marked.
 external source · synchronisation · background work · journey ·
 screen · text · access · lifecycle.
 
-⚠️ **A block with two natures holds two subjects.** Split it.
+⚠️ **A block with two triggers or two outputs holds two subjects.**
+Split it.
 
 **How the global is read**
 
@@ -439,7 +445,7 @@ told to read that is not there, a false premise that voids the work.
 - 🔴 **Settle a product matter** in the Product Owner's place
 - 🔴 **Put two natures on a block**, or two features in one file
 - 🔴 **Write in the global** — that is the Fusionneur
-- 🔴 **Leave a block holding two subjects** — split it
+- 🔴 **Leave a block holding two triggers** — split it
 - 🔴 **Close a block no answer touched and no `NEW` marks** — it was
   closed on an earlier turn
 - 🔴 **Create a block without `NEW`** — invocation 2 would never close

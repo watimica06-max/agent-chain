@@ -54,7 +54,7 @@ and each reads what the previous one wrote.
 
 ## Git, in this mode
 
-🔴 **Commit the feature folder first**, before creating the worktree:
+🔴 **Commit the feature folder**, before creating the worktree:
 
     git add docs/features/<name>/ && git commit -m "chore: answers"
 
@@ -89,6 +89,19 @@ invocation is redone.)*
 🔴 **Merge before handing back, always** — a phase whose output sits on
 an unmerged branch is invisible to the next one. ⚠️ **A
 `blocked_*.md` merges too**: the Product Owner has to see it.
+
+---
+
+## Filing away, once the merge holds
+
+🔴 **The cycle ends here** — move every root `questions-*.md` to
+`questions/<its agent>/`:
+
+    git mv docs/features/<name>/questions-<agent>-NN.md \
+           docs/features/<name>/questions/<agent>/
+
+⚠️ **`git mv`, never a read-and-rewrite.** 📌 **Create the folder if it
+does not exist**, and commit the moves.
 
 ---
 
