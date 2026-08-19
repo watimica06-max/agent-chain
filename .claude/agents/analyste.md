@@ -137,13 +137,18 @@ raw idea.**
 **The Product Owner filled the `Answer:` fields by hand, in French.**
 🔴 **You decide nothing** — you transcribe, translate and file.
 
-**How you load the product file** — 🔴 **never in full:**
+**How you load the product file**
+
+🔴 **You never read it whole.** It runs to hundreds of lines and you
+need a handful of blocks; reading it all is the single most wasteful
+thing you can do here.
 
 1. **Grep `NEW`** — strip the marker from every title line it returns.
-   🔴 **A targeted edit per line, not a load** — the marker is on the
-   title, its block stays closed
+   🔴 **One targeted edit per line** — the marker sits on the title,
+   the block below it is not opened
 2. **Grep `^###`** — the list of block titles, nothing more
-3. **Load only the blocks the answers name** by identifier
+3. **Load only the blocks the answers name** by identifier — 🔴 **a
+   ranged read per block**, never the file
 4. **Edit those blocks in place**
 
 ⚠️ **Open one more block only if a title is ambiguous** and you cannot
@@ -215,11 +220,19 @@ is no title to look up.
 **The blocks that moved:**
 
 1. **Grep `^Block:` in the highest-numbered questions file** — those
-   identifiers name the blocks an answer touched. 🔴 **Read nothing
-   else in that file** — not a question, not an answer
+   identifiers name the blocks an answer touched.
+
+   🔴 **A grep, never a `Read`** — whatever the file's size. Your look
+   at the product file has to be agnostic, and it stops being so the
+   moment a question enters your context. **You cannot unsee it.**
+
 2. **Grep `NEW` in the product file** — those blocks were created on
    the last turn
 3. **Load both sets, and no others**
+
+⚠️ **A closed block cited by one of yours is read, never closed.** Its
+title answers the closure test on its own — open it only when the
+citation asserts something about its content.
 
 📌 **You close the product file as it stands, not what was asked about
 it.**
@@ -443,6 +456,9 @@ told to read that is not there, a false premise that voids the work.
 
 ## What you never do
 
+- 🔴 **Read the product file whole** — grep its titles, load the blocks
+  you need
+- 🔴 **`Read` a questions file** — grep it, at invocation 2
 - 🔴 **Run the grid as a questionnaire**
 - 🔴 **Leave a block holding two triggers**, or two features in one
   file
