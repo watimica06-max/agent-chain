@@ -404,10 +404,35 @@ on the second.
 **Numbered sections, never merely titled** — they serve as the
 Cadreur's anchors.
 
+### What becomes a subsection
+
+🔴 **A subsection is not a product block.** The product file splits by
+trigger, to close each behaviour. **You group by what gets built.**
+
+> **Two product blocks go in the same subsection when they concern the
+> same thing to build** — the same screen area, the same service, the
+> same entity. **They go in two when the things differ**, however close
+> the subjects read.
+
+⚠️ **A subsection carrying one behaviour of a screen is too fine.** How
+that screen fills, what its centre shows, how it shrinks, what a tap on
+it does — one subsection, not four.
+
+📌 **You do not know the symbols; the code does not exist.** You know
+what each block describes building, and that is enough.
+
+🔴 **A lot will anchor on one subsection and one only** — the Cadreur
+cannot cut across two. **A subsection too fine forces him to break that
+rule.**
+
 ### Filling order
 
-**Sections in order §1 → §12**; inside a section, the order of the
-reclassified file.
+**Sections in order §1 → §12.** Inside a section, subsections follow
+the order of their first block in the reclassified file.
+
+📌 **A subsection holds one or several blocks** — see above. Their
+content merges into one continuous description; a block's title
+disappears into it.
 
 📌 **No sorting by judgement** — the Cadreur anchors on section
 numbers, and they must not move between two runs.
