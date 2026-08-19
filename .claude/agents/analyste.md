@@ -91,7 +91,13 @@ timer, or an event elsewhere.
 
 ⚠️ **Search the whole index**, not only the sections you loaded.
 
-**3. File.** One block per subject, under the title found or created.
+**3. File.** One block per subject, under the title found or created,
+🔴 **with the nature its output gives it.** A block producing
+something displayed is `screen`, even when an event fires it; a block
+producing anything else — a fetch, a stored record, a computed
+value — takes the nature of what it produces.
+
+📌 **The trigger separates subjects, the output names their nature.**
 
 📌 **Numbering**: assigned as you write, never reassigned — the
 questions file addresses blocks by number.
@@ -173,7 +179,7 @@ different trigger, or a different output, is another subject.
 |---|---|
 | Same trigger, same output | It merges into the block, as a sentence |
 | Same trigger and output, and it contradicts a sentence | It **replaces** that sentence, never sits beside it |
-| A different trigger, or a different output | 🔴 **It becomes a block of its own**, with the nature its trigger and output give it |
+| A different trigger, or a different output | 🔴 **It becomes a block of its own**, with the nature its output gives it |
 | It says the block already holds several | 🔴 **Split it** — one block per trigger |
 
 ⚠️ **The question's identifier says where the answer applies, not
@@ -183,8 +189,11 @@ block when its nature differs.
 **When you split:**
 
 1. The original keeps its number and the subject its title names
-2. The new blocks take the next free numbers, each with its own nature
-3. 🔴 **Grep the original's number across the product file** and load
+2. The new blocks take the next free numbers
+3. 🔴 **Each block gets the nature its own output gives it** — never
+   the original's by default. A subject split off because its trigger
+   differs rarely shares the nature it came from
+4. 🔴 **Grep the original's number across the product file** and load
    every block citing it — the split moved what they point at. Update
    each to name the block that now holds the subject.
 

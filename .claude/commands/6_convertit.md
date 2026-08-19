@@ -8,6 +8,11 @@ Act as the orchestrator, in **upstream mode**.
 
 **This command invokes `convertisseur`, invocation 2 — Producing.**
 
+📌 **It can run more than once.** If it had to assume something, it
+writes `questions-convertisseur-NN.md` alongside the document and marks
+each assumption `<<ASSUMED …>>`; answering and re-running updates those
+marks in place.
+
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
 
@@ -54,7 +59,21 @@ and each reads what the previous one wrote.
 
 ## Git, in this mode
 
-🔴 **Commit the feature folder**, before creating the worktree:
+🔴 **Before invoking, move every root `questions-*.md` whose prefix is
+not `convertisseur`:**
+
+    git mv docs/features/<name>/questions-<other>-NN.md \
+           docs/features/<name>/questions/<other>/
+
+⚠️ **`git mv`, never a read-and-rewrite** — the agent must not open
+those files, and neither should you.
+
+🔴 **And every `questions-convertisseur-NN.md` but the highest** — the
+last one stays at the root, it carries the numbering.
+
+📌 **Create `questions/<agent>/` if it does not exist.**
+
+🔴 **Then commit the feature folder**, before creating the worktree:
 
     git add docs/features/<name>/ && git commit -m "chore: answers"
 

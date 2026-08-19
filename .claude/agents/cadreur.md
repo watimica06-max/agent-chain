@@ -48,13 +48,18 @@ file.** They belong to the chain before you.
 
 ---
 
-## The four moves, in this order
+## The five moves, in this order
 
 *On a first split. On a take-back, see below.*
 
-**1. Read `spec-technique.md` in full.**
+**1. Grep `<<ASSUMED` in `spec-technique.md`.** 🔴 **One hit and you
+stop**, writing `code/blocked_cadreur.md` — the mark says a rule is
+provisional, and cutting around it would anchor a lot on something
+about to change.
 
-**2. Section by section, cut.** 🔴 **Split by what the section
+**2. Read `spec-technique.md` in full.**
+
+**3. Section by section, cut.** 🔴 **Split by what the section
 describes building** — one lot per identifiable thing, whether another
 part consumes it or not.
 
@@ -68,7 +73,7 @@ part consumes it or not.
 | §10 Text | Set of labels one screen uses |
 | §11 Access, §12 Lifecycle | Rule |
 
-**3. For each lot, name what it needs and what it builds**, then grep
+**4. For each lot, name what it needs and what it builds**, then grep
 each of those names in the state document.
 
 🔴 **A symbol is a name the code carries** — a class, a table, a route,
@@ -87,7 +92,7 @@ hundreds of kilobytes, and you only need the names your lots use.
 ⚠️ **On a fix or an evolution a lot often produces nothing**: it only
 modifies.
 
-**4. Anchor each lot** in the precise section it derives from.
+**5. Anchor each lot** in the precise section it derives from.
 
 ⚠️ **The anchor must be precise** — a section, not a chapter.
 `spec-technique.md` is numbered at two levels, `§3` then `§3.1`: 🔴
@@ -189,8 +194,9 @@ merely say it.
 
 ⚠️ **Blocking is not flagging.** A section you find thin, a rule you
 find odd: that is not yours to judge. 🔴 **You block only when cutting
-is impossible** — no technical document, no state document, or a
-document whose sections are not numbered.
+is impossible** — no technical document, no state document, a document
+whose sections are not numbered, or one still carrying an
+`<<ASSUMED` mark.
 
 **Its shape** — three headings, one answer each:
 
