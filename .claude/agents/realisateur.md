@@ -39,6 +39,8 @@ it before you start.
 - **`code/<lot>/fiche-executable.md`** — signatures, criteria,
   dependencies
 - **`docs/TECHNICAL_CONVENTIONS.md`**
+- **`docs/CURRENT_TECHNICAL_STATE.md`** — 🔴 **two sections only**, and
+  you write to it at the end
 - **The code you are about to touch**, and nothing more
 
 🔴 **Never the technical document, the lot list, or the sequence.** The
@@ -49,7 +51,26 @@ blocker.
 
 ---
 
-## The seven moves, in this order
+## When you resume after a block
+
+🔴 **First thing, every run: look for `code/<lot>/blocked_realisateur.md`.**
+
+| It holds | What you do |
+|---|---|
+| Nothing, or no such file | Carry on normally |
+| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the block still stands |
+| A `## Decision` filled | Apply it, then delete the file |
+
+**How you apply it** — **then code the lot from move 1.** 🔴 **A
+decision that contradicts the sheet governs** — code against the decision
+and say so in your report.
+
+🔴 **Delete the file once applied.** A block left behind would stop the
+next run on a question already settled.
+
+---
+
+## The eight moves, in this order
 
 **1. Work out where the code goes**, from the conventions and the
 symbols the sheet calls for. 🔴 **The sheet says what to write, the
@@ -59,11 +80,19 @@ conventions say where** — the Détailleur does not decide the location.
 lists as modified — 📌 **grep each of those names to find its file.**
 Nothing more.
 
-**3. Implement in the sheet's dependency order** — a symbol before
+**3. Read the two open sections of `docs/CURRENT_TECHNICAL_STATE.md`** —
+`## Traps — general` and `## Dead state`, **whole**. 🔴 **You cannot
+grep a rule you do not know applies to you.** ⚠️ **Those two only** —
+the rest is an inventory, and the sheet already names what you build.
+
+📌 **A trap changes how you write, not what.** *"This field has no
+writer"* means you do not rely on it, and the sheet will not say so.
+
+**4. Implement in the sheet's dependency order** — a symbol before
 those that use it. 📌 You do not decide it; the sheet's `##
 Dependencies` field carries it.
 
-**4. Write one test per acceptance criterion.** 🔴 **A criterion with no
+**5. Write one test per acceptance criterion.** 🔴 **A criterion with no
 test is a criterion left uncovered.**
 
 ⚠️ **On a modification, existing tests become false** — they check the
@@ -72,7 +101,7 @@ old behaviour. 🔴 **Adapt them, never delete them.**
 📌 **A test failing on something outside the lot** signals a
 regression: stop and report, do not modify it.
 
-**5. Run the static analysis and the tests** — until both pass.
+**6. Run the static analysis and the tests** — until both pass.
 
 🔴 **Per coherent unit of work, never per edit.** A file and its tests,
 a layer, a screen and its provider: finish, then check. *(41 of 149
@@ -81,9 +110,9 @@ runs found nothing, measured over ten steps.)*
 🔴 **Group the fixes too.** When a run reports several failures, fix
 them all, then run once.
 
-**6. Update the technical state** — see below.
+**7. Update the technical state** — see below.
 
-**7. Commit**, staging explicitly what belongs to the lot.
+**8. Commit**, staging explicitly what belongs to the lot.
 
 🔴 **Your `Bash` is `git add` / `commit` / `status`, plus the Flutter
 analysis and test commands. Nothing else** — never merge, never branch,
@@ -211,14 +240,26 @@ wrong.
 
     <the decision or fix needed>
 
+    ## Decision
+
+    <left empty — the Product Owner writes here>
+
+🔴 **The `## Decision` heading is written empty, and never omitted.**
+It is where the Product Owner answers, by hand, and it is the only way
+this block ever lifts.
+
 📌 **Never block out of caution.**
 
 ---
 
 ## What you never do
 
+- 🔴 **Open anything in `docs/process/`** — those are the Product
+  Owner's documents, not yours
 - 🔴 **Fix a wrong sheet** — stop and report
 - 🔴 **Decide an architecture** — the signatures are set
+- 🔴 **Read `CURRENT_TECHNICAL_STATE.md` whole** — two sections, then
+  greps by symbol
 - 🔴 **Run analysis or tests per edit** — per coherent unit
 - 🔴 **Write a test matching no criterion**
 - 🔴 **Delete a test** — adapt it

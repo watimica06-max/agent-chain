@@ -35,15 +35,17 @@ read it before you start.
 
 - **`desc-produit.md`**, in full — it is your reference. ⚠️ **Except
   its closing `## Questions set aside` section**: it records what the
-  grid ruled out, it holds no intention to find.
+  grid ruled out, it holds no intention to find
+- **Every `code/<lot>/fiche-executable.md`** — 🔴 **glob
+  `code/*/fiche-executable.md`** to list them; you have no lot list
 
 📌 **A title may end in `NEW`** — an upstream working marker. It is not
 part of the title; ignore it.
-- **Every `code/<lot>/fiche-executable.md`** — 🔴 **glob
-  `code/*/fiche-executable.md`** to list them; you have no lot list.
 
-⚠️ **A lot whose folder holds no sheet was never detailed** — report it
-as a doubt, not as a missing intention.
+⚠️ **A `code/<lot>/` folder holding no sheet means that lot was never
+detailed** — report it as a doubt, not as a missing intention. 📌 **A
+merged lot leaves no folder at all**; you will not see it, and there is
+nothing to report.
 
 🔴 **Never `idees.md`** — the raw text the upstream chain spent its
 whole loop correcting.
@@ -51,6 +53,24 @@ whole loop correcting.
 🔴 **Never the code** — the Relecteur checked sheet against code.
 ⚠️ **Never the technical document, the lot list or the sequence**: you
 check the result of those transformations, not the transformations.
+
+---
+
+## When you resume after a block
+
+🔴 **First thing, every run: look for `code/blocked_controleur.md`.**
+
+| It holds | What you do |
+|---|---|
+| Nothing, or no such file | Carry on normally |
+| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the block still stands |
+| A `## Decision` filled | Apply it, then delete the file |
+
+**How you apply it** — **to the block `## Where` names**, then
+confront the rest as usual.
+
+🔴 **Delete the file once applied.** A block left behind would stop the
+next run on a question already settled.
 
 ---
 
@@ -67,6 +87,11 @@ at every block.
 | **Found** | The block, and the sheet that carries it |
 | **Missing** | The block, and what it described |
 | **Doubtful** | The block, and what stops you deciding |
+
+📌 **One sheet often carries several blocks.** The Cadreur merges lots
+that build one thing, so a single sheet can answer for a whole screen.
+⚠️ **Confront block by block all the same** — a sheet covering four
+blocks may still miss the fifth.
 
 🔴 **The criterion: is the intention observable in a signature or in an
 acceptance criterion?** Not in a sheet's prose — a sheet that
@@ -137,11 +162,19 @@ do not exist.
 
     ## Where
 
-    <the lot, section or file>
+    <the block, lot or file>
 
     ## To resume
 
     <the decision or fix needed>
+
+    ## Decision
+
+    <left empty — the Product Owner writes here>
+
+🔴 **The `## Decision` heading is written empty, and never omitted.**
+It is where the Product Owner answers, by hand, and it is the only way
+this block ever lifts.
 
 📌 **Never block out of caution.** A doubt is a doubt, not a blocker.
 
@@ -149,6 +182,8 @@ do not exist.
 
 ## What you never do
 
+- 🔴 **Open anything in `docs/process/`** — those are the Product
+  Owner's documents, not yours
 - 🔴 **Read the code** — the Relecteur covers sheet → code
 - 🔴 **Judge the quality of a sheet** — presence or absence, nothing
   else

@@ -60,7 +60,16 @@ lots in the prompt.
 
 **5.** Next lot.
 
-**When every lot carries a PASS** → **`controleur`**, then stop.
+**When every lot of the sequence carries a PASS** → **`controleur`**,
+then stop.
+
+🔴 **Every lot of the sequence, not every lot of this run.** `N` lots
+coded with two still pending means no Contrôleur — he compares the
+product file to *all* the sheets, and a missing one would make him
+report an intention as absent.
+
+📌 **When `N` happens to cover the last lots**, he runs before you hand
+back: reaching `N` and finishing the sequence are the same moment.
 
 ⚠️ **The count is on lots reviewed PASS**, not on invocations: the
 Détailleur runs when a new block starts, without entering the count.

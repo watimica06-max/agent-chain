@@ -68,17 +68,50 @@ turn into signatures.
 
 ---
 
-## The five moves, per lot of the block
+## When you resume after a block
+
+🔴 **First thing, every run: look for `code/<lot>/blocked_detailleur.md`, for
+every lot of your block.**
+
+| It holds | What you do |
+|---|---|
+| Nothing, or no such file | Carry on normally |
+| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the block still stands |
+| A `## Decision` filled | Apply it, then delete the file |
+
+**How you apply it** — **to the lot `## Where` names**, then derive
+its sheet as usual. 🔴 **The decision replaces what the anchored subsection
+said on that point** — write the sheet against the decision, not against the
+subsection.
+
+🔴 **Delete the file once applied.** A block left behind would stop the
+next run on a question already settled.
+
+---
+
+## The six moves, per lot of the block
 
 **1. Open every subsection the lot anchors on** — 🔴 **a merged lot
 carries several**, and they describe one thing to build. Read them all
 before deriving anything.
 
-**2. For each rule it describes, work out a signature** — see below. 📌
-**The naming conventions apply here**, nowhere else.
+**2. Read the two open sections of the state document** —
+`## Traps — general` and `## Dead state`, **whole**. 🔴 **You cannot
+grep a rule you do not know applies to you**; that is why they are
+sections and not entries. ⚠️ **Those two only** — the rest of the file
+is an inventory you grep by symbol.
 
-**3. Grep every symbol the signature uses**, before writing it down —
-confirmed by grep, never from memory.
+📌 **A trap changes a signature.** *"Date queries must use a range"*
+means the signature takes a range, not a date.
+
+**3. For each rule it describes, work out a signature** — see below.
+📌 **The naming conventions apply here**, nowhere else, and 🔴 **the
+preamble's `Vocabulary` fixes the terms** — a signature never renames
+what the feature already calls something.
+
+**4. Grep every symbol the signature uses**, before writing it down —
+confirmed by grep, never from memory. 📌 **A trap owned by a symbol
+comes back with it** — the state document files it under that symbol.
 
 | The grep | What it means |
 |---|---|
@@ -103,9 +136,9 @@ is the answer.
 📌 **This catches what no split declared** — a type a signature needed
 and nobody could foresee.
 
-**4. Write the signature** in the sheet, once every type is confirmed.
+**5. Write the signature** in the sheet, once every type is confirmed.
 
-**5. Write the acceptance criteria** — see below.
+**6. Write the acceptance criteria** — see below.
 
 ---
 
@@ -253,6 +286,14 @@ contradicts the lot's declaration**, or on a missing input.
 
     <the decision or fix needed>
 
+    ## Decision
+
+    <left empty — the Product Owner writes here>
+
+🔴 **The `## Decision` heading is written empty, and never omitted.**
+It is where the Product Owner answers, by hand, and it is the only way
+this block ever lifts.
+
 📌 **Never block out of caution.** A terse but complete rule is not
 ambiguous.
 
@@ -265,6 +306,8 @@ ambiguous.
 - 🔴 **Settle an ambiguous rule** — *you are not the safety net of the
   upstream chain*
 - 🔴 **Use a type without confirming it by grep**
+- 🔴 **Read `CURRENT_TECHNICAL_STATE.md` whole** — two sections, then
+  greps by symbol
 - 🔴 **Redeclare a symbol an earlier lot's `## Symbols` already
   names** — reuse it
 - 🔴 **Copy the rule into the sheet**

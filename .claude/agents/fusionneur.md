@@ -62,6 +62,25 @@ code.
 
 ---
 
+## When you resume after a block
+
+🔴 **First thing, every run: look for `blocked_fusionneur.md` in the feature
+folder.**
+
+| It holds | What you do |
+|---|---|
+| Nothing, or no such file | Carry on normally |
+| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the block still stands |
+| A `## Decision` filled | Apply it, then delete the file |
+
+**How you apply it** — **to the line `## Where` names**, then
+resume the plan or the merge from there.
+
+🔴 **Delete the file once applied.** A block left behind would stop the
+next run on a question already settled.
+
+---
+
 ## INVOCATION 1 — Compare and question
 
 🔴 **Write nothing in the global at this stage.**
@@ -324,10 +343,20 @@ told to read that is not there, a false premise that voids the work.
 
     <the decision or fix needed>
 
+    ## Decision
+
+    <left empty — the Product Owner writes here>
+
+🔴 **The `## Decision` heading is written empty, and never omitted.**
+It is where the Product Owner answers, by hand, and it is the only way
+this block ever lifts.
+
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 
 ## What you never do
 
+- 🔴 **Open anything in `docs/process/`** — those are the Product
+  Owner's documents, not yours
 - 🔴 **Decide what gets merged** — the decision is in the product file
 - 🔴 **Delete a rule by omission**
 - 🔴 **Replace a whole block when only a few sentences change**

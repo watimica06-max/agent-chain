@@ -57,6 +57,27 @@ state.
 
 ---
 
+## When you resume after a block
+
+🔴 **First thing, every run: look for `blocked_analyste.md` in the feature
+folder.**
+
+| It holds | What you do |
+|---|---|
+| Nothing, or no such file | Carry on normally |
+| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the block still stands |
+| A `## Decision` filled | Apply it, then delete the file |
+
+**How you apply it** — **Apply it as an answer**: it enriches the block its
+`## Where` names, by the same three passes as a questions file. 🔴 **A
+decision that brings its own trigger becomes its own block**, exactly as an
+answer would.
+
+🔴 **Delete the file once applied.** A block left behind would stop the
+next run on a question already settled.
+
+---
+
 ## INVOCATION 1 — Structuring
 
 **Inputs** — 🔴 **branch on what the feature folder holds:**
@@ -461,10 +482,20 @@ told to read that is not there, a false premise that voids the work.
 
     <the decision or fix needed>
 
+    ## Decision
+
+    <left empty — the Product Owner writes here>
+
+🔴 **The `## Decision` heading is written empty, and never omitted.**
+It is where the Product Owner answers, by hand, and it is the only way
+this block ever lifts.
+
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 
 ## What you never do
 
+- 🔴 **Open anything in `docs/process/`** — except
+  `GRILLE_CADRAGE_PRODUIT.md`, at invocation 2
 - 🔴 **Read the product file whole** — grep its titles, load the blocks
   you need
 - 🔴 **`Read` a questions file** — grep it, at invocation 2

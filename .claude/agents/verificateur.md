@@ -48,6 +48,25 @@ report.
 
 ---
 
+## When you resume after a block
+
+🔴 **First thing, every run: look for `code/blocked_verificateur.md`.**
+
+| It holds | What you do |
+|---|---|
+| Nothing, or no such file | Carry on normally |
+| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the block still stands |
+| A `## Decision` filled | Apply it, then delete the file |
+
+**How you apply it** — **then run all four moves again from the
+start** — a decision on the lot list changes what crosses, and a partial
+re-check would miss it.
+
+🔴 **Delete the file once applied.** A block left behind would stop the
+next run on a question already settled.
+
+---
+
 ## The four moves, in this order
 
 **1. Cross the declarations**, and note three kinds of defect:
@@ -80,6 +99,10 @@ actually treat what the lot announces.
 🔴 **Does what the lot declares match what the subsection describes?**
 A lot announcing one service where the spec describes two distinct
 things to build is badly cut.
+
+📌 **The preamble settles a naming doubt** — its `Vocabulary` says what
+a term means, its `Dependencies` says what already exists. **Read it
+before calling a mismatch.**
 
 📌 **These two checks protect the Détailleur** — a false sheet
 contaminates a whole block.
@@ -208,6 +231,14 @@ unreadable** — there is nothing to check.
     ## To resume
 
     <the decision or fix needed>
+
+    ## Decision
+
+    <left empty — the Product Owner writes here>
+
+🔴 **The `## Decision` heading is written empty, and never omitted.**
+It is where the Product Owner answers, by hand, and it is the only way
+this block ever lifts.
 
 📌 **Never block out of caution.**
 

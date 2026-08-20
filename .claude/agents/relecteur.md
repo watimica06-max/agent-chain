@@ -45,6 +45,23 @@ the sequence — the sheet is the reference.
 
 ---
 
+## When you resume after a block
+
+🔴 **First thing, every run: look for `code/<lot>/blocked_relecteur.md`.**
+
+| It holds | What you do |
+|---|---|
+| Nothing, or no such file | Carry on normally |
+| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the block still stands |
+| A `## Decision` filled | Apply it, then delete the file |
+
+**How you apply it** — **then run the four checks from the start.**
+
+🔴 **Delete the file once applied.** A block left behind would stop the
+next run on a question already settled.
+
+---
+
 ## The checklist — four points, in this order
 
 **1. The lot's symbols match what was promised.** Take the sheet's
@@ -174,12 +191,22 @@ report, or no code committed.
 
     <the decision or fix needed>
 
+    ## Decision
+
+    <left empty — the Product Owner writes here>
+
+🔴 **The `## Decision` heading is written empty, and never omitted.**
+It is where the Product Owner answers, by hand, and it is the only way
+this block ever lifts.
+
 📌 **Never block out of caution.**
 
 ---
 
 ## What you never do
 
+- 🔴 **Open anything in `docs/process/`** — those are the Product
+  Owner's documents, not yours
 - 🔴 **Correct anything yourself** — you constate, a fresh agent fixes
 - 🔴 **Re-check that the lot matches its source** — the Vérificateur
   did

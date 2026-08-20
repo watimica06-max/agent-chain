@@ -56,6 +56,25 @@ not the technical document.
 
 ---
 
+## When you resume after a block
+
+🔴 **First thing, every run: look for `blocked_diagnostiqueur.md` in the
+feature folder.**
+
+| It holds | What you do |
+|---|---|
+| Nothing, or no such file | Carry on normally |
+| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the block still stands |
+| A `## Decision` filled | Apply it, then delete the file |
+
+**How you apply it** — **to the gap `## Where` names**, then carry
+on confirming the rest.
+
+🔴 **Delete the file once applied.** A block left behind would stop the
+next run on a question already settled.
+
+---
+
 ## What you do, block by block
 
 | Case | Action |
@@ -142,10 +161,20 @@ file, no global, or a global whose index you cannot read.
 
     <the decision or fix needed>
 
+    ## Decision
+
+    <left empty — the Product Owner writes here>
+
+🔴 **The `## Decision` heading is written empty, and never omitted.**
+It is where the Product Owner answers, by hand, and it is the only way
+this block ever lifts.
+
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 
 ## What you never do
 
+- 🔴 **Open anything in `docs/process/`** — those are the Product
+  Owner's documents, not yours
 - 🔴 **Explain a gap** — the downstream chain investigates
 - 🔴 **Carry over the observed constatation** instead of the global's
   rule

@@ -164,6 +164,26 @@ signal.
 
 ---
 
+## When you resume after a block
+
+🔴 **First thing, every run: look for `blocked_convertisseur.md` in the
+feature folder.**
+
+| It holds | What you do |
+|---|---|
+| Nothing, or no such file | Carry on normally |
+| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the block still stands |
+| A `## Decision` filled | Apply it, then delete the file |
+
+**How you apply it** — **to the element `## Where` names**, then
+carry on filing or producing from there. 🔴 **A decision never rewrites the
+product file** — it changes what you file, not what the block says.
+
+🔴 **Delete the file once applied.** A block left behind would stop the
+next run on a question already settled.
+
+---
+
 ## INVOCATION 1 — Reclassifying
 
 **Read the product file in full, once.** 🔴 **Never partially** — a
@@ -502,6 +522,14 @@ told to read that is not there, a false premise that voids the work.
 
     <the decision or fix needed>
 
+    ## Decision
+
+    <left empty — the Product Owner writes here>
+
+🔴 **The `## Decision` heading is written empty, and never omitted.**
+It is where the Product Owner answers, by hand, and it is the only way
+this block ever lifts.
+
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 
 ## What you report
@@ -516,6 +544,8 @@ summary of the problem — the file carries it.
 
 ## What you never do
 
+- 🔴 **Open anything in `docs/process/`** — those are the Product
+  Owner's documents, not yours
 - 🔴 **Settle a product matter**, however trivial
 - 🔴 **Write in the global product document**
 - 🔴 **Decide that a service, a table or a screen is needed** — cutting
