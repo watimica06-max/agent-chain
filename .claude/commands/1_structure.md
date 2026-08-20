@@ -31,6 +31,21 @@ never open `CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
 **What you do**: invoke the agent via `Agent()` with the feature folder
 and which invocation it is — and nothing else.
 
+### Once it has run
+
+🔴 **Grep `NEW` in `desc-produit.md`.** If any is there, **delete
+`desc-par-nature.md` and `spec-technique.md`.**
+
+⚠️ **The product file gained a block**, and anything built from the
+previous version is stale — a targeted update on that technical
+document would patch a file that no longer matches.
+
+📌 **No `NEW`, nothing to delete.** An answer that only sharpened a
+sentence leaves both valid, and the cycle can return straight to
+`/3_reclasse` or `/4_convertit`.
+
+**Say which files you deleted**, or that none needed it.
+
 🔴 **Never paraphrase the agent's process in your invocation** — not
 its inputs, its checks, its output format. It reads its own
 instructions.

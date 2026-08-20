@@ -40,7 +40,7 @@ to resume.
 carrying PASS.** A read, not a scan — the sequence holds the order.
 
 ⚠️ **If `## Defects` is not empty**, stop: the split was never
-corrected. Run `/9_decoupe` first.
+corrected. Run `/7_decoupe` first.
 
 ---
 

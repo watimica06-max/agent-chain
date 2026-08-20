@@ -51,8 +51,10 @@ never wait for her on anything an agent can settle.
 | `/start_coding` | `[N]` · `task NNN` · `task NNN-MMM` — optional | **MODE 1** — execute existing task files |
 | `/start_creating` | spec paths — **required** | **MODE 2** — author task files |
 | `/start_investigating` | the brief, as text — **required** | **MODE 3** — report only |
-| `/0_init` · `/0b_extrait` · `/1_structure` · `/1b_diagnostique` · `/2_grille` · `/5_reclasse` · `/6_convertit` · `/7_compare` · `/8_fusionne` | see each | **Upstream** — one agent per command |
-| `/9_decoupe` · `/10_code` | a feature name | **Downstream** — several agents, chained |
+| `/init` · `/extrait` · `/diagnostique` | see each | **Outside the cycle** — set up, take over an existing app, enter on a bug |
+| `/cycle` | a feature name | **Cycle, chained** — runs the phases below in sequence, stops on any decision |
+| `/1_structure` · `/2_grille` · `/3_reclasse` · `/4_convertit` · `/5_compare` · `/6_fusionne` | a feature name | **Cycle, upstream** — one agent per command |
+| `/7_decoupe` · `/8_code` | a feature name | **Cycle, downstream** — several agents, chained |
 
 📌 **Each upstream command carries its own mode**, like `/start_creating`
 — its invocation parameters, its git handling and what to relay live in

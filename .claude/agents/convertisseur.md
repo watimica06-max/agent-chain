@@ -253,12 +253,12 @@ follows depends on what it changed:
 | After `/1_structure` | The route |
 |---|---|
 | No `NEW` in the product file | 🔴 **Straight to the invocation that asked** |
-| A `NEW` appeared | `/2_grille` → `/5_reclasse` → `/6_convertit` — a new block was never closed, and never filed |
+| A `NEW` appeared | `/2_grille` → `/3_reclasse` → `/4_convertit` — a new block was never closed, and never filed |
 
 📌 **A question from invocation 2 rarely creates a block.** It sharpens
 a sentence that already exists.
 
-⚠️ **The long route runs `/5_reclasse`, which deletes the technical
+⚠️ **The long route runs `/3_reclasse`, which deletes the technical
 document** — invocation 2 then produces it in full rather than patching
 a stale one.
 
@@ -282,6 +282,11 @@ on the next round. That is normal, not a failure.
 
 📌 **On a targeted update, read only the questions file each mark
 names** — the answer is there, at the entry the mark identifies.
+
+🔴 **Write a questions file either way** — full production or targeted
+update, and **even when nothing had to be assumed.** Its absence would
+leave the previous one as the latest, and the orchestration would read
+that as *"this invocation has not run yet"*.
 
 ⚠️ **A mark whose answer is still empty stays as it is.** Say which
 ones remain.

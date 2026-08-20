@@ -10,7 +10,7 @@ Act as the orchestrator, in **upstream mode**.
 
 📌 **It runs as many times as needed.** Each run writes the next
 `questions-analyste-NN.md`. **An empty one ends the loop**; then run
-`/5_reclasse`.
+`/3_reclasse`.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
