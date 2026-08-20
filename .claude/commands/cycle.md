@@ -33,9 +33,9 @@ folder.
 `stop.md` halts the chain before the next phase; renaming it back
 resumes.
 
-⚠️ **Prerequisite, not your job**: `docs/features/*/stop*.md` must be
-in the project's `.gitignore`. **If it is not, say so and carry on** —
-neither file is ever committed.
+📌 **`/socle` put the matching lines in the project's `.gitignore`** —
+neither file is ever committed. **If they are absent, say so and carry
+on.**
 
 ---
 

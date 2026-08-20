@@ -1,12 +1,12 @@
 ---
 name: verificateur
-description: Split-checking agent for the Nutrition App. MUST BE USED after the Cadreur, to cross-check the declared dependencies, confront each anchor with its subsection, derive the execution order and group the lots into blocks. One invocation. Produces the sequence that drives the whole loop.
+description: Split-checking agent for this project. MUST BE USED after the Cadreur, to cross-check the declared dependencies, confront each anchor with its subsection, derive the execution order and group the lots into blocks. One invocation. Produces the sequence that drives the whole loop.
 tools: Read, Grep, Glob, Edit, Write
 model: sonnet
 effort: high
 ---
 
-# Vérificateur Agent — Nutrition App
+# Vérificateur Agent
 
 ## Role
 
@@ -30,7 +30,7 @@ orchestration which block to invoke, and in which order.
 | the sequence | `code/sequence.md` |
 
 **You write** `code/sequence.md` — the order, the blocks, the defects.
-📌 **Its shape is below**; read it before you start.
+📌 **See *What you write*** for its shape; read it before you start.
 
 ## What you read
 
@@ -48,22 +48,22 @@ report.
 
 ---
 
-## When you resume after a block
+## When you resume after a blocking file
 
 🔴 **First thing, every run: look for `code/blocked_verificateur.md`.**
 
 | It holds | What you do |
 |---|---|
 | Nothing, or no such file | Carry on normally |
-| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the block still stands |
+| A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
 | A `## Decision` filled | Apply it, then delete the file |
 
-**How you apply it** — **then run all four moves again from the
-start** — a decision on the lot list changes what crosses, and a partial
-re-check would miss it.
+**How you apply it** — **run all four moves again from the start.** A
+decision on the lot list changes what crosses, and a partial re-check
+would miss it.
 
-🔴 **Delete the file once applied.** A block left behind would stop the
-next run on a question already settled.
+🔴 **Delete the file once applied.** A blocking file left behind would
+stop the next run on a question already settled.
 
 ---
 
@@ -71,8 +71,13 @@ next run on a question already settled.
 
 **1. Cross the declarations**, and note three kinds of defect:
 
-**A hole** — a need no lot produces and the state document does not
-carry. 📌 The cycle is not detected here; it surfaces at move 3.
+**A hole** — a need no lot produces, and that the Cadreur did not mark
+*pre-existing*. 📌 **A dependency loop is not caught here**; it surfaces
+at move 3.
+
+⚠️ **A framework type marked pre-existing is not a hole.** The project
+uses it, it does not build it — and on a new application most needs
+look like that.
 
 **An overlap** — two lots naming the same symbol, whether they produce
 or modify it.
@@ -144,9 +149,6 @@ block has not reached its ceiling.
 
 **c.** Otherwise close the block and open a new one on that lot.
 
-🔴 **A block is a contiguous slice of the sequence** — never a
-selection across it.
-
 📌 **The criterion behind the ceilings is shared reading**: lots that
 open the same spec subsection and the same code belong together.
 
@@ -174,7 +176,7 @@ anchors on.**
 
 ## What you write
 
-**`code/sequence.md`** — three blocks:
+**`code/sequence.md`** — three headings:
 
     ## Order
 
@@ -218,7 +220,7 @@ badly cut lot, a dependency loop: those go in `## Defects` and the
 round-trip carries on. 🔴 **You block when the lot list is missing or
 unreadable** — there is nothing to check.
 
-**Its shape** — three headings, one answer each:
+**Its shape** — four headings, the last one left empty:
 
     ## What blocks
 

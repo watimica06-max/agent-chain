@@ -101,9 +101,14 @@ sequential and each reads what the previous one wrote.
 
 ## Where you stop and hand back
 
-🔴 **A `blocked_*.md`**, wherever it sits — 📌 **two places**:
-`code/blocked_<agent>.md` for the Contrôleur,
+🔴 **A `blocked_*.md` whose `## Decision` is still empty**, wherever it
+sits — 📌 **two places**: `code/blocked_<agent>.md` for the Contrôleur,
 `code/<lot>/blocked_<agent>.md` for the other three.
+
+📌 **A filled `## Decision` is not a stop** — invoke the agent it names
+on the lot it names, and let it apply the decision. ⚠️ **Even on a lot
+already carrying a PASS**: the Contrôleur reports missing intentions
+after every lot is reviewed, and a block is how they come back.
 
 🔴 **A lot fails three times.**
 
