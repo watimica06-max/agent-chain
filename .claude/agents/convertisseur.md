@@ -422,6 +422,16 @@ trigger, to close each behaviour. **You group by what gets built.**
 that screen fills, what its centre shows, how it shrinks, what a tap on
 it does — one subsection, not four.
 
+🔴 **Blocks that list values with no rule producing them go in one
+subsection**, whatever their subjects. A theme's colours, its
+typography and its spacing are one set of tokens; a catalogue of
+labels, a set of display formats, a table of thresholds are each one
+thing. **Split by subject and you get a lot per subject.**
+
+📌 **The test**: does this block describe a behaviour, or enumerate
+values? ⚠️ **A rule with inputs and an output is a behaviour**, even
+when it holds a table.
+
 📌 **You do not know the symbols; the code does not exist.** You know
 what each block describes building, and that is enough.
 
