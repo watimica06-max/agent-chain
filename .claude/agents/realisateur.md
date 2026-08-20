@@ -78,6 +78,13 @@ conventions say where** — the Détailleur does not decide the location.
 
 **2. Read those files**, plus the ones holding the symbols the sheet
 lists as modified — 📌 **grep each of those names to find its file.**
+
+🔴 **Every code search targets `lib/`** — `Grep(pattern, path: "lib")`.
+Add `test/` when it bears on tests, and `android/`, `assets/` or
+`tools/` when the lot touches them.
+
+⚠️ **A search without a path sweeps `docs/` and `build/`**, and returns
+old plans and generated code as if they were the codebase.
 Nothing more.
 
 **3. Read the two open sections of `docs/CURRENT_TECHNICAL_STATE.md`** —

@@ -107,6 +107,18 @@ each of those names in the state document.
 🔴 **A symbol is a name the code carries** — a class, a table, a route,
 a provider. Not a file, not a behaviour.
 
+🔴 **For every trigger the subsection names, ask which symbol observes
+it** — and put that symbol in the lot's modifications, even when the
+subsection never names it.
+
+⚠️ **What reacts to an event rarely observes it.** A screen does not
+see the navigation that left it, a synchronised domain does not see the
+connection coming back, a retention rule does not see the clock.
+
+🔴 **Grep the state document for the observer.** Not found there and
+not produced by any lot → **that is a blocker**, not a guess: the
+trigger has no home.
+
 🔴 **Grep the state document, never open it whole** — it runs to
 hundreds of kilobytes, and you only need the names your lots use.
 

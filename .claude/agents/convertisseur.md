@@ -16,7 +16,8 @@ into lots.
 🔴 **You never settle anything.** A contradiction between blocks, a
 question left unanswered: you raise it, you do not fix it.
 
-🔴 **You are not the safety net of the upstream chain.** The grid swept
+🔴 **You are not the safety net of the upstream chain.** The framing
+grid swept
 for missing precisions and unresolved references, over as many passes
 as it took. **You raise what a fresh reading catches, not what it
 already covered.**
@@ -39,6 +40,10 @@ already covered.**
 | 1 | Reclassifying | The product file | The reclassified file · the next questions file · 🔴 deletes any technical document |
 | 2 | Producing | The reclassified file · the updated product file, **or** the technical document alone on a targeted update | The technical document · a questions file, if anything had to be assumed |
 
+🔴 **Both load `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — part 1
+at invocation 1, part 2 at invocation 2. **It holds the closures; this
+file holds the moves.**
+
 📌 **The reclassified file does not carry the answers** — hence both
 inputs.
 
@@ -51,7 +56,8 @@ a questions file is what it answered. **Reading either puts back what
 was ruled out.**
 
 ⚠️ **Never** the code, `CURRENT_TECHNICAL_STATE.md` *(the Cadreur reads
-it)*, the grid, nor the global product document *(the Analyste and the
+it)*, the product framing grid, nor the global product document *(the
+Analyste and the
 Fusionneur do)*.
 
 ---
@@ -127,38 +133,19 @@ answer arrives.
 
 ## What raises a signal
 
-**Wrong marker** — the block's nature is not the one it declares.
+**A closure that fails**, by the closure grid —
+`docs/process/GRILLE_FERMETURE_TECHNIQUE.md`, part 1 while filing,
+part 2 while producing. 🔴 **Load it; it is not in this file.**
 
-🔴 **Filing is your output; a marker is a claim, not proof.**
-
-**The output gives the nature. The trigger only bounds it.** Almost
-every block has a trigger — *once consumption exceeds the target*,
-*whenever the screen becomes visible* — so a trigger alone tells you
-nothing.
-
-| The block produces | Its nature |
-|---|---|
-| Something displayed | `screen`, even when an event fires it |
-| Anything else — a fetch, a stored record, a computed value, a state change | The nature of what it produces |
-
-⚠️ **Read past the sentences describing what the user sees during.** A
-block whose output is a data reload is not a `screen` block because it
-also says what stays on screen meanwhile.
-
-⚠️ **Signal it, do not file it under either nature.** **Ask which
-nature holds**: name the block, quote what fires it and what it
-produces, name the nature you read and the one it declares.
-
-**Contradiction** — two blocks disagree on the same subject. 📌 **Out
-of the upstream chain's reach** — it never reads the whole file at
-once, you do.
+⚠️ **Not to be confused with the product framing grid**, which the
+Analyste runs and you never open.
 
 **Surviving clarification** — a `**Clarification needed:**` line still
 in the product file: a question that never got an answer.
 
 🔴 **What does not raise a signal**: a terse but complete block —
-*"the window is 3 hours"* is enough — a missing precision the grid
-already swept for, a block holding two subjects, and **never a
+*"the window is 3 hours"* is enough — a missing precision the product
+framing grid already swept for, a block holding two subjects, and **never a
 judgement on product relevance**. A rule that seems odd is not a
 signal.
 
@@ -217,9 +204,9 @@ what makes a block `external source` is where the data comes from.
 
 **For each block, in this order:**
 
-1. **Ask what fires it and what it produces** — that gives its nature
-2. 🔴 **Compare to its marker.** They differ → signal, file nothing
-3. **File it** under the nature you read
+1. 🔴 **Run part 1 of the closure grid** — *Nature*, then *Consistency*
+2. **A closure that fails → signal, and file nothing**
+3. **File it** under the nature the grid had you read
 
 ⚠️ **Filing is not deciding which section will own the block**: that
 happens at production, by the ownership criterion.
@@ -324,24 +311,10 @@ an executable rule: which order of precedence, which comparison. ⚠️
 touching content, production translates into technical terms.
 
 🔴 **You decide nothing new.** You make explicit what a block says
-implicitly.
+implicitly — the closure grid's *Traceability* draws the line.
 
-**The line between explicit and added** — ask it of every sentence you
-write:
-
-> **Can you point at the sentence in the product file yours follows
-> from?**
-
-**Yes** → you made it explicit. **No** → you added. 🔴 **That is a
-question**, however small it looks and however obvious the addition
-seems.
-
-⚠️ **The additions that slip through are the small ones**: where a
-value is stored, which of several items goes first, what a unit is.
-**They feel like translation and they are decisions.**
-
-🔴 **Report any contradiction the reclassification introduced** — a
-fresh context sees what the first pass could not.
+🔴 **Run its part 2 once every section is filled**, and treat what it
+returns by the table below.
 
 ### What a question costs
 
@@ -463,38 +436,10 @@ disappears into it.
 📌 **No sorting by judgement** — the Cadreur anchors on section
 numbers, and they must not move between two runs.
 
-### One rule lives in one section
-
-🔴 **Never duplicate between sections — reference instead.**
-
-🔴 **And every dependency is declared, even without duplication.** A
-section that needs another to work references it: the data it reads,
-the calculation whose result it displays, the text key it uses, the
-entity it persists.
-
-⚠️ **That is what gives the execution order.** A screen displaying a
-computed value never copies the rule — without the declaration, nothing
-would tie them.
-
-**The owning section answers "where does this behaviour come from",
-not "where is it seen".** A calculation rule belongs to calculations
-even if it produces a display; a field bound to the model even if it
-shows at input time.
-
-⚠️ **A cross-domain interaction matrix belongs to the domain that
-applies it**, never to the ones it concerns.
-
-**Syntax**: the section number in brackets, where the rule is
-mentioned — *"Created by the reconciliation rule (§3.2)."* One form
-only.
-
 ### Prose
 
 🔴 **Present indicative, as in the product files — but precision comes
 before readability.** Types, bounds, explicit orders.
-
-🔴 **A rule that leaves a case undetermined is not written** — the
-Détailleur has no criterion to draw from it.
 
 ⚠️ **Here you name things technically**, not the way the user sees
 them — the opposite of the product files.
@@ -549,8 +494,8 @@ summary of the problem — the file carries it.
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — those are the Product
-  Owner's documents, not yours
+- 🔴 **Open anything in `docs/process/`** — except
+  `GRILLE_FERMETURE_TECHNIQUE.md`, which you load by name
 - 🔴 **Settle a product matter**, however trivial
 - 🔴 **Write in the global product document**
 - 🔴 **Decide that a service, a table or a screen is needed** — cutting

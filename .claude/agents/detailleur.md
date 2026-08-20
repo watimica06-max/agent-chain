@@ -110,8 +110,17 @@ preamble's `Vocabulary` fixes the terms** — a signature never renames
 what the feature already calls something.
 
 **4. Grep every symbol the signature uses**, before writing it down —
-confirmed by grep, never from memory. 📌 **A trap owned by a symbol
-comes back with it** — the state document files it under that symbol.
+confirmed by grep, never from memory.
+
+🔴 **Every code search targets `lib/`** — `Grep(pattern, path: "lib")`.
+Add `test/` when it bears on tests, and `android/`, `assets/` or
+`tools/` when the lot touches them.
+
+⚠️ **A search without a path sweeps `docs/` and `build/`**, and returns
+old plans and generated code as if they were the codebase.
+
+📌 **A trap owned by a symbol comes back with it** — the state document
+files it under that symbol.
 
 | The grep | What it means |
 |---|---|
