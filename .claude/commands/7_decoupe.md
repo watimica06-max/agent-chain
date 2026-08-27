@@ -80,7 +80,16 @@ Vérificateur reported defects in code/sequence.md."`
 
 ## Git, in this mode
 
-🔴 **Commit the feature folder first**, before creating the worktree:
+🔴 **File away every root `questions-*.md` first** — the upstream loop
+is over and nothing downstream reads them:
+
+    git mv docs/features/<name>/questions-<agent>-NN.md \
+           docs/features/<name>/questions/<agent>/
+
+⚠️ **`git mv`, never a read-and-rewrite.** 📌 **Create the folder if it
+does not exist.**
+
+🔴 **Then commit the feature folder**, before creating the worktree:
 
     git add docs/features/<name>/ && git commit -m "chore: pre-split"
 
@@ -102,7 +111,15 @@ isolated.
 **Then, once the split holds:**
 
 1. `git merge --no-ff <branch>` from the main checkout root
-2. `git worktree remove <path>`
+2. `git push`
+3. `git worktree remove <path>`
+
+🔴 **The push is part of the merge, not an afterthought.** A phase that
+sits only on the local machine is lost with it.
+
+⚠️ **A push that fails — diverged remote, no network — is reported, not
+retried and not worked around.** The merge holds locally; say so and
+carry on.
 
 🔴 **Merge before handing back, always** — including a
 `blocked_*.md`: the Product Owner has to see it.

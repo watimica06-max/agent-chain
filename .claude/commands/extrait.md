@@ -62,7 +62,10 @@ discarded.
 the first, not after a failure.
 
 **When the last pass is done:** `git merge --no-ff <branch>` from the
-main checkout root, then `git worktree remove <path>`.
+main checkout root, then `git push`, then `git worktree remove <path>`.
+
+🔴 **The push is part of the merge, not an afterthought.** ⚠️ **A push
+that fails is reported, not retried and not worked around.**
 
 **1. Application pass** — what the code carries without belonging to a
 domain. 🔴 **Name its folders in the prompt**, as for a domain; the

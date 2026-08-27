@@ -7,9 +7,9 @@
 been lost, and nothing it did not settle has been added.** Every rule
 sits in one place, names what it consumes, and leaves no case open.
 
-**Part 1 runs while filing, part 2 while producing.** 📌 **"Block"
-means a block of the product file**; **"section"** a numbered section
-of the technical document.
+**Part 1 closes the product file, part 2 the technical document.**
+📌 **"Block"** means a block of the product file; **"entry"** a
+numbered entry of the technical document.
 
 ---
 
@@ -87,6 +87,28 @@ shows at input time.
 ⚠️ **A cross-domain interaction matrix belongs to the domain that
 applies it**, never to the ones it concerns.
 
+## Agreement between entries
+
+**Do two entries say the same thing about the same subject?**
+
+🔴 **You wrote them both**, from two product blocks that spoke of the
+same rule. **Neither is a duplicate you chose to write** — you
+reformulated twice, and two reformulations of one thing rarely
+coincide.
+
+| Where it shows | What to look for |
+|---|---|
+| A rule restated | One entry lists a case another excludes |
+| A value repeated | Two entries give it with different precision or units |
+| A label quoted twice | The two wordings differ |
+| An order of precedence | Two entries state it in opposite directions |
+
+⚠️ **This is not *Singularity*.** That one bars duplication you chose;
+this one catches the duplication you did not notice.
+
+📌 **Nobody else can see it.** The Cadreur reads the whole document but
+does not judge its content; every agent after him opens a few entries.
+
 ## Declared links
 
 **Is what a section consumes declared?**
@@ -108,8 +130,8 @@ available?**
 | The answer | What you do |
 |---|---|
 | No | Move on |
-| Yes, and the section carrying it has the entry | Reference it |
-| Yes, and no section carries it | 🔴 **Write the entry yourself** |
+| Yes, and an entry already carries it | Reference it |
+| Yes, and no entry carries it | 🔴 **Write that entry yourself** |
 
 ⚠️ **A section describing a content does not carry the resource that
 makes it available.** A label quoted in a screen section needs its key
@@ -140,13 +162,13 @@ each of them once.**
 
 # Running it
 
-**Part 1, on each block, while filing it.** A block that fails either
-test is signalled, not filed.
+**Part 1, on each block of the product file.** A block that fails
+either test is signalled; nothing is written from it.
 
-**Part 2, on the document, once every section is filled.** 🔴 **Not
-while writing** — a section grows, and what it consumes only becomes
-visible once it stands.
+**Part 2, on the technical document, once every section is filled.**
+🔴 **Not while writing** — entries accumulate, and what they consume or
+contradict only shows once the document stands.
 
 ⚠️ **A failure is a question, never a fix.** The one exception is
-*Resources*, where the entry is written when the product already
-settled its content.
+*Resources*, where the missing entry is written when the product
+already settled its content.

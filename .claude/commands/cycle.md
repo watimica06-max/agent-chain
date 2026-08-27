@@ -60,6 +60,10 @@ on.**
 📌 **"The latest questions file" is the highest-numbered one at the
 root**, whatever its prefix.
 
+⚠️ **Two files of the same prefix at the root is normal** — a command
+keeps the highest and files the rest away. **Two prefixes is not**: one
+of them was never filed.
+
 ---
 
 ## The routing table
@@ -69,7 +73,7 @@ root**, whatever its prefix.
 | # | Test | What you do |
 |---|---|---|
 | 1 | `stop.md` at the root | 🔴 **STOP** — the Product Owner halted the chain |
-| 2 | Two or more questions files at the root | 🔴 **STOP** — a filing step failed; say which files |
+| 2 | Questions files of two different prefixes at the root | 🔴 **STOP** — a filing step failed; say which files |
 | 3 | A `blocked_detailleur`, `_realisateur` or `_relecteur` | **STOP** — that block belongs to `/8_code` |
 | 4 | A cycle agent's `blocked_*` with `## Decision` empty | **STOP** — the decision is still to write |
 | 5 | The latest questions file has an empty `Answer:` | **STOP** — questions are waiting |
@@ -129,8 +133,12 @@ worktree** — a worktree holds a copy frozen at its creation, and would
 never see a file created after it.
 
 📌 **Which is why each phase gets its own worktree**: created from
-local `HEAD`, merged, removed, before the next one starts. **Each
-phase's output is acquired even if you stop right after.**
+local `HEAD`, merged, pushed, removed, before the next one starts.
+**Each phase's output is acquired even if you stop right after.**
+
+📌 **The commands push, not you** — each one merges and pushes its own
+phase. ⚠️ **A push that fails does not stop the chain**: the phase is
+merged locally, the command says so, you carry on.
 
 ---
 

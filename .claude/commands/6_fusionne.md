@@ -84,7 +84,15 @@ invocation is redone.)*
 **Then, once the agent reports:**
 
 1. `git merge --no-ff <branch>` from the main checkout root
-2. `git worktree remove <path>`
+2. `git push`
+3. `git worktree remove <path>`
+
+🔴 **The push is part of the merge, not an afterthought.** A phase that
+sits only on the local machine is lost with it.
+
+⚠️ **A push that fails — diverged remote, no network — is reported, not
+retried and not worked around.** The merge holds locally; say so and
+carry on.
 
 🔴 **Merge before handing back, always** — a phase whose output sits on
 an unmerged branch is invisible to the next one. ⚠️ **A
@@ -94,8 +102,8 @@ an unmerged branch is invisible to the next one. ⚠️ **A
 
 ## Filing away, once the merge holds
 
-🔴 **The cycle ends here** — move every root `questions-*.md` to
-`questions/<its agent>/`:
+🔴 **The merge branch ends here** — move every root `questions-*.md`
+to `questions/<its agent>/`:
 
     git mv docs/features/<name>/questions-<agent>-NN.md \
            docs/features/<name>/questions/<agent>/

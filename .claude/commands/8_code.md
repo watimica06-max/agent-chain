@@ -147,7 +147,15 @@ you do not commit for him.
 **When the run ends:**
 
 1. `git merge --no-ff <branch>` from the main checkout root
-2. `git worktree remove <path>`
+2. `git push`
+3. `git worktree remove <path>`
+
+🔴 **The push is part of the merge, not an afterthought.** A phase that
+sits only on the local machine is lost with it.
+
+⚠️ **A push that fails — diverged remote, no network — is reported, not
+retried and not worked around.** The merge holds locally; say so and
+carry on.
 
 🔴 **Merge before handing back, always** — including a `blocked_*.md`.
 

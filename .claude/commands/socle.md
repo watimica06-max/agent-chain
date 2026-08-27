@@ -47,7 +47,7 @@ chain runs end to end:**
 
 📌 **Neither blocks the upstream chain** — only `/7_decoupe` onward.
 
-Then commit alone: `chore: scaffolding for the chain`.
+Then commit alone: `chore: scaffolding for the chain`, and push.
 
 📌 **No agent, no worktree** — this command writes in place and
 commits.
