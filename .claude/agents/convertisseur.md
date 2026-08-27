@@ -360,6 +360,14 @@ file**, nothing deduced:
 | Cross-cutting rules | The blocks declared valid everywhere |
 | Dependencies | The references marked *existing* |
 
+🔴 **A cross-cutting rule constrains without producing anything.** A
+set of values the code has to write somewhere **produces**, even when
+the whole document references it.
+
+📌 **The test**: if nobody writes it, is something missing from the
+code? **Yes → it is a subsection**, not a preamble block. Design
+tokens, a format catalogue, a threshold table all answer yes.
+
 📌 **Dependencies come from the Analyste, not from you** — only he has
 the global in front of him.
 
