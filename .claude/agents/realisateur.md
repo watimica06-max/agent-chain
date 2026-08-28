@@ -92,12 +92,11 @@ conventions say where** — the Détailleur does not decide the location.
 lists as modified — 📌 **grep each of those names to find its file.**
 **Nothing more.**
 
-🔴 **Every code search targets `lib/`** — `Grep(pattern, path: "lib")`.
-Add `test/` when it bears on tests, and `android/`, `assets/` or
-`tools/` when the lot touches them.
+🔴 **Every code search targets the code folders the conventions
+name** — `Grep(pattern, path: "<folder>")`, never a bare pattern.
 
-⚠️ **A search without a path sweeps `docs/` and `build/`**, and returns
-old plans and generated code as if they were the codebase.
+⚠️ **A search without a path sweeps `docs/` and the build output**, and
+returns old plans and generated code as if they were the codebase.
 
 **3. Read the two open sections of the state document** —
 `## Traps — general` and `## Dead state`, **whole**. 🔴 **You cannot

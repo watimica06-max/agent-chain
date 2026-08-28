@@ -42,7 +42,7 @@ Owner creates it and writes `bug-list.md`; you write everything else.
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Investigation | **One gap, in the prompt** · the code, by grep · `docs/CURRENT_TECHNICAL_STATE.md` | `investigation/<id>.md` |
+| 1 | Investigation | **One gap, in the prompt** · `docs/TECHNICAL_CONVENTIONS.md` · the code, by grep · `docs/CURRENT_TECHNICAL_STATE.md` | `investigation/<id>.md` |
 | 2 | Assembly | Every `investigation/*.md` · `bug-list.md`, for the order · `docs/process/GRILLE_FERMETURE_TECHNIQUE.md` | `desc-bug.md` |
 
 🔴 **The prompt says which one, and invocation 1 says which gap.**
@@ -110,9 +110,9 @@ stop the next run on a question already settled.
 **One gap, given in the prompt with its identifier.** 🔴 **You never
 see the others**, and nothing you write depends on them.
 
-🔴 **Every code search targets `lib/`** — `Grep(pattern, path: "lib")`.
-Add the folders the gap touches. ⚠️ **A search without a path sweeps
-`docs/` and `build/`.**
+🔴 **Every code search targets the code folders the conventions
+name** — `Grep(pattern, path: "<folder>")`, never a bare pattern.
+⚠️ **A search without a path sweeps `docs/` and the build output.**
 
 **1. Turn the gap into search terms.** 🔴 **A gap is written in
 behaviour, not in symbols** — *"the correction factor is never

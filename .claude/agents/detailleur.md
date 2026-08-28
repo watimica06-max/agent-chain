@@ -126,12 +126,11 @@ what the feature already calls something.
 **4. Grep every symbol the signature uses**, before writing it down —
 confirmed by grep, never from memory.
 
-🔴 **Every code search targets `lib/`** — `Grep(pattern, path: "lib")`.
-Add `test/` when it bears on tests, and `android/`, `assets/` or
-`tools/` when the lot touches them.
+🔴 **Every code search targets the code folders the conventions
+name** — `Grep(pattern, path: "<folder>")`, never a bare pattern.
 
-⚠️ **A search without a path sweeps `docs/` and `build/`**, and returns
-old plans and generated code as if they were the codebase.
+⚠️ **A search without a path sweeps `docs/` and the build output**, and
+returns old plans and generated code as if they were the codebase.
 
 📌 **A trap owned by a symbol comes back with it** — the state document
 files it under that symbol.
@@ -140,12 +139,21 @@ files it under that symbol.
 |---|---|
 | Found in the code | It exists — place it with the second grep below |
 | Not found, and a lot of this block produces it | Legitimate — this block will build it |
+| Not found, and an earlier lot of the sequence produces it | Legitimate — it exists by the time this one runs |
 | Not found, and it comes from the framework or a declared dependency | Legitimate — the project does not own it |
 | Not found, and none of the above | 🔴 **Stop.** The lot list is wrong, or the sequence put this block too early |
 
-⚠️ **A framework type is not a project symbol.** A grep on `lib/` finds
-nothing for one the project never declares, and that says nothing about
-the split. 📌 **On a new application almost every type is one of
+🔴 **You create no symbol the lot does not declare.** A signature names
+types this block produces, types that exist, or types from a
+dependency — never one you invent because nothing fits.
+
+⚠️ **Declaring an interface is the tempting way out**: it compiles, its
+tests pass on a fake, and nothing fulfils it. **A type nobody declares
+is a blocker.**
+
+⚠️ **A framework type is not a project symbol.** A grep on the code
+folders finds nothing for one the project never declares, and that says
+nothing about the split. 📌 **On a new application almost every type is one of
 these** — the code is empty and the state document with it.
 
 **A symbol found in the code — where does it come from?** 🔴 **Grep the
@@ -344,6 +352,7 @@ ambiguous.
 - 🔴 **Settle an ambiguous rule** — *you are not the safety net of the
   upstream chain*
 - 🔴 **Use a type without confirming it by grep**
+- 🔴 **Declare a type the lot does not** — an interface least of all
 - 🔴 **Read `CURRENT_TECHNICAL_STATE.md` whole** — two sections, then
   greps by symbol
 - 🔴 **Redeclare a symbol an earlier lot's report already names** —

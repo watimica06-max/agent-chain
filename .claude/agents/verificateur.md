@@ -112,6 +112,9 @@ or modify it.
 `Produces` field names no caller.** A rule built and never invoked is
 dead code.
 
+📌 **A piece is the exception**: the inventory marks it as such, no
+entry names it, and what calls it is the contract it fulfils.
+
 📌 **You check that a caller is named, not that it is right.** *Mounted
 by the system*, *reached by a route*: the Cadreur knows the framework,
 you do not.
@@ -121,6 +124,9 @@ symbol another one modifies comes after it. **Record it**, it feeds
 move 3.
 
 **2. Open each cited entry**, one by one, and confront:
+
+📌 **Two lots may cite one entry** — a contract and the piece that
+realises it. **They differ by layer**, and the second needs the first.
 
 🔴 **Are the cited entries all from one section?** `§3.1`, never `§3`.
 **Several entries are legitimate** — a lot groups what builds one

@@ -1,6 +1,6 @@
 ---
 name: extracteur
-description: Product-documentation extractor for this project. MUST BE USED to build the global product document from existing code, one domain per invocation, when taking over a codebase that has none. Reads code and ARB files, writes product descriptions — never technical ones.
+description: Product-documentation extractor for this project. MUST BE USED to build the global product document from existing code, one domain per invocation, when taking over a codebase that has none. Reads code and the language files, writes product descriptions — never technical ones.
 tools: Read, Grep, Glob, Edit, Write
 model: sonnet
 effort: high
@@ -24,11 +24,14 @@ project's.**
 
 ## What you read
 
+- **`docs/TECHNICAL_CONVENTIONS.md`** — 🔴 **in full.** It names the
+  code folders, the language files and where the route map lives.
 - **The code of the domain you were given** — its folders are named in
   your prompt.
-- The localisation files (ARB), for the exact strings
-- `lib/app/router.dart` — the route↔screen map. 📌 **That is how you
-  know whether a screen is reachable.**
+- The language files, for the exact strings — 🔴 **the conventions
+  name them**
+- The route↔screen map, wherever the conventions place it. 📌 **That
+  is how you know whether a screen is reachable.**
 
 🔴 **Never `docs/CURRENT_TECHNICAL_STATE.md`.** You read the code
 directly.
@@ -61,7 +64,7 @@ stop the next run on a question already settled.
 
 | From | What you take |
 |---|---|
-| A screen | What it displays, the strings from the ARB files, the conditions, what each action does |
+| A screen | What it displays, the strings from the language files, the conditions, what each action does |
 | A service | The rule, its inputs, its output, its values |
 | An entity | Its fields, their types and bounds |
 | An external source | What is read, with what priorities |
@@ -178,7 +181,7 @@ them by script.
 | `<<REF:name>>` | Reference to a domain not yet extracted — resolved in the final pass |
 | `<<ORPHAN>>` | A screen or service that appears in no route and no call |
 | `<<HARD_STYLE>>` | A style value hard-coded instead of coming from the theme |
-| `<<HARD_TEXT>>` | A displayed string hard-coded instead of coming from the ARB files |
+| `<<HARD_TEXT>>` | A displayed string hard-coded instead of coming from the language files |
 | `<<DOUBT>>` | Something you could not interpret |
 
 📌 **You decide none of these.** You describe and you tag.

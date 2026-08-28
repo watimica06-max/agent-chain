@@ -424,6 +424,24 @@ l'utilise, il ne le construit pas. ⚠️ **Sur une application neuve,
 presque tous les types en sont** — le code est vide et le document
 d'état avec lui.
 
+🔴 **Une règle qui nomme un acteur hors du programme a besoin d'une
+pièce pour l'atteindre** — l'OS, un appareil, un capteur, le disque, le
+réseau, une horloge, une autre application.
+
+**Le test** : qui, hors de ce code, doit agir ou répondre pour que la
+règle tienne ? **Personne** → le code suffit. **Quelqu'un** → greper la
+pièce qui l'atteint.
+
+🔴 **La pièce est un lot à part**, jamais fondue dans celui qui déclare
+le contrat. **Deux couches** : le contrat là où vit la règle, la pièce
+dans le module que les conventions autorisent à toucher la plateforme.
+📌 **Elle cite la même entrée**, et a besoin du contrat.
+
+⚠️ **Un contrat n'est pas une pièce.** Une interface dit ce dont on a
+besoin ; **quelque chose doit la remplir**, dans un module que les
+conventions autorisent à toucher la plateforme. **Un contrat sans rien
+derrière compile, passe ses tests, et ne fait rien.**
+
 🔴 **Pour chaque déclencheur nommé, quel symbole l'observe ?** Il entre
 dans les modifications du lot, même si aucune entrée ne le nomme.
 ⚠️ **Ce qui réagit à un événement l'observe rarement** — un écran ne
@@ -471,7 +489,7 @@ n'est pas un conflit.
 | Services | **6-8** | Sa section de spec, quelques greps |
 | Repositories | **6-8** | Le modèle qu'il porte |
 | Providers | **4-6** | Le service consommé, sa signature |
-| Écrans | **3-4** | Providers, routes, clés ARB, navigation |
+| Écrans | **3-4** | Providers, routes, clés de texte, navigation |
 
 ⚠️ **Ce sont des plafonds indicatifs, pas des cibles**, et ils bornent
 un bloc — que le Vérificateur formera. Le Cadreur s'en sert pour
@@ -645,8 +663,9 @@ ci-dessous. 📌 **Les conventions de nommage s'appliquent ici**, et le
 doit exister, venir du framework, ou être produit par ce bloc** —
 confirmé par grep, jamais de mémoire.
 
-🔴 **Toute recherche de code cible `lib/`.** Sans chemin, elle ratisse
-`docs/` et `build/`, et remonte de vieux plans comme du code.
+🔴 **Toute recherche de code cible les dossiers que les conventions
+nomment.** Sans chemin, elle ratisse `docs/` et la sortie de build, et
+remonte de vieux plans comme du code.
 
 📌 **Un symbole trouvé : d'où vient-il ?** Un second grep dans les
 comptes rendus du cycle. **Une occurrence** → un lot antérieur l'a
@@ -739,6 +758,8 @@ incohérent avec sa source — a été écarté par le Vérificateur avant lui.
 - 🔴 **Trancher une règle ambiguë** — *il n'est pas le filet de la
   chaîne amont*
 - 🔴 **Employer un type sans l'avoir confirmé par grep**
+- 🔴 **Déclarer un type que le lot ne déclare pas** — une interface
+  moins que tout
 - 🔴 **Recopier la règle dans la fiche** — elle vit dans la section
   ancrée
 - 🔴 **Décider si un symbole se crée ou se modifie** — le lot le
@@ -776,7 +797,8 @@ l'emplacement.
 
 **2. Lire les fichiers concernés**, et ceux qui portent les symboles
 que la fiche déclare modifiés. 🔴 **Toute recherche de code cible
-`lib/`** — sans chemin, elle ratisse `docs/` et `build/`.
+les dossiers que les conventions nomment** — sans chemin, elle ratisse
+`docs/` et la sortie de build.
 
 **3. Lire les deux sections ouvertes du document d'état** — pièges
 généraux et état mort, en entier. 📌 **Un piège change comment il

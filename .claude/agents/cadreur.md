@@ -88,9 +88,9 @@ numbering, same moves.
 🔴 **Grep, never a file read.** You establish what a symbol is, not
 what its implementation does.
 
-🔴 **Every code search targets `lib/`** — `Grep(pattern, path: "lib")`.
-Add the folders the feature touches. ⚠️ **A search without a path
-sweeps `docs/` and `build/`.**
+🔴 **Every code search targets the code folders the conventions
+name** — `Grep(pattern, path: "<folder>")`, never a bare pattern.
+⚠️ **A search without a path sweeps `docs/` and the build output.**
 
 🔴 **Never the product file, either grid, or any questions file.** They
 belong to the chain before you.
@@ -142,6 +142,10 @@ writes and whose screens ask three reads carries seven operations.
 *"Today at 09:02"*, a segment's display name: something has to carry
 them, and no entry says so.
 
+⚠️ **So is the piece a rule needs to reach outside the program** — see
+move 5. **No entry names it**, and the inventory is where it first
+appears.
+
 🔴 **Grep each symbol as you note it.** What the code carries today,
 against what the entries ask of it — **the gap is what has to be
 built.**
@@ -175,6 +179,10 @@ to build are one lot.**
 
 🔴 **A lot never groups entries from two sections.** Its nature would
 be undecided, and a block holds one layer.
+
+📌 **Move 5 adds lots this table does not describe** — the pieces that
+reach outside the program. They cite an entry already cited, and they
+are cut there, not here.
 
 ⚠️ **The table says what a lot is, not how many there are.** Seventeen
 screens make seventeen lots; one theme's tokens, spread over four
@@ -218,6 +226,33 @@ is right: the entries say what to change, the code says what breaks.
 outside the split — a route, the framework, the system. **Say which**,
 in the `Produces` field: `WatchComplicationEntry (mounted by the
 system)`.
+
+🔴 **A rule naming an actor outside the program needs a piece to reach
+it.** The OS, a device, a sensor, the disk, the network, a clock,
+another application.
+
+**The test**: who, outside this code, has to act or answer for the rule
+to hold? **Nobody** → the code suffices. **Someone** → grep the piece
+that reaches them.
+
+| The grep | What you do |
+|---|---|
+| The piece exists | **Need**, pre-existing |
+| Nothing, and the conventions name the technology | 🔴 **Cut a lot for it** — see below |
+| Nothing, and the conventions name none | 🔴 **A blocker** — the rule cannot be built |
+
+🔴 **The piece is its own lot**, never folded into the one declaring
+the contract. **Two layers**: the contract belongs where the rule
+lives, the piece to the module the conventions let touch the platform.
+📌 **It cites the same entry**, and needs the contract.
+
+⚠️ **Its identifier says what it is** — the contract's name plus what
+realises it. **A lot nobody can name is a lot nobody misses.**
+
+⚠️ **A contract is not a piece.** An interface the domain declares says
+what is needed; **something has to fulfil it**, in a module the
+conventions let touch the platform. **A contract with nothing behind it
+compiles, passes its tests, and does nothing.**
 
 🔴 **For every trigger an entry names, ask which symbol observes it** —
 and put that symbol in the lot's modifications, even when no entry
@@ -311,8 +346,15 @@ Grouping it with another would break the first constraint.
       segmentName(index)         §9.2, §9.14
       relativeDate.today         §9.6
 
+    RecordedRaceTransport — piece
+      sends a race to the paired device      §6.2
+
 📌 **One line per thing asked of it**, with the entries that ask.
-🔴 **A symbol nobody asks anything of does not belong here.**
+🔴 **A symbol nothing needs and no entry reaches through does not
+belong here.**
+
+📌 **A piece is marked as such**, and the entry is the one whose rule
+needs it — no entry names the piece itself.
 
 **Then five fields per lot, one lot after another:**
 
@@ -401,6 +443,8 @@ this block ever lifts.
 - 🔴 **Copy a rule from the technical document**
 - 🔴 **Cite a bare `§3`**, or entries from two sections
 - 🔴 **Declare a production without naming what calls it**
+- 🔴 **Fold a piece into the lot declaring its contract** — two layers,
+  two lots
 - 🔴 **Cut before the inventory is written** — you would group against
   a surface you have not seen
 - 🔴 **Open a code file** — grep only; you establish what a symbol is,

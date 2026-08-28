@@ -1321,7 +1321,8 @@ invocation par domaine, plus une passe application et une passe
 finale.*
 
 **Entrées** : le code du domaine · les fichiers de langue ·
-`lib/app/router.dart`, la carte route↔écran. ⚠️ **Ni les documents
+la carte route↔écran, là où les conventions la placent. ⚠️ **Ni les
+documents
 produit existants** — il décrirait des décisions non implémentées — **ni
 `CURRENT_TECHNICAL_STATE.md`**, qui est un inventaire technique.
 
