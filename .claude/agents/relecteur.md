@@ -99,8 +99,12 @@ observable gap, not a judgement call.
 grep settles** — a hardcoded user-facing string, an identifier not in
 English, a convention the sheet named explicitly.
 
+🔴 **The sheet's `## Conventions` says which ones.** Open each rule it
+names and check the lot against it. ⚠️ **A named rule broken is a
+FAIL**, whatever the code otherwise does.
+
 📌 **Not a full audit of `TECHNICAL_CONVENTIONS.md`.** You check the
-lot, not the codebase.
+rules the sheet names, on the lot, not the codebase.
 
 **4. The report's other fields hold.** 🔴 **`## Build` says analysis
 and tests passed, `## State` names what went into the state document,

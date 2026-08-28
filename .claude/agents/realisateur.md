@@ -142,6 +142,9 @@ orchestration.
 ## Conventions and language
 
 **Apply `docs/TECHNICAL_CONVENTIONS.md`** to everything you write.
+🔴 **The sheet's `## Conventions` names the rules bearing on this
+lot** — open each one and hold it. ⚠️ **Naming them is the Détailleur's
+job, holding them is yours.**
 
 🔴 **Code identifiers and comments in English.** 🔴 **No user-facing
 string is ever hardcoded** — the conventions say which files carry

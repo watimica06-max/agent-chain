@@ -168,8 +168,9 @@ process.
 | Signatures | noms de classe, méthodes, types — complets ou absents |
 | Critères d'acceptation | dérivés de la section ancrée |
 | Dépendances | symboles déjà produits dont ce lot a besoin |
+| Conventions | les règles du projet qui portent sur ce lot, nommées |
 
-**Structure** : trois champs, chacun répond à une question précise.
+**Structure** : quatre champs, chacun répond à une question précise.
 **Absent par construction** : citation de la spec, justification du
 découpage.
 
@@ -644,7 +645,7 @@ signature tout autant.
 
 **Sortie** — les fiches exécutables des lots du bloc
 
-#### Les six gestes, par lot du bloc
+#### Les sept gestes, par lot du bloc
 
 **1. Ouvrir chaque entrée que le lot cite** — 🔴 **un lot
 en cite souvent plusieurs**, et elles décrivent une seule chose à
@@ -676,6 +677,17 @@ créé, le réutiliser. **Aucune** → il précède le cycle.
 **5. Écrire la signature**, une fois chaque type confirmé.
 
 **6. Écrire les critères d'acceptation** — voir ci-dessous.
+
+**7. Nommer les conventions que ce lot doit tenir.** 🔴 **Chaque règle
+🔴 de `TECHNICAL_CONVENTIONS.md` qui porte sur ce que le lot touche** —
+les bibliothèques de sa couche, où vivent ses chaînes, ce qu'une classe
+de son espèce étend, ce que son module peut importer.
+
+📌 **Il lit les conventions en entier ; le Réalisateur code contre la
+fiche.** Une règle qu'il ne nomme pas est une règle que le Réalisateur
+n'appliquera pas, et que le Relecteur ne saura pas chercher.
+
+⚠️ **Nommer la règle, jamais la réécrire.** Une ligne chacune.
 
 📌 **Une invocation par bloc, pas par lot** : le deuxième lot coûte
 moins que le premier, il partage les lectures.

@@ -101,7 +101,7 @@ stop the next run on a question already settled.
 
 ---
 
-## The six moves, per lot of the block
+## The seven moves, per lot of the block
 
 **1. Open every entry the lot cites** — 🔴 **a lot often cites
 several**, and together they describe one thing to build. Read them all
@@ -176,6 +176,18 @@ and nobody could foresee.
 **5. Write the signature** in the sheet, once every type is confirmed.
 
 **6. Write the acceptance criteria** — see below.
+
+**7. Name the conventions this lot has to hold.** 🔴 **Every 🔴 rule of
+`TECHNICAL_CONVENTIONS.md` bearing on what the lot touches** — the
+libraries its layer uses, where its strings live, what a class of its
+kind extends, what its module may import.
+
+📌 **You read the conventions whole; the Réalisateur codes against the
+sheet.** A rule you do not name is a rule he will not apply, and the
+Relecteur will not know to look for.
+
+⚠️ **Name the rule, never restate it** — `§10 · no hardcoded string`.
+**One line each.**
 
 ---
 
@@ -263,7 +275,7 @@ report.
 
 ## What you write
 
-**`code/<lot>/fiche-executable.md`**, one per lot of the block — three
+**`code/<lot>/fiche-executable.md`**, one per lot of the block — four
 fields:
 
     ## Signatures
@@ -283,6 +295,11 @@ fields:
 
     ActivityEntry — pre-existing
     ReconciliationResult — produced by lot-02
+
+    ## Conventions
+
+    §3 · a rule needing a Context is in the wrong module
+    §9 · the name of the rule, not of the structure
 
 **Absent by construction**: no spec quotation, no rationale for the
 split. 🔴 **The rule lives in the cited entries.**
