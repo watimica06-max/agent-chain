@@ -1268,6 +1268,20 @@ sans porteur est écarté**, jamais deviné.
 📌 **Sur un appel manquant, le porteur est l'appelant** — c'est là que
 le code change.
 
+🔴 **Le déclencheur se confirme comme le comportement.** Rien ne
+l'observe → c'est un second manque, et le rapport le dit. ⚠️ **Un
+déclencheur interne au flux du code est presque toujours observé** ; un
+déclencheur externe — une connexion, une horloge, un capteur — souvent
+pas.
+
+🔴 **Le porteur est le symbole, pas le fichier qui le réalise** — celui
+dont le reste du code dépend. Deux noms pour une chose seraient groupés
+en deux.
+
+🔴 **Un porteur par écart.** Si la correction touche plusieurs symboles
+inséparables, nommer celui qui porte le comportement. **Deux symboles
+qui ne découlent pas l'un de l'autre sont deux écarts.**
+
 **Sortie** — six champs : verdict, porteur, déclencheur, ce que le code
 fait aujourd'hui, ce qu'il doit faire, les termes cherchés.
 

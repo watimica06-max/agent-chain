@@ -58,8 +58,18 @@ missing is not your call.
 | Defects | Back to `cadreur`, then `verificateur` again |
 
 🔴 **Three rounds maximum.** On the third round still carrying defects,
-stop and hand back — the split is not converging, and that is the
-Product Owner's call.
+**write `code/blocked_verificateur.md`**, then stop.
+
+| Heading | What goes in |
+|---|---|
+| `## What blocks` | The defects still standing, and what each agent held to across the rounds |
+| `## Where` | The lots and the entries they cite |
+| `## To resume` | What the Product Owner has to settle |
+| `## Decision` | 🔴 **Left empty** |
+
+⚠️ **A report in the console is lost; a file is not.** 📌 **The
+Cadreur reads it on his next run** — a filled `## Decision` is a split
+instruction.
 
 🔴 **Never paraphrase an agent's process in your invocation** — not its
 inputs, its checks, its output format. It reads its own instructions.

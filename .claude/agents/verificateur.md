@@ -122,6 +122,12 @@ move 3.
 thing. 🔴 **Entries from two sections are a defect**: the lot belongs
 to no layer.
 
+⚠️ **Not on a bug-fix cycle** — the working folder carries
+`desc-bug.md`. **There a lot groups by bearer**, and a symbol that
+already exists can carry entries from any section. 🔴 **The defect
+there is two lots naming one bearer**, never one lot spanning two
+sections.
+
 🔴 **Do the cited entries describe what the lot announces?** A lot
 declaring one service where its entries describe two distinct things
 to build is badly cut.
@@ -166,8 +172,9 @@ sequence.
 
 **a.** Open a block on the first lot.
 
-**b.** Add the next lot **if it belongs to the same layer** and the
-block has not reached its ceiling.
+**b.** Add the next lot **if it belongs to the same layer** — 📌 **on a
+bug-fix cycle, whatever its layer**, see below — and the block has not
+reached its ceiling.
 
 **c.** Otherwise close the block and open a new one on that lot.
 
@@ -186,6 +193,15 @@ open the same entries and the same code belong together.
 
 🔴 **A block never mixes two layers**, and never breaks the order — it
 is a contiguous slice of the sequence.
+
+⚠️ **The layer rule does not apply on a bug-fix cycle** — the working
+folder carries `desc-bug.md`. **Two fixes on one layer share no
+reading there**: each opens its own entry, greps its own symbol, and
+the fixed cost of a block is paid once whatever they hold.
+
+🔴 **There, group on contiguity alone**, up to the lowest ceiling among
+the layers the block holds. **A block of one lot is a fixed cost paid
+for nothing.**
 
 ⚠️ **Indicative ceilings, not targets, and estimates rather than
 measurements.**

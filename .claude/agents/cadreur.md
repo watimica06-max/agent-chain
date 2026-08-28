@@ -60,7 +60,13 @@ never both — a folder carrying the two is a defect; stop and say so.
 fix. **The inventory is that list**, and what it holds against each
 bearer is what the bearer is missing.
 
-🔴 **Group by bearer.** Entries sharing one are one lot.
+🔴 **Group by bearer, even across sections.** The symbol already
+exists, so unrelated entries can land on it, and two lots may never
+touch one symbol. **Two entries sharing a bearer are one lot, whatever
+sections they come from.**
+
+⚠️ **The nature still holds**: a bearer belongs to one layer, and that
+is what a block groups by. **A single bearer never spans two layers.**
 
 🔴 **Almost everything you declare is a modification** — the feature is
 built, you are changing it.

@@ -439,6 +439,12 @@ découpages le satisfont.
 🔴 **Un lot cite des entrées, jamais un `§3` nu.** Une entrée, ou
 plusieurs quand elles décrivent une seule chose à construire.
 
+⚠️ **Sur un cycle de correction, le groupement se fait par porteur, pas
+par section.** Le symbole existe déjà, donc des écarts sans rapport
+peuvent l'atteindre — et deux lots ne peuvent jamais toucher un même
+symbole. 📌 **La nature tient quand même** : un porteur appartient à
+une couche.
+
 🔴 **Et jamais sur deux natures.** `§3.1` et `§9.2` ne cohabitent pas
 dans un lot : il n'appartiendrait à aucune couche.
 
@@ -547,6 +553,13 @@ d'exécution.
 
 **La taille d'un bloc** — le critère est le **partage des lectures**,
 borné par les plafonds par couche que porte le Cadreur.
+
+⚠️ **La règle de couche ne s'applique pas sur un cycle de
+correction.** Deux corrections d'une même couche n'y partagent aucune
+lecture : chacune ouvre son entrée, grepe son symbole, et le coût fixe
+d'un bloc se paie une fois quel que soit ce qu'il porte. 🔴 **Le
+regroupement se fait alors sur la contiguïté seule**, jusqu'au plafond
+le plus bas des couches présentes.
 
 🔴 **Les plafonds comptent des lots, pas leur poids.** Un lot citant
 cinq entrées en pèse cinq — le compter par entrée citée.
@@ -1102,7 +1115,11 @@ Chacune porte son propre mode — comme `/start_creating`.
 
 🔴 **Trois tours maximum.** Un défaut signalé renvoie au Cadreur avec
 la liste des défauts ; au troisième tour sans convergence,
-l'orchestrateur s'arrête et rend la main.
+l'orchestrateur **écrit `code/blocked_verificateur.md`** et s'arrête.
+
+📌 **Un rapport en console se perd, un fichier non.** Le Cadreur le
+relit à son tour suivant : une `## Decision` remplie est une
+instruction de découpage.
 
 **Sortie** : la séquence et les blocs. 📌 **C'est la pause naturelle** —
 tout est décidé, rien n'est codé.

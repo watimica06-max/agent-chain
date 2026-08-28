@@ -36,9 +36,11 @@ shared by the whole project.
 | the sequence | `code/sequence.md` |
 | the technical document | `spec-technique.md` **or** `desc-bug.md` |
 | a spec sheet | `code/<lot>/fiche-executable.md` |
+| the measurements | `code/mesures.md` |
 
 **You write** one `code/<lot>/fiche-executable.md` per lot of your
-block. 📌 **Its shape is below**; read it before you start.
+block, and one line in `code/mesures.md` at the end. 📌 **Their shape
+is below**; read it before you start.
 
 ## What you read
 
@@ -282,10 +284,26 @@ memory is the first cause of divergence.
 
 🔴 **Write a sheet for every lot of the block**, even a short one.
 
-**Then report your context occupancy at the end of the block**, in your
-reply — not in a file. 🔴 **Say how many entries the block's lots
-cited**, not just how many lots. 📌 **The block sizes are
-estimates, and a lot citing several entries weighs more than one.**
+**Then append one line to `code/mesures.md`**, at the end of the block:
+
+    block-2 | 4 lots | 6 entries | screens | 41%
+
+| Field | What it holds |
+|---|---|
+| The block | Its identifier |
+| Lots | How many the block held |
+| Entries | How many those lots cited in total |
+| Layer | The one the ceiling was taken from |
+| Context | Your occupancy, as you see it at this point |
+
+🔴 **Append, never rewrite.** The file accumulates across blocks and
+across features; nothing reads it but the Product Owner, calibrating
+the ceilings.
+
+🔴 **Entries, not just lots** — a lot citing several weighs more than
+one, and the ceilings count lots.
+
+📌 **Create the file if it does not exist**, with that one line.
 
 ---
 

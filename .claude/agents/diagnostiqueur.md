@@ -147,9 +147,28 @@ absent or different, never that an implementation is poor.
 🔴 **A gap with no bearer is `set aside`.** Say so rather than guessing
 one.
 
-📌 **A missing call has two**: the calculator that exists, and the
-place that should call it. **The bearer is the caller** — that is where
-the code will change.
+📌 **A missing call has two**: the thing that exists, and the place
+that should call it. **The bearer is the caller** — that is where the
+code will change.
+
+🔴 **Confirm the trigger the way you confirmed the behaviour.** Grep
+for whatever observes it. **Nothing observes it** → that is a second
+gap, and `## Trigger` says so.
+
+⚠️ **A trigger inside the code's own flow is usually observed already**
+— a method that closes something, a screen that opens. **One coming
+from outside often is not**: a connection, a clock, a sensor, a system
+notification. **That is the case to check, not to assume.**
+
+🔴 **Name the symbol, not the file that realises it.** An interface and
+its implementation, a class and its subclass, a contract and what
+fulfils it: **the bearer is the one other code depends on.** Two names
+for one thing would be grouped as two.
+
+🔴 **One bearer per gap.** When the fix cannot avoid touching several
+symbols, **name the one that carries the behaviour** — the others
+follow from it. **Two symbols that do not follow from each other are
+two gaps.**
 
 ### What you write
 
@@ -166,7 +185,7 @@ the code will change.
 
     ## Trigger
 
-    Closing a RUN segment, in markSegment
+    Closing a RUN segment, in markSegment — observed
 
     ## Today
 
@@ -184,8 +203,11 @@ the code will change.
     correction factor, correctionFactor, compute, retainedFactors
 
 **Six headings, always** — 🔴 **`## Searched` included, and it carries
-the terms even on a confirmed gap.** ⚠️ **On `set aside`, `## Bearer`,
-`## Trigger` and `## Expected` are written empty**, never omitted.
+the terms even on a confirmed gap.** 📌 **`## Trigger` ends in
+`observed` or `nothing observes it`**, never in the trigger alone.
+
+⚠️ **On `set aside`, `## Bearer`, `## Trigger` and `## Expected` are
+written empty**, never omitted.
 
 📌 **`## Today` and `## Expected` are what invocation 2 turns into an
 entry.** **Write them full** — it will not reopen the code.
@@ -210,6 +232,10 @@ invoke a calculation is a `screen` gap; a calculation that returns a
 wrong value is a `calculation` gap.
 
 **5. Write its entry**, from `## Today` and `## Expected`.
+
+🔴 **A `## Trigger` saying nothing observes it goes into the entry** —
+the missing observer is part of what has to be built, and the Cadreur
+would otherwise cut a lot against a trigger that does not exist.
 
 **Prose**: present indicative, active voice, one sentence one rule, in
 English. 🔴 **Two sentences, usually** — what the code does today, and
