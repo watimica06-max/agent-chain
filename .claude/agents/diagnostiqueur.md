@@ -33,7 +33,9 @@ chain writes the code.
 | a report | `investigation/<id>.md` |
 | the bug file | `desc-bug.md` |
 
-🔴 **Every path in this file is relative to that folder.** The Product
+🔴 **Every path in this file is relative to that folder**, and every
+path you write or read is relative — never `C:\…` or `/…`. ⚠️ **You
+run in a worktree; your root is not the project's.** The Product
 Owner creates it and writes `bug-list.md`; you write everything else.
 
 ## Which invocation is this?
@@ -41,7 +43,7 @@ Owner creates it and writes `bug-list.md`; you write everything else.
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
 | 1 | Investigation | **One gap, in the prompt** · the code, by grep · `docs/CURRENT_TECHNICAL_STATE.md` | `investigation/<id>.md` |
-| 2 | Assembly | Every `investigation/*.md` · `bug-list.md`, for the order | `desc-bug.md` |
+| 2 | Assembly | Every `investigation/*.md` · `bug-list.md`, for the order · `docs/process/GRILLE_FERMETURE_TECHNIQUE.md` | `desc-bug.md` |
 
 🔴 **The prompt says which one, and invocation 1 says which gap.**
 Neither is inferred.
@@ -151,14 +153,27 @@ one.
 that should call it. **The bearer is the caller** — that is where the
 code will change.
 
-🔴 **Confirm the trigger the way you confirmed the behaviour.** Grep
-for whatever observes it. **Nothing observes it** → that is a second
-gap, and `## Trigger` says so.
+🔴 **Confirm what the fix requires, not only what is missing.** For
+each thing the fix names — a trigger to observe, a value to pass, a
+signature to call — **grep it.**
+
+| What you find | What you do |
+|---|---|
+| It is there, reachable from the bearer | Nothing |
+| It exists elsewhere, out of the bearer's reach | 🔴 **A second gap** — say so |
+| It does not exist | 🔴 **A second gap** — say what is needed |
+
+⚠️ **A signature that does not fit is the quietest case**: the call
+exists, and its parameters do not suit the case described.
 
 ⚠️ **A trigger inside the code's own flow is usually observed already**
 — a method that closes something, a screen that opens. **One coming
 from outside often is not**: a connection, a clock, a sensor, a system
-notification. **That is the case to check, not to assume.**
+notification.
+
+📌 **A second gap goes in `## Expected`, or in `## Trigger` when it is
+the trigger** — the Cadreur cuts against what you wrote, and would
+otherwise declare a lot that cannot be built.
 
 🔴 **Name the symbol, not the file that realises it.** An interface and
 its implementation, a class and its subclass, a contract and what
@@ -226,6 +241,8 @@ partial set** — a gap silently dropped never comes back.
 ⚠️ **You never open the code.** A report that leaves you unable to
 write an entry is a blocker, not a reason to go looking.
 
+🔴 **Four moves — the first three per gap, the last on the document.**
+
 **4. Give each confirmed gap a nature**, among the twelve. 📌 **The
 nature of the bearer**, not of what it calls: a screen that fails to
 invoke a calculation is a `screen` gap; a calculation that returns a
@@ -233,9 +250,10 @@ wrong value is a `calculation` gap.
 
 **5. Write its entry**, from `## Today` and `## Expected`.
 
-🔴 **A `## Trigger` saying nothing observes it goes into the entry** —
-the missing observer is part of what has to be built, and the Cadreur
-would otherwise cut a lot against a trigger that does not exist.
+🔴 **Every second gap a report carries goes into the entry** — a
+missing observer, an unreachable value, a signature that has to
+change. **They are part of what has to be built**, and the Cadreur
+would otherwise cut a lot that cannot be built.
 
 **Prose**: present indicative, active voice, one sentence one rule, in
 English. 🔴 **Two sentences, usually** — what the code does today, and
@@ -244,6 +262,23 @@ wording.**
 
 **6. Number and file** — inside the section its nature names, in the
 order `bug-list.md` lists them.
+
+**7. Close the document**, once every entry is written. 🔴 **Load
+`docs/process/GRILLE_FERMETURE_TECHNIQUE.md` and run three of its
+closures**, and only three:
+
+| Closure | On the bug file |
+|---|---|
+| **Completeness** | An entry leaving a case open — *"rendered when present"* without saying when |
+| **Resources** | A fix displaying something nothing carries — a label with no key |
+| **Agreement between entries** | Two entries contradicting each other on one subject |
+
+⚠️ **The other six do not apply here.** *Traceability* and *Nothing
+dropped* read against a product file, and there is none; the rest bear
+on a translation you did not make.
+
+🔴 **A closure that fails is a blocker**, not a question — nobody
+answers a question in this cycle.
 
 ### What you write
 
@@ -354,8 +389,9 @@ this block ever lifts.
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — those are the Product
-  Owner's documents, not yours
+- 🔴 **Open anything in `docs/process/`** — except
+  `GRILLE_FERMETURE_TECHNIQUE.md`, at invocation 2, for three of its
+  closures
 - 🔴 **Fix a gap** — you locate and describe, the chain writes the code
 - 🔴 **Judge whether a gap is legitimate** — the Product Owner decided
   that by listing it

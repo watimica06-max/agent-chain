@@ -85,7 +85,7 @@ Réalisateur ne décide plus d'architecture.
 | Document | Écrit par | Lu par |
 |---|---|---|
 | `spec-technique.md` | en amont | Cadreur (tout), Vérificateur et Détailleur (sections ancrées) |
-| `CURRENT_TECHNICAL_STATE.md` | Réalisateur | Cadreur, Détailleur |
+| `CURRENT_TECHNICAL_STATE.md` | Réalisateur | Détailleur |
 | `TECHNICAL_CONVENTIONS.md` | hors process | Détailleur, Réalisateur, Relecteur |
 | Liste des lots + ancres | Cadreur | Vérificateur, Détailleur |
 | Séquence + blocs | Vérificateur | orchestration, Détailleur |
@@ -365,7 +365,15 @@ suivant l'aurait vu en lisant le code.*
 
 ### Le Cadreur
 
-**Entrées** — `spec-technique.md` · `docs/CURRENT_TECHNICAL_STATE.md`
+**Entrées** — le document technique · `docs/TECHNICAL_CONVENTIONS.md` ·
+**le code, en grep uniquement**
+
+🔴 **Il lit le code.** Le document d'état ne suffisait pas — il n'est
+pas exhaustif, et il ne dit rien de ce qu'un symbole porte ni de qui
+l'appelle. **Onze blocages sur une seule feature sont sortis de là.**
+
+⚠️ **Grep, jamais une lecture de fichier.** Il établit ce qu'un symbole
+est, pas ce que son implémentation fait.
 
 📌 **Les conventions de découpage sont dans ce fichier même** — ce sont
 des propriétés du process, pas du projet.
@@ -396,18 +404,20 @@ le porte.
 **4. Section par section, grouper les entrées en lots.**
 
 **5. Nommer besoins, productions et modifications**, puis greper chacun
-dans le document d'état. ⚠️ **Non trouvé mais marqué `existant` dans le
-préambule → besoin préexistant** : le document d'état n'est pas
-exhaustif.
+dans le code. 📌 **L'inventaire du geste 3 a déjà tranché** — ce qu'un
+symbole porte y est établi.
+
+🔴 **Il grepe aussi les appelants de tout symbole déclaré modifié.** Un
+contrat changé les casse, et chacun est une modification de plus.
 
 **6. Citer les entrées que chaque lot prend** — toutes d'une seule
 section.
 
 🔴 **Produire et modifier ne sont pas la même chose.** Un lot qui
 change un symbole existant le déclare en modification, jamais en
-production — le document d'état dit lesquels existent. ⚠️ **Sur une
-correction ou une évolution, un lot ne produit souvent rien** : il ne
-fait que modifier.
+production — le grep dit lesquels existent. ⚠️ **Sur une correction ou
+une évolution, un lot ne produit souvent rien** : il ne fait que
+modifier.
 
 🔴 **Un type du framework n'est jamais une production.** Le projet
 l'utilise, il ne le construit pas. ⚠️ **Sur une application neuve,
@@ -482,7 +492,7 @@ rend sa réalisation impossible dans un contexte sain.
 - 🔴 **Ancrer un lot sur un `§3` nu, ou sur deux natures**
 - 🔴 **Fusionner en cascade** — une passe, sur les déclarations du
   geste 4
-- 🔴 **Lire le code** — il lit le document d'état, pas les fichiers
+- 🔴 **Ouvrir un fichier de code** — grep seul
 - 🔴 **Écrire une signature ou un critère d'acceptation** — c'est le
   Détailleur
 
@@ -570,9 +580,11 @@ liste. **Le départage est mécanique**, donc reproductible.
 
 ⚠️ **Estimations dérivées d'un raisonnement, pas de mesures.** Ce dont
 on est sûr est l'ordre : un écran coûte plus par unité qu'un modèle,
-parce qu'il dépend de tout ce qui précède. **À calibrer** — le
-Détailleur rapporte son contexte en fin de bloc ; trois ou quatre blocs
-suffiront.
+parce qu'il dépend de tout ce qui précède.
+
+**À calibrer** — 🔴 **par une investigation sur les logs d'agent**, pas
+par une estimation de l'agent lui-même : il n'a aucun accès à son
+propre compteur.
 
 📌 **Regard indépendant sur le découpage** — justifié par (b), pas par
 le contexte.
@@ -1202,8 +1214,10 @@ différence est de proportion, pas de nature.
 ## Questions ouvertes
 
 🟡 **Calibrer les tailles de bloc** — les valeurs par couche sont des
-estimations. Le Détailleur rapporte son contexte de fin ; trois ou
-quatre blocs diront si elles tiennent.
+estimations. 🔴 **Seule une investigation sur les logs d'agent peut
+les trancher** : tours, contexte réel, appels, cache contre
+chargement. ⚠️ **Un agent ne peut pas se mesurer lui-même** — il n'a
+aucun accès à son compteur.
 
 🟡 **Poser le seuil de passage à Opus** sur le code — non fixé,
 à déterminer sur les premiers FAIL structurels qualifiés par le

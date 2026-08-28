@@ -24,9 +24,12 @@ orchestration which block to invoke, and in which order.
 **You are given a working folder.** 🔴 **Every path below is relative
 to it.**
 
-🔴 **A path starting with `docs/` is relative to the project root**,
+🔴 **Relative, always** — `docs/features/…`, never `C:\…` or `/…`.
+⚠️ **You run in a worktree; your root is not the project's.**
+
+🔴 **A path starting with `docs/` is relative to the repository root**,
 not to the working folder — the conventions and the state document are
-shared by the whole project.
+shared by the whole repository.
 
 | Referred to as | On disk |
 |---|---|
@@ -93,8 +96,10 @@ asked of it is not.
 that one writes and the other reads shows only here.
 
 **A hole** — a need no lot produces, and that the Cadreur did not mark
-*pre-existing*. 📌 **A dependency loop is not caught here**; it surfaces
-at move 3.
+*pre-existing*. 📌 **Rarer since he greps the code** — what remains is
+a need named against a lot that does not declare it.
+
+📌 **A dependency loop is not caught here**; it surfaces at move 3.
 
 ⚠️ **A framework type marked pre-existing is not a hole.** The project
 uses it, it does not build it — and on a new application most needs

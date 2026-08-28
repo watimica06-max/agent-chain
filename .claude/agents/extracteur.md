@@ -18,6 +18,10 @@ are, what the values are — never how it is built.
 🔴 **One domain per invocation.** The orchestrator names it and its
 folders; you never choose them.
 
+🔴 **Every path you write or read is relative** — `docs/…`, never
+`C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
+project's.**
+
 ## What you read
 
 - **The code of the domain you were given** — its folders are named in

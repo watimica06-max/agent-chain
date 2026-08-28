@@ -20,8 +20,14 @@ verifiable — the Relecteur compares tests to criteria.
 
 📌 **One invocation per lot.**
 
-**The files, in the working folder you were given.** 🔴 **A path
-starting with `docs/` is relative to the project root**, not to it. 🔴 **The
+**The files, in the working folder you were given.**
+
+🔴 **Every path you write or read is relative** — `docs/features/…`,
+never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
+project's.** An absolute path points outside your session and fails.
+ 🔴 **A path
+starting with `docs/` is relative to the repository root**, not to
+it. 🔴 **The
 orchestration names your lot in the prompt** — `<lot>` below is that
 name.
 

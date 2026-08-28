@@ -133,6 +133,11 @@ agent must write, enter the worktree first** — waiting for the failure
 costs a full invocation, since the agent does the whole job before
 discovering it cannot save it.
 
+🔴 **Inside a worktree, every path is relative to the repository
+root** — `docs/features/<name>/…`, never `C:\Dev\<project>\docs\…`.
+⚠️ **An absolute path points at the main checkout**, outside the
+isolated session, and the write fails.
+
 🔴 **Create it from local `HEAD`** — see the rule at the top of this
 file — and register it.
 
@@ -153,8 +158,8 @@ disk forever.
   **Reading one puts discarded reasoning into your context.**
   ⚠️ **The one exception is `GRILLE_CADRAGE_PRODUIT.md`**, which the
   Analyste loads by name.
-- **Open `CURRENT_TECHNICAL_STATE.md`** — the Cadreur, the Détailleur
-  and the Réalisateur read it; you dispatch.
+- **Open `CURRENT_TECHNICAL_STATE.md`** — the Détailleur and the
+  Réalisateur read it; you dispatch.
 - **Run the project's analysis or test commands** — the Réalisateur
   runs them in the worktree, the Relecteur checks the result, and a
   clean merge produces identical code.

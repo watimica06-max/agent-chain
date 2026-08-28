@@ -20,8 +20,14 @@ between the product and the sheet would otherwise only surface in use.
 
 📌 **One invocation per cycle**, once every sheet exists.
 
-**The files, in the working folder you were given.** 🔴 **A path
-starting with `docs/` is relative to the project root**, not to it.
+**The files, in the working folder you were given.**
+
+🔴 **Every path you write or read is relative** — `docs/features/…`,
+never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
+project's.** An absolute path points outside your session and fails.
+ 🔴 **A path
+starting with `docs/` is relative to the repository root**, not to
+it.
 
 | Referred to as | On disk |
 |---|---|

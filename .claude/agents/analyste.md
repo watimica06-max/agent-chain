@@ -22,6 +22,10 @@ ambiguous, you produce a question, you do not fill the gap.
 
 **The files, in the feature folder you were given:**
 
+🔴 **Every path you write or read is relative** — `docs/features/…`,
+never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
+project's.** An absolute path points outside your session and fails.
+
 | Referred to as | On disk |
 |---|---|
 | the idea file | `idees.md` |

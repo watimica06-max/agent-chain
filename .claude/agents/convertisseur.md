@@ -23,6 +23,10 @@ what it already covered.**
 
 **The files, in the feature folder you were given:**
 
+🔴 **Every path you write or read is relative** — `docs/features/…`,
+never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
+project's.** An absolute path points outside your session and fails.
+
 | Referred to as | On disk |
 |---|---|
 | the product file | `desc-produit.md` |

@@ -1242,7 +1242,7 @@ d'écarts.** C'est le seul agent de la chaîne dans ce cas.
 | # | Invocation | Entrées | Sortie |
 |---|---|---|---|
 | 1 | Investigation | Un écart, dans le prompt · le code, en grep · le document d'état | `investigation/<id>.md` |
-| 2 | Assemblage | Tous les rapports · `bug-list.md`, pour l'ordre | `desc-bug.md` |
+| 2 | Assemblage | Tous les rapports · `bug-list.md`, pour l'ordre · la grille de fermeture technique | `desc-bug.md` |
 
 📌 **Pourquoi découper** : dix écarts dans un seul contexte, ce sont
 dix séries de greps qui s'accumulent. **Une investigation ne voit que
@@ -1268,11 +1268,14 @@ sans porteur est écarté**, jamais deviné.
 📌 **Sur un appel manquant, le porteur est l'appelant** — c'est là que
 le code change.
 
-🔴 **Le déclencheur se confirme comme le comportement.** Rien ne
-l'observe → c'est un second manque, et le rapport le dit. ⚠️ **Un
-déclencheur interne au flux du code est presque toujours observé** ; un
-déclencheur externe — une connexion, une horloge, un capteur — souvent
-pas.
+🔴 **Il confirme ce que la correction exige, pas seulement ce qui
+manque.** Chaque chose que la correction nomme — un déclencheur à
+observer, une valeur à passer, une signature à appeler — se grepe.
+**Hors de portée du porteur, ou inexistante : c'est un second manque**,
+et le rapport le dit.
+
+⚠️ **Une signature qui ne colle pas est le cas le plus discret** :
+l'appel existe, ses paramètres ne conviennent pas au cas décrit.
 
 🔴 **Le porteur est le symbole, pas le fichier qui le réalise** — celui
 dont le reste du code dépend. Deux noms pour une chose seraient groupés
@@ -1287,9 +1290,18 @@ fait aujourd'hui, ce qu'il doit faire, les termes cherchés.
 
 #### Invocation 2 — Assemblage
 
-**Trois gestes** : donner une nature à chaque écart confirmé — celle du
-porteur ; écrire son entrée depuis les deux champs du rapport ;
-numéroter et ranger dans les douze sections.
+**Quatre gestes** : donner une nature à chaque écart confirmé — celle
+du porteur ; écrire son entrée depuis les deux champs du rapport ;
+numéroter et ranger dans les douze sections ; **fermer le document**.
+
+🔴 **Trois fermetures de la grille technique, et trois seulement** —
+complétude, ressources, accord entre entrées. ⚠️ **Les six autres ne
+s'appliquent pas** : traçabilité et rien perdu se lisent contre un
+fichier produit, qui n'existe pas ici ; les autres portent sur une
+traduction qu'il n'a pas faite.
+
+📌 **Une fermeture qui échoue est un blocage**, pas une question —
+personne ne répond à une question dans ce cycle.
 
 **Sortie** — `desc-bug.md`, à la forme du document technique :
 préambule, douze sections par nature, entrées numérotées, plus la liste
