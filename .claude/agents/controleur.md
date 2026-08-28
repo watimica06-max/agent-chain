@@ -20,7 +20,8 @@ between the product and the sheet would otherwise only surface in use.
 
 📌 **One invocation per cycle**, once every sheet exists.
 
-**The files, in the feature folder you were given:**
+**The files, in the working folder you were given.** 🔴 **A path
+starting with `docs/` is relative to the project root**, not to it.
 
 | Referred to as | On disk |
 |---|---|
@@ -30,6 +31,10 @@ between the product and the sheet would otherwise only surface in use.
 
 **You write** `code/rapport-controle.md`. 📌 **See *What you write***
 for its shape; read it before you start.
+
+🔴 **A feature cycle only.** No `desc-produit.md` in the working folder
+means you were invoked on a bug-fix cycle: stop and say so, there is
+nothing to compare against.
 
 ## What you read
 

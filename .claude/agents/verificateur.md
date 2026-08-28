@@ -21,13 +21,22 @@ orchestration which block to invoke, and in which order.
 
 📌 **One invocation per cycle.**
 
-**The files, in the feature folder you were given:**
+**You are given a working folder.** 🔴 **Every path below is relative
+to it.**
+
+🔴 **A path starting with `docs/` is relative to the project root**,
+not to the working folder — the conventions and the state document are
+shared by the whole project.
 
 | Referred to as | On disk |
 |---|---|
 | the lot list | `code/decoupage.md` |
-| the technical document | `spec-technique.md` |
+| the technical document | `spec-technique.md` **or** `desc-bug.md` |
 | the sequence | `code/sequence.md` |
+
+📌 **One of the two technical documents is present, never both.** A
+bug-fix cycle carries `desc-bug.md`; everything you do is identical
+either way.
 
 **You write** `code/sequence.md` — the order, the blocks, the defects.
 📌 **See *What you write*** for its shape; read it before you start.
@@ -35,9 +44,13 @@ orchestration which block to invoke, and in which order.
 ## What you read
 
 - **`code/decoupage.md`**, in full
-- **`spec-technique.md`'s preamble** — 🔴 **always.** Its `Vocabulary`
-  and `Dependencies` tell you what a lot's declarations mean
+- **The technical document's preamble** — 🔴 **always.** Its
+  `Vocabulary` and `Dependencies` tell you what a lot's declarations
+  mean
 - **The entries its lots cite**, opened one by one
+
+📌 **The `## Symbols` inventory comes first** — it is what the lots are
+checked against.
 
 🔴 **Nothing else.** Not the code, not the state document, not the
 product file.
@@ -68,7 +81,16 @@ stop the next run on a question already settled.
 
 ## The four moves, in this order
 
-**1. Cross the declarations**, and note two kinds of defect:
+**1. Cross the inventory against the lots**, and note four kinds of
+defect:
+
+**An unbuilt surface** — 🔴 **an operation the inventory lists that no
+lot produces or modifies.** The symbol may well be produced; what is
+asked of it is not.
+
+📌 **This is the check names alone cannot make.** A lot needing
+`RaceRepository` and a lot producing `RaceRepository` cross perfectly;
+that one writes and the other reads shows only here.
 
 **A hole** — a need no lot produces, and that the Cadreur did not mark
 *pre-existing*. 📌 **A dependency loop is not caught here**; it surfaces
@@ -80,6 +102,14 @@ look like that.
 
 **An overlap** — two lots naming the same symbol, whether they produce
 or modify it.
+
+**A production nobody calls** — 🔴 **no lot needs it, and its
+`Produces` field names no caller.** A rule built and never invoked is
+dead code.
+
+📌 **You check that a caller is named, not that it is right.** *Mounted
+by the system*, *reached by a route*: the Cadreur knows the framework,
+you do not.
 
 ⚠️ **A modification creates a dependency too.** A lot consuming a
 symbol another one modifies comes after it. **Record it**, it feeds
@@ -131,10 +161,6 @@ not decided.
 matches the lot you just placed.** Nothing matching → the lot list's
 own order. **The tie-break is mechanical**, so two runs give the same
 sequence.
-
-⚠️ **That is what keeps a block from holding one lot.** Eligible lots
-interleaved by layer force a block to close at every switch, and a
-block of one amortises nothing.
 
 **4. Group into blocks**, walking the order from the first lot:
 
@@ -249,6 +275,8 @@ this block ever lifts.
 - 🔴 **Read an entry no lot cites.** Needing one to understand a lot
   means the split is bad — a defect to report, not to fix.
   ⚠️ **The preamble is not an entry**; read it
+- 🔴 **Judge whether a named caller is the right one** — you check it
+  is named
 - 🔴 **Write a signature, an acceptance criterion, or code**
 - 🔴 **Derive an order despite a cycle** — report it and leave the
   order empty

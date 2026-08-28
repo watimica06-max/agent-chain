@@ -73,6 +73,29 @@ looks and however obvious the addition seems.
 value is stored, which of several items goes first, what a unit is.
 **They feel like translation and they are decisions.**
 
+## Nothing dropped
+
+**Read the product file again, block by block: is everything it
+enumerates somewhere in an entry?**
+
+🔴 **Naming a set erases its members.** *"A relative-date template"*
+stands in for three labels; *"a three-case type"* stands in for three
+cases to handle. **The product gave them one by one, and each has to
+exist in the code.**
+
+| The product gives | The entry must carry |
+|---|---|
+| Wordings, one by one | Each one, in full |
+| A rule's cases | Each case, and what it produces |
+| A set of values | Every value, not the set's name |
+
+⚠️ **This runs the other way round from *Traceability*.** That one
+starts from your sentence and looks for its source; this one starts
+from the product's and checks it arrived whole.
+
+📌 **It is a sweep, not a test on one entry** — run it once, on the
+finished document.
+
 ## Singularity
 
 **Does this rule live in one place?**
@@ -166,8 +189,12 @@ each of them once.**
 either test is signalled; nothing is written from it.
 
 **Part 2, on the technical document, once every section is filled.**
-🔴 **Not while writing** — entries accumulate, and what they consume or
-contradict only shows once the document stands.
+🔴 **Not while writing** — entries accumulate, and what they consume,
+contradict or dropped only shows once the document stands.
+
+📌 **Two of them sweep rather than test an entry**: *Nothing dropped*
+reads the product file again, *Agreement between entries* reads the
+technical document as a whole.
 
 ⚠️ **A failure is a question, never a fix.** The one exception is
 *Resources*, where the missing entry is written when the product

@@ -14,6 +14,15 @@ for it and stop — never guess which feature is meant.
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
+🔴 **The working folder is the highest `bugfix-NN/` in it, if there is
+one; the feature folder itself otherwise.** A bug-fix cycle keeps
+everything it produces inside its own folder.
+
+📌 **Same structure either way**: the technical document at the root —
+`spec-technique.md` or `desc-bug.md` — and `code/` beside it.
+
+📌 **Every path below is relative to the working folder.**
+
 ---
 
 ## What you read
@@ -62,8 +71,11 @@ Agent(
   subagent_type="cadreur",
   model="sonnet",
   description="Split <feature>",
-  prompt="Feature folder: docs/features/<name>/."
+  prompt="Working folder: <the working folder>."
 )
+
+🔴 **Pass the working folder, never the feature folder.** On a bug-fix
+cycle they differ, and the agent would read the wrong one.
 ```
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist

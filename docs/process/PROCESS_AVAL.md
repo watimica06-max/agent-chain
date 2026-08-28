@@ -372,7 +372,7 @@ des propriétés du process, pas du projet.
 
 **Sortie** — la liste des lots
 
-#### Les cinq gestes, dans cet ordre
+#### Les six gestes, dans cet ordre
 
 **1. Grep `<<ASSUMED`** — 🔴 **une seule occurrence bloque.** Le
 marqueur dit qu'une règle est provisoire.
@@ -381,14 +381,26 @@ marqueur dit qu'une règle est provisoire.
 C'est le seul agent qui le lit tout. ⚠️ **Son `Out of scope` dit ce que
 la feature ne touche pas** — jamais de lot pour ce qui y figure.
 
-**3. Section par section, grouper les entrées en lots.**
+**3. Inventorier les symboles.** Parcourir chaque entrée et noter,
+pour chaque symbole nommé, **tout ce qu'on lui demande** — une
+opération, un champ lu, un libellé cité. 🔴 **C'est l'union qui
+compte** : une repository dont l'entrée créatrice décrit quatre
+écritures et dont les écrans demandent trois lectures porte sept
+opérations.
 
-**4. Nommer besoins, productions et modifications**, puis greper chacun
+⚠️ **Un libellé donné en toutes lettres est un symbole** — la clé qui
+le porte.
+
+📌 **L'inventaire s'écrit dans `decoupage.md`, avant les lots.**
+
+**4. Section par section, grouper les entrées en lots.**
+
+**5. Nommer besoins, productions et modifications**, puis greper chacun
 dans le document d'état. ⚠️ **Non trouvé mais marqué `existant` dans le
 préambule → besoin préexistant** : le document d'état n'est pas
 exhaustif.
 
-**5. Citer les entrées que chaque lot prend** — toutes d'une seule
+**6. Citer les entrées que chaque lot prend** — toutes d'une seule
 section.
 
 🔴 **Produire et modifier ne sont pas la même chose.** Un lot qui
@@ -406,6 +418,15 @@ d'état avec lui.
 dans les modifications du lot, même si aucune entrée ne le nomme.
 ⚠️ **Ce qui réagit à un événement l'observe rarement** — un écran ne
 voit pas la navigation qui l'a quitté.
+
+🔴 **Une entrée qui dit quand une règle s'applique nomme aussi un
+déclencheur** — un événement système, ou un moment dans un flux que le
+code contrôle. *« À la fin de chaque kilomètre »*, *« dès que le lien
+est établi »* : **le lot qui porte ce moment déclare la règle en
+besoin.** 📌 **Une règle que personne n'appelle est du code mort.**
+
+🔴 **Nommer ce qui appelle chaque production** — un lot, ou quelque
+chose hors du découpage : une route, le framework, le système.
 
 #### Ce qui fait un lot
 
@@ -471,8 +492,18 @@ Détailleur**
 
 #### Les quatre gestes, dans cet ordre
 
-**1. Croiser les déclarations**, et noter deux sortes de défaut : un
-trou et un recouvrement.
+**1. Croiser l'inventaire contre les lots**, et noter quatre sortes de
+défaut : une surface non construite, un trou, un recouvrement, **et une
+production que personne n'appelle**.
+
+🔴 **La surface non construite est le contrôle que les noms seuls ne
+permettent pas.** Un lot qui a besoin de `RaceRepository` et un lot qui
+le produit se croisent parfaitement ; que l'un écrive et l'autre lise
+ne se voit que sur l'inventaire.
+
+📌 **Sur une production inappelée, il vérifie qu'un appelant est
+nommé**, pas qu'il est juste — le Cadreur connaît le framework, lui
+non.
 
 ⚠️ **Une modification crée aussi une dépendance.** Un lot qui consomme
 un symbole qu'un autre modifie doit venir après lui — sinon il code
@@ -635,6 +666,11 @@ booléen**, ni un booléen accompagné d'un effet de bord.
 
 ⚠️ **Une règle qui ne produit rien mais change un état** : la signature
 dit ce qu'elle change ; le critère porte sur l'état après.
+
+🔴 **La signature dit ce que vaut le retour aux limites** — absence,
+vide, borne, unité, ordre. **Un type ne porte pas ça**, et deux lots
+peuvent nommer le même symbole en en attendant deux choses
+différentes.
 
 **Le nom** — celui de la règle, dans le vocabulaire du produit, jamais
 celui de la structure. `reconcile`, pas `processEntries`.

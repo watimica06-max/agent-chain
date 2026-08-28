@@ -20,7 +20,8 @@ verifiable — the Relecteur compares tests to criteria.
 
 📌 **One invocation per lot.**
 
-**The files, in the feature folder you were given.** 🔴 **The
+**The files, in the working folder you were given.** 🔴 **A path
+starting with `docs/` is relative to the project root**, not to it. 🔴 **The
 orchestration names your lot in the prompt** — `<lot>` below is that
 name.
 

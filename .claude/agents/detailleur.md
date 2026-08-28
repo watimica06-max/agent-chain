@@ -23,13 +23,18 @@ confirmed by grep before being written.
 
 📌 **One invocation per block, not per lot.**
 
-**The files, in the feature folder you were given:**
+**You are given a working folder.** 🔴 **Every path below is relative
+to it.**
+
+🔴 **A path starting with `docs/` is relative to the project root**,
+not to the working folder — the conventions and the state document are
+shared by the whole project.
 
 | Referred to as | On disk |
 |---|---|
 | the lot list | `code/decoupage.md` |
 | the sequence | `code/sequence.md` |
-| the technical document | `spec-technique.md` |
+| the technical document | `spec-technique.md` **or** `desc-bug.md` |
 | a spec sheet | `code/<lot>/fiche-executable.md` |
 
 **You write** one `code/<lot>/fiche-executable.md` per lot of your
@@ -42,8 +47,10 @@ block. 📌 **Its shape is below**; read it before you start.
   `## Defects` first**: a defect naming a lot of your block means the
   split was not corrected — stop and report rather than detailing
   against it
-- **`code/decoupage.md`**, restricted to those lots
-- **`spec-technique.md`'s preamble** — 🔴 **always**, whatever your
+- **`code/decoupage.md`**, restricted to those lots — 📌 **plus its
+  `## Symbols` inventory**, which says what a symbol you consume
+  carries and which entries ask it
+- **The technical document's preamble** — 🔴 **always**, whatever your
   block. Its `Vocabulary` names the terms your signatures must use;
   its `Dependencies` lists what already exists, so you grep those first
 - **The spec entries their lots cite** — 📌 **those, not the whole
@@ -100,14 +107,15 @@ before deriving anything.
 **2. Read the two open sections of the state document** —
 `## Traps — general` and `## Dead state`, **whole**. 🔴 **You cannot
 grep a rule you do not know applies to you**; that is why they are
-sections and not entries. ⚠️ **Those two only** — the rest of the file
-is an inventory you grep by symbol.
+sections and not entries. ⚠️ **Those two only** — the rest of that file
+you grep, symbol by symbol.
 
 📌 **A trap changes a signature.** *"Date queries must use a range"*
 means the signature takes a range, not a date.
 
 **3. For each rule those entries describe, work out a signature** —
 see below.
+
 📌 **The naming conventions apply here**, nowhere else, and 🔴 **the
 preamble's `Vocabulary` fixes the terms** — a signature never renames
 what the feature already calls something.
@@ -194,6 +202,17 @@ return a boolean**, nor a boolean plus a side effect.
 
 ⚠️ **A rule that produces nothing but changes a state**: the signature
 says what it changes; the criterion bears on the state after.
+
+🔴 **A signature says what the return is worth at the edges** —
+absence, emptiness, a bound, a unit, an order. **A type does not carry
+that**, and two lots can name the same symbol while expecting two
+different things of it.
+
+| Written | Not enough |
+|---|---|
+| `observe(): Flow<Profile?>` — null until one has ever been received | `Flow<Profile?>` alone: null could mean not yet loaded |
+| `observeAll(): Flow<List<Race>>` — most recent first, empty when none | `Flow<List<Race>>` alone: order and empty case are guesses |
+| `delta(a, b): Long` — milliseconds, signed, negative means ahead | `Long` alone: unit and sign are guesses |
 
 **The name** — the rule's, in the product's vocabulary, never the
 structure's. `reconcile`, not `processEntries`.

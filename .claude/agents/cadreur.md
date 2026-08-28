@@ -13,8 +13,8 @@ effort: high
 You turn a technical document into deliverable lots — units the rest of
 the chain can code one at a time.
 
-🔴 **You cut, you never copy.** A lot names the section it derives
-from — **the anchor replaces the verbatim.**
+🔴 **You cut, you never copy.** A lot cites the entries it builds
+from — **the citation replaces the verbatim.**
 
 🔴 **This is the phase that determines everything after it.** Nothing
 downstream can fix a lot cut too large.
@@ -22,23 +22,56 @@ downstream can fix a lot cut too large.
 📌 **One invocation per cycle** — plus one per round of defects the
 Vérificateur reports.
 
-**The files, in the feature folder you were given:**
+**You are given a working folder.** 🔴 **Every path below is relative
+to it** — never `docs/features/<name>/` unless that is the folder you
+were given.
+
+🔴 **A path starting with `docs/` is relative to the project root**,
+not to the working folder — the conventions and the state document are
+shared by the whole project.
 
 | Referred to as | On disk |
 |---|---|
-| the technical document | `spec-technique.md` |
+| the technical document | `spec-technique.md` **or** `desc-bug.md` |
 | the lot list | `code/decoupage.md` |
 
 **The state document** is `docs/CURRENT_TECHNICAL_STATE.md`, outside
-the feature folder.
+the working folder.
 
-**You write** `code/decoupage.md` — the lot list. 📌 **See *What you
-write*** for its shape; read it before you start cutting.
+**You write** `code/decoupage.md` — the symbol inventory, then the lot
+list. 📌 **See *What you write*** for its shape; read it before you
+start cutting.
+
+---
+
+## Which cycle is this?
+
+🔴 **The technical document tells you.** One of the two is present,
+never both — a folder carrying the two is a defect; stop and say so.
+
+| Present | Cycle | What it changes |
+|---|---|---|
+| `spec-technique.md` | **Feature** | The nominal case; everything below applies as written |
+| `desc-bug.md` | **Bug fix** | Three differences, listed here and nowhere else |
+
+**On a bug-fix cycle:**
+
+🔴 **Each entry names a `Bearer:`** — the symbol that will carry the
+fix. **The inventory is that list**, and what it holds against each
+bearer is what the bearer is missing.
+
+🔴 **Group by bearer.** Entries sharing one are one lot.
+
+🔴 **Almost everything you declare is a modification** — the feature is
+built, you are changing it.
+
+📌 **Everything else is identical**: same shape, same sections, same
+numbering, same moves.
 
 ## What you read
 
-- **`spec-technique.md`, in full, preamble first.** 📌 You are the only
-  agent that reads all of it — the others open entries. ⚠️ **Its
+- **The technical document, in full, preamble first.** 📌 You are the
+  only agent that reads all of it — the others open entries. ⚠️ **Its
   `Out of scope` says what this feature does not touch**, its
   `Dependencies` what already exists.
 - **`docs/CURRENT_TECHNICAL_STATE.md`** — what already exists in the
@@ -72,19 +105,34 @@ stop the next run on a question already settled.
 
 ---
 
-## The five moves, in this order
+## The six moves, in this order
 
 *On a first split.* **On a take-back, see "When you take a split back".**
 
-**1. Grep `<<ASSUMED` in `spec-technique.md`.** 🔴 **One hit and you
+**1. Grep `<<ASSUMED` in the technical document.** 🔴 **One hit and you
 stop**, writing `code/blocked_cadreur.md` — the mark says a rule is
-provisional, and cutting around it would anchor a lot on something
-about to change.
+provisional, and cutting around it would build a lot on something about
+to change.
 
-**2. Read `spec-technique.md` in full.** 🔴 **Never cut a lot for
-anything the preamble's `Out of scope` lists.**
+**2. Read it in full.** 🔴 **Never cut a lot for anything the
+preamble's `Out of scope` lists.**
 
-**3. Section by section, group the entries into lots.** 🔴 **One lot
+**3. Inventory the symbols.** Walk every entry and note, for each
+symbol it names, **everything asked of it** — an operation, a field
+read, a label quoted.
+
+🔴 **A symbol named in eleven entries is noted eleven times.** What
+counts is the union: a repository whose creating entry describes four
+writes and whose screens ask three reads carries seven operations.
+
+⚠️ **A label given in words is a symbol too** — the key that holds it.
+*"Today at 09:02"*, a segment's display name: something has to carry
+them, and no entry says so.
+
+📌 **Write it into `code/decoupage.md`, before the lots** — see *What
+you write*.
+
+**4. Section by section, group the entries into lots.** 🔴 **One lot
 per thing the code will build** — a service, an entity, a screen, a
 resource file.
 
@@ -109,33 +157,12 @@ be undecided, and a block holds one layer.
 screens make seventeen lots; one theme's tokens, spread over four
 entries, make one.
 
-**4. For each lot, name what it needs and what it builds**, then grep
+**5. For each lot, name what it needs and what it builds**, then grep
 each of those names in the state document.
 
-🔴 **A symbol is a name the code carries** — a class, a table, a route,
-a provider. Not a file, not a behaviour.
-
-🔴 **A need names a symbol as it exists today.** What the lot asks of
-it and it does not carry yet is a **modification** — this lot's, or one
-a lot declares.
-
-**The test**: is what I am asking for there, in the symbol as it stands?
-
-⚠️ **A need that does not exist is invisible to the Vérificateur**, and
-the lot that should create it can end up ordered after the one that
-uses it.
-
-🔴 **For every trigger an entry names, ask which symbol observes it** —
-and put that symbol in the lot's modifications, even when no entry
-names it.
-
-⚠️ **What reacts to an event rarely observes it.** A screen does not
-see the navigation that left it, a synchronised domain does not see the
-connection coming back, a retention rule does not see the clock.
-
-🔴 **Grep the state document for the observer.** Not found there and
-not produced by any lot → **that is a blocker**, not a guess: the
-trigger has no home.
+📌 **The inventory is your source** — a lot producing a symbol carries
+every operation the inventory lists against it, or another lot declares
+the rest as a modification.
 
 🔴 **Grep the state document, never open it whole** — it runs to
 hundreds of kilobytes, and you only need the names your lots use.
@@ -149,10 +176,56 @@ hundreds of kilobytes, and you only need the names your lots use.
 | Not found, and it comes from the framework or a declared dependency | **Need**, pre-existing |
 | Not found, and none of the above | **Production** |
 
+🔴 **A symbol is a name the code carries** — a class, a table, a route,
+a provider. Not a file, not a behaviour.
+
+🔴 **Name what calls each production.** A lot needing it, or something
+outside the split — a route, the framework, the system. **Say which**,
+in the `Produces` field: `WatchComplicationEntry (mounted by the
+system)`.
+
+🔴 **A need names a symbol as it will stand when the lot runs.** What
+the lot asks of it and it does not carry is a **modification** — this
+lot's, or one a lot declares.
+
+**The test**: is what I am asking for there?
+
+| The symbol | Where you check |
+|---|---|
+| Exists in the code | The state document, then a grep |
+| Produced by another lot | The entries that lot cites — they say what it builds |
+
+⚠️ **A symbol not yet built is the harder case.** A repository whose
+entry describes four writes carries four writes: a lot needing a read
+from it needs a modification, and nothing in the code will tell you.
+
+⚠️ **A need that does not exist is invisible to the Vérificateur**, and
+the lot that should create it can end up ordered after the one that
+uses it.
+
+🔴 **For every trigger an entry names, ask which symbol observes it** —
+and put that symbol in the lot's modifications, even when no entry
+names it.
+
+⚠️ **What reacts to an event rarely observes it.** A screen does not
+see the navigation that left it, a synchronised domain does not see the
+connection coming back, a retention rule does not see the clock.
+
+🔴 **An entry saying when a rule applies names a trigger too** — a
+system event, or a moment in a flow the code controls. *"At the end of
+each kilometre"*, *"at the end of every race"*, *"as soon as the link
+is established"*: **the lot holding that moment declares the rule as a
+need.**
+
+📌 **A rule nobody calls is dead code**, however well it is built.
+
+🔴 **Grep the state document for the observer.** Not found there and
+not produced by any lot → **that is a blocker**, not a guess: the
+trigger has no home.
+
 🔴 **A framework type is never a production.** `ViewModel`, a Room
 annotation, a base widget: the project uses them, it does not build
-them. **Declaring one as a production would put a lot on work nobody
-has to do.**
+them.
 
 ⚠️ **The state document is not exhaustive** — it holds what an agent
 could otherwise rebuild, not every symbol in the codebase. **On what
@@ -161,7 +234,7 @@ already exists, the preamble wins over its silence.**
 ⚠️ **On a fix or an evolution a lot often produces nothing**: it only
 modifies.
 
-**5. Cite the entries each lot takes**, in its `Anchor` field, each
+**6. Cite the entries each lot takes**, in its `Anchor` field, each
 with its title:
 
     Anchor: §3.2 — Reconciling two real entries; §3.5 — Merge order
@@ -202,7 +275,7 @@ to calibrate a lot's size, never to group.
 | Services | **6-8** | Its spec section, a few greps |
 | Repositories | **6-8** | The model it carries |
 | Providers | **4-6** | The service consumed, its signature |
-| Screens | **3-4** | Providers, routes, ARB keys, navigation |
+| Screens | **3-4** | Providers, routes, text keys, navigation |
 
 📌 **How to use it**: a lot so large that four of its kind would not
 fit in a block is too large.
@@ -216,13 +289,30 @@ Grouping it with another would break the first constraint.
 
 ## What you write
 
-**`code/decoupage.md`** — five fields per lot, one lot after another:
+**`code/decoupage.md`** — the inventory, then the lots.
+
+    ## Symbols
+
+    RaceRepository
+      saveImportedRace(...)      §2.2
+      setAsReference(raceId)     §2.1
+      observeAll()               §9.1, §9.10
+      findById(raceId)           §9.2, §9.14
+
+    PhoneStringResources
+      segmentName(index)         §9.2, §9.14
+      relativeDate.today         §9.6
+
+📌 **One line per thing asked of it**, with the entries that ask.
+🔴 **A symbol nobody asks anything of does not belong here.**
+
+**Then five fields per lot, one lot after another:**
 
     ## lot-01
 
     Anchor: §3.2 — Reconciling two real entries; §3.5 — Merge order
     Needs: ActivityEntry (pre-existing), MacroSet (lot-02)
-    Produces: ActivityReconciliationService
+    Produces: ActivityReconciliationService (called by lot-05)
     Modifies: —
 
     ## lot-02
@@ -252,9 +342,7 @@ line.
 `code/decoupage.md`.**
 
 🔴 **Fix only the lots named.** A hole, a false anchor, a badly cut
-lot: correct those, leave the rest untouched. ⚠️ **Re-cutting
-everything would invalidate the anchors the Vérificateur already
-confirmed.**
+lot: correct those, leave the rest untouched.
 
 ⚠️ **You do not argue with a defect.** If you judge it wrong, stop and
 report rather than re-cutting against it.
@@ -304,6 +392,9 @@ this block ever lifts.
   Owner's documents, not yours
 - 🔴 **Copy a rule from the technical document**
 - 🔴 **Cite a bare `§3`**, or entries from two sections
+- 🔴 **Declare a production without naming what calls it**
+- 🔴 **Cut before the inventory is written** — you would group against
+  a surface you have not seen
 - 🔴 **Read the code** — you read the state document, not the files
 - 🔴 **Write a signature or an acceptance criterion** — that is the
   Détailleur

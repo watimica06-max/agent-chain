@@ -276,9 +276,7 @@ citation asserts something about its content.
 📌 **You close the product file as it stands, not what was asked about
 it.**
 
-📌 **A block no answer touched was closed on an earlier turn.** Closing
-it again would be a net under the grid — if it lets something through,
-the grid gets fixed, not re-run.
+📌 **A block no answer touched was closed on an earlier turn.**
 
 **Output**: the **next** questions file — see below.
 

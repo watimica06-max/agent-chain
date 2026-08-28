@@ -43,10 +43,10 @@ transcrit. Le cycle peut s'étaler sur plusieurs jours.
 
 ### 2. Convertisseur
 
-📌 **Il applique `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — huit
+📌 **Il applique `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — neuf
 fermetures en deux parties : nature et cohérence sur le fichier
-produit, puis traçabilité, unicité, accord entre entrées, liens
-déclarés, ressources et complétude sur le document technique.
+produit, puis traçabilité, rien perdu, unicité, accord entre entrées,
+liens déclarés, ressources et complétude sur le document technique.
 🔴 **La grille porte les tests, l'agent porte les gestes.**
 
 **Ferme le fichier produit sous l'angle technique, puis produit le
@@ -69,11 +69,16 @@ la chaîne.
 
 ### 4. Diagnostiqueur — cycle bug fix
 
-**Confronte un fichier d'écarts au document global** et produit un
-fichier produit ne portant que les écarts confirmés.
+**Confirme chaque écart dans le code** et produit `desc-bug.md`, le
+document technique d'un cycle de correction. **Deux invocations** :
+une investigation par écart, puis un assemblage.
 
 📌 **Il n'intervient que sur une correction de défaut** — voir "Les
 quatre points d'entrée".
+
+🔴 **Le cycle de correction ne repasse pas par la chaîne amont.** Le
+produit dit déjà ce qui est attendu ; une correction n'y ajoute rien.
+**`/diagnostique` → `/7_decoupe` → `/8_code`.**
 
 ---
 
@@ -91,8 +96,9 @@ Une invocation par domaine.
 | Fichier | Écrit par | Lu par |
 |---|---|---|
 | **Fichier d'idées** | Product Owner, hors ligne | Analyste |
-| **Fichier d'écarts** *(bug fix)* | Product Owner, hors ligne | Diagnostiqueur |
-| **Fichier produit d'une fonctionnalité** | Analyste — ou Diagnostiqueur en cycle bug fix | Analyste, Convertisseur, Fusionneur |
+| **`bug-list.md`** *(bug fix)* | Product Owner, hors ligne | Diagnostiqueur |
+| **Fichier produit d'une fonctionnalité** | Analyste | Analyste, Convertisseur, Fusionneur |
+| **Fichier de bugs** *(bug fix)* | Diagnostiqueur | Cadreur *(process aval)* |
 | **Document produit global** | Fusionneur | Analyste, Product Owner |
 | **Document technique** | Convertisseur | Cadreur *(process aval)* |
 | **Plan de fusion** | Fusionneur, 1ʳᵉ invocation | Fusionneur, 2ᵉ invocation |
@@ -135,7 +141,7 @@ décompose de toute façon, mais il se trompera moins.
 
 ### Les deux fichiers produit
 
-**Produits par** l'Analyste — ou le Diagnostiqueur en cycle bug fix —
+**Produits par** l'Analyste —
 *(fichier d'une fonctionnalité)* et le Fusionneur *(document global)*.
 **Lus par** tous les agents amont et le Product Owner.
 
@@ -370,38 +376,26 @@ développement.
 
 ---
 
-### Le fichier d'écarts — cycle bug fix
+### `bug-list.md` — cycle bug fix
 
-**Écrit par** le Product Owner, hors ligne. **Lu par** le
-Diagnostiqueur.
+**Écrit par** le Product Owner, hors ligne, dans le dossier
+`bugfix-NN/` qu'il crée. **Lu par** le Diagnostiqueur.
 
-🔴 **Sous les titres du document global** — section et bloc — pour que
-la comparaison soit mécanique.
+🔴 **Un écart par entrée, forme libre** — une phrase qui nomme ce qui
+ne va pas, et ce qui devrait être :
 
-    ## Activity screen
-    ### Add button
-    Observed: absent
+    - Le facteur de correction n'est jamais calculé. Il devrait
+      l'être à la fin de chaque kilomètre, et son résultat gardé sur
+      la course.
+    - L'écran de profil édite trois réglages ; le quatrième seuil de
+      zone n'a pas de handler.
 
-**Vocabulaire de constat, fermé** — un agent ne devine pas ce qu'un
-raccourci veut dire :
+📌 **Aucun vocabulaire fermé.** Ce qui compte est que chaque entrée
+nomme un comportement, pas un fichier.
 
-| Constat | Sens |
-|---|---|
-| `absent` | Ne s'affiche nulle part, ne se déclenche jamais |
-| `different` | Présent, mais ne correspond pas à la description |
-| `conditional` | Présent dans certains cas seulement, alors qu'il devrait l'être partout — ou l'inverse |
-
-⚠️ **Préciser le contexte quand il compte** : quel écran, quel état,
-quelles conditions d'observation.
-
----
-
-#### 5. Extracteur — reprise d'une application existante
-
-**Construit le document global depuis le code**, quand il n'existe pas.
-Une invocation par domaine.
-
-📌 **Il n'intervient qu'une fois**, à la reprise d'un projet déjà codé.
+⚠️ **Sa source ne change rien** : constat à l'usage, ou intention
+absente relevée par le Contrôleur. **Ce qui entre dans le cycle est la
+décision du Product Owner.**
 
 ---
 
@@ -885,14 +879,14 @@ document technique.
 
 #### La grille de fermeture technique
 
-**Il applique `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — huit
+**Il applique `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — neuf
 fermetures en deux parties. 🔴 **La grille porte les tests, l'agent
 porte les gestes.**
 
 | Partie | Quand | Ce qu'elle ferme |
 |---|---|---|
 | 1 | En fermant le produit | Nature · cohérence entre blocs |
-| 2 | En produisant | Traçabilité · unicité · accord entre entrées · liens déclarés · ressources · complétude |
+| 2 | En produisant | Traçabilité · rien perdu · unicité · accord entre entrées · liens déclarés · ressources · complétude |
 
 **Une fermeture qui échoue est un signalement.**
 
@@ -1240,42 +1234,57 @@ domaine n'existe pas**, il en crée un au niveau domaines.
 
 ### Le Diagnostiqueur
 
-*Cycle bug fix uniquement. Une seule invocation.*
+*Cycle bug fix uniquement.*
 
-**Entrées** : le fichier d'écarts · le document global. ⚠️ **Pas le
-code** — il constate un écart déclaré, il ne l'explique pas. C'est
-l'aval qui investiguera.
+🔴 **Deux invocations, et la première tourne autant de fois qu'il y a
+d'écarts.** C'est le seul agent de la chaîne dans ce cas.
 
-**Ce qu'il fait**, bloc par bloc :
+| # | Invocation | Entrées | Sortie |
+|---|---|---|---|
+| 1 | Investigation | Un écart, dans le prompt · le code, en grep · le document d'état | `investigation/<id>.md` |
+| 2 | Assemblage | Tous les rapports · `bug-list.md`, pour l'ordre | `desc-bug.md` |
 
-| Cas | Action |
-|---|---|
-| Le titre existe et décrit le comportement attendu | **Écart confirmé** — il produit un bloc au format produit portant **ce que le global exige**, pas ce qui a été observé |
-| Le titre existe mais décrit autre chose | **Écarté** — révision produit, pas correction |
-| Le titre n'existe pas | **Écarté** — le cas n'a jamais été cadré |
+📌 **Pourquoi découper** : dix écarts dans un seul contexte, ce sont
+dix séries de greps qui s'accumulent. **Une investigation ne voit que
+son écart**, et rien de ce qu'elle cherche n'aide les autres.
 
-📌 **Sa sortie est riche même si le fichier d'écarts est pauvre** : il
-recopie la règle complète du global, pas le constat — donc au format et
-dans la prose du global — voir "Les règles d'écriture des fichiers
-produit".
+⚠️ **L'assemblage n'ouvre jamais le code** — les rapports portent tout.
+Un rapport qui ne suffit pas à écrire une entrée est un blocage.
 
-#### Cahier des charges
+#### Invocation 1 — Investigation
 
-**Entrées** — le fichier d'écarts · le document global. ⚠️ **Rien
-d'autre** : ni le code, ni `CURRENT_TECHNICAL_STATE.md`, ni le document
-technique.
+**Trois gestes** :
 
-**Sorties** — `desc-produit.md` avec les seuls écarts confirmés · la
-liste des écarts écartés, avec leur raison.
+**1. Dériver les termes de recherche.** 🔴 **Un écart est écrit en
+comportement, pas en symboles** — *« le facteur n'est jamais
+calculé »* ne nomme aucune classe.
 
-🔴 **Chaque bloc porte `NEW` sur sa ligne de titre** — tous sont neufs,
-et la passe de grille grepe ce marqueur.
+**2. Confirmer** — `missing`, `wrong`, ou écarté.
 
-**Ce qu'il ne fait jamais**
-- 🔴 Expliquer un écart — c'est l'aval qui investigue
-- 🔴 Reprendre le constat observé plutôt que la règle du global
-- 🔴 Écrire dans le document global
-- 🔴 Traiter un écart dont le titre n'existe pas au global
+**3. Localiser — deux symboles.** Le **porteur**, qui portera la
+correction ; le **déclencheur**, ce qui doit l'appeler. 🔴 **Un écart
+sans porteur est écarté**, jamais deviné.
+
+📌 **Sur un appel manquant, le porteur est l'appelant** — c'est là que
+le code change.
+
+**Sortie** — six champs : verdict, porteur, déclencheur, ce que le code
+fait aujourd'hui, ce qu'il doit faire, les termes cherchés.
+
+#### Invocation 2 — Assemblage
+
+**Trois gestes** : donner une nature à chaque écart confirmé — celle du
+porteur ; écrire son entrée depuis les deux champs du rapport ;
+numéroter et ranger dans les douze sections.
+
+**Sortie** — `desc-bug.md`, à la forme du document technique :
+préambule, douze sections par nature, entrées numérotées, plus la liste
+des écarts écartés.
+
+📌 **Chaque entrée nomme son porteur** — c'est ce sur quoi le Cadreur
+groupe.
+
+📌 **Aucun marqueur `NEW`** — rien ici ne passe par une grille.
 
 ---
 
@@ -1384,19 +1393,20 @@ exemples, pas un modèle.
 
 **Correction d'un défaut** — un cycle à part, avec son propre agent.
 
-**Le Product Owner écrit un fichier d'écarts** — voir "Le fichier
-d'écarts" pour sa structure.
+**Le Product Owner crée `bugfix-NN/` et y écrit `bug-list.md`** — voir
+sa section pour la forme.
 
-**La chaîne** : `/diagnostique` → `/3_reclasse` → *(`/1_structure` si
-questions)* → `/4_convertit` → chaîne aval.
+**La chaîne** : `/diagnostique` → `/7_decoupe` → `/8_code`.
 
-🔴 **Le Fusionneur ne tourne pas** — le global est la référence, il ne
-change pas. Ni la grille, ni les deux invocations de l'Analyste : il
-n'y a aucune décision produit à obtenir.
+🔴 **Rien de la chaîne amont ne tourne** — ni l'Analyste, ni la grille,
+ni le Convertisseur, ni le Fusionneur. **Le produit dit déjà ce qui est
+attendu ; une correction n'y ajoute rien.**
 
-⚠️ **L'invocation 1 de l'Analyste reste dans la boucle** : si le
-Convertisseur pose des questions, c'est elle qui intègre les réponses
-au `desc-produit.md`.
+📌 **`desc-bug.md` est le document technique du cycle** — le Cadreur le
+découpe comme il découpe une spec.
+
+⚠️ **Le Contrôleur ne tourne pas non plus** : il compare le fichier
+produit aux fiches, et il n'y a pas de fichier produit ici.
 
 ---
 
@@ -1480,12 +1490,29 @@ pas le bon instrument.
 **Un dossier par feature** : `docs/features/<nom>/`, créé par le
 Product Owner, qui y dépose son fichier d'idées.
 
-    idees.md · ecarts-constates.md · desc-produit.md
-    plan-fusion.md · spec-technique.md
-    rapport-fusion.md
+    idees.md · desc-produit.md · plan-fusion.md
+    spec-technique.md · rapport-fusion.md
 
     questions-<agent>-01.md…      à la racine, le cycle en cours
     questions/<agent>/            les cycles clos, un dossier par agent
+
+    code/                         le process aval
+
+**Un cycle de correction vit dans son propre dossier**, numéroté :
+
+    bugfix-01/
+      bug-list.md                 Product Owner
+      desc-bug.md                 Diagnostiqueur, invocation 2
+      investigation/<id>.md       Diagnostiqueur, invocation 1
+      code/                       le process aval, à l'identique
+
+🔴 **Le Product Owner crée le dossier et y écrit `bug-list.md`** — les
+commandes ne le créent jamais.
+
+📌 **`/7_decoupe` et `/8_code` travaillent dans le `bugfix-NN` le plus
+haut s'il en existe un**, dans le dossier feature sinon. **Même
+structure des deux côtés** : le document technique à la racine, `code/`
+à côté.
 
 🔴 **Les fichiers de questions portent le nom de leur émetteur** —
 `questions-analyste-01.md`, `questions-convertisseur-01.md`,

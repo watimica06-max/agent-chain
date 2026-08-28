@@ -15,7 +15,17 @@ it, ask for it and stop.
 **The second is optional**: how many lots to code. 🔴 **One by
 default.**
 
-Feature folder: `docs/features/$ARGUMENTS/`
+Feature folder: `docs/features/<first argument>/` — 🔴 **the first
+argument only**; `$ARGUMENTS` holds both.
+
+🔴 **The working folder is the highest `bugfix-NN/` in it, if there is
+one; the feature folder itself otherwise.** A bug-fix cycle keeps
+everything it produces inside its own folder.
+
+📌 **Same structure either way**: the technical document at the root —
+`spec-technique.md` or `desc-bug.md` — and `code/` beside it.
+
+📌 **Every path below is relative to the working folder.**
 
 ---
 
@@ -63,6 +73,10 @@ lots in the prompt.
 **When every lot of the sequence carries a PASS** → **`controleur`**,
 then stop.
 
+🔴 **Only on a feature cycle.** On a bug-fix cycle — the working folder
+carries `desc-bug.md` — **skip him and stop**: he compares the product
+file to the sheets, and there is no product file here.
+
 🔴 **Every lot of the sequence, not every lot of this run.** `N` lots
 coded with two still pending means no Contrôleur — he compares the
 product file to *all* the sheets, and a missing one would make him
@@ -83,12 +97,15 @@ Agent(
   subagent_type="realisateur",
   model="sonnet",
   description="Code <lot>",
-  prompt="Feature folder: docs/features/<name>/. Lot: lot-03."
+  prompt="Working folder: <the working folder>. Lot: lot-03."
 )
 ```
 
 🔴 **Name the lot — or the block, for the Détailleur — in the prompt.**
 The agent cannot guess which one is his.
+
+🔴 **Pass the working folder, never the feature folder.** On a bug-fix
+cycle they differ, and the agent would read the wrong one.
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
 either** — in this environment the Agent tool always runs async and
