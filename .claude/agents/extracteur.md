@@ -171,6 +171,8 @@ already there are not yours.
 2. **"Found N matches"** → anchor on the nearest unique heading, never
    lengthen with prose.
 
+---
+
 ## What you flag
 
 🔴 **Every flag is a greppable tag**, so the Product Owner can collect

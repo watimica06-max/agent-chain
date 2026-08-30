@@ -90,7 +90,9 @@ what its implementation does.
 
 🔴 **Every code search targets the code folders the conventions
 name** — `Grep(pattern, path: "<folder>")`, never a bare pattern.
-⚠️ **A search without a path sweeps `docs/` and the build output.**
+📌 **Their test folders count as code folders** when you are looking
+for callers. ⚠️ **A search without a path sweeps `docs/` and the build
+output.**
 
 🔴 **Never the product file, either grid, or any questions file.** They
 belong to the chain before you.
@@ -118,7 +120,7 @@ stop the next run on a question already settled.
 
 ---
 
-## The six moves, in this order
+## The ten moves, in this order
 
 *On a first split.* **On a take-back, see "When you take a split back".**
 
@@ -142,9 +144,9 @@ writes and whose screens ask three reads carries seven operations.
 *"Today at 09:02"*, a segment's display name: something has to carry
 them, and no entry says so.
 
-⚠️ **So is the piece a rule needs to reach outside the program** — see
-move 5. **No entry names it**, and the inventory is where it first
-appears.
+⚠️ **So is a piece** — what a rule needs to reach outside the program,
+the OS or a device. 📌 **No entry names one**, and the inventory is
+where it first appears. **Move 5 says how you find them.**
 
 🔴 **Grep each symbol as you note it.** What the code carries today,
 against what the entries ask of it — **the gap is what has to be
@@ -180,15 +182,17 @@ to build are one lot.**
 🔴 **A lot never groups entries from two sections.** Its nature would
 be undecided, and a block holds one layer.
 
-📌 **Move 5 adds lots this table does not describe** — the pieces that
-reach outside the program. They cite an entry already cited, and they
-are cut there, not here.
+📌 **Move 7 adds lots this table does not describe** — the pieces. They
+cite an entry already cited, and they are cut there, not here.
 
 ⚠️ **The table says what a lot is, not how many there are.** Seventeen
 screens make seventeen lots; one theme's tokens, spread over four
 entries, make one.
 
 **5. For each lot, name what it needs and what it builds.**
+
+📌 **A first pass** — moves 6 to 9 add to these declarations, and one
+of them adds lots.
 
 📌 **The inventory is your source** — you grepped every symbol at move
 3, and what it carries is settled.
@@ -211,25 +215,42 @@ them.
 🔴 **What a lot asks of an existing symbol and the symbol does not
 carry is a modification** — never a need. **Move 3 told you which.**
 
-🔴 **Grep the callers of every symbol declared modified.** A changed
-contract breaks them, and each one is a modification too.
+**6. Grep the callers of every symbol declared modified.** 🔴 **A
+changed contract breaks them, and each one is a modification too.**
+
+⚠️ **Tests are callers.** A test reading a field a lot removes stops
+compiling, and its whole source set with it. **Search the test folders
+too**, not only the code ones.
+
+🔴 **A lot changing a mechanism changes what its callers need.** The
+new mechanism carries requirements no entry names.
+
+**The test, on each caller**: what it holds today, does the new
+mechanism accept it? ⚠️ **One that cannot is a modification too**, and
+what it lacks belongs in the lot.
 
 | The caller | What the lot declares |
 |---|---|
 | No other lot names it | **Modification**, with the rest of the lot |
-| Another lot of this split modifies it too | 🔴 **A defect** — two lots would touch one symbol; re-cut |
+| Another lot removes the call as part of its own change | **Nothing** — that lot already declares it, and runs first |
+| Another lot modifies it for its own reasons | 🔴 **A defect** — two lots would touch one symbol; re-cut |
 
 📌 **A caller widens a lot beyond what the entries describe**, and that
 is right: the entries say what to change, the code says what breaks.
+
+🔴 **A signature and its call sites go in one lot**, save for that
+second case. Splitting them leaves the module uncompilable between the
+two, and no declaration ties them — **neither consumes the other's
+production, so nothing orders them.**
 
 🔴 **Name what calls each production.** A lot needing it, or something
 outside the split — a route, the framework, the system. **Say which**,
 in the `Produces` field: `WatchComplicationEntry (mounted by the
 system)`.
 
-🔴 **A rule naming an actor outside the program needs a piece to reach
-it.** The OS, a device, a sensor, the disk, the network, a clock,
-another application.
+**7. Find the pieces the rules need.** 🔴 **A rule naming an actor
+outside the program needs a piece to reach it.** The OS, a device, a
+sensor, the disk, the network, a clock, another application.
 
 **The test**: who, outside this code, has to act or answer for the rule
 to hold? **Nobody** → the code suffices. **Someone** → grep the piece
@@ -254,8 +275,22 @@ what is needed; **something has to fulfil it**, in a module the
 conventions let touch the platform. **A contract with nothing behind it
 compiles, passes its tests, and does nothing.**
 
-🔴 **For every trigger an entry names, ask which symbol observes it** —
-and put that symbol in the lot's modifications, even when no entry
+**8. Name what has to be declared outside the code.** 🔴 **A
+permission, a service, a library, an entry point: each is written in a
+file the code never imports, and no grep on a symbol finds it.**
+
+**The question, on every production and every piece**: what has to be
+declared for this to be reachable?
+
+🔴 **And what does a removal leave unused?** ⚠️ **A leftover lies to
+the next grep** — a dependency declared with nothing using it reads as
+a use.
+
+📌 **The lot carries the declaration**, never a lot of its own: between
+the two, nothing works.
+
+**9. For every trigger an entry names, ask which symbol observes it.**
+🔴 **Put that symbol in the lot's modifications**, even when no entry
 names it.
 
 ⚠️ **What reacts to an event rarely observes it.** A screen does not
@@ -277,7 +312,7 @@ emit. ⚠️ **Cannot tell what it would be?** Then it is a blocker.
 ⚠️ **On a fix or an evolution a lot often produces nothing**: it only
 modifies.
 
-**6. Cite the entries each lot takes**, in its `Anchor` field, each
+**10. Cite the entries each lot takes**, in its `Anchor` field, each
 with its title:
 
     Anchor: §3.2 — Reconciling two real entries; §3.5 — Merge order
@@ -445,6 +480,8 @@ this block ever lifts.
 - 🔴 **Declare a production without naming what calls it**
 - 🔴 **Fold a piece into the lot declaring its contract** — two layers,
   two lots
+- 🔴 **Declare a production without what has to be declared for it** —
+  a permission, a service, a library
 - 🔴 **Cut before the inventory is written** — you would group against
   a surface you have not seen
 - 🔴 **Open a code file** — grep only; you establish what a symbol is,

@@ -73,7 +73,7 @@ a lot, the split is bad, and that is a defect to report.
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
 | A `## Decision` filled | Apply it, then delete the file |
 
-**How you apply it** — **run all four moves again from the start.** A
+**How you apply it** — **run all five moves again from the start.** A
 decision on the lot list changes what crosses, and a partial re-check
 would miss it.
 
@@ -82,7 +82,7 @@ stop the next run on a question already settled.
 
 ---
 
-## The four moves, in this order
+## The five moves, in this order
 
 **1. Cross the inventory against the lots**, and note four kinds of
 defect:
@@ -99,7 +99,7 @@ that one writes and the other reads shows only here.
 *pre-existing*. 📌 **Rarer since he greps the code** — what remains is
 a need named against a lot that does not declare it.
 
-📌 **A dependency loop is not caught here**; it surfaces at move 3.
+📌 **A dependency loop is not caught here**; it surfaces at move 4.
 
 ⚠️ **A framework type marked pre-existing is not a hole.** The project
 uses it, it does not build it — and on a new application most needs
@@ -112,18 +112,31 @@ or modify it.
 `Produces` field names no caller.** A rule built and never invoked is
 dead code.
 
-📌 **A piece is the exception**: the inventory marks it as such, no
-entry names it, and what calls it is the contract it fulfils.
+📌 **A piece is the exception.** **A piece is what a rule needs to
+reach outside the program** — the OS, a device, the disk, the network.
+The inventory marks it as such, no entry names it, and what calls it is
+the contract it fulfils.
 
 📌 **You check that a caller is named, not that it is right.** *Mounted
 by the system*, *reached by a route*: the Cadreur knows the framework,
 you do not.
 
-⚠️ **A modification creates a dependency too.** A lot consuming a
-symbol another one modifies comes after it. **Record it**, it feeds
-move 3.
+**2. Record what orders lots without declaring it.** 🔴 **Two kinds**,
+and neither shows in a `Needs` field.
 
-**2. Open each cited entry**, one by one, and confront:
+⚠️ **A modification creates a dependency.** A lot consuming a symbol
+another one modifies comes after it.
+
+🔴 **Two lots changing both ends of one call are ordered too.** One
+changes a signature, the other changes or drops the call: neither
+consumes the other's production, so nothing declares an order — **and
+between them the module does not compile.**
+
+📌 **The one that leaves the call valid goes first.** Dropping a call
+before changing the signature works; the reverse does not. ⚠️ **Where
+neither order works, they are one lot** — say so as a defect.
+
+**3. Open each cited entry**, one by one, and confront:
 
 📌 **Two lots may cite one entry** — a contract and the piece that
 realises it. **They differ by layer**, and the second needs the first.
@@ -155,7 +168,8 @@ before calling a mismatch.**
 📌 **These two checks protect the Détailleur** — a false sheet
 contaminates a whole block.
 
-**3. Derive the order** from the declared dependencies:
+**4. Derive the order** from the declared dependencies **and from what
+move 2 recorded**:
 
 **a.** Take the lots whose needs are all pre-existing — they come
 first.
@@ -179,7 +193,7 @@ matches the lot you just placed.** Nothing matching → the lot list's
 own order. **The tie-break is mechanical**, so two runs give the same
 sequence.
 
-**4. Group into blocks**, walking the order from the first lot:
+**5. Group into blocks**, walking the order from the first lot:
 
 **a.** Open a block on the first lot.
 

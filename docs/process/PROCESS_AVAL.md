@@ -259,7 +259,7 @@ décision remplie → il l'applique et supprime le fichier.
 📌 **Chacun a sa méthode d'application** — le Détailleur écrit sa fiche
 contre la décision plutôt que contre l'entrée, le Réalisateur
 code contre elle et le dit dans son compte rendu, le Vérificateur
-rejoue ses quatre gestes depuis le début.
+rejoue ses cinq gestes depuis le début.
 
 ⚠️ **Bloquer n'est pas signaler.** Un défaut, une divergence, un écart :
 ça part dans la sortie normale et le cycle continue. 🔴 **On ne bloque
@@ -381,7 +381,7 @@ des propriétés du process, pas du projet.
 
 **Sortie** — la liste des lots
 
-#### Les six gestes, dans cet ordre
+#### Les dix gestes, dans cet ordre
 
 **1. Grep `<<ASSUMED`** — 🔴 **une seule occurrence bloque.** Le
 marqueur dit qu'une règle est provisoire.
@@ -443,6 +443,18 @@ besoin ; **quelque chose doit la remplir**, dans un module que les
 conventions autorisent à toucher la plateforme. **Un contrat sans rien
 derrière compile, passe ses tests, et ne fait rien.**
 
+🔴 **Que faut-il déclarer, hors du code, pour que ceci soit
+atteignable ?** Une permission, un service, une bibliothèque, un point
+d'entrée : chacun s'écrit dans un fichier que le code n'importe pas,
+et aucun grep sur un symbole ne le trouve.
+
+🔴 **Et qu'est-ce qu'un retrait rend inutile ?** ⚠️ **Un résidu ment au
+grep suivant** — une dépendance déclarée sans usage se lit comme un
+usage.
+
+📌 **Le lot porte la déclaration**, jamais un lot à part : entre les
+deux, rien ne marche.
+
 🔴 **Pour chaque déclencheur nommé, quel symbole l'observe ?** Il entre
 dans les modifications du lot, même si aucune entrée ne le nomme.
 ⚠️ **Ce qui réagit à un événement l'observe rarement** — un écran ne
@@ -453,6 +465,17 @@ déclencheur** — un événement système, ou un moment dans un flux que le
 code contrôle. *« À la fin de chaque kilomètre »*, *« dès que le lien
 est établi »* : **le lot qui porte ce moment déclare la règle en
 besoin.** 📌 **Une règle que personne n'appelle est du code mort.**
+
+🔴 **Greper les appelants de tout symbole déclaré modifié.** Un contrat
+changé les casse, et chacun est une modification de plus. ⚠️ **Les
+tests en sont** : un test qui lit un champ qu'un lot retire cesse de
+compiler, et tout son jeu de sources avec lui.
+
+🔴 **Un lot qui change de mécanisme change les besoins de ses
+appelants.** Le nouveau mécanisme porte des exigences qu'aucune entrée
+ne nomme. 📌 **Le test, sur chaque appelant** : ce qu'il porte
+aujourd'hui, le nouveau mécanisme l'accepte-t-il ? **Celui qui ne le
+peut pas est une modification de plus.**
 
 🔴 **Nommer ce qui appelle chaque production** — un lot, ou quelque
 chose hors du découpage : une route, le framework, le système.
@@ -525,7 +548,7 @@ ouvertes une par une. Rien d'autre.
 **Sortie** — la séquence, les défauts constatés, et **les blocs pour le
 Détailleur**
 
-#### Les quatre gestes, dans cet ordre
+#### Les cinq gestes, dans cet ordre
 
 **1. Croiser l'inventaire contre les lots**, et noter quatre sortes de
 défaut : une surface non construite, un trou, un recouvrement, **et une
@@ -543,6 +566,13 @@ non.
 ⚠️ **Une modification crée aussi une dépendance.** Un lot qui consomme
 un symbole qu'un autre modifie doit venir après lui — sinon il code
 contre l'ancienne signature.
+
+🔴 **Deux lots qui changent les deux bouts d'un appel s'ordonnent
+aussi.** L'un change une signature, l'autre change ou retire l'appel :
+aucun ne consomme la production de l'autre, donc rien ne déclare
+d'ordre — **et entre les deux le module ne compile pas.** 📌 **Celui
+qui laisse l'appel valide passe en premier**, et si aucun ordre ne
+marche, ils sont un seul lot.
 
 🔴 **Deux lots ne modifient jamais le même symbole.** C'est un défaut
 de découpage : leurs changements se recouvriraient sans que rien ne le
@@ -645,7 +675,7 @@ signature tout autant.
 
 **Sortie** — les fiches exécutables des lots du bloc
 
-#### Les sept gestes, par lot du bloc
+#### Les huit gestes, par lot du bloc
 
 **1. Ouvrir chaque entrée que le lot cite** — 🔴 **un lot
 en cite souvent plusieurs**, et elles décrivent une seule chose à
@@ -674,11 +704,14 @@ créé, le réutiliser. **Aucune** → il précède le cycle.
 
 ⚠️ **Si le grep contredit ce que le lot déclare**, voir plus bas.
 
-**5. Écrire la signature**, une fois chaque type confirmé.
+**5. Pour chaque symbole trouvé dans le code, greper les comptes rendus
+du cycle** — pour savoir d'où il vient.
 
-**6. Écrire les critères d'acceptation** — voir ci-dessous.
+**6. Écrire la signature**, une fois chaque type confirmé.
 
-**7. Nommer les conventions que ce lot doit tenir.** 🔴 **Chaque règle
+**7. Écrire les critères d'acceptation** — voir ci-dessous.
+
+**8. Nommer les conventions que ce lot doit tenir.** 🔴 **Chaque règle
 🔴 de `TECHNICAL_CONVENTIONS.md` qui porte sur ce que le lot touche** —
 les bibliothèques de sa couche, où vivent ses chaînes, ce qu'une classe
 de son espèce étend, ce que son module peut importer.

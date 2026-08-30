@@ -144,7 +144,9 @@ signal.
 
 ## INVOCATION 1 — Closing
 
-**Read the product file in full, once.** 🔴 **Never partially** — a
+**Three moves.**
+
+**1. Read the product file in full, once.** 🔴 **Never partially** — a
 calculation rule can be described inside a screen section, and the
 other way round.
 
@@ -173,16 +175,16 @@ produces:**
 ⚠️ **A failure case does not name a nature.** A local read fails too;
 what makes a block `external source` is where the data comes from.
 
-🔴 **Run part 1 of the closure grid on every block** — *Nature*, then
-*Consistency*. **You write no technical content here**; you close, and
+**2. Run part 1 of the closure grid on every block** — 🔴 *Nature*,
+then *Consistency*. **You write no technical content here**; you close, and
 you signal what does not close.
 
 🔴 **A failure never stops the rest.** Note it, carry on to the last
 block.
 
-🔴 **Delete `spec-technique.md` if it exists.** The product file has
-moved since it was written — leaving it would send invocation 2 into a
-targeted update on a document that no longer matches.
+**3. Delete `spec-technique.md` if it exists.** 🔴 **The product file
+has moved since it was written** — leaving it would send invocation 2
+into a targeted update on a document that no longer matches.
 
 **One output**: the questions file — one question per failure, carrying
 the identifier of the block it blocks. 🔴 **Write it even when empty**
@@ -222,7 +224,10 @@ on the next round. That is normal, not a failure.
 
 ## INVOCATION 2 — Producing
 
-🔴 **First, look for `spec-technique.md`.**
+**Three moves.**
+
+**1. Look for `spec-technique.md`** — it tells you which regime you
+are in.
 
 | It | What you do |
 |---|---|
@@ -247,8 +252,8 @@ still points at where its answer will come from.
 
 ---
 
-**On a full production: take the updated product file**, which carries
-the answers. 🔴 **Read it in full, once** — a calculation rule can be
+**2. On a full production, take the updated product file**, which
+carries the answers. 🔴 **Read it in full, once** — a calculation rule can be
 described inside a screen section, and the other way round.
 
 📌 **The outgoing references carried on each block become the section
@@ -264,8 +269,9 @@ production translates into technical terms.
 🔴 **You decide nothing new.** You make explicit what a block says
 implicitly — the closure grid's *Traceability* draws the line.
 
-🔴 **Run its part 2 once every section is filled**, and treat what it
-returns by the table below.
+**3. Run part 2 of the closure grid, once every section is filled** —
+🔴 **not while writing** — and treat what it returns by the table
+below.
 
 ### What a question costs
 
@@ -439,6 +445,8 @@ It is where the Product Owner answers, by hand, and it is the only way
 this block ever lifts.
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
+
+---
 
 ## What you report
 

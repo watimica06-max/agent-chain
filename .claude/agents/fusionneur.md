@@ -143,6 +143,9 @@ block, one line per sentence:
 `PENDING`. A sentence that falls under none of them means the
 comparison is not finished.
 
+📌 **`INIT` is the exception**: on an empty global the plan is that one
+word, alone, with no sentence under it.
+
 ⚠️ **`DELETE` never comes from you** — only from an answer confirming a
 rule no longer holds. Invocation 1 writes `PENDING`; the deletion is
 recorded when the answer comes back.
@@ -166,6 +169,15 @@ whole loop correcting.
 🔴 **Never open a questions file written before you** — those belong to
 the loops that ran earlier. ⚠️ **Invocation 2 reads the one you wrote,
 and it alone.**
+
+🔴 **A global holding nothing but `# Application` is a first feature.**
+There is nothing to compare: **the plan is one line, `INIT`**, and no
+question comes out of it.
+
+📌 **Everything below applies to a global that already describes
+something.**
+
+---
 
 ### Three levels of location
 
@@ -233,7 +245,19 @@ answered · the global.
 📌 **Look for it at the root first, then in `questions/fusionneur/`** —
 another agent may have filed it away since.
 
-**Apply the merge plan**, in targeted edits.
+**On `INIT`: copy the product file under `# Application`.** 🔴 **Drop
+what belongs to the feature file alone** — the block numbers, the `NEW`
+markers, and its own `# Application`. 📌 **The `Nature:` lines stay**:
+the global carries them, as the Extracteur writes them.
+
+⚠️ **Nothing else changes.** The prose is already the global's, and
+rewriting it would lose what the upstream loop settled.
+
+📌 **Then you are done** — no `PENDING`, no answer to resolve.
+
+---
+
+**Otherwise, apply the merge plan** in targeted edits.
 
 **Each `PENDING` line resolves against its answer:**
 
@@ -268,6 +292,9 @@ global.** There, a block has its title alone.
 ### The merge report
 
 **Written after applying, never before.**
+
+📌 **On an `INIT`, one line under new sections** — the global was
+written from the feature file, and every section is new.
 
 | Field | Contents |
 |---|---|

@@ -85,13 +85,15 @@ stop the next run on a question already settled.
 
 ---
 
-## What you do, block by block
+## The two moves
 
-**Read every sheet once, then take each block of the product file and
-ask: is its intention carried by one of them?**
+**Two moves.**
 
-🔴 **Sheets first, blocks second** — the other way reopens the sheets
-at every block.
+**1. Read every sheet, once.** 🔴 **All of them, before any block** —
+the other way round reopens them at every block.
+
+**2. Take each block of the product file and ask: is its intention
+carried by one of them?**
 
 | Outcome | What you write |
 |---|---|

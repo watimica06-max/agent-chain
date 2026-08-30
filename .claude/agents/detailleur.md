@@ -40,6 +40,10 @@ shared by the whole repository.
 | the technical document | `spec-technique.md` **or** `desc-bug.md` |
 | a spec sheet | `code/<lot>/fiche-executable.md` |
 
+📌 **On a bug-fix cycle each entry opens with a `Bearer:` line** — the
+symbol that carries the fix. **It tells you which symbol the entry is
+about**; the rule to derive a signature from is the prose below it.
+
 **You write** one `code/<lot>/fiche-executable.md` per lot of your
 block. 📌 **Its shape is below**; read it before you start.
 
@@ -101,7 +105,7 @@ stop the next run on a question already settled.
 
 ---
 
-## The seven moves, per lot of the block
+## The eight moves, per lot of the block
 
 **1. Open every entry the lot cites** — 🔴 **a lot often cites
 several**, and together they describe one thing to build. Read them all
@@ -137,7 +141,7 @@ files it under that symbol.
 
 | The grep | What it means |
 |---|---|
-| Found in the code | It exists — place it with the second grep below |
+| Found in the code | It exists — move 5 says where it came from |
 | Not found, and a lot of this block produces it | Legitimate — this block will build it |
 | Not found, and an earlier lot of the sequence produces it | Legitimate — it exists by the time this one runs |
 | Not found, and it comes from the framework or a declared dependency | Legitimate — the project does not own it |
@@ -156,8 +160,8 @@ folders finds nothing for one the project never declares, and that says
 nothing about the split. 📌 **On a new application almost every type is one of
 these** — the code is empty and the state document with it.
 
-**A symbol found in the code — where does it come from?** 🔴 **Grep the
-cycle's reports:**
+**5. For every symbol found in the code, grep the cycle's reports** —
+you need to know where it came from.
 
     Grep(pattern: "<symbol>", glob: "**/compte-rendu.md")
 
@@ -173,11 +177,11 @@ is the answer.
 📌 **This catches what no split declared** — a type a signature needed
 and nobody could foresee.
 
-**5. Write the signature** in the sheet, once every type is confirmed.
+**6. Write the signature** in the sheet, once every type is confirmed.
 
-**6. Write the acceptance criteria** — see below.
+**7. Write the acceptance criteria** — see below.
 
-**7. Name the conventions this lot has to hold.** 🔴 **Every 🔴 rule of
+**8. Name the conventions this lot has to hold.** 🔴 **Every 🔴 rule of
 `TECHNICAL_CONVENTIONS.md` bearing on what the lot touches** — the
 libraries its layer uses, where its strings live, what a class of its
 kind extends, what its module may import.

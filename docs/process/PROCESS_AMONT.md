@@ -683,7 +683,7 @@ utiles — voir "Comment le document global se lit". 📌 **Le Product
 Owner peut nommer des sections** s'il sait déjà lesquelles sont
 touchées ; sinon l'agent les identifie depuis l'index.
 
-**Trois gestes, dans cet ordre, sur chaque passage du fichier
+**Quatre gestes, dans cet ordre, sur chaque passage du fichier
 d'idées :**
 
 **1. Décomposer.** 🔴 **Ce que le Product Owner dit est un flux, pas une
@@ -1253,7 +1253,7 @@ Un rapport qui ne suffit pas à écrire une entrée est un blocage.
 
 #### Invocation 1 — Investigation
 
-**Trois gestes** :
+**Cinq gestes** :
 
 **1. Dériver les termes de recherche.** 🔴 **Un écart est écrit en
 comportement, pas en symboles** — *« le facteur n'est jamais
@@ -1268,14 +1268,23 @@ sans porteur est écarté**, jamais deviné.
 📌 **Sur un appel manquant, le porteur est l'appelant** — c'est là que
 le code change.
 
-🔴 **Il confirme ce que la correction exige, pas seulement ce qui
-manque.** Chaque chose que la correction nomme — un déclencheur à
+**4. Confirmer ce que la correction exige**, pas seulement ce qui
+manque. Chaque chose que la correction nomme — un déclencheur à
 observer, une valeur à passer, une signature à appeler — se grepe.
-**Hors de portée du porteur, ou inexistante : c'est un second manque**,
-et le rapport le dit.
+🔴 **Hors de portée du porteur, ou inexistante : c'est un second
+manque**, et le rapport le dit.
 
 ⚠️ **Une signature qui ne colle pas est le cas le plus discret** :
 l'appel existe, ses paramètres ne conviennent pas au cas décrit.
+
+**5. Relire chaque appelant contre le nouveau mécanisme.** 🔴 **Une
+correction qui change de mécanisme change les besoins de ses
+appelants.** Le nouveau mécanisme porte des exigences que l'écart ne
+nomme jamais.
+
+📌 **Le test, sur chaque appelant** : ce qu'il porte aujourd'hui, le
+nouveau mécanisme l'accepte-t-il ? **Celui qui ne peut pas y répondre
+est un second manque.**
 
 🔴 **Le porteur est le symbole, pas le fichier qui le réalise** — celui
 dont le reste du code dépend. Deux noms pour une chose seraient groupés
@@ -1290,7 +1299,8 @@ fait aujourd'hui, ce qu'il doit faire, les termes cherchés.
 
 #### Invocation 2 — Assemblage
 
-**Quatre gestes** : donner une nature à chaque écart confirmé — celle
+**Quatre gestes**, numérotés 6 à 9 : donner une nature à chaque écart
+confirmé — celle
 du porteur ; écrire son entrée depuis les deux champs du rapport ;
 numéroter et ranger dans les douze sections ; **fermer le document**.
 

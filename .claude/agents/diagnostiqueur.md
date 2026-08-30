@@ -84,7 +84,7 @@ not a file.
 | A `## Decision` filled | Apply it, then delete the file |
 
 **How you apply it, at invocation 1** — **to your own gap**, then run
-the three moves as usual. 📌 **A decision naming another gap is not
+the five moves as usual. 📌 **A decision naming another gap is not
 yours to apply.**
 
 **How you apply it, at invocation 2** — 🔴 **the decision does not
@@ -149,13 +149,23 @@ absent or different, never that an implementation is poor.
 🔴 **A gap with no bearer is `set aside`.** Say so rather than guessing
 one.
 
+🔴 **Name the symbol, not the file that realises it.** An interface and
+its implementation, a class and its subclass, a contract and what
+fulfils it: **the bearer is the one other code depends on.** Two names
+for one thing would be grouped as two.
+
+🔴 **One bearer per gap.** When the fix cannot avoid touching several
+symbols, **name the one that carries the behaviour** — the others
+follow from it. **Two symbols that do not follow from each other are
+two gaps.**
+
 📌 **A missing call has two**: the thing that exists, and the place
 that should call it. **The bearer is the caller** — that is where the
 code will change.
 
-🔴 **Confirm what the fix requires, not only what is missing.** For
+**4. Confirm what the fix requires, not only what is missing.** For
 each thing the fix names — a trigger to observe, a value to pass, a
-signature to call — **grep it.**
+signature to call — 🔴 **grep it.**
 
 | What you find | What you do |
 |---|---|
@@ -171,19 +181,19 @@ exists, and its parameters do not suit the case described.
 from outside often is not**: a connection, a clock, a sensor, a system
 notification.
 
+**5. Read each caller against the new mechanism.** 🔴 **A fix that
+changes a mechanism changes what its callers need**, and the new
+mechanism carries requirements the gap never names.
+
+**The test, on each caller**: what it holds today, does the new
+mechanism accept it?
+
+⚠️ **One that cannot answer is a second gap** — say which, and what it
+lacks.
+
 📌 **A second gap goes in `## Expected`, or in `## Trigger` when it is
 the trigger** — the Cadreur cuts against what you wrote, and would
 otherwise declare a lot that cannot be built.
-
-🔴 **Name the symbol, not the file that realises it.** An interface and
-its implementation, a class and its subclass, a contract and what
-fulfils it: **the bearer is the one other code depends on.** Two names
-for one thing would be grouped as two.
-
-🔴 **One bearer per gap.** When the fix cannot avoid touching several
-symbols, **name the one that carries the behaviour** — the others
-follow from it. **Two symbols that do not follow from each other are
-two gaps.**
 
 ### What you write
 
@@ -241,14 +251,15 @@ partial set** — a gap silently dropped never comes back.
 ⚠️ **You never open the code.** A report that leaves you unable to
 write an entry is a blocker, not a reason to go looking.
 
-🔴 **Four moves — the first three per gap, the last on the document.**
+🔴 **Four moves — the first three per gap, the last on the whole
+document.**
 
-**4. Give each confirmed gap a nature**, among the twelve. 📌 **The
+**6. Give each confirmed gap a nature**, among the twelve. 📌 **The
 nature of the bearer**, not of what it calls: a screen that fails to
 invoke a calculation is a `screen` gap; a calculation that returns a
 wrong value is a `calculation` gap.
 
-**5. Write its entry**, from `## Today` and `## Expected`.
+**7. Write its entry**, from `## Today` and `## Expected`.
 
 🔴 **Every second gap a report carries goes into the entry** — a
 missing observer, an unreachable value, a signature that has to
@@ -260,10 +271,10 @@ English. 🔴 **Two sentences, usually** — what the code does today, and
 what it must do. ⚠️ **No justification, no reference to `bug-list.md`'s
 wording.**
 
-**6. Number and file** — inside the section its nature names, in the
+**8. Number and file** — inside the section its nature names, in the
 order `bug-list.md` lists them.
 
-**7. Close the document**, once every entry is written. 🔴 **Load
+**9. Close the document**, once every entry is written. 🔴 **Load
 `docs/process/GRILLE_FERMETURE_TECHNIQUE.md` and run three of its
 closures**, and only three:
 
