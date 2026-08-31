@@ -40,7 +40,7 @@ project's.** An absolute path points outside your session and fails.
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
 | 1 | Closing | The product file | The next questions file · 🔴 deletes any technical document |
-| 2 | Producing | The updated product file, **or** the technical document alone on a targeted update | The technical document · a questions file |
+| 2 | Producing | The updated product file, **or** the technical document alone on a targeted update | The technical document · `tracabilite.md` · a questions file |
 
 🔴 **Both load `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — part 1
 at invocation 1, part 2 at invocation 2. **It holds the closures; this
@@ -293,6 +293,35 @@ where its answer will come from.
 
 📌 **Both cases write the question the same way** — a new entry with an
 empty `Answer:` field. **Say which of the two you are in.**
+
+### The traceability file
+
+**`tracabilite.md`**, at the feature folder's root, alongside the
+technical document.
+
+🔴 **One line per block of the product file, in block order** — its
+identifier, its title, then the entries carrying at least one of its
+rules:
+
+    B1   Race segment structure          §1.1
+    B43  Sending profile to the watch     §6.1, §9.6, §9.9
+    B59  Measured physiological data      —
+
+📌 **Two spaces at least between the columns**; nothing else on the
+line, no prose, no header.
+
+🔴 **Every block appears**, those no entry carries included — a dash
+says you looked and found none, an absent line says nothing at all.
+
+⚠️ **A block often gives several entries, and an entry often comes from
+several blocks.** Force neither.
+
+📌 **You know this as you write.** Each entry is written from blocks you
+have in front of you; the file records what you did, it is not a second
+pass.
+
+🔴 **On a targeted update, leave it as it is.** A mark replaced by its
+answer changes no rule's origin.
 
 ---
 

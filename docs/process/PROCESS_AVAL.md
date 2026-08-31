@@ -784,6 +784,12 @@ ancrée doit être observable par au moins un critère.
 trois ; un écran, un par état affiché ; une migration, un sur ce que
 deviennent les données existantes.
 
+🔴 **Ce qu'une entrée nomme comme déclencheur porte un critère sur ce
+qu'il atteint**, pas seulement sur son existence. **Un déclencheur
+construit et branché sur rien se lit comme construit.** ⚠️ **Ce qu'il
+atteint vit souvent dans une autre entrée** — celle que le lot cite
+nomme le déclencheur, une autre décrit la suite.
+
 **Plus ce que la section nomme comme limite** — entrée absente, valeur
 hors bornes, source indisponible.
 
@@ -1039,7 +1045,14 @@ l'usage montre des incohérences récurrentes.**
 **Entrées** — le fichier produit de la fonctionnalité · toutes les
 fiches exécutables
 
-**Actions** — pour chaque bloc du fichier produit, trois issues :
+**Actions** — pour chaque bloc du fichier produit, **phrase par
+phrase**, trois issues :
+
+🔴 **L'unité est la phrase, jamais le bloc entier.** Un bloc qui porte
+onze intentions demande onze réponses — sept critères sur onze ne font
+pas une intention retrouvée. ⚠️ **Un bloc qui se lit comme un seul
+sujet peut en porter beaucoup** : une carte de navigation est un bloc,
+et chacun de ses chemins est une intention.
 
 | Issue | Ce qu'il écrit |
 |---|---|
@@ -1184,7 +1197,7 @@ seul argument : le nom de la feature.
 
     /8_code panneau-calories 3
 
-### Deux commandes
+### Trois commandes
 
 Chacune porte son propre mode — comme `/start_creating`.
 
@@ -1226,6 +1239,18 @@ les blocs.
 5. Lot suivant
 
 **Quand tous les lots ont un PASS** → **Contrôleur**, puis arrêt.
+
+### `/9_controle <feature>`
+
+**Le Contrôleur seul.** 📌 `/8_code` le lance déjà quand le dernier lot
+passe ; cette commande sert à le relancer — après que les fiches ont
+changé, après que ses propres règles ont changé, ou pour comparer deux
+états.
+
+🔴 **Il n'écrase jamais un rapport existant** : il écrit le numéro
+libre suivant à côté. ⚠️ **Et il n'ouvre jamais les précédents** — leur
+contenu lui dirait ce qu'une exécution antérieure a conclu, et il
+cesserait de chercher.
 
 ### Où il s'arrête et rend la main
 

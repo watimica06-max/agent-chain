@@ -114,16 +114,31 @@ two outputs, is two subjects.**
 opening on what the user sees can still be fired by a failure, a
 timer, or an event elsewhere.
 
-**2. Grep the global's index for a title covering this subject.** Found
-→ reuse it verbatim. Not found → create one.
+🔴 **The shape the Product Owner gives an idea is not the shape of its
+subjects.** A sentence, an arrow, a table row, a bullet: **each is read
+for its own trigger and its own output.**
+
+⚠️ **A navigation map is the trap**: one shape, as many subjects as it
+has paths. **Transcribing it in one block buries every transition but
+the first.**
+
+**2. Grep the global's index for a title covering this subject.**
 
 ⚠️ **Search the whole index**, not only the sections you loaded.
 
+🔴 **A near title is a doubt, and a doubt is settled by reading.** Load
+that section and put move 1's test to it: **same trigger, same
+output?**
+
+**Yes** → reuse the title verbatim. **No** → create one.
+
+📌 **No near title, nothing to load** — create one.
+
 **3. File.** One block per subject, under the title found or created,
-🔴 **with the nature its output gives it.** A block producing
-something displayed is `screen`, even when an event fires it; a block
-producing anything else — a fetch, a stored record, a computed
-value — takes the nature of what it produces.
+🔴 **with the nature its output gives it** — read on the technical
+document's twelve, named below. A block producing something displayed
+is `screen`, even when an event fires it; a block producing anything
+else takes the nature of what it produces.
 
 📌 **The trigger separates subjects, the output names their nature.**
 

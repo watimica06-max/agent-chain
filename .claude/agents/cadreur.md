@@ -324,6 +324,20 @@ with its title:
 ⚠️ **An entry the lot implements without citing it is a missing
 anchor** — the Détailleur would never open it.
 
+🔴 **An entry no lot cites is declared with no lot**, at the end of the
+list:
+
+    ## Entries with no lot
+
+    §11.1 — carried by §4.1 and §5.2, nothing of its own to build
+
+📌 **An entry attributing a rule to another, or setting a boundary,
+builds nothing.** ⚠️ **Its reason fits on one line.**
+
+🔴 **Every entry is either cited or declared here.** One that is
+neither is an omission, not a decision — **and nothing downstream can
+tell them apart.**
+
 ---
 
 ## What makes a lot
@@ -391,7 +405,8 @@ belong here.**
 📌 **A piece is marked as such**, and the entry is the one whose rule
 needs it — no entry names the piece itself.
 
-**Then five fields per lot, one lot after another:**
+**Then five fields per lot, one lot after another** — and, at the end,
+`## Entries with no lot`:
 
     ## lot-01
 

@@ -697,9 +697,22 @@ demandant : qu'est-ce qui déclenche ceci, et qu'est-ce que ça produit ?
 s'ouvre sur ce que l'utilisateur voit peut être déclenchée par un
 échec, un minuteur, ou un événement ailleurs.
 
+🔴 **La forme que le Product Owner donne à son idée n'est pas la forme
+de ses sujets.** Une phrase, une flèche, une ligne de tableau, un
+point de liste : **chacun se lit pour son propre déclencheur et sa
+propre sortie.**
+
+⚠️ **Une carte de navigation est le piège** : une seule forme, autant
+de sujets que de chemins. **La transcrire d'un bloc enterre toutes les
+transitions sauf la première.**
+
 **2. Chercher le titre dans l'index du global.** 🔴 **Un grep, jamais
-une relecture.** Si le titre existe, il est repris ; sinon, il est
-créé.
+une relecture.**
+
+🔴 **Un titre proche est un doute, et un doute se lève par une
+lecture.** Charger la section et lui appliquer le test du geste 1 :
+même déclencheur, même sortie ? **Oui** → le titre est repris.
+**Non** → il en crée un.
 
 ⚠️ **Ce grep porte sur tous les titres de l'index**, pas seulement sur
 les sections chargées — c'est ce qui rattrape un conflit dans une

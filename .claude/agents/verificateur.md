@@ -51,6 +51,10 @@ either way.
   `Vocabulary` and `Dependencies` tell you what a lot's declarations
   mean
 - **The entries its lots cite**, opened one by one
+- **The technical document's list of entry titles** — 🔴 **grep
+  `^### §`, never a read.** It tells you which entries exist; the lots
+  and the `## Entries with no lot` list tell you which are accounted
+  for
 
 📌 **The `## Symbols` inventory comes first** — it is what the lots are
 checked against.
@@ -58,8 +62,10 @@ checked against.
 🔴 **Nothing else.** Not the code, not the state document, not the
 product file.
 
-⚠️ **And never an entry no lot cites** — if you need one to understand
-a lot, the split is bad, and that is a defect to report.
+⚠️ **And never open an entry no lot cites** — if you need one to
+understand a lot, the split is bad, and that is a defect to report.
+📌 **Its title is another matter**: the grep tells you it exists, and
+that is all you need to see it is orphaned.
 
 ---
 
@@ -84,7 +90,7 @@ stop the next run on a question already settled.
 
 ## The five moves, in this order
 
-**1. Cross the inventory against the lots**, and note four kinds of
+**1. Cross the inventory against the lots**, and note five kinds of
 defect:
 
 **An unbuilt surface** — 🔴 **an operation the inventory lists that no
@@ -107,6 +113,10 @@ look like that.
 
 **An overlap** — two lots naming the same symbol, whether they produce
 or modify it.
+
+**An orphan entry** — 🔴 **neither cited by a lot, nor declared under
+`## Entries with no lot`.** 📌 **The Cadreur decided or forgot; the
+first shows, the second does not.**
 
 **A production nobody calls** — 🔴 **no lot needs it, and its
 `Produces` field names no caller.** A rule built and never invoked is

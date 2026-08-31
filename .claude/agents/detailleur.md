@@ -61,7 +61,9 @@ block. 📌 **Its shape is below**; read it before you start.
   block. Its `Vocabulary` names the terms your signatures must use;
   its `Dependencies` lists what already exists, so you grep those first
 - **The spec entries their lots cite** — 📌 **those, not the whole
-  document.** The Cadreur read it all; you read a few
+  document.** The Cadreur read it all; you read a few. ⚠️ **Plus any
+  entry one of them points at** for what a trigger it names reaches —
+  see *Writing an acceptance criterion*
 - **`docs/CURRENT_TECHNICAL_STATE.md`** — what exists
 - **The reports of this cycle's coded lots** — 🔴 **never opened, only
   grepped**, when a symbol needs placing. See below
@@ -265,6 +267,14 @@ describe must be observable through at least one criterion.
 ⚠️ **Behaviour, not case.** A calculation with three outcomes needs
 three; a screen, one per displayed state; a migration, one on what
 becomes of existing data.
+
+🔴 **What an entry names as a trigger has a criterion on what it
+reaches**, not only on its own existence. **A trigger built and wired
+to nothing reads as built.**
+
+⚠️ **What it reaches often lives in another entry** — the one this lot
+cites names the trigger, another describes what follows. **Open that
+one too**: a criterion stopping at the trigger leaves it inert.
 
 **Plus what the entries name as a limit** — missing input, value out
 of bounds, source unavailable.
