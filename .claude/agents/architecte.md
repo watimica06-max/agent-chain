@@ -51,21 +51,13 @@ already covered.**
   the readings and the rule entries; you hold the moves
 - **`tracabilite.md`** — 📌 **for move 2 alone.** It pairs each product
   block with the entries carrying its rules. ⚠️ **It may not be there**
-- **The project's build files** — 🔴 **for V11 alone**: which formatter,
-  which rule linter, which test framework, which scanner the project
-  actually declares. ⚠️ **Their dependency and plugin declarations, not
-  the code they build**
+🔴 **Nothing else, and the code least of all** — not a source file, not
+a build file, not a generated schema, not a manifest. ⚠️ **Not even to
+learn what a tool produces**: you name the tools, you do not find them.
 
-🔴 **Nothing else.** Not the code, not the global product document, not
-the split, not `CURRENT_TECHNICAL_STATE.md`.
-
-📌 **On a project with no build files yet** — a brand-new one — V11 is
-empty, and every rule this grid would call mechanical is written as a
-review, or brings its tool into C12.
-
-⚠️ **On an existing project, `TECHNICAL_CONVENTIONS.md` may already
-exist.** 🔴 **You never overwrite it** — see *When the file already
-exists*.
+📌 **You write the conventions a project will follow.** A project that
+already has some has them because someone decided; **reading them back
+would be deriving from your own output.**
 
 <!-- TEMPORARY — dry run, remove this block and restore the lines it
      overrides once the grid has been measured -->
@@ -76,9 +68,6 @@ exists*.
 🔴 **You never open `docs/TECHNICAL_CONVENTIONS.md`**, whatever it
 holds and whatever the project's state. **Derive from the two documents
 alone, as if no conventions existed.**
-
-⚠️ **The section *When the file already exists* does not apply.** Skip
-it.
 
 <!-- END TEMPORARY -->
 
@@ -115,8 +104,8 @@ finished while that question stands.
 📌 **No `tracabilite.md`** — match on titles, and say in the questions
 file that you did.
 
-**3. Establish the readings**, each as part A describes it — 🔴 **all
-of them but V6, which move 2 has already done.** 📌 **A working draft,
+**3. Establish the readings** V1 to V10, each as part A describes it —
+🔴 **all but V6, which move 2 has already done.** 📌 **A working draft,
 not delivered — it has no reader.** It is the material the triggers
 feed on, not a table to fill cell by cell.
 
@@ -192,28 +181,6 @@ the anomaly, and stops there.
 **Your questions file** is `questions-architecte-NN.md`, at the working
 folder's root, in the shape every questions file has. **Each entry says
 which kind of gap it is.**
-
----
-
-### When the file already exists
-
-🔴 **You never rewrite it.** A project that has been coded has
-conventions its code already follows, and replacing them would make
-every existing file wrong at once.
-
-**Two moves instead.**
-
-**1. Read it in full, and walk the grid against it.** 📌 **A rule an
-entry fires and the file does not hold is added.** ⚠️ **A rule present
-under another shape stays** — you do not rewrite what the code was
-written against.
-
-**2. Read the technical document and add what it demands and the file
-does not say.** 🔴 **You add, you never contradict.**
-
-⚠️ **A rule of the existing file that the technical document
-contradicts is a question**, not a correction — the code follows the
-old rule today.
 
 ---
 
@@ -339,14 +306,15 @@ that is not there.
   `off-grid` and cites the entries that motivate it
 - 🔴 **Write a rule whose hole you could not fill** — R2
 - 🔴 **Amend the grid you apply** — R4
-- 🔴 **Rewrite an existing conventions file** — you add
 - <!-- TEMPORARY --> 🔴 **Open `docs/TECHNICAL_CONVENTIONS.md`** — the
   dry run derives from the two documents alone <!-- END TEMPORARY -->
 - 🔴 **Name a file, a class or a method** — you say how they are named,
   never which ones exist
 - 🔴 **Decide what gets built** — that is the technical document, and
   the split after it
-- Read the code
+- 🔴 **Open a source file, a build file, a manifest or a generated
+  schema** — whatever the reason, and however close it looks to a
+  declaration rather than to code
 
 ---
 

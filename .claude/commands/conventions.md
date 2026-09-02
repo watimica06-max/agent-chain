@@ -45,6 +45,11 @@ neither.
 `docs/TECHNICAL_CONVENTIONS.md`.** **Nothing it writes reaches the
 coding agents.**
 
+🔴 **On a project that already holds code, that dry run is what tells
+you whether the grid derives or copies.** ⚠️ **The agent reads neither
+the code nor the build files** — if a rule it writes matches what the
+project already does, the grid found it, not the repository.
+
 <!-- END TEMPORARY -->
 
 🔴 **Stop if `spec-technique.md` is absent** — say so. The agent derives

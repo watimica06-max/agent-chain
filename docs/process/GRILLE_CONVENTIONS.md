@@ -38,6 +38,12 @@ written in advance. 📌 **It cites the entries that motivate it and
 carries `off-grid`.** ⚠️ **The mark is not distrust** — it is how the
 grid learns which forms it lacks.
 
+**R5 — A list never permits what it leaves out.** A hole asking for an
+enumeration carries the rule over *every* case of its class; the list
+names those the corpus states, it does not bound the rule. ⚠️ **Writing
+*only X and Y* where the corpus happened to name X and Y turns an
+incomplete reading into a permission.**
+
 **R4 — The Architecte never amends the grid he applies.** A missing
 form, or a form that keeps producing a useless rule, goes back through
 a coding agent's lot report.
@@ -61,7 +67,6 @@ they feed the triggers and the holes of part B.*
 | **V8** | Quantities carrying a unit, a scale or an identity, and facts stated as always true | sweep N1 |
 | **V9** | Ambient sources each entry reads: clock, randomness, locale, environment | sweep N2, N3, N5, N7 |
 | **V10** | Writes declared to happen before a call returns | sweep N2 |
-| **V11** | What the project can actually check — which formatter, which rule linter, which test framework, which scanner — and what those tools produce | read the build files |
 
 🔴 **V2 is the most valuable reading of this grid.** It turns the
 costliest architectural decision — the direction of dependencies — into
@@ -70,14 +75,13 @@ a mechanical read of a graph the upstream chain already wrote.
 🔴 **V6 runs before everything else.** A defect there is a question,
 never work to make up for.
 
-🔴 **V11 is what makes the `Test` field honest.** A rule this grid
-calls mechanical is only mechanical where a tool carries it: a
-formatter is not a rule linter, and a project can hold one without the
-other.
+🔴 **A rule is mechanical only where a tool carries it**, and the tool
+is one you name in C12. **A formatter is not a rule linter**: a project
+can hold one without the other, and calling a rule mechanical on a tool
+you did not name makes the `Test` field a wish.
 
-⚠️ **A rule whose tool the project does not have is written as a
-review** — or the tool it needs enters C12, and the rule says so. **It
-is never written as mechanical on a tool that is not there.**
+⚠️ **Either the tool is in C12 and the rule is mechanical, or the rule
+is a review.** 🔴 **Never mechanical on nothing.**
 
 ---
 
@@ -110,12 +114,12 @@ not a target.*
     ## 5. Interface contracts
     The shape of what crosses a public boundary — what ties the agent
     writing signatures to the one writing code.
-    [4 to 6]
+    [6 to 8]
 
     ## 6. Errors and failure
     How an error is represented, propagated, and what may stop the
     program.
-    [5 to 7]
+    [6 to 8]
 
     ## 7. State, resources and effects
     Where mutable state lives, who owns a resource, what survives what,
@@ -227,15 +231,15 @@ evolves? · *Trigger*: an N2 entry describes structured persistence
 
 **G3.4** · *Question*: which paths does a lot never write, and which
 does it write only after asking? · *Trigger*: always
-- **Form**: "Never: `<generated output, build output, lock files,
-  dated migrations, whatever else V11 shows is produced by a tool>`.
-  Ask first: `<the paths a change to which reaches beyond the lot>`."
+- **Form**: "Never: `<what a tool produces — build output, generated
+  sources, lock files, dated migrations>`. Ask first: `<the paths a
+  change to which reaches beyond the lot>`."
 - **Test**: mechanical on the "never" line — a diff touching one of
   those paths fails.
 
-📌 **The "never" line comes from V11**: what a tool produces, a lot does
-not write by hand. ⚠️ **The "ask first" line is your own call**, and it
-is short or it is noise.
+📌 **The "never" line follows from the tools you named in C12**: what a
+tool produces, a lot does not write by hand. ⚠️ **The "ask first" line
+is your own call**, and it is short or it is noise.
 
 ---
 
@@ -298,8 +302,10 @@ one leaves the other as it was, and nothing says so.
 
 **G4.9** · *Question*: which stored data is searched on, and which
 identifies (V8, N2)? · *Trigger*: N2 non-empty
-- **Form**: "`<the fields searched on>` carry an index.
-  `<the fields that identify>` carry a uniqueness constraint."
+- **Form**: "A field the code searches on carries an index; a field the
+  code treats as identifying carries a uniqueness constraint. 🔴 **Every
+  such field, whether or not an entry names it** — a lookup a lot
+  writes counts as much as one the corpus states."
 - **Test**: mechanical — schema check.
 
 ⚠️ **A field the code treats as identifying without the store saying so
@@ -348,6 +354,33 @@ identity (V8)? · *Trigger*: V8 non-empty
 
 ---
 
+**G5.8** · *Question*: which operations reach a store, a device or the
+network, and what does their signature say about it? · *Trigger*: N2,
+N5, N6 or N7 non-empty
+- **Form**: "An operation reaching outside the process says so in its
+  signature, in whatever way `<the platform>` expresses waiting. 🔴 **It
+  moves to the thread that work belongs on, inside its own
+  implementation, and never on its caller's word.**"
+- **Test**: signature check on the modules concerned.
+
+⚠️ **G7.4 states the model the project presumes.** 🔴 **This one binds
+each signature to it** — without it, every lot decides on its own which
+call may block.
+
+**G5.9** · *Question*: none, fixed entry · *Trigger*: always
+- **Form**: "What a signature promises, the body delivers. 🔴 **An
+  argument it takes is read**, a handle it is handed is awaited, and a
+  value that must outlive the process is written where it does."
+- **Test**: review, signature by signature.
+
+📌 **Three ways one signature lies**, and each has been seen: a
+parameter ignored, a fire-and-forget call never read, an identity held
+only in memory.
+
+⚠️ **A declared failure type that does not carry every failure is a
+fourth** — 🔴 **G6.8 holds it**, where the failure comes from leaving
+the process.
+
 **G5.6** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "No non-null assertion on a value coming from outside the
   function: what can be missing is declared as such, and handled."
@@ -358,9 +391,11 @@ site cannot see it, and a change to either breaks the assertion.
 
 **G5.7** · *Question*: which quantities are compared against a bound
 (V8)? · *Trigger*: V8 holds at least one bounded quantity
-- **Form**: "A bound on `<quantity>` is `<inclusive | exclusive>`,
-  the same way everywhere it is compared."
-- **Test**: review, quantity by quantity.
+- **Form**: "A bound is `<inclusive | exclusive>`, the same way for
+  every quantity of one kind. 🔴 **A duration against a window, a
+  timeout, a threshold — one convention, all of them**, whether or not
+  an entry names each."
+- **Test**: review, kind by kind.
 
 📌 **Two rules comparing one quantity two ways is invisible in each of
 them, and wrong between them.**
@@ -385,6 +420,18 @@ and where do they stop? · *Trigger*: N5 non-empty
 - **Form**: "Data entering through `<boundary module>` is validated
   there and converted to a domain type; no type of the source crosses."
 - **Test**: mechanical — import check, plus review.
+
+**G6.8** · *Question*: what reaches outside the process, and what does
+it hand back when it fails? · *Trigger*: N2, N5, N6 or N7 non-empty
+- **Form**: "Every call leaving the process — a store, a device, the
+  network, a deserialisation — returns its failure as a value. 🔴 **What
+  it needs before it can run at all** — a permission, a service, a
+  client — **is checked before, not caught after.**"
+- **Test**: a failure-injection test per boundary.
+
+📌 **G6.3 covers what an external source hands in.** 🔴 **This one
+covers everything else that leaves the process** — a store raises, a
+deserialisation raises, a platform service may not be there at all.
 
 **G6.4** · *Question*: which transitions are forbidden? · *Trigger*: an
 N4 entry names at least one
@@ -452,9 +499,11 @@ N8 non-empty
 
 **G7.6** · *Question*: what does each screen hold that the system can
 take away? · *Trigger*: N9 non-empty
-- **Form**: "`<the state each screen holds>` says what becomes of it
-  when the system rebuilds that screen: kept, or built again from its
-  source. An in-progress input is kept."
+- **Form**: "Every screen's own state says what becomes of it when the
+  system rebuilds that screen. 🔴 **What the user has in progress is
+  kept, on every screen** — a field being typed, a dialog's contents, a
+  selection not confirmed, the path they navigated to get here.
+  **Anything else is built again from its source.**"
 - **Test**: one test per screen holding state.
 
 ⚠️ **A screen is rebuilt far more often than a process dies** — a
@@ -599,18 +648,22 @@ which versions? · *Trigger*: always — filled from platform knowledge
   amendment proposed before writing, and delivered on its own."
 - **Test**: mechanical — a manifest diff inside a lot fails.
 
-**G12.3** · *Question*: which tools do the rules of this file need
-(V11)? · *Trigger*: a rule written here calls for a tool the project
-does not declare
+**G12.3** · *Question*: which tools do the rules of this file need? ·
+*Trigger*: a rule written here calls for one
 - **Form**: the table of G12.1 carries them, each with the rules it
   serves.
 - **Test**: mechanical — every tool named in a `Test` field appears in
   the table.
 
-🔴 **A rule that demands tests, on a project declaring no test
-framework, is a rule the first lot cannot follow.** ⚠️ **And G12.2
-forbids adding one inside a lot** — the tool has to be here, or the
-rule is not written.
+🔴 **A rule that demands tests, on a project naming no test framework,
+is a rule the first lot cannot follow.** ⚠️ **And G12.2 forbids adding
+one inside a lot** — the tool is named here, or the rule is not
+written.
+
+🔴 **A tool named here carries the rules it is named for, and no
+others.** ⚠️ **A rule whose exact check no named tool performs is a
+review**, however close a named tool sounds: a formatter is not a rule
+linter, and a rule linter does not read a database schema.
 
 **G12.4** · *Question*: does the corpus presume network access? ·
 *Trigger*: N5 **empty**
@@ -624,8 +677,8 @@ is a fact, and a fact worth writing down.
 
 ## What the volume should be
 
-**Sixty entries, of which eight to twelve do not fire on a given
-project.** 📌 **Forty-five to fifty rules written.**
+**Sixty-three entries, of which eight to twelve do not fire on a given
+project.** 📌 **Fifty to fifty-five rules written.**
 
 ⚠️ **Two places where the budget strains:**
 
