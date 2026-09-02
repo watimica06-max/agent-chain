@@ -114,7 +114,7 @@ not a target.*
     ## 5. Interface contracts
     The shape of what crosses a public boundary — what ties the agent
     writing signatures to the one writing code.
-    [6 to 8]
+    [7 to 9]
 
     ## 6. Errors and failure
     How an error is represented, propagated, and what may stop the
@@ -124,7 +124,7 @@ not a target.*
     ## 7. State, resources and effects
     Where mutable state lives, who owns a resource, what survives what,
     on which execution model the code is written.
-    [5 to 8]
+    [6 to 9]
 
     ## 8. Configuration and secrets
     Where settings come from, and when they are validated.
@@ -237,6 +237,9 @@ does it write only after asking? · *Trigger*: always
 - **Test**: mechanical on the "never" line — a diff touching one of
   those paths fails.
 
+🔴 **The list names what the corpus states; the rule covers the
+class.**
+
 📌 **The "never" line follows from the tools you named in C12**: what a
 tool produces, a lot does not write by hand. ⚠️ **The "ask first" line
 is your own call**, and it is short or it is noise.
@@ -328,6 +331,9 @@ identity (V8)? · *Trigger*: V8 non-empty
 - **Test**: review; mechanical where `<language>` carries nominal
   types.
 
+🔴 **The list names what the corpus states; the rule covers the
+class.**
+
 **G5.2** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "Data crossing a public boundary is immutable; no public
   function mutates its argument."
@@ -345,6 +351,11 @@ identity (V8)? · *Trigger*: V8 non-empty
 - **Form**: "Missing data is carried by `<absence type>`; no module
   invents a default for data that is not there."
 - **Test**: review.
+
+**G5.10** · *Question*: none, fixed entry · *Trigger*: N3 non-empty
+- **Form**: "A calculation combining parts says what it returns when a
+  part is missing. 🔴 **Never a total that reads as complete.**"
+- **Test**: one test per calculation that combines.
 
 **G5.5** · *Question*: what identifies one thing seen from two origins?
 · *Trigger*: N6 non-empty
@@ -369,8 +380,9 @@ call may block.
 
 **G5.9** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "What a signature promises, the body delivers. 🔴 **An
-  argument it takes is read**, a handle it is handed is awaited, and a
-  value that must outlive the process is written where it does."
+  argument it takes is read**, a handle it is handed or hands back is
+  awaited, and a value that must outlive the process is written where
+  it does."
 - **Test**: review, signature by signature.
 
 📌 **Three ways one signature lies**, and each has been seen: a
@@ -396,6 +408,12 @@ site cannot see it, and a change to either breaks the assertion.
   timeout, a threshold — one convention, all of them**, whether or not
   an entry names each."
 - **Test**: review, kind by kind.
+
+🔴 **Where an entry states a bound either way, that statement stands
+and the rest of its kind follow it.** ⚠️ **A convention never overrides
+what the corpus says** — grouping a kind is how you reach the quantities
+the corpus leaves silent, never a licence to re-decide the ones it
+does not.
 
 📌 **Two rules comparing one quantity two ways is invisible in each of
 them, and wrong between them.**
@@ -451,6 +469,14 @@ non-empty
   propagates. None is deferred."
 - **Test**: a failure-injection test per write read.
 
+🔴 **The list names what the corpus states; the rule covers the
+class.**
+
+🔴 **A write holding an invariant is atomic against a concurrent
+reader**, not merely synchronous. ⚠️ **Two writes that together keep
+one invariant are one write** — between them, a reader sees a state the
+invariant forbids.
+
 **G6.7** · *Question*: what happens when two origins diverge? ·
 *Trigger*: N6 non-empty **and** an N6 entry states a resolution policy
 - **Form**: "A synchronisation conflict is a declared error type, never
@@ -482,12 +508,25 @@ non-empty
   them is read inside `<the root modules>`."
 - **Test**: mechanical — import and call check.
 
+🔴 **The list names what the corpus states; the rule covers the
+class.**
+
 **G7.4** · *Question*: what execution model does this project presume?
 · *Trigger*: always — the hole is the Architecte's call, informed by V1
 - **Form**: "Presumed execution model: `<single-threaded | pool of N |
   cooperative async>`. Code departing from it is an amendment proposed
   before writing, carrying its own locking discipline."
 - **Test**: review.
+
+**G7.9** · *Question*: none, fixed entry · *Trigger*: always
+- **Form**: "Nothing holds a lock across a wait. 🔴 **What a lock
+  protects is read or written and released before anything is
+  awaited.**"
+- **Test**: review, lock by lock.
+
+⚠️ **A lock held while a call waits freezes every other caller of the
+same lock** — and the wait is often invisible at the line that takes
+it.
 
 **G7.5** · *Question*: who holds the state of a journey? · *Trigger*:
 N8 non-empty
@@ -520,6 +559,9 @@ rotation, a resize, a theme change.
   `<the pairs, opened by / closed by>`. A handle, a session, a scope, a
   registration — each has one place that ends it."
 - **Test**: review, pair by pair.
+
+🔴 **The list names what the corpus states; the rule covers the
+class.**
 
 📌 **G7.2 covers what a single scope opens and closes.** ⚠️ **This
 covers what outlives a scope** — what one moment opens and another has
@@ -665,6 +707,11 @@ others.** ⚠️ **A rule whose exact check no named tool performs is a
 review**, however close a named tool sounds: a formatter is not a rule
 linter, and a rule linter does not read a database schema.
 
+🔴 **A language, a runtime or a library is not a checker.** A tool
+named here runs, and reports what it found. ⚠️ **Naming one against
+*all rules* makes the table useless as a guard** — every rule would
+read as mechanical.
+
 **G12.4** · *Question*: does the corpus presume network access? ·
 *Trigger*: N5 **empty**
 - **Form**: "No network dependency and no network call."
@@ -677,8 +724,8 @@ is a fact, and a fact worth writing down.
 
 ## What the volume should be
 
-**Sixty-three entries, of which eight to twelve do not fire on a given
-project.** 📌 **Fifty to fifty-five rules written.**
+**Sixty-five entries, of which eight to twelve do not fire on a given
+project.** 📌 **Fifty-two to fifty-seven rules written.**
 
 ⚠️ **Two places where the budget strains:**
 
