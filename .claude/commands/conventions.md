@@ -41,9 +41,12 @@ neither.
 📌 **Run by hand, on a feature whose technical document exists.** 🔴
 **Not part of `/cycle`.**
 
-⚠️ **The agent writes `docs/conventions-test.md` and never opens
-`docs/TECHNICAL_CONVENTIONS.md`.** **Nothing it writes reaches the
-coding agents.**
+🔴 **Pass the output path in the prompt**, and give it a name no
+earlier run used: `docs/conventions-<n>.md`, the next free number.
+⚠️ **The agent has no tool to list a folder** — it writes where you say
+and reads nothing else.
+
+⚠️ **Nothing it writes reaches the coding agents.**
 
 🔴 **On a project that already holds code, that dry run is what tells
 you whether the grid derives or copies.** ⚠️ **The agent reads neither
@@ -85,7 +88,9 @@ Agent(
   subagent_type="architecte",
   model="sonnet",
   description="conventions <feature>",
-  prompt="Feature folder: docs/features/<name>/. Invocation 1 — Deriving."
+  prompt="Feature folder: docs/features/<name>/.
+          Invocation 1 — Deriving.
+          Write to docs/conventions-<n>.md."
 )
 ```
 

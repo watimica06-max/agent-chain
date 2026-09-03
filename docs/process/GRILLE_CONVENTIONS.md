@@ -114,17 +114,17 @@ not a target.*
     ## 5. Interface contracts
     The shape of what crosses a public boundary — what ties the agent
     writing signatures to the one writing code.
-    [7 to 9]
+    [9 to 11]
 
     ## 6. Errors and failure
     How an error is represented, propagated, and what may stop the
     program.
-    [6 to 8]
+    [7 to 9]
 
     ## 7. State, resources and effects
     Where mutable state lives, who owns a resource, what survives what,
     on which execution model the code is written.
-    [6 to 9]
+    [7 to 10]
 
     ## 8. Configuration and secrets
     Where settings come from, and when they are validated.
@@ -232,8 +232,9 @@ evolves? · *Trigger*: an N2 entry describes structured persistence
 **G3.4** · *Question*: which paths does a lot never write, and which
 does it write only after asking? · *Trigger*: always
 - **Form**: "Never: `<what a tool produces — build output, generated
-  sources, lock files, dated migrations>`. Ask first: `<the paths a
-  change to which reaches beyond the lot>`."
+  sources, lock files, dated migrations>`, **nor anything else a tool
+  writes**. Ask first: `<the paths a change to which reaches beyond the
+  lot>`."
 - **Test**: mechanical on the "never" line — a diff touching one of
   those paths fails.
 
@@ -293,9 +294,9 @@ non-empty
 **G4.8** · *Question*: which adapters do two application modules both
 need? · *Trigger*: more than one application module, and V1 shows a
 nature both of them reach
-- **Form**: "An adapter both applications need lives in
+- **Form**: "**Any** adapter both applications need lives in
   `<the shared module>`, which they depend on and which depends on
-  neither. **Identical, not merely similar**: one whose behaviour
+  neither — **whatever it adapts**. **Identical, not merely similar**: one whose behaviour
   differs between them stays where it is used."
 - **Test**: mechanical — no two source files of the same name under two
   application modules.
@@ -326,8 +327,8 @@ is an assumption two lots can break.**
 
 **G5.1** · *Question*: which quantities carry a unit, a scale or an
 identity (V8)? · *Trigger*: V8 non-empty
-- **Form**: "No `<quantity read>` appears as a bare primitive in a
-  public signature."
+- **Form**: "No `<quantity read>`, **nor any quantity of the same
+  kind**, appears as a bare primitive in a public signature."
 - **Test**: review; mechanical where `<language>` carries nominal
   types.
 
@@ -352,10 +353,28 @@ class.**
   invents a default for data that is not there."
 - **Test**: review.
 
+**G5.11** · *Question*: which values does the corpus bound, and where
+do they enter? · *Trigger*: V8 holds at least one bounded quantity
+- **Form**: "A value the corpus bounds is checked against those bounds
+  at every place it enters — **typed by hand, read from a store, taken
+  from a payload, computed** — and a value outside them is refused,
+  never stored."
+- **Test**: one test per entry point of each bounded value.
+
+📌 **A type says what a value can be; this says what it may hold.** ⚠️
+**A field validated on one path and not another is the shape this
+prevents.**
+
 **G5.10** · *Question*: none, fixed entry · *Trigger*: N3 non-empty
-- **Form**: "A calculation combining parts says what it returns when a
-  part is missing. 🔴 **Never a total that reads as complete.**"
-- **Test**: one test per calculation that combines.
+- **Form**: "A calculation says what it returns at the limits of its
+  inputs — **a missing part, a zero divisor, a negative where it
+  expects a positive, an order it does not expect**. 🔴 **Never a value
+  that reads as valid.**"
+- **Test**: one test per limit, per calculation.
+
+⚠️ **A platform that does not raise on these makes it worse** — an
+infinity, a not-a-number or a truncation travels to a screen and looks
+like an answer.
 
 **G5.5** · *Question*: what identifies one thing seen from two origins?
 · *Trigger*: N6 non-empty
@@ -451,6 +470,17 @@ it hand back when it fails? · *Trigger*: N2, N5, N6 or N7 non-empty
 covers everything else that leaves the process** — a store raises, a
 deserialisation raises, a platform service may not be there at all.
 
+**G6.9** · *Question*: none, fixed entry · *Trigger*: always
+- **Form**: "A caller that receives a failure acts on it. 🔴 **It is
+  handled, propagated, or reported — never dropped**, and never left to
+  a value that reads as success."
+- **Test**: mechanical where `<language>` marks an unused result;
+  review otherwise.
+
+⚠️ **G6.8 says what a boundary hands back.** 🔴 **This says what the
+one who receives it does** — the two are answered separately, and the
+second is the one nothing else covers.
+
 **G6.4** · *Question*: which transitions are forbidden? · *Trigger*: an
 N4 entry names at least one
 - **Form**: "A transition N4 does not name is a declared error, never a
@@ -466,7 +496,8 @@ non-empty
 **G6.6** · *Question*: which writes happen before a call returns (V10)?
 · *Trigger*: V10 non-empty
 - **Form**: "`<the writes read>` are synchronous; their failure
-  propagates. None is deferred."
+  propagates. None is deferred. **Any write the corpus states must
+  precede a return is one of these, named here or not.**"
 - **Test**: a failure-injection test per write read.
 
 🔴 **The list names what the corpus states; the rule covers the
@@ -504,8 +535,9 @@ invariant forbids.
 **G7.3** · *Question*: which ambient sources do calculations read (V9)?
 · *Trigger*: N3 non-empty
 - **Form**: "Every N3 entry is realised by a pure function.
-  `<the ambient sources read in V9>` are passed as arguments. None of
-  them is read inside `<the root modules>`."
+  `<the ambient sources read in V9>` — **and any other ambient
+  source** — are passed as arguments, and none is read inside
+  `<the root modules>`."
 - **Test**: mechanical — import and call check.
 
 🔴 **The list names what the corpus states; the rule covers the
@@ -548,6 +580,17 @@ take away? · *Trigger*: N9 non-empty
 ⚠️ **A screen is rebuilt far more often than a process dies** — a
 rotation, a resize, a theme change.
 
+**G7.10** · *Question*: what does the corpus say must outlive the
+process? · *Trigger*: N2 non-empty
+- **Form**: "`<what the corpus says survives>` is written where it
+  survives, as it changes — not held in memory and written at the end.
+  🔴 **What is read back at start-up is read from there**, and the
+  application resumes where it left off."
+- **Test**: one test per surviving thing, killing between two steps.
+
+📌 **G7.6 covers a screen the system rebuilds.** 🔴 **This covers the
+process dying** — a different event, and a different answer.
+
 **G7.7** · *Question*: none, fixed entry · *Trigger*: N9 non-empty
 - **Form**: "A screen reads a source once per entry, never once per
   frame. A read that is not remembered is a read on every redraw."
@@ -556,8 +599,9 @@ rotation, a resize, a theme change.
 
 **G7.8** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "Everything opened is closed, and this file says where:
-  `<the pairs, opened by / closed by>`. A handle, a session, a scope, a
-  registration — each has one place that ends it."
+  `<the pairs, opened by / closed by>`. **A handle, a session, a scope,
+  a registration — each has one place that ends it, named here or
+  not.**"
 - **Test**: review, pair by pair.
 
 🔴 **The list names what the corpus states; the rule covers the
@@ -707,6 +751,11 @@ others.** ⚠️ **A rule whose exact check no named tool performs is a
 review**, however close a named tool sounds: a formatter is not a rule
 linter, and a rule linter does not read a database schema.
 
+🔴 **Each tool of the table carries the scope it is given, and a `Test`
+field naming it stays inside that scope.** ⚠️ **A tool declared for one
+section does not serve another**, and a capability the table does not
+list is one it does not have.
+
 🔴 **A language, a runtime or a library is not a checker.** A tool
 named here runs, and reports what it found. ⚠️ **Naming one against
 *all rules* makes the table useless as a guard** — every rule would
@@ -724,8 +773,8 @@ is a fact, and a fact worth writing down.
 
 ## What the volume should be
 
-**Sixty-five entries, of which eight to twelve do not fire on a given
-project.** 📌 **Fifty-two to fifty-seven rules written.**
+**Sixty-eight entries, of which eight to twelve do not fire on a given
+project.** 📌 **Fifty-six to sixty-one rules written.**
 
 ⚠️ **Two places where the budget strains:**
 
