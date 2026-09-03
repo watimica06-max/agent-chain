@@ -300,10 +300,12 @@ non-empty
 **G4.8** · *Question*: which adapters do two application modules both
 need? · *Trigger*: more than one application module, and V1 shows a
 nature both of them reach
-- **Form**: "**Any** adapter both applications need lives in
-  `<the shared module>`, which they depend on and which depends on
-  neither — **whatever it adapts**. **Identical, not merely similar**: one whose behaviour
-  differs between them stays where it is used."
+- **Form**: "**Any** adapter both applications need lives in a shared
+  module they both depend on and that depends on neither — **whatever
+  it adapts**. 🔴 **If no shared module suits what it adapts, one is
+  added for it**, named for what it holds. **Identical, not merely
+  similar**: one whose behaviour differs between them stays where it is
+  used."
 - **Test**: mechanical — no two source files of the same name under two
   application modules.
 
@@ -463,11 +465,16 @@ them, and wrong between them.**
   module declares; a dependency's own error never crosses."
 - **Test**: review.
 
-**G6.3** · *Question*: which types does an external source hand over,
-and where do they stop? · *Trigger*: N5 non-empty
-- **Form**: "Data entering through `<boundary module>` is validated
-  there and converted to a domain type; no type of the source crosses."
+**G6.3** · *Question*: what types enter from outside the process, and
+where do they stop? · *Trigger*: N5 or N6 non-empty
+- **Form**: "🔴 **Data entering from anywhere outside the process** — a
+  source, a payload from another device, a store — is validated at the
+  module that receives it and converted to a domain type; no type of
+  the outside crosses."
 - **Test**: mechanical — import check, plus review.
+
+⚠️ **A payload from the paired device is data from outside**, as much
+as a file or a service is.
 
 **G6.8** · *Question*: what reaches outside the process, and what does
 it hand back when it fails? · *Trigger*: N2, N5, N6 or N7 non-empty
@@ -739,10 +746,12 @@ which versions? · *Trigger*: always — filled from platform knowledge
 
 **G12.3** · *Question*: which tools do the rules of this file need? ·
 *Trigger*: a rule written here calls for one
-- **Form**: the table of G12.1 carries them, each with the rules it
-  serves.
+- **Form**: "The dependency table carries each tool with the rules it
+  serves. 🔴 **A tool serves the rules named against it and no others,
+  and a language, a runtime or a library is never one of them** — a
+  tool runs and reports what it found."
 - **Test**: mechanical — every tool named in a `Test` field appears in
-  the table.
+  the table, against that rule.
 
 🔴 **A rule that demands tests, on a project naming no test framework,
 is a rule the first lot cannot follow.** ⚠️ **And G12.2 forbids adding

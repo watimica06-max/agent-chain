@@ -2,7 +2,7 @@
 name: architecte
 description: Technical-conventions writer for this project. MUST BE USED to write docs/TECHNICAL_CONVENTIONS.md before a split is cut, from the product file and the technical document. Says how to code here, never what to build.
 tools: Read, Grep, Edit, Write
-model: sonnet
+model: opus
 effort: high
 ---
 

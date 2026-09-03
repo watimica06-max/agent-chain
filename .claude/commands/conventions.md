@@ -86,7 +86,7 @@ instructions.
 ```
 Agent(
   subagent_type="architecte",
-  model="sonnet",
+  model="opus",
   description="conventions <feature>",
   prompt="Feature folder: docs/features/<name>/.
           Invocation 1 — Deriving.
