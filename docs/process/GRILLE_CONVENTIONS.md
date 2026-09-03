@@ -38,11 +38,15 @@ written in advance. 📌 **It cites the entries that motivate it and
 carries `off-grid`.** ⚠️ **The mark is not distrust** — it is how the
 grid learns which forms it lacks.
 
-**R5 — A list never permits what it leaves out.** A hole asking for an
-enumeration carries the rule over *every* case of its class; the list
-names those the corpus states, it does not bound the rule. ⚠️ **Writing
-*only X and Y* where the corpus happened to name X and Y turns an
-incomplete reading into a permission.**
+**R5 — A list never permits what it leaves out.** 🔴 **Where a form
+names a class, write the class**, not the members of it you found. ⚠️
+**Writing *only X and Y* where the corpus happened to name X and Y
+turns an incomplete reading into a permission** — and the reading is
+always incomplete, since the corpus states what it needed to state, not
+every case the code will meet.
+
+📌 **A form that gives examples is naming the class, not listing the
+rule.**
 
 **R4 — The Architecte never amends the grid he applies.** A missing
 form, or a form that keeps producing a useless rule, goes back through
@@ -231,15 +235,12 @@ evolves? · *Trigger*: an N2 entry describes structured persistence
 
 **G3.4** · *Question*: which paths does a lot never write, and which
 does it write only after asking? · *Trigger*: always
-- **Form**: "Never: `<what a tool produces — build output, generated
-  sources, lock files, dated migrations>`, **nor anything else a tool
-  writes**. Ask first: `<the paths a change to which reaches beyond the
-  lot>`."
+- **Form**: "Never a file a tool writes — 🔴 **build output, generated
+  sources, lock files, dated migrations, whatever else the tools named
+  in C12 produce.** Ask first: 🔴 **any file a change to which reaches
+  beyond the lot that touches it.**"
 - **Test**: mechanical on the "never" line — a diff touching one of
   those paths fails.
-
-🔴 **The list names what the corpus states; the rule covers the
-class.**
 
 📌 **The "never" line follows from the tools you named in C12**: what a
 tool produces, a lot does not write by hand. ⚠️ **The "ask first" line
@@ -258,9 +259,14 @@ V2 is acyclic
 
 **G4.2** · *Question*: which entries consume nothing (V3)? · *Trigger*:
 V3 finds at least one root
-- **Form**: "`<modules realising the root entries>` import no module of
-  this project."
+- **Form**: "A module realising an entry that consumes nothing imports
+  no module of this project. 🔴 **Every such module**, whatever it is
+  named."
 - **Test**: mechanical — import check.
+
+⚠️ **A module realising both a root entry and a consuming one breaks
+this rule by construction** — say so as a question rather than naming
+only the modules that happen to obey.
 
 **G4.3** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "No module named `utils`, `common`, `helpers`, `misc` or
@@ -327,13 +333,14 @@ is an assumption two lots can break.**
 
 **G5.1** · *Question*: which quantities carry a unit, a scale or an
 identity (V8)? · *Trigger*: V8 non-empty
-- **Form**: "No `<quantity read>`, **nor any quantity of the same
-  kind**, appears as a bare primitive in a public signature."
+- **Form**: "No quantity carrying a unit, a scale or an identity
+  appears as a bare primitive in a public signature."
 - **Test**: review; mechanical where `<language>` carries nominal
   types.
 
-🔴 **The list names what the corpus states; the rule covers the
-class.**
+📌 **V8 tells you which quantities the corpus states.** ⚠️ **The rule
+covers the kind, not the readings** — a quantity V8 missed is one all
+the same.
 
 **G5.2** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "Data crossing a public boundary is immutable; no public
@@ -365,12 +372,16 @@ do they enter? · *Trigger*: V8 holds at least one bounded quantity
 **A field validated on one path and not another is the shape this
 prevents.**
 
-**G5.10** · *Question*: none, fixed entry · *Trigger*: N3 non-empty
-- **Form**: "A calculation says what it returns at the limits of its
-  inputs — **a missing part, a zero divisor, a negative where it
-  expects a positive, an order it does not expect**. 🔴 **Never a value
-  that reads as valid.**"
-- **Test**: one test per limit, per calculation.
+**G5.10** · *Question*: none, fixed entry · *Trigger*: always
+- **Form**: "**Anything that computes** states what it returns for
+  every input it cannot compute on. 🔴 **A calculation, a format, a
+  comparison — wherever arithmetic happens.** Never a value that reads
+  as valid."
+- **Test**: one test per such input, wherever it computes.
+
+🔴 **Not only the calculation entries.** A formatter divides, a
+comparison subtracts, a screen scales — and each is as able to produce
+a value that reads as valid.
 
 ⚠️ **A platform that does not raise on these makes it worse** — an
 infinity, a not-a-number or a truncation travels to a screen and looks
@@ -495,18 +506,14 @@ non-empty
 
 **G6.6** · *Question*: which writes happen before a call returns (V10)?
 · *Trigger*: V10 non-empty
-- **Form**: "`<the writes read>` are synchronous; their failure
-  propagates. None is deferred. **Any write the corpus states must
-  precede a return is one of these, named here or not.**"
+- **Form**: "A write the corpus states must happen before a call
+  returns is synchronous, and its failure propagates. 🔴 **A write
+  holding an invariant is atomic against a concurrent reader** — two
+  writes that together keep one invariant are one write."
 - **Test**: a failure-injection test per write read.
 
-🔴 **The list names what the corpus states; the rule covers the
-class.**
-
-🔴 **A write holding an invariant is atomic against a concurrent
-reader**, not merely synchronous. ⚠️ **Two writes that together keep
-one invariant are one write** — between them, a reader sees a state the
-invariant forbids.
+⚠️ **Between two writes that keep one invariant, a reader sees a state
+the invariant forbids** — synchronous is not enough.
 
 **G6.7** · *Question*: what happens when two origins diverge? ·
 *Trigger*: N6 non-empty **and** an N6 entry states a resolution policy
@@ -535,13 +542,10 @@ invariant forbids.
 **G7.3** · *Question*: which ambient sources do calculations read (V9)?
 · *Trigger*: N3 non-empty
 - **Form**: "Every N3 entry is realised by a pure function.
-  `<the ambient sources read in V9>` — **and any other ambient
-  source** — are passed as arguments, and none is read inside
-  `<the root modules>`."
+  🔴 **Anything it reads from outside itself** — the clock, a reading, a
+  random value, the environment — **is passed as an argument**, and
+  none is read inside `<the pure modules>`."
 - **Test**: mechanical — import and call check.
-
-🔴 **The list names what the corpus states; the rule covers the
-class.**
 
 **G7.4** · *Question*: what execution model does this project presume?
 · *Trigger*: always — the hole is the Architecte's call, informed by V1
@@ -562,30 +566,30 @@ it.
 
 **G7.5** · *Question*: who holds the state of a journey? · *Trigger*:
 N8 non-empty
-- **Form**: "The state of a journey is held by one module:
-  `<the pairs, journey by journey>`."
-- **Test**: review.
+- **Form**: "The state of a journey is held by one module, and this
+  file says which. 🔴 **Every journey**, whether or not an entry names
+  it as one."
+- **Test**: review, journey by journey.
 
 ---
 
 **G7.6** · *Question*: what does each screen hold that the system can
 take away? · *Trigger*: N9 non-empty
-- **Form**: "Every screen's own state says what becomes of it when the
-  system rebuilds that screen. 🔴 **What the user has in progress is
-  kept, on every screen** — a field being typed, a dialog's contents, a
-  selection not confirmed, the path they navigated to get here.
-  **Anything else is built again from its source.**"
+- **Form**: "Every screen keeps what the user has in progress across a
+  system rebuild. 🔴 **Anything they have entered, opened or selected
+  and not yet confirmed.**"
 - **Test**: one test per screen holding state.
 
 ⚠️ **A screen is rebuilt far more often than a process dies** — a
 rotation, a resize, a theme change.
 
-**G7.10** · *Question*: what does the corpus say must outlive the
-process? · *Trigger*: N2 non-empty
-- **Form**: "`<what the corpus says survives>` is written where it
-  survives, as it changes — not held in memory and written at the end.
-  🔴 **What is read back at start-up is read from there**, and the
-  application resumes where it left off."
+**G7.10** · *Question*: what must the application find again after the
+process dies? · *Trigger*: N2 non-empty
+- **Form**: "🔴 **Anything the application must find again after the
+  process dies** — what the corpus says survives, and what the user
+  would expect to find where they left it — **is written where it
+  survives, as it changes, and read back from there.** 🔴 **The
+  application resumes from what it read.**"
 - **Test**: one test per surviving thing, killing between two steps.
 
 📌 **G7.6 covers a screen the system rebuilds.** 🔴 **This covers the
@@ -598,14 +602,10 @@ process dying** — a different event, and a different answer.
   carries it.
 
 **G7.8** · *Question*: none, fixed entry · *Trigger*: always
-- **Form**: "Everything opened is closed, and this file says where:
-  `<the pairs, opened by / closed by>`. **A handle, a session, a scope,
-  a registration — each has one place that ends it, named here or
-  not.**"
-- **Test**: review, pair by pair.
-
-🔴 **The list names what the corpus states; the rule covers the
-class.**
+- **Form**: "🔴 **Anything one moment opens and another must end is
+  released, and this file says by what** — a handle, a session, a
+  scope, a registration, a subscription."
+- **Test**: review, one acquisition at a time.
 
 📌 **G7.2 covers what a single scope opens and closes.** ⚠️ **This
 covers what outlives a scope** — what one moment opens and another has
@@ -617,8 +617,10 @@ to end.
 
 **G8.1** · *Question*: what must be ready before anything answers? ·
 *Trigger*: N12 non-empty
-- **Form**: "`<the prerequisites N12 states>` are validated at
-  start-up; failure stops immediately, naming the one at fault."
+- **Form**: "Anything that must be ready before the application answers
+  is validated at start-up, and failure stops immediately, naming the
+  one at fault. 🔴 **Whatever it is** — a setting, a permission, a
+  service, a stored state, a version."
 - **Test**: a start-up test per prerequisite.
 
 **G8.2** · *Question*: none, fixed entry · *Trigger*: always
@@ -643,8 +645,9 @@ non-empty
 
 **G9.2** · *Question*: which data is attached to a person? · *Trigger*:
 an N1 or N11 entry names such data
-- **Form**: "No `<field read>` appears in a log message, not even
-  truncated."
+- **Form**: "No data attached to a person appears in a log message,
+  not even truncated. 🔴 **Whatever carries it** — a measurement, an
+  identifier, a name, a place, a time it happened."
 - **Test**: mechanical — pattern check on log calls.
 
 ---
