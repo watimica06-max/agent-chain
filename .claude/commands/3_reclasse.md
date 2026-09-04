@@ -37,7 +37,7 @@ instructions.
 ```
 Agent(
   subagent_type="<agent>",
-  model="sonnet",
+  model="opus",
   description="<phase> <feature>",
   prompt="Feature folder: docs/features/<name>/. <Which invocation>."
 )

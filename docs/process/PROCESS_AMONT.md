@@ -1500,15 +1500,22 @@ relancent simplement tant qu'il reste des questions. Idem pour
 
 ### Modèles
 
-🔴 **Tout en Sonnet au démarrage**, sans exception — aucune mesure ne
-justifie Opus aujourd'hui.
+🔴 **Le Convertisseur et l'Architecte tournent en Opus.** 📌 **Onze des
+soixante-six défauts d'un cycle de correction remontent au premier**,
+et le second a mesuré l'écart : à grille identique, le passage de
+Sonnet à Opus a fait passer sa prise de 34 défauts à 42.
 
-⚠️ **Trois phases sont les candidates si la qualité ne suit pas** :
+⚠️ **Le coût est borné** : deux invocations par feature pour l'un, une
+pour l'autre.
+
+📌 **Le reste de l'amont est en Sonnet** — l'Analyste, le Fusionneur,
+le Diagnostiqueur, l'Extracteur.
+
+⚠️ **Deux phases restent candidates si la qualité ne suit pas** :
 
 | Phase | Ce qu'elle demande |
 |---|---|
 | Analyste, invocation 1 | Décomposer un flux libre en sujets et poser une nature — une mauvaise décomposition se propage jusqu'au code |
-| Convertisseur, invocation 2 | Reformuler une règle produit en règle exécutable |
 | Fusionneur, invocation 1 | Reconnaître que deux formulations décrivent la même règle |
 
 📌 **Les autres phases sont mécaniques** — trier sur des natures

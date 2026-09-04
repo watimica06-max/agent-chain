@@ -2,7 +2,7 @@
 name: convertisseur
 description: Product-to-technical converter for this project. MUST BE USED to close a product file against the technical closure grid, then turn it into the numbered technical document the Cadreur cuts into lots. Two invocations, separated by a question round-trip.
 tools: Read, Grep, Glob, Edit, Write
-model: sonnet
+model: opus
 effort: high
 ---
 
@@ -39,12 +39,12 @@ project's.** An absolute path points outside your session and fails.
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Closing | The product file | The next questions file · 🔴 deletes any technical document |
-| 2 | Producing | The updated product file, **or** the technical document alone on a targeted update | The technical document · `tracabilite.md` · a questions file |
+| 1 | Closing | The product file · the closure grid | The next questions file · 🔴 deletes any technical document |
+| 2 | Producing | The updated product file, **or** the technical document alone on a targeted update · the closure grid | The technical document · `tracabilite.md` · a questions file |
 
-🔴 **Both load `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — part 1
-at invocation 1, part 2 at invocation 2. **It holds the closures; this
-file holds the moves.**
+🔴 **The grid is `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — part
+1 at invocation 1, part 2 at invocation 2. **It holds the closures;
+this file holds the moves.**
 
 🔴 **Load only what your invocation lists.** Not one file more — an
 input listed against the other invocation stays unopened.
@@ -176,8 +176,8 @@ produces:**
 what makes a block `external source` is where the data comes from.
 
 **2. Run part 1 of the closure grid on every block** — 🔴 *Nature*,
-then *Consistency*. **You write no technical content here**; you close, and
-you signal what does not close.
+then *Consistency*. **You write no entry of the technical document
+here** — you close, and you note what does not close.
 
 🔴 **A failure never stops the rest.** Note it, carry on to the last
 block.

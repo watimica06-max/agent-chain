@@ -38,10 +38,9 @@ written in advance. 📌 **It cites the entries that motivate it and
 carries `off-grid`.** ⚠️ **The mark is not distrust** — it is how the
 grid learns which forms it lacks.
 
-**R6 — A form written as two quoted clauses is two rules.** 📌 **Write
-both.** ⚠️ **The clause a rule loses is almost always the last one of
-its form** — a second pair of quotes is what keeps it from reading as a
-tail.
+**R4 — The Architecte never amends the grid he applies.** A missing
+form, or a form that keeps producing a useless rule, goes back as a
+conventions request in `architecte/`.
 
 **R5 — A list never permits what it leaves out.** 🔴 **Where a form
 names a class, write the class**, not the members of it you found. ⚠️
@@ -53,9 +52,10 @@ every case the code will meet.
 📌 **A form that gives examples is naming the class, not listing the
 rule.**
 
-**R4 — The Architecte never amends the grid he applies.** A missing
-form, or a form that keeps producing a useless rule, goes back through
-a coding agent's lot report.
+**R6 — A form written as two quoted clauses is two rules.** 📌 **Write
+both.** ⚠️ **The clause a rule loses is almost always the last one of
+its form** — a second pair of quotes is what keeps it from reading as a
+tail.
 
 ---
 
@@ -180,10 +180,10 @@ with its holes in `< >`, and **test**.*
   does. **Every other rule is checkable against a file.**
 
 **G1.2** · *Question*: none, fixed entry · *Trigger*: always
-- **Form**: "A technical decision this file does not cover is proposed
-  as a convention amendment in the lot report, never settled in
-  silence."
-- **Test**: the lot report carries that field; check it is there.
+- **Form**: "A technical decision this file does not cover is raised as
+  a request, never settled in silence. 🔴 **The lot goes on against
+  this file as it stands**, unless it cannot."
+- **Test**: review.
 
 **G1.3** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "This file carries its version and the date it was
@@ -304,7 +304,7 @@ non-empty
   nature."
 - **Test**: mechanical — import check.
 
-**G4.8** · *Question*: which adapters do two application modules both
+**G4.7** · *Question*: which adapters do two application modules both
 need? · *Trigger*: more than one application module, and V1 shows a
 nature both of them reach
 - **Form**: "**Any** adapter both applications need lives in a shared
@@ -320,7 +320,7 @@ nature both of them reach
 📌 **Two copies of one adapter is what this prevents** — a correction to
 one leaves the other as it was, and nothing says so.
 
-**G4.9** · *Question*: which stored data is searched on, and which
+**G4.8** · *Question*: which stored data is searched on, and which
 identifies (V8, N2)? · *Trigger*: N2 non-empty
 - **Form**: "A field the code searches on carries an index; a field the
   code treats as identifying carries a uniqueness constraint. 🔴 **Every
@@ -331,7 +331,7 @@ identifies (V8, N2)? · *Trigger*: N2 non-empty
 ⚠️ **A field the code treats as identifying without the store saying so
 is an assumption two lots can break.**
 
-**G4.7** · *Question*: does the `Consumes:` graph hold a cycle (V2)? ·
+**G4.9** · *Question*: does the `Consumes:` graph hold a cycle (V2)? ·
 *Trigger*: V2 finds one
 - **Form**: none. 🔴 **The entry raises a question naming the entries in
   the cycle, and G4.1 is not written.**
@@ -370,7 +370,7 @@ the same.
   invents a default for data that is not there."
 - **Test**: review.
 
-**G5.11** · *Question*: which values does the corpus bound, and where
+**G5.5** · *Question*: which values does the corpus bound, and where
 do they enter? · *Trigger*: V8 holds at least one bounded quantity
 - **Form**: "A value the corpus bounds is checked against those bounds
   at every place it enters — **typed by hand, read from a store, taken
@@ -382,7 +382,7 @@ do they enter? · *Trigger*: V8 holds at least one bounded quantity
 **A field validated on one path and not another is the shape this
 prevents.**
 
-**G5.10** · *Question*: none, fixed entry · *Trigger*: always
+**G5.6** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "**Anything that computes** states what it returns for
   every input it cannot compute on. 🔴 **A calculation, a format, a
   comparison — wherever arithmetic happens.** Never a value that reads
@@ -397,7 +397,7 @@ a value that reads as valid.
 infinity, a not-a-number or a truncation travels to a screen and looks
 like an answer.
 
-**G5.5** · *Question*: what identifies one thing seen from two origins?
+**G5.7** · *Question*: what identifies one thing seen from two origins?
 · *Trigger*: N6 non-empty
 - **Form**: "Every synchronisable entity carries its identity and its
   origin in its type."
@@ -414,7 +414,7 @@ N5, N6 or N7 non-empty
   implementation, and never on its caller's word.**"
 - **Test**: signature check on the modules concerned.
 
-⚠️ **G7.4 states the model the project presumes.** 🔴 **This one binds
+⚠️ **G7.5 states the model the project presumes.** 🔴 **This one binds
 each signature to it** — without it, every lot decides on its own which
 call may block.
 
@@ -430,10 +430,10 @@ parameter ignored, a fire-and-forget call never read, an identity held
 only in memory.
 
 ⚠️ **A declared failure type that does not carry every failure is a
-fourth** — 🔴 **G6.8 holds it**, where the failure comes from leaving
+fourth** — 🔴 **G6.4 holds it**, where the failure comes from leaving
 the process.
 
-**G5.6** · *Question*: none, fixed entry · *Trigger*: always
+**G5.10** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "No non-null assertion on a value coming from outside the
   function: what can be missing is declared as such, and handled."
 - **Test**: mechanical where `<language>` marks such an assertion.
@@ -441,7 +441,7 @@ the process.
 ⚠️ **An invariant held in another file is not an invariant** — the call
 site cannot see it, and a change to either breaks the assertion.
 
-**G5.7** · *Question*: which quantities are compared against a bound
+**G5.11** · *Question*: which quantities are compared against a bound
 (V8)? · *Trigger*: V8 holds at least one bounded quantity
 - **Form**: "A bound is `<inclusive | exclusive>`, the same way for
   every quantity of one kind. 🔴 **A duration against a window, a
@@ -484,7 +484,7 @@ where do they stop? · *Trigger*: N5 or N6 non-empty
 ⚠️ **A payload from the paired device is data from outside**, as much
 as a file or a service is.
 
-**G6.8** · *Question*: what reaches outside the process, and what does
+**G6.4** · *Question*: what reaches outside the process, and what does
 it hand back when it fails? · *Trigger*: N2, N5, N6 or N7 non-empty
 - **Form**: "Every call leaving the process — a store, a device, the
   network, a deserialisation — returns its failure as a value. 🔴 **What
@@ -496,30 +496,30 @@ it hand back when it fails? · *Trigger*: N2, N5, N6 or N7 non-empty
 covers everything else that leaves the process** — a store raises, a
 deserialisation raises, a platform service may not be there at all.
 
-**G6.9** · *Question*: none, fixed entry · *Trigger*: always
+**G6.5** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "A caller that receives a failure acts on it. 🔴 **It is
   handled, propagated, or reported — never dropped**, and never left to
   a value that reads as success."
 - **Test**: mechanical where `<language>` marks an unused result;
   review otherwise.
 
-⚠️ **G6.8 says what a boundary hands back.** 🔴 **This says what the
+⚠️ **G6.4 says what a boundary hands back.** 🔴 **This says what the
 one who receives it does** — the two are answered separately, and the
 second is the one nothing else covers.
 
-**G6.4** · *Question*: which transitions are forbidden? · *Trigger*: an
+**G6.6** · *Question*: which transitions are forbidden? · *Trigger*: an
 N4 entry names at least one
 - **Form**: "A transition N4 does not name is a declared error, never a
   no-op."
 - **Test**: review; paired with G10.4.
 
-**G6.5** · *Question*: what does a refusal return? · *Trigger*: N11
+**G6.7** · *Question*: what does a refusal return? · *Trigger*: N11
 non-empty
 - **Form**: "An access refusal is a declared error type, never empty
   data, a truncated list or silence."
 - **Test**: review.
 
-**G6.6** · *Question*: which writes happen before a call returns (V10)?
+**G6.8** · *Question*: which writes happen before a call returns (V10)?
 · *Trigger*: V10 non-empty
 - **Form**: "A write the corpus states must happen before a call
   returns is synchronous, and its failure propagates. 🔴 **A write
@@ -530,7 +530,7 @@ non-empty
 ⚠️ **Between two writes that keep one invariant, a reader sees a state
 the invariant forbids** — synchronous is not enough.
 
-**G6.7** · *Question*: what happens when two origins diverge? ·
+**G6.9** · *Question*: what happens when two origins diverge? ·
 *Trigger*: N6 non-empty **and** an N6 entry states a resolution policy
 - **Form**: "A synchronisation conflict is a declared error type, never
   a silent resolution. The policy is `<the one N6 states>`."
@@ -548,13 +548,33 @@ the invariant forbids** — synchronous is not enough.
   variable."
 - **Test**: mechanical where `<language>` allows; review otherwise.
 
-**G7.2** · *Question*: which resources are acquired and given back? ·
+**G7.2** · *Question*: which objects does the platform construct
+rather than the code? · *Trigger*: N9, N11 or N12 non-empty
+- **Form**: "🔴 **What the platform constructs receives its dependencies
+  through `<the mechanism>`** — never by reading them from a module
+  variable, never by building them itself."
+
+  🔴 **"A dependency the mechanism cannot supply is a build failure,
+  never a run-time one."**
+- **Test**: review, one such object at a time.
+
+📌 **G7.1 forbids the wrong way; this names the right one.** ⚠️ **A
+screen, a service, an activity is instantiated by the system** — no
+caller passes it anything, and without a mechanism named here every lot
+invents its own.
+
+🔴 **Name it for what it is** — a library and its version, not a
+principle — **and put it in the table of G12.1.** ⚠️ **G12.2 forbids a
+lot from adding a dependency**, so a mechanism not named here leaves
+the first lot unable to build anything the platform constructs.
+
+**G7.3** · *Question*: which resources are acquired and given back? ·
 *Trigger*: N2 or N5 non-empty
 - **Form**: "Every acquired resource is released in the same scope,
   through `<the platform's mechanism>`."
 - **Test**: mechanical where a linter carries it.
 
-**G7.3** · *Question*: which ambient sources do calculations read (V9)?
+**G7.4** · *Question*: which ambient sources do calculations read (V9)?
 · *Trigger*: N3 non-empty
 - **Form**: "Every N3 entry is realised by a pure function.
   🔴 **Anything it reads from outside itself** — the clock, a reading, a
@@ -562,14 +582,14 @@ the invariant forbids** — synchronous is not enough.
   none is read inside `<the pure modules>`."
 - **Test**: mechanical — import and call check.
 
-**G7.4** · *Question*: what execution model does this project presume?
+**G7.5** · *Question*: what execution model does this project presume?
 · *Trigger*: always — the hole is the Architecte's call, informed by V1
 - **Form**: "Presumed execution model: `<single-threaded | pool of N |
   cooperative async>`. Code departing from it is an amendment proposed
   before writing, carrying its own locking discipline."
 - **Test**: review.
 
-**G7.9** · *Question*: none, fixed entry · *Trigger*: always
+**G7.6** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "Nothing holds a lock across a wait. 🔴 **What a lock
   protects is read or written and released before anything is
   awaited.**"
@@ -579,7 +599,7 @@ the invariant forbids** — synchronous is not enough.
 same lock** — and the wait is often invisible at the line that takes
 it.
 
-**G7.5** · *Question*: who holds the state of a journey? · *Trigger*:
+**G7.7** · *Question*: who holds the state of a journey? · *Trigger*:
 N8 non-empty
 - **Form**: "The state of a journey is held by one module, and this
   file says which. 🔴 **Every journey**, whether or not an entry names
@@ -588,7 +608,7 @@ N8 non-empty
 
 ---
 
-**G7.6** · *Question*: what does each screen hold that the system can
+**G7.8** · *Question*: what does each screen hold that the system can
 take away? · *Trigger*: N9 non-empty
 - **Form**: "Every screen keeps what the user has in progress across a
   system rebuild. 🔴 **Anything they have entered, opened or selected
@@ -598,7 +618,7 @@ take away? · *Trigger*: N9 non-empty
 ⚠️ **A screen is rebuilt far more often than a process dies** — a
 rotation, a resize, a theme change.
 
-**G7.10** · *Question*: what must the application find again after the
+**G7.9** · *Question*: what must the application find again after the
 process dies? · *Trigger*: N2 non-empty
 - **Form**: "🔴 **Anything the application must find again after the
   process dies** — what the corpus says survives, and what the user
@@ -607,22 +627,22 @@ process dies? · *Trigger*: N2 non-empty
   application resumes from what it read.**"
 - **Test**: one test per surviving thing, killing between two steps.
 
-📌 **G7.6 covers a screen the system rebuilds.** 🔴 **This covers the
+📌 **G7.8 covers a screen the system rebuilds.** 🔴 **This covers the
 process dying** — a different event, and a different answer.
 
-**G7.7** · *Question*: none, fixed entry · *Trigger*: N9 non-empty
+**G7.10** · *Question*: none, fixed entry · *Trigger*: N9 non-empty
 - **Form**: "A screen reads a source once per entry, never once per
   frame. A read that is not remembered is a read on every redraw."
 - **Test**: review; mechanical where the platform's own tooling
   carries it.
 
-**G7.8** · *Question*: none, fixed entry · *Trigger*: always
+**G7.11** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "🔴 **Anything one moment opens and another must end is
   released, and this file says by what** — a handle, a session, a
   scope, a registration, a subscription."
 - **Test**: review, one acquisition at a time.
 
-📌 **G7.2 covers what a single scope opens and closes.** ⚠️ **This
+📌 **G7.3 covers what a single scope opens and closes.** ⚠️ **This
 covers what outlives a scope** — what one moment opens and another has
 to end.
 
@@ -691,7 +711,7 @@ you infer from two values sitting near each other** — two numbers in
 one entry, in two different units, state nothing about their sum. **R2
 applies: what the corpus does not state writes no rule.**
 
-**G10.4** · *Question*: G6.4 named the forbidden transitions — which
+**G10.4** · *Question*: G6.6 named the forbidden transitions — which
 of them has a test? · *Trigger*: an N4 entry names at least one
 - **Form**: "Each forbidden transition N4 names has its own test."
 - **Test**: one test per transition.
@@ -712,7 +732,7 @@ of them has a test? · *Trigger*: an N4 entry names at least one
 ⚠️ **N6 says two origins meet; it need not say at what grain.** 📌 **A
 model entry often does.**
 
-**G10.7** · *Question*: G6.6 named the writes that precede a return —
+**G10.7** · *Question*: G6.8 named the writes that precede a return —
 which of them has an interruption test? · *Trigger*: V10 non-empty
 - **Form**: "Each write read in V10 has a test interrupting between the
   write and the return."
@@ -798,13 +818,31 @@ read as mechanical.
 📌 **The only entry a trigger fires on an *empty* nature.** An absence
 is a fact, and a fact worth writing down.
 
+**G12.5** · *Question*: what does the platform require of the project
+as a whole, before the corpus can work at all? · *Trigger*: always —
+📌 **read against V1**: each non-empty nature may demand something
+- **Form**: "🔴 **What the platform demands of the project as a
+  whole** — a target version, an identity, a signature, a
+  capability — **is declared here, with what demands it.**"
+- **Test**: mechanical — the build declares each of them.
+
+⚠️ **What one lot declares for itself is not this** — a permission in
+the manifest of the lot that needs it belongs to that lot. 🔴 **This is
+what no single lot can declare**, because it holds for every module at
+once.
+
+📌 **Walk the natures rather than the entries**: two applications that
+exchange demand a shared identity, a sensor demands a floor on the
+platform version, a background task demands a capability. **The corpus
+states the behaviour; the platform states its price.**
+
 ---
 
 ## What the volume should be
 
-**Sixty-eight entries, of which five to eight do not fire on a given
-project.** 📌 **Sixty to sixty-five rules written**, plus whatever R3
-allows off-grid.
+**Seventy entries, of which five to eight do not fire on a given
+project.** 📌 **Sixty-two to sixty-seven rules written**, plus whatever
+R3 allows off-grid.
 
 ⚠️ **Measured over eight passes on one corpus** — the earlier figure
 was an estimate, and every pass exceeded it.
@@ -814,7 +852,7 @@ was an estimate, and every pass exceeded it.
 📌 **C11 reaches three dense rules** when N10 is non-empty. **If G11.2
 is fully carried by the linter, it moves to C2.**
 
-📌 **C6 and C10 are paired** — G6.4 with G10.4, G6.6 with G10.7. 🔴
+📌 **C6 and C10 are paired** — G6.6 with G10.4, G6.8 with G10.7. 🔴
 **Each pair reads one fact of the corpus and writes two different
 rules**: what the code does with it, and what proves the code does it.
 **They are answered once and written twice.**

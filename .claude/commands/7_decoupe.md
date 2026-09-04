@@ -48,13 +48,25 @@ missing is not your call.
 
 **1. `cadreur`** — produces `code/decoupage.md`.
 
+🔴 **If it wrote `blocked_cadreur.md` and `architecte/cadreur.md`
+together**, the conventions fall short of what the split needs:
+**invoke `architecte`, invocation 3**, then run `cadreur` again. ⚠️
+**The blocking file goes; the request stays with its verdict.**
+
+📌 **If `architecte` blocks in turn** — `blocked_architecte.md` —
+**stop.** The Product Owner settles it.
+
+📌 **A request written without a blocking file changes nothing here** —
+the Cadreur cut against the conventions as they stand, and the request
+waits for the end of the run.
+
 **2. `verificateur`** — produces `code/sequence.md`.
 
 **3. Read its `## Defects` section.**
 
 | It holds | What you do |
 |---|---|
-| Nothing | 🔴 **Stop.** The split holds; report where things stand |
+| Nothing | 🔴 **The split holds.** If `architecte/` holds a request with an empty `## Verdict`, invoke `architecte`, invocation 3. Then stop and report |
 | Defects | Back to `cadreur`, then `verificateur` again |
 
 🔴 **Three rounds maximum.** On the third round still carrying defects,
@@ -79,7 +91,7 @@ inputs, its checks, its output format. It reads its own instructions.
 ```
 Agent(
   subagent_type="cadreur",
-  model="sonnet",
+  model="opus",
   description="Split <feature>",
   prompt="Working folder: <the working folder>."
 )
@@ -87,6 +99,9 @@ Agent(
 🔴 **Pass the working folder, never the feature folder.** On a bug-fix
 cycle they differ, and the agent would read the wrong one.
 ```
+
+📌 **`cadreur` and `verificateur` run on `opus`** — they decide the
+whole structure, and an error here spreads to every lot.
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
 either** — in this environment the Agent tool always runs async and

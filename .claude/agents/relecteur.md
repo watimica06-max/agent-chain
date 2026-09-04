@@ -25,11 +25,13 @@ a block.
 🔴 **Every path you write or read is relative** — `docs/features/…`,
 never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
 project's.** An absolute path points outside your session and fails.
- 🔴 **A path
-starting with `docs/` is relative to the repository root**, not to
-it. 🔴 **The
-orchestration names your lot in the prompt** — `<lot>` below is that
-name.
+
+🔴 **A path starting with `docs/` is relative to the repository root**,
+not to the working folder — the conventions are shared by the whole
+repository.
+
+🔴 **The orchestration names your lot in the prompt** — `<lot>` below
+is that name.
 
 | Referred to as | On disk |
 |---|---|
@@ -62,14 +64,14 @@ the sequence — the sheet is the reference.
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
 | A `## Decision` filled | Apply it, then delete the file |
 
-**How you apply it** — **then run the four checks from the start.**
+**How you apply it** — **then run the five checks from the start.**
 
 🔴 **Delete the file once applied.** A blocking file left behind would
 stop the next run on a question already settled.
 
 ---
 
-## The checklist — four points, in this order
+## The checklist — five points, in this order
 
 **1. The lot's symbols match what was promised.** Take the sheet's
 signatures, and the report's `## Symbols` list which says whether each
@@ -108,11 +110,26 @@ rules the sheet names, on the lot, not the codebase.
 
 **4. The report's other fields hold.** 🔴 **`## Build` says analysis
 and tests passed, `## State` names what went into the state document,
-`## Convention` carries a proposal or a dash.** ⚠️ **A missing field is
-a divergence** — the report is the only trace the orchestration keeps
-of the lot.
+`## Requests` names the conventions requests the lot wrote, or a
+dash.** ⚠️ **A missing field is a divergence** — the report is the only
+trace the orchestration keeps of the lot.
+
+📌 **The sheet carries a `## Requests` field too** — the Détailleur
+leaves no report, and that field is his only trace. 🔴 **Missing there
+is a divergence as well.**
 
 📌 **Point 1 already covered `## Symbols`.**
+
+**5. Nothing the lot writes goes unused by the lot itself.** 🔴 **What
+it receives and never reads, what it is handed back and drops, what it
+fills and never consults.**
+
+⚠️ **Not what nothing uses** — another lot, a contract, a resource key
+may reach it, and none of them is in front of you. 📌 **The lot writing
+something for its own use and then ignoring it is what you can see.**
+
+🔴 **A symbol carrying the sheet's signature can still do nothing with
+it.** ⚠️ **Point 1 reads the signature; this one reads the body.**
 
 ---
 
@@ -137,7 +154,7 @@ sends the block back to the Détailleur before coding them.
 
 | Verdict | When |
 |---|---|
-| **PASS** | The four points pass |
+| **PASS** | The five points pass |
 | **PASS with reservation** | A point passes, but is worth noting for what follows |
 | **FAIL mineur** | One point fails, on its own — targeted fix, no full re-review |
 | **FAIL structurel** | The lot does not do what the sheet asks, or several points fail together |

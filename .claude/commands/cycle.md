@@ -14,6 +14,11 @@ the moment something needs a decision.
 the global product document, and nothing downstream reads it — run them
 when you choose.
 
+⚠️ **`/conventions` is not in the chain either**, though its place is
+between `/4_convertit` and `/7_decoupe` — the Cadreur reads the
+conventions in full. 🔴 **Run it by hand until the grid has been
+measured on a real cycle.**
+
 🔴 **It stops before `/8_code`.** The split is the last point where
 turning back costs no commits.
 

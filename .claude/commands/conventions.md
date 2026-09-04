@@ -17,9 +17,12 @@ for it and stop — never guess which feature is meant.
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
-🔴 **Always the feature folder, never a `bugfix-NN/`.** Conventions are
-derived from a feature's own two documents; a correction cycle has
-neither.
+🔴 **Invocations 1 and 2 run on the feature folder, never on a
+`bugfix-NN/`.** Conventions are derived from a feature's own two
+documents, and a correction cycle has neither.
+
+📌 **Invocation 3 runs where the request was written** — the feature
+folder, or a `bugfix-NN/` inside it. **A second argument names it.**
 
 ---
 
@@ -34,29 +37,16 @@ neither.
 
 ## When it runs
 
-<!-- TEMPORARY — dry run. This command sits outside the numbered chain
-     and `/cycle` does not call it. Renumber it and wire it in once the
-     grid has been measured. -->
+📌 **After `/4_convertit`, before `/7_decoupe`.** The Cadreur reads the
+conventions in full; they have to exist when it does.
 
-📌 **Run by hand, on a feature whose technical document exists.** 🔴
-**Not part of `/cycle`.**
-
-🔴 **Pass the output path in the prompt**, and give it a name no
-earlier run used: `docs/conventions-<n>.md`, the next free number.
-⚠️ **The agent has no tool to list a folder** — it writes where you say
-and reads nothing else.
-
-⚠️ **Nothing it writes reaches the coding agents.**
-
-🔴 **On a project that already holds code, that dry run is what tells
-you whether the grid derives or copies.** ⚠️ **The agent reads neither
-the code nor the build files** — if a rule it writes matches what the
-project already does, the grid found it, not the repository.
-
-<!-- END TEMPORARY -->
+⚠️ **Run by hand** — 🔴 **`/cycle` does not call it**, and wiring it in
+waits until the grid has been measured on a real cycle.
 
 🔴 **Stop if `spec-technique.md` is absent** — say so. The agent derives
-from it, and the upstream loop has not reached it yet.
+from it, and the upstream loop has not reached it yet. ⚠️ **Invocation 3
+does not need it**: it judges a request against the conventions and the
+grid.
 
 🔴 **Stop if a root `questions-architecte-*.md` carries an empty
 `Answer:`** — relay it. The agent asked something and it is unanswered.
@@ -65,10 +55,18 @@ from it, and the upstream loop has not reached it yet.
 
 ## Which invocation
 
-| The root holds | What you invoke |
+🔴 **Walk this table from the top and stop at the first row that
+matches.**
+
+| The folder holds | What you invoke |
 |---|---|
+| A request in `architecte/` with an empty `## Verdict` | **Invocation 3 — Requests** |
 | A `questions-architecte-NN.md`, answered | **Invocation 2 — Integrating** |
 | Nothing of the sort | **Invocation 1 — Deriving** |
+
+📌 **Invocation 3 runs on a working folder** — a feature, or a
+`bugfix-NN` inside it. ⚠️ **Each cycle holds its own `architecte/`**,
+and a request is treated in the cycle that raised it.
 
 ---
 
@@ -88,9 +86,7 @@ Agent(
   subagent_type="architecte",
   model="opus",
   description="conventions <feature>",
-  prompt="Feature folder: docs/features/<name>/.
-          Invocation 1 — Deriving.
-          Write to docs/conventions-<n>.md."
+  prompt="Feature folder: docs/features/<name>/. Invocation 1 — Deriving."
 )
 ```
 

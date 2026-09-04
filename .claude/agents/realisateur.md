@@ -25,11 +25,13 @@ verifiable — the Relecteur compares tests to criteria.
 🔴 **Every path you write or read is relative** — `docs/features/…`,
 never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
 project's.** An absolute path points outside your session and fails.
- 🔴 **A path
-starting with `docs/` is relative to the repository root**, not to
-it. 🔴 **The
-orchestration names your lot in the prompt** — `<lot>` below is that
-name.
+
+🔴 **A path starting with `docs/` is relative to the repository root**,
+not to the working folder — the conventions and the state document are
+shared by the whole repository.
+
+🔴 **The orchestration names your lot in the prompt** — `<lot>` below
+is that name.
 
 | Referred to as | On disk |
 |---|---|
@@ -151,8 +153,8 @@ string is ever hardcoded** — the conventions say which files carry
 them, in which language, and whether a key is duplicated across
 several.
 
-⚠️ **A convention you find wrong is a proposal in the report**, never a
-direct edit of the shared file.
+⚠️ **A convention you find wrong is a request in `architecte/`**, never
+a direct edit of the shared file.
 
 ---
 
@@ -220,12 +222,16 @@ four fields:
     Added: ActivityReconciliationService
     Removed: —
 
-    ## Convention
+    ## Requests
 
-    —
+    architecte/realisateur-lot-04.md
 
-**Structure**: one field, one answer. **Absent by construction**: any
-rationale for a choice — it is in the sheet, not to repeat.
+**Structure**: one field, one answer. 📌 **`## Requests` names the
+conventions requests this lot wrote, or a dash** — the file itself
+carries what they say.
+
+**Absent by construction**: any rationale for a choice — it is in the
+sheet, not to repeat.
 
 **Prose**: 🔴 **English, present indicative, active voice.** One field,
 one answer — what does not answer the field is not in it. ⚠️ **No
@@ -236,6 +242,33 @@ promised.** Name them exactly.
 
 🔴 **Write the report even on a short lot** — the Relecteur compares
 its symbols to the sheet's, and has nothing to compare without it.
+
+---
+
+## When the conventions fall short
+
+🔴 **A condition of running that nothing states.** An environment
+variable, a service that has to be up, a device that has to be
+attached, an order the commands have to follow — 📌 **anything you had
+to work out to make the verification pass, and that the next lot will
+work out again.**
+
+**Write `architecte/realisateur-<lot>.md`** in the working folder. 📌
+**Create the folder if it is not there.**
+
+    ## What I need
+    ## Why the lot cannot proceed
+    ## Where I met it
+    ## What I think it is        add · update · remove
+    ## Verdict                   🔴 left empty
+
+🔴 **You describe what you lack, never the rule itself.** ⚠️ **You do
+not know whether it is a convention** — the Architecte does, and it may
+well belong to the tooling or to the machine rather than to that file.
+
+📌 **You never block on this.** ⚠️ **A blocker is for a sheet you
+cannot implement** — this is not one. 🔴 **A second request on the same
+lot takes a suffix.**
 
 ---
 
@@ -287,7 +320,8 @@ this block ever lifts.
 - 🔴 **Write a test matching no criterion**
 - 🔴 **Delete a test** — adapt it
 - 🔴 **Argue with a verdict** — fix, or stop
-- 🔴 **Edit `docs/TECHNICAL_CONVENTIONS.md`** — propose in the report
+- 🔴 **Edit `docs/TECHNICAL_CONVENTIONS.md`** — write a request in
+  `architecte/` instead
 - 🔴 **Merge, branch, or touch a worktree** — that is the
   orchestration's
 - 🔴 **Fall back to Bash file splicing** when `Edit` fails — re-Read and

@@ -1126,7 +1126,15 @@ structure entière ; une erreur ici se propage à tout le document
 technique. Le coût reste faible en absolu : une invocation chacun par
 document technique, pas par lot.
 
-**Détailleur, Réalisateur — Sonnet, sans exception.** 🔴 **Pas de
+**Détailleur — Opus.** 🔴 **Seize des soixante-six défauts d'un cycle
+de correction remontent à lui** — la signature qu'il écrit est ce
+contre quoi tout le bloc est codé. ⚠️ **Une invocation par bloc, pas
+par lot** : le coût reste borné.
+
+📌 **Mesuré ailleurs** : sur l'Architecte, le même passage de Sonnet à
+Opus a fait passer la prise de 34 défauts à 42, à grille identique.
+
+**Réalisateur — Sonnet, sans exception.** 🔴 **Pas de
 plancher par couche ni par type d'action.** L'ancienne matrice de
 risque (LOW/MEDIUM/HIGH) a été construite sur des steps traversant
 plusieurs couches ; on ne sait pas si ses planchers restent justifiés

@@ -50,6 +50,11 @@ Name each consumer.
 Unchanged → thread closes, marked *existing*. Changed → walk up what
 depends on it.
 
+**If it produces an order — what separates two elements that tie?**
+🔴 **Asked whenever a block sorts, ranks or picks a most recent.** ⚠️
+**A key that can repeat leaves the order to chance**: two records made
+the same day, two values equally close.
+
 ## Around it
 
 **This block sits in something that already exists. What surrounds it
@@ -57,6 +62,10 @@ and does not change?**
 
 What shares its display surface · what treats the same subject
 elsewhere · what it replaces without saying so.
+
+🔴 **Name each one, and say whether it changes.** Unchanged → mark it
+*existing*. Changed → it is a block of its own, and nobody else will
+write it.
 
 ⚠️ **A chain walks up what consumes and down what produces. A neighbour
 does neither** — no closure reaches it.
@@ -84,17 +93,24 @@ Finding the earlier state, or clean.
 | Nature | Questions |
 |---|---|
 | model | Type, bounds, allowed values? Mandatory or optional? 🔴 Even when trivial — the upper bound is a product decision |
-| persistence | Stored or recomputed? What happens to existing records if the structure changes? |
-| calculation | Inputs, output, rule for each case? And when an input is missing? 🔴 See exhaustiveness below |
+| persistence | Stored or recomputed? What happens to existing records if the structure changes? 🔴 If something can be stored incomplete: what does it hold then — the absence, or an empty value? |
+| calculation | Inputs, output, rule for each case? And when an input is missing? What values can its output take, and which are acceptable? 🔴 See below |
 | transition | What event triggers it? What states exist, reachable from which? 🔴 See exhaustiveness below |
-| external source | What if it fails, is unavailable, returns invalid data? |
-| synchronisation | Rule when two versions diverge? What the user sees during, and on failure? |
+| external source | What if it fails, is unavailable, returns invalid data? 🔴 What makes two incoming things the same one — and what happens to the second? |
+| synchronisation | Rule when two versions diverge? What the user sees during, and on failure? 🔴 What identifies one same thing seen from both sides? And to which changes does a mirrored copy update — the list being closed |
 | background work | Frequency? What if the system interrupts it — does it resume alone? |
 | journey | Conditions for moving on? What if the user goes back, or abandons? |
-| screen | What is displayed, where, what each action does? What is shown with no data, loading, on failure? |
+| screen | What is displayed, where, what each action does? What is shown with no data, loading, on failure? 🔴 And what becomes of the screen itself when the system rebuilds it — what the user has in progress is kept, the rest is built again from its source |
 | text | Exact label? What it becomes if the value is absent? |
 | access | Who sees, who changes? What does someone who cannot? |
 | lifecycle | How long does the data live, what becomes of it after? |
+
+**On `calculation` — the bounds of an output:**
+
+🔴 **A value a calculation produces and a field stores carries the same
+bounds as one the user would have typed.** ⚠️ **The grid bounds a field
+at `model`; nothing bounds what a rule computes** unless this question
+is asked.
 
 **Exhaustiveness — on `calculation` and `transition`:**
 
@@ -150,10 +166,17 @@ The words that mean different things depending on who uses them.
 
 **Does it collect personal or sensitive data?**
 Health, location, biometrics, identifiers. Consent is a product
-decision, never ticked by default.
+decision, never ticked by default. 🔴 **One answer per kind** — health
+and location are not consented to together.
 
 **What system permissions, and what if they are denied for good?**
-🔴 Asked at the moment of use, never at launch.
+🔴 Asked at the moment of use, never at launch. 🔴 **One answer per
+permission** — a refused sensor and a refused link do not leave the
+same application behind.
+
+⚠️ **These two are the only part 4 questions with several instances.**
+📌 **Everything else here is asked once**; these are asked once per
+thing they name.
 
 ---
 

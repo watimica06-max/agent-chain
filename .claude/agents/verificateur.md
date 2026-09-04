@@ -2,7 +2,7 @@
 name: verificateur
 description: Split-checking agent for this project. MUST BE USED after the Cadreur, to cross-check the declared dependencies, confront each lot with the entries it cites, derive the execution order and group the lots into blocks. One invocation. Produces the sequence that drives the whole loop.
 tools: Read, Grep, Glob, Edit, Write
-model: sonnet
+model: opus
 effort: high
 ---
 
@@ -90,7 +90,7 @@ stop the next run on a question already settled.
 
 ## The five moves, in this order
 
-**1. Cross the inventory against the lots**, and note five kinds of
+**1. Cross the inventory against the lots**, and note seven kinds of
 defect:
 
 **An unbuilt surface** — 🔴 **an operation the inventory lists that no
@@ -121,6 +121,21 @@ first shows, the second does not.**
 **A production nobody calls** — 🔴 **no lot needs it, and its
 `Produces` field names no caller.** A rule built and never invoked is
 dead code.
+
+**A caller no lot declares** — 🔴 **a lot changes a signature, and
+something calling it is named in no `Modifies` field.** ⚠️ **It does
+not show as a hole**: nothing needs it, nothing produces it, and the
+split reads as complete. 📌 **It shows when the module stops
+compiling**, in a lot that touches neither end.
+
+**A contract changed without its cascade** — 🔴 **a lot modifies a
+contract and declares nothing that fulfils it, nor anything that calls
+it.** ⚠️ **A contract exists to be fulfilled and called**: a lot
+changing one and declaring neither has grepped nothing.
+
+📌 **You judge the shape, not the count.** Whether four callers is the
+right number is the Cadreur's to know; **that a changed contract
+declares none of either is a defect you can see.**
 
 📌 **A piece is the exception.** **A piece is what a rule needs to
 reach outside the program** — the OS, a device, the disk, the network.
@@ -209,7 +224,8 @@ sequence.
 
 **b.** Add the next lot **if it belongs to the same layer** — 📌 **on a
 bug-fix cycle, whatever its layer**, see below — and the block has not
-reached its ceiling.
+reached its ceiling. 🔴 **What the ceiling counts is entries cited**,
+not lots: see below.
 
 **c.** Otherwise close the block and open a new one on that lot.
 
@@ -241,8 +257,9 @@ for nothing.**
 ⚠️ **Indicative ceilings, not targets, and estimates rather than
 measurements.**
 
-🔴 **They count lots, not their weight.** A lot citing five entries
-weighs several — **count it as one per entry cited.**
+🔴 **The ceilings count entries cited, not lots.** A lot citing five
+entries weighs five, a lot citing one weighs one — **what a block costs
+is what it opens.**
 
 ---
 
@@ -270,6 +287,11 @@ weighs several — **count it as one per entry cited.**
 more — the rationale is already in the lot list, not to repeat. **A
 defect has three fields**: which lot, which type, what correction is
 expected — one defect per line.
+
+🔴 **The third field quotes the line it contests**, as the two examples
+above do. ⚠️ **Quote it from the file you just read, not from what you
+remember of it** — a quote you cannot find there is a defect that no
+longer holds, on a split already corrected.
 
 **Absent by construction**: no business rule, no signature. You
 constate structure, you produce none of the content.

@@ -84,7 +84,7 @@ not a file.
 | A `## Decision` filled | Apply it, then delete the file |
 
 **How you apply it, at invocation 1** — **to your own gap**, then run
-the five moves as usual. 📌 **A decision naming another gap is not
+moves 1 to 5 as usual. 📌 **A decision naming another gap is not
 yours to apply.**
 
 **How you apply it, at invocation 2** — 🔴 **the decision does not
@@ -185,11 +185,18 @@ notification.
 changes a mechanism changes what its callers need**, and the new
 mechanism carries requirements the gap never names.
 
-**The test, on each caller**: what it holds today, does the new
-mechanism accept it?
+**Two tests, on each caller.**
 
-⚠️ **One that cannot answer is a second gap** — say which, and what it
-lacks.
+📌 **What it holds today — does the new mechanism accept it?** ⚠️ **One
+that cannot is a second gap** — say which, and what it lacks.
+
+🔴 **What the new mechanism hands it — does it use it?** ⚠️ **A fix
+adding an information adds it for someone**: a caller that compiles
+without reading it is a dead field the day it is written.
+
+📌 **The first test catches what breaks; the second catches what
+silently does nothing.** 🔴 **A type that grows passes the first and
+fails the second** — nothing stops compiling, and nobody reads it.
 
 📌 **A second gap goes in `## Expected`, or in `## Trigger` when it is
 the trigger** — the Cadreur cuts against what you wrote, and would
@@ -251,8 +258,9 @@ partial set** — a gap silently dropped never comes back.
 ⚠️ **You never open the code.** A report that leaves you unable to
 write an entry is a blocker, not a reason to go looking.
 
-🔴 **Four moves — the first three per gap, the last on the whole
-document.**
+🔴 **Four moves, numbered from the five above** — the chain runs
+straight through, one investigation then one assembly. **The first
+three per gap, the last on the whole document.**
 
 **6. Give each confirmed gap a nature**, among the twelve. 📌 **The
 nature of the bearer**, not of what it calls: a screen that fails to
@@ -284,9 +292,9 @@ closures**, and only three:
 | **Resources** | A fix displaying something nothing carries — a label with no key |
 | **Agreement between entries** | Two entries contradicting each other on one subject |
 
-⚠️ **The other six do not apply here.** *Traceability* and *Nothing
-dropped* read against a product file, and there is none; the rest bear
-on a translation you did not make.
+⚠️ **The grid's other closures do not apply here.** *Traceability* and
+*Nothing dropped* read against a product file, and there is none; the
+rest bear on a translation you did not make.
 
 🔴 **A closure that fails is a blocker**, not a question — nobody
 answers a question in this cycle.

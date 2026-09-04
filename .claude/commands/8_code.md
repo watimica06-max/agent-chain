@@ -70,6 +70,17 @@ lots in the prompt.
 
 **5.** Next lot.
 
+**6. At the end of the block** — 🔴 **before the next one, and never
+during** — glob `architecte/`. **A request with an empty `## Verdict`
+→ `architecte`, invocation 3.**
+
+⚠️ **Never while a lot is running.** 📌 **The conventions file is what
+every agent of the next block reads**, and two worktrees writing it at
+once lose one of the two.
+
+📌 **No request, or every verdict filled** — carry on without invoking
+anything.
+
 **When every lot of the sequence carries a PASS** → **`controleur`**,
 then stop.
 
@@ -106,6 +117,10 @@ The agent cannot guess which one is his.
 
 🔴 **Pass the working folder, never the feature folder.** On a bug-fix
 cycle they differ, and the agent would read the wrong one.
+
+📌 **`detailleur` runs on `opus`**, `realisateur` and `relecteur` on
+`sonnet` — the first writes the signatures every lot of the block is
+built on, the other two work against a sheet already written.
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
 either** — in this environment the Agent tool always runs async and

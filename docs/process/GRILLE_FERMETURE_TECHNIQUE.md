@@ -102,7 +102,13 @@ finished document.
 
 🔴 **Never duplicate between sections — reference instead.**
 
-**The owning section answers "where does this behaviour come from",
+**And is that place the one the behaviour comes from?**
+
+🔴 **Ask it of every rule, not only the ones written twice.** ⚠️ **A
+rule living in the section where it is seen holds only there** — a
+second path reaching the same thing never meets it.
+
+📌 **The owning section answers "where does this behaviour come from",
 not "where is it seen".** A calculation rule belongs to calculations
 even if it produces a display; a field bound to the model even if it
 shows at input time.
@@ -129,6 +135,15 @@ coincide.
 ⚠️ **This is not *Singularity*.** That one bars duplication you chose;
 this one catches the duplication you did not notice.
 
+**Do two entries treat the same kind of thing in two ways?**
+
+🔴 **Two durations against a threshold, two identifiers, two orders,
+two units** — ⚠️ **the kind is the same, the answer has to be.**
+
+📌 **The reverse of the closure above**: that one looks for two
+wordings of one rule, this one for two rules of one kind. **Neither is
+wrong on its own; together they are.**
+
 📌 **Nobody else can see it.** The Cadreur reads the whole document but
 does not judge its content; every agent after him opens a few entries.
 
@@ -144,6 +159,16 @@ entity it persists.
 ⚠️ **That is what gives the execution order.** A screen displaying a
 computed value never copies the rule — without the declaration,
 nothing would tie them.
+
+**Does the destination carry what the reference attributes to it?**
+
+🔴 **A reference names what it expects of its target.** ⚠️ **The entry
+cited carries it, or the reference is false** — and a false reference
+is worse than none: it reads as settled.
+
+📌 **Declaring a link and checking it are two closures.** The first
+asks whether the dependency is named; this one asks whether the thing
+named answers for it.
 
 ## Resources
 
@@ -181,6 +206,31 @@ which.
 📌 **The cases a rule distinguishes must cover every possible value,
 each of them once.**
 
+**Can any input of the rule take a value the rule cannot compute on?**
+
+🔴 **The corpus bounds it, or the rule says what it returns there.** ⚠️
+**Neither leaves the code to invent one**, and what it invents reads as
+an answer.
+
+📌 **Distinct from the question above**: that one asks whether the
+cases cover the values; this one asks whether the values are ones the
+rule can take at all.
+
+## What a nature owes
+
+**Does every field carry what its nature owes it?**
+
+🔴 **A field named without its constraints, a lookup named without its
+index, a schema named without its migration** — ⚠️ **the nature says
+what it carries, and a field that gets only part of it leaves the rest
+to the code.**
+
+📌 **Carried, or declared as having none** — never silent.
+
+⚠️ **This one bears on an entry's contents, not on a rule.**
+*Completeness* asks whether a rule leaves a case open; this asks
+whether an entry left a field bare.
+
 ---
 
 # Running it
@@ -188,7 +238,8 @@ each of them once.**
 **Part 1, on each block of the product file.** A block that fails
 either test is signalled; nothing is written from it.
 
-**Part 2, on the technical document, once every section is filled.**
+**Part 2 — eight closures, on the technical document, once every
+section is filled.**
 🔴 **Not while writing** — entries accumulate, and what they consume,
 contradict or dropped only shows once the document stands.
 
