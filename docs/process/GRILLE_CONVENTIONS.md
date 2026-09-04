@@ -38,6 +38,11 @@ written in advance. 📌 **It cites the entries that motivate it and
 carries `off-grid`.** ⚠️ **The mark is not distrust** — it is how the
 grid learns which forms it lacks.
 
+**R6 — A form written as two quoted clauses is two rules.** 📌 **Write
+both.** ⚠️ **The clause a rule loses is almost always the last one of
+its form** — a second pair of quotes is what keeps it from reading as a
+tail.
+
 **R5 — A list never permits what it leaves out.** 🔴 **Where a form
 names a class, write the class**, not the members of it you found. ⚠️
 **Writing *only X and Y* where the corpus happened to name X and Y
@@ -237,8 +242,10 @@ evolves? · *Trigger*: an N2 entry describes structured persistence
 does it write only after asking? · *Trigger*: always
 - **Form**: "Never a file a tool writes — 🔴 **build output, generated
   sources, lock files, dated migrations, whatever else the tools named
-  in C12 produce.** Ask first: 🔴 **any file a change to which reaches
-  beyond the lot that touches it.**"
+  in C12 produce.**"
+
+  🔴 **"Ask first: any file a change to which reaches beyond the lot
+  that touches it."**
 - **Test**: mechanical on the "never" line — a diff touching one of
   those paths fails.
 
@@ -303,9 +310,10 @@ nature both of them reach
 - **Form**: "**Any** adapter both applications need lives in a shared
   module they both depend on and that depends on neither — **whatever
   it adapts**. 🔴 **If no shared module suits what it adapts, one is
-  added for it**, named for what it holds. **Identical, not merely
-  similar**: one whose behaviour differs between them stays where it is
-  used."
+  added for it**, named for what it holds."
+
+  🔴 **"Identical, not merely similar: one whose behaviour differs
+  between them stays where it is used."**
 - **Test**: mechanical — no two source files of the same name under two
   application modules.
 
@@ -696,9 +704,13 @@ of them has a test? · *Trigger*: an N4 entry names at least one
 
 **G10.6** · *Question*: at what grain do two origins compare? ·
 *Trigger*: N6 non-empty
-- **Form**: "The comparison grain N6 states has a test confronting two
-  origins on `<the grain>`."
+- **Form**: "The comparison grain has a test confronting two origins on
+  it. 🔴 **Wherever the corpus states that grain**, whatever the nature
+  of the entry that states it."
 - **Test**: one test.
+
+⚠️ **N6 says two origins meet; it need not say at what grain.** 📌 **A
+model entry often does.**
 
 **G10.7** · *Question*: G6.6 named the writes that precede a return —
 which of them has an interruption test? · *Trigger*: V10 non-empty
@@ -726,7 +738,10 @@ which of them has an interruption test? · *Trigger*: V10 non-empty
 **G11.3** · *Question*: are user-facing strings keys or literals? ·
 *Trigger*: N10 non-empty
 - **Form**: "No user-facing string is a literal in the code: a key and
-  a table, the key being the one its N10 entry names."
+  a table."
+
+  🔴 **"The key is the one its own N10 entry names — every N10 entry,
+  not one of them."**
 - **Test**: mechanical — literal check outside the resource files.
 
 ---
@@ -747,9 +762,11 @@ which versions? · *Trigger*: always — filled from platform knowledge
 **G12.3** · *Question*: which tools do the rules of this file need? ·
 *Trigger*: a rule written here calls for one
 - **Form**: "The dependency table carries each tool with the rules it
-  serves. 🔴 **A tool serves the rules named against it and no others,
-  and a language, a runtime or a library is never one of them** — a
-  tool runs and reports what it found."
+  serves. 🔴 **A tool serves the rules named against it and no
+  others.**"
+
+  🔴 **"A language, a runtime or a library is never a tool of that
+  table — a tool runs, and reports what it found."**
 - **Test**: mechanical — every tool named in a `Test` field appears in
   the table, against that rule.
 
@@ -785,8 +802,12 @@ is a fact, and a fact worth writing down.
 
 ## What the volume should be
 
-**Sixty-eight entries, of which eight to twelve do not fire on a given
-project.** 📌 **Fifty-six to sixty-one rules written.**
+**Sixty-eight entries, of which five to eight do not fire on a given
+project.** 📌 **Sixty to sixty-five rules written**, plus whatever R3
+allows off-grid.
+
+⚠️ **Measured over eight passes on one corpus** — the earlier figure
+was an estimate, and every pass exceeded it.
 
 ⚠️ **Two places where the budget strains:**
 
