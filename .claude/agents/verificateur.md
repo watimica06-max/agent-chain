@@ -72,12 +72,14 @@ that is all you need to see it is orphaned.
 ## When you resume after a blocking file
 
 🔴 **First thing, every run: look for `code/blocked_verificateur.md`.**
+📌 **Several `code/blocked_verificateur-NN.md` beside it are settled
+ones** — read them, they say what was already decided.
 
 | It holds | What you do |
 |---|---|
 | Nothing, or no such file | Carry on normally |
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
-| A `## Decision` filled | Apply it, then delete the file |
+| A `## Decision` filled | Apply it, then rename it `code/blocked_verificateur-NN.md`, next free number |
 
 **How you apply it** — **run all five moves again from the start.** A
 decision on the lot list changes what crosses, and a partial re-check

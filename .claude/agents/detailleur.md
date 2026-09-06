@@ -88,13 +88,15 @@ turn into signatures.
 ## When you resume after a blocking file
 
 🔴 **First thing, every run: look for
-`code/<lot>/blocked_detailleur.md`, for every lot of your block.**
+`code/<lot>/blocked_detailleur.md`, for every lot of your block.** 📌
+**Several `blocked_detailleur-NN.md` beside it are settled ones** —
+read them, they say what was already decided on this lot.
 
 | It holds | What you do |
 |---|---|
 | Nothing, or no such file | Carry on normally |
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
-| A `## Decision` filled | Apply it, then delete the file |
+| A `## Decision` filled | Apply it, then rename it `blocked_detailleur-NN.md`, next free number |
 
 **How you apply it** — **to the lot `## Where` names**, then derive its
 sheet as usual.

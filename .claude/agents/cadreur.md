@@ -101,13 +101,15 @@ belong to the chain before you.
 
 ## When you resume after a blocking file
 
-🔴 **First thing, every run: look for `code/blocked_cadreur.md`.**
+🔴 **First thing, every run: look for `code/blocked_cadreur.md`.** 📌
+**Several `code/blocked_cadreur-NN.md` beside it are settled ones** —
+read them, they say what was already decided on this split.
 
 | It holds | What you do |
 |---|---|
 | Nothing, or no such file | Carry on normally |
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
-| A `## Decision` filled | Apply it, then delete the file |
+| A `## Decision` filled | Apply it, then rename it `code/blocked_cadreur-NN.md`, next free number |
 
 **How you apply it** — **to the lot or entry `## Where` names**,
 then cut the rest as usual.

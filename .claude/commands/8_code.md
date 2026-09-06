@@ -49,6 +49,10 @@ to resume.
 🔴 **The next lot is the first in the sequence with no `verdict.md`
 carrying PASS.** A read, not a scan — the sequence holds the order.
 
+📌 **No such lot** — every one carries a PASS — 🔴 **go straight to the
+Contrôleur**, then stop. ⚠️ **That is the normal shape of a run
+restarted after a stop on the last lot.**
+
 ⚠️ **If `## Defects` is not empty**, stop: the split was never
 corrected. Run `/7_decoupe` first.
 
@@ -68,15 +72,35 @@ retries maximum per lot**, all FAIL types counted together.
 **`detailleur`** on the block, to rewrite those sheets only. Say which
 lots in the prompt.
 
-**5.** Next lot.
+**5. Look for `stop.md` at the feature folder's root** — 🔴 **from the
+main checkout, never from a worktree**: a worktree holds a copy frozen
+at its creation and would never see a file created after it.
+
+📌 **Present → stop here**, whatever lots remain. **The lot just
+finished is merged and pushed; nothing is lost.** ⚠️ **Say how many
+lots remain and that the stop was asked for** — a stop is not a
+failure.
+
+📌 **Absent → next lot.**
+
+🔴 **`stop1.md` is the disarmed form** — the Product Owner renames it
+to `stop.md` to halt, and back to resume. ⚠️ **Neither being there is
+not an error**: say so and carry on.
 
 **6. At the end of the block** — 🔴 **before the next one, and never
-during** — glob `architecte/`. **A request with an empty `## Verdict`
-→ `architecte`, invocation 3.**
+during** — glob `architecte/`. **Any request with an empty
+`## Verdict` → `architecte`, invocation 3.**
+
+🔴 **One invocation, whatever the number of requests.** ⚠️ **Never one
+per file**: he reads them all before settling any, and two invocations
+would write the conventions file at once.
 
 ⚠️ **Never while a lot is running.** 📌 **The conventions file is what
 every agent of the next block reads**, and two worktrees writing it at
 once lose one of the two.
+
+📌 **A stop at move 5 skips this**, like a block does — the pending
+requests wait for the next run, on the block they belong to.
 
 📌 **No request, or every verdict filled** — carry on without invoking
 anything.
@@ -95,6 +119,10 @@ report an intention as absent.
 
 📌 **When `N` happens to cover the last lots**, he runs before you hand
 back: reaching `N` and finishing the sequence are the same moment.
+
+🔴 **A `stop.md` on the last lot stops before him.** ⚠️ **He reads
+every sheet at once**, and a run halted mid-sequence has none to
+compare — re-running `/8_code` with no lot left invokes him.
 
 ⚠️ **The count is on lots reviewed PASS**, not on invocations: the
 Détailleur runs when a new block starts, without entering the count.
@@ -137,12 +165,44 @@ sequential and each reads what the previous one wrote.
 sits — 📌 **two places**: `code/blocked_<agent>.md` for the Contrôleur,
 `code/<lot>/blocked_<agent>.md` for the other three.
 
+**Before stopping, invoke `arbitre` on it** — 🔴 **except on a
+Relecteur or Contrôleur block**, which says something is missing rather
+than something to settle.
+
+    Agent(
+      subagent_type="arbitre",
+      model="opus",
+      description="Settle <lot>",
+      prompt="Working folder: <the working folder>.
+              Blocking files: <their paths in it>."
+    )
+
+📌 **Several blocks at once** — 🔴 **one invocation, naming them all.**
+⚠️ **Never one per file**: blocks raised together often carry one
+cause, and an Arbitre seeing only one settles it too narrowly.
+
+📌 **`## Decision` filled** → run the agent it names again, on the lot
+it names, **at the move it blocked on** — a Détailleur block returns to
+move 1, a Réalisateur block to move 2. ⚠️ **The relaunch does not count
+as a retry**: the lot never failed, it stopped.
+
+📌 **Still empty** → relay it and stop.
+
+🔴 **When you stop on a block, move 6 has not run** — the pending
+requests wait for the next `/8_code`, on the block they belong to. ⚠️
+**Do not invoke `architecte` on a block that did not finish**: its
+lots may still change.
+
+🔴 **One pass per block.** A block the Arbitre handed back does not go
+to it twice — even when a later block on the same lot does.
+
 📌 **A filled `## Decision` is not a stop** — invoke the agent it names
 on the lot it names, and let it apply the decision. ⚠️ **Even on a lot
 already carrying a PASS**: the Contrôleur reports missing intentions
 after every lot is reviewed, and a block is how they come back.
 
-🔴 **A lot fails three times.**
+🔴 **A lot fails three times.** 📌 **Look for `stop.md` then too** —
+say it was asked for, alongside the failure.
 
 🔴 **`N` lots have been reviewed PASS.**
 
@@ -197,5 +257,9 @@ carry on.
 
 **Which lots passed, and where the run stopped.** 🔴 **Nothing else is
 yours** — no judgement on the code, no re-reading of a verdict.
+
+**If you stopped on `stop.md`**: say so, and how many lots of the block
+remain. 🔴 **Re-running `/8_code` picks up where you left off** — the
+lots already carrying a PASS are not redone.
 
 **If an agent returns a `blocked_*.md`**: relay it and stop.

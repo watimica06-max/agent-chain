@@ -56,13 +56,15 @@ the sequence — the sheet is the reference.
 
 ## When you resume after a blocking file
 
-🔴 **First thing, every run: look for `code/<lot>/blocked_relecteur.md`.**
+🔴 **First thing, every run: look for
+`code/<lot>/blocked_relecteur.md`.** 📌 **Several
+`blocked_relecteur-NN.md` beside it are settled ones.**
 
 | It holds | What you do |
 |---|---|
 | Nothing, or no such file | Carry on normally |
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
-| A `## Decision` filled | Apply it, then delete the file |
+| A `## Decision` filled | Apply it, then rename it `blocked_relecteur-NN.md`, next free number |
 
 **How you apply it** — **then run the five checks from the start.**
 

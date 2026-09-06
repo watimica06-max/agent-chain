@@ -82,12 +82,14 @@ check the result of those transformations, not the transformations.
 ## When you resume after a blocking file
 
 🔴 **First thing, every run: look for `code/blocked_controleur.md`.**
+📌 **Several `code/blocked_controleur-NN.md` beside it are settled
+ones.**
 
 | It holds | What you do |
 |---|---|
 | Nothing, or no such file | Carry on normally |
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
-| A `## Decision` filled | Apply it, then delete the file |
+| A `## Decision` filled | Apply it, then rename it `code/blocked_controleur-NN.md`, next free number |
 
 **How you apply it** — **to the block `## Where` names**, then confront
 the rest as usual.

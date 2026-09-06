@@ -53,8 +53,15 @@ together**, the conventions fall short of what the split needs:
 **invoke `architecte`, invocation 3**, then run `cadreur` again. ⚠️
 **The blocking file goes; the request stays with its verdict.**
 
+📌 **That block goes to the Architecte, never to the Arbitre** — a
+missing convention is settled where conventions are written.
+
 📌 **If `architecte` blocks in turn** — `blocked_architecte.md` —
-**stop.** The Product Owner settles it.
+**stop.** 🔴 **The Arbitre does not settle it either**: it asks for a
+rule nobody has written.
+
+🔴 **A `blocked_cadreur.md` alone, with no request beside it**, goes to
+the Arbitre — see *What you relay*.
 
 📌 **A request written without a blocking file changes nothing here** —
 the Cadreur cut against the conventions as they stand, and the request
@@ -67,10 +74,20 @@ waits for the end of the run.
 | It holds | What you do |
 |---|---|
 | Nothing | 🔴 **The split holds.** If `architecte/` holds a request with an empty `## Verdict`, invoke `architecte`, invocation 3. Then stop and report |
+| Defects, third round | 📌 **See below** — the Arbitre first, then the requests |
 | Defects | Back to `cadreur`, then `verificateur` again |
 
 🔴 **Three rounds maximum.** On the third round still carrying defects,
-**write `code/blocked_verificateur.md`**, then stop.
+**write `code/blocked_verificateur.md`**, then invoke `arbitre` on it —
+see *What you relay*.
+
+📌 **Settled** → run `cadreur` again with it, then `verificateur`, and
+this is the last round. **Handed back** → 🔴 **then invoke `architecte`
+on any pending request**, and stop.
+
+⚠️ **The Arbitre comes first**: a settled block means the split moves
+again, and a request written on a split that is about to change is
+worth less than one written on a split that holds.
 
 | Heading | What goes in |
 |---|---|
@@ -170,4 +187,23 @@ defect left. 🔴 **Nothing else is yours** — no risk level, no
 `TaskCreate`, no judgement on the split itself, and no reading of git
 history to explain what a run found.
 
-**If an agent returns a `blocked_*.md`**: relay it and stop.
+**If an agent returns a `blocked_*.md`** — 🔴 **invoke `arbitre` on it
+before stopping.** 📌 **There is only ever one here**: this command
+splits, and a block bears on the split as a whole.
+
+    Agent(
+      subagent_type="arbitre",
+      model="opus",
+      description="Settle <lot or split>",
+      prompt="Working folder: <the working folder>.
+              Blocking files: <their paths in it>."
+    )
+
+📌 **`## Decision` filled** → run the agent it names again, which reads
+it, applies it and archives the file. **Then carry on where you were.**
+
+📌 **Still empty, or saying it is not settled there** → relay it and
+stop. ⚠️ **The Arbitre wrote why** — relay that too.
+
+🔴 **One pass per block.** A block the Arbitre handed back is the
+Product Owner's; do not send it again.

@@ -83,12 +83,13 @@ alone.**
 ## When you resume after a blocking file
 
 🔴 **Look for `blocked_architecte.md` in the working folder before
-anything else.**
+anything else.** 📌 **Several `blocked_architecte-NN.md` beside it are
+settled ones.**
 
 | Its `## Decision` | What you do |
 |---|---|
 | Empty | 🔴 **Write it again unchanged and stop** |
-| Filled | **Apply it, delete the file, carry on** |
+| Filled | **Apply it, rename it `blocked_architecte-NN.md`, carry on** |
 
 ---
 

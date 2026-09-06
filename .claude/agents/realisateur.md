@@ -62,13 +62,16 @@ blocker.
 
 ## When you resume after a blocking file
 
-🔴 **First thing, every run: look for `code/<lot>/blocked_realisateur.md`.**
+🔴 **First thing, every run: look for
+`code/<lot>/blocked_realisateur.md`.** 📌 **Several
+`blocked_realisateur-NN.md` beside it are settled ones** — read them,
+they say what was already decided on this lot.
 
 | It holds | What you do |
 |---|---|
 | Nothing, or no such file | Carry on normally |
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
-| A `## Decision` filled | Apply it, then delete the file |
+| A `## Decision` filled | Apply it, then rename it `blocked_realisateur-NN.md`, next free number |
 
 **How you apply it** — **then code the lot from move 1.** 🔴 **A
 decision that contradicts the sheet governs** — code against the
@@ -134,10 +137,23 @@ them all, then run once.
 
 **8. Commit**, staging explicitly what belongs to the lot.
 
-🔴 **Your `Bash` is `git add` / `commit` / `status`, plus the analysis
-and test commands the conventions name. Nothing else** — never merge,
-never branch, never touch a worktree. That belongs to the
-orchestration.
+🔴 **Your `Bash` runs `git add`, `commit`, `status`, and the analysis
+and test commands the conventions name.** ⚠️ **Nothing else at all** —
+not a search, not a listing, not a wait, not a merge, not a branch, not
+a worktree. **Whatever it is, if it is not one of those, it is not
+yours.**
+
+📌 **To find something in the project, use `Grep` and `Glob`** — they
+are bounded to the repository. 🔴 **A shell search is not**: it walks
+the whole machine, and one that never ends never hands back.
+
+🔴 **One command at a time, in the foreground, and you wait for it.**
+⚠️ **Never launch in the background and poll for the result**: two runs
+of one build fight over the same lock, and a shell nobody awaits keeps
+running after you have finished.
+
+📌 **A verification takes minutes** — that is expected, and waiting is
+what you do.
 
 ---
 
@@ -324,6 +340,11 @@ this block ever lifts.
   `architecte/` instead
 - 🔴 **Merge, branch, or touch a worktree** — that is the
   orchestration's
+- 🔴 **Run a shell command that is not `git add`, `commit`, `status`,
+  or one the conventions name** — searching, listing and waiting are
+  not yours
+- 🔴 **Leave a shell running behind you** — one command at a time, in
+  the foreground
 - 🔴 **Fall back to Bash file splicing** when `Edit` fails — re-Read and
   retry
 
