@@ -57,6 +57,12 @@ both.** ⚠️ **The clause a rule loses is almost always the last one of
 its form** — a second pair of quotes is what keeps it from reading as a
 tail.
 
+**R7 — A rule that narrows another is written in both.** 🔴 **The
+narrow one names the broad one, and the broad one names the narrow one
+back.** ⚠️ **An agent reads the broad rule, finds its case, and
+stops** — 📌 **a restriction it never reaches is a restriction that does
+not exist.**
+
 ---
 
 # Part A — Readings

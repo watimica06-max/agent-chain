@@ -122,10 +122,11 @@ Agent(
 `Agent` in `tools` — 🔴 **measured, not assumed**: it keeps its context
 across the call and carries on afterwards.
 
-⚠️ **Almost none of them may.** 📌 **Two do, and only within the
-dialogue their files describe**: the `realisateur` calls the `arbitre`,
-and the `arbitre` calls the `architecte`. 🔴 **Everything else routes
-through you.**
+⚠️ **Most of them may not.** 📌 **Four do, and only within the
+dialogue their files describe**: the `cadreur` calls the
+`verificateur`, the `detailleur` and the `realisateur` call the
+`arbitre`, and the `arbitre` calls the `architecte`. 🔴 **Everything
+else routes through you.**
 
 ⚠️ **An agent waiting on another agent waits without bound** — 📌 no
 polling, no timeout. **Only a wait on the Product Owner is polled**,
