@@ -95,6 +95,15 @@ during** — glob `architecte/`. **Any request with an empty
 per file**: he reads them all before settling any, and two invocations
 would write the conventions file at once.
 
+```
+Agent(
+  subagent_type="architecte",
+  model="opus",
+  description="Requests <the working folder>",
+  prompt="Working folder: <the working folder>. Invocation 3 — Requests."
+)
+```
+
 ⚠️ **Never while a lot is running.** 📌 **The conventions file is what
 every agent of the next block reads**, and two worktrees writing it at
 once lose one of the two.

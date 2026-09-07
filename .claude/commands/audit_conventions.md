@@ -35,13 +35,25 @@ again once it carries a verdict.
 
 **`docs/TECHNICAL_CONVENTIONS.md`** — 🔴 **in full.**
 
-**`couverture.md`**, if it is there — which entry each rule came from.
+**`couverture.md`** — which entry each rule came from.
 
-🔴 **Without it, findings 1, 4 and 6 cannot be made.** ⚠️ **Say so under
-each of their headings** — *no coverage file* — and make the others.
+🔴 **On a correction cycle it is not in the working folder**: the
+Architecte writes it when it derives the conventions, and that runs on
+the feature folder. ⚠️ **Look for it one level up**, at the feature
+folder's root, and use it from there.
+
+📌 **The rules it traces still hold** — the conventions file is shared
+by the whole project, feature cycles and correction cycles alike.
+
+⚠️ **Absent from both** — 🔴 **findings 1, 4 and 6 cannot be made.**
+**Say so under each of their headings** — *no coverage file* — and make
+the others.
 
 **The technical document** — 🔴 **only the entries `couverture.md`
-names**, one at a time, for finding 4.
+names**, one at a time, for finding 4. 📌 **The one those entries live
+in**: `couverture.md` traces to the document it was written against,
+which may be the feature's `spec-technique.md` rather than this cycle's
+`desc-bug.md`.
 
 **`code/decoupage.md`** — 📌 **for finding 6 alone**, its lots'
 `Anchor` lines.

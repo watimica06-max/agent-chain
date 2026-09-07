@@ -56,6 +56,17 @@ together**, the conventions fall short of what the split needs:
 📌 **That block goes to the Architecte, never to the Arbitre** — a
 missing convention is settled where conventions are written.
 
+```
+Agent(
+  subagent_type="architecte",
+  model="opus",
+  description="Requests <the working folder>",
+  prompt="Working folder: <the working folder>. Invocation 3 — Requests."
+)
+```
+
+🔴 **The same call wherever this command invokes `architecte`.**
+
 📌 **If `architecte` blocks in turn** — `blocked_architecte.md` —
 **stop.** 🔴 **The Arbitre does not settle it either**: it asks for a
 rule nobody has written.

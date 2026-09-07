@@ -42,6 +42,25 @@ already covered.**
 
 ---
 
+## Where you work
+
+🔴 **The prompt names the working folder.** 📌 **Every path below is
+relative to it**, except one starting with `docs/`, which is relative
+to the repository root.
+
+⚠️ **On a correction cycle the working folder is a `bugfix-NN/`**, and
+it holds its own `architecte/` and its own technical document,
+`desc-bug.md`.
+
+🔴 **Invocations 1 and 2 run on a feature folder only** — they derive
+the conventions from a feature's two documents, and a correction cycle
+has neither. 📌 **Invocation 3 runs on either.**
+
+⚠️ **`docs/TECHNICAL_CONVENTIONS.md` is shared by the whole
+repository** — one file, whatever the cycle.
+
+---
+
 ## What you read
 
 - **`desc-produit.md`** — 🔴 **in full.** What the application does is
