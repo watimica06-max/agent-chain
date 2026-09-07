@@ -65,6 +65,10 @@ block.
 
 **2.** **`realisateur`** → **`relecteur`**.
 
+📌 **If `code/<lot>/reprise_realisateur.md` is there**, 🔴 **name it in
+the Réalisateur's prompt**: a run before it got part of the lot done
+and wrote what it left. ⚠️ **Without it, it starts the lot again.**
+
 **3.** On FAIL → a **fresh `realisateur`**, with the verdict. 🔴 **Three
 retries maximum per lot**, all FAIL types counted together.
 
@@ -87,13 +91,20 @@ failure.
 to `stop.md` to halt, and back to resume. ⚠️ **Neither being there is
 not an error**: say so and carry on.
 
-**6. At the end of the block** — 🔴 **before the next one, and never
-during** — glob `architecte/`. **Any request with an empty
+**6. At the end of the lot** — 🔴 **before the next one, and never
+while one runs** — glob `architecte/`. **Any request with an empty
 `## Verdict` → `architecte`, invocation 3.**
+
+🔴 **At the end of the lot, not of the block.** ⚠️ **A rule settled a
+block late is settled after every lot it should have governed** — 📌
+**this way the next lot has it.**
 
 🔴 **One invocation, whatever the number of requests.** ⚠️ **Never one
 per file**: he reads them all before settling any, and two invocations
 would write the conventions file at once.
+
+📌 **A request the Arbitre raised mid-lot is already settled** — its
+`## Verdict` is filled, and this move skips it.
 
 ```
 Agent(
@@ -168,42 +179,65 @@ sequential and each reads what the previous one wrote.
 
 ---
 
+## When the split comes back
+
+🔴 **A Détailleur's or a Réalisateur's `## Decision` sends the lot back
+to the split.** 📌 **The Arbitre wrote `code/redecoupage.md`**, and the
+agent stopped — ⚠️ **the Détailleur without writing a sheet, the
+Réalisateur after dropping its code.**
+
+**Run `/7_decoupe` on this working folder**, and wait for it. ⚠️ **Then
+carry on your loop** — 📌 **you do not hand back, and the Product Owner
+is not waiting on anything.**
+
+🔴 **Where you carry on from is the same rule as always**: the first
+lot in the sequence with no `verdict.md` carrying PASS. ⚠️ **The split
+changed, the coded lots did not** — their verdicts are still there, and
+they are still behind.
+
+📌 **Your count of lots carries on too** — 🔴 **it does not restart.**
+`N` counts lots reviewed PASS in this run, and a redécoupage reviewed
+none.
+
+🔴 **The sheets of every lot that is not coded are stale** — ⚠️ **they
+were written against the old split.** 📌 **Delete them**, in
+`code/<lot>/fiche-executable.md`, for every lot with no `verdict.md`
+carrying PASS.
+
+⚠️ **Move 1 writes them again** — 🔴 **a Détailleur that finds a sheet
+does not rewrite it**, and would detail against a lot that changed
+shape.
+
+⚠️ **If `/7_decoupe` stops on a defect or a block**, 🔴 **stop too** —
+relay what it said. **There is no split to code against.**
+
+---
+
 ## Where you stop and hand back
 
 🔴 **A `blocked_*.md` whose `## Decision` is still empty**, wherever it
 sits — 📌 **two places**: `code/blocked_<agent>.md` for the Contrôleur,
 `code/<lot>/blocked_<agent>.md` for the other three.
 
-**Before stopping, invoke `arbitre` on it** — 🔴 **except on a
-Relecteur or Contrôleur block**, which says something is missing rather
-than something to settle.
+🔴 **You never invoke the Arbitre.** 📌 **The Détailleur and the
+Réalisateur call it themselves**, wait for it, and only stop when the
+field came back empty. ⚠️ **A block that reaches you has already been
+through it** — sending it again would ask twice.
 
-    Agent(
-      subagent_type="arbitre",
-      model="opus",
-      description="Settle <lot>",
-      prompt="Working folder: <the working folder>.
-              Blocking files: <their paths in it>."
-    )
+📌 **The Relecteur and the Contrôleur do not call it either** — 🔴 their
+blocks say something is missing, not something to settle.
 
-📌 **Several blocks at once** — 🔴 **one invocation, naming them all.**
-⚠️ **Never one per file**: blocks raised together often carry one
-cause, and an Arbitre seeing only one settles it too narrowly.
+⚠️ **Unless a Détailleur's or a Réalisateur's `## Decision` sends the
+lot back to the split.** 🔴 **That is not a stop** — see *When the
+split comes back*.
 
-📌 **`## Decision` filled** → run the agent it names again, on the lot
-it names, **at the move it blocked on** — a Détailleur block returns to
-move 1, a Réalisateur block to move 2. ⚠️ **The relaunch does not count
-as a retry**: the lot never failed, it stopped.
+📌 **Any other block** → relay it and stop. 🔴 **The Product Owner
+fills `## Decision`**, and the next `/8_code` picks it up.
 
-📌 **Still empty** → relay it and stop.
-
-🔴 **When you stop on a block, move 6 has not run** — the pending
-requests wait for the next `/8_code`, on the block they belong to. ⚠️
-**Do not invoke `architecte` on a block that did not finish**: its
-lots may still change.
-
-🔴 **One pass per block.** A block the Arbitre handed back does not go
-to it twice — even when a later block on the same lot does.
+🔴 **When you stop on a block, move 6 has not run** — 📌 **a request
+waiting in `architecte/` waits for the next `/8_code`.** ⚠️ **Do not
+invoke `architecte` on a lot that did not finish**: what it asks for
+may change with the decision.
 
 📌 **A filled `## Decision` is not a stop** — invoke the agent it names
 on the lot it names, and let it apply the decision. ⚠️ **Even on a lot

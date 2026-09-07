@@ -6,8 +6,9 @@ argument-hint: "<feature folder name>"
 
 Act as the orchestrator, in **downstream splitting mode**.
 
-**This command runs `cadreur`, then `verificateur`, until the split
-holds.**
+**This command runs `cadreur`, once.** 🔴 **It calls the Vérificateur
+itself**, corrects what it reports, and calls it again — ⚠️ **three
+rounds at most, which it counts.**
 
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
@@ -46,15 +47,48 @@ command is the trigger, never the state of the folder.**
 means the Product Owner wants a new one; diagnosing why it went
 missing is not your call.
 
-**1. `cadreur`** — produces `code/decoupage.md`.
+🔴 **Unless `code/redecoupage.md` is there.** 📌 **Then coding sent the
+split back**, and lots are already coded and merged — ⚠️ **overwriting
+their entries would describe something that is not in the tree.**
 
-🔴 **If it wrote `blocked_cadreur.md` and `architecte/cadreur.md`
-together**, the conventions fall short of what the split needs:
-**invoke `architecte`, invocation 3**, then run `cadreur` again. ⚠️
-**The blocking file goes; the request stays with its verdict.**
+**Say so in the prompt of both agents**, and name the file:
 
-📌 **That block goes to the Architecte, never to the Arbitre** — a
-missing convention is settled where conventions are written.
+    A code/redecoupage.md is present: coding sent the split back.
+    Read it before anything else.
+
+📌 **They know what to do with it** — the Cadreur leaves the coded lots
+closed and adds lots for what has to change, the Vérificateur keeps
+them where they ran and archives the file when the sequence is
+written.
+
+**One invocation: `cadreur`.** 🔴 **It calls the Vérificateur itself**,
+reads the defects, corrects, and calls it again — 📌 **three rounds at
+most, which it counts.**
+
+⚠️ **You do not run `verificateur`** — 🔴 **and you do not loop.** 📌
+**You invoke the Cadreur once and read what comes back.**
+
+**When it hands back**, look at what is on disk:
+
+| What you find | What you do |
+|---|---|
+| `code/sequence.md`, no `## Defects` | 🔴 **The split holds.** See *the pending requests*, then stop and report |
+| `code/blocked_cadreur.md` **and** `architecte/cadreur.md` | 📌 **The conventions fall short**: invoke `architecte`, invocation 3, then invoke `cadreur` again |
+| `code/blocked_cadreur.md` alone | 🔴 **Stop.** Relay it — the Product Owner fills `## Decision`, and the Cadreur reads it on its next run |
+| `code/blocked_verificateur.md` | 🔴 **Stop.** There was nothing to check |
+
+📌 **A `blocked_cadreur.md` at the third round** names what would not
+converge. ⚠️ **That is not a failure of the command** — 🔴 the split
+does not converge, and the Product Owner decides.
+
+### The pending requests
+
+📌 **Once the split holds**, glob `architecte/`. **Any request with an
+empty `## Verdict`** → `architecte`, invocation 3.
+
+🔴 **One invocation, whatever their number.** ⚠️ **Then stop** — the
+conventions changed after the split was cut, and `/8_code` runs against
+both.
 
 ```
 Agent(
@@ -65,51 +99,14 @@ Agent(
 )
 ```
 
-🔴 **The same call wherever this command invokes `architecte`.**
-
 📌 **If `architecte` blocks in turn** — `blocked_architecte.md` —
-**stop.** 🔴 **The Arbitre does not settle it either**: it asks for a
-rule nobody has written.
+**stop.** 🔴 **It asks for a rule nobody has written.**
 
-🔴 **A `blocked_cadreur.md` alone, with no request beside it**, goes to
-the Arbitre — see *What you relay*.
-
-📌 **A request written without a blocking file changes nothing here** —
-the Cadreur cut against the conventions as they stand, and the request
-waits for the end of the run.
-
-**2. `verificateur`** — produces `code/sequence.md`.
-
-**3. Read its `## Defects` section.**
-
-| It holds | What you do |
-|---|---|
-| Nothing | 🔴 **The split holds.** If `architecte/` holds a request with an empty `## Verdict`, invoke `architecte`, invocation 3. Then stop and report |
-| Defects, third round | 📌 **See below** — the Arbitre first, then the requests |
-| Defects | Back to `cadreur`, then `verificateur` again |
-
-🔴 **Three rounds maximum.** On the third round still carrying defects,
-**write `code/blocked_verificateur.md`**, then invoke `arbitre` on it —
-see *What you relay*.
-
-📌 **Settled** → run `cadreur` again with it, then `verificateur`, and
-this is the last round. **Handed back** → 🔴 **then invoke `architecte`
-on any pending request**, and stop.
-
-⚠️ **The Arbitre comes first**: a settled block means the split moves
-again, and a request written on a split that is about to change is
-worth less than one written on a split that holds.
-
-| Heading | What goes in |
-|---|---|
-| `## What blocks` | The defects still standing, and what each agent held to across the rounds |
-| `## Where` | The lots and the entries they cite |
-| `## To resume` | What the Product Owner has to settle |
-| `## Decision` | 🔴 **Left empty** |
-
-⚠️ **A report in the console is lost; a file is not.** 📌 **The
-Cadreur reads it on his next run** — a filled `## Decision` is a split
-instruction.
+⚠️ **You never invoke the Arbitre here.** 📌 **What the Cadreur and the
+Vérificateur block on is mechanical** — a missing document, an
+unreadable list, a convention that forbids what a lot needs. 🔴 **None
+of it is settled by looking at the corpus**, and the last one goes to
+the Architecte.
 
 🔴 **Never paraphrase an agent's process in your invocation** — not its
 inputs, its checks, its output format. It reads its own instructions.
@@ -123,23 +120,28 @@ Agent(
   description="Split <feature>",
   prompt="Working folder: <the working folder>."
 )
+```
 
 🔴 **Pass the working folder, never the feature folder.** On a bug-fix
 cycle they differ, and the agent would read the wrong one.
-```
 
-📌 **`cadreur` and `verificateur` run on `opus`** — they decide the
-whole structure, and an error here spreads to every lot.
+📌 **`cadreur` runs on `opus`** — it decides the whole structure, and
+an error here spreads to every lot. ⚠️ **You never invoke
+`verificateur`**: the Cadreur does, with the model its own frontmatter
+names.
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
 either** — in this environment the Agent tool always runs async and
 notifies on completion. Do not pass it; wait for the notification.
 
-❌ **Never pass `isolation`** — the two phases are sequential and the
-second reads what the first wrote.
+❌ **Never pass `isolation`** — 📌 **the Cadreur keeps its context
+across the rounds**, and branching would cut it from what it just
+cut.
 
-📌 **On a take-back, say so in the prompt**: `"Feature folder: … . The
-Vérificateur reported defects in code/sequence.md."`
+📌 **The Cadreur finds by itself what brought it back** — a
+`## Defects` section, or a `code/redecoupage.md`. 🔴 **Say nothing about
+it in the prompt**: it reads its own instructions, and a paraphrase
+would compete with them.
 
 ---
 
@@ -198,23 +200,10 @@ defect left. 🔴 **Nothing else is yours** — no risk level, no
 `TaskCreate`, no judgement on the split itself, and no reading of git
 history to explain what a run found.
 
-**If an agent returns a `blocked_*.md`** — 🔴 **invoke `arbitre` on it
-before stopping.** 📌 **There is only ever one here**: this command
-splits, and a block bears on the split as a whole.
+**If an agent returns a `blocked_*.md`**: 🔴 **relay it and stop**,
+naming the file. 📌 **The Product Owner fills `## Decision`**, and the
+Cadreur reads it on its next run.
 
-    Agent(
-      subagent_type="arbitre",
-      model="opus",
-      description="Settle <lot or split>",
-      prompt="Working folder: <the working folder>.
-              Blocking files: <their paths in it>."
-    )
-
-📌 **`## Decision` filled** → run the agent it names again, which reads
-it, applies it and archives the file. **Then carry on where you were.**
-
-📌 **Still empty, or saying it is not settled there** → relay it and
-stop. ⚠️ **The Arbitre wrote why** — relay that too.
-
-🔴 **One pass per block.** A block the Arbitre handed back is the
-Product Owner's; do not send it again.
+⚠️ **Except a `blocked_cadreur.md` with an `architecte/cadreur.md`
+beside it** — 📌 that one goes to the Architecte, and the Cadreur runs
+again.

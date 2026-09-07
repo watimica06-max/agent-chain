@@ -66,6 +66,14 @@ the sequence — the sheet is the reference.
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
 | A `## Decision` filled | Apply it, then rename it `blocked_relecteur-NN.md`, next free number |
 
+🔴 **Renaming means renaming** — ⚠️ **`git mv`, or the equivalent**:
+one file, under a new name. 📌 **Never write the numbered one and leave
+something at the old name** — not a copy, not a note, not an empty
+file.
+
+⚠️ **Anything left at the unnumbered name reads as a block still
+standing**, and the next run treats it as one.
+
 **How you apply it** — **then run the five checks from the start.**
 
 🔴 **Delete the file once applied.** A blocking file left behind would
@@ -115,6 +123,28 @@ and tests passed, `## State` names what went into the state document,
 `## Requests` names the conventions requests the lot wrote, or a
 dash.** ⚠️ **A missing field is a divergence** — the report is the only
 trace the orchestration keeps of the lot.
+
+🔴 **What the lot has to show is its own module's check, green.** ⚠️
+**Its own** — the module the sheet's symbols live in.
+
+📌 **Another module red is a case a convention covers**, and the report
+names which. 🔴 **Read that rule before accepting it**, and check it
+says what the report claims — ⚠️ **a rule that allows a red build
+elsewhere does not allow the lot's own module to stay red.**
+
+🔴 **The lot's own module not compiling, or its tests not running, is a
+`FAIL structurel`** — 📌 **whatever reason the report gives.** ⚠️ **Its
+code was never executed and its tests were never a test**: the lot has
+demonstrated nothing, and a targeted fix would demonstrate nothing
+either.
+
+🔴 **`## Outside the lot` names every file the lot touched that its
+sheet does not declare, or a dash.** ⚠️ **Check it against the diff**:
+a file changed and not named there is a change nobody can attribute.
+
+📌 **You do not judge whether the lot was right to touch it** — a
+decision may have authorised it, or it could not compile otherwise.
+🔴 **You check it is named.**
 
 📌 **The sheet carries a `## Requests` field too** — the Détailleur
 leaves no report, and that field is his only trace. 🔴 **Missing there
@@ -172,11 +202,15 @@ the accumulated causes.
 
 ## What you write
 
-**`code/<lot>/verdict.md`** — three fields:
+**`code/<lot>/verdict.md`** — four fields:
 
     ## Status
 
     FAIL mineur
+
+    ## Verified
+
+    :core-domain:check green, 47 tests
 
     ## Cause
 
@@ -186,6 +220,14 @@ the accumulated causes.
 
     ActivityReconciliationService.reconcile — returns bool, sheet says
     ReconciliationResult — affects lot-04, which consumes it
+
+🔴 **`## Verified` copies what `## Build` claims**, in one line: which
+command ran green, and how many tests.
+
+⚠️ **It did not run, or it ran red** — 📌 **say that instead**, and the
+status is `FAIL structurel`. 🔴 **Never leave the field empty**: an
+empty one reads as *nobody looked at the build*, and that is how a lot
+whose module never compiled passes.
 
 **Structure**: one item per line — greppable for aggregation.
 **Absent by construction**: no restatement of the lot, no narrative of

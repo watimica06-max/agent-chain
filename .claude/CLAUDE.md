@@ -101,7 +101,7 @@ rejected, not ignored:
 |---|---|
 | `prompt` | The full instructions |
 | `description` | 3-5 words, for context tracking |
-| `subagent_type` | `analyste` · `convertisseur` · `fusionneur` · `diagnostiqueur` · `extracteur` · `cadreur` · `verificateur` · `detailleur` · `realisateur` · `relecteur` · `controleur` |
+| `subagent_type` | `analyste` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `extracteur` · `cadreur` · `verificateur` · `detailleur` · `realisateur` · `relecteur` · `controleur` · `arbitre` |
 | `model` | `sonnet` · `opus` — the agent's frontmatter says which |
 | `isolation` | ❌ **Never pass it.** It is concurrency isolation: each call would branch fresh and could not see what the previous phase wrote. Our phases are strictly sequential. |
 | `run_in_background` | ⚠️ **May not exist.** In this environment the tool always runs async and notifies on completion — do not pass it, wait for the notification |
@@ -118,7 +118,22 @@ Agent(
 )
 ```
 
-📌 Subagents cannot spawn agents: everything routes through you.
+📌 **A subagent can spawn an agent** when its own frontmatter carries
+`Agent` in `tools` — 🔴 **measured, not assumed**: it keeps its context
+across the call and carries on afterwards.
+
+⚠️ **Almost none of them may.** 📌 **Two do, and only within the
+dialogue their files describe**: the `realisateur` calls the `arbitre`,
+and the `arbitre` calls the `architecte`. 🔴 **Everything else routes
+through you.**
+
+⚠️ **An agent waiting on another agent waits without bound** — 📌 no
+polling, no timeout. **Only a wait on the Product Owner is polled**,
+and only the `arbitre` does it.
+
+🔴 **The agent registry is fixed at session start.** ⚠️ **A file added
+or renamed under `.claude/agents/` is invisible until the session is
+restarted.**
 
 ---
 

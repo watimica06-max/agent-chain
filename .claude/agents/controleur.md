@@ -91,6 +91,14 @@ ones.**
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
 | A `## Decision` filled | Apply it, then rename it `code/blocked_controleur-NN.md`, next free number |
 
+🔴 **Renaming means renaming** — ⚠️ **`git mv`, or the equivalent**:
+one file, under a new name. 📌 **Never write the numbered one and leave
+something at the old name** — not a copy, not a note, not an empty
+file.
+
+⚠️ **Anything left at the unnumbered name reads as a block still
+standing**, and the next run treats it as one.
+
 **How you apply it** — **to the block `## Where` names**, then confront
 the rest as usual.
 
