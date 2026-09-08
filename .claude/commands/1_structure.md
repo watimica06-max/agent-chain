@@ -6,7 +6,7 @@ argument-hint: "<feature folder name>"
 
 Act as the orchestrator, in **upstream mode**.
 
-**This command invokes `analyste`, invocation 1 — Structuring.**
+**This command invokes `redacteur`, invocation 1 — Structuring.**
 
 📌 **It runs as many times as needed.** With no questions file it reads
 `idees.md`; with one, it integrates the answers instead.
@@ -40,8 +40,12 @@ and which invocation it is — and nothing else.
 previous version is stale — a targeted update on that technical
 document would patch a file that no longer matches.
 
-📌 **No `NEW`, nothing to delete.** An answer that only sharpened a
-sentence leaves both valid, and the cycle can return straight to
+📌 **`MODIFIED` alone does not trigger this.** ⚠️ **A block that changed
+still exists under the same identifier**, and a targeted update reaches
+it.
+
+📌 **Neither marker, nothing to delete.** An answer that only sharpened
+a sentence leaves both valid, and the cycle can return straight to
 `/3_reclasse` or `/4_convertit`.
 
 **Say which files you deleted**, or that none needed it.

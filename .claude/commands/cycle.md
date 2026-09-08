@@ -58,7 +58,7 @@ on.**
 
 | State | Test |
 |---|---|
-| **Empty** | No `### Q` line at all — 📌 the closing `## Questions set aside` section does not count |
+| **Empty** | No `### Q` line at all |
 | **Answered** | Every `Answer:` carries text |
 | **Integrated** | At least one entry carries `[integrated:` |
 
@@ -83,14 +83,14 @@ of them was never filed.
 | 4 | A cycle agent's `blocked_*` with `## Decision` empty | **STOP** — the decision is still to write |
 | 5 | The latest questions file has an empty `Answer:` | **STOP** — questions are waiting |
 | 6a | Latest is integrated **and** `NEW` is present | `/2_grille` |
-| 6b | Latest is integrated, prefix `analyste` | `/2_grille` |
+| 6b | Latest is integrated, prefix `redacteur` | `/2_grille` |
 | 6c | Latest is integrated, other prefix, no `NEW` | `/3_reclasse` if no `spec-technique.md`, else `/4_convertit` |
-| 7 | A cycle agent's `blocked_*` with `## Decision` filled | `analyste` → `/1_structure` · `convertisseur` → `/3` or `/4` on `spec-technique.md` · `cadreur` or `verificateur` → `/7_decoupe` |
+| 7 | A cycle agent's `blocked_*` with `## Decision` filled | `redacteur` → `/1_structure` · a `sondeur-*` → `/2_grille` · `convertisseur` → `/3` or `/4` on `spec-technique.md` · `cadreur` or `verificateur` → `/7_decoupe` |
 | 8 | Latest is answered, not integrated | `/1_structure` |
 | 9 | `<<ASSUMED` in `spec-technique.md` | `/4_convertit` |
 | 10 | `code/sequence.md` carries defects | 🔴 **STOP** — the split is not converging |
 | 11 | `code/sequence.md` is clean | 🔴 **STOP** — run `/8_code` |
-| 12 | Latest is empty | `analyste` → `/3_reclasse` · `convertisseur` → `/4_convertit` if no `spec-technique.md`, else `/7_decoupe` |
+| 12 | Latest is empty | `sondeur` → `/3_reclasse` · `convertisseur` → `/4_convertit` if no `spec-technique.md`, else `/7_decoupe` |
 | 13 | `spec-technique.md`, no questions file | `/7_decoupe` |
 | 14 | `desc-par-nature.md`, no questions file | `/4_convertit` |
 | 15 | `desc-produit.md`, no questions file | `/2_grille` |

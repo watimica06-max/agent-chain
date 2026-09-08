@@ -75,8 +75,12 @@ value is stored, which of several items goes first, what a unit is.
 
 ## Nothing dropped
 
-**Read the product file again, block by block: is everything it
-enumerates somewhere in an entry?**
+**Read the product file again, block by block, sentence by sentence:
+is everything each sentence states somewhere in an entry?**
+
+🔴 **The unit is the sentence, not the list.** ⚠️ **A sentence
+enumerating nothing is dropped as easily as a member of a set** — and
+nothing counts it missing.
 
 🔴 **Naming a set erases its members.** *"A relative-date template"*
 stands in for three labels; *"a three-case type"* stands in for three
@@ -88,6 +92,16 @@ exist in the code.**
 | Wordings, one by one | Each one, in full |
 | A rule's cases | Each case, and what it produces |
 | A set of values | Every value, not the set's name |
+| A single statement holding no list | 🔴 **That statement** — a position, a relation, a constancy, an absence, a form |
+
+⚠️ **The last row is the one that catches nothing by counting.** 📌 **A
+sentence placing one thing against another, or stating that something
+never changes, holds no member to count** — 🔴 **and reads as
+commentary when it is a requirement.**
+
+📌 **A quoted wording is what is displayed, never an example of a
+format.** ⚠️ **Its every character belongs to the entry**, prefix and
+punctuation included.
 
 ⚠️ **This runs the other way round from *Traceability*.** That one
 starts from your sentence and looks for its source; this one starts
@@ -144,6 +158,17 @@ two units** — ⚠️ **the kind is the same, the answer has to be.**
 wordings of one rule, this one for two rules of one kind. **Neither is
 wrong on its own; together they are.**
 
+**Does one entry give two answers to one question?**
+
+🔴 **A rule holding two cases gives each its own answer** — ⚠️ **and
+the entry says which case is which.** 📌 **Written as one name covering
+both, it reads as one answer**, and whoever codes it keeps whichever
+half they read.
+
+🔴 **Two calculations, two values, two forms under a single name are
+two rules.** ⚠️ **Name the condition that separates them**, or write
+one of them out of the entry.
+
 📌 **Nobody else can see it.** The Cadreur reads the whole document but
 does not judge its content; every agent after him opens a few entries.
 
@@ -192,6 +217,16 @@ naming the resource that carries it is the translation you are here
 for. ⚠️ **Unless the product never settled it** — then it is a
 question.
 
+🔴 **A content described without being quoted needs its resource just
+the same.** ⚠️ **An entry saying that something is stated, indicated
+or announced, without giving the words, still puts a wording on
+screen** — 📌 **and nothing quoted is nothing to trace.**
+
+🔴 **Ask what will be read there**, and either reference the entry
+carrying it or raise the question. ⚠️ **Leaving it undecided sends
+whoever codes it to invent a wording**, and nothing downstream will
+say it was invented.
+
 ## Completeness
 
 **Does this rule leave a case undetermined?**
@@ -205,6 +240,15 @@ which.
 
 📌 **The cases a rule distinguishes must cover every possible value,
 each of them once.**
+
+🔴 **An entry naming where it applies says whether that list is
+closed.** ⚠️ **A list read as exhaustive by one reader and as an
+example by another leaves the question open** — 📌 **and the entries it
+does not name carry nothing either way.**
+
+🔴 **Say it, both ways**: what the list covers, and that nothing
+outside it is concerned — or that the entries outside it settle the
+question themselves.
 
 **Can any input of the rule take a value the rule cannot compute on?**
 

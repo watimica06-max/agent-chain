@@ -18,6 +18,10 @@ answer a question about another, and never tries.
 shows when two blocks are put together.** 🔴 **The reader holds no block
 at all** — it holds the index pass A produced, and crosses its columns.
 
+🔴 **Every question carries an identifier** — `A1.3`, `A2.screen.2`,
+`C1.6`. ⚠️ **Whoever answers writes that identifier, exactly** — 📌 it
+is what makes one block's answers comparable to another's.
+
 ⚠️ **A closure belongs to one pass, never both.** 📌 **The three passes
 below are contiguous** — each is read as one range, never assembled
 from pieces.
@@ -40,12 +44,12 @@ divisions are parts.
 
 ## Upstream
 
-**What sets it in motion?**
+**`A1.1` What sets it in motion?**
 A user action, a system event, a threshold crossed, incoming data, time
 passing. 🔴 **Nothing sets it off → it is a reference table**, see
 A3.
 
-**What does it consume?**
+**`A1.2` What does it consume?**
 🔴 **Name each piece of data**, and put every one in the index.
 
 ⚠️ **Whether it exists elsewhere is not your question** — 📌 pass B
@@ -53,15 +57,16 @@ answers it from the index.
 
 ## Downstream
 
-**What does it produce?**
+**`A1.3` What does it produce?**
 Data, a display, a state change, another mechanism firing. 🔴 **Name
 each one, and put every one in the index.**
 
-**Where does it draw?**
+**`A1.4` Where does it draw?**
 🔴 **Asked of every block that displays anything.** 📌 **Name the screen
 and the area it occupies**, and put both in the index.
 
-**If it produces an order — what separates two elements that tie?**
+**`A1.5` If it produces an order — what separates two elements that
+tie?**
 🔴 **Asked whenever a block sorts, ranks or picks a most recent.** ⚠️
 **A key that can repeat leaves the order to chance**: two records made
 the same day, two values equally close.
@@ -70,14 +75,14 @@ the same day, two values equally close.
 
 🔴 **Asked even when the answer is "nothing".**
 
-**What happens when the trigger stops being true?**
+**`A1.6` What happens when the trigger stops being true?**
 The effect undoes itself, persists, or persists until something clears
 it.
 
-**What becomes of what was already produced?**
+**`A1.7` What becomes of what was already produced?**
 Kept, recomputed, deleted.
 
-**Can it be set off again?**
+**`A1.8` Can it be set off again?**
 Finding the earlier state, or clean.
 
 ---
@@ -86,20 +91,22 @@ Finding the earlier state, or clean.
 
 🔴 **Ask the questions of the block's nature, and only those.**
 
+📌 **Their identifiers carry the nature** — `A2.model.1`, `A2.screen.3`.
+
 | Nature | Questions |
 |---|---|
-| model | Type, bounds, allowed values? Mandatory or optional? 🔴 Even when trivial — the upper bound is a product decision |
-| persistence | Stored or recomputed? What happens to existing records if the structure changes? 🔴 If something can be stored incomplete: what does it hold then — the absence, or an empty value? |
-| calculation | Inputs, output, rule for each case? And when an input is missing? What values can its output take, and which are acceptable? 🔴 See below |
-| transition | What event triggers it? What states exist, reachable from which? 🔴 See exhaustiveness below |
-| external source | What if it fails, is unavailable, returns invalid data? 🔴 What makes two incoming things the same one — and what happens to the second? |
-| synchronisation | Rule when two versions diverge? What the user sees during, and on failure? 🔴 What identifies one same thing seen from both sides? And to which changes does a mirrored copy update — the list being closed |
-| background work | Frequency? What if the system interrupts it — does it resume alone? |
-| journey | Conditions for moving on? What if the user goes back, or abandons? |
-| screen | What is displayed, where, what each action does? What is shown with no data, loading, on failure? 🔴 And what becomes of the screen itself when the system rebuilds it — what the user has in progress is kept, the rest is built again from its source |
-| text | Exact label? What it becomes if the value is absent? |
-| access | Who sees, who changes? What does someone who cannot? |
-| lifecycle | How long does the data live, what becomes of it after? |
+| model | **1** Type, bounds, allowed values? · **2** Mandatory or optional? 🔴 Even when trivial — the upper bound is a product decision |
+| persistence | **1** Stored or recomputed? · **2** What happens to existing records if the structure changes? · **3** 🔴 If something can be stored incomplete: what does it hold then — the absence, or an empty value? |
+| calculation | **1** Inputs, output, rule for each case? · **2** And when an input is missing? · **3** What values can its output take, and which are acceptable? 🔴 See below |
+| transition | **1** What event triggers it? · **2** What states exist, reachable from which? 🔴 See exhaustiveness below |
+| external source | **1** What if it fails, is unavailable, returns invalid data? · **2** 🔴 What makes two incoming things the same one — and what happens to the second? |
+| synchronisation | **1** Rule when two versions diverge? · **2** What the user sees during, and on failure? · **3** 🔴 What identifies one same thing seen from both sides? And to which changes does a mirrored copy update — the list being closed |
+| background work | **1** Frequency? · **2** What if the system interrupts it — does it resume alone? |
+| journey | **1** Conditions for moving on? · **2** What if the user goes back, or abandons? |
+| screen | **1** What is displayed, where, what each action does? · **2** What is shown with no data, loading, on failure? · **3** 🔴 And what becomes of the screen itself when the system rebuilds it — what the user has in progress is kept, the rest is built again from its source |
+| text | **1** Exact label? · **2** What it becomes if the value is absent? |
+| access | **1** Who sees, who changes? · **2** What does someone who cannot? |
+| lifecycle | **1** How long does the data live, what becomes of it after? |
 
 **On `calculation` — the bounds of an output:**
 
@@ -128,14 +135,14 @@ programme.
 
 *A reference table, a scale, a convention, a catalogue.*
 
-**What values, exactly?** 🔴 All of them, not a sample.
+**`A3.1` What values, exactly?** 🔴 All of them, not a sample.
 
-**Who consults them?**
+**`A3.2` Who consults them?**
 
-**What if a value looked up is not there?**
+**`A3.3` What if a value looked up is not there?**
 Default, error, or impossible by construction.
 
-**Can they change after delivery?**
+**`A3.4` Can they change after delivery?**
 ⚠️ If so: is what was computed with the old values recomputed?
 
 ---
@@ -150,10 +157,12 @@ all to find one name carrying two values.
 
 **Two questions on every name a block cites:**
 
-🔴 **Is it defined where it stands?** A name designating an attribute
+**`A4.1`** 🔴 **Is it defined where it stands?** A name designating an
+attribute
 of the block itself points nowhere — 🔴 **a chain does not catch it.**
 
-🔴 **Does it point at something described?** A destination, a piece of
+**`A4.2`** 🔴 **Does it point at something described?** A destination, a
+piece of
 data, a rule — described here, or marked *existing*.
 
 📌 **A block title answers this**, and the index carries the titles.
@@ -174,7 +183,8 @@ pointer needs no more than the title.**
 **A third question, on every word the block uses to qualify
 something:**
 
-🔴 **Does it compare, and against what?** ⚠️ **A word saying a thing is
+**`A4.3`** 🔴 **Does it compare, and against what?** ⚠️ **A word saying a
+thing is
 more, less, or placed relative to something says nothing until the
 other term is given.**
 
@@ -220,26 +230,26 @@ question this pass does not ask** — it belongs to pass A, or nowhere.
 
 ## The crossings
 
-**A piece of data consumed and produced nowhere.**
+**`B1.1` A piece of data consumed and produced nowhere.**
 🔴 **It exists outside the feature, or it is missing.** ⚠️ **Say which**
 — an unnamed origin is a gap.
 
-**One piece of data produced by two blocks.**
+**`B1.2` One piece of data produced by two blocks.**
 ⚠️ **Two paths writing the same thing diverge.** 🔴 **Same rule, or the
 difference is named.**
 
-**A production consumed by nobody.**
+**`B1.3` A production consumed by nobody.**
 📌 **It is written for nothing, or a consumer was left out.**
 
-**A consumer reading before the writer writes.**
+**`B1.4` A consumer reading before the writer writes.**
 🔴 **It gets nothing.** ⚠️ **Compare the two moments** — a block reading
 at launch and a block writing on a user action never meet.
 
-**Two blocks drawing on the same screen and area.**
+**`B1.5` Two blocks drawing on the same screen and area.**
 🔴 **One replaces the other, they coexist, or nobody decided.** 📌 **The
 one written second rarely says which.**
 
-**One name carrying two values.**
+**`B1.6` One name carrying two values.**
 📌 **See B2** — the index makes it visible.
 
 ## What a crossing costs
@@ -266,7 +276,8 @@ name, do neither** — 🔴 **only the index puts them side by side.**
 📌 **Pass B.** 🔴 **Answered from the index's `Names` column, and from
 nothing else.**
 
-🔴 **One name, used twice, is worth the same twice.** ⚠️ **Read every
+**`B2.1`** 🔴 **One name, used twice, is worth the same twice.** ⚠️ **Read
+every
 use of a name together, never one at a time** — 📌 each use is complete
 on its own, and that is why two different values under one word go
 unseen.
@@ -283,27 +294,30 @@ unseen.
 *Run once on the feature. The only enumerated questions — short on
 purpose.*
 
-**Does a settings change apply retroactively, or only from now on?**
+**`C1.1` Does a settings change apply retroactively, or only from now
+on?**
 ⚠️ **The most often forgotten.** A single value applies retroactively by
 construction; a dated value only from its date.
 
-**What is out of scope, though one might think it in?**
+**`C1.2` What is out of scope, though one might think it in?**
 
-**For each existing rule the feature touches: kept, changed, removed?**
+**`C1.3` For each existing rule the feature touches: kept, changed,
+removed?**
 🔴 **Silence is not removal.** Rule by rule.
 
-**What terms must be settled before writing the rules?**
+**`C1.4` What terms must be settled before writing the rules?**
 The words that mean different things depending on who uses them.
 
-**Are the displayed terms the product's or the code's?**
+**`C1.5` Are the displayed terms the product's or the code's?**
 🔴 Internal naming never surfaces on screen.
 
-**Does it collect personal or sensitive data?**
+**`C1.6` Does it collect personal or sensitive data?**
 Health, location, biometrics, identifiers. Consent is a product
 decision, never ticked by default. 🔴 **One answer per kind** — health
 and location are not consented to together.
 
-**What system permissions, and what if they are denied for good?**
+**`C1.7` What system permissions, and what if they are denied for
+good?**
 🔴 Asked at the moment of use, never at launch. 🔴 **One answer per
 permission** — a refused sensor and a refused link do not leave the
 same application behind.

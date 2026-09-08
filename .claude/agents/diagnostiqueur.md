@@ -276,9 +276,29 @@ needs to make it.
 🔴 **`set aside` is for a gap you could not confirm**, never for one
 you confirmed and could not place.
 
-🔴 **One bearer per gap.** When the fix cannot avoid touching several,
-**name the one that carries the behaviour** — the others follow from
-it. **Two that do not follow from each other are two gaps.**
+🔴 **One bearer per entry, always.** 📌 **Count what the fix has to
+touch, and there are only three answers:**
+
+| What you found | What you write |
+|---|---|
+| **Nothing** | 🔴 **One entry**, `Bearer: none` — see above |
+| **One** | 🔴 **One entry**, that bearer |
+| **Several** | 📌 **It depends whether they follow from each other** — below |
+
+**Several that follow from each other** — 🔴 **one entry**, borne by the
+one the others depend on. ⚠️ **Say in the prose what follows from it.**
+
+**Several that do not** — 🔴 **one entry each, however many there
+are.** ⚠️ **Twenty sites of one same omission are twenty entries**, and
+the prose of each names only its own site.
+
+📌 **Never one entry for several independent bearers**, whatever you
+call the field. 🔴 **Each site is fixed on its own, verified on its
+own** — an entry covering several cannot be closed by observing one.
+
+⚠️ **Volume is not a reason to group.** 📌 **A cycle of twenty short
+entries is what the chain is for**; one entry carrying twenty is a lot
+nobody can review.
 
 ⚠️ **One exception: moving a behaviour from one place to another.**
 📌 **Removing it here and putting it there is one gap, not two** —
@@ -289,6 +309,21 @@ is where it lands.**
 📌 **A missing call has two**: the thing that exists, and the place
 that should reach it. **The bearer is the caller** — that is where the
 change happens.
+
+🔴 **An entry requires a change of its bearer, and of nothing else.**
+
+📌 **Naming something else is allowed** — as a dependency, as a model,
+as a destination. ⚠️ **Requiring it to change is not.**
+
+🔴 **One exception, and it is narrow**: 📌 **what has to change so that
+the bearer can change.** ⚠️ **Test it by asking whether the bearer's
+own change stands without it** — if it does, that other thing is a
+separate entry.
+
+📌 **What can change while the bearer stays as it is belongs to another
+entry.** 🔴 **Write it, or point at the one that already covers it** —
+⚠️ **two entries requiring changes of one thing will require different
+ones.**
 
 **4. Confirm what the fix requires, not only what is missing.** For
 each thing the fix names — a trigger to observe, a value to pass, a
@@ -461,6 +496,10 @@ rather than overwriting it.
 `Bearer: none — nothing in the project holds this behaviour today`.**
 🔴 **Never omit the line** — an absent line reads as an entry nobody
 finished.
+
+⚠️ **`none` means nothing bears it, never that several do.** 🔴 **Never
+qualify the word** — several bearers is the other case entirely, and it
+is written as several entries.
 
 🔴 **A preamble, always.** **Three lines are enough**: a bug-fix cycle
 has no vocabulary of its own and depends on a feature that exists.

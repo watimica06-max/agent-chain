@@ -174,15 +174,37 @@ observe, and what must be seen.
 | Property | What it rules out |
 |---|---|
 | **Observable** from outside the code | *"the window is 3h"* — that is implementation |
+| ⚠️ **A named value an entry sets on something it describes is not implementation** | 🔴 **The entry chose it**; you are not free to choose otherwise, and what applies it is observable |
 | **Decidable** — two people, same verdict | *"the display is correct"* |
 | **Attributable** to this lot | a criterion failing because of another lot |
 
-**How many are needed**: every behaviour the lot's cited entries
-describe must be observable through at least one criterion.
+**How many are needed**: 🔴 **every assertion the lot's cited entries
+make must be observable through at least one criterion** — not every
+behaviour.
 
-⚠️ **Behaviour, not case.** A calculation with three outcomes needs
-three; a screen, one per displayed state; a migration, one on what
-becomes of existing data.
+⚠️ **An assertion is anything the entry states holds.** 📌 **A value
+produced is one** — *this field takes that value*. 🔴 **So is
+everything an entry states without producing anything**: something
+being present, absent, constant, positioned relative to another, of a
+given form, counted, or forbidden.
+
+🔴 **The second kind is the one that goes missing.** ⚠️ **It reads as
+description rather than as work**, because nothing is computed —
+📌 **and it is exactly what nobody will notice is absent**, since no
+calculation fails without it.
+
+**Two tests, and an entry's assertion passes both:**
+
+📌 **Could the code satisfy every one of your criteria and still
+contradict this sentence?** 🔴 **Then it is not covered.**
+
+📌 **Read your criteria back without the entry: does anything say this
+element exists at all?** ⚠️ **A criterion naming what a field holds
+never says that anything renders it.**
+
+⚠️ **Assertion, not sentence.** 📌 **One sentence can hold several** — a
+list of attributes on one element is one assertion per element, an
+element under two conditions is one per condition.
 
 🔴 **What an entry names as a trigger has a criterion on what it
 reaches**, not only on its own existence. **A trigger built and wired
@@ -452,6 +474,15 @@ the two that blocked is eight lots detailed twice.**
 **1. Open every entry the lot cites** — 🔴 **a lot often cites
 several**, and together they describe one thing to build. Read them all
 before deriving anything.
+
+🔴 **Every entry whole, to its last line.** ⚠️ **An entry's later
+paragraphs carry what its first ones leave out** — 📌 what a rule
+computes comes first, what it looks like and where it sits comes
+after.
+
+⚠️ **Never judge a paragraph by what introduces it.** 🔴 **A heading
+saying how something is presented still holds assertions**, and
+skipping it on its title is how a whole half of an entry is lost.
 
 **2. Read the two open sections of the state document** —
 `## Traps — general` and `## Dead state`, **whole**. 🔴 **You cannot

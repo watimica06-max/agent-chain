@@ -46,9 +46,7 @@ not to the working folder.
 
 ## What you read
 
-- **`desc-produit.md`** — 🔴 **only the blocks your group names.**
-  ⚠️ **Skip its closing `## Questions set aside` section**: it records
-  what the framing grid ruled out, it holds no intention to find
+- **`desc-produit.md`** — 🔴 **only the blocks your group names**
 - **The sheets your group names**, `code/<lot>/fiche-executable.md` —
   🔴 **those, and no other**
 

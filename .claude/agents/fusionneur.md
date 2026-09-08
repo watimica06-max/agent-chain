@@ -28,7 +28,7 @@ chain.**
 
 **Last**, once the conversion has come through with no signal:
 
-`Analyste → product file → conversion → questions file fully answered
+`Rédacteur → product file → conversion → questions file fully answered
 → merge`
 
 ⚠️ **Otherwise the global would describe a state the spec will never
@@ -157,7 +157,7 @@ rather than looking for it.
 ## Between the two — the round-trip
 
 The questions file goes to the Product Owner, who fills the `Answer:`
-fields by hand. The Analyste integrates them, then hands back.
+fields by hand. The Rédacteur integrates them, then hands back.
 
 🔴 **A question whose answer is recorded is never asked again** —
 re-asking would send the Product Owner back over what he has settled.

@@ -63,7 +63,7 @@ the whole document references it.
 code? **Yes → it is a numbered entry**, not a preamble block. Design
 tokens, a format catalogue, a threshold table all answer yes.
 
-📌 **Dependencies come from the Analyste, not from you** — only he has
+📌 **Dependencies come from the Rédacteur, not from you** — only he has
 the global in front of him.
 
 **Sections** — each one produces lots:
@@ -196,7 +196,7 @@ flag"*; a missing one says *"the agent did not run"*.
 ## Between the two — the round-trip
 
 The questions file goes to the Product Owner, who fills the `Answer:`
-fields by hand. The Analyste then integrates them into the blocks of
+fields by hand. The Rédacteur then integrates them into the blocks of
 the product file.
 
 **An answer comes back through `/1_structure` first, always.** What
@@ -230,7 +230,7 @@ on the next round. That is normal, not a failure.
 part 2 at invocation 2. 🔴 **Load it; it is not in this file.**
 
 ⚠️ **Not to be confused with the product framing grid**, which the
-Analyste runs and you never open.
+sondeurs run and you never open.
 
 **Surviving clarification** — a `**Clarification needed:**` line still
 in the product file: a question that never got an answer.
@@ -344,8 +344,8 @@ update, invocation 2 reads the entries its own `<<ASSUMED` marks name,
 and those only.
 
 ⚠️ **Never** the code, `CURRENT_TECHNICAL_STATE.md` *(the Cadreur reads
-it)*, the product framing grid, nor the global product document *(the
-Analyste and the Fusionneur do)*.
+it)*, the product framing grid *(the sondeurs run it)*, nor the global
+product document *(the Rédacteur and the Fusionneur do)*.
 
 ---
 
@@ -392,9 +392,9 @@ been blocked on** — 🔴 **the next run reads them.**
 calculation rule can be described inside a screen section, and the
 other way round.
 
-⚠️ **Except its closing section** — `## Questions set aside` from the
-Analyste, `## Gaps set aside` from the Diagnostiqueur. It records what
-was ruled out, it holds no product content. Skip it.
+⚠️ **Except a closing `## Gaps set aside` section** from the
+Diagnostiqueur. It records what was ruled out, it holds no product
+content. Skip it.
 
 **The twelve natures, in this order — by what a block of that nature
 produces:**

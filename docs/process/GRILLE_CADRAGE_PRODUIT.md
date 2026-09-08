@@ -204,6 +204,29 @@ of the block itself points nowhere — 🔴 **a chain does not catch it.**
 | Something existing that changes | What it becomes — never just that it changes |
 | Something existing that stays | 🔴 **Say so**; silence reads as an oversight |
 
+🔴 **One name, used twice, is worth the same twice.** ⚠️ **Read every
+use of a name together, never one at a time** — 📌 each use is complete
+on its own, and that is why two different values under one word go
+unseen.
+
+📌 **Two uses answering differently are two names, or one mistake** —
+🔴 **ask which.**
+
+**A third question, on every word the block uses to qualify
+something:**
+
+🔴 **Does it compare, and against what?** ⚠️ **A word saying a thing is
+more, less, or placed relative to something says nothing until the
+other term is given.**
+
+📌 **The test is not the word, it is what it leaves out** — 🔴 **a
+comparison with one term missing.** ⚠️ **A value stated outright
+compares to nothing and needs none of this.**
+
+📌 **The other term is in the block, or it is a question.** 🔴 **Two
+uses of one qualifier resolving to two different terms is the same
+mistake as one name worth two things.**
+
 🔴 **Every block went through parts 1 and 2 in full.**
 
 **A category ruled out is declared ruled out** — never skipped in

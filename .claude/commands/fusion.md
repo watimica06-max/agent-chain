@@ -6,7 +6,7 @@ argument-hint: "<feature folder name>"
 
 Act as the orchestrator, in **upstream mode**.
 
-**This command chains three phases** — the Analyste over the bug-fix
+**This command chains three phases** — the Rédacteur over the bug-fix
 lists, then the Fusionneur's two invocations.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
@@ -44,11 +44,11 @@ matches.**
 | 5 | A root questions file with an empty `Answer:` | 🔴 **STOP** — relay it |
 | 6 | `questions-fusionneur-NN.md`, answered | **Fusionneur, invocation 2** |
 | 7 | `plan-fusion.md` exists | **Fusionneur, invocation 2** |
-| 8 | `questions-analyste-NN.md`, answered | **Analyste, invocation 3** |
-| 9 | A `bugfix-*/` folder, and no `questions-analyste-*` anywhere | **Analyste, invocation 3** |
+| 8 | `questions-redacteur-NN.md`, answered | **Rédacteur, invocation 2** |
+| 9 | A `bugfix-*/` folder, and no `questions-redacteur-*` anywhere | **Rédacteur, invocation 2** |
 | 10 | Otherwise | **Fusionneur, invocation 1** |
 
-📌 **Row 9 fires once.** The Analyste writes a questions file even when
+📌 **Row 9 fires once.** The Rédacteur writes a questions file even when
 empty, and its presence is what says the pass has run — the
 `bugfix-*/` folders never go away.
 
