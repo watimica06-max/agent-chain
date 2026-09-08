@@ -19,6 +19,14 @@ lifecycle. `C1`–`C12` are the sections of the conventions file.
 
 🔴 **Never write `§2.5` alone.** It is ambiguous between the two.
 
+📌 **`<the dependency check>`** appears in several entries. 🔴 **It is
+whatever tool reads how `<language>` states that one module uses
+another** — ⚠️ **an import declaration where the language has them**,
+a manifest entry or a build declaration where it does not.
+
+🔴 **Name the tool, not the notion** — 📌 the tool goes in the table of
+G12.1 like any other.
+
 ---
 
 ## How this grid is applied
@@ -123,7 +131,7 @@ not a target.*
     [3 to 4]
 
     ## 4. Structure and dependency direction
-    Where a new file goes, and who may import whom.
+    Where a new file goes, and which module may depend on which.
     [5 to 8]
 
     ## 5. Interface contracts
@@ -265,17 +273,19 @@ is your own call**, and it is short or it is noise.
 
 **G4.1** · *Question*: which nature consumes which (V2)? · *Trigger*:
 V2 is acyclic
-- **Form**: "The import graph between top-level modules is a subset of
-  the `Consumes:` adjacency aggregated by nature. An import outside
-  that graph is an amendment proposed before writing."
-- **Test**: mechanical — import check wired into `<cmd verify>`.
+- **Form**: "The dependency graph between top-level modules is a
+  subset of the `Consumes:` adjacency aggregated by nature. A
+  dependency outside that graph is an amendment proposed before
+  writing."
+- **Test**: mechanical — `<the dependency check>` wired into
+  `<cmd verify>`.
 
 **G4.2** · *Question*: which entries consume nothing (V3)? · *Trigger*:
 V3 finds at least one root
-- **Form**: "A module realising an entry that consumes nothing imports
-  no module of this project. 🔴 **Every such module**, whatever it is
+- **Form**: "A module realising an entry that consumes nothing depends
+  on no module of this project. 🔴 **Every such module**, whatever it is
   named."
-- **Test**: mechanical — import check.
+- **Test**: mechanical — `<the dependency check>`.
 
 ⚠️ **A module realising both a root entry and a consuming one breaks
 this rule by construction** — say so as a question rather than naming
@@ -301,14 +311,14 @@ a file the four agents do not read is a convention they cannot follow.
 **G4.5** · *Question*: where does data from outside come in? ·
 *Trigger*: N5 non-empty
 - **Form**: "Every access to an external source is confined to
-  `<boundary module>`; no other module imports `<client library>`."
-- **Test**: mechanical — import check.
+  `<boundary module>`; no other module depends on `<client library>`."
+- **Test**: mechanical — `<the dependency check>`.
 
-**G4.6** · *Question*: who may import a screen? · *Trigger*: N9
+**G4.6** · *Question*: who may depend on a screen? · *Trigger*: N9
 non-empty
-- **Form**: "No screen module is imported by a module of another
+- **Form**: "No screen module is depended on by a module of another
   nature."
-- **Test**: mechanical — import check.
+- **Test**: mechanical — `<the dependency check>`.
 
 **G4.7** · *Question*: which adapters do two application modules both
 need? · *Trigger*: more than one application module, and V1 shows a
@@ -469,9 +479,9 @@ them, and wrong between them.**
 ## C6 — Errors and failure
 
 **G6.1** · *Question*: none, fixed entry · *Trigger*: always
-- **Form**: "No empty and no generic catch. An error is handled where
-  it is caught or propagated with the calling context — never
-  absorbed."
+- **Form**: "No handler that swallows a failure, and none that catches
+  every kind at once. A failure is handled where it is caught or
+  propagated with the calling context — never absorbed."
 - **Test**: mechanical — most linters carry it.
 
 **G6.2** · *Question*: none, fixed entry · *Trigger*: always
@@ -485,7 +495,7 @@ where do they stop? · *Trigger*: N5 or N6 non-empty
   source, a payload from another device, a store — is validated at the
   module that receives it and converted to a domain type; no type of
   the outside crosses."
-- **Test**: mechanical — import check, plus review.
+- **Test**: mechanical — `<the dependency check>`, plus review.
 
 ⚠️ **A payload from the paired device is data from outside**, as much
 as a file or a service is.
@@ -586,7 +596,7 @@ the first lot unable to build anything the platform constructs.
   🔴 **Anything it reads from outside itself** — the clock, a reading, a
   random value, the environment — **is passed as an argument**, and
   none is read inside `<the pure modules>`."
-- **Test**: mechanical — import and call check.
+- **Test**: mechanical — `<the dependency check>` and call check.
 
 **G7.5** · *Question*: what execution model does this project presume?
 · *Trigger*: always — the hole is the Architecte's call, informed by V1
@@ -756,8 +766,8 @@ which of them has an interruption test? · *Trigger*: V10 non-empty
 
 **G11.2** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "Identifiers, comments, error messages and documentation in
-  English. Every exported symbol carries one line saying what it
-  guarantees and when it fails. No comment paraphrases the line below
+  English. Every symbol visible outside its module carries one line
+  saying what it guarantees and when it fails. No comment paraphrases the line below
   it."
 - **Test**: review; partly mechanical.
 
@@ -819,7 +829,7 @@ read as mechanical.
 **G12.4** · *Question*: does the corpus presume network access? ·
 *Trigger*: N5 **empty**
 - **Form**: "No network dependency and no network call."
-- **Test**: mechanical — import check.
+- **Test**: mechanical — `<the dependency check>`.
 
 📌 **The only entry a trigger fires on an *empty* nature.** An absence
 is a fact, and a fact worth writing down.

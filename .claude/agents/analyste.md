@@ -608,7 +608,7 @@ application does?**
 
 | The line says | What you do |
 |---|---|
-| A symbol is missing, a library is absent, a class does not extend what it should | **Nothing** — it is technical |
+| A symbol is missing, a dependency is absent, something is not built on what it should be | **Nothing** — it is technical |
 | The application behaves differently from what the product file describes | **Integrate it** |
 | The application does something the product file describes nowhere | **Integrate it** |
 

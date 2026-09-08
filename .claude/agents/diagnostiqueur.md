@@ -201,16 +201,32 @@ name** — `Grep(pattern, path: "<folder>")`, never a bare pattern.
 ⚠️ **A search without a path sweeps `docs/` and the build output.**
 
 **1. Turn the gap into search terms.** 🔴 **A gap is written in
-behaviour, not in symbols** — *"the correction factor is never
-computed"* names no class. **Derive the terms**: the domain words it
-uses, the screen it happens on, the value it produces.
+behaviour, not in names** — *"the correction factor is never
+computed"* names nothing that exists. **Derive the terms**: the domain
+words it uses, the screen it happens on, the value it produces.
 
-📌 **Then grep, widening as you go** — the exact term, then its parts,
-then the screen or the service that would hold it.
+📌 **Then search, widening as you go** — the exact term, then its
+parts, then what would hold it.
 
-🔴 **Stop after the third widening.** Nothing found by then means the
-code does not carry the terms, and that is a verdict — `set aside`,
-with what you searched. **Widening further is guessing.**
+🔴 **A behaviour does not live only in source files.** ⚠️ **Search
+everything the build carries.**
+
+📌 **The test**: 🔴 **would changing this file change what the
+application does?** ⚠️ **If yes, it is in scope** — whether it computes
+the behaviour or declares the conditions under which it happens.
+
+📌 **The conventions name the project's folders** — 🔴 **read them
+before searching**, and search every one of them.
+
+⚠️ **A behaviour absent from the source is not a behaviour absent.**
+🔴 **Before concluding, ask what else could carry it**: something
+declared and never used, a default that applies because nothing
+overrides it, a value fixed outside the code.
+
+🔴 **Stop after the third widening.** Nothing found by then means
+nothing in the project carries the terms, and that is a verdict —
+`set aside`, with what you searched **and where**. **Widening further
+is guessing.**
 
 **2. Confirm it.**
 
@@ -220,34 +236,59 @@ with what you searched. **Widening further is guessing.**
 | Something does it, differently from the gap's description | `wrong` |
 | Something does it as described | `set aside` — name the file and the symbol |
 | Nothing relates to the terms at all | `set aside` — say what you searched |
-| Confirmed, but move 3 finds no bearer | `set aside` — say what you found and what is missing |
+| Confirmed, but move 3 finds no bearer | 🔴 **`missing` or `wrong` all the same** — see move 3 |
 
 ⚠️ **Confirming is not reviewing.** You establish that a behaviour is
 absent or different, never that an implementation is poor.
 
-**3. Locate it — two symbols, not one.**
+**3. Locate it — the bearer, and the trigger when there is one.**
+
+🔴 **The question is: what has to change for the behaviour to
+change?** 📌 **Whatever answers it is the bearer, whatever its form.**
+
+⚠️ **Never ask what kind of thing it is.** 🔴 **A form you have not met
+before is still a bearer** if changing it changes the behaviour.
 
 | Which | What it is |
 |---|---|
-| **The bearer** | The symbol that will carry the fix — a repository, a view model, a resource file |
-| **The trigger**, when there is one | What has to call it — a symbol, a route, the system |
+| **The bearer** | What will carry the fix, whatever its form |
+| **The trigger**, when there is one | What has to reach it, whatever reaching means here |
 
-🔴 **A gap with no bearer is `set aside`.** Say so rather than guessing
-one.
+🔴 **The one constraint: the rest depends on it, not the reverse.** An
+interface and its implementation, a contract and what fulfils it, a
+declaration and what relies on it: 📌 **the bearer is the one others
+depend on.** ⚠️ **Two names for one thing would be grouped as two.**
 
-🔴 **Name the symbol, not the file that realises it.** An interface and
-its implementation, a class and its subclass, a contract and what
-fulfils it: **the bearer is the one other code depends on.** Two names
-for one thing would be grouped as two.
+🔴 **A confirmed gap is written whether or not you find a bearer.** ⚠️
+**Look once more before giving up on one** — 📌 **a behaviour that
+exists has something that governs it**, and *"nothing bears it"* usually
+means the search stayed inside one kind of file.
 
-🔴 **One bearer per gap.** When the fix cannot avoid touching several
-symbols, **name the one that carries the behaviour** — the others
-follow from it. **Two symbols that do not follow from each other are
-two gaps.**
+📌 **Still none, and the gap is confirmed** — 🔴 **write the entry with
+its bearer left unnamed**, and say in it that nothing in the project
+carries the behaviour today.
+
+⚠️ **That is the shape of a behaviour that has to move**: 🔴 **you
+establish it belongs elsewhere, not where it lands.** 📌 **Where it
+lands is a split decision**, and the entry gives the Cadreur what it
+needs to make it.
+
+🔴 **`set aside` is for a gap you could not confirm**, never for one
+you confirmed and could not place.
+
+🔴 **One bearer per gap.** When the fix cannot avoid touching several,
+**name the one that carries the behaviour** — the others follow from
+it. **Two that do not follow from each other are two gaps.**
+
+⚠️ **One exception: moving a behaviour from one place to another.**
+📌 **Removing it here and putting it there is one gap, not two** —
+🔴 **between the two halves the behaviour exists nowhere**, and a fix
+that leaves the project in that state is not deliverable. **The bearer
+is where it lands.**
 
 📌 **A missing call has two**: the thing that exists, and the place
-that should call it. **The bearer is the caller** — that is where the
-code will change.
+that should reach it. **The bearer is the caller** — that is where the
+change happens.
 
 **4. Confirm what the fix requires, not only what is missing.** For
 each thing the fix names — a trigger to observe, a value to pass, a
@@ -415,6 +456,11 @@ rather than overwriting it.
 
     ## §5 External source
     ...
+
+📌 **An entry whose bearer you could not name carries
+`Bearer: none — nothing in the project holds this behaviour today`.**
+🔴 **Never omit the line** — an absent line reads as an entry nobody
+finished.
 
 🔴 **A preamble, always.** **Three lines are enough**: a bug-fix cycle
 has no vocabulary of its own and depends on a feature that exists.

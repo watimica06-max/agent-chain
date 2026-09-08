@@ -179,8 +179,9 @@ produce mentions it.
 - 🔴 **Declare a production without naming what calls it**
 - 🔴 **Write `and their tests`, or any other unnamed set** — a file not
   named is a file not declared
-- 🔴 **Grep an import to find a caller** — the name, always: a caller
-  in the same package carries no import
+- 🔴 **Search on what declares a symbol's origin to find its callers** —
+  the name, always: the closest callers declare nothing, and they break
+  first
 - 🔴 **Fold a piece into the lot declaring its contract** — two layers,
   two lots
 - 🔴 **Declare a production without what has to be declared for it** —
@@ -258,6 +259,16 @@ never both — a folder carrying the two is a defect; stop and say so.
 🔴 **Each entry names a `Bearer:`** — the symbol that will carry the
 fix. **The inventory is that list**, and what it holds against each
 bearer is what the bearer is missing.
+
+⚠️ **An entry reading `Bearer: none` is one whose behaviour lives
+nowhere yet** — 🔴 **you decide where it lands**, from the entry's prose
+and the conventions. 📌 **What it lands on is its bearer**, and it is a
+production rather than a modification.
+
+🔴 **Decide every `none` before grouping.** ⚠️ **Two of them can land on
+one symbol** — 📌 **and then they are one lot, like any two entries
+sharing a bearer.** **Grouping before deciding would make two lots
+build the same thing.**
 
 🔴 **Group by bearer, even across sections.** The symbol already
 exists, so unrelated entries can land on it, and two lots may never
@@ -404,10 +415,15 @@ changed contract breaks them, and each one is a modification too.**
 compiling, and its whole source set with it. **Search the test folders
 too**, not only the code ones.
 
-🔴 **Grep the symbol's name, never its import.** ⚠️ **A test in the
-symbol's own package carries no import line** — 📌 **measured: five test
-files that use a modified symbol, zero import between them.** **An
-import-grep finds none of the ones that matter most.**
+🔴 **Grep the symbol's name, never what declares where it comes
+from.** ⚠️ **A caller that does not need to declare a symbol's origin
+declares nothing about it** — 📌 **and those are exactly the closest
+callers, the ones that break first.**
+
+📌 **In a language with import lines, grep the name and never the
+import** — 🔴 **measured: five test files using a modified symbol, not
+one importing it.** **An import-grep finds none of the ones that matter
+most.**
 
 📌 **Every file the grep returns goes into the lot's `Modifies`, by
 name.** 🔴 **Never `and their tests`** — ⚠️ **what is not named is not
@@ -425,7 +441,8 @@ alike, a double included. **Each one the lot does not declare stops
 compiling**, and no caller-grep finds them.
 
 🔴 **And what has to resemble the symbol breaks with it, without ever
-calling it.** ⚠️ **The compiler demands the resemblance, not the use.**
+calling it.** ⚠️ **What the resemblance is owed to is the build, not
+the use** — 📌 it fails before anything runs.
 
 📌 **A `when` that exhausts it** — the symbol gains a case, every
 exhaustive `when` on it stops compiling. 📌 **A double that replaces
@@ -510,7 +527,7 @@ finds out long after you.**
 
 **8. Name what has to be declared outside the code.** 🔴 **A
 permission, a service, a library, an entry point: each is written in a
-file the code never imports, and no grep on a symbol finds it.**
+file nothing in the code names, and no grep on a symbol finds it.**
 
 **The question, on every production and every piece**: what has to be
 declared for this to be reachable?

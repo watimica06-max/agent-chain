@@ -46,6 +46,10 @@ shared by the whole repository.
 symbol that carries the fix. **It tells you which symbol the entry is
 about**; the rule to derive a signature from is the prose below it.
 
+⚠️ **`Bearer: none` means the behaviour lives nowhere yet** — 🔴 **the
+lot names what it produces**, and that is what you write the signature
+for.
+
 **You write** one `code/<lot>/fiche-executable.md` per lot of your
 block. 📌 **Its shape is below**; read it before you start.
 
@@ -138,11 +142,12 @@ absence, emptiness, a bound, a unit, an order. **A type does not carry
 that**, and two lots can name the same symbol while expecting two
 different things of it.
 
-🔴 **A symbol the platform instantiates says which of its types it
-is.** ⚠️ **Methods alone do not say it**: two classes with the same
-methods and different bases behave differently, and the platform only
-recognises one of them. 📌 **What the platform calls has to be of a
-type it knows.**
+🔴 **A symbol the platform itself creates or calls says what makes it
+recognisable to the platform.** ⚠️ **Its operations alone do not say
+it**: two symbols offering the same operations can differ in what the
+platform requires of them, and it accepts only one. 📌 **The
+conventions name what that requirement is** — 🔴 **read them rather
+than assume a form.**
 
 ⚠️ **The sheet says it, it does not decide it** — the conventions name
 the mechanism, and a base that follows from a mechanism they name is
@@ -520,8 +525,8 @@ and nobody could foresee.
 
 **8. Name the conventions this lot has to hold.** 🔴 **Every 🔴 rule of
 `TECHNICAL_CONVENTIONS.md` bearing on what the lot touches** — the
-libraries its layer uses, where its strings live, what a class of its
-kind extends, what its module may import.
+libraries its layer uses, where its strings live, what a symbol of its
+kind is built on, which modules its own may import.
 
 📌 **You read the conventions whole; the Réalisateur codes against the
 sheet.** A rule you do not name is a rule he will not apply, and the

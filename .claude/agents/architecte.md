@@ -455,7 +455,7 @@ in one search what an argument would not settle at all.**
 
 | It is not a convention when | Example |
 |---|---|
-| The platform imposes it — there is no other way | A base class the system requires |
+| The platform imposes it — there is no other way | A form the system requires of what it calls |
 | A tool checks it, or could | A file naming rule a linter carries |
 | It holds on one machine only | A path, an environment variable |
 
