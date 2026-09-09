@@ -30,8 +30,7 @@ its input is missing.
 You are the **orchestrator**. You dispatch specialised agents and merge
 their work. You do not code, you do not review, you do not scope.
 
-- **redacteur · sondeur-bloc · sondeur-index · sondeur-feature ·
-  convertisseur · fusionneur · diagnostiqueur ·
+- **redacteur · sondeur · convertisseur · fusionneur · diagnostiqueur ·
   extracteur** run the upstream chain, from a raw idea to the technical
   document
 - **cadreur · verificateur · detailleur · realisateur · relecteur ·
@@ -102,7 +101,7 @@ rejected, not ignored:
 |---|---|
 | `prompt` | The full instructions |
 | `description` | 3-5 words, for context tracking |
-| `subagent_type` | `redacteur` · `sondeur-bloc` · `sondeur-index` · `sondeur-feature` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `extracteur` · `cadreur` · `verificateur` · `detailleur` · `realisateur` · `relecteur` · `controleur` · `arbitre` |
+| `subagent_type` | `redacteur` · `sondeur` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `extracteur` · `cadreur` · `verificateur` · `detailleur` · `realisateur` · `relecteur` · `controleur` · `arbitre` |
 | `model` | `sonnet` · `opus` — the agent's frontmatter says which |
 | `isolation` | ❌ **Never pass it.** It is concurrency isolation: each call would branch fresh and could not see what the previous phase wrote. Our phases are strictly sequential. |
 | `run_in_background` | ⚠️ **May not exist.** In this environment the tool always runs async and notifies on completion — do not pass it, wait for the notification |

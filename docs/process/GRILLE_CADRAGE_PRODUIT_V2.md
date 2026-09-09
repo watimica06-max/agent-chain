@@ -8,31 +8,27 @@ element has a named trigger and a named effect; every name it cites
 either points at something described, or is defined on the spot. **A
 name with nothing behind it is a gap.**
 
-🔴 **Two passes, and they read different things.**
+🔴 **Three passes, and they read different things.**
 
 **Pass A — one block at a time.** 📌 **Everything a block closes on its
-own.** ⚠️ **The reader holds one block and nothing else** — it cannot
-answer a question about another, and never tries.
+own.** ⚠️ **Answer from that block alone** — 🔴 whether another block
+holds the answer is not this pass's question.
 
-**Pass B — the index, all blocks at once.** 📌 **Everything that only
-shows when two blocks are put together.** 🔴 **The reader holds no block
-at all** — it holds the index pass A produced, and crosses its columns.
+**Pass B — the blocks against each other.** 📌 **Everything that only
+shows when two are put together.** ⚠️ **Nothing here is visible from
+one block**, and a chain never reaches it.
+
+**Pass C — the feature, once.** 📌 **What no block raises, because it
+belongs to none of them.**
 
 🔴 **Every question carries an identifier** — `A1.3`, `A2.screen.2`,
 `C1.6`. ⚠️ **Whoever answers writes that identifier, exactly** — 📌 it
 is what makes one block's answers comparable to another's.
 
-⚠️ **A closure belongs to one pass, never both.** 📌 **The three passes
-below are contiguous** — each is read as one range, never assembled
-from pieces.
-
-📌 **Pass C runs once on the whole feature**, neither per block nor on
-the index.
+⚠️ **A closure belongs to one pass, never both.**
 
 🔴 **"Block" always means a block of the product file** — the grid's own
 divisions are parts.
-
----
 
 ---
 
@@ -40,30 +36,34 @@ divisions are parts.
 
 # A1 — Close the block
 
-📌 **Pass A.**
-
 ## Upstream
 
 **`A1.1` What sets it in motion?**
 A user action, a system event, a threshold crossed, incoming data, time
-passing. 🔴 **Nothing sets it off → it is a reference table**, see
-A3.
+passing.
+
+🔴 **Two answers look alike and are not.** 📌 **Nothing sets it off** —
+it is consulted, never fired: a reference table, and A3 applies.
+⚠️ **Something sets it off and the block does not say what** — that is
+a gap, and A3 does not apply.
+
+🔴 **Say which of the two**, never *"no trigger"* alone.
 
 **`A1.2` What does it consume?**
-🔴 **Name each piece of data**, and put every one in the index.
+🔴 **Name each piece of data.**
 
-⚠️ **Whether it exists elsewhere is not your question** — 📌 pass B
-answers it from the index.
+⚠️ **Whether another block produces it is not your question** — 📌 pass
+B answers that.
 
 ## Downstream
 
 **`A1.3` What does it produce?**
 Data, a display, a state change, another mechanism firing. 🔴 **Name
-each one, and put every one in the index.**
+each one.**
 
 **`A1.4` Where does it draw?**
 🔴 **Asked of every block that displays anything.** 📌 **Name the screen
-and the area it occupies**, and put both in the index.
+and the area it occupies.**
 
 **`A1.5` If it produces an order — what separates two elements that
 tie?**
@@ -96,14 +96,14 @@ Finding the earlier state, or clean.
 | Nature | Questions |
 |---|---|
 | model | **1** Type, bounds, allowed values? · **2** Mandatory or optional? 🔴 Even when trivial — the upper bound is a product decision |
-| persistence | **1** Stored or recomputed? · **2** What happens to existing records if the structure changes? · **3** 🔴 If something can be stored incomplete: what does it hold then — the absence, or an empty value? |
+| persistence | **1** Stored or recomputed? · **2** 🔴 If something can be stored incomplete: what does it hold then — the absence, or an empty value? |
 | calculation | **1** Inputs, output, rule for each case? · **2** And when an input is missing? · **3** What values can its output take, and which are acceptable? 🔴 See below |
 | transition | **1** What event triggers it? · **2** What states exist, reachable from which? 🔴 See exhaustiveness below |
 | external source | **1** What if it fails, is unavailable, returns invalid data? · **2** 🔴 What makes two incoming things the same one — and what happens to the second? |
 | synchronisation | **1** Rule when two versions diverge? · **2** What the user sees during, and on failure? · **3** 🔴 What identifies one same thing seen from both sides? And to which changes does a mirrored copy update — the list being closed |
 | background work | **1** Frequency? · **2** What if the system interrupts it — does it resume alone? |
 | journey | **1** Conditions for moving on? · **2** What if the user goes back, or abandons? |
-| screen | **1** What is displayed, where, what each action does? · **2** What is shown with no data, loading, on failure? · **3** 🔴 And what becomes of the screen itself when the system rebuilds it — what the user has in progress is kept, the rest is built again from its source |
+| screen | **1** What is displayed, where, what each action does? · **2** What is shown with no data, loading, on failure? · **3** 🔴 What the user has in progress on this screen is kept when they leave and come back, or lost — say which, for each thing they can have in progress |
 | text | **1** Exact label? · **2** What it becomes if the value is absent? |
 | access | **1** Who sees, who changes? · **2** What does someone who cannot? |
 | lifecycle | **1** How long does the data live, what becomes of it after? |
@@ -135,6 +135,11 @@ programme.
 
 *A reference table, a scale, a convention, a catalogue.*
 
+🔴 **Asked only when `A1.1` answered that nothing sets the block off.**
+📌 **Otherwise, write `A3 | not applicable` and its reason, on one
+line** — ⚠️ **a section skipped in silence and a section that does not
+apply read the same.**
+
 **`A3.1` What values, exactly?** 🔴 All of them, not a sample.
 
 **`A3.2` Who consults them?**
@@ -149,34 +154,48 @@ Default, error, or impossible by construction.
 
 # A4 — Closing test
 
-📌 **Pass A**, except its last question — see B2.
+📌 **Its last question is B2's** — see below.
 
-🔴 **Every name a block uses goes in the index**, with the value the
-block gives it. ⚠️ **Even a name you close here** — pass B needs them
-all to find one name carrying two values.
+🔴 **Write down every name a block uses**, with the value the block
+gives it. ⚠️ **Even a name you close here** — pass B needs them all to
+find one name carrying two values.
 
-**Two questions on every name a block cites:**
+🔴 **First, list what the block names and does not settle on the
+spot.** ⚠️ **Every one of them, written out** — 📌 **a judgement on a
+list you did not write covers what you did not look at.**
 
-**`A4.1`** 🔴 **Is it defined where it stands?** A name designating an
-attribute
-of the block itself points nowhere — 🔴 **a chain does not catch it.**
+📌 **A name is anything the block refers to and expects to exist**: a
+thing it displays, a value it applies, a state it distinguishes, a rule
+it invokes. 🔴 **Not only what carries a proper name** — *"the five zone
+rows"*, *"the active arc at rest"* and *"the time shown"* are names.
+
+**Then two questions on each:**
+
+**`A4.1`** 🔴 **Is it settled where it stands?** ⚠️ **A name designating
+something of the block itself points nowhere** — 🔴 **a chain does not
+catch it.**
 
 **`A4.2`** 🔴 **Does it point at something described?** A destination, a
-piece of
-data, a rule — described here, or marked *existing*.
+piece of data, a rule — described here, or marked *existing*.
 
-📌 **A block title answers this**, and the index carries the titles.
+📌 **A block title answers this.**
 ⚠️ **Open the target only when the citation asserts something about its
 content** — *"as described in B4"*, *"the same colour as B3"*. **A bare
 pointer needs no more than the title.**
 
-| The block cites | What must be there |
+| The block names | What must be there |
 |---|---|
 | A displayed text | Its exact wording |
+| A displayed value | Its exact form — 🔴 **`09:14` and `9:14` are two answers** |
 | A dimension, a position | Its value, or what it depends on |
 | A visual state | What distinguishes it from the others |
+| A set it counts | Every member, one by one, never the count alone |
 | Something existing that changes | What it becomes — never just that it changes |
 | Something existing that stays | 🔴 **Say so**; silence reads as an oversight |
+
+⚠️ **A row that returns nothing is answered too** — 📌 *the block
+displays no value*. 🔴 **Silence on a row and a row that does not apply
+read the same.**
 
 ---
 
@@ -206,27 +225,29 @@ rewrite it.
 
 ---
 
-# PASS B — the index, all blocks at once
+# PASS B — the blocks against each other
 
 # B1 — Close the block against the others
 
-📌 **Pass B.** 🔴 **Every question here is answered from the index, and
-from nothing else.**
+🔴 **Every question here needs two blocks**, and none is
+answerable from one.
 
-⚠️ **Read no block.** 📌 **A question the index cannot answer is a
-question this pass does not ask** — it belongs to pass A, or nowhere.
+## What pass A left you
 
-## What the index carries
+🔴 **Every crossing below reads pass A's answers**, never the blocks
+again:
 
-🔴 **One row per block**, filled by pass A:
-
-| Column | What it holds |
+| What you cross | Where it is |
 |---|---|
-| **Consumes** | Every piece of data the block reads, named |
-| **Produces** | Every piece of data, display, state change or mechanism it writes, named |
-| **Draws on** | The screen and area it occupies, or empty |
-| **Names** | Every name it uses, with the value it gives that name |
-| **Reads at / writes at** | The moment in the flow, when the block states one |
+| What a block consumes | `A1.2`, per block |
+| What it produces | `A1.3` |
+| Where it draws | `A1.4` |
+| When it fires | `A1.1` — 📌 **a block writes when its trigger fires** |
+| Every name it uses, with its value | `A4`'s list |
+
+📌 **Gather one of these across every block, then cross it** — 🔴 **never
+block by block**, or you re-read sixty times what one column shows at
+once.
 
 ## The crossings
 
@@ -250,7 +271,7 @@ at launch and a block writing on a user action never meet.
 one written second rarely says which.**
 
 **`B1.6` One name carrying two values.**
-📌 **See B2** — the index makes it visible.
+📌 **See B2.**
 
 ## What a crossing costs
 
@@ -267,14 +288,14 @@ before anything can consume it.
 
 ⚠️ **This is what a chain never reaches.** 📌 **A chain walks up what
 consumes and down what produces; two blocks sharing a screen, or one
-name, do neither** — 🔴 **only the index puts them side by side.**
+name, do neither** — 🔴 **only a column gathered whole shows them.**
 
 ---
 
 # B2 — One name, across the blocks
 
-📌 **Pass B.** 🔴 **Answered from the index's `Names` column, and from
-nothing else.**
+🔴 **Answered from the `Names` column, gathered across
+every block.**
 
 **`B2.1`** 🔴 **One name, used twice, is worth the same twice.** ⚠️ **Read
 every

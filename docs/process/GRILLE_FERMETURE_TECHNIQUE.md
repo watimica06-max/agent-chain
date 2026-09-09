@@ -275,6 +275,15 @@ to the code.**
 *Completeness* asks whether a rule leaves a case open; this asks
 whether an entry left a field bare.
 
+🔴 **A screen entry owes the source of everything it shows.** ⚠️ **The
+product says what the user finds again on coming back; the technical
+document says where the rest comes from** — 📌 **read from a store,
+recomputed, or requested afresh.**
+
+📌 **Asked of every screen entry**, whatever the product decided is
+kept: 🔴 **what is not kept is rebuilt from somewhere**, and a screen
+whose entry does not name that somewhere leaves it to the code.
+
 ---
 
 # Running it
