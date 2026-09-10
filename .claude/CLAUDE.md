@@ -49,8 +49,10 @@ never wait for her on anything an agent can settle.
 |---|---|---|
 | `/socle` · `/extrait` · `/diagnostique` | see each | **Outside the cycle** — set up, take over an existing app, enter on a bug |
 | `/cycle` | a feature name | **Cycle, chained** — runs the phases below in sequence, stops on any decision |
-| `/1_lexique` · `/2_structure` · `/3_decoupe` · `/3b_nature` · `/5_reclasse` · `/6_convertit` · `/fusion_compare` · `/fusion_applique` | a feature name | **Cycle, upstream** — one agent per command |
-| `/4_grille` | a feature name | **Cycle, upstream** — three sondeurs at once, then the assembleur |
+| `/1_lexique` · `/2_structure` · `/3_decoupe` · `/3b_nature` · `/fusion_compare` · `/fusion_applique` | a feature name | **Cycle, upstream** — one agent per command |
+| `/4_grille` | a feature name | **Cycle, upstream** — four sondeurs at once, three angles and one global invocation, then the assembleur |
+| `/5_reclasse` | a feature name | **Cycle, upstream** — no agent; sorts the product file by nature |
+| `/6_convertit` | a feature name | **Cycle, upstream** — the convertisseur once per nature, all at once, then once across the document |
 | `/7_lots` · `/8_code` | a feature name | **Cycle, downstream** — several agents, chained |
 | `/9_controle` · `/conventions` · `/fusion` | a feature name | **Outside the chain** — run by hand |
 
@@ -178,8 +180,6 @@ disk forever.
   Product Owner's own documents. They describe why the agents are
   built as they are, including rules that were considered and dropped.
   **Reading one puts discarded reasoning into your context.**
-  ⚠️ **The one exception is `GRILLE_CADRAGE_PRODUIT.md`**, which the
-  Rédacteur loads by name.
 - **Open `CURRENT_TECHNICAL_STATE.md`** — the Détailleur and the
   Réalisateur read it; you dispatch.
 - **Run the project's analysis or test commands** — the Réalisateur

@@ -166,6 +166,14 @@ existing domain. ⚠️ **When in doubt, file it under the existing one.**
 
 ## The shape of a questions file
 
+🔴 **Yours is `questions-redacteur-NN.md`, at the root** — 📌 **your
+number: the highest at the root, or in `questions/redacteur/` if the
+root holds none, plus one.**
+
+🔴 **Write it at every invocation, even empty** — ⚠️ **an empty one says
+nothing waits on an answer and the chain moves on; a missing one says
+you did not run.**
+
 🔴 **One entry per question, four lines, no exception.** 📌 **Numbering
 restarts at Q1 in each file.**
 
@@ -271,8 +279,8 @@ this block ever lifts.
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Structuring | `idees.md` · `lexique.md` · the global | The product file, plus a questions file when anything is flagged |
-| 2 | Integrating | 🔴 **The questions file the prompt names** · `lexique.md` · the global | The product file, updated · that questions file, its entries marked |
+| 1 | Structuring | `idees.md` · `lexique.md` · the global | The product file · your questions file |
+| 2 | Integrating | 🔴 **The questions file the prompt names** · `lexique.md` · the global | The product file, updated · that questions file, its entries marked · your questions file |
 
 🔴 **The prompt says which one, and names the file.** ⚠️ **Neither is
 ever inferred from the folder** — 📌 the orchestrator looked, you do not
@@ -286,9 +294,8 @@ the other stays unopened, whatever your curiosity.
 look for one yourself**: the orchestrator checked, and would not have
 called you on an empty decision.
 
-📌 **Invocation 2 serves every filled questions file** — a sondeur's,
-the Convertisseur's, the Fusionneur's, your own. **Same work whoever
-asked.**
+📌 **Invocation 2 serves every filled questions file** — whichever
+agent wrote it, your own included. **Same work whoever asked.**
 
 📌 **Between two sessions, re-read the product file** — it is your
 state.

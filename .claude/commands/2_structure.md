@@ -34,7 +34,21 @@ need.
 
 ## How it runs
 
-**First, the blocking file.** 🔴 **Does `blocked_redacteur.md` sit in
+**First, file the lexicographe's questions file** — 🔴 **the choice of
+invocation below reads the root after it:**
+
+    git mv docs/features/<name>/questions-lexicographe-NN.md \
+           docs/features/<name>/questions/lexicographe/
+
+⚠️ **`/1_lexique` reads the root to know which invocation it is** — 📌
+**a lexicographe file left there and an answered file beside it read as
+its fourth**, when its work is done.
+
+📌 **Create `questions/lexicographe/` if it does not exist.** ⚠️
+**Nothing to file is a normal outcome.** 📌 **What remains at the root
+is the file to integrate — one at most.**
+
+**Then, the blocking file.** 🔴 **Does `blocked_redacteur.md` sit in
 the feature folder?**
 
 | | What you do |
@@ -51,12 +65,13 @@ file.
 | At the root | Invocation | What you name |
 |---|---|---|
 | No questions file | **1 — Structuring** | `idees.md` |
-| One or more, any prefix | **2 — Integrating** | 🔴 **The highest-numbered one** |
+| One, any prefix | **2 — Integrating** | 🔴 **That one** |
+| More than one | 🔴 **Stop** — a filing failed; say which files | — |
 
 ⚠️ **Any prefix** — 📌 the agent integrates the answers whichever agent
 asked.
 
-🔴 **If the highest carries an empty `Answer:`** — 📌 **stop**, and say
+🔴 **If it carries an empty `Answer:`** — 📌 **stop**, and say
 which questions are waiting.
 
 ```
@@ -84,22 +99,13 @@ other.**
 ⚠️ **Anything left at the unnumbered name reads as a block still
 standing**, and the next run stops on it.
 
-🔴 **Grep `NEW` in `desc-produit.md`.** If any is there, **delete
-`desc-par-nature.md` and `spec-technique.md`.**
+🔴 **At invocation 2, file the questions file it integrated**, into
+`questions/<agent>/`, inside the worktree before the merge — 📌 **integrated, it waits for nothing**; ⚠️ **left
+at the root beside the Rédacteur's own, the next command could not tell
+which one waits.**
 
-⚠️ **The product file gained a block**, and anything built from the
-previous version is stale — a targeted update on that technical
-document would patch a file that no longer matches.
-
-📌 **`MODIFIED` alone does not trigger this.** ⚠️ **A block that changed
-still exists under the same identifier**, and a targeted update reaches
-it.
-
-📌 **Neither marker, nothing to delete.** An answer that only sharpened
-a sentence leaves both valid, and the cycle can return straight to
-`/5_reclasse` or `/6_convertit`.
-
-**Say which files you deleted**, or that none needed it.
+🔴 **Check `questions-redacteur-NN.md` was written** — ⚠️ **a missing one
+stops the command**: the agent says it writes one every time.
 
 🔴 **Never paraphrase the agent's process in your invocation** — not
 its inputs, its checks, its output format. It reads its own
@@ -127,17 +133,8 @@ and each reads what the previous one wrote.
 
 ## Git, in this mode
 
-🔴 **File the lexicographe's questions file before anything else:**
-
-    git mv docs/features/<name>/questions-lexicographe-NN.md \
-           docs/features/<name>/questions/lexicographe/
-
-⚠️ **`/1_lexique` reads the root to know which invocation it is** — 📌
-**a lexicographe file left there and a grid file beside it read as its
-fourth**, when its work is done.
-
-📌 **Create `questions/lexicographe/` if it does not exist.** ⚠️
-**Nothing to file is a normal outcome.**
+📌 **The lexicographe's questions file was filed first** — see *How it
+runs*.
 
 🔴 **Commit the feature folder**, before creating the worktree:
 
@@ -189,12 +186,18 @@ an unmerged branch is invisible to the next one. ⚠️ **A
 
 The agent's own report.
 
-**What to run next**
+**What to run next** — 📌 **indications for the Product Owner.**
+⚠️ **You relay them; you run nothing after this command.**
+
+🔴 **First match wins:**
 
 | What just happened | Next |
 |---|---|
-| It flagged a clarification | 🔴 **Answer it, then `/2_structure`** — nothing downstream runs while a flag stands |
-| It wrote the product file | 📌 `/3_decoupe` | 🔴 **Nothing else is yours**:
-no phase chain, no risk level, no `TaskCreate`.
+| It wrote a blocking file | 📌 Fill its `## Decision`, then `/2_structure` again |
+| Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a flag stands until answered, and nothing downstream runs meanwhile |
+| Its questions file is empty | 📌 `/3_decoupe` — 🔴 a new block is split, classed and framed before the Convertisseur reads it |
+
+🔴 **Nothing else is yours**: no phase chain, no risk level, no
+`TaskCreate`.
 
 **If it returns a `blocked_*.md`**: relay it and stop.

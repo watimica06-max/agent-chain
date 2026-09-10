@@ -687,7 +687,7 @@ second** — rien ne cesse de compiler, et personne ne lit le champ.
 Product Owner l'a décidé en le listant. 🔴 **Il ne lit pas le code
 au-delà d'un grep** : il confirme un comportement, il ne relit pas une
 implémentation. 🔴 **`desc-bug.md` prend la forme du document
-technique** — préambule, douze sections, entrées numérotées — 📌 **parce
+technique** — préambule, neuf sections, entrées numérotées — 📌 **parce
 que le Cadreur le découpe exactement comme une spec.**
 
 ---

@@ -428,10 +428,11 @@ write an entry is a blocker, not a reason to go looking.
 straight through, one investigation then one assembly. **The first
 three per gap, the last on the whole document.**
 
-**6. Give each confirmed gap a nature**, among the twelve. 📌 **The
-nature of the bearer**, not of what it calls: a screen that fails to
-invoke a calculation is a `screen` gap; a calculation that returns a
-wrong value is a `calculation` gap.
+**6. Give each confirmed gap a nature**, among the eight. 📌 **The
+nature of the bearer**, not of what it calls: a view that fails to
+invoke a calculation is a `presentation` gap; a calculation that
+returns a wrong value is a `calculation` gap. ⚠️ **A missing text key
+is no nature's** — it goes under §9 Text.
 
 **7. Write its entry**, from `## Today` and `## Expected`.
 
@@ -468,8 +469,8 @@ answers a question in this cycle.
 ### What you write
 
 **`desc-bug.md`** — the confirmed gaps only, **in the technical
-document's shape**: a preamble, twelve sections by nature, numbered
-entries inside. 🔴 **If the file already exists, stop and say so**
+document's shape**: a preamble, nine sections — the eight natures,
+then §9 Text — numbered entries inside. 🔴 **If the file already exists, stop and say so**
 rather than overwriting it.
 
     ## Preamble
@@ -493,7 +494,7 @@ rather than overwriting it.
     expected distance, and writes the outcome into the race's
     retainedFactors or rejectedCalibrations.
 
-    ## §5 External source
+    ## §5 External exchange
     ...
 
 📌 **An entry whose bearer you could not name carries
@@ -511,11 +512,11 @@ has no vocabulary of its own and depends on a feature that exists.
 🔴 **Every entry names its bearer**, on its own line, right under the
 title — **the symbol that will carry the fix.**
 
-🔴 **The twelve sections, always, empty ones included.**
+🔴 **The nine sections, always, empty ones included.**
 
-**The natures, in this order**: model · persistence · calculation ·
-transition · external source · synchronisation · background work ·
-journey · screen · text · access · lifecycle.
+**In this order**: model · persistence · calculation · transition ·
+external exchange · synchronisation · presentation · access — the eight
+natures — then text.
 
 🔴 **One entry, one gap**, numbered inside its section — `§4.1`,
 `§4.2`. **Numbered as you write, never renumbered**: a lot cites

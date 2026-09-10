@@ -46,6 +46,19 @@ file.
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
 one**, and that `/2_structure` has to run first.
 
+🔴 **File every root `questions-*.md`**, by `git mv`:
+
+    git mv docs/features/<name>/questions-<agent>-NN.md \
+           docs/features/<name>/questions/<agent>/
+
+📌 **This command reads none of them.** 🔴 **A questions file stays at
+the root only while it waits to be answered or integrated** — ⚠️ **the
+next one written has to be the only one there**, or the next command
+cannot tell which one waits.
+
+📌 **Create `questions/<agent>/` if it does not exist**; nothing to file
+is a normal outcome.
+
 ---
 
 ## Which blocks it looks at
@@ -65,6 +78,10 @@ moved since.
 
 ⚠️ **Do not grep the questions file** — 🔴 **a block an answer touched
 carries `MODIFIED`**, and the second grep finds it.
+
+📌 **Neither grep returns anything** — 🔴 **invoke nothing.** 📌
+**Commit what the filing moved, if anything, and push** — no worktree.
+Say there is nothing to split, and go to *What you relay*.
 
 ---
 
@@ -93,7 +110,7 @@ notifies on completion. Do not pass it; wait for the notification.
 
 🔴 **A blocking file you named is filed:**
 
-    git mv docs/features/<name>/blocked_decoupeur.md \\
+    git mv docs/features/<name>/blocked_decoupeur.md \
            docs/features/<name>/blocked_decoupeur-NN.md
 
 ⚠️ **Anything left at the unnumbered name reads as a block still
@@ -103,7 +120,7 @@ standing**, and the next run stops on it.
 blocks the file held before, and how many it holds now.**
 
 ⚠️ **Same count means it split nothing** — 📌 **that is a normal
-outcome**, and the cycle carries on to `/4_grille`.
+outcome**, and the cycle carries on to `/3b_nature`.
 
 🔴 **Never read a block to check its work.** 📌 **The sondeurs probe
 what it produced; that is what catches a bad split.**
@@ -158,8 +175,13 @@ too**: the Product Owner has to see it.
 
 📌 **How many blocks before, how many after.**
 
-**What to run next** — 📌 `/3b_nature`, whether it split anything or
-not.
+**What to run next** — 📌 **indications for the Product Owner.**
+⚠️ **You relay them; you run nothing after this command.**
+
+| What just happened | Next |
+|---|---|
+| It wrote a blocking file | 📌 Fill its `## Decision`, then `/3_decoupe` again |
+| Otherwise | 📌 `/3b_nature`, whether it split anything or not |
 
 🔴 **Nothing else is yours**: no risk level, no
 `TaskCreate`, no reading of what a block says.

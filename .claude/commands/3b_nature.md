@@ -46,6 +46,19 @@ file.
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
 one**, and that `/2_structure` has to run first.
 
+🔴 **File every root `questions-*.md`**, by `git mv`:
+
+    git mv docs/features/<name>/questions-<agent>-NN.md \
+           docs/features/<name>/questions/<agent>/
+
+📌 **This command reads none of them.** 🔴 **A questions file stays at
+the root only while it waits to be answered or integrated** — ⚠️ **the
+next one written has to be the only one there**, or the next command
+cannot tell which one waits.
+
+📌 **Create `questions/<agent>/` if it does not exist**; nothing to file
+is a normal outcome.
+
 ---
 
 ## Which blocks it looks at
@@ -57,8 +70,9 @@ one**, and that `/2_structure` has to run first.
 | `grep -B1 '^Nature:$'` | 🔴 **The blocks whose nature is empty** — the line above each hit carries the block |
 | `MODIFIED` | The blocks changed last turn, whose nature may have moved with them |
 
-📌 **Neither returns anything** → 🔴 **do not invoke.** ⚠️ **Say so**,
-and carry on to `/4_grille`.
+📌 **Neither returns anything** → 🔴 **do not invoke.** 📌 **Commit
+what the filing moved, if anything, and push** — no worktree. ⚠️ **Say
+there is nothing to class**, and go to *What you relay*.
 
 ⚠️ **A block with a filled nature and no marker was classed on an
 earlier turn**, and nothing about it has moved since.
@@ -106,6 +120,10 @@ you say which.
 
 📌 **Relay which blocks changed nature**, if it says any did.
 
+🔴 **Check `questions-classeur-NN.md` was written** — ⚠️ **a missing one
+stops the command**: the agent writes one every time it runs.
+🔴 **Grep `^### Q` in it** and say how many questions it holds.
+
 🔴 **Never read a block to check its work.** 📌 **The sondeurs probe
 what it classed; that is what catches a wrong nature.**
 
@@ -149,12 +167,19 @@ too**: the Product Owner has to see it.
 
 ## What you relay
 
-📌 **How many blocks were classed**, and which changed nature.
+📌 **How many blocks were classed**, which changed nature, and how many
+questions.
 
 🔴 **Nothing else is yours**: no risk level, no `TaskCreate`, no
 reading of what a block says.
 
-**What to run next** — 📌 `/4_grille`, whether it classed anything or
-not.
+**What to run next** — 📌 **indications for the Product Owner.**
+⚠️ **You relay them; you run nothing after this command.**
+
+| What just happened | Next |
+|---|---|
+| It wrote a blocking file | 📌 Fill its `## Decision`, then `/3b_nature` again |
+| Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a block producing two things is split before the grid probes it |
+| Its questions file is empty, or there was nothing to class | 📌 `/4_grille` |
 
 **If it returns `blocked_classeur.md`**: relay it and stop.

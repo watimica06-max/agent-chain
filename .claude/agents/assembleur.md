@@ -28,8 +28,12 @@ never `C:\…` or `/…`. ⚠️ **You run in a worktree.**
 ⚠️ **Not the product file, not the grid, not the code.** 📌 **You
 compare questions to each other**, never to what would answer them.
 
-🔴 **A file that is missing or empty stops you** — 📌 say which. ⚠️ **A
-merge missing one list is a merge nobody can trust.**
+🔴 **A file that is missing stops you** — 📌 say which. ⚠️ **A merge
+missing one list is a merge nobody can trust.**
+
+📌 **An empty file is a sondeur that found nothing** — 🔴 **it counts,
+and brings no question.** ⚠️ **Every file empty is how the grid says
+the product file is closed.**
 
 ## What you never do
 
@@ -117,8 +121,8 @@ are different questions, whatever they say.
 **Within a group, two questions are the same when answering one
 answers the other.**
 
-⚠️ **Answering, not wording.** 🔴 **Three readings of one document
-raise one gap from three angles** — 📌 one starts from what a table
+⚠️ **Answering, not wording.** 🔴 **Several readings of one document
+raise one gap from several angles** — 📌 one starts from what a table
 holds, another from what a message promises, a third from what a rule
 accepts. **Read past the angle to the answer that would close it.**
 
@@ -163,3 +167,7 @@ nothing, you merge nothing into one sentence.**
 
 ⚠️ **Nothing else** — 🔴 **no verdict on a question, no note on which
 sondeur found what.**
+
+📌 **No question in any file** → 🔴 **the file holds the `## Merge`
+count alone** — ⚠️ **written all the same**: its absence would read as
+*the merge did not run*.

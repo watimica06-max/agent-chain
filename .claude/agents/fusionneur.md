@@ -388,7 +388,7 @@ back as a new question rather than being interpreted.
 make targeted edits possible.
 
 **A new section goes into its domain**, after the sections of the same
-nature — screens with screens. ⚠️ **If the domain does not exist**,
+nature — presentation with presentation. ⚠️ **If the domain does not exist**,
 create one at domain level.
 
 ### Transposing to the descriptive present

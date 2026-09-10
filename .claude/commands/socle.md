@@ -9,10 +9,6 @@ Create, and nothing else:
 
 - `docs/PRODUIT_GLOBAL.md` — with `# Application` as its only line
 - `docs/features/` — empty
-- `docs/process/GRILLE_CADRAGE_PRODUIT.md` — only if absent; never
-  overwrite it
-- `docs/process/GRILLE_FERMETURE_TECHNIQUE.md` — same rule; the
-  Convertisseur loads it by name
 
 **In `.gitignore`, at the project root** — 🔴 **append if the lines are
 absent**, never rewrite the file:

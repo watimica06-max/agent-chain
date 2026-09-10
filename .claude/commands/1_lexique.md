@@ -1,5 +1,5 @@
 ---
-description: Settle the idea file's vocabulary before the product file is written
+description: Settle the vocabulary — the idea file's before the product file is written, then every answered questions file's
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent
 argument-hint: "<feature folder name>"
 ---
@@ -11,6 +11,9 @@ Act as the orchestrator, in **upstream mode**.
 📌 **It runs before `/2_structure`, and loops** until a questions file
 comes out empty. 🔴 **Then the vocabulary is settled**, and the chain
 starts.
+
+📌 **It runs again on every answered questions file of the grid or of
+the conversion** — 🔴 **before `/2_structure` integrates it.**
 
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
@@ -50,13 +53,18 @@ never the number.**
 
 | At the root | Invocation |
 |---|---|
-| Neither questions file | **1 — Sweeping** |
+| No questions file | **1 — Sweeping** |
 | `questions-lexicographe` alone | **2 — Settling** |
-| `questions-sondeur` alone | **3 — Watching** |
-| Both | **4 — Correcting** |
+| Another agent's questions file alone | **3 — Watching** |
+| Another agent's, and `questions-lexicographe` | **4 — Correcting** |
+| Two files of other agents | 🔴 **Stop** — a filing failed; say which files |
 
-⚠️ **`/2_structure` files the lexicographe's**, 📌 **`/4_grille` files
-whatever is not its own** — 🔴 **which is what keeps these four apart.**
+📌 **Call the other agent's file *the answered file***, whichever agent
+wrote it — 🔴 **3 and 4 name it in the prompt.**
+
+⚠️ **Every command of the cycle files the questions files it does not
+read** — 🔴 **which is what keeps these four apart**: the root holds at
+most the file waiting on you, and yours.
 
 **A file with an empty `Answer:`** → 🔴 **stop**, and say which
 questions are waiting.
@@ -64,14 +72,15 @@ questions are waiting.
 📌 **After 2, run 1 again** — 🔴 **a settled term can uncover a pair the
 first sweep could not see.**
 
-📌 **After 4, the grid's file is clean** — 🔴 **run `/2_structure`.**
+📌 **After 4, the answered file is clean** — 🔴 **run `/2_structure`.**
 
 ⚠️ **An empty questions file ends a loop.**
 
 🔴 **A `desc-produit.md` in the folder does not stop 3 or 4** — 📌 they
-run on every turn of the grid. ⚠️ **It stops 1 and 2**: the vocabulary
-is settled before the product file exists, never after — a term changed
-then would leave sixty blocks carrying the old one.
+run on every turn of the grid and of the conversion. ⚠️ **It stops 1
+and 2**: the vocabulary is settled before the product file exists,
+never after — a term changed then would leave sixty blocks carrying the
+old one.
 
 ---
 
@@ -85,6 +94,8 @@ Agent(
   prompt="The idea file: docs/features/<name>/idees.md.
           Invocation <1 — Sweeping, 2 — Settling,
                        3 — Watching, or 4 — Correcting>.
+          <At 3 and 4: The answered file:
+           docs/features/<name>/questions-<agent>-NN.md.>
           Write to docs/features/<name>/."
 )
 ```
@@ -102,11 +113,15 @@ notifies on completion. Do not pass it; wait for the notification.
 
 🔴 **A blocking file you named is filed:**
 
-    git mv docs/features/<name>/blocked_lexicographe.md \\
+    git mv docs/features/<name>/blocked_lexicographe.md \
            docs/features/<name>/blocked_lexicographe-NN.md
 
 ⚠️ **Anything left at the unnumbered name reads as a block still
 standing**, and the next run stops on it.
+
+🔴 **After 2 or 4, file the lexicographe's questions file it applied**,
+into `questions/lexicographe/`, inside the worktree before the merge — ⚠️ **left at the root, it would read
+as waiting again**, and the next run would take it for invocation 2.
 
 **After every invocation** — 🔴 **check `lexique.md` exists**, and grep
 its two counts: `retenu` for what is settled, the lines under
@@ -124,13 +139,15 @@ them, not you.**
 
 ## Git, in this mode
 
-🔴 **File the previous turn's questions file before invoking:**
+🔴 **Before invoking, file every root `questions-*.md` this invocation
+does not read** — ⚠️ **the lexicographe's is read at 2 and 4, the
+answered file at 3 and 4**:
 
-    git mv docs/features/<name>/questions-lexicographe-NN.md \
-           docs/features/<name>/questions/lexicographe/
+    git mv docs/features/<name>/questions-<agent>-NN.md \
+           docs/features/<name>/questions/<agent>/
 
-📌 **The highest-numbered one stays at the root** — it carries the
-numbering. ⚠️ **Create `questions/lexicographe/` if it does not exist.**
+📌 **Create `questions/<agent>/` if it does not exist**; nothing to file
+is a normal outcome.
 
 🔴 **Then commit the feature folder**, before creating the worktree:
 
@@ -171,13 +188,17 @@ too**: the Product Owner has to see it.
 
 ## What you relay
 
-**What to run next**
+**What to run next** — 📌 **indications for the Product Owner.**
+⚠️ **You relay them; you run nothing after this command.**
 
 | What just happened | Next |
 |---|---|
-| 1 or 3 asked something | 📌 Answer them, then `/1_lexique` again |
-| 2 ran, and 1 finds nothing left | 📌 `/2_structure` |
-| 4 ran | 📌 `/2_structure` — 🔴 the grid's answers are settled |
+| It wrote a blocking file | 📌 Fill its `## Decision`, then `/1_lexique` again |
+| 1 asked something | 📌 Answer them, then `/1_lexique` again |
+| 1 asked nothing | 📌 `/2_structure` — 🔴 the vocabulary is settled |
+| 2 ran | 📌 `/1_lexique` again — 🔴 a settled term can uncover a pair |
+| 3 ran | 📌 **Answer its questions if it asked any, then `/1_lexique` again** — 🔴 4 replaces the retired terms the answers carry, questions or not |
+| 4 ran | 📌 `/2_structure` — 🔴 the answers are settled |
 
 🔴 **Nothing else is yours**: no risk level, no
 `TaskCreate`, no reading of what a term means.

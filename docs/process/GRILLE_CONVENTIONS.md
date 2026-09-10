@@ -9,13 +9,14 @@ and a convention is an implementation decision. **What the Architecte
 looks for is where two entries could be built differently.**
 
 📌 **Two properties of the technical document do the work**: the
-natures — a closed vocabulary of twelve, so a sweep can be exhaustive —
+natures — a closed vocabulary of eight, so a sweep can be exhaustive —
 and `Consumes:` — a declared graph, so it can be read mechanically.
 
-**Notation.** `N1`–`N12` are the natures of the technical document, in
-order: model, persistence, calculation, transition, external source,
-synchronisation, background work, journey, screen, text, access,
-lifecycle. `C1`–`C12` are the sections of the conventions file.
+**Notation.** `N1`–`N9` are the sections of the technical document, in
+order: model, persistence, calculation, transition, external exchange,
+synchronisation, presentation, access — the eight natures — then text,
+the one section no block carries by nature. `C1`–`C12` are the sections
+of the conventions file.
 
 🔴 **Never write `§2.5` alone.** It is ambiguous between the two.
 
@@ -88,7 +89,7 @@ they feed the triggers and the holes of part B.*
 | **V6** | Cross-coverage: one product block ↔ one technical entry, both ways | match the identifiers |
 | **V7** | Pairs of entries consuming the same entry with diverging expectations | cross V2 |
 | **V8** | Quantities carrying a unit, a scale or an identity, and facts stated as always true | sweep N1 |
-| **V9** | Ambient sources each entry reads: clock, randomness, locale, environment | sweep N2, N3, N5, N7 |
+| **V9** | Ambient sources each entry reads: clock, randomness, locale, environment | sweep N2, N3, N5 |
 | **V10** | Writes declared to happen before a call returns | sweep N2 |
 
 🔴 **V2 is the most valuable reading of this grid.** It turns the
@@ -308,16 +309,16 @@ the hole is the Architecte's own call, informed by V1 and V3
 🔴 **The list is written out in the rule.** A convention that points at
 a file the four agents do not read is a convention they cannot follow.
 
-**G4.5** · *Question*: where does data from outside come in? ·
+**G4.5** · *Question*: where does the program meet other systems? ·
 *Trigger*: N5 non-empty
-- **Form**: "Every access to an external source is confined to
+- **Form**: "Every exchange with another system is confined to
   `<boundary module>`; no other module depends on `<client library>`."
 - **Test**: mechanical — `<the dependency check>`.
 
-**G4.6** · *Question*: who may depend on a screen? · *Trigger*: N9
-non-empty
-- **Form**: "No screen module is depended on by a module of another
-  nature."
+**G4.6** · *Question*: who may depend on a presentation module? ·
+*Trigger*: N7 non-empty
+- **Form**: "No presentation module is depended on by a module of
+  another nature."
 - **Test**: mechanical — `<the dependency check>`.
 
 **G4.7** · *Question*: which adapters do two application modules both
@@ -374,14 +375,14 @@ the same.
 - **Test**: review.
 
 **G5.3** · *Question*: which operations can block or run long? ·
-*Trigger*: N5 or N7 non-empty
+*Trigger*: N5 non-empty, or an entry runs with nobody waiting on it
 - **Form**: "Every public operation that can block accepts
   `<the platform's cancellation mechanism>` in its signature. No
   unbounded wait is reachable from a public boundary."
 - **Test**: signature review; mechanisable on the modules concerned.
 
 **G5.4** · *Question*: which data can be missing at display time? ·
-*Trigger*: N9 non-empty
+*Trigger*: N7 non-empty
 - **Form**: "Missing data is carried by `<absence type>`; no module
   invents a default for data that is not there."
 - **Test**: review.
@@ -423,7 +424,7 @@ like an answer.
 
 **G5.8** · *Question*: which operations reach a store, a device or the
 network, and what does their signature say about it? · *Trigger*: N2,
-N5, N6 or N7 non-empty
+N5 or N6 non-empty
 - **Form**: "An operation reaching outside the process says so in its
   signature, in whatever way `<the platform>` expresses waiting. 🔴 **It
   moves to the thread that work belongs on, inside its own
@@ -501,14 +502,14 @@ where do they stop? · *Trigger*: N5 or N6 non-empty
 as a file or a service is.
 
 **G6.4** · *Question*: what reaches outside the process, and what does
-it hand back when it fails? · *Trigger*: N2, N5, N6 or N7 non-empty
+it hand back when it fails? · *Trigger*: N2, N5 or N6 non-empty
 - **Form**: "Every call leaving the process — a store, a device, the
   network, a deserialisation — returns its failure as a value. 🔴 **What
   it needs before it can run at all** — a permission, a service, a
   client — **is checked before, not caught after.**"
 - **Test**: a failure-injection test per boundary.
 
-📌 **G6.3 covers what an external source hands in.** 🔴 **This one
+📌 **G6.3 covers what another system hands in.** 🔴 **This one
 covers everything else that leaves the process** — a store raises, a
 deserialisation raises, a platform service may not be there at all.
 
@@ -529,7 +530,7 @@ N4 entry names at least one
   no-op."
 - **Test**: review; paired with G10.4.
 
-**G6.7** · *Question*: what does a refusal return? · *Trigger*: N11
+**G6.7** · *Question*: what does a refusal return? · *Trigger*: N8
 non-empty
 - **Form**: "An access refusal is a declared error type, never empty
   data, a truncated list or silence."
@@ -565,7 +566,8 @@ the invariant forbids** — synchronous is not enough.
 - **Test**: mechanical where `<language>` allows; review otherwise.
 
 **G7.2** · *Question*: which objects does the platform construct
-rather than the code? · *Trigger*: N9, N11 or N12 non-empty
+rather than the code? · *Trigger*: N7 or N8 non-empty, or an entry
+runs with nobody waiting on it
 - **Form**: "🔴 **What the platform constructs receives its dependencies
   through `<the mechanism>`** — never by reading them from a module
   variable, never by building them itself."
@@ -615,17 +617,18 @@ the first lot unable to build anything the platform constructs.
 same lock** — and the wait is often invisible at the line that takes
 it.
 
-**G7.7** · *Question*: who holds the state of a journey? · *Trigger*:
-N8 non-empty
-- **Form**: "The state of a journey is held by one module, and this
-  file says which. 🔴 **Every journey**, whether or not an entry names
-  it as one."
-- **Test**: review, journey by journey.
+**G7.7** · *Question*: who holds the state of a path across several
+views? · *Trigger*: an N7 entry says what moves the user from one view
+to the next
+- **Form**: "The state of a path across several views is held by one
+  module, and this file says which. 🔴 **Every such path**, whether or
+  not an entry names it as one."
+- **Test**: review, path by path.
 
 ---
 
 **G7.8** · *Question*: what does each screen hold that the system can
-take away? · *Trigger*: N9 non-empty
+take away? · *Trigger*: N7 non-empty
 - **Form**: "Every screen keeps what the user has in progress across a
   system rebuild. 🔴 **Anything they have entered, opened or selected
   and not yet confirmed.**"
@@ -646,7 +649,7 @@ process dies? · *Trigger*: N2 non-empty
 📌 **G7.8 covers a screen the system rebuilds.** 🔴 **This covers the
 process dying** — a different event, and a different answer.
 
-**G7.10** · *Question*: none, fixed entry · *Trigger*: N9 non-empty
+**G7.10** · *Question*: none, fixed entry · *Trigger*: N7 non-empty
 - **Form**: "A screen reads a source once per entry, never once per
   frame. A read that is not remembered is a read on every redraw."
 - **Test**: review; mechanical where the platform's own tooling
@@ -667,7 +670,7 @@ to end.
 ## C8 — Configuration and secrets
 
 **G8.1** · *Question*: what must be ready before anything answers? ·
-*Trigger*: N12 non-empty
+*Trigger*: N2, N5 or N8 non-empty
 - **Form**: "Anything that must be ready before the application answers
   is validated at start-up, and failure stops immediately, naming the
   one at fault. 🔴 **Whatever it is** — a setting, a permission, a
@@ -679,7 +682,7 @@ to end.
   command-line or configuration-file read anywhere else."
 - **Test**: mechanical — call check.
 
-**G8.3** · *Question*: none, fixed entry · *Trigger*: N5 or N11
+**G8.3** · *Question*: none, fixed entry · *Trigger*: N5 or N8
 non-empty
 - **Form**: "No secret in clear in the code, the tests or a default
   value; a secret is referred to by name."
@@ -695,7 +698,7 @@ non-empty
 - **Test**: mechanical — call check.
 
 **G9.2** · *Question*: which data is attached to a person? · *Trigger*:
-an N1 or N11 entry names such data
+an N1 or N8 entry names such data
 - **Form**: "No data attached to a person appears in a log message,
   not even truncated. 🔴 **Whatever carries it** — a measurement, an
   identifier, a name, a place, a time it happened."
@@ -772,11 +775,11 @@ which of them has an interruption test? · *Trigger*: V10 non-empty
 - **Test**: review; partly mechanical.
 
 **G11.3** · *Question*: are user-facing strings keys or literals? ·
-*Trigger*: N10 non-empty
+*Trigger*: N9 non-empty
 - **Form**: "No user-facing string is a literal in the code: a key and
   a table."
 
-  🔴 **"The key is the one its own N10 entry names — every N10 entry,
+  🔴 **"The key is the one its own N9 entry names — every N9 entry,
   not one of them."**
 - **Test**: mechanical — literal check outside the resource files.
 
@@ -865,7 +868,7 @@ was an estimate, and every pass exceeded it.
 
 ⚠️ **Two places where the budget strains:**
 
-📌 **C11 reaches three dense rules** when N10 is non-empty. **If G11.2
+📌 **C11 reaches three dense rules** when N9 is non-empty. **If G11.2
 is fully carried by the linter, it moves to C2.**
 
 📌 **C6 and C10 are paired** — G6.6 with G10.4, G6.8 with G10.7. 🔴

@@ -1,17 +1,18 @@
 ---
-description: Probe the product file against the framing grid, three readings at once
+description: Probe the product file against the framing grid — three angles and one global invocation at once
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent
 argument-hint: "<feature folder name>"
 ---
 
 Act as the orchestrator, in **upstream mode**.
 
-**This command invokes `sondeur` three times in parallel, then
+**This command invokes `sondeur` four times in parallel, then
 `assembleur` once.**
 
-📌 **Three sondeurs read the same document under the same grid, in
-three different orders.** 🔴 **The union of what they raise is the
-turn's output** — ⚠️ **not what they agree on.**
+📌 **Three angles run pass A, each in its own reading order, on the
+blocks that moved; one global invocation records every block and runs
+passes B and C.** 🔴 **The union of what they raise is the turn's
+output** — ⚠️ **not what they agree on.**
 
 📌 **It runs as many times as needed.** Each run writes the next
 `questions-sondeur-NN.md`. **An empty one ends the loop**; then run
@@ -36,14 +37,24 @@ or a questions file's content.**
 
 ## Before anything else
 
-🔴 **Does a `blocked_sondeur.md` or a `blocked_assembleur.md` sit in
-the feature folder?**
+🔴 **Does a blocking file sit in the feature folder, unnumbered?** 📌
+**Five names, one per invocation this command runs** — ⚠️ **the four
+sondeurs run at once, and a shared name would let one overwrite
+another:**
+
+| File | Whose |
+|---|---|
+| `cadrage-produit/blocked_par-bloc.md` | The sondeur reading block by block |
+| `cadrage-produit/blocked_par-question.md` | The sondeur reading question by question |
+| `cadrage-produit/blocked_par-nature.md` | The sondeur reading by nature |
+| `cadrage-produit/blocked_global.md` | The global invocation |
+| `blocked_assembleur.md`, at the feature folder's root | The assembleur |
 
 | | What you do |
 |---|---|
-| Neither | 📌 Carry on |
+| None | 📌 Carry on |
 | One, its `## Decision` empty | 🔴 **Stop** — say which one still stands |
-| One, its `## Decision` filled | 📌 **Name it in that agent's prompt** |
+| One, its `## Decision` filled | 📌 **Name it in that agent's prompt, and in no other** |
 
 ⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
 file.
@@ -58,38 +69,45 @@ one**, and that `/2_structure` has to run first.
 
 ---
 
-## Which blocks pass A probes
+## Which blocks the angles probe
 
 **First turn — no `questions-sondeur-*.md` anywhere:** 🔴 **every
 block.** 📌 **Name none in the prompts.**
 
-**Later turns — three greps, and the union of what they return:**
+**Later turns — two greps in `desc-produit.md`, and the union of what
+they return:**
 
-| Grep | In | What it names |
-|---|---|---|
-| `^Block:` | The highest `questions-sondeur-NN.md` | The blocks an answer touched |
-| `NEW` | `desc-produit.md` | The blocks created last turn |
-| `MODIFIED` | `desc-produit.md` | The blocks changed last turn |
+| Grep | What it names |
+|---|---|
+| `NEW` | The blocks created last turn |
+| `MODIFIED` | The blocks changed last turn |
 
-🔴 **A question naming two blocks sends both.** ⚠️ **A `Block: -` names
-none** — 📌 what its answer changed carries `MODIFIED`.
+⚠️ **Never the questions file** — 🔴 **a block an answer touched carries
+`MODIFIED`**, and the second grep finds it.
 
-⚠️ **This narrows pass A alone.** 🔴 **Passes B and C run whole every
-turn.**
+⚠️ **This narrows the angles alone.** 🔴 **The global invocation reads
+every block, every turn** — a changed block changes its crossings with
+the others.
 
-📌 **The three sondeurs get the same list.**
+📌 **The three angles get the same list.**
+
+📌 **Neither grep returns anything, on a later turn** → 🔴 **invoke
+nothing.** 📌 **Nothing moved since a turn whose questions are
+answered** — write `questions-sondeur-NN.md` empty, commit and push
+without a worktree, and go to *What you relay*.
 
 ---
 
-## The three invocations
+## The four invocations
 
-🔴 **The three `Agent(...)` calls go in one message.** ⚠️ **Three
+🔴 **The four `Agent(...)` calls go in one message.** ⚠️ **Several
 messages run them in series** — 📌 they share nothing, and issued
 together the wall-clock cost is one sondeur's.
 
-🔴 **Then wait for all three** before anything else.
+🔴 **Then wait for all four** before anything else.
 
-**They differ by one line, and one line only — their reading order.**
+**The three angles differ by one line, and one line only — their
+reading order.**
 
 ```
 Agent(
@@ -97,10 +115,12 @@ Agent(
   description="Probe <name>, by block",
   prompt="The product file: docs/features/<name>/desc-produit.md.
           The grid: docs/process/GRILLE_CADRAGE_PRODUIT_V2.md.
+          Invocation 1 — Angle.
           Pass A on these blocks: <list — or: every block>.
           Your reading order: block by block, in the document's order.
           Take every grid question to a block before moving to the next.
-          Write to docs/features/<name>/cadrage-produit/par-bloc.md."
+          Write to docs/features/<name>/cadrage-produit/par-bloc.md.
+          <Plus: cadrage-produit/blocked_par-bloc.md, its decision is filled.>"
 )
 ```
 
@@ -110,11 +130,13 @@ Agent(
   description="Probe <name>, by question",
   prompt="The product file: docs/features/<name>/desc-produit.md.
           The grid: docs/process/GRILLE_CADRAGE_PRODUIT_V2.md.
+          Invocation 1 — Angle.
           Pass A on these blocks: <list — or: every block>.
           Your reading order: question by question. Take one grid
           question to every block in scope, then move to the next
           question.
-          Write to docs/features/<name>/cadrage-produit/par-question.md."
+          Write to docs/features/<name>/cadrage-produit/par-question.md.
+          <Plus: cadrage-produit/blocked_par-question.md, its decision is filled.>"
 )
 ```
 
@@ -124,10 +146,27 @@ Agent(
   description="Probe <name>, by nature",
   prompt="The product file: docs/features/<name>/desc-produit.md.
           The grid: docs/process/GRILLE_CADRAGE_PRODUIT_V2.md.
+          Invocation 1 — Angle.
           Pass A on these blocks: <list — or: every block>.
           Your reading order: by nature. Gather the blocks of one
           nature, probe them together, then move to the next nature.
-          Write to docs/features/<name>/cadrage-produit/par-nature.md."
+          Write to docs/features/<name>/cadrage-produit/par-nature.md.
+          <Plus: cadrage-produit/blocked_par-nature.md, its decision is filled.>"
+)
+```
+
+**The global invocation:**
+
+```
+Agent(
+  subagent_type="sondeur", model="opus",
+  description="Record and cross <name>",
+  prompt="The product file: docs/features/<name>/desc-produit.md.
+          The grid: docs/process/GRILLE_CADRAGE_PRODUIT_V2.md.
+          Invocation 2 — Global: every block.
+          Write the record to docs/features/<name>/cadrage-produit/releve.md.
+          Write to docs/features/<name>/cadrage-produit/global.md.
+          <Plus: cadrage-produit/blocked_global.md, its decision is filled.>"
 )
 ```
 
@@ -138,26 +177,28 @@ checks, its output format. It reads its own instructions.
 either** — in this environment the Agent tool always runs async and
 notifies on completion. Do not pass it; wait for the notifications.
 
-❌ **Never pass `isolation`** — 📌 **the three read the same files and
-write three different ones**, and none reads what another wrote.
+❌ **Never pass `isolation`** — 📌 **the four read the same files and
+write different ones**, and none reads what another wrote.
 
 ---
 
 ## Then the merge
 
-🔴 **Check the three files exist.** 📌 **A missing one stops the
-command** — say which, and go no further. ⚠️ **A merge missing one
-reading is a merge nobody can trust.**
+🔴 **Check the four questions files exist, and the record.** 📌 **A
+missing one stops the command** — say which, and go no further. ⚠️ **A
+merge missing one reading is a merge nobody can trust.**
 
 ```
 Agent(
   subagent_type="assembleur", model="sonnet",
-  description="Merge the three readings of <name>",
+  description="Merge the four readings of <name>",
   prompt="Merge, in docs/features/<name>/cadrage-produit/:
             par-bloc.md
             par-question.md
             par-nature.md
-          Write to docs/features/<name>/cadrage-produit/questions.md."
+            global.md
+          Write to docs/features/<name>/cadrage-produit/questions.md.
+          <Plus: blocked_assembleur.md, its decision is filled.>"
 )
 ```
 
@@ -165,16 +206,18 @@ Agent(
 
 ## Once it has reported
 
-🔴 **A blocking file you named is filed:**
+🔴 **A blocking file you named is filed**, in the folder it sits in:
 
-    git mv docs/features/<name>/blocked_<agent>.md \
-           docs/features/<name>/blocked_<agent>-NN.md
+    git mv docs/features/<name>/cadrage-produit/blocked_par-bloc.md \
+           docs/features/<name>/cadrage-produit/blocked_par-bloc-NN.md
 
 ⚠️ **Anything left at the unnumbered name reads as a block still
 standing**, and the next run stops on it.
 
 🔴 **Copy `cadrage-produit/questions.md` to
-`questions-sondeur-NN.md`** at the feature folder's root.
+`questions-sondeur-NN.md`** at the feature folder's root — 📌 **`NN`:
+the highest `questions-sondeur-NN.md` in `questions/sondeur/`, plus
+one**; ⚠️ the root holds none by now.
 
 📌 **Renumber `Q1` upward.** ⚠️ **Drop its closing `## Merge`
 section** — 🔴 it is a working note, not a question.
@@ -189,25 +232,25 @@ what ends the loop.**
 
 ## Git, in this mode
 
-🔴 **Before invoking, file every root `questions-*.md` whose prefix is
-not `sondeur`:**
+🔴 **Before invoking, file every root `questions-*.md`:**
 
-    git mv docs/features/<name>/questions-<other>-NN.md \
-           docs/features/<name>/questions/<other>/
+    git mv docs/features/<name>/questions-<agent>-NN.md \
+           docs/features/<name>/questions/<agent>/
+
+📌 **This command reads none of them.** 🔴 **A questions file stays at
+the root only while it waits to be answered or integrated** — ⚠️ **the
+next one written has to be the only one there.**
 
 ⚠️ **`git mv`, never a read-and-rewrite** — the agents must not open
 those files, and neither should you.
 
-🔴 **And every `questions-sondeur-NN.md` but the highest** — the last
-one stays at the root, it carries the numbering.
-
-🔴 **And the previous turn's four `cadrage-produit/` files:**
+🔴 **And the previous turn's six `cadrage-produit/` files:**
 
     git mv docs/features/<name>/cadrage-produit/par-bloc.md \
            docs/features/<name>/cadrage-produit/closed/par-bloc-NN.md
 
-📌 **The same for `par-question.md`, `par-nature.md` and
-`questions.md`.**
+📌 **The same for `par-question.md`, `par-nature.md`, `global.md`,
+`releve.md` and `questions.md`.**
 
 📌 **Create `questions/<agent>/` and `cadrage-produit/closed/` if they
 do not exist.**
@@ -271,12 +314,14 @@ merges too**: the Product Owner has to see it.
 📌 **How many questions each reading raised**, and how many the merge
 kept.
 
-**What to run next**
+**What to run next** — 📌 **indications for the Product Owner.**
+⚠️ **You relay them; you run nothing after this command.**
 
-| The questions file | Next |
+| The run | Next |
 |---|---|
-| Holds questions | 📌 **Answer them, then `/1_lexique`** — 🔴 it settles the vocabulary your answers brought, before the Rédacteur reads them |
-| Is empty | 📌 `/5_reclasse` — 🔴 the product file is closed |
+| Wrote a blocking file | 📌 Fill its `## Decision`, then `/4_grille` again |
+| Its questions file holds questions | 📌 **Answer them, then `/1_lexique`** — 🔴 it settles the vocabulary your answers brought, before the Rédacteur reads them |
+| Its questions file is empty | 📌 `/5_reclasse` — 🔴 the product file is closed |
 
 🔴 **Nothing else is yours**: no risk level, no
 `TaskCreate`, no reading of what the questions say.

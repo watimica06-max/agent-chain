@@ -58,7 +58,7 @@ directly.
 | A screen | What it displays, the strings from the language files, the conditions, what each action does |
 | A service | The rule, its inputs, its output, its values |
 | An entity | Its fields, their types and bounds |
-| An external source | What is read, with what priorities |
+| An external exchange | What is read or sent, with what priorities |
 
 **Level of detail**: 🔴 **what comes from the theme goes in the theme
 section, everything else is described.** A colour named from the theme
@@ -90,14 +90,13 @@ block talks about two things, split it.
 **Every block carries its nature**, on the line under its title:
 
     ### Rejecting invalid durations
-    Nature: external source
+    Nature: external exchange
 
     An entry whose duration is negative or over 24 hours is ignored: it
     appears nowhere and produces no message.
 
 **The natures**: model · persistence · calculation · transition ·
-external source · synchronisation · background work · journey ·
-screen · text · access · lifecycle.
+external exchange · synchronisation · presentation · access.
 
 ⚠️ **A block with two natures holds two subjects.** Split it.
 

@@ -1,17 +1,17 @@
 ---
-description: Produce the technical document for the Cadreur
+description: Produce the technical document for the Cadreur, one nature at a time
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent
 argument-hint: "<feature folder name>"
 ---
 
 Act as the orchestrator, in **upstream mode**.
 
-**This command invokes `convertisseur`, invocation 2 — Producing.**
+**This command invokes `convertisseur` — invocation 1 once per nature
+that has to be written, all at once; then invocation 2, once.**
 
-📌 **It can run more than once.** If it had to assume something, it
-writes `questions-convertisseur-NN.md` alongside the document and marks
-each assumption `<<ASSUMED …>>`; answering and re-running updates those
-marks in place.
+📌 **It runs as many times as needed.** 🔴 **Each run writes again only
+the sections whose blocks changed, or that still carry an `<<ASSUMED`
+mark**, and keeps the others as they stand.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
@@ -22,56 +22,63 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 ## What you read
 
-Nothing. Each agent declares its own inputs; you pass the feature
-folder and nothing else. `CLAUDE.md`'s standing reading rules apply:
-never open `CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+🔴 **Greps, byte comparisons and copies, and nothing else.** 📌 **You
+never read a block, an entry or a question for what it says.**
+
+⚠️ **`CLAUDE.md`'s standing reading rules apply**: never open
+`CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
 
 ---
 
-## How it runs
+## Before anything else
 
-**What you do**: invoke the agent via `Agent()` with the feature folder
-and which invocation it is — and nothing else.
+**1.** 🔴 **`code/decoupage.md` exists → stop.** ⚠️ **The split is cut,
+and a lot cites entries by number** — 📌 **writing a section again would
+renumber it under the lot.** Say that a change to the product now
+belongs to a new cycle.
 
-🔴 **Never paraphrase the agent's process in your invocation** — not
-its inputs, its checks, its output format. It reads its own
-instructions.
+**2.** 🔴 **`desc-par-nature.md` absent → stop.** Say `/5_reclasse` has
+to run first.
 
-### Invocation parameters
+**3. The blocking files** — `convertisseur/blocked_<nature>.md` and
+`convertisseur/blocked_transversal.md`, unnumbered:
 
-```
-Agent(
-  subagent_type="<agent>",
-  model="opus",
-  description="<phase> <feature>",
-  prompt="Feature folder: docs/features/<name>/. <Which invocation>."
-)
-```
+| | What you do |
+|---|---|
+| None | 📌 Carry on |
+| One, its `## Decision` empty | 🔴 **Stop** — say which one still stands |
+| One, its `## Decision` filled | 📌 **Name it in that invocation's prompt** |
 
-❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
-either** — in this environment the Agent tool always runs async and
-notifies on completion. Do not pass it; wait for the notification.
-
-❌ **Never pass `isolation`** — the phases are sequential
-and each reads what the previous one wrote.
+⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
+file.
 
 ---
 
-## Git, in this mode
+## Git, before invoking
 
-🔴 **Before invoking, move every root `questions-*.md` whose prefix is
-not `convertisseur`:**
+🔴 **Move every root `questions-*.md`:**
 
-    git mv docs/features/<name>/questions-<other>-NN.md \
-           docs/features/<name>/questions/<other>/
+    git mv docs/features/<name>/questions-<agent>-NN.md \
+           docs/features/<name>/questions/<agent>/
+
+📌 **This command reads none of them.** 🔴 **A questions file stays at
+the root only while it waits to be answered or integrated** — ⚠️ **the
+next one written has to be the only one there.**
 
 ⚠️ **`git mv`, never a read-and-rewrite** — the agent must not open
 those files, and neither should you.
 
-🔴 **And every `questions-convertisseur-NN.md` but the highest** — the
-last one stays at the root, it carries the numbering.
+🔴 **And every `convertisseur/questions-*.md` the last run wrote**, into
+`convertisseur/closed/`, each under the next free number:
 
-📌 **Create `questions/<agent>/` if it does not exist.**
+    git mv docs/features/<name>/convertisseur/questions-presentation.md \
+           docs/features/<name>/convertisseur/closed/questions-presentation-NN.md
+
+⚠️ **They were merged already** — 📌 **left in place, a nature that does
+not run this time would see its old questions merged again.**
+
+📌 **Create `questions/<agent>/` and `convertisseur/closed/` if they do
+not exist.**
 
 🔴 **Then commit the feature folder**, before creating the worktree:
 
@@ -79,9 +86,8 @@ last one stays at the root, it carries the numbering.
 
 ⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
 session.** A worktree branches from the last commit — uncommitted
-answers are invisible inside it, and the agent works on a stale
-`questions.md`. *(Seen once: 186 lines in the worktree, 195 in the main
-checkout.)*
+answers are invisible inside it. *(Seen once: 186 lines in the
+worktree, 195 in the main checkout.)*
 
 📌 **Nothing to commit is a normal outcome** — carry on.
 
@@ -90,17 +96,182 @@ checkout.)*
     git worktree add .claude/worktrees/<name> HEAD
 
 ⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. An agent
-would then work on stale content and its output would have to be
-discarded. *(Seen once: a whole invocation lost that way.)*
+`origin/master`, which can sit several commits behind local. *(Seen
+once: a whole invocation lost that way.)*
 
-📌 **Enter the worktree before invoking the agent**, not after it
+📌 **Enter the worktree before anything below**, not after a write
 fails — the harness blocks a subagent's writes until the session is
-isolated. *(Measured on three
-phases: the agent does the full job, cannot write, and the whole
-invocation is redone.)*
+isolated. *(Measured on three phases: the agent does the full job,
+cannot write, and the whole invocation is redone.)*
 
-**Then, once the agent reports:**
+🔴 **Inside it, create `convertisseur/closed/`** if it is not there —
+⚠️ an agent whose target folder is missing searches instead of
+stopping.
+
+---
+
+## Which natures run
+
+**For each of the eight natures**, take its part of `desc-par-nature.md` —
+the lines under its `## <nature>` heading, up to the next `## `. 📌
+**`<nature>` in a file name takes a hyphen for a space** —
+`convertisseur/external-exchange.md`.
+
+| What you find | The nature |
+|---|---|
+| Its part holds no block | 🔴 **Runs nowhere** — delete its `<nature>.md`, `<nature>-input.md` and `<nature>-notes.md` if they are there; its section is written empty |
+| Its part differs from `convertisseur/<nature>-input.md`, or that file is absent | 🔴 **Runs** |
+| `convertisseur/<nature>.md` is absent | 🔴 **Runs** — its last run wrote no section |
+| `convertisseur/<nature>.md` holds `<<ASSUMED` | 🔴 **Runs** — ⚠️ **a mark is lifted only by writing its section again** |
+| `convertisseur/blocked_<nature>.md` carries a filled `## Decision` | 🔴 **Runs** — ⚠️ **a decision is applied only by the invocation it is named to** |
+| None of the above | 📌 **Kept as it stands** |
+
+🔴 **Compare bytes, never by reading** — `cmp`, or `diff -q`.
+
+📌 **Why the part and not the markers** — ⚠️ **the Rédacteur strips
+every marker on each turn**, and a block changed two turns of the grid
+ago carries none by now. **The part the last run translated is what
+this one compares against.**
+
+🔴 **Then, for every nature that runs, copy its part to
+`convertisseur/<nature>-input.md`** — 📌 **it is the agent's input, and
+what the next run compares against.**
+
+**No nature runs:**
+
+| | What you do |
+|---|---|
+| `spec-technique.md` exists, holds no `<<ASSUMED` and no `[B`, no nature's files were just deleted, and `blocked_transversal.md` carries no filled `## Decision` | 🔴 **Nothing to write** — say the document stands, and go to *Once it has run* |
+| Otherwise | 📌 **Skip to the assembly** — the document has to be built again around what stands |
+
+---
+
+## The nature invocations
+
+🔴 **All in one message** — ⚠️ **several messages run them in series**,
+and they share nothing.
+
+```
+Agent(
+  subagent_type="convertisseur",
+  model="opus",
+  description="Convert <name>, <nature>",
+  prompt="Feature folder: docs/features/<name>/.
+          Invocation 1 — Nature: <nature>.
+          <Plus: convertisseur/blocked_<nature>.md, its decision is filled.>"
+)
+```
+
+🔴 **Wait for all of them**, then check each wrote
+`convertisseur/questions-<nature>.md` — 🔴 **and, when it wrote its
+section, `convertisseur/<nature>-notes.md`**: the references and the
+traceability are built from it. ⚠️ **A missing one stops the command**
+— say which nature and which file, and go no further.
+
+---
+
+## The assembly
+
+| Every nature whose part holds blocks has its `convertisseur/<nature>.md` | What you do |
+|---|---|
+| Yes | 📌 **Assemble** |
+| No | 🔴 **Assemble nothing** — delete `spec-technique.md` if it is there, skip invocation 2, go to *The questions*, and say which nature wrote no section. ⚠️ **It asked something it cannot write a rule without**, and a document missing that rule would be cut as if it were whole |
+
+**`spec-technique.md`, at the feature folder's root, replaced whole** —
+the nine sections in order:
+
+| § | Title | § | Title |
+|---|---|---|---|
+| §1 | Model | §6 | Synchronisation |
+| §2 | Persistence | §7 | Presentation |
+| §3 | Calculation | §8 | Access |
+| §4 | Transition | §9 | Text |
+| §5 | External exchange | | |
+
+🔴 **Each of §1 to §8 is its nature's `convertisseur/<nature>.md`,
+copied as it stands, by script — never retyped.** 📌 **A nature with no
+block gets its heading, then `*(empty)*` — and §9 Text always does**:
+no nature writes it, invocation 2 fills it.
+
+    ## §9 Text
+
+    *(empty)*
+
+🔴 **Never omit a section** — ⚠️ **an empty one tells the Cadreur there
+is nothing of that nature; an absent one tells him nothing.**
+
+📌 **No preamble** — invocation 2 writes it.
+
+---
+
+## The references with one target
+
+🔴 **Before invocation 2, resolve by script every `[B<n>: …]` whose block
+gave a single entry** — in `spec-technique.md`, never in the nature
+files.
+
+📌 **The block's line is under `## Trace`**, in whichever
+`convertisseur/*-notes.md` holds it. 🔴 **One entry on it → write that
+number in place of the brackets. Several, a dash, or no line → leave
+them** — invocation 2 settles those.
+
+⚠️ **Replace, never read** — 📌 **one entry leaves nothing to judge**, and
+that is the only case you touch.
+
+---
+
+## Invocation 2
+
+🔴 **Every time a document was assembled** — ⚠️ **a section written
+again may have renumbered its entries**, and every reference into it
+has to be resolved afresh.
+
+```
+Agent(
+  subagent_type="convertisseur",
+  model="opus",
+  description="Convert <name>, transversal",
+  prompt="Feature folder: docs/features/<name>/.
+          Invocation 2 — Transversal.
+          <Plus: convertisseur/blocked_transversal.md, its decision is filled.>"
+)
+```
+
+🔴 **Then check `tracabilite.md` and
+`convertisseur/questions-transversal.md` exist.** ⚠️ **A missing one
+stops the command** — say which.
+
+---
+
+## The questions
+
+🔴 **Merge into the next `questions-convertisseur-NN.md`, at the
+root** — the highest number in `questions/convertisseur/`, plus one;
+⚠️ the root holds none by now.
+
+📌 **What goes in: the files this run wrote** — the natures in section
+order, then `questions-transversal.md`.
+
+🔴 **Every entry copied as written, renumbered from `Q1`.** ⚠️ **You
+rephrase nothing.**
+
+📌 **No question at all** → 🔴 **write the file empty.** ⚠️ **That is
+what ends the loop.**
+
+---
+
+## Once it has run
+
+🔴 **A blocking file you named is filed** — `blocked_transversal.md`
+the same way:
+
+    git mv docs/features/<name>/convertisseur/blocked_<nature>.md \
+           docs/features/<name>/convertisseur/blocked_<nature>-NN.md
+
+⚠️ **Anything left at the unnumbered name reads as a block still
+standing**, and the next run stops on it.
+
+**Then:**
 
 1. `git merge --no-ff <branch>` from the main checkout root
 2. `git push`
@@ -121,7 +292,19 @@ an unmerged branch is invisible to the next one. ⚠️ **A
 
 ## What you relay
 
-The agent's own report, and nothing more. 🔴 **Nothing else is yours**:
-no phase chain, no risk level, no `TaskCreate`.
+📌 **Which natures ran, which were kept, how many questions, and how
+many `<<ASSUMED` marks the document holds** — a grep.
 
-**If it returns a `blocked_*.md`**: relay it and stop.
+**What to run next** — 📌 **indications for the Product Owner.**
+⚠️ **You relay them; you run nothing after this command.**
+
+| The run | Next |
+|---|---|
+| An invocation wrote a blocking file | 📌 Fill its `## Decision`, then `/6_convertit` again |
+| Wrote questions | 📌 **Answer them, then `/1_lexique`** — 🔴 it settles the vocabulary your answers brought, before the Rédacteur reads them |
+| Wrote an empty questions file, or found the document standing | 📌 `/conventions`, then `/7_lots` — 🔴 the Cadreur reads the conventions in full. 📌 The merge, `/fusion_compare`, branches off here whenever you choose |
+
+🔴 **Nothing else is yours**: no phase chain, no risk level, no
+`TaskCreate`.
+
+**If an agent returns a blocking file**: relay it and stop.

@@ -125,7 +125,7 @@ of the technical document, in its order:**
     §1.1   N1   → R12
     §2.5   N2   → R21, R33
     §6.1   N6   → no rule ; Q1
-    §9.4   N9   → no rule (nature covered by R30)
+    §7.4   N7   → no rule (nature covered by R30)
 
 🔴 **`no rule` is written out.** It is what separates an entry you
 looked at from an entry you missed.

@@ -366,11 +366,11 @@ to build are one lot.**
 |---|---|
 | §1 Model, §2 Persistence | Entity, with its table and its migration |
 | §3 Calculation | Rule, or group of rules sharing their inputs |
-| §4 Transition, §7 Background work | Mechanism |
-| §5 External source, §6 Synchronisation | Source, or domain synchronised |
-| §8 Journey, §9 Screen | Screen, with what it displays |
-| §10 Text | Resource file, or set of formatters |
-| §11 Access, §12 Lifecycle | Rule |
+| §4 Transition | Mechanism |
+| §5 External exchange, §6 Synchronisation | Source or destination, or domain synchronised |
+| §7 Presentation | View, with what it renders |
+| §8 Access | Rule |
+| §9 Text | Resource file, or set of formatters |
 
 🔴 **A lot never groups entries from two sections.** Its nature would
 be undecided, and a block holds one layer.
@@ -585,7 +585,7 @@ list:
 
     ## Entries with no lot
 
-    §11.1 — carried by §4.1 and §5.2, nothing of its own to build
+    §8.1 — carried by §4.1 and §5.2, nothing of its own to build
 
 📌 **An entry attributing a rule to another, or setting a boundary,
 builds nothing.** ⚠️ **Its reason fits on one line.**
@@ -605,12 +605,12 @@ tell them apart.**
     RaceRepository
       saveImportedRace(...)      §2.2
       setAsReference(raceId)     §2.1
-      observeAll()               §9.1, §9.10
-      findById(raceId)           §9.2, §9.14
+      observeAll()               §7.1, §7.10
+      findById(raceId)           §7.2, §7.14
 
     PhoneStringResources
-      segmentName(index)         §9.2, §9.14
-      relativeDate.today         §9.6
+      segmentName(index)         §7.2, §7.14
+      relativeDate.today         §7.6
 
     RecordedRaceTransport — piece
       sends a race to the paired device      §6.2

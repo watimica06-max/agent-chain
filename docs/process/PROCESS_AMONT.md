@@ -64,7 +64,7 @@ que ce que les agents font. Les deux sont documentés ici.
 
 # LES AGENTS
 
-*Neuf agents. Chacun existe parce qu'un agent voisin ne peut pas faire
+*Dix agents. Chacun existe parce qu'un agent voisin ne peut pas faire
 son travail sans se contredire.*
 
 ---
@@ -89,7 +89,7 @@ fichier d'idées lui-même.**
 |---|---|---|
 | 1 | Balaye les termes, lève les paires | Avant le fichier produit |
 | 2 | Applique les réponses, écrit `lexique.md` | idem |
-| 3 | Surveille les réponses de la grille | À chaque tour de grille |
+| 3 | Surveille les réponses de la grille ou du Convertisseur | À chaque fichier de questions répondu |
 | 4 | Corrige ces réponses, complète le lexique | idem |
 
     1 → questions → répondu → 2 → 1 → …          avant le produit
@@ -104,9 +104,12 @@ terme changé alors laisserait soixante blocs portant l'ancien.
 portent des mots que personne n'a balayés.** Deux balayages sur ces
 réponses seules :
 
-📌 **Un terme retiré** — un grep sur `lexique.md` le trouve. ⚠️ **Ce
-n'est pas une question** : la décision est prise, l'invocation 4
-remplace.
+📌 **Un terme retiré** — un grep sur `lexique.md` le trouve, et c'est
+l'invocation 4 qui le fait, puisque c'est elle qui remplace. ⚠️ **Ce
+n'est pas une question** : la décision est prise. 🔴 **D'où : après 3,
+toujours 4**, qu'elle ait posé des questions ou non — *(avant, 3
+« notait » les termes retirés sans avoir où les noter, et rien ne
+disait quoi faire quand elle ne demandait rien)*.
 
 📌 **Un synonyme neuf** — un mot que le lexique ne porte nulle part,
 désignant une chose qu'il porte déjà. 🔴 **C'est celui-là qui coûte** :
@@ -125,7 +128,7 @@ concept *race start*. **Deux entrées, pas une.**
 
 **Ce que porte `lexique.md`** — deux sections, `## Tranché` et
 `## Non tranché`. 🔴 **Les termes retirés y sont écrits sous celui qui
-tient** — ⚠️ **c'est ce qui rend le grep de l'invocation 3 possible.**
+tient** — ⚠️ **c'est ce qui rend le grep de l'invocation 4 possible.**
 Les jeter les rendrait invisibles.
 
 🔴 **Un terme tranché sans rival y va aussi** : le tour suivant grepe ce
@@ -158,12 +161,16 @@ question, pas une hypothèse.
 
 | # | Entrées | Sortie |
 |---|---|---|
-| 1 — Structurer | `idees.md` · `lexique.md` · l'index du global | Le fichier produit |
-| 2 — Intégrer | 🔴 **Le fichier de questions que le prompt nomme** · `lexique.md` · l'index du global | Le fichier produit, à jour |
+| 1 — Structurer | `idees.md` · `lexique.md` · l'index du global | Le fichier produit · son fichier de questions |
+| 2 — Intégrer | 🔴 **Le fichier de questions que le prompt nomme** · `lexique.md` · l'index du global | Le fichier produit, à jour · son fichier de questions |
 
-📌 **L'invocation 2 sert tout fichier de questions rempli** — celui d'un
-sondeur, du Convertisseur, du Fusionneur, le sien. **Même travail quel
-que soit le demandeur.**
+📌 **L'invocation 2 sert tout fichier de questions rempli**, quel que
+soit l'agent qui l'a écrit, le sien compris. **Même travail quel que
+soit le demandeur.**
+
+🔴 **Il écrit son fichier de questions à chaque invocation, même vide**
+— 📌 c'est ce qui dit à `/2_structure` s'il faut revenir à
+`/1_lexique` ou passer à `/3_decoupe`.
 
 **Structurer, c'est quatre gestes** — 🔴 **et le premier porte tout le
 reste.**
@@ -280,7 +287,7 @@ phrase à phrase.**
 
 **À quoi il sert** — 📌 **La nature d'un bloc décide deux choses en
 aval.** 🔴 **Quelles questions la grille lui pose** — on ne demande pas à
-un bloc `screen` ce qu'on demande à un bloc `persistence`. 🔴 **Et quelle
+un bloc `presentation` ce qu'on demande à un bloc `persistence`. 🔴 **Et quelle
 section du document technique le porte** — autrement dit, quelle couche
 du code.
 
@@ -302,16 +309,65 @@ le Découpeur écrivent `Nature:` sans rien après, jamais ne l'omettent.**
 ⚠️ **Une ligne absente et une ligne oubliée se liraient pareil.**
 
 **La règle** — 🔴 **la nature d'un bloc est ce qu'il produit, jamais ce
-qui le déclenche.** 📌 **Un bloc qui produit un affichage est `screen`**,
-même déclenché par un événement ; **une règle déclenchée par un capteur
-prend la nature de ce qu'elle calcule.**
+qui le déclenche.** 📌 **Une règle déclenchée par un capteur, ou lancée
+chaque nuit, prend la nature de ce qu'elle produit.**
 
 ⚠️ **Un cas d'échec ne nomme pas une nature** — 📌 **une lecture locale
-échoue aussi** : ce qui fait qu'un bloc est `external source` est d'où
-la donnée vient.
+échoue aussi** : ce qui fait qu'un bloc est `external exchange`, c'est
+que la donnée franchit la frontière avec un autre système.
 
-🔴 **Une nature par bloc, toujours.** ⚠️ **Un bloc qui semble en vouloir
-deux a été mal découpé** — 📌 **il le dit plutôt que de choisir.**
+**Les huit natures, et pourquoi celles-là** — 🔴 **une liste fermée est
+nécessaire** : l'Architecte balaie les natures une à une, et un
+balayage n'est exhaustif que sur un vocabulaire fermé. ⚠️ **Mais elle ne
+doit pas être arbitraire** : elle découle d'une règle, qu'on revérifie
+à chaque doute.
+
+🔴 **Une nature est une sorte de chose que tout programme construit,
+quel que soit son langage ou sa plateforme.** Quatre tests :
+**générale** — elle existe hors de toute plateforme ; **une couche de
+code à part** ; **des questions à part** dans la grille ; **sans
+recouvrement** — le Classeur tranche sans hésiter.
+
+📌 **Ce qu'un programme produit tombe dans trois cas**, et les huit les
+couvrent : **à l'intérieur** — la forme d'une donnée (`model`), sa
+conservation (`persistence`), une valeur dérivée (`calculation`), un
+changement d'état du domaine (`transition`) ; **à sa frontière** — vers
+l'utilisateur (`presentation`), vers un autre système dans un seul sens
+(`external exchange`), deux copies qui bougent des deux côtés
+(`synchronisation`) ; **une décision sur qui a le droit d'agir**
+(`access`).
+
+**Ce que sont devenues les quatre retirées** — elles échouaient à au
+moins un test :
+
+| Retirée | Pourquoi | Où va ce qu'elle couvrait |
+|---|---|---|
+| `journey` | Propre aux interfaces à écrans ; ses questions sont celles de `transition` ; §9 Screen portait déjà la navigation | La navigation → `presentation` ; l'état d'un parcours → `transition` |
+| `text` | Un bloc produit rarement un libellé seul ; A4 demande déjà le libellé exact à tout bloc | Le libellé → `presentation` ; la clé → §9 Text, une section sans nature, écrite par *Resources* |
+| `background work` | Décrit quand une chose tourne, pas ce qu'elle produit | Sa nature est ce qu'il produit ; ses questions — fréquence, reprise — vont au déclencheur, `A1.1` |
+| `lifecycle` | Sa section mêlait quatre choses | Conservation, purge → `persistence` ; export → `external exchange` ; consentement → `access` |
+
+📌 **`screen` devient `presentation`** — une vibration ou un son rendus à
+l'utilisateur n'ont pas d'écran. **`external source` devient `external
+exchange`** — ce qui sort vers un autre système n'avait plus de place.
+
+⚠️ **L'exhaustivité est démontrée, pas prouvée.** 📌 **Le système a son
+détecteur** : un bloc qu'aucune nature ne couvre fait bloquer le
+Classeur, qui dit ce que le bloc produit. **C'est le cas réel qui
+complétera la liste**, jamais une nature ajoutée par précaution.
+
+🔴 **Une nature par bloc, toujours.** ⚠️ **Un bloc dont deux phrases
+produisent deux choses différentes a été mal découpé** — 📌 **c'est une
+question, pas un choix.** La réponse dit au Rédacteur s'il faut scinder.
+
+📌 **Il écrit quand même la ligne `Nature:`** — celle qu'il donnerait ;
+pour deux sorties, celle de ce que le titre nomme. ⚠️ **Une réponse qui garde le bloc entier n'y change rien**,
+et une ligne laissée vide le lui renverrait, pour reposer la question.
+
+🔴 **Son fichier de questions s'écrit à chaque passage, même vide** — 📌
+**non vide, `/3b_nature` renvoie à `/1_lexique`** : un bloc qui produit
+deux choses se scinde avant que la grille ne le sonde sur une seule
+nature.
 
 **Sur un bloc `MODIFIED` qui porte déjà une nature** — 🔴 **il repose la
 question et compare.** 📌 **Même réponse, il ne change rien** ;
@@ -319,15 +375,19 @@ question et compare.** 📌 **Même réponse, il ne change rien** ;
 été fermé par la grille sur les mauvaises questions**, ce que son
 marqueur renvoie sonder.
 
-**La frontière** — 🔴 **Il écrit cette ligne, et rien d'autre.** Ni une
-phrase, ni un titre, ni un marqueur. 🔴 **Il ne découpe ni ne fusionne** :
+**La frontière** — 🔴 **Il écrit cette ligne, et rien d'autre** dans le
+fichier produit. Ni une phrase, ni un titre, ni un marqueur. 🔴 **Il ne découpe ni ne fusionne** :
 c'est le Découpeur. 🔴 **Il ne remplit pas une ligne déjà remplie**, sauf
 sur un bloc `MODIFIED`.
 
 ⚠️ **Hésiter n'est pas bloquer** : 📌 **un bloc dont il pèse la nature
 entre deux prend celle que sa sortie nomme**, et il dit lesquelles il a
 pesées. 🔴 **Il bloque quand aucune nature ne convient** — 📌 **ce qui
-veut dire que le bloc porte deux sujets, ou aucun.**
+veut dire que le bloc ne produit rien, ou que les huit ratent quelque
+chose.** 🔴 **Au moindre doute, une question** — deux sorties, deux
+natures possibles pour une seule sortie, une frontière qui ne tranche
+pas. ⚠️ **Jamais un choix fait en silence** : une nature fausse ferme le
+bloc sur les mauvaises questions, et rien ne le rattrape plus loin.
 
 ---
 
@@ -339,9 +399,34 @@ et personne ne saura qu'une décision a été prise.
 
 **Il pose chaque question de la grille et écrit ce qui reste ouvert.**
 
-**Ce qui le déclenche** — 🔴 **Trois sondeurs en parallèle, sur le même
-document et la même grille, dans trois ordres de lecture différents** :
-bloc par bloc, question par question, nature par nature.
+**Ce qui le déclenche** — 🔴 **Quatre invocations en parallèle, à
+chaque tour, sur le même document et la même grille :**
+
+| # | Invocation | Blocs | Ce qu'elle passe |
+|---|---|---|---|
+| 1 | **Angle** — trois, un par ordre de lecture : bloc par bloc, question par question, nature par nature | Les blocs `NEW` ou `MODIFIED` — tous au premier tour | 🔴 **La passe A, et elle seule** |
+| 2 | **Globale** — une | 🔴 **Tous les blocs, à chaque tour** | Le relevé, puis les passes B et C |
+
+🔴 **Pourquoi deux métiers** : 📌 **l'ordre de lecture ne change rien aux
+passes B et C** — elles rassemblent des colonnes et les croisent.
+⚠️ **Trois sondeurs les faisaient trois fois, à l'identique**, et sur un
+relevé qui, hors premier tour, ne couvrait que les blocs modifiés : **la
+passe A restreinte, la passe B croisait des colonnes incomplètes.**
+📌 **L'invocation globale relève tous les blocs à chaque tour** — un bloc qui
+change change ses croisements avec tous les autres.
+
+**Le relevé** — `cadrage-produit/releve.md` : 🔴 **pour chaque bloc, les
+réponses que la passe B croise** — `A1.1` à `A1.4` et la liste des noms
+d'`A4` — **chacune sous son identifiant de grille.** 📌 **C'est là que
+l'identifiant sert** : il rend les réponses d'un bloc comparables à
+celles d'un autre. ⚠️ **Une question posée au Product Owner n'en porte
+aucun.**
+
+📌 **Les trois angles restent aux tours suivants** — ⚠️ **un bloc `NEW`
+n'a jamais été sondé**, et mérite les trois regards. 🔴 **À mesurer sur
+des cycles réels** : s'ils ne trouvent plus rien de propre après le
+premier tour, les angles « par question » et « par nature » en
+sortiront.
 
 📌 **L'union de ce qu'ils lèvent est la sortie du tour** — ⚠️ **pas ce
 sur quoi ils s'accordent.**
@@ -369,10 +454,8 @@ question demande** — ⚠️ **pas que le bloc traite le même sujet.**
 🔴 **En doute, il pose plutôt qu'il n'écarte** — 📌 une question écartée
 à tort ne revient jamais ; une question de trop coûte une ligne.
 
-**Quels blocs** — 🔴 **la passe A ne porte que sur les blocs que la
-commande nomme.** ⚠️ **Les passes B et C tournent en entier, à chaque
-tour** — 📌 **elles lisent le document tel qu'il est maintenant**, et ce
-qui a changé dans un bloc change ce qui se croise.
+**Quels blocs** — 🔴 **les angles ne sondent que les blocs que la
+commande nomme** ; ⚠️ **l'invocation globale les lit tous, à chaque tour.**
 
 **La frontière** — 🔴 **Il n'écrit jamais dans le fichier produit.**
 🔴 **Il ne ferme jamais un trou de passe A parce qu'un autre bloc y
@@ -387,14 +470,14 @@ bloc.** 📌 **Plusieurs identifiants quand le trou est entre deux blocs**,
 
 ## L'Assembleur
 
-**À quoi il sert** — 📌 **Trois lectures d'un même document lèvent le
-même trou sous deux formulations**, et le Product Owner y répondrait
+**À quoi il sert** — 📌 **Plusieurs lectures d'un même document lèvent
+le même trou sous deux formulations**, et le Product Owner y répondrait
 deux fois.
 
 ⚠️ **Il supprime ce qui est demandé deux fois, et rien d'autre.**
 
-**Ce qui le déclenche** — une invocation, après les trois sondeurs. 🔴
-**La commande vérifie que les trois fichiers existent avant de
+**Ce qui le déclenche** — une invocation, après les quatre sondeurs. 🔴
+**La commande vérifie que les quatre fichiers existent avant de
 l'appeler** — ⚠️ une fusion à laquelle il manque une lecture est une
 fusion dont personne ne peut se servir.
 
@@ -421,7 +504,7 @@ fermerait.**
 trou supprimé coûte une ligne de code fausse.
 
 🔴 **Une question levée par un seul sondeur est gardée, toujours.**
-📌 **C'est exactement ce pour quoi on en lance trois** — ⚠️ **l'accord
+📌 **C'est exactement ce pour quoi on lance trois angles** — ⚠️ **l'accord
 n'est pas le test.**
 
 **La frontière** — 🔴 **Il n'ouvre pas le fichier produit.** 📌 **Il
@@ -434,63 +517,83 @@ précisément.
 
 ## Le Convertisseur
 
-**À quoi il sert** — Il transforme le fichier produit en document
+**À quoi il sert** — Il transforme le fichier produit fermé en document
 technique numéroté, celui que le Cadreur découpe en lots.
 
-🔴 **Il ne tranche jamais rien.** Une contradiction entre blocs, une
-question sans réponse : il signale, il ne comble pas.
+🔴 **Il ne tranche jamais rien.** Une contradiction, une question sans
+réponse : il signale, il ne comble pas.
 
 🔴 **Il n'est pas le filet de la chaîne amont.** La grille de cadrage a
-balayé les précisions manquantes et les références pendantes, autant de
-passes qu'il l'a fallu. **Il lève ce qu'une lecture fraîche attrape, pas
-ce qu'elle a déjà couvert.**
+balayé les précisions manquantes, le Classeur a posé les natures.
+**Il traduit ce qu'ils ont fermé.**
 
-**Ce qui le déclenche** — deux invocations, séparées par un aller-retour
-de questions.
+**Ce qu'il apporte** — 🔴 **quatre choses que le fichier produit n'a
+pas :**
+
+| Apport | Pour qui |
+|---|---|
+| Un vocabulaire technique — `lapDelta`, pas « l'écart du tour » | Le Détailleur, qui écrit des signatures ; le Cadreur, qui grepe |
+| Un rangement par couche — les neuf sections | Le Cadreur : un lot cite les entrées d'une seule section |
+| Les lignes `Consumes:` — le graphe des dépendances entre entrées | L'Architecte : le sens des dépendances entre modules (V2, V3, V7) |
+| La reformulation exécutable — « la plus fiable gagne » devient un ordre de précédence | Tout l'aval |
+
+⚠️ **`Consumes:` ne donne pas l'ordre d'exécution** — le Vérificateur le
+dérive des déclarations du Cadreur. 📌 **Aucun agent n'avait jamais été
+chargé de l'écrire** : apparu dans le seul document technique réel, lu
+par l'Architecte, produit par personne. 🔴 **C'est désormais la forme
+imposée de *Declared links*** — `Consumes: —` quand l'entrée ne
+consomme rien, pour qu'une racine ne se lise pas comme un oubli.
+
+**Ce qui le déclenche** — `/6_convertit`, deux invocations :
 
 | # | Ce qu'elle fait | Sortie |
 |---|---|---|
-| 1 — Fermer | Partie 1 de la grille de fermeture sur chaque bloc | Un fichier de questions · 🔴 **supprime le document technique s'il existe** |
-| 2 — Produire | Partie 2, une fois toutes les sections remplies | `spec-technique.md` · `tracabilite.md` · un fichier de questions |
+| 1 — Nature | Une par nature à écrire, toutes en parallèle : traduit les blocs de sa nature | Sa section · ses notes *(trace, préambule)* · ses questions |
+| 2 — Transversale | Une fois, sur le document assemblé | Le préambule · les renvois résolus · les entrées de *Resources* · `tracabilite.md` · ses questions |
 
-📌 **Deux, pas une** : ⚠️ **deux régimes différents.** La fermeture lit
-sans écrire ; la production traduit en termes techniques.
+🔴 **Pourquoi par nature** : ⚠️ **un fichier produit de trois cents
+blocs fins ne se lit pas d'une traite**, et la section d'une entrée est
+la couche de son lot. 📌 **Le Classeur a posé la nature ; le
+Convertisseur la lit, il ne la re-dérive jamais.**
 
-🔴 **La grille de fermeture porte les tests, l'agent porte les gestes.**
-Elle vit dans `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`, en deux
-parties — l'une à la fermeture, l'autre à la production. ⚠️ **À ne pas
-confondre avec la grille de cadrage produit**, que les sondeurs
-déroulent et qu'il n'ouvre jamais.
+🔴 **Pourquoi une transversale** : ⚠️ **en parallèle, aucune nature ne
+connaît les numéros des autres.** 📌 **Un renvoi hors de sa section
+s'écrit `[B12: ce qu'on en attend]` — le bloc qui porte la cible, et ce
+qu'on attend d'elle.** 🔴 **Le bloc n'a donné qu'une entrée → la commande
+remplace par script, sans jugement.** ⚠️ **Plusieurs → la transversale
+prend celle qui porte ce que les crochets attendent** — et dans le
+doute, une question. 📌 **L'attente écrite réduit le jugement ; le
+remplacement mécanique le supprime là où il n'y a rien à juger.** 🔴 **Elle seule voit tout le document** :
+le préambule, *Singularity*, *Agreement between entries*, *Resources*.
 
-🔴 **Il lit la nature sur la ligne `Nature:` du bloc, il ne la re-dérive
-jamais.** 📌 **Le Classeur l'a posée** — ⚠️ **et la grille a posé au bloc
-les questions de cette nature** : un second avis ici fermerait le bloc
-contre des questions que personne n'a posées. 📌 **Les douze lui servent
-dans l'ordre où le document technique les prend.**
+⚠️ **Elle ne réécrit jamais une règle qu'une nature a écrite** — 📌 une
+règle qu'elle juge fausse est une question.
 
-**Pourquoi l'invocation 1 supprime le document technique** — 🔴 **le
-fichier produit a bougé depuis qu'il a été écrit.** Le laisser
-enverrait l'invocation 2 en mise à jour ciblée sur un document qui ne
-correspond plus.
+**Pourquoi il ne ferme plus le fichier produit** — 🔴 **l'ancienne
+invocation 1 le fermait avant de le traduire.** ⚠️ **Sa fermeture
+*Nature* doublait le Classeur** : deux juges sur une même chose, et une
+nature changée là laissait un bloc fermé par la grille sur les
+mauvaises questions. ⚠️ **Sa fermeture *Consistency* doublait la passe B
+des sondeurs**, et ne tenait pas à trois cents blocs. 📌 **Supprimée,
+avec la partie 1 de la grille de fermeture.**
 
-**Deux régimes à l'invocation 2**, décidés par un seul test :
-
-| `spec-technique.md` | Ce qu'il fait |
-|---|---|
-| Absent | Production complète |
-| Présent | 🔴 **Mise à jour ciblée** — grep `<<ASSUMED`, remplacer chaque marque par sa réponse, ne toucher à rien d'autre |
+**Une règle qui appartient à une autre couche** — 🔴 **une question,
+jamais une entrée écrite ailleurs.** 📌 **Le bloc a été mal classé ou
+mal découpé**, et ça se règle en amont.
 
 **Ce qu'une question coûte** — 🔴 **la question à se poser est : sans
 ça, puis-je écrire la règle du tout ?**
 
 | La réponse | Ce qu'il fait |
 |---|---|
-| **Non** — la règle n'existe pas sans | Demander, **n'écrire aucun document**, et supprimer celui qui existe |
+| **Non** — la règle n'existe pas sans | Demander, **n'écrire aucune section** — la commande n'assemble alors rien |
 | **Oui, en supposant** | Demander, **et produire** — la supposition marquée sur place |
 
-🔴 **La marque porte l'identifiant qui la lèvera** :
-`<<ASSUMED questions-convertisseur-04 Q2: …>>`. 📌 **Elle dit que la
-ligne est provisoire**, et où sa réponse viendra.
+🔴 **La marque porte le bloc que sa réponse changera** :
+`<<ASSUMED B40: …>>`. 📌 **Elle se lève en réécrivant la section**, une
+fois la réponse dans le fichier produit — 🔴 **la commande relance toute
+section qui en porte encore une.** ⚠️ **Plus de mise à jour ciblée** :
+un seul mode de relance.
 
 **Ce qui devient une entrée numérotée** — 🔴 **une règle ou une table.**
 
@@ -503,46 +606,44 @@ sépare par déclencheur, pour fermer chaque comportement ; le document
 technique sépare par ce qui reste complet seul.** **Un bloc peut donner
 deux entrées, deux blocs une seule.**
 
-🔴 **Numérotées à l'écriture, jamais renumérotées.** ⚠️ **Un lot cite
-`§3.7`**, et cette citation doit tenir d'une exécution à l'autre — d'où
-l'ordre de remplissage imposé, §1 à §12 puis l'ordre des blocs, sans
-aucun tri par jugement.
+🔴 **Numérotées à l'écriture, dans l'ordre des blocs.** ⚠️ **Une section
+réécrite est renumérotée** — 📌 **d'où l'arrêt de `/6_convertit` dès
+que `code/decoupage.md` existe** : un numéro qu'un lot cite ne bouge
+plus.
 
 📌 **Une section vide est une information**, pas un oubli : elle dit au
-Cadreur qu'il n'y a rien de cette nature. **On part des douze et on
+Cadreur qu'il n'y a rien de cette nature. **On part des neuf et on
 laisse vide, jamais l'inverse.**
 
-**Le préambule** — 🔴 **il cadre, il ne produit aucun lot.** Entièrement
-repris du fichier produit, rien de déduit.
+**Le préambule** — 🔴 **il cadre, il ne produit aucun lot.** Écrit par la
+transversale, entièrement repris du fichier produit, rien de déduit.
 
 🔴 **Une règle transversale contraint sans rien produire.** 📌 **Le
 test** : si personne ne l'écrit, est-ce que le code manque quelque
-chose ? **Oui → c'est une entrée numérotée**, pas un bloc de préambule.
-Les tokens d'un thème, un catalogue de formats, une table de seuils
-répondent oui.
+chose ? **Oui → c'est une entrée numérotée**, pas une ligne de
+préambule. Les tokens d'un thème, un catalogue de formats, une table de
+seuils répondent oui.
 
 📌 **Les dépendances du préambule viennent du Rédacteur, pas de lui** —
 seul le Rédacteur a le global sous les yeux.
 
 **`tracabilite.md`** — 🔴 **une ligne par bloc du fichier produit**, dans
 l'ordre : son identifiant, son titre, les entrées qui portent au moins
-une de ses règles, ou un tiret.
+une de ses règles, ou un tiret. 📌 **La transversale l'assemble depuis
+la trace que chaque nature a consignée en écrivant** — ce n'est pas une
+seconde passe.
 
 🔴 **Tous les blocs y figurent, ceux que rien ne porte compris** —
 ⚠️ **un tiret dit qu'on a cherché et rien trouvé ; une ligne absente ne
 dit rien du tout.**
-
-📌 **Il le sait en écrivant** : chaque entrée est écrite depuis des
-blocs qu'il a sous les yeux. **Le fichier consigne ce qu'il a fait, ce
-n'est pas une seconde passe.**
 
 **La frontière** — 🔴 **Il ne groupe pas en unités de travail.** Le
 Cadreur le fait, avec le document d'état sous les yeux et les symboles
 grepés. **Un groupement fait ici déciderait pour lui, à l'aveugle.**
 
 🔴 **Il ne lit jamais le code**, ni le global, ni `idees.md`, ni un
-fichier de questions — sauf les entrées qu'une marque `<<ASSUMED`
-nomme.
+fichier de questions — 📌 **une réponse lui parvient par le fichier
+produit.**
 
 ---
 
@@ -829,7 +930,8 @@ affichée »* en sont.
 **Passe B — les blocs les uns contre les autres.** 📌 **Tout ce qui
 n'apparaît qu'en les mettant ensemble.**
 
-🔴 **Elle lit les réponses de la passe A, jamais les blocs à nouveau.**
+🔴 **Elle lit le relevé — les réponses de la passe A, prises sur tous
+les blocs — jamais les blocs à nouveau.**
 📌 **On rassemble une colonne à travers tous les blocs, puis on la
 croise** — ⚠️ **jamais bloc par bloc**, ou on relit soixante fois ce
 qu'une colonne montre d'un coup.
@@ -848,11 +950,18 @@ personne d'autre ne l'écrira.**
 lève, parce que ça n'appartient à aucun.** 🔴 **Les seules questions
 énumérées de la grille — courtes exprès.**
 
+⚠️ **« Quels termes trancher avant d'écrire les règles ? » en est sortie**
+— 📌 **c'est le travail du Lexicographe**, créé pour ça. La garder, c'était
+un filet sur l'étape d'avant, et un filet qui contournait le lexique :
+une réponse à cette question ne rejoignait jamais `lexique.md`.
+
 ## Deux mécaniques qui traversent la grille
 
-🔴 **Chaque question porte un identifiant** — `A1.3`, `A2.screen.2`,
-`C1.6`. ⚠️ **Qui répond écrit cet identifiant, exactement** — 📌 c'est
-ce qui rend les réponses d'un bloc comparables à celles d'un autre.
+🔴 **Chaque question porte un identifiant** — `A1.3`, `A2.presentation.2`,
+`C1.5`. ⚠️ **Qui répond, dans le relevé, écrit cet identifiant,
+exactement** — 📌 c'est ce qui rend les réponses d'un bloc comparables à
+celles d'un autre. 🔴 **Une question posée au Product Owner n'en porte
+aucun.**
 
 🔴 **Une catégorie écartée est déclarée écartée**, jamais sautée en
 silence. ⚠️ **Une section sautée en silence et une section sans objet
@@ -870,9 +979,9 @@ se lisent pareil.**
 | `/2_structure` | redacteur | `desc-produit.md` |
 | `/3_decoupe` | decoupeur | `desc-produit.md`, blocs découpés |
 | `/3b_nature` | classeur | `desc-produit.md`, natures posées |
-| `/4_grille` | sondeur ×3, puis assembleur | `questions-sondeur-NN.md` |
-| `/5_reclasse` | convertisseur, inv. 1 | `questions-convertisseur-NN.md` |
-| `/6_convertit` | convertisseur, inv. 2 | `spec-technique.md` · `tracabilite.md` |
+| `/4_grille` | sondeur ×4 — trois angles, une globale — puis assembleur | `questions-sondeur-NN.md` |
+| `/5_reclasse` | — *(aucun agent)* | `desc-par-nature.md` |
+| `/6_convertit` | convertisseur — une par nature, puis la transversale | `spec-technique.md` · `tracabilite.md` · `questions-convertisseur-NN.md` |
 | `/conventions` | architecte | `TECHNICAL_CONVENTIONS.md` · `couverture.md` |
 | `/fusion_compare` | fusionneur, inv. 1 | `plan-fusion.md` · questions |
 | `/fusion_applique` | fusionneur, inv. 2 | Le global à jour · `rapport-fusion.md` |
@@ -891,38 +1000,36 @@ le numéro.**
 |---|---|
 | Aucun fichier de questions | **1 — Balayage** |
 | `questions-lexicographe` seul | **2 — Tranchage** |
-| `questions-sondeur` seul | **3 — Surveillance** |
-| Les deux | **4 — Correction** |
+| Le fichier d'un autre agent, seul | **3 — Surveillance** |
+| Celui d'un autre agent, et `questions-lexicographe` | **4 — Correction** |
+| Ceux de deux autres agents | 🔴 **Arrêt** — un rangement a échoué |
 
-🔴 **Pourquoi c'est la commande** : ⚠️ **c'est le rangement fait par
-`/2_structure` et `/4_grille` qui sépare ces quatre cas.** `/2_structure`
-range le fichier du lexicographe, `/4_grille` range tout ce qui n'est
-pas le sien. **L'agent ne voit pas cet état ; l'orchestrateur, si.**
+🔴 **Pourquoi c'est la commande** : ⚠️ **c'est le rangement qui sépare
+ces quatre cas** — voir *L'enveloppe git*. 📌 **Il ne reste à la racine
+que le fichier qui attend, et celui du lexicographe** : plus besoin de
+nommer les agents. **L'agent ne voit pas cet état ; l'orchestrateur, si.**
 
 🔴 **Elle décide aussi que `desc-produit.md` arrête 1 et 2, mais pas 3
 et 4** — le vocabulaire se tranche avant le fichier produit, jamais
 après.
 
-## `/2_structure` — décide ce qui devient périmé
+## `/2_structure` — décide l'invocation, et ne jette rien
 
-**Elle décide l'invocation** : sans fichier de questions à la racine,
-1 ; avec un ou plusieurs, **quel que soit leur préfixe**, 2 sur le plus
-haut numéro. ⚠️ **Un `Answer:` vide l'arrête**, et elle dit lesquelles
-attendent.
+**Elle décide l'invocation** : après avoir rangé celui du
+lexicographe, sans fichier de questions à la racine, 1 ; avec un, **quel
+que soit son auteur**, 2 sur celui-là ; 🔴 **avec plusieurs, elle
+s'arrête** — un rangement a échoué. ⚠️ **Un `Answer:` vide
+l'arrête**, et elle dit lesquelles attendent.
 
-🔴 **Et elle décide ce qui est à jeter.** Elle grepe `NEW` dans le
-fichier produit : s'il y en a, elle supprime le document technique.
+🔴 **Elle ne supprime plus rien.** 📌 **`desc-par-nature.md` est refait
+par `/5_reclasse` à chaque passage, et les sections dont les blocs ont
+changé sont refaites par `/6_convertit`** — ⚠️ **jeter ici ce que l'aval
+refait de toute façon serait un filet.**
 
-⚠️ **Le fichier produit a gagné un bloc**, et tout ce qui a été
-construit depuis la version précédente est périmé — une mise à jour
-ciblée corrigerait un document qui ne correspond plus.
-
-📌 **`MODIFIED` seul ne déclenche rien** : ⚠️ **un bloc changé existe
-toujours sous le même identifiant**, et une mise à jour ciblée
-l'atteint.
-
-🔴 **Pourquoi c'est la commande** : c'est la seule à voir à la fois le
-marqueur et les fichiers d'aval. L'agent n'ouvre ni l'un ni l'autre.
+📌 **Son fichier de questions vide, elle renvoie à `/3_decoupe`** —
+non vide, à `/1_lexique`. **Un bloc qu'une réponse a créé ou changé
+est découpé, classé et refermé avant que le Convertisseur ne le
+lise.**
 
 ## `/3_decoupe` — décide quels blocs regarder
 
@@ -932,6 +1039,9 @@ blocs.** **Tours suivants** — l'union de deux greps, `NEW` et
 
 ⚠️ **Elle ne grepe pas le fichier de questions** — 🔴 **un bloc qu'une
 réponse a touché porte `MODIFIED`**, et le second grep le trouve.
+
+📌 **Aucun des deux ne rend rien** → 🔴 **elle n'invoque pas**, dit qu'il
+n'y a rien à découper, et passe à `/3b_nature`.
 
 🔴 **Elle décide aussi de s'arrêter** sur un `Clarification needed` dans
 le fichier produit.
@@ -957,23 +1067,39 @@ précédent**, et rien à son sujet n'a bougé depuis.
 ⚠️ **autre chose veut dire qu'un bloc est resté non classé**, et elle dit
 lequel.
 
+🔴 **Elle renvoie à `/1_lexique` si le fichier de questions du Classeur
+n'est pas vide** — ⚠️ la grille ne sonde pas un bloc dont la nature est
+en question.
+
 🔴 **Pourquoi c'est la commande** : 📌 **le Classeur ne grepe pas**, on
 lui nomme ses blocs. ⚠️ **Et c'est la commande qui voit si le compte est
 retombé à zéro** — l'agent ne relit pas son propre travail.
 
-## `/4_grille` — décide les trois ordres et ce qui clôt la boucle
+## `/4_grille` — décide les quatre invocations et ce qui clôt la boucle
 
-🔴 **Les trois appels `Agent(...)` partent dans un seul message.**
-⚠️ **Trois messages les font tourner en série** — 📌 ils ne partagent
+🔴 **Les quatre appels `Agent(...)` partent dans un seul message.**
+⚠️ **Plusieurs messages les font tourner en série** — 📌 ils ne partagent
 rien, et lancés ensemble le coût en temps est celui d'un seul sondeur.
 
-**Elle décide les blocs de la passe A** — l'union de trois greps :
-`^Block:` dans le dernier fichier de questions des sondeurs, `NEW` et
-`MODIFIED` dans le fichier produit. 🔴 **Une question nommant deux blocs
-les envoie tous les deux.** ⚠️ **Ça ne rétrécit que la passe A.**
+**Elle décide les blocs de la passe A** — l'union de deux greps, `NEW`
+et `MODIFIED` dans le fichier produit. 📌 **Jamais le fichier de
+questions** : 🔴 **un bloc qu'une réponse a touché porte `MODIFIED`.**
+⚠️ **Ça ne rétrécit que la passe A.**
 
-**Elle décide que la fusion peut avoir lieu** : 🔴 **les trois fichiers
-existent, sinon elle s'arrête** et dit lequel manque.
+**Aux tours suivants, aucun bloc marqué** → 🔴 **elle n'invoque rien** :
+rien n'a bougé depuis un tour dont les questions sont répondues, et elle
+écrit le fichier de questions vide.
+
+**Elle décide que la fusion peut avoir lieu** : 🔴 **les quatre fichiers
+de questions et le relevé existent, sinon elle s'arrête** et dit lequel
+manque.
+
+📌 **Un fichier de blocage par invocation** —
+`cadrage-produit/blocked_par-bloc.md` et ses trois voisins, dont
+`blocked_global.md`. ⚠️ **Ils tournent en parallèle** : un nom partagé
+laisserait un blocage en écraser un autre, et une décision ne dirait pas
+à qui elle revient. 🔴 **La commande la nomme dans le seul prompt
+concerné.**
 
 **Et elle clôt la boucle** : 🔴 **elle recopie le fichier fusionné en
 `questions-sondeur-NN.md`**, renumérote à partir de `Q1`, retire la
@@ -985,11 +1111,53 @@ termine la boucle.**
 d'invoquer** — ⚠️ un agent dont le dossier cible manque cherche au lieu
 de s'arrêter.
 
-## `/5_reclasse` et `/6_convertit` — ne décident rien d'autre que l'enveloppe
+## `/5_reclasse` — range, sans agent
 
-📌 **Elles nomment l'invocation, passent le dossier, et gèrent le
-rangement et le git.** ⚠️ **Ce qui tourne ensuite n'y est pas** — c'est
-l'agent qui le porte, dans sa table d'aller-retour.
+🔴 **Elle écrit `desc-par-nature.md`** : les blocs du fichier produit
+recopiés par script sous les huit natures, dans l'ordre du fichier.
+📌 **Le tri est un grep sur la ligne `Nature:`** — le Classeur a jugé,
+il ne reste rien à juger.
+
+🔴 **Refait à chaque passage** — ⚠️ un bloc modifié a pu changer de
+nature. 🔴 **Les marqueurs `NEW` et `MODIFIED` sont retirés de la
+copie** — 📌 `/6_convertit` compare ces blocs à ceux qu'il a traduits, et
+un marqueur qui va et vient se lirait comme un changement.
+
+🔴 **Elle compte** : autant de blocs des deux côtés, aucune ligne
+`Nature:` vide, aucune nature hors des huit — sinon elle s'arrête.
+
+📌 **Pas d'agent, pas de worktree** — elle écrit en place et commite.
+
+## `/6_convertit` — décide quelles natures réécrire
+
+🔴 **Elle s'arrête si `code/decoupage.md` existe** — ⚠️ réécrire une
+section la renumérote sous un lot. 📌 **Un changement du produit après
+le découpage appartient à un nouveau cycle.**
+
+**Elle décide quelles natures tournent** — 🔴 **par comparaison
+d'octets, jamais par lecture** : la part de `desc-par-nature.md` d'une
+nature contre la copie que la dernière exécution a traduite. **Tourne** :
+une part qui diffère, une section absente, une section qui porte encore
+`<<ASSUMED`. **Gardée** : tout le reste.
+
+⚠️ **Pourquoi pas les marqueurs** : 📌 **le Rédacteur les efface à chaque
+tour**, et un bloc changé deux tours de grille plus tôt n'en porte plus
+aucun. 🔴 **La comparaison attrape aussi un changement de nature** — le
+bloc quitte une part et entre dans une autre, les deux diffèrent.
+
+🔴 **Les natures partent dans un seul message**, puis elle assemble
+`spec-technique.md` par script : les neuf sections dans l'ordre, une
+section sans bloc écrite `*(empty)*`. ⚠️ **Une nature qui n'a écrit
+aucune section — sa règle ne s'écrit pas sans réponse — et elle
+n'assemble rien** : un document amputé se découperait comme s'il était
+entier.
+
+🔴 **La transversale tourne à chaque assemblage** — une section réécrite
+a pu renuméroter ses entrées.
+
+📌 **Elle fusionne les questions de l'exécution** en un
+`questions-convertisseur-NN.md`, renuméroté, sans reformuler. **Vide, il
+clôt la boucle.**
 
 ## `/conventions` — décide l'invocation, et se porte garante du relais
 
@@ -1051,14 +1219,25 @@ rapporte les domaines ratés à la fin.
 
 ## L'enveloppe git, commune à toutes
 
+📌 **`/5_reclasse` fait exception** : sans agent, elle écrit en place et
+commite.
+
 🔴 **Quatre gestes, dans cet ordre, avant d'invoquer :**
 
-**1. Ranger** tout `questions-*.md` de la racine dont le préfixe n'est
-pas celui de la phase, dans `questions/<agent>/`. 🔴 **Par `git mv`,
-jamais par une lecture-réécriture** — ⚠️ **les agents ne doivent pas
-ouvrir ces fichiers, et l'orchestrateur non plus.** 📌 **Le plus haut
-numéro du préfixe courant reste à la racine** : il porte la
-numérotation.
+**1. Ranger** tout `questions-*.md` de la racine que la phase ne lit
+pas, dans `questions/<agent>/`. 🔴 **Par `git mv`, jamais par une
+lecture-réécriture** — ⚠️ **les agents ne doivent pas ouvrir ces
+fichiers, et l'orchestrateur non plus.** 🔴 **Un fichier de questions ne
+reste à la racine que tant qu'il attend une réponse ou une
+intégration** — 📌 **celui qu'une phase vient d'intégrer ou d'appliquer
+est rangé aussitôt.** **Il ne reste donc à la racine que le fichier qui
+attend** (plus celui du lexicographe entre ses invocations 3 et 4), et
+une commande le trouve sans connaître son auteur. 📌 **La numérotation
+tient** : chaque agent cherche son plus haut numéro à la racine, puis
+dans `questions/<agent>/`.
+
+⚠️ **Ce geste vaut pour les commandes du cycle.** `/conventions` et les
+commandes de fusion sont des branches à part, avec leur propre boucle.
 
 **2. Commiter le dossier de la fonctionnalité.** ⚠️ **Le Product Owner
 remplit les `Answer:` à la main, hors session.** Un worktree part du
@@ -1093,48 +1272,54 @@ merge aussi** : le Product Owner doit le voir.
 
 *Portée par la section **What to run next** de chaque commande.*
 
-    /1_lexique  ⇄  questions            (invocations 1 et 2)
-         │ vide
-         ↓
-    /2_structure ──→ /3_decoupe ──→ /3b_nature ──→ /4_grille
-         ↑                                              │
-         │                              des questions ──┤──→ /1_lexique (3 puis 4)
-         │←─────────────────────────────────────────────┘            │
-         │                                                            ↓
-         │                                              (retour à /2_structure)
-         │
-         └── /4_grille vide ──→ /5_reclasse ──→ /6_convertit ──→ /conventions ──→ aval
-                                                      │
-                                             /fusion_compare ──→ /fusion_applique
+    idees.md ──→ /1_lexique ⇄ questions            (invocations 1 et 2)
+             ──→ /2_structure ──→ /3_decoupe ──→ /3b_nature ──→ /4_grille
+             ──→ /5_reclasse ──→ /6_convertit ──→ /conventions ──→ aval
+
+    Toute réponse, de la grille ou du Convertisseur :
+             ──→ /1_lexique (3 puis 4) ──→ /2_structure ──→ … la même route
+
+    /6_convertit ──→ /fusion_compare ──→ /fusion_applique   (quand le Product Owner le choisit)
 
 **Les enchaînements, un par un :**
 
 | Ce qui vient de se passer | Ensuite |
 |---|---|
-| `/1_lexique` 1 ou 3 a demandé quelque chose | Répondre, puis `/1_lexique` |
-| `/1_lexique` 2 a tourné, et 1 ne trouve plus rien | `/2_structure` |
-| `/1_lexique` 4 a tourné | `/2_structure` — 🔴 les réponses de la grille sont tranchées |
-| `/2_structure` a signalé une clarification | 🔴 **Répondre, puis `/2_structure`** — rien en aval ne tourne tant qu'un signalement tient |
-| `/2_structure` a écrit le fichier produit | `/3_decoupe` |
-| `/3_decoupe` a tourné | `/3b_nature`, qu'il ait découpé ou non |
-| `/3b_nature` a tourné, ou n'a rien eu à classer | `/4_grille` — 🔴 la grille pose à un bloc les questions de sa nature, et un bloc sans nature ne s'en verrait poser aucune |
+| `/1_lexique` 1 a demandé quelque chose | Répondre, puis `/1_lexique` |
+| `/1_lexique` 1 n'a rien demandé | `/2_structure` |
+| `/1_lexique` 2 a tourné | `/1_lexique` — 🔴 un terme tranché peut révéler une paire |
+| `/1_lexique` 3 a tourné | Répondre s'il a demandé, puis `/1_lexique` — 🔴 l'invocation 4 remplace les termes retirés, questions ou pas |
+| `/1_lexique` 4 a tourné | `/2_structure` — 🔴 les réponses sont tranchées |
+| `/2_structure` : son fichier de questions n'est pas vide | 🔴 **Répondre, puis `/1_lexique`** — rien en aval ne tourne tant qu'un signalement tient |
+| `/2_structure` : son fichier de questions est vide | `/3_decoupe` |
+| `/3_decoupe` a tourné, ou n'avait rien à découper | `/3b_nature` |
+| `/3b_nature` a levé des questions | 🔴 **Répondre, puis `/1_lexique`** — un bloc qui produit deux choses se scinde avant la grille |
+| `/3b_nature` : questions vides, ou rien à classer | `/4_grille` — 🔴 la grille pose à un bloc les questions de sa nature, et un bloc sans nature ne s'en verrait poser aucune |
 | `/4_grille` a levé des questions | 🔴 **Répondre, puis `/1_lexique`** — il tranche le vocabulaire que ces réponses apportent, avant que le Rédacteur les lise |
 | `/4_grille` est vide | `/5_reclasse` — le fichier produit est fermé |
+| `/5_reclasse` a tourné | `/6_convertit` |
+| `/6_convertit` a levé des questions | 🔴 **Répondre, puis `/1_lexique`** — la même route que la grille |
+| `/6_convertit` est vide, ou le document tenait déjà | `/conventions`, puis `/7_lots` |
 
-**L'aller-retour du Convertisseur** — 🔴 **une réponse revient toujours
-par `/2_structure` d'abord.** La suite dépend de ce qu'elle a changé :
+📌 **Ces enchaînements sont des indications au Product Owner** — une
+commande n'en lance jamais une autre. 🔴 **Trois règles les tiennent
+tous** : **un fichier de blocage** → remplir sa décision, relancer la
+même commande ; **un fichier de questions non vide** → répondre, puis
+`/1_lexique`, quoi qu'il arrive ; **un fichier de questions vide** → la
+commande suivante.
 
-| Après `/2_structure` | La route |
-|---|---|
-| Aucun `NEW` dans le fichier produit | 🔴 **Directement à l'invocation qui a demandé** |
-| Un `NEW` est apparu | `/4_grille` → `/5_reclasse` → `/6_convertit` — 📌 un bloc neuf n'a jamais été fermé, ni classé |
+**Une seule route pour toute réponse** — 🔴 **qu'elle vienne du
+Rédacteur, du Classeur, de la grille ou du Convertisseur, elle repasse
+par `/1_lexique`, puis par toute la chaîne.** 📌 **Chaque commande ne traite que ce qui a bougé** :
+`/3_decoupe` et `/3b_nature` les blocs marqués, `/4_grille` sa passe A
+sur les blocs marqués, `/6_convertit` les natures dont la part a changé.
 
-⚠️ **La route longue repasse par `/5_reclasse`, qui supprime le document
-technique** — 📌 l'invocation 2 le produit alors en entier plutôt que de
-rapiécer un document périmé.
+⚠️ **Plus de route courte.** 🔴 **Un bloc qu'une réponse au Convertisseur
+a changé a pu changer de nature** — et seule la route entière le
+reclasse et le referme avant qu'il ne soit traduit.
 
-📌 **Les questions de l'invocation 2 créent rarement un bloc** : elles
-affûtent une phrase qui existe déjà.
+⚠️ **Le coût** : `/4_grille` refait ses passes B et C en entier à chaque
+tour.
 
 **Le critère d'arrêt, partout** — 🔴 **un fichier de questions
 entièrement répondu, jamais un nombre d'itérations.** ⚠️ **Une question
@@ -1151,11 +1336,15 @@ fasse apparaître un nouveau problème est normal, pas un échec.**
 |---|---|---|
 | `idees.md` | Product Owner, hors ligne · **Lexicographe** pour les termes tranchés | Lexicographe, Rédacteur *(inv. 1)* |
 | `lexique.md` | Lexicographe | Lexicographe, Rédacteur |
-| `desc-produit.md` | **Rédacteur** · Découpeur *(découpes seules)* · Classeur *(la ligne `Nature:` seule)* | Sondeur, Convertisseur, Fusionneur, Architecte |
-| `cadrage-produit/par-bloc.md` · `par-question.md` · `par-nature.md` | Les trois sondeurs | Assembleur |
+| `desc-produit.md` | **Rédacteur** · Découpeur *(découpes seules)* · Classeur *(la ligne `Nature:` seule)* | Sondeur, `/5_reclasse`, Convertisseur *(inv. 2 : ses titres, son texte hors blocs)*, Fusionneur, Architecte |
+| `desc-par-nature.md` | `/5_reclasse`, par script | `/6_convertit` |
+| `convertisseur/<nature>-input.md` | `/6_convertit` — la part de la nature | Convertisseur *(inv. 1)* · `/6_convertit`, qui y compare la part suivante |
+| `convertisseur/<nature>.md` · `<nature>-notes.md` · `questions-<nature>.md` | Convertisseur *(inv. 1)* | `/6_convertit` *(assemblage, fusion des questions)* · Convertisseur *(inv. 2)* |
+| `cadrage-produit/par-bloc.md` · `par-question.md` · `par-nature.md` · `global.md` | Les quatre invocations du sondeur | Assembleur |
+| `cadrage-produit/releve.md` | L'invocation globale | Lui-même, pour les passes B et C |
 | `cadrage-produit/questions.md` | Assembleur | La commande `/4_grille`, qui le recopie |
-| `questions-<agent>-NN.md` | L'agent émetteur · **Product Owner** pour les réponses | Son émetteur, le Rédacteur |
-| `spec-technique.md` | Convertisseur *(inv. 2)* | Architecte, **Cadreur** *(aval)* |
+| `questions-<agent>-NN.md` | L'agent émetteur · **Product Owner** pour les réponses | Son émetteur, le Lexicographe *(inv. 3 et 4)*, le Rédacteur |
+| `spec-technique.md` | `/6_convertit` *(assemblage)* · Convertisseur *(inv. 2 : préambule, renvois, Resources)* | Architecte, **Cadreur** *(aval)* |
 | `tracabilite.md` | Convertisseur *(inv. 2)* | Architecte *(inv. 1)* |
 | `docs/TECHNICAL_CONVENTIONS.md` | **Architecte, seul** | Tous les agents de code, Extracteur |
 | `couverture.md` | Architecte | Product Owner, une fois |
@@ -1222,6 +1411,12 @@ reviendrait à trancher une décision produit.
 
 **La numérotation avance d'une invocation, jamais d'une question** —
 📌 un fichier par invocation, portant toutes ses questions.
+
+🔴 **Vide, il dit « on passe » ; non vide, il ramène à `/1_lexique`.**
+📌 **Tous les agents du cycle qui en écrivent un l'écrivent à chaque
+passage** — Lexicographe, Rédacteur, Classeur, Sondeurs *(par
+`/4_grille`)*, Convertisseur. ⚠️ **Le Découpeur n'en écrit pas** : il
+découpe ou il bloque.
 
 ## Écrire la sortie même vide
 
@@ -1309,29 +1504,11 @@ le fait qu'elle existe.
 *Points où deux fichiers ne disent pas la même chose. Non tranchés
 ici.*
 
-📌 **Six entrées ont été retirées**, tranchées dans les fichiers : le
+📌 **Neuf entrées ont été retirées**, tranchées dans les fichiers : le
 modèle du Rédacteur, la forme de la ligne `Block:`, les invocations que
 `/1_lexique` sait nommer, ce que `/fusion` enchaîne, ce que
-`.claude/CLAUDE.md` dit des modèles, et `desc-par-nature.md` —
-📌 **le Classeur pose la nature, le reclassement par nature reste au
-Convertisseur, et le fichier ne revient pas.**
-
-🟡 **La route longue du Convertisseur ne passe pas par `/3b_nature`.**
-Son aller-retour dit qu'un `NEW` apparu renvoie à
-`/4_grille` → `/5_reclasse` → `/6_convertit`. 🔴 **Mais un bloc neuf
-porte une ligne `Nature:` vide** — ⚠️ **et la grille pose à un bloc les
-questions de sa nature.** 📌 **Sans classement, elle ne lui en pose
-aucune**, et le bloc traverse le tour fermé sur rien.
-
-🟡 **Ce que `.claude/CLAUDE.md` dit de la grille de cadrage.** Il annonce
-que le Rédacteur charge `GRILLE_CADRAGE_PRODUIT.md` par son nom ;
-🔴 **le Rédacteur s'interdit d'ouvrir quoi que ce soit dans
-`docs/process/`**, et la grille que les sondeurs déroulent est
-`GRILLE_CADRAGE_PRODUIT_V2.md`. ⚠️ **Les deux fichiers coexistent dans
-`docs/process/`**, et seul le second est celui que la chaîne lit.
-
-🟡 **Deux résidus de l'arbitrage tranché**, et c'est sa mise en œuvre qui
-n'a pas suivi, non la décision. 📌 **`/2_structure` supprime toujours
-`desc-par-nature.md`** quand un `NEW` apparaît, et aucun agent ne
-l'écrit. 📌 **Et l'invocation 1 du Convertisseur s'appelle toujours
-*Closing* dans l'agent**, *« Reclassifying »* dans `/5_reclasse`.
+`.claude/CLAUDE.md` dit des modèles et de la grille de cadrage, la
+route longue du Convertisseur, le retour de `desc-par-nature.md`, et le
+nom de l'invocation 1 du Convertisseur — 📌 **une seule route pour toute
+réponse, `/5_reclasse` range sans agent, et l'invocation qui fermait le
+fichier produit a disparu.**

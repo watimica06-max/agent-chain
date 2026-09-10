@@ -21,7 +21,7 @@ one block**, and a chain never reaches it.
 **Pass C — the feature, once.** 📌 **What no block raises, because it
 belongs to none of them.**
 
-🔴 **Every question carries an identifier** — `A1.3`, `A2.screen.2`,
+🔴 **Every question carries an identifier** — `A1.3`, `A2.presentation.2`,
 `C1.6`. ⚠️ **Whoever answers writes that identifier, exactly** — 📌 it
 is what makes one block's answers comparable to another's.
 
@@ -49,6 +49,11 @@ a gap, and A3 does not apply.
 
 🔴 **Say which of the two**, never *"no trigger"* alone.
 
+📌 **Set off by time passing or by the system, with nobody waiting on
+it** — 🔴 **how often?** and 🔴 **if the system interrupts it, does it
+resume on its own?** ⚠️ **When a block runs is not its nature**; these
+two belong to its trigger.
+
 **`A1.2` What does it consume?**
 🔴 **Name each piece of data.**
 
@@ -62,8 +67,8 @@ Data, a display, a state change, another mechanism firing. 🔴 **Name
 each one.**
 
 **`A1.4` Where does it draw?**
-🔴 **Asked of every block that displays anything.** 📌 **Name the screen
-and the area it occupies.**
+🔴 **Asked of every block that shows or tells the user anything.** 📌
+**Name the view — or the channel — and the area it occupies.**
 
 **`A1.5` If it produces an order — what separates two elements that
 tie?**
@@ -91,22 +96,18 @@ Finding the earlier state, or clean.
 
 🔴 **Ask the questions of the block's nature, and only those.**
 
-📌 **Their identifiers carry the nature** — `A2.model.1`, `A2.screen.3`.
+📌 **Their identifiers carry the nature** — `A2.model.1`, `A2.presentation.3`.
 
 | Nature | Questions |
 |---|---|
 | model | **1** Type, bounds, allowed values? · **2** Mandatory or optional? 🔴 Even when trivial — the upper bound is a product decision |
-| persistence | **1** Stored or recomputed? · **2** 🔴 If something can be stored incomplete: what does it hold then — the absence, or an empty value? |
+| persistence | **1** Stored or recomputed? · **2** 🔴 If something can be stored incomplete: what does it hold then — the absence, or an empty value? · **3** How long does it live, and what becomes of it after? |
 | calculation | **1** Inputs, output, rule for each case? · **2** And when an input is missing? · **3** What values can its output take, and which are acceptable? 🔴 See below |
 | transition | **1** What event triggers it? · **2** What states exist, reachable from which? 🔴 See exhaustiveness below |
-| external source | **1** What if it fails, is unavailable, returns invalid data? · **2** 🔴 What makes two incoming things the same one — and what happens to the second? |
+| external exchange | **1** What if it fails, is unavailable, returns invalid data — on the way in or out? · **2** 🔴 What makes two incoming things the same one — and what happens to the second? |
 | synchronisation | **1** Rule when two versions diverge? · **2** What the user sees during, and on failure? · **3** 🔴 What identifies one same thing seen from both sides? And to which changes does a mirrored copy update — the list being closed |
-| background work | **1** Frequency? · **2** What if the system interrupts it — does it resume alone? |
-| journey | **1** Conditions for moving on? · **2** What if the user goes back, or abandons? |
-| screen | **1** What is displayed, where, what each action does? · **2** What is shown with no data, loading, on failure? · **3** 🔴 What the user has in progress on this screen is kept when they leave and come back, or lost — say which, for each thing they can have in progress |
-| text | **1** Exact label? · **2** What it becomes if the value is absent? |
+| presentation | **1** What is shown or told, where, what each action does? · **2** What is shown with no data, loading, on failure? · **3** 🔴 What the user has in progress on this view is kept when they leave and come back, or lost — say which, for each thing they can have in progress · **4** Conditions for moving on to the next view? · **5** What if the user goes back, or abandons? |
 | access | **1** Who sees, who changes? · **2** What does someone who cannot? |
-| lifecycle | **1** How long does the data live, what becomes of it after? |
 
 **On `calculation` — the bounds of an output:**
 
@@ -234,8 +235,9 @@ answerable from one.
 
 ## What pass A left you
 
-🔴 **Every crossing below reads pass A's answers**, never the blocks
-again:
+🔴 **Every crossing below reads the record** — pass A's answers to
+`A1.1`–`A1.4` and `A4`'s list, taken on every block — **never the
+blocks again:**
 
 | What you cross | Where it is |
 |---|---|
@@ -266,14 +268,14 @@ difference is named.**
 🔴 **It gets nothing.** ⚠️ **Compare the two moments** — a block reading
 at launch and a block writing on a user action never meet.
 
-**`B1.5` Two blocks drawing on the same screen and area.**
+**`B1.5` Two blocks drawing on the same view and area.**
 🔴 **One replaces the other, they coexist, or nobody decided.** 📌 **The
 one written second rarely says which.**
 
 **`B1.6` A name one block declares and no other uses.**
 🔴 **It is dead, or its consumer uses another in its place.** ⚠️ **Say
 which** — 📌 **a scale that declares five steps and sees four used has
-either one step too many, or one screen reaching for the wrong one.**
+either one step too many, or one view reaching for the wrong one.**
 
 ⚠️ **This is not `B1.3`.** 📌 **That one crosses produced data; a name
 is declared, not produced**, and nothing in `Produces` carries it.
@@ -334,18 +336,15 @@ construction; a dated value only from its date.
 removed?**
 🔴 **Silence is not removal.** Rule by rule.
 
-**`C1.4` What terms must be settled before writing the rules?**
-The words that mean different things depending on who uses them.
-
-**`C1.5` Are the displayed terms the product's or the code's?**
+**`C1.4` Are the displayed terms the product's or the code's?**
 🔴 Internal naming never surfaces on screen.
 
-**`C1.6` Does it collect personal or sensitive data?**
+**`C1.5` Does it collect personal or sensitive data?**
 Health, location, biometrics, identifiers. Consent is a product
 decision, never ticked by default. 🔴 **One answer per kind** — health
 and location are not consented to together.
 
-**`C1.7` What system permissions, and what if they are denied for
+**`C1.6` What system permissions, and what if they are denied for
 good?**
 🔴 Asked at the moment of use, never at launch. 🔴 **One answer per
 permission** — a refused sensor and a refused link do not leave the

@@ -1,12 +1,19 @@
 ---
-description: Reclassify the product file by technical nature
-allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent
+description: Sort the product file's blocks by nature, for the Convertisseur
+allowed-tools: Read, Grep, Glob, Write, Bash
 argument-hint: "<feature folder name>"
 ---
 
 Act as the orchestrator, in **upstream mode**.
 
-**This command invokes `convertisseur`, invocation 1 — Reclassifying.**
+**This command invokes no agent.** 🔴 **It writes `desc-par-nature.md`
+— the product file's blocks, sorted under the nature the classeur gave
+each one.** 📌 **The Convertisseur translates one nature at a time, and
+this is where each nature's blocks are gathered.**
+
+🔴 **It writes the file afresh on every run** — ⚠️ **a block that
+changed may have changed nature too**, and a file kept from an earlier
+run would file it under the old one.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
@@ -17,106 +24,101 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 ## What you read
 
-Nothing. Each agent declares its own inputs; you pass the feature
-folder and nothing else. `CLAUDE.md`'s standing reading rules apply:
-never open `CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+🔴 **`desc-produit.md`, to copy its blocks — never to judge them.**
+
+⚠️ **`CLAUDE.md`'s standing reading rules apply**: never open
+`CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
 
 ---
 
-## How it runs
+## Before anything else
 
-**What you do**: invoke the agent via `Agent()` with the feature folder
-and which invocation it is — and nothing else.
+🔴 **Grep `-c '^Nature:$'` in `desc-produit.md`** — it must return zero.
 
-🔴 **Never paraphrase the agent's process in your invocation** — not
-its inputs, its checks, its output format. It reads its own
-instructions.
+⚠️ **Anything else means a block was left unclassed.** 📌 **Grep
+`-B1 '^Nature:$'` to say which**, say `/3b_nature` has to run, and
+stop.
 
-### Invocation parameters
+🔴 **File every root `questions-*.md`**, by `git mv`:
 
-```
-Agent(
-  subagent_type="<agent>",
-  model="opus",
-  description="<phase> <feature>",
-  prompt="Feature folder: docs/features/<name>/. <Which invocation>."
-)
-```
+    git mv docs/features/<name>/questions-<agent>-NN.md \
+           docs/features/<name>/questions/<agent>/
 
-❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
-either** — in this environment the Agent tool always runs async and
-notifies on completion. Do not pass it; wait for the notification.
+📌 **This command reads none of them.** 🔴 **A questions file stays at
+the root only while it waits to be answered or integrated** — ⚠️ **the
+next one written has to be the only one there**, or the next command
+cannot tell which one waits.
 
-❌ **Never pass `isolation`** — the phases are sequential
-and each reads what the previous one wrote.
+📌 **Create `questions/<agent>/` if it does not exist**; nothing to file
+is a normal outcome.
+
+---
+
+## What you write
+
+**`desc-par-nature.md`, at the feature folder's root, replaced whole:**
+
+    # Product file by nature
+
+    ## model
+
+    ### B3 — Race segment structure
+    Nature: model
+
+    <its text>
+
+    ## persistence
+
+    *(none)*
+
+🔴 **The eight natures, in this order, one heading each** — `model`,
+`persistence`, `calculation`, `transition`, `external exchange`,
+`synchronisation`, `presentation`, `access`. 📌 **A nature no block carries still gets its
+heading**, with `*(none)*` under it.
+
+🔴 **Under each, every block whose `Nature:` line carries it**, in the
+product file's order. 📌 **A block runs from its `### B` line to the
+next heading of any level.**
+
+🔴 **Copied as it stands, by script — never retyped.** ⚠️ **A block
+retyped is a block that may have changed**, and nothing downstream
+would see it.
+
+🔴 **Except its marker**: strip a trailing `NEW` or `MODIFIED` from
+the `### B` line. ⚠️ **It says what moved on the Rédacteur's last
+turn**, and `/6_convertit` compares these blocks against the last ones
+it translated — 📌 **a marker coming or going would read as a change.**
+
+⚠️ **A `Nature:` value that is not one of the eight** — say which
+block, and stop without writing.
+
+**Then count** `^### B` in both files. 🔴 **The two counts match** —
+⚠️ **a difference means a block was lost or doubled**; say so, and
+stop without committing.
 
 ---
 
 ## Git, in this mode
 
-🔴 **Before invoking, move every root `questions-*.md` whose prefix is
-not `convertisseur`:**
+📌 **No agent, no worktree** — this command writes in place.
 
-    git mv docs/features/<name>/questions-<other>-NN.md \
-           docs/features/<name>/questions/<other>/
-
-⚠️ **`git mv`, never a read-and-rewrite** — the agent must not open
-those files, and neither should you.
-
-🔴 **And every `questions-convertisseur-NN.md` but the highest** — the
-last one stays at the root, it carries the numbering.
-
-📌 **Create `questions/<agent>/` if it does not exist.**
-
-🔴 **Then commit the feature folder**, before creating the worktree:
-
-    git add docs/features/<name>/ && git commit -m "chore: answers"
-
-⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
-session.** A worktree branches from the last commit — uncommitted
-answers are invisible inside it, and the agent works on a stale
-`questions.md`. *(Seen once: 186 lines in the worktree, 195 in the main
-checkout.)*
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. An agent
-would then work on stale content and its output would have to be
-discarded. *(Seen once: a whole invocation lost that way.)*
-
-📌 **Enter the worktree before invoking the agent**, not after it
-fails — the harness blocks a subagent's writes until the session is
-isolated. *(Measured on three
-phases: the agent does the full job, cannot write, and the whole
-invocation is redone.)*
-
-**Then, once the agent reports:**
-
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
-
-🔴 **The push is part of the merge, not an afterthought.** A phase that
-sits only on the local machine is lost with it.
+🔴 **Commit the feature folder**, `chore: product file by nature`, and
+push.
 
 ⚠️ **A push that fails — diverged remote, no network — is reported, not
-retried and not worked around.** The merge holds locally; say so and
+retried and not worked around.** The commit holds locally; say so and
 carry on.
-
-🔴 **Merge before handing back, always** — a phase whose output sits on
-an unmerged branch is invisible to the next one. ⚠️ **A
-`blocked_*.md` merges too**: the Product Owner has to see it.
 
 ---
 
 ## What you relay
 
-The agent's own report, and nothing more. 🔴 **Nothing else is yours**:
-no phase chain, no risk level, no `TaskCreate`.
+📌 **How many blocks under each nature**, one line.
 
-**If it returns a `blocked_*.md`**: relay it and stop.
+**What to run next** — 📌 **indications for the Product Owner.**
+⚠️ **You relay them; you run nothing after this command.**
+
+📌 `/6_convertit`.
+
+🔴 **Nothing else is yours**: no phase chain, no risk level, no
+`TaskCreate`.
