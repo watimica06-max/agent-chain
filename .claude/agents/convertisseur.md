@@ -199,18 +199,18 @@ The questions file goes to the Product Owner, who fills the `Answer:`
 fields by hand. The Rédacteur then integrates them into the blocks of
 the product file.
 
-**An answer comes back through `/1_structure` first, always.** What
+**An answer comes back through `/2_structure` first, always.** What
 follows depends on what it changed:
 
-| After `/1_structure` | The route |
+| After `/2_structure` | The route |
 |---|---|
 | No `NEW` in the product file | 🔴 **Straight to the invocation that asked** |
-| A `NEW` appeared | `/2_grille` → `/3_reclasse` → `/4_convertit` — a new block was never closed, and never filed |
+| A `NEW` appeared | `/4_grille` → `/5_reclasse` → `/6_convertit` — a new block was never closed, and never filed |
 
 📌 **A question from invocation 2 rarely creates a block.** It sharpens
 a sentence that already exists.
 
-⚠️ **The long route runs `/3_reclasse`, which deletes the technical
+⚠️ **The long route runs `/5_reclasse`, which deletes the technical
 document** — invocation 2 then produces it in full rather than patching
 a stale one.
 

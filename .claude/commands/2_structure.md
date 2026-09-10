@@ -6,7 +6,7 @@ argument-hint: "<feature folder name>"
 
 Act as the orchestrator, in **upstream mode**.
 
-**This command invokes `redacteur`, invocation 1 — Structuring.**
+**This command invokes `redacteur`, invocation 1 or 2.**
 
 📌 **It runs as many times as needed.** With no questions file it reads
 `idees.md`; with one, it integrates the answers instead.
@@ -20,18 +20,69 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 ## What you read
 
-Nothing. Each agent declares its own inputs; you pass the feature
-folder and nothing else. `CLAUDE.md`'s standing reading rules apply:
-never open `CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+🔴 **One `ls` of the feature folder's root**, and nothing else.
+📌 **You pass the agent the file it reads; it does not look for
+itself.**
+
+⚠️ **`CLAUDE.md`'s standing reading rules apply**: never open
+`CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+
+🔴 **Never open a questions file's content** — 📌 its name is all you
+need.
 
 ---
 
 ## How it runs
 
-**What you do**: invoke the agent via `Agent()` with the feature folder
-and which invocation it is — and nothing else.
+**First, the blocking file.** 🔴 **Does `blocked_redacteur.md` sit in
+the feature folder?**
+
+| | What you do |
+|---|---|
+| Absent | 📌 Carry on |
+| Its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands |
+| Its `## Decision` is filled | 📌 **Name it in the prompt**, beside the file to read |
+
+⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
+file.
+
+**Then, which invocation and which file:**
+
+| At the root | Invocation | What you name |
+|---|---|---|
+| No questions file | **1 — Structuring** | `idees.md` |
+| One or more, any prefix | **2 — Integrating** | 🔴 **The highest-numbered one** |
+
+⚠️ **Any prefix** — 📌 the agent integrates the answers whichever agent
+asked.
+
+🔴 **If the highest carries an empty `Answer:`** — 📌 **stop**, and say
+which questions are waiting.
+
+```
+Agent(
+  subagent_type="redacteur",
+  model="opus",
+  description="Structure <name>",
+  prompt="Feature folder: docs/features/<name>/.
+          Invocation <1 — Structuring, or 2 — Integrating>.
+          Read: <idees.md, or questions-<agent>-NN.md>.
+          <Plus: blocked_redacteur.md, its decision is filled.>"
+)
+```
+
+🔴 **Name the file, always** — ⚠️ **the agent opens that one and no
+other.**
 
 ### Once it has run
+
+🔴 **A blocking file you named is filed:**
+
+    git mv docs/features/<name>/blocked_redacteur.md \
+           docs/features/<name>/blocked_redacteur-NN.md
+
+⚠️ **Anything left at the unnumbered name reads as a block still
+standing**, and the next run stops on it.
 
 🔴 **Grep `NEW` in `desc-produit.md`.** If any is there, **delete
 `desc-par-nature.md` and `spec-technique.md`.**
@@ -46,7 +97,7 @@ it.
 
 📌 **Neither marker, nothing to delete.** An answer that only sharpened
 a sentence leaves both valid, and the cycle can return straight to
-`/3_reclasse` or `/4_convertit`.
+`/5_reclasse` or `/6_convertit`.
 
 **Say which files you deleted**, or that none needed it.
 
@@ -75,6 +126,18 @@ and each reads what the previous one wrote.
 ---
 
 ## Git, in this mode
+
+🔴 **File the lexicographe's questions file before anything else:**
+
+    git mv docs/features/<name>/questions-lexicographe-NN.md \
+           docs/features/<name>/questions/lexicographe/
+
+⚠️ **`/1_lexique` reads the root to know which invocation it is** — 📌
+**a lexicographe file left there and a grid file beside it read as its
+fourth**, when its work is done.
+
+📌 **Create `questions/lexicographe/` if it does not exist.** ⚠️
+**Nothing to file is a normal outcome.**
 
 🔴 **Commit the feature folder**, before creating the worktree:
 
@@ -124,7 +187,14 @@ an unmerged branch is invisible to the next one. ⚠️ **A
 
 ## What you relay
 
-The agent's own report, and nothing more. 🔴 **Nothing else is yours**:
+The agent's own report.
+
+**What to run next**
+
+| What just happened | Next |
+|---|---|
+| It flagged a clarification | 🔴 **Answer it, then `/2_structure`** — nothing downstream runs while a flag stands |
+| It wrote the product file | 📌 `/3_decoupe` | 🔴 **Nothing else is yours**:
 no phase chain, no risk level, no `TaskCreate`.
 
 **If it returns a `blocked_*.md`**: relay it and stop.

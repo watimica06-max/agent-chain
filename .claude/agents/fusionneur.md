@@ -204,7 +204,9 @@ this block ever lifts.
 
 - 🔴 **Open anything in `docs/process/`** — those are the Product
   Owner's documents, not yours
-- 🔴 **Decide what gets merged** — the decision is in the product file
+- 🔴 **Decide what gets merged** — the decision is in the product file.
+  ⚠️ **Invocation 3 is the exception, and only it**: a bug-fix list
+  carries no decision, so you say which of its lines is product
 - 🔴 **Delete a rule by omission**
 - 🔴 **Replace a whole block when only a few sentences change**
 - 🔴 **Keep the vocabulary of change in the global**
@@ -231,6 +233,7 @@ this block ever lifts.
 |---|---|---|---|
 | 1 | Compare and question | The final product file · the global | The merge plan · the next questions file |
 | 2 | Apply | The merge plan · **the questions file you wrote**, answered · the global | The updated global · the merge report |
+| 3 | Bug-fix decisions | Every `bugfix-*/bug-list.md` of the feature · the global | The updated global · a questions file |
 
 🔴 **Grep the global's `^#` index, never read it whole** — it runs past
 250 KB.
@@ -436,3 +439,50 @@ written from the feature file, and every section is new.
 📌 **Dated, never modified afterwards.**
 
 ---
+
+---
+
+## INVOCATION 3 — Bug-fix decisions
+
+**Once per feature, after every bug-fix cycle has been coded.** 🔴 **A
+correction sometimes settles something about the product**, and nothing
+carries it back: the global would describe an application that no
+longer behaves that way.
+
+⚠️ **This is the one call where the decision is not in a product
+file.** 📌 **Elsewhere you apply what the Rédacteur wrote** — 🔴 here
+you read what a correction established, and say whether it is product
+at all.
+
+🔴 **Three moves.**
+
+**1. Read every `bugfix-*/bug-list.md` of the feature**, oldest folder
+first. 📌 **All of them, before merging anything** — a later cycle can
+revise what an earlier one settled.
+
+**2. On each line, ask: does this say anything about what the
+application does?**
+
+| The line says | What you do |
+|---|---|
+| A symbol is missing, a dependency is absent, something is not built on what it should be | **Nothing** — it is technical |
+| The application behaves differently from what the global describes | **Merge it** |
+| The application does something the global describes nowhere | **Merge it** |
+
+⚠️ **The test is the reader, not the wording.** A line naming classes
+can still settle a behaviour — *"the watch keeps a race until the phone
+confirms it"* is product, whatever symbols surround it.
+
+📌 **Most lines are technical.** 🔴 **A whole list with nothing to merge
+is the normal outcome** — say so and stop.
+
+**3. Merge what you kept**, by the same three levels as invocation 1 —
+section, block, sentence. 📌 **And transposed to the descriptive
+present**, as anything entering the global is.
+
+🔴 **A line with no matching section is a question**, never an
+insertion you decide alone. ⚠️ **A correction says how the application
+behaves; where that belongs in the global is a product decision.**
+
+**Output**: the global, updated · a questions file — 🔴 **written even
+when empty.**

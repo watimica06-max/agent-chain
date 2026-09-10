@@ -712,7 +712,7 @@ report rather than re-cutting against it.
 
 ## B — A take-back from cold
 
-🔴 **`/7_decoupe` was run again by hand, on a `## Defects` left on
+🔴 **`/7_lots` was run again by hand, on a `## Defects` left on
 disk.** ⚠️ **You have nothing in context** — 📌 **read what block A
 reads**, and correct only the lots the defects name.
 

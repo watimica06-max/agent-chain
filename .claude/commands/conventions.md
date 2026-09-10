@@ -37,7 +37,7 @@ folder, or a `bugfix-NN/` inside it. **A second argument names it.**
 
 ## When it runs
 
-📌 **After `/4_convertit`, before `/7_decoupe`.** The Cadreur reads the
+📌 **After `/6_convertit`, before `/7_lots`.** The Cadreur reads the
 conventions in full; they have to exist when it does.
 
 ⚠️ **Run by hand** — 🔴 **`/cycle` does not call it**, and wiring it in

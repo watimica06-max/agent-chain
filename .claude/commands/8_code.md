@@ -54,7 +54,7 @@ Contrôleur**, then stop. ⚠️ **That is the normal shape of a run
 restarted after a stop on the last lot.**
 
 ⚠️ **If `## Defects` is not empty**, stop: the split was never
-corrected. Run `/7_decoupe` first.
+corrected. Run `/7_lots` first.
 
 ---
 
@@ -186,7 +186,7 @@ to the split.** 📌 **The Arbitre wrote `code/redecoupage.md`**, and the
 agent stopped — ⚠️ **the Détailleur without writing a sheet, the
 Réalisateur after dropping its code.**
 
-**Run `/7_decoupe` on this working folder**, and wait for it. ⚠️ **Then
+**Run `/7_lots` on this working folder**, and wait for it. ⚠️ **Then
 carry on your loop** — 📌 **you do not hand back, and the Product Owner
 is not waiting on anything.**
 
@@ -208,7 +208,7 @@ carrying PASS.
 does not rewrite it**, and would detail against a lot that changed
 shape.
 
-⚠️ **If `/7_decoupe` stops on a defect or a block**, 🔴 **stop too** —
+⚠️ **If `/7_lots` stops on a defect or a block**, 🔴 **stop too** —
 relay what it said. **There is no split to code against.**
 
 ---

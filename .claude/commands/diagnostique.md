@@ -10,7 +10,7 @@ Act as the orchestrator, in **upstream mode**.
 the investigation, then once for the assembly.
 
 📌 **It produces `desc-bug.md`** — the technical document of a bug-fix
-cycle. **Then `/7_decoupe`, then `/8_code`.** ⚠️ **No grid, no
+cycle. **Then `/7_lots`, then `/8_code`.** ⚠️ **No grid, no
 Convertisseur, no Fusionneur**: the product already says what is
 expected, and a correction adds nothing to it.
 

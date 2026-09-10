@@ -270,7 +270,15 @@ at launch and a block writing on a user action never meet.
 🔴 **One replaces the other, they coexist, or nobody decided.** 📌 **The
 one written second rarely says which.**
 
-**`B1.6` One name carrying two values.**
+**`B1.6` A name one block declares and no other uses.**
+🔴 **It is dead, or its consumer uses another in its place.** ⚠️ **Say
+which** — 📌 **a scale that declares five steps and sees four used has
+either one step too many, or one screen reaching for the wrong one.**
+
+⚠️ **This is not `B1.3`.** 📌 **That one crosses produced data; a name
+is declared, not produced**, and nothing in `Produces` carries it.
+
+**`B1.7` One name carrying two values.**
 📌 **See B2.**
 
 ## What a crossing costs

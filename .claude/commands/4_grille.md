@@ -15,7 +15,7 @@ turn's output** — ⚠️ **not what they agree on.**
 
 📌 **It runs as many times as needed.** Each run writes the next
 `questions-sondeur-NN.md`. **An empty one ends the loop**; then run
-`/3_reclasse`.
+`/5_reclasse`.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
@@ -36,10 +36,22 @@ or a questions file's content.**
 
 ## Before anything else
 
+🔴 **Does a `blocked_sondeur.md` or a `blocked_assembleur.md` sit in
+the feature folder?**
+
+| | What you do |
+|---|---|
+| Neither | 📌 Carry on |
+| One, its `## Decision` empty | 🔴 **Stop** — say which one still stands |
+| One, its `## Decision` filled | 📌 **Name it in that agent's prompt** |
+
+⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
+file.
+
 🔴 **Grep `Clarification needed` in `desc-produit.md`.**
 
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
-one**, and that `/1_structure` has to run first.
+one**, and that `/2_structure` has to run first.
 
 🔴 **A flagged block was transcribed on a reading nobody confirmed** —
 📌 **probing it would close a text that is about to change.**
@@ -153,6 +165,14 @@ Agent(
 
 ## Once it has reported
 
+🔴 **A blocking file you named is filed:**
+
+    git mv docs/features/<name>/blocked_<agent>.md \
+           docs/features/<name>/blocked_<agent>-NN.md
+
+⚠️ **Anything left at the unnumbered name reads as a block still
+standing**, and the next run stops on it.
+
 🔴 **Copy `cadrage-produit/questions.md` to
 `questions-sondeur-NN.md`** at the feature folder's root.
 
@@ -251,7 +271,14 @@ merges too**: the Product Owner has to see it.
 📌 **How many questions each reading raised**, and how many the merge
 kept.
 
-🔴 **Nothing else is yours**: no phase chain, no risk level, no
+**What to run next**
+
+| The questions file | Next |
+|---|---|
+| Holds questions | 📌 **Answer them, then `/1_lexique`** — 🔴 it settles the vocabulary your answers brought, before the Rédacteur reads them |
+| Is empty | 📌 `/5_reclasse` — 🔴 the product file is closed |
+
+🔴 **Nothing else is yours**: no risk level, no
 `TaskCreate`, no reading of what the questions say.
 
 **If an agent returns a `blocked_*.md`**: relay it and stop.

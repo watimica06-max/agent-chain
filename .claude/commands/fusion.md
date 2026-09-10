@@ -44,8 +44,8 @@ matches.**
 | 5 | A root questions file with an empty `Answer:` | 🔴 **STOP** — relay it |
 | 6 | `questions-fusionneur-NN.md`, answered | **Fusionneur, invocation 2** |
 | 7 | `plan-fusion.md` exists | **Fusionneur, invocation 2** |
-| 8 | `questions-redacteur-NN.md`, answered | **Rédacteur, invocation 2** |
-| 9 | A `bugfix-*/` folder, and no `questions-redacteur-*` anywhere | **Rédacteur, invocation 2** |
+| 8 | `questions-fusionneur-NN.md`, answered, and a `bugfix-*/` folder | **Fusionneur, invocation 3** |
+| 9 | A `bugfix-*/` folder, and no `questions-fusionneur-*` anywhere | **Fusionneur, invocation 3** |
 | 10 | Otherwise | **Fusionneur, invocation 1** |
 
 📌 **Row 9 fires once.** The Rédacteur writes a questions file even when

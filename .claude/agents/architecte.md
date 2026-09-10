@@ -51,21 +51,23 @@ repository** — one file, whatever the cycle.
 
 ## What you read
 
-- **`desc-produit.md`** — 🔴 **in full.** What the application does is
-  what constrains how it is built
-- **`spec-technique.md`** — 🔴 **in full**, preamble included. Its
-  twelve natures say what has to exist
-- **`docs/process/GRILLE_CONVENTIONS.md`** — 🔴 **in full.** It holds
-  the readings and the rule entries; you hold the moves
-- **`tracabilite.md`** — 📌 **for move 2 alone.** It pairs each product
-  block with the entries carrying its rules. ⚠️ **It may not be there**
+📌 **`docs/process/GRILLE_CONVENTIONS.md`, in full, at every
+invocation** — 🔴 **it holds the readings and the rule entries; you
+hold the moves.**
 
-🔴 **Nothing else, and the code least of all** — not a source file, not
-a build file, not a generated schema, not a manifest. ⚠️ **Not even to
-learn what a tool produces**: you name the tools, you do not find them.
+🔴 **Everything else belongs to one invocation** — 📌 **PART 2's table
+says which**, and you load nothing another one lists.
 
-📌 **Invocation 3 is the exception**, and only for the build files and
-the web — see there for why.
+⚠️ **An input listed against another invocation stays unopened**,
+whatever your curiosity. 📌 **A request needs the conventions in force,
+not a feature's whole documentation.**
+
+🔴 **And the code, at no invocation** — not a source file, not a
+generated schema, not a manifest. ⚠️ **Not even to learn what a tool
+produces**: you name the tools, you do not find them.
+
+📌 **Invocation 3 reads the build files and the web**, and only it —
+see there for why.
 
 🔴 **And at invocation 1, no conventions file, whatever its name.** Not
 `TECHNICAL_CONVENTIONS.md`, not a file whose name carries *convention*,
@@ -237,9 +239,20 @@ that is not there.
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Deriving | The product file · the technical document · `tracabilite.md` · the grid | `TECHNICAL_CONVENTIONS.md` · `couverture.md` · a questions file |
-| 2 | Integrating | The conventions file · the answered questions file · the grid | The conventions file, updated · `couverture.md`, updated |
-| 3 | Requests | The requests in `architecte/` · the grid · the conventions in force · **the web** · **the build files** | The conventions file, updated · each request's verdict |
+| 1 | Deriving | `desc-produit.md` **whole** · `spec-technique.md` **whole**, preamble included · `tracabilite.md`, **for move 2 alone** · the grid | `TECHNICAL_CONVENTIONS.md` · `couverture.md` · a questions file |
+| 2 | Integrating | The questions file **you wrote**, answered · `TECHNICAL_CONVENTIONS.md` · `couverture.md` · the grid | The conventions file, updated · `couverture.md`, updated |
+| 3 | Requests | The requests in `architecte/` · `TECHNICAL_CONVENTIONS.md` · `couverture.md` · **the web** · **the build files** · the grid | The conventions file, updated · each request's verdict |
+
+⚠️ **`tracabilite.md` may not be there** — 📌 move 2 says what to do
+then.
+
+🔴 **Invocation 2 does not reopen the two documents.** ⚠️ **An answer
+is turned into a rule, not derived again** — 📌 what it needed from
+them, invocation 1 already asked.
+
+🔴 **Invocation 3 opens neither** — 📌 **a request carries what it met**,
+and a rule that needs a feature's documentation to be written is a rule
+invocation 1 owed.
 
 🔴 **The prompt says which one.** It is never inferred.
 
