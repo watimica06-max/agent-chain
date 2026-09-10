@@ -1,1324 +1,1218 @@
 # Process aval — du document technique au code
 
 > Documentation de référence. Décrit la chaîne **document technique →
-> code**, dérivée des phases réelles d'un développement.
+> code**.
 >
 > 📌 **L'amont** — de l'idée au document technique — vit dans
-> `PROCESS_AMONT.md`.
+> `PROCESS_AMONT.md`. ⚠️ **Ce qu'il porte n'est pas redit ici** : la
+> forme des fichiers de questions, celle des fichiers de blocage,
+> l'enveloppe git des commandes, les trois invocations de l'Architecte
+> qui dérivent les conventions.
 >
 > 🔴 **Aucun agent ne lit ce document.** Il dit pourquoi les agents sont
-> construits comme ils le sont, y compris des règles envisagées puis
-> écartées.
+> construits comme ils le sont — les décisions, pas leurs gestes.
+> ⚠️ **Il ne recopie ni un agent ni une commande** : ceux-là vivent dans
+> `.claude/agents/` et `.claude/commands/`, et les redire ici les ferait
+> diverger.
+>
+> **Le test** : quelqu'un qui a ce document et pas les agents doit
+> pouvoir les réécrire, parce qu'il comprend ce que chaque règle
+> empêche.
 
 ---
 
-## Trois principes
+## La frontière avec l'amont
 
-### 1. Un rôle se justifie par une des deux raisons seulement
+**L'aval commence au document technique.** 🔴 **Il en existe deux
+formes, jamais ensemble** : `spec-technique.md` sur un cycle de
+fonctionnalité, `desc-bug.md` sur un cycle de correction. **Le dossier
+qui porte les deux est un défaut** ; le Cadreur s'arrête dessus.
 
-**(a) Contexte incompatible** — les documents que deux travaux exigent
-ne peuvent pas cohabiter sans dégrader la qualité.
+📌 **Tout le reste est identique** — même découpage, même séquence,
+mêmes fiches, même boucle.
 
-**(b) Indépendance du regard** — juger son propre jugement ne
-fonctionne pas.
-
-🔴 **Tout le reste va ensemble.** Un humain lit, décide et écrit d'un
-même mouvement ; découper sans l'une de ces deux raisons ajoute du coût
-sans rien garantir.
-
-⚠️ La raison (a) est **circonstancielle** — elle dépend du volume, donc
-du dimensionnement des lots. La raison (b) est **structurelle**.
-
-### 2. Boucle de vérification, pas filet
-
-**Une boucle** — l'agent vérifie son propre travail avant de rendre. Il
-a déjà le contexte : ça ne coûte presque rien.
-
-**Un filet** — un autre agent revérifie. Ça coûte une invocation, un
-chargement, un regard qui doit tout reconstruire.
-
-🔴 **Le filet ne se justifie que là où l'auto-vérification est
-structurellement impossible** : quand il faudrait juger son propre
-jugement.
-
-*Un agent peut vérifier qu'il a écrit dans le bon fichier, au bon
-format, avec les bons champs — c'est mécanique. Il ne peut pas vérifier
-que son code fait ce qui était demandé : il a choisi son
-interprétation.*
-
-⚠️ **Chaque contrôle ajouté doit nommer ce qu'aucun autre ne fait
-déjà.** Sinon c'est de la ratification, pas de la détection.
-
-### 3. Un fichier est écrit une fois
-
-Écrit par un seul acteur, à un seul moment, et **plus modifié ensuite**.
-
-*Trois fichiers ont grossi jusqu'à devenir inexploitables — 88 Ko,
-276 Ko, un doublement — tous parce que plusieurs acteurs y ajoutaient
-au fil de l'eau.*
+🔴 **L'aval n'a presque pas besoin du Product Owner une fois lancé.**
+L'amont en a besoin à chaque tour ; ici une commande code plusieurs
+lots d'affilée sans que personne réponde à rien. ⚠️ **C'est ce qui
+autorise l'enchaînement silencieux** que l'amont s'interdit.
 
 ---
 
-## Les agents
+## Ce qui distingue l'aval
 
-| # | Agent | Justification | Fréquence |
-|---|---|---|---|
-| 1 | **Cadreur** — découpage | (a) contexte de specs | une fois |
-| 2 | **Vérificateur** — contrôle du découpage | (b) regard indépendant | une fois |
-| 3 | **Détailleur** — signatures et critères | (a) contexte de code | **par bloc** |
-| 4+5 | **Réalisateur** — code et état | (a) contexte de code | par lot |
-| 6 | **Relecteur** — verdict | (b) regard indépendant | par lot |
-| 7 | **Contrôleur** — intention produit vs fiches | (a) + (b) | une fois, à la fin |
-| 8 | *Product Owner* — test | — | une fois, à la fin |
+🔴 **Un sous-agent peut en appeler un autre.** ⚠️ **En amont, tout passe
+par la commande.** 📌 **Ici quatre dialogues existent**, et ils sont la
+structure même de la chaîne — voir *Les quatre dialogues*.
 
-**Deux invocations par lot**, plus une par bloc. Les phases 1, 2 et 7
-tournent une fois pour tout le document technique ; le test humain une
-fois à la fin.
+**Pourquoi** : 📌 **l'appelant garde son contexte pendant que l'appelé
+tourne, et reprend derrière lui.** 🔴 **Un aller-retour par la commande
+rendrait la main au Product Owner** à chaque tour, et perdrait ce que
+l'appelant avait en tête.
 
-📌 **Six agents au lieu de quatre, mais le plan disparaît** et le
-Réalisateur ne décide plus d'architecture.
+🔴 **Une attente sur un agent n'a pas de borne ; une attente sur le
+Product Owner est sondée.** ⚠️ **Un agent finit toujours** — le
+sonder n'apprend rien et coûte des appels. 📌 **Une personne peut ne
+pas être au clavier** : l'Arbitre sonde le fichier de blocage pendant
+vingt minutes, de plus en plus espacé, puis s'arrête.
+
+🔴 **Le découpage peut revenir sans intervention humaine.** ⚠️ **Un lot
+en cours de codage peut renvoyer au Cadreur** — l'Arbitre écrit ce
+qu'il faut, la commande relance le découpage et **poursuit sa boucle**.
+📌 **Le Product Owner n'attend sur rien.**
+
+🔴 **Un Réalisateur qui s'éteint laisse de quoi reprendre.**
+`reprise_realisateur.md` dit ce qui est fait, ce qui reste, ce qui est
+à moitié écrit. ⚠️ **Sans lui, le suivant recommence le lot.**
 
 ---
 
-## Les fichiers
+## Le principe qui tient toute la chaîne
 
-| Document | Écrit par | Lu par |
-|---|---|---|
-| `spec-technique.md` | en amont | Cadreur (tout), Vérificateur et Détailleur (sections ancrées) |
-| `CURRENT_TECHNICAL_STATE.md` | Réalisateur | Détailleur |
-| `TECHNICAL_CONVENTIONS.md` | hors process | Détailleur, Réalisateur, Relecteur |
-| Liste des lots + ancres | Cadreur | Vérificateur, Détailleur |
-| Séquence + blocs | Vérificateur | orchestration, Détailleur |
-| Fiche exécutable d'un lot | Détailleur | Réalisateur, Relecteur |
-| Compte rendu | Réalisateur | Relecteur, bloc suivant |
-| Verdict | Relecteur | orchestration |
-| Rapport d'écarts | Contrôleur | Product Owner |
+🔴 **Un agent constate, un autre corrige — jamais le même.**
 
-⚠️ **Ce qui disparaît** : le plan comme artefact — il comblait le vide
-entre un périmètre vague et le code, et ce vide est désormais comblé
-par la fiche exécutable. Et toute validation intermédiaire.
+📌 **Trois fois dans la chaîne** : le Vérificateur constate, le Cadreur
+corrige ; le Relecteur constate, un Réalisateur neuf corrige ;
+l'Arbitre tranche, l'agent bloqué applique.
 
-### La liste des lots
+⚠️ **Juger son propre jugement ne fonctionne pas.** 📌 **Un agent peut
+vérifier qu'il a écrit dans le bon fichier, au bon format** — c'est
+mécanique. 🔴 **Il ne peut pas vérifier que son code fait ce qui était
+demandé** : il a choisi son interprétation.
 
-**Produite par** le Cadreur. **Lue par** le Vérificateur et le
-Détailleur.
+**Le corollaire, et il est cher** : 🔴 **un contexte frais là où il faut
+un regard neuf.** ⚠️ **Le Vérificateur est rappelé jusqu'à trois fois
+sur un même découpage, chaque fois sans mémoire du tour précédent** —
+📌 **il doit juger un découpage qu'il n'a pas coupé**, et c'est tout ce
+pour quoi il existe. **Un FAIL amène de même un Réalisateur neuf**,
+jamais celui qui a écrit le code.
 
-📌 **Pourquoi elle existe** : elle transforme un document par nature en
-unités livrables, chacune ancrée dans sa source. Sans elle, le
-Détailleur devrait découper et détailler en même temps.
+🔴 **Et l'inverse, tout aussi délibéré** : **le Cadreur, lui, garde son
+contexte à travers les tours.** 📌 **Il vient de couper ce qu'on lui
+reproche**, et corriger contre ce qu'il a en tête ne coûte rien.
 
-| Bloc | Contenu |
+🔴 **Un agent ne cherche jamais dans le dossier** — on lui nomme son
+lot, son bloc, son fichier de blocage. 📌 **La commande a regardé.**
+⚠️ **Un agent dont le dossier cible manque ne s'arrête pas : il
+cherche**, liste, tente un chemin absolu.
+
+---
+
+# LES AGENTS
+
+*Neuf agents. Sept portent la chaîne, deux la partagent avec l'amont ou
+avec un autre point d'entrée.*
+
+---
+
+## Le Cadreur
+
+**À quoi il sert** — Il transforme le document technique en **lots** :
+des unités livrables que le reste de la chaîne code une à une.
+
+🔴 **Il coupe, il ne recopie jamais.** Un lot **cite** les entrées dont
+il découle — 📌 **la citation remplace le verbatim.**
+
+🔴 **C'est la phase qui détermine tout ce qui suit.** ⚠️ **Rien en aval
+ne rattrape un lot coupé trop gros.**
+
+**Ce qui le déclenche** — 🔴 **une invocation par cycle, et il dure tout
+le cycle.** 📌 **Quatre entrées possibles**, et ce qui est sur le disque
+dit laquelle :
+
+| Ce qu'il trouve | Ce qu'il fait |
 |---|---|
-| Identifiant du lot | `lot-01`, `lot-02`… — 🔴 **depuis 1 dans chaque feature**, pas de continuité entre features |
-| Ancre | la section précise du document technique dont le lot découle |
-| Besoins | symboles requis, produits par un lot antérieur ou préexistants |
-| Productions | symboles que ce lot va créer |
-| Modifications | symboles existants dont ce lot change la signature ou le comportement |
+| Un fichier de blocage à `## Decision` remplie | Il l'applique, puis reprend par le cas qui suit |
+| `code/redecoupage.md` | 🔴 **Le codage l'a renvoyé** — les lots codés sont clos |
+| Des défauts dans la séquence | 🔴 **Il ne corrige que les lots nommés** |
+| Rien de tout ça | Un premier découpage |
 
-**Structure** : cinq champs par lot, un lot après l'autre — pas de
-prose entre eux, pas de section d'introduction récapitulative.
+🔴 **Sur les trois derniers cas, il ne rejoue pas le découpage
+complet.** ⚠️ **Ces gestes coupent un premier découpage** — 📌 **il
+greperait, lirait, inventorierait et regrouperait avant d'atteindre le
+lot pour lequel on l'a rappelé, et ce lot n'y survivrait pas.**
 
-**Absent par construction** : aucune règle métier, aucun verbatim de
-spec — l'ancre les remplace. Aucune signature ni critère d'acceptation
-— c'est le travail du Détailleur.
+**Ce qui fait un lot** — 📌 **une unité livrable ne suffit pas à
+couper** : plusieurs découpages la satisfont. **Trois contraintes
+resserrent :**
 
----
+🔴 **Un lot cite les entrées d'une seule section.** ⚠️ **Un lot à cheval
+sur deux sections n'appartient à aucune couche.**
 
-### La séquence et les blocs
+🔴 **Deux lots ne touchent jamais un même symbole.** 📌 **Le même
+fichier est permis** — ce n'est pas un conflit.
 
-**Produite par** le Vérificateur. **Lue par** l'orchestration et le
-Détailleur.
+🔴 **Un lot tient dans un contexte sain.** 📌 **Le test** : un lot si
+gros que quatre de son espèce ne tiendraient pas dans un bloc est trop
+gros.
 
-📌 **Pourquoi elle existe** : c'est elle qui dit dans quel ordre coder,
-et où couper les blocs. 🔴 **Le seul artefact qui pilote la boucle.**
+**L'inventaire d'abord, le découpage ensuite** — 🔴 **il ne coupe pas
+avant d'avoir écrit l'inventaire des symboles**, sinon il grouperait
+contre une surface qu'il n'a pas vue.
 
-| Bloc | Contenu |
-|---|---|
-| Ordre d'exécution | les lots, dans l'ordre dérivé de leurs dépendances déclarées |
-| Défauts constatés | trous, cycles, ancre incohérente avec son lot |
-| Regroupement en blocs | les lots groupés par partage de lecture, dans l'ordre |
+📌 **Pour chaque symbole, tout ce qu'on lui demande**, avec les entrées
+qui le demandent. 🔴 **Un symbole nommé dans onze entrées est noté onze
+fois** — ce qui compte est l'union. **Puis un grep** : ce que le code
+porte aujourd'hui contre ce que les entrées demandent, **et l'écart est
+ce qu'il faut construire.**
 
-**Structure** : la séquence est une liste ordonnée d'identifiants de
-lot, rien de plus — la justification est déjà dans la fiche du Cadreur,
-pas à répéter. Les défauts ont trois champs : quel lot, quel type,
-quelle correction attendue — un défaut par ligne.
+🔴 **Il grepe, il n'ouvre jamais un fichier de code.** 📌 **Il établit
+ce qu'un symbole est, pas ce que son implémentation fait.**
 
-**Absent par construction** : règle métier, signature — le Vérificateur
-constate la structure, il ne produit rien du contenu.
+**Ce que le découpage doit rattraper, et que rien d'autre ne
+verrait** — 📌 **trois catégories n'apparaissent dans aucune entrée :**
 
-🔴 **C'est le seul artefact de la liste qui pilote la boucle**, pas
-seulement lu par un agent : c'est lui qui dit à l'orchestrateur quel
-bloc invoquer, dans quel ordre. Le format n'en change pas — une liste
-ordonnée reste une liste ordonnée — mais ce rôle doit être explicite
-quand les instructions de l'orchestrateur seront écrites.
+🔴 **Les appelants.** Un contrat qui change casse ce qui l'appelle, ce
+qui le remplit, et ce qui doit lui ressembler. ⚠️ **Les tests sont des
+appelants.** 🔴 **On grepe le nom, jamais ce qui déclare d'où le symbole
+vient** — 📌 **les appelants les plus proches ne déclarent rien de son
+origine, et ce sont eux qui cassent en premier.**
 
----
+🔴 **Les pièces.** 📌 **Une règle qui nomme un acteur hors du programme
+a besoin d'une pièce pour l'atteindre** — l'OS, un capteur, le disque,
+le réseau, une horloge. ⚠️ **Aucune entrée n'en nomme une.**
+🔴 **La pièce est un lot à part**, jamais repliée dans celui qui déclare
+le contrat : **deux couches.** ⚠️ **Un contrat sans rien derrière
+compile, passe ses tests, et ne fait rien.**
 
-### La fiche exécutable
+🔴 **Les déclarations hors du code.** Une permission, un service, une
+bibliothèque, un point d'entrée : **chacune vit dans un fichier que
+rien dans le code ne nomme**, et aucun grep sur un symbole ne la
+trouve.
 
-**Produite par** le Détailleur, une par lot. **Lue par** le
-Réalisateur, le Relecteur et le Contrôleur.
+**Et les déclencheurs** — 🔴 **pour chaque déclencheur qu'une entrée
+nomme, quel symbole l'écoute ?** ⚠️ **Ce qu'un déclencheur atteint est
+rarement ce qui l'écoute.** 📌 **Une règle que personne n'appelle est du
+code mort**, si bien construite soit-elle.
 
-📌 **Pourquoi elle existe** : elle comble le vide entre une règle
-produit et du code. C'est elle qui remplace le plan de l'ancien
-process.
+**Toute entrée est citée ou déclarée sans lot** — 🔴 **une entrée qui
+n'est ni l'un ni l'autre est un oubli, pas une décision**, et rien en
+aval ne sait les distinguer.
 
-| Bloc | Contenu |
-|---|---|
-| Signatures | noms de classe, méthodes, types — complets ou absents |
-| Critères d'acceptation | dérivés de la section ancrée |
-| Dépendances | symboles déjà produits dont ce lot a besoin |
-| Conventions | les règles du projet qui portent sur ce lot, nommées |
+**Sur un cycle de correction** — 🔴 **chaque entrée nomme son porteur**,
+et **le groupement se fait par porteur, même à travers les sections.**
+📌 **Le symbole existe déjà**, donc des entrées sans rapport peuvent
+atterrir dessus. ⚠️ **Un porteur `none` est décidé avant tout
+groupement** — deux `none` peuvent atterrir sur un même symbole, et
+grouper avant de décider ferait construire deux fois la même chose.
 
-**Structure** : quatre champs, chacun répond à une question précise.
-**Absent par construction** : citation de la spec, justification du
-découpage.
-
-### Le compte rendu
-
-**Produit par** le Réalisateur, un par lot. **Lu par** le Relecteur et
-le Détailleur du bloc suivant.
-
-📌 **Pourquoi il existe** : il déclare ce qui a été réellement produit,
-et c'est cette déclaration que le contrôle de divergence compare aux
-symboles promis.
-
-| Bloc | Contenu |
-|---|---|
-| Symboles | ceux créés **et** ceux modifiés, à comparer à ceux promis |
-| Build | résultat d'analyze et de test |
-| État | ce qui a été ajouté ou retiré de `CURRENT_TECHNICAL_STATE.md` |
-| Convention, si pertinent | proposition — jamais une modification directe du fichier partagé |
-
-**Structure** : un champ, une réponse.
-**Absent par construction** : justification des choix — elle est dans
-la fiche du Détailleur, pas à répéter.
-
-### Le rapport d'écarts
-
-**Produit par** le Contrôleur, une fois par cycle. **Lu par** le
-Product Owner.
-
-📌 **Pourquoi il existe** : il ferme la chaîne sur son point de départ.
-Sans lui, une intention perdue entre le produit et la fiche ne se
-découvrirait qu'à l'usage.
-
-| Bloc | Contenu |
-|---|---|
-| Intentions retrouvées | La liste, une ligne chacune — le bloc produit et la fiche qui le porte |
-| Intentions absentes | Le bloc produit, et ce qu'il décrivait |
-| Doutes | Ce qu'il n'a pas su trancher |
-
-🔴 **Une ligne par entrée, pas de prose.** Il est lu une fois par le
-Product Owner.
-
-📌 **Les intentions retrouvées y figurent** — leur absence de la liste
-serait ambiguë : traitée, ou oubliée ?
-
-### Le verdict
-
-**Produit par** le Relecteur, un par lot. **Lu par** l'orchestration.
-
-📌 **Pourquoi il existe** : il décide si le lot passe, et si un échec
-se corrige seul ou relance tout le lot. 🔴 **C'est aussi lui qui porte
-la reprise** — le prochain lot est le premier de la séquence sans
-verdict PASS.
-
-**Un fichier par lot** : `code/<lot>/verdict.md`.
-
-| Bloc | Contenu |
-|---|---|
-| Statut | PASS · PASS avec réserve · FAIL mineur · FAIL structurel |
-| Cause, si FAIL | compréhension du lot · limite de raisonnement — alimente le seuil de passage à Opus |
-| Divergences de symbole | lesquelles, et quel lot elles affectent |
-
-**Structure** : un item par ligne — grepable pour l'agrégation.
-**Absent par construction** : reformulation du lot, récit de ce qui a
-été vérifié.
-
-### Les fichiers de blocage
-
-🔴 **Un agent qui ne peut pas produire écrit un fichier**, il ne se
-contente pas de le dire.
-
-**Un nom par agent** — `blocked_cadreur.md`, `blocked_verificateur.md`,
-`blocked_detailleur.md`, `blocked_realisateur.md`,
-`blocked_relecteur.md`, `blocked_controleur.md`.
-
-| Bloc | Contenu |
-|---|---|
-| Ce qui bloque | Le fait constaté, pas son interprétation |
-| Où | Le lot, le bloc, ou l'entrée concernée |
-| Ce qu'il faudrait pour reprendre | Une décision, une correction en amont, une entrée absente |
-| Décision | 🔴 **Écrit vide** — Khatya y répond à la main |
-
-🔴 **Un blocage n'est pas un cul-de-sac.** Chaque agent cherche ses
-propres blocages en premier geste : décision vide → il rebloque,
-décision remplie → il l'applique et supprime le fichier.
-
-📌 **Chacun a sa méthode d'application** — le Détailleur écrit sa fiche
-contre la décision plutôt que contre l'entrée, le Réalisateur
-code contre elle et le dit dans son compte rendu, le Vérificateur
-rejoue ses cinq gestes depuis le début.
-
-⚠️ **Bloquer n'est pas signaler.** Un défaut, une divergence, un écart :
-ça part dans la sortie normale et le cycle continue. 🔴 **On ne bloque
-que quand produire est impossible** — spec ambiguë pour le Détailleur,
-fiche fausse pour le Réalisateur, trou ou cycle pour le Vérificateur.
-
-📌 **Ne jamais bloquer par excès de prudence.** Le doute se signale.
-
-### Écrire la sortie même vide
-
-🔴 **Un fichier de sortie s'écrit toujours, même sans contenu.** Un
-rapport d'écarts vide dit *« rien trouvé »* ; son absence dit *« l'agent
-n'a pas tourné »*. L'orchestration ne peut pas distinguer les deux
-autrement.
-
-### Le principe commun à tous
-
-**Prose** : ces fichiers sont lus par des agents, pas par le Product
-Owner. 🔴 **En anglais**, comme tout fichier destiné à un agent —
-⚠️ **sauf les libellés d'interface**, cités dans leur langue
-d'affichage.
-
-🔴 **Présent de l'indicatif, voix active.** *« Le lot produit… »* —
-jamais « il faudra », jamais « on pourrait ».
-
-🔴 **Un champ, une réponse.** Ce qui ne répond pas au champ n'y est pas.
-
-**Interdits** : le futur, le conditionnel, la justification d'un choix
-— elle est dans le fichier de l'agent qui l'a fait, pas ici.
-
-⚠️ **Nommer les symboles exactement**, jamais approximativement. Une
-signature reformulée de mémoire est la première cause de divergence.
-
-🔴 **Pas de plafond de longueur.** Déjà écarté pour les blocs, même
-logique ici : une limite en lignes est arbitraire et contredit notre
-propre critère.
-
-📌 **Ce qui prévient la dérive, c'est la structure à champs fixes.**
-Rien n'invite à développer au-delà de ce que chaque champ demande — pas
-parce qu'on l'interdit, mais parce qu'il n'y a nulle part où mettre du
-superflu.
+**La frontière** — 🔴 **il ne groupe pas les lots en blocs** : c'est le
+Vérificateur, qui a l'ordre d'exécution. 🔴 **Il n'écrit ni signature ni
+critère** : c'est le Détailleur. 🔴 **Il n'invoque que le
+Vérificateur.**
 
 ---
 
-## Le mécanisme d'état projeté
+## Le Vérificateur
 
-**Le Cadreur peut découper tous les lots d'un coup, sans attendre
-qu'aucun soit exécuté.**
+**À quoi il sert** — Il vérifie qu'un découpage tient, et **il produit
+la séquence sur laquelle tout le cycle tourne.**
 
-Chaque lot déclare deux choses :
-- **ce dont il a besoin** — ce qui doit exister avant
-- **ce qu'il va produire** — le service créé, la table ajoutée, la route
+🔴 **Il constate, il ne corrige jamais.** Un défaut repart au Cadreur.
 
-Le lot B se découpe en sachant que A aura créé `XService`. C'est de
-l'**état projeté**, et il suffit.
+🔴 **La séquence est le seul artefact qui pilote la boucle** — c'est
+elle qui dit à la commande quel lot invoquer, et dans quel ordre.
 
-### D'où vient alors la péremption
+**Ce qui le déclenche** — 🔴 **le Cadreur l'appelle**, jusqu'à trois
+fois sur un même découpage, ⚠️ **chaque fois sur un contexte frais.**
+📌 **Il ne cherche pas ce qu'un tour précédent de lui-même a signalé** :
+il vérifie le découpage qu'il a devant lui.
 
-Pas du temps qui passe. **De la divergence entre ce qu'un lot a promis
-et ce qu'il a livré.**
+**Ce qu'il croise** — 🔴 **l'inventaire contre les lots**, et sept
+espèces de défaut en sortent. **Trois méritent d'être comprises :**
 
-Deux causes :
-- le lot a fait autrement que prévu
-- **un autre travail est passé entre-temps** et a pris ce que le lot
-  suivant comptait utiliser
+📌 **Une surface non construite** — une opération que l'inventaire
+liste et qu'aucun lot ne produit ni ne modifie. 🔴 **C'est le contrôle
+que les noms seuls ne peuvent pas faire** : un lot qui a besoin d'un
+dépôt et un lot qui le produit se croisent parfaitement ; **que l'un
+écrive et que l'autre lise ne se voit qu'ici.**
 
-### Le contrôle qui en découle
+📌 **Un appelant qu'aucun lot ne déclare** — ⚠️ **il n'apparaît pas
+comme un trou** : rien n'en a besoin, rien ne le produit, et le
+découpage se lit comme complet. 🔴 **Il se voit quand le module cesse
+de compiler**, dans un lot qui ne touche ni l'un ni l'autre bout.
 
-**Pas « le code a-t-il bougé »** — trop large, et c'est ce qui coûte
-cher aujourd'hui.
+📌 **Un contrat changé sans sa cascade** — ⚠️ **un contrat existe pour
+être rempli et appelé** : un lot qui en change un et ne déclare ni l'un
+ni l'autre n'a rien grepé.
 
-**Mais « les lots dont je dépends ont-ils livré ce qu'ils
-annonçaient »** — quelques vérifications ciblées, nommées d'avance.
+🔴 **Il juge la forme, pas le compte.** ⚠️ **Que quatre appelants soit
+le bon nombre est au Cadreur de le savoir** ; 📌 **qu'un contrat changé
+n'en déclare aucun est un défaut visible.**
 
-📌 Cela suppose que le Réalisateur **écrive ce qu'il a réellement
-produit**, pas seulement ce qu'il a fait.
+**Ce qui ordonne sans se déclarer** — 🔴 **deux choses n'apparaissent
+dans aucun champ de besoin.** 📌 **Une modification crée une
+dépendance** : un lot qui consomme un symbole qu'un autre modifie passe
+après. 📌 **Deux lots qui changent les deux bouts d'un même appel sont
+ordonnés aussi** — ⚠️ **entre eux le module ne compile pas**, et rien ne
+le déclare. 🔴 **Celui qui laisse l'appel valide passe devant.**
 
-### Où la divergence se détecte
+**L'ordre se dérive, il ne se décide pas** — 📌 **les lots dont tous les
+besoins préexistent d'abord, puis ceux qui deviennent éligibles, et
+ainsi de suite.** 🔴 **Un lot qui ne devient jamais éligible est dans un
+cycle** — ⚠️ **un défaut, pas un blocage**, et l'ordre reste vide : sans
+ordre, il n'y a rien à grouper.
 
-**Le Relecteur compare les symboles promis à ceux réellement créés.**
-Noms et signatures — pas le comportement, il le juge par ailleurs. Un
-grep par symbole, dans une invocation qui a lieu de toute façon.
+🔴 **La départage est mécanique**, pour que deux exécutions donnent la
+même séquence.
 
-🔴 **L'alternance bloc par bloc réduit la surface d'erreur à presque
-rien.** Le Détailleur des providers écrit ses signatures *après* que
-les services aient été codés : il lit ce qui existe, pas ce qui était
-promis. **Une divergence ne peut donc contaminer que les lots d'un même
-bloc**, détaillés ensemble avant d'être codés.
+**Les blocs** — 📌 **une tranche contiguë de la séquence**, d'une seule
+couche. 🔴 **Le critère est la lecture partagée** : des lots qui ouvrent
+les mêmes entrées et le même code vont ensemble. ⚠️ **Les plafonds
+comptent les entrées citées, pas les lots** — 📌 **ce qu'un bloc coûte
+est ce qu'il ouvre.**
 
-- **Conforme** → on enchaîne.
-- **Divergence dans le bloc courant** → les lots non encore codés du
-  bloc sont corrigés avant d'être réalisés.
-- **Divergence découverte plus tard** → elle ne touche pas les blocs
-  suivants, qui seront détaillés sur le code réel.
+⚠️ **La règle de couche saute sur un cycle de correction** : 📌 **deux
+corrections d'une même couche n'y partagent aucune lecture** — chacune
+ouvre son entrée, grepe son symbole. 🔴 **On groupe alors sur la
+contiguïté seule.**
 
-📌 *C'est ce qui manque aujourd'hui : un step a ajouté une bottom
-sheet, personne n'a mis à jour les steps suivants, et le compte est
-devenu faux plusieurs steps plus loin. Ici, le Détailleur du bloc
-suivant l'aurait vu en lisant le code.*
-
----
-
-## Les agents en détail
-
-### Le Cadreur
-
-**Entrées** — le document technique · `docs/TECHNICAL_CONVENTIONS.md` ·
-**le code, en grep uniquement**
-
-🔴 **Il lit le code.** Le document d'état ne suffisait pas — il n'est
-pas exhaustif, et il ne dit rien de ce qu'un symbole porte ni de qui
-l'appelle. **Onze blocages sur une seule feature sont sortis de là.**
-
-⚠️ **Grep, jamais une lecture de fichier.** Il établit ce qu'un symbole
-est, pas ce que son implémentation fait.
-
-📌 **Les conventions de découpage sont dans ce fichier même** — ce sont
-des propriétés du process, pas du projet.
-
-**Sortie** — la liste des lots
-
-#### Les dix gestes, dans cet ordre
-
-**1. Grep `<<ASSUMED`** — 🔴 **une seule occurrence bloque.** Le
-marqueur dit qu'une règle est provisoire.
-
-**2. Lire le document technique en entier, préambule d'abord.** 📌
-C'est le seul agent qui le lit tout. ⚠️ **Son `Out of scope` dit ce que
-la feature ne touche pas** — jamais de lot pour ce qui y figure.
-
-**3. Inventorier les symboles.** Parcourir chaque entrée et noter,
-pour chaque symbole nommé, **tout ce qu'on lui demande** — une
-opération, un champ lu, un libellé cité. 🔴 **C'est l'union qui
-compte** : une repository dont l'entrée créatrice décrit quatre
-écritures et dont les écrans demandent trois lectures porte sept
-opérations.
-
-⚠️ **Un libellé donné en toutes lettres est un symbole** — la clé qui
-le porte.
-
-📌 **L'inventaire s'écrit dans `decoupage.md`, avant les lots.**
-
-**4. Section par section, grouper les entrées en lots.**
-
-**5. Nommer besoins, productions et modifications**, puis greper chacun
-dans le code. 📌 **L'inventaire du geste 3 a déjà tranché** — ce qu'un
-symbole porte y est établi.
-
-🔴 **Il grepe aussi les appelants de tout symbole déclaré modifié.** Un
-contrat changé les casse, et chacun est une modification de plus.
-
-**6. Citer les entrées que chaque lot prend** — toutes d'une seule
-section.
-
-🔴 **Produire et modifier ne sont pas la même chose.** Un lot qui
-change un symbole existant le déclare en modification, jamais en
-production — le grep dit lesquels existent. ⚠️ **Sur une correction ou
-une évolution, un lot ne produit souvent rien** : il ne fait que
-modifier.
-
-🔴 **Un type du framework n'est jamais une production.** Le projet
-l'utilise, il ne le construit pas. ⚠️ **Sur une application neuve,
-presque tous les types en sont** — le code est vide et le document
-d'état avec lui.
-
-🔴 **Une règle qui nomme un acteur hors du programme a besoin d'une
-pièce pour l'atteindre** — l'OS, un appareil, un capteur, le disque, le
-réseau, une horloge, une autre application.
-
-**Le test** : qui, hors de ce code, doit agir ou répondre pour que la
-règle tienne ? **Personne** → le code suffit. **Quelqu'un** → greper la
-pièce qui l'atteint.
-
-🔴 **La pièce est un lot à part**, jamais fondue dans celui qui déclare
-le contrat. **Deux couches** : le contrat là où vit la règle, la pièce
-dans le module que les conventions autorisent à toucher la plateforme.
-📌 **Elle cite la même entrée**, et a besoin du contrat.
-
-⚠️ **Un contrat n'est pas une pièce.** Une interface dit ce dont on a
-besoin ; **quelque chose doit la remplir**, dans un module que les
-conventions autorisent à toucher la plateforme. **Un contrat sans rien
-derrière compile, passe ses tests, et ne fait rien.**
-
-🔴 **Que faut-il déclarer, hors du code, pour que ceci soit
-atteignable ?** Une permission, un service, une bibliothèque, un point
-d'entrée : chacun s'écrit dans un fichier que le code n'importe pas,
-et aucun grep sur un symbole ne le trouve.
-
-🔴 **Et qu'est-ce qu'un retrait rend inutile ?** ⚠️ **Un résidu ment au
-grep suivant** — une dépendance déclarée sans usage se lit comme un
-usage.
-
-📌 **Le lot porte la déclaration**, jamais un lot à part : entre les
-deux, rien ne marche.
-
-🔴 **Pour chaque déclencheur nommé, quel symbole l'observe ?** Il entre
-dans les modifications du lot, même si aucune entrée ne le nomme.
-⚠️ **Ce qui réagit à un événement l'observe rarement** — un écran ne
-voit pas la navigation qui l'a quitté.
-
-🔴 **Une entrée qui dit quand une règle s'applique nomme aussi un
-déclencheur** — un événement système, ou un moment dans un flux que le
-code contrôle. *« À la fin de chaque kilomètre »*, *« dès que le lien
-est établi »* : **le lot qui porte ce moment déclare la règle en
-besoin.** 📌 **Une règle que personne n'appelle est du code mort.**
-
-🔴 **Greper les appelants de tout symbole déclaré modifié.** Un contrat
-changé les casse, et chacun est une modification de plus. ⚠️ **Les
-tests en sont** : un test qui lit un champ qu'un lot retire cesse de
-compiler, et tout son jeu de sources avec lui.
-
-🔴 **Un lot qui change de mécanisme change les besoins de ses
-appelants.** Le nouveau mécanisme porte des exigences qu'aucune entrée
-ne nomme. 📌 **Le test, sur chaque appelant** : ce qu'il porte
-aujourd'hui, le nouveau mécanisme l'accepte-t-il ? **Celui qui ne le
-peut pas est une modification de plus.**
-
-🔴 **Nommer ce qui appelle chaque production** — un lot, ou quelque
-chose hors du découpage : une route, le framework, le système.
-
-#### Ce qui fait un lot
-
-**Une unité livrable** — l'application reste cohérente une fois qu'il
-est passé. ⚠️ **Ce critère ne suffit pas à découper** : plusieurs
-découpages le satisfont.
-
-**Trois contraintes le resserrent :**
-
-🔴 **Un lot cite des entrées, jamais un `§3` nu.** Une entrée, ou
-plusieurs quand elles décrivent une seule chose à construire.
-
-⚠️ **Sur un cycle de correction, le groupement se fait par porteur, pas
-par section.** Le symbole existe déjà, donc des écarts sans rapport
-peuvent l'atteindre — et deux lots ne peuvent jamais toucher un même
-symbole. 📌 **La nature tient quand même** : un porteur appartient à
-une couche.
-
-🔴 **Et jamais sur deux natures.** `§3.1` et `§9.2` ne cohabitent pas
-dans un lot : il n'appartiendrait à aucune couche.
-
-🔴 **Deux lots ne touchent jamais le même symbole**, ni en production
-ni en modification. Leurs changements se recouvriraient sans que rien
-ne le détecte. 📌 **Le même fichier, en revanche, est permis** — ce
-n'est pas un conflit.
-
-🔴 **Un lot tient dans un contexte sain.** Les plafonds par couche :
-
-| Couche | Lots par bloc | Ce qu'un lot ajoute en lecture |
-|---|---|---|
-| Modèles, migrations | **8-10** | Presque rien — les tables tiennent dans un fichier |
-| Services | **6-8** | Sa section de spec, quelques greps |
-| Repositories | **6-8** | Le modèle qu'il porte |
-| Providers | **4-6** | Le service consommé, sa signature |
-| Écrans | **3-4** | Providers, routes, clés de texte, navigation |
-
-⚠️ **Ce sont des plafonds indicatifs, pas des cibles**, et ils bornent
-un bloc — que le Vérificateur formera. Le Cadreur s'en sert pour
-calibrer ses lots : dix services relevant d'une même section tiennent
-ensemble ; s'ils viennent de six sections, ils feront six lots.
-
-📌 **Une entrée qui décrit une seule chose donne un lot d'une
-entrée.**
-
-🔴 **C'est la phase qui détermine tout le reste** — un lot trop gros
-rend sa réalisation impossible dans un contexte sain.
-
-#### Ce qu'il ne fait jamais
-
-- 🔴 **Recopier une règle du document technique.** L'ancre la remplace :
-  le Détailleur ouvre les entrées citées et lit la source, jamais une
-  reformulation
-- 🔴 **Ancrer un lot sur un `§3` nu, ou sur deux natures**
-- 🔴 **Fusionner en cascade** — une passe, sur les déclarations du
-  geste 4
-- 🔴 **Ouvrir un fichier de code** — grep seul
-- 🔴 **Écrire une signature ou un critère d'acceptation** — c'est le
-  Détailleur
+**La frontière** — 🔴 **il n'ouvre jamais une entrée qu'aucun lot ne
+cite.** ⚠️ **En avoir besoin pour comprendre un lot signifie que le
+découpage est mauvais** — 📌 **c'est un défaut à signaler, pas à
+combler.**
 
 ---
 
-### Le Vérificateur
+## Le Détailleur
 
-**Entrées** — la liste des lots · **les sections qu'elles ancrent**,
-ouvertes une par une. Rien d'autre.
+**À quoi il sert** — Il transforme les règles des entrées qu'un lot
+cite en **signatures et critères d'acceptation** : la fiche depuis
+laquelle un Réalisateur code sans rien décider.
 
-**Sortie** — la séquence, les défauts constatés, et **les blocs pour le
-Détailleur**
+🔴 **Il ne tranche rien.** ⚠️ **Une entrée qui laisse une règle ambiguë
+l'arrête** — 📌 **il n'est pas le filet de la chaîne amont.**
 
-#### Les cinq gestes, dans cet ordre
+🔴 **Une fiche fausse contamine tout un bloc** — d'où la règle qui
+gouverne tous ses gestes : **tout symbole est confirmé par grep avant
+d'être écrit.**
 
-**1. Croiser l'inventaire contre les lots**, et noter quatre sortes de
-défaut : une surface non construite, un trou, un recouvrement, **et une
-production que personne n'appelle**.
+**Ce qui le déclenche** — 🔴 **une invocation par bloc, pas par lot.**
+📌 **C'est ce qui fait exister le bloc** : les lots d'un bloc partagent
+leurs lectures, et les détailler ensemble les paie une fois.
 
-🔴 **La surface non construite est le contrôle que les noms seuls ne
-permettent pas.** Un lot qui a besoin de `RaceRepository` et un lot qui
-le produit se croisent parfaitement ; que l'un écrive et l'autre lise
-ne se voit que sur l'inventaire.
+**Il parcourt tout le bloc avant d'écrire une seule fiche** —
+⚠️ **il cherche une seule chose : ce qui l'empêcherait de détailler,
+sur n'importe quel lot.**
 
-📌 **Sur une production inappelée, il vérifie qu'un appelant est
-nommé**, pas qu'il est juste — le Cadreur connaît le framework, lui
-non.
+📌 **Pourquoi rien d'abord, plutôt que ce qu'il peut** : 🔴 **une fiche
+n'est gardée que si le découpage tient.** ⚠️ **Un bloc renvoyé au
+découpage perd toutes ses fiches non codées** — 📌 **détailler huit lots
+pour les perdre avec les deux qui bloquaient, c'est huit lots détaillés
+deux fois.**
 
-⚠️ **Une modification crée aussi une dépendance.** Un lot qui consomme
-un symbole qu'un autre modifie doit venir après lui — sinon il code
-contre l'ancienne signature.
+🔴 **Et ce qui l'arrête se voit dans les entrées, qu'il ouvre de toute
+façon** — **parcourir d'abord ne coûte aucune lecture.**
 
-🔴 **Deux lots qui changent les deux bouts d'un appel s'ordonnent
-aussi.** L'un change une signature, l'autre change ou retire l'appel :
-aucun ne consomme la production de l'autre, donc rien ne déclare
-d'ordre — **et entre les deux le module ne compile pas.** 📌 **Celui
-qui laisse l'appel valide passe en premier**, et si aucun ordre ne
-marche, ils sont un seul lot.
+**Ce qu'une signature doit dire** — 📌 **ce qui entre, ce qui sort, et
+sous quel nom.** 🔴 **Mais surtout ce que le retour vaut aux bords** :
+l'absence, le vide, une borne, une unité, un ordre. ⚠️ **Un type ne
+porte pas ça**, et deux lots peuvent nommer le même symbole en en
+attendant deux choses différentes.
 
-🔴 **Deux lots ne modifient jamais le même symbole.** C'est un défaut
-de découpage : leurs changements se recouvriraient sans que rien ne le
-détecte.
+📌 **Une règle à trois issues ne renvoie pas un booléen**, ni un booléen
+plus un effet de bord.
 
-🔴 **Un cycle est un défaut, pas un blocage.** Le Vérificateur le
-signale, laisse l'ordre et les blocs vides, et le Cadreur redécoupe.
+**Ce qu'un critère d'acceptation doit être** — 📌 **une observation
+vérifiable après coup**, à trois propriétés : **observable de
+l'extérieur du code**, **décidable** — deux personnes, même verdict —
+et **attribuable à ce lot.**
 
-**2. Ouvrir chaque entrée citée**, une par une, et confronter :
+🔴 **Toute assertion des entrées citées doit être observable par au
+moins un critère** — ⚠️ **pas tout comportement, toute assertion.**
 
-🔴 **Les entrées citées sont-elles d'une seule section ?** `§3.1`,
-jamais `§3`. **Plusieurs sont légitimes** — un lot groupe ce qui
-construit une chose. ⚠️ **Des entrées de deux sections sont un
-défaut.**
+🔴 **Et la seconde espèce d'assertion est celle qui disparaît** : 📌 **ce
+qu'une entrée affirme sans rien produire** — une chose présente,
+absente, constante, placée par rapport à une autre, de telle forme,
+comptée, interdite. ⚠️ **Ça se lit comme une description plutôt que
+comme du travail**, parce que rien n'est calculé — 📌 **et c'est
+exactement ce dont personne ne remarquera l'absence**, puisque aucun
+calcul n'échoue sans.
 
-🔴 **Décrivent-elles ce que le lot annonce ?**
+📌 **Deux tests attrapent ça** : *le code pourrait-il satisfaire tous
+mes critères et contredire quand même cette phrase ?* et *mes critères
+relus sans l'entrée disent-ils que cet élément existe ?*
 
-🔴 **Ce que le lot déclare produire correspond-il à ce qu'elle
-décrit ?** Un lot annonçant un service là où la spec décrit deux choses
-à construire est mal découpé.
+🔴 **Un déclencheur a un critère sur ce qu'il atteint**, pas seulement
+sur son existence — ⚠️ **un déclencheur construit et branché sur rien se
+lit comme construit.** 📌 **Ce qu'il atteint vit souvent dans une autre
+entrée** : il l'ouvre aussi.
 
-📌 **Ces deux contrôles protègent le Détailleur.** Une ancre fausse ou
-un lot incohérent produirait une fiche fausse — et une fiche fausse
-contamine tout un bloc.
+🔴 **Un critère qu'on ne peut pas écrire en test n'est pas un
+critère.** ⚠️ **Ne pas savoir quoi observer signifie que la règle est
+ambiguë** : il s'arrête.
 
-**3. Dériver l'ordre** des déclarations de dépendance. 📌 **Ce n'est
-pas un ordonnancement** : il découle mécaniquement, il ne se décide
-pas.
+**Il nomme les conventions qui portent sur le lot** — 🔴 **il lit les
+conventions en entier, le Réalisateur code contre la fiche.** ⚠️ **Une
+règle qu'il ne nomme pas est une règle que le Réalisateur
+n'appliquera pas, et que le Relecteur ne saura pas chercher.**
 
-**4. Regrouper en blocs** — voir ci-dessous.
-
-🔴 **C'est lui qui regroupe parce qu'il a l'ordre.** Un bloc doit être
-contigu dans la séquence — sinon on détaillerait ensemble des lots
-qu'on ne peut pas coder à la suite. ⚠️ **Le Cadreur ne peut pas
-grouper** : il voit les lots, il n'a pas encore leur ordre
-d'exécution.
-
-**La taille d'un bloc** — le critère est le **partage des lectures**,
-borné par les plafonds par couche que porte le Cadreur.
-
-⚠️ **La règle de couche ne s'applique pas sur un cycle de
-correction.** Deux corrections d'une même couche n'y partagent aucune
-lecture : chacune ouvre son entrée, grepe son symbole, et le coût fixe
-d'un bloc se paie une fois quel que soit ce qu'il porte. 🔴 **Le
-regroupement se fait alors sur la contiguïté seule**, jusqu'au plafond
-le plus bas des couches présentes.
-
-🔴 **Les plafonds comptent des lots, pas leur poids.** Un lot citant
-cinq entrées en pèse cinq — le compter par entrée citée.
-
-🔴 **Entre lots éligibles au même moment, prendre celui dont la couche
-est celle du lot précédent.** Rien qui corresponde → l'ordre de la
-liste. **Le départage est mécanique**, donc reproductible.
-
-⚠️ **Estimations dérivées d'un raisonnement, pas de mesures.** Ce dont
-on est sûr est l'ordre : un écran coûte plus par unité qu'un modèle,
-parce qu'il dépend de tout ce qui précède.
-
-**À calibrer** — 🔴 **par une investigation sur les logs d'agent**, pas
-par une estimation de l'agent lui-même : il n'a aucun accès à son
-propre compteur.
-
-📌 **Regard indépendant sur le découpage** — justifié par (b), pas par
-le contexte.
-
-#### Ce qu'il ne fait jamais
-
-- 🔴 **Corriger un découpage** — il constate, le Cadreur reprend
-- 🔴 **Lire au-delà de la section ancrée.** S'il en a besoin pour
-  comprendre un lot, c'est que le découpage est mauvais — un défaut à
-  signaler, pas à corriger
-- 🔴 **Écrire une signature ou du code**
-- 🔴 **Laisser passer un cycle** — c'est un blocage, pas un défaut
+**La frontière** — 🔴 **il ne décide pas si un symbole est créé ou
+modifié** : le lot l'a déclaré, il applique. ⚠️ **Si le grep contredit
+la déclaration, c'est un défaut de découpage**, pas une décision à
+prendre ici. 🔴 **Il ne décide pas où le code va** : le Réalisateur le
+tire des conventions.
 
 ---
 
-### Le Détailleur
+## Le Réalisateur
 
-**Entrées** — la liste des lots, restreinte à son bloc *(la séquence
-dit lesquels)* · le préambule du document technique · **les
-entrées que leurs lots citent** · `CURRENT_TECHNICAL_STATE.md`
-· les comptes rendus des lots déjà codés, **grepés jamais ouverts** ·
-`TECHNICAL_CONVENTIONS.md`, **en entier** · **le code, en grep
-uniquement**
+**À quoi il sert** — Il code un lot, depuis sa fiche.
 
-⚠️ **Le code sert à confirmer l'existence d'un symbole, jamais à
-comprendre une règle.** Un grep, pas une lecture de fichier — le
-document d'état ne suffit pas : c'est un inventaire, il ne prouve pas
-qu'un type existe.
+🔴 **Aucun plan.** 📌 **Le Détailleur a produit les signatures : il ne
+reste aucune architecture à décider.**
 
-📌 **Il ouvre les entrées de son bloc, pas le document entier.**
+🔴 **Un test par critère d'acceptation.** ⚠️ **C'est ce qui rend le lot
+vérifiable** — le Relecteur compare les tests aux critères.
 
-⚠️ **Le Vérificateur a lu les mêmes — ce n'est pas un doublon.** Il y
-cherchait si l'ancre pointe juste ; le Détailleur y cherche la règle à
-traduire en signature.
+**Ce qui le déclenche** — 📌 **une invocation par lot**, et **un
+Réalisateur neuf sur un FAIL**, jamais celui qui a écrit le code.
 
-📌 **Les conventions se lisent en entier** : le nommage est la part
-visible, mais le découpage en modules et les interdits contraignent une
-signature tout autant.
-
-**Sortie** — les fiches exécutables des lots du bloc
-
-#### Les huit gestes, par lot du bloc
-
-**1. Ouvrir chaque entrée que le lot cite** — 🔴 **un lot
-en cite souvent plusieurs**, et elles décrivent une seule chose à
-construire.
-
-**2. Lire les deux sections ouvertes du document d'état** — pièges
-généraux et état mort, en entier. 🔴 **On ne peut pas greper une règle
-dont on ignore qu'elle s'applique.** 📌 **Un piège change une
-signature.**
-
-**3. Pour chaque règle décrite, dériver une signature** — voir
-ci-dessous. 📌 **Les conventions de nommage s'appliquent ici**, et le
-`Vocabulary` du préambule fixe les termes.
-
-**4. Greper chaque symbole avant de l'écrire.** 🔴 **Tout type employé
-doit exister, venir du framework, ou être produit par ce bloc** —
-confirmé par grep, jamais de mémoire.
-
-🔴 **Toute recherche de code cible les dossiers que les conventions
-nomment.** Sans chemin, elle ratisse `docs/` et la sortie de build, et
-remonte de vieux plans comme du code.
-
-📌 **Un symbole trouvé : d'où vient-il ?** Un second grep dans les
-comptes rendus du cycle. **Une occurrence** → un lot antérieur l'a
-créé, le réutiliser. **Aucune** → il précède le cycle.
-
-⚠️ **Si le grep contredit ce que le lot déclare**, voir plus bas.
-
-**5. Pour chaque symbole trouvé dans le code, greper les comptes rendus
-du cycle** — pour savoir d'où il vient.
-
-**6. Écrire la signature**, une fois chaque type confirmé.
-
-**7. Écrire les critères d'acceptation** — voir ci-dessous.
-
-**8. Nommer les conventions que ce lot doit tenir.** 🔴 **Chaque règle
-🔴 de `TECHNICAL_CONVENTIONS.md` qui porte sur ce que le lot touche** —
-les bibliothèques de sa couche, où vivent ses chaînes, ce qu'une classe
-de son espèce étend, ce que son module peut importer.
-
-📌 **Il lit les conventions en entier ; le Réalisateur code contre la
-fiche.** Une règle qu'il ne nomme pas est une règle que le Réalisateur
-n'appliquera pas, et que le Relecteur ne saura pas chercher.
-
-⚠️ **Nommer la règle, jamais la réécrire.** Une ligne chacune.
-
-📌 **Une invocation par bloc, pas par lot** : le deuxième lot coûte
-moins que le premier, il partage les lectures.
-
-#### Production ou modification
-
-🔴 **Le lot l'a déjà déclaré.** Le Cadreur a tranché, le Détailleur
-applique :
-
-| Déclaré comme | Ce qu'il écrit |
+| Le verdict | Ce qu'il fait |
 |---|---|
-| **Production** | La signature du symbole à créer |
-| **Modification** | La signature **après** changement, et ce qui change |
+| **FAIL mineur** | Corriger le point signalé, 🔴 **sans revisiter le reste du lot** |
+| **FAIL structurel** | Reprendre le lot depuis le début |
 
-⚠️ **Si le grep contredit la déclaration** — un symbole déclaré en
-production qui existe déjà, ou l'inverse — il le signale et s'arrête.
-C'est un défaut de découpage, pas une décision à prendre ici.
+**La fiche est autosuffisante** — 🔴 **il ne lit ni le document
+technique, ni la liste des lots, ni la séquence.** ⚠️ **Si la fiche ne
+suffit pas, elle est fausse**, et c'est un blocage.
 
-📌 **La modification est le cas normal sur une application
-existante.**
+🔴 **Il ne corrige jamais une fiche fausse.** ⚠️ **Improviser rendrait
+la divergence invisible** — le code s'écarterait de la fiche sans que
+rien le signale.
 
-#### Dériver une signature d'une règle
+**Ce qu'il déclare hors de son lot** — 🔴 **tout fichier touché que la
+fiche ne déclare pas, et ce qu'il en a fait.** 📌 **Une décision l'a
+autorisé, ou il ne pouvait pas compiler sans** — ⚠️ **dans les deux cas
+ce n'est pas dans ses modifications, et personne d'autre ne sait qu'il
+l'a fait.** 🔴 **Une correction laissée hors de ce champ est une
+correction que personne ne peut attribuer.**
 
-**Une signature dit ce qui entre, ce qui sort, et sous quel nom.**
+**Il tient l'état technique à jour** — 📌 **ce qui mérite une place** :
+un service, un mécanisme qu'un autre lot pourrait reconstruire, une
+table, une route, une cascade, un piège, un état mort. 🔴 **Ce que son
+lot a rendu faux disparaît** — une entrée n'est jamais *« modifiée par
+lot-03 »*. ⚠️ **Ce document commande le Cadreur.**
 
-**Ce qui entre** — ce dont la règle a besoin et qu'elle ne peut pas
-obtenir seule.
+**Sa discipline de vérification** — 🔴 **analyse et tests par unité
+cohérente de travail, jamais par édition.** *(41 exécutions sur 149
+n'ont rien trouvé, mesuré sur dix étapes.)* 🔴 **Les corrections se
+groupent aussi** : plusieurs échecs, on corrige tout, puis on relance
+une fois.
 
-**Ce qui sort** — ce que la règle produit, sous un type qui **exprime
-toutes ses issues**. 🔴 **Une règle à trois issues ne retourne pas un
-booléen**, ni un booléen accompagné d'un effet de bord.
+🔴 **Son shell est réduit à `git add`, `commit`, `status` et les
+commandes d'analyse et de test que les conventions nomment.**
+⚠️ **Rien d'autre du tout** — 📌 **chercher se fait par `Grep`, qui est
+borné au dépôt ; une recherche shell parcourt la machine, et celle qui
+ne finit pas ne rend jamais la main.**
 
-⚠️ **Une règle qui ne produit rien mais change un état** : la signature
-dit ce qu'elle change ; le critère porte sur l'état après.
+🔴 **Une commande à la fois, au premier plan, et il l'attend.**
+⚠️ **Jamais en arrière-plan avec sondage** : deux exécutions d'un même
+build se disputent le même verrou, et un shell que personne n'attend
+continue après lui.
 
-🔴 **La signature dit ce que vaut le retour aux limites** — absence,
-vide, borne, unité, ordre. **Un type ne porte pas ça**, et deux lots
-peuvent nommer le même symbole en en attendant deux choses
-différentes.
-
-**Le nom** — celui de la règle, dans le vocabulaire du produit, jamais
-celui de la structure. `reconcile`, pas `processEntries`.
-
-#### Écrire un critère d'acceptation
-
-**Un critère est une observation vérifiable après coup** : quoi
-observer, et ce qu'on doit voir.
-
-🔴 **Trois propriétés, toutes obligatoires :**
-
-| Propriété | Ce qu'elle exclut |
-|---|---|
-| **Observable** de l'extérieur du code | *« la fenêtre vaut 3 h »* — c'est l'implémentation |
-| **Décidable** — deux personnes, même verdict | *« l'affichage est correct »* |
-| **Attribuable** à ce lot | un critère qui échoue à cause d'un autre lot |
-
-**Combien il en faut** : chaque comportement décrit par la section
-ancrée doit être observable par au moins un critère.
-
-⚠️ **Comportement, pas cas.** Un calcul à trois issues en demande
-trois ; un écran, un par état affiché ; une migration, un sur ce que
-deviennent les données existantes.
-
-🔴 **Ce qu'une entrée nomme comme déclencheur porte un critère sur ce
-qu'il atteint**, pas seulement sur son existence. **Un déclencheur
-construit et branché sur rien se lit comme construit.** ⚠️ **Ce qu'il
-atteint vit souvent dans une autre entrée** — celle que le lot cite
-nomme le déclencheur, une autre décrit la suite.
-
-**Plus ce que la section nomme comme limite** — entrée absente, valeur
-hors bornes, source indisponible.
-
-🔴 **Un critère qu'on ne peut pas écrire comme un test n'est pas un
-critère.** Si tu ne sais pas quoi observer, la règle est ambiguë : tu
-t'arrêtes et tu remontes.
-
-📌 **Pas de critère de non-régression.** *« Rien d'autre n'a changé »*
-n'est ni décidable ni attribuable — c'est le Relecteur qui le voit, sur
-le diff.
-
-📌 **Ce qui pourrait rendre sa fiche fausse** — mauvaise ancre, lot
-incohérent avec sa source — a été écarté par le Vérificateur avant lui.
-
-#### Ce qu'il ne fait jamais
-
-- 🔴 **Trancher une règle ambiguë** — *il n'est pas le filet de la
-  chaîne amont*
-- 🔴 **Employer un type sans l'avoir confirmé par grep**
-- 🔴 **Déclarer un type que le lot ne déclare pas** — une interface
-  moins que tout
-- 🔴 **Recopier la règle dans la fiche** — elle vit dans la section
-  ancrée
-- 🔴 **Décider si un symbole se crée ou se modifie** — le lot le
-  déclare, il applique
-- Écrire du code
-
-📌 **Le bloc est détaillé, puis codé, puis on passe au bloc suivant.**
-Le Détailleur du bloc « providers » écrit ses signatures **après** que
-les services aient été codés — il ne travaille plus sur des promesses,
-mais sur ce qui existe. ⚠️ **La divergence ne peut donc survenir qu'à
-l'intérieur d'un bloc**, entre lots détaillés ensemble. C'est une
-surface d'erreur beaucoup plus petite.
+**La frontière** — 🔴 **il ne fusionne pas, ne crée pas de branche, ne
+touche pas un worktree** : c'est l'orchestration. 🔴 **Il ne modifie
+jamais les conventions** : il écrit une demande. 🔴 **Il ne discute pas
+un verdict** : il corrige, ou il s'arrête.
 
 ---
 
-### Le Réalisateur
+## Le Relecteur
 
-**Entrées** — **la fiche exécutable du lot** *(signatures, critères,
-dépendances)* · `TECHNICAL_CONVENTIONS.md` ·
-`CURRENT_TECHNICAL_STATE.md`, **deux sections seulement** · le code
-qu'il touche
+**À quoi il sert** — Il juge un lot contre sa fiche, et **il écrit le
+verdict qui pilote la boucle.**
 
-**Sorties** — le code et les tests · le compte rendu, **incluant ce
-qu'il a réellement produit**
+🔴 **Il constate, il ne corrige jamais.**
 
-🔴 **Pas de plan.** Le Détailleur a produit les signatures : il n'y a
-plus d'architecture à décider.
+🔴 **Il juge l'interprétation, pas l'exécution** — 📌 **la boucle du
+Réalisateur couvre la mécanique.**
 
-#### Les huit gestes, dans cet ordre
+**Ce qu'il ne vérifie pas, et pourquoi** — 🔴 **que le lot corresponde à
+sa source** : le Vérificateur l'a confirmé en amont. 🔴 **La mécanique**
+— analyse, tests, fichiers présents : la boucle du Réalisateur les
+couvre. ⚠️ **Chaque contrôle ajouté doit nommer ce qu'aucun autre ne
+fait déjà**, sinon c'est de la ratification, pas de la détection.
 
-**1. Déterminer où le code va**, à partir des conventions et des
-symboles que la fiche demande. 🔴 **La fiche dit quoi écrire, les
-conventions disent où** — le Détailleur ne décide pas de
-l'emplacement.
+**Cinq points, et deux méritent d'être compris :**
 
-**2. Lire les fichiers concernés**, et ceux qui portent les symboles
-que la fiche déclare modifiés. 🔴 **Toute recherche de code cible
-les dossiers que les conventions nomment** — sans chemin, elle ratisse
-`docs/` et la sortie de build.
+📌 **Sur une modification, l'existence ne prouve rien** — 🔴 **seule la
+signature dit si le lot a fait son travail.**
 
-**3. Lire les deux sections ouvertes du document d'état** — pièges
-généraux et état mort, en entier. 📌 **Un piège change comment il
-écrit, pas quoi** — et la fiche ne le dira pas.
+📌 **Le dernier point lit le corps, pas la signature** : 🔴 **ce que le
+lot reçoit et ne lit jamais, ce qu'on lui rend et qu'il jette, ce qu'il
+remplit et ne consulte pas.** ⚠️ **Un symbole qui porte la signature de
+la fiche peut n'en rien faire.**
 
-**4. Implémenter dans l'ordre des dépendances de la fiche.** 📌 Il ne
-le décide pas — le Détailleur l'a établi.
+⚠️ **Pas ce que rien n'utilise** — 📌 **un autre lot, un contrat, une
+clé de ressource peuvent l'atteindre, et aucun n'est devant lui.**
 
-**5. Écrire un test par critère d'acceptation.** 🔴 **La correspondance
-est directe** : un critère sans test est un critère non couvert. C'est
-ce qui rend le lot vérifiable — le Relecteur compare les tests aux
-critères, pas à une intention.
+**Le champ vérifié** — 🔴 **il recopie ce que le compte rendu affirme du
+build**, en une ligne. ⚠️ **Jamais vide** : 📌 **un champ vide se lit
+comme *personne n'a regardé le build***, et c'est ainsi qu'un lot dont
+le module n'a jamais compilé passe.
 
-⚠️ **Sur une modification, des tests existants deviennent faux** — ils
-vérifient l'ancien comportement. 🔴 **Il les adapte au nouveau, il ne
-les supprime pas.** Un test retiré est un comportement qui cesse d'être
-vérifié.
+🔴 **Le module du lot qui ne compile pas est un FAIL structurel**,
+quelle que soit la raison donnée. ⚠️ **Son code n'a jamais été exécuté
+et ses tests n'ont jamais été des tests** : **le lot n'a rien
+démontré**, et une correction ciblée ne démontrerait rien non plus.
 
-📌 **Un test qui échoue sans porter sur le lot** signale une régression :
-il s'arrête et remonte, il ne le modifie pas.
+**Ce qui fait repartir la boucle** — 🔴 **une divergence de symbole ne
+menace que les lots non codés du même bloc** : 📌 **les blocs suivants
+seront détaillés sur le code réel.** ⚠️ **Il nomme ces lots dans le
+verdict** — leurs fiches ont été écrites contre une signature que le
+code ne porte pas, et sont fausses.
 
-**6. Lancer l'analyse statique et les tests** — jusqu'à ce que les deux
-passent.
+🔴 **Une divergence est signalée même quand le code marche.**
 
-🔴 **Par bloc cohérent de travail, jamais par édition.** Un fichier et
-ses tests, une couche, un écran et son provider : terminer, puis
-vérifier. *(Mesuré sur dix steps : 41 relances sur 149 sans aucun
-échec entre les deux ; une séquence a enchaîné 16 analyses propres
-pendant que la même invocation écrivait encore.)*
+**La frontière** — 🔴 **un lot, un verdict**, jamais un bloc entier.
 
-🔴 **Grouper les corrections aussi.** Quand une exécution remonte
-plusieurs échecs, les corriger tous, puis relancer une fois.
+---
 
-**7. Mettre à jour l'état projeté** — voir ci-dessous.
+## L'Arbitre
 
-**8. Commiter**, en indexant explicitement ce qui appartient au lot.
+**À quoi il sert** — Il remplit le champ `## Decision` d'un fichier de
+blocage, **pour que l'agent qui l'a écrit puisse continuer.**
 
-#### Quand il reprend un lot en FAIL
+🔴 **Il ne tranche presque rien de lui-même.** 📌 **Presque tout blocage
+a déjà sa réponse quelque part dans le corpus** — une convention, une
+entrée du document technique, ou le même problème résolu ailleurs dans
+le même code. **Son travail est de trouver cette réponse, pas d'en
+inventer une.**
 
-**Un FAIL déclenche un Réalisateur neuf**, jamais celui qui a écrit le
+**Le test, un seul** — 🔴 **votre réponse change-t-elle un comportement
+que le corpus décrit ?**
+
+📌 **Oui** — elle trancherait ce que la personne qui utilise
+l'application obtient. **Il rend la main.**
+📌 **Non** — une signature, un module, un ordre entre lots, un type,
+une portée. **Il tranche.**
+
+⚠️ **La ligne n'est pas à quel point ça sonne technique.** 📌 **Savoir
+si un total est masqué ou affiché quand il ne peut pas être calculé est
+une question produit**, si profond dans le code qu'elle surgisse.
+**Savoir lequel de deux modules porte un adaptateur est à lui**, si
+architectural que ça paraisse.
+
+**Ce qui le déclenche** — 🔴 **le Détailleur et le Réalisateur
+l'appellent, et eux seuls.** 📌 **Un blocage par invocation.** ⚠️ **Ils
+tournent encore pendant qu'il travaille**, et lisent le champ dès qu'il
+sort.
+
+🔴 **Le Cadreur et le Vérificateur ne l'appellent pas** — ⚠️ **ce sur
+quoi ils bloquent est mécanique** : un document manquant, une liste
+illisible, une convention qui interdit ce qu'un lot exige. 📌 **Et la
+dernière va à l'Architecte.**
+
+🔴 **Un blocage du Relecteur ou du Contrôleur dit que quelque chose
+manque** — ⚠️ **rien ne s'y tranche** : l'agent qui le devait doit
+retourner.
+
+**Ce qu'une décision porte** — 📌 **trois parties** : ce que l'agent
+fait, ce sur quoi ça repose, et **ce à quoi ça ne s'étend pas.**
+🔴 **La troisième est ce qui empêche une décision de se répandre** —
+⚠️ **un lot à qui on dit de corriger un site d'appel corrigera tous
+ceux qu'il rencontre**, sauf si la décision dit où s'arrêter.
+
+📌 **Les blocages déjà tranchés sont à côté, numérotés** — 🔴 **il les
+lit avant de trancher** : ⚠️ **un blocage qui en suit un autre signifie
+souvent que la réponse précédente était trop étroite.** 📌 **Il tranche
+plus large cette fois, et dit ce que la précédente avait manqué.**
+
+**Quatre issues** — trancher · demander une règle à l'Architecte ·
+renvoyer au découpage · attendre le Product Owner. **Les trois
+dernières sont détaillées plus bas.**
+
+**La frontière** — 🔴 **il ne dit jamais comment couper** : 📌 **il nomme
+ce qui doit devenir possible, le Cadreur décide comment.** ⚠️ **Une
+contrainte écrite comme une solution lui prend son travail.**
+
+🔴 **Il ne répond jamais de mémoire** : un fait sur le code se grepe.
+
+---
+
+## Le Contrôleur
+
+**À quoi il sert** — Il vérifie que **chaque intention du fichier
+produit est portée par une fiche.**
+
+🔴 **Il ferme la chaîne sur son point de départ.** ⚠️ **Une intention
+perdue entre le produit et la fiche ne referait surface qu'à l'usage.**
+
+📌 **Le Relecteur couvre fiche → code. Lui couvre produit → fiche.**
+
+**Ce qui le déclenche** — 📌 **une fois, quand toutes les fiches
+existent.** 🔴 **Deux invocations** : une par groupe de blocs que la
+commande nomme, puis une pour assembler leurs rapports partiels.
+
+🔴 **Cycle de fonctionnalité seulement.** ⚠️ **Pas de fichier produit
+sur un cycle de correction** — il n'y a rien à confronter.
+
+**L'unité est la phrase** — 🔴 **jamais le bloc entier.** 📌 **Un bloc
+qui porte onze intentions demande onze réponses** — ⚠️ **sept critères
+sur onze n'est pas une intention trouvée.**
+
+📌 **Un bloc qui se lit comme un sujet peut en porter beaucoup** : une
+carte de navigation est un bloc, et chaque chemin dedans est une
+intention.
+
+**Le critère** — 🔴 **l'intention est-elle observable dans une signature
+ou dans un critère d'acceptation ?** ⚠️ **Pas dans la prose d'une
+fiche** : 📌 **une fiche qui *mentionne* un bouton sans qu'aucun critère
+l'observe ne porte pas l'intention.**
+
+🔴 **Une intention qui joint deux choses demande un critère sur la
+jointure.** 📌 *« L'icône de l'en-tête ouvre le profil »* n'est pas
+portée par un critère qui dit que la méthode du navigateur change son
+état : **ça observe la méthode, pas ce qui l'appelle.**
+
+⚠️ **Tout bloc qui nomme ce qui déclenche un comportement se lit ainsi**
+— 📌 **la chose déclenchée peut être construite et observée, et rien ne
+l'atteindre.**
+
+**La frontière** — 🔴 **il ne lit pas le code** : le Relecteur a couvert
+fiche → code. 🔴 **Il ne tranche aucun doute** : une intention qu'il ne
+peut pas rattacher va sous *douteux*, jamais sous *manquant*.
+🔴 **Il ne relance rien** — 📌 **le Product Owner lit le rapport et
+décide** s'il devient une liste d'écarts pour un cycle de correction.
+
+⚠️ **Il n'écrase jamais un rapport antérieur** — 📌 **il en écrit un
+nouveau, numéroté** : c'est ainsi qu'on compare deux états. 🔴 **Il n'en
+ouvre aucun non plus** : ce qu'une exécution antérieure a conclu
+l'arrêterait de chercher.
+
+---
+
+## L'Architecte — partagé avec l'amont
+
+📌 **Ses invocations 1 et 2 appartiennent à l'amont** — voir
+`PROCESS_AMONT.md`. **Ce qui suit est sa face aval.**
+
+**Ce qui le déclenche ici** — 🔴 **l'invocation 3, sur les demandes qui
+attendent dans `architecte/`.** 📌 **Deux choses l'appellent** : la
+commande, à la fin d'un lot ou une fois le découpage tenu — ou
+**l'Arbitre**, qui est bloqué sur une demande et l'attend.
+
+📌 **Il ne les traite pas différemment** : il les lit toutes, les
+tranche toutes, écrit chaque verdict.
+
+🔴 **Il lit toutes les demandes avant d'en trancher une** — 📌 **deux
+demandes portent souvent une seule règle**, et deviennent un seul
+changement.
+
+**Ce qu'il refuse** — 🔴 **une convention dit ce que le projet a
+choisi.** 📌 **Trois choses n'en sont pas** : ce que la plateforme
+impose — il n'y a pas d'autre voie ; ce qu'un outil vérifie ou pourrait
+vérifier ; ce qui ne tient que sur une machine.
+
+⚠️ **Cette invocation seule peut lire le web et les fichiers de
+build** — 📌 **partout ailleurs c'est interdit**, et pour de bonnes
+raisons : **ici il ne dérive pas un fichier, il juge une affirmation
+sur une plateforme**, et ça se cherche plutôt que ça ne se sait.
+
+🔴 **Un verdict porte le texte de la règle, pas seulement son numéro** —
+⚠️ **l'agent qui le lit n'ouvre pas le fichier de conventions**, il
+recopie ce que le verdict dit.
+
+🔴 **Il n'attend jamais le Product Owner** : il tranche, il refuse, ou
+il bloque, et il sort. ⚠️ **Et quand l'Arbitre l'a appelé, il ne bloque
+pas du tout** — 📌 **le refus s'écrit dans le `## Verdict` de la
+demande**, parce que l'Arbitre tourne encore. 🔴 **Un fichier de blocage
+laisserait deux agents suspendus à la même réponse.**
+
+---
+
+## Le Diagnostiqueur — le point d'entrée d'un cycle de correction
+
+**À quoi il sert** — Il **confirme un écart signalé contre le code**,
+et le décrit assez précisément pour qu'il soit découpé en lots.
+
+🔴 **Il ne tranche rien** : ce qui entre dans le cycle est la décision
+du Product Owner — **elle l'a listé, il confirme qu'il existe.**
+🔴 **Il ne corrige rien** : il localise et décrit.
+
+**Ce qui le déclenche** — 🔴 **deux invocations, et la première tourne
+autant de fois qu'il y a d'écarts**, toutes lancées ensemble.
+
+📌 **Pourquoi découper** : dix écarts dans un seul contexte, ce sont dix
+séries de greps qui s'accumulent. **Une investigation ne voit que son
+écart**, et rien de ce qu'elle cherche n'aide les autres.
+
+⚠️ **L'assemblage n'ouvre jamais le code** — 🔴 **les rapports portent
+tout.** **Un rapport qui ne suffit pas à écrire une entrée est un
+blocage.**
+
+**Ce qu'une investigation établit** — 📌 **un écart est écrit en
+comportement, pas en noms** : *« le facteur de correction n'est jamais
+calculé »* ne nomme rien qui existe. 🔴 **Il en dérive les termes**, puis
+cherche en élargissant. **Il s'arrête après le troisième
+élargissement** — ⚠️ **au-delà, c'est deviner.**
+
+🔴 **Un comportement ne vit pas que dans les fichiers source.** 📌 **Le
+test** : *changer ce fichier changerait-il ce que l'application fait ?*
+⚠️ **Un comportement absent des sources n'est pas un comportement
+absent** : quelque chose de déclaré et jamais utilisé, un défaut qui
+s'applique parce que rien ne le surcharge, une valeur fixée hors du
 code.
 
-**Entrées** — les mêmes, **plus le verdict**.
+**Le porteur** — 🔴 **la question est : qu'est-ce qui doit changer pour
+que le comportement change ?** 📌 **Ce qui y répond est le porteur,
+quelle que soit sa forme.** ⚠️ **Ne jamais demander de quelle espèce de
+chose il s'agit.**
 
-**FAIL mineur** : corriger le point signalé, relancer l'analyse et les
-tests, réécrire le compte rendu. 🔴 **Ne pas revisiter le reste du
-lot.**
+🔴 **La contrainte : le reste dépend de lui, pas l'inverse.** 📌 **Sur un
+appel manquant, le porteur est l'appelant** — c'est là que le code
+change.
 
-**FAIL structurel** : reprendre le lot depuis le geste 1.
+🔴 **Un porteur par entrée.** ⚠️ **Vingt sites d'un même oubli sont
+vingt entrées**, et la prose de chacune ne nomme que son site.
+📌 **Le volume n'est pas une raison de grouper** : **une entrée qui en
+couvre plusieurs ne peut pas être close en en observant une.**
 
-⚠️ **Il ne discute pas le verdict.** S'il le juge faux, il s'arrête et
-remonte plutôt que de coder contre.
+⚠️ **Une exception, étroite** : 📌 **déplacer un comportement d'un
+endroit à un autre est un seul écart** — 🔴 **entre les deux moitiés le
+comportement n'existe nulle part**, et un correctif qui laisse le
+projet dans cet état n'est pas livrable.
 
-#### Quand la fiche est fausse
+**Les seconds manques** — 🔴 **il confirme ce que le correctif exige,
+pas seulement ce qui manque.** 📌 **Et il relit chaque appelant contre
+le nouveau mécanisme**, sur deux tests : *ce qu'il porte aujourd'hui,
+le nouveau mécanisme l'accepte-t-il ?* et *ce que le nouveau mécanisme
+lui tend, s'en sert-il ?*
 
-🔴 **Il ne la corrige pas.** Une signature qui ne compile pas, un type
-qui n'existe pas, une dépendance vers un lot non encore réalisé : il
-s'arrête et remonte.
+📌 **Le premier attrape ce qui casse ; le second ce qui ne fait rien en
+silence.** 🔴 **Un type qui grossit passe le premier et rate le
+second** — rien ne cesse de compiler, et personne ne lit le champ.
 
-⚠️ **Improviser rendrait la divergence invisible** — le code
-s'écarterait de la fiche sans que rien ne le signale. Le Détailleur a
-produit la fiche, le Vérificateur aurait dû attraper l'erreur : c'est
-en amont qu'elle se corrige.
-
-#### Ce qu'il ne fait jamais
-
-- 🔴 **Corriger une fiche fausse** — il s'arrête et remonte
-- 🔴 **Décider d'une architecture** — les signatures sont posées
-- 🔴 **Lancer l'analyse ou les tests par édition** — par bloc cohérent
-- 🔴 **Écrire un test qui ne correspond à aucun critère**
-- 🔴 **Discuter un verdict** — il corrige, ou il s'arrête
-
-🔴 **C'est ici que le volume mord** — mesuré à ~440k si tout cohabite,
-au-dessus de la zone de dégradation (~400k). ⚠️ Le volume dépend
-entièrement de la taille du lot : c'est la variable d'ajustement, pas
-le découpage en rôles.
-
----
-
-#### La mise à jour de l'état — même invocation
-
-**Le document d'état est `docs/CURRENT_TECHNICAL_STATE.md`**, unique
-pour tout le projet.
-
-🔴 **Charger le skill `technical-state-format` avant d'y écrire**,
-jamais sans. C'est ce qui a évité sa dérive.
-
-**Ce qui y entre** : un service, un provider, un mécanisme qu'un autre
-lot pourrait reconstruire · une table, une route, une cascade · un
-piège · un état mort.
-
-🔴 **Ce que le lot a rendu faux disparaît** — une entrée n'est jamais
-« modifiée par lot-03 ».
-
-📌 **Appartient au Réalisateur**, dans la même invocation : il sait ce
-qu'il vient de produire, ça ne coûte presque rien.
-
-⚠️ **Ce document commande le Cadreur.** S'il ment, tout le découpage
-suivant repose sur du faux.
+**La frontière** — 🔴 **il ne juge pas si un écart est légitime** : le
+Product Owner l'a décidé en le listant. 🔴 **Il ne lit pas le code
+au-delà d'un grep** : il confirme un comportement, il ne relit pas une
+implémentation. 🔴 **`desc-bug.md` prend la forme du document
+technique** — préambule, douze sections, entrées numérotées — 📌 **parce
+que le Cadreur le découpe exactement comme une spec.**
 
 ---
 
-### Le Relecteur
+## Qui tourne sur quel modèle
 
-**Entrées** — **la fiche exécutable du lot** · le code produit · le
-compte rendu · `docs/TECHNICAL_CONVENTIONS.md`
+*Porté par la frontmatter de chaque agent.*
 
-**Sortie** — le verdict : ce qui manque, et toute divergence de symbole
-
-#### La checklist — quatre points, dans cet ordre
-
-**1. Les symboles du lot correspondent à ce qui était promis.** Un grep
-chacun. 🔴 **Toute divergence se signale**, même quand le code
-fonctionne.
-
-| Déclaré comme | Ce qu'il vérifie |
+| Opus | Sonnet |
 |---|---|
-| **Production** | Le symbole existe, avec la signature de la fiche |
-| **Modification** | Le symbole a **la nouvelle** signature, pas l'ancienne |
+| cadreur · verificateur · detailleur · arbitre · architecte | realisateur · relecteur · controleur · diagnostiqueur |
 
-⚠️ **Sur une modification, l'existence ne prouve rien** — le symbole
-existait déjà. Seule la signature dit si le lot a fait son travail.
+📌 **La ligne de partage** : 🔴 **décide-t-il une structure dont tout le
+reste dépend ?** **Le Cadreur décide le découpage entier ; le Détailleur
+écrit les signatures sur lesquelles tout un bloc est construit.**
+📌 **Le Réalisateur et le Relecteur travaillent contre une fiche déjà
+écrite.**
 
-**2. Un test par critère d'acceptation.** ⚠️ **La correspondance est
-directe** — un critère sans test est un manque constatable, pas une
-appréciation.
+---
 
-**3. Les conventions tiennent** sur ce que le lot a touché.
+# LES QUATRE DIALOGUES
 
-**4. Les autres champs du compte rendu tiennent** — l'analyse et les
-tests passent, ce qui est entré dans le document d'état est nommé, une
-proposition de convention ou un tiret. 📌 **Le point 1 a déjà couvert
-les symboles.**
+*🔴 **Un sous-agent en appelle un autre**, et c'est ce qui distingue
+l'aval. ⚠️ **Aucun autre appel n'existe** — tout le reste passe par la
+commande.*
 
-#### Ce qu'il ne vérifie pas
+| Appelant | Appelé | Sur quoi | Combien |
+|---|---|---|---|
+| **Cadreur** | Vérificateur | Le découpage qu'il vient de couper | 🔴 **Trois tours au plus**, qu'il compte |
+| **Détailleur** | Arbitre | Un fichier de blocage à décision vide | Un par blocage |
+| **Réalisateur** | Arbitre | Idem | Un par blocage |
+| **Arbitre** | Architecte | Une demande de convention | 🔴 **Une fois, jamais deux** |
 
-🔴 **La cohérence du lot avec sa source** — le Vérificateur l'a
-confirmée en amont.
+**Ce que chaque issue produit :**
 
-🔴 **La mécanique** — analyse statique, tests lancés, fichiers
-présents : la boucle du Réalisateur les couvre.
+**Cadreur ⇄ Vérificateur** — 📌 **des défauts vides** : le découpage
+tient, le Cadreur sort. 📌 **Des défauts** : il corrige **les seuls lots
+nommés** et rappelle. ⚠️ **Encore des défauts au troisième tour** : il
+écrit un fichier de blocage nommant ce qui n'a pas convergé et sort.
+🔴 **Il ne discute pas un défaut** — s'il le juge faux, il le dit dans
+ce fichier plutôt que de recouper contre.
 
-📌 **Il juge l'interprétation, pas l'exécution.**
+**Détailleur / Réalisateur → Arbitre** — 🔴 **ce que l'Arbitre rend est
+un accusé de réception ; la réponse est dans le champ `## Decision`**,
+qu'ils relisent.
 
-#### Le verdict
+| Le champ | Le Détailleur | Le Réalisateur |
+|---|---|---|
+| **Rempli** | Applique et détaille le bloc — 📌 le parcours tient encore | Applique et **reprend où il s'était arrêté** — 📌 il n'a rien perdu |
+| **Renvoie au découpage** | 🔴 **N'écrit aucune fiche** | 🔴 **Jette tout ce qu'il a écrit**, ne commite rien |
+| **Toujours vide** | S'arrête, le bloc en l'état | Écrit `reprise_realisateur.md` et s'arrête |
 
-| Verdict | Quand |
+**Arbitre → Architecte** — 📌 **une règle écrite ou changée** : il en
+recopie le numéro **et le texte** dans sa décision. 📌 **Refusée** : il
+attend le Product Owner. 🔴 **Une demande refusée ne repart pas à
+l'Architecte sous une autre formulation.**
+
+**Les deux régimes d'attente**
+
+🔴 **Attendre un agent n'a pas de borne** — ⚠️ **ni sondage, ni délai.**
+📌 **Un agent finit toujours** : le sonder n'apprend rien et coûte des
+appels.
+
+🔴 **Attendre le Product Owner est sondé, et borné** — 📌 **deux minutes
+d'écart au début, cinq ensuite, et rien au bout de vingt minutes
+arrête.** ⚠️ **Une personne peut ne pas être au clavier.**
+
+🔴 **Le champ reste alors exactement vide** — ⚠️ **c'est le seul cas où
+l'Arbitre n'y touche pas.** 📌 **C'est ce vide que l'appelant teste**, et
+n'importe quoi d'écrit là se lirait comme une réponse.
+
+---
+
+# LA BOUCLE DU CODAGE
+
+## Lot par lot
+
+    ┌─ nouveau bloc ? ──→ Détailleur (tout le bloc, d'un coup)
+    │                          │
+    │                     Réalisateur ──→ Relecteur ──→ verdict.md
+    │                          ↑              │
+    │                          └── FAIL ──────┤  🔴 3 reprises au plus
+    │                                         │
+    │              divergence nommant des lots ┤ ──→ Détailleur, ces fiches seules
+    │                                         │
+    │                    stop.md présent ? ────┤ ──→ arrêt demandé
+    └──────────────── lot suivant ←───────────┘
+
+    tous les lots en PASS  ──→  Contrôleur  ──→  fin
+
+🔴 **Le prochain lot est le premier de la séquence sans `verdict.md` en
+PASS.** 📌 **Une lecture, pas un balayage** — la séquence porte l'ordre.
+
+**Ce qui fait repartir la boucle — quatre choses, et une seule
+s'arrête :**
+
+**1. Un FAIL** — 🔴 **un Réalisateur neuf, avec le verdict.**
+📌 **Trois reprises au plus par lot**, tous types de FAIL confondus.
+⚠️ **Un FAIL isolé n'arrête pas la commande.**
+
+**2. Une divergence** — 🔴 **le verdict nomme les lots dont les fiches
+sont devenues fausses**, et le Détailleur les réécrit, **celles-là
+seules.** ⚠️ **Les lots codés gardent les leurs** : elles décrivent ce
+qui a été construit.
+
+**3. Un redécoupage** — 🔴 **sans intervention humaine.** 📌 **L'Arbitre
+a écrit `code/redecoupage.md`**, l'agent s'est arrêté, **la commande
+relance le découpage et poursuit sa boucle.** ⚠️ **Le Product Owner
+n'attend sur rien.**
+
+🔴 **Les fiches de tout lot non codé sont périmées** — 📌 **écrites
+contre l'ancien découpage, elles sont supprimées.** ⚠️ **Un Détailleur
+qui trouve une fiche ne la réécrit pas**, et détaillerait contre un lot
+qui a changé de forme.
+
+📌 **Le compte de lots ne repart pas** — 🔴 **un redécoupage n'en a
+relu aucun.**
+
+**4. `stop.md`** — 📌 **le Product Owner l'a posé pour arrêter
+proprement.** 🔴 **Il se lit depuis le checkout principal, jamais depuis
+un worktree** : ⚠️ **un worktree porte une copie figée à sa création et
+ne verrait jamais un fichier créé après.** 📌 **`stop1.md` est sa forme
+désarmée** — on renomme pour arrêter, on renomme en sens inverse pour
+reprendre.
+
+⚠️ **Un arrêt n'est pas un échec** : le lot qui vient de finir est
+fusionné et poussé, rien n'est perdu.
+
+## Ce que le redécoupage laisse intact
+
+🔴 **Un lot dont le verdict porte PASS est clos.** ⚠️ **Ses entrées, ses
+symboles et son numéro restent exactement tels quels** — 📌 **son code
+est fusionné**, et changer ce qu'il déclarait décrirait quelque chose
+qui n'est pas là.
+
+🔴 **Là où un lot codé doit changer, on ajoute un lot** — 📌 **un lot qui
+modifie ce qu'un précédent a construit**, déclarant ces symboles en
+modifications comme n'importe quels autres.
+
+🔴 **Un lot codé est derrière, quoi qu'il consomme** — ⚠️ **l'ordre dans
+lequel il a tourné est un fait, pas un plan**, et rien ne peut le
+mettre plus tard. 📌 **Un lot qui modifie ce qu'un lot codé a construit
+passe en premier parmi ce qui reste.**
+
+## Ce qui fait converger un redécoupage
+
+🔴 **Le Cadreur lit les redécoupages précédents pour ce qui revient.**
+
+📌 **Le même symbole deux ou trois fois** — la frontière est au mauvais
+endroit, et recouper autour renverra une quatrième. 📌 **La même
+entrée** — elle porte plus d'une nature, et aucune coupe le long d'elle
+ne tiendra. 📌 **La même espèce de défaut** — ce qui est faux est le
+critère de coupe, pas cette coupe-ci.
+
+🔴 **Il écrit ce qu'il en fait**, et c'est ce champ qui fait
+converger. ⚠️ **Sans lui, il recoupe autour du même point**, et le
+cinquième redécoupage redit ce que le deuxième disait déjà.
+
+## Les demandes de convention, entre deux lots
+
+🔴 **À la fin de chaque lot, jamais pendant qu'un tourne.** 📌 **Le
+fichier de conventions est ce que lit chaque agent du bloc suivant**, et
+⚠️ **deux worktrees qui l'écrivent en même temps en perdent un.**
+
+🔴 **À la fin du lot, pas du bloc.** ⚠️ **Une règle tranchée en fin de
+bloc est tranchée après tous les lots qu'elle aurait dû gouverner** —
+📌 **ainsi le lot suivant l'a.**
+
+🔴 **Une seule invocation, quel que soit le nombre de demandes** —
+⚠️ **jamais une par fichier** : il les lit toutes avant d'en trancher
+une, et deux invocations écriraient le fichier de conventions en même
+temps.
+
+📌 **Une demande que l'Arbitre a levée en cours de lot est déjà
+tranchée** — son verdict est rempli, et ce geste la saute.
+
+---
+
+# LES COMMANDES
+
+*Ce que chacune décide, et pourquoi c'est elle qui décide.*
+
+| Commande | Agents | Ce qu'elle produit |
+|---|---|---|
+| `/diagnostique` | diagnostiqueur | `desc-bug.md` — entrée d'un cycle de correction |
+| `/7_lots` | cadreur *(qui appelle le vérificateur)* | Le découpage et la séquence |
+| `/8_code` | detailleur · realisateur · relecteur · architecte · controleur | Le code, lot par lot |
+| `/9_controle` | controleur | Le rapport d'intentions |
+| `/conventions` | architecte | `TECHNICAL_CONVENTIONS.md` · `couverture.md` |
+| `/deploie` | — *(script)* | Les deux applications sur les appareils |
+| `/audit_blocages` · `/audit_conventions` | — *(l'orchestrateur seul)* | Deux rapports d'audit |
+
+🔴 **Le dossier de travail est le `bugfix-NN/` le plus haut s'il en
+existe un ; le dossier de la fonctionnalité sinon.** 📌 **Un cycle de
+correction garde tout ce qu'il produit dans son propre dossier**, et la
+structure est la même des deux côtés.
+
+⚠️ **On passe le dossier de travail, jamais le dossier de la
+fonctionnalité** — 🔴 **sur un cycle de correction ils diffèrent**, et
+l'agent lirait le mauvais.
+
+## `/diagnostique` — décide ce qui n'est pas à refaire
+
+📌 **Elle découpe `bug-list.md` en écarts identifiés, un par appel**,
+et passe le texte de chacun **verbatim**. 🔴 **Elle les lit pour les
+distribuer, jamais pour les juger, les réécrire ou les fusionner.**
+
+🔴 **Elle saute tout écart dont le rapport existe déjà** — ⚠️ **une
+reprise coûte une investigation entière.** 📌 **C'est ainsi qu'une seule
+investigation ratée se rejoue** : le Product Owner remplit son fichier
+de blocage, relance la commande, et celle-là seule repart.
+
+📌 **Un blocage en phase 1 n'annule pas la phase 2** — 🔴 **l'assemblage
+compte les rapports contre `bug-list.md` et bloque de lui-même s'il en
+manque un**, en nommant l'identifiant.
+
+## `/7_lots` — décide ce que le Cadreur trouve, jamais ce qu'il fait
+
+📌 **Une seule invocation.** 🔴 **Elle ne lance pas le Vérificateur et
+elle ne boucle pas** — le Cadreur s'en charge.
+
+🔴 **Elle ne dit rien dans le prompt de ce qui l'a rappelé** —
+📌 **défauts ou redécoupage, le Cadreur les trouve seul**, et une
+paraphrase entrerait en concurrence avec ses propres instructions.
+
+**L'exception** : 📌 **un `code/redecoupage.md` est nommé dans le prompt
+des deux agents** — ⚠️ **des lots sont déjà codés et fusionnés**, et
+écraser leurs entrées décrirait quelque chose qui n'est pas dans
+l'arbre.
+
+**Ce qu'elle décide en sortie** :
+
+| Ce qu'elle trouve | Ce qu'elle fait |
 |---|---|
-| **PASS** | Les quatre points passent |
-| **PASS avec réserve** | Un point passe, mais mérite d'être noté pour la suite |
-| **FAIL mineur** | Un point échoue, isolé — correction ciblée, pas de relecture complète |
-| **FAIL structurel** | Le lot ne fait pas ce que la fiche demande, ou plusieurs points échouent ensemble |
+| Une séquence sans défaut | 🔴 **Le découpage tient** — elle traite les demandes en attente, puis s'arrête |
+| Un blocage du Cadreur **et** une demande de convention | 📌 **L'Architecte, puis le Cadreur à nouveau** |
+| Un blocage du Cadreur seul | 🔴 **Arrêt** — le Product Owner remplit la décision |
 
-⚠️ **Ne jamais tomber sur structurel par défaut** pour un manquement
-isolé.
+🔴 **Elle n'invoque jamais l'Arbitre.** 📌 **Ce sur quoi le Cadreur et
+le Vérificateur bloquent est mécanique**, et rien de tout ça ne se règle
+en regardant le corpus.
 
-#### Ce qu'il ne fait jamais
+⚠️ **Un blocage au troisième tour n'est pas un échec de la commande** —
+🔴 **le découpage ne converge pas, et c'est au Product Owner de
+décider.**
 
-- 🔴 **Corriger lui-même** — il constate, un agent frais corrige
-- 🔴 **Revérifier la cohérence du lot avec sa source** — le
-  Vérificateur l'a faite
-- 🔴 **Revérifier la mécanique** — la boucle du Réalisateur la couvre
-- 🔴 **Tomber sur structurel par défaut** pour un manquement isolé
+## `/8_code` — décide où reprendre, et quand s'arrêter
 
-📌 **Une divergence ne menace que les lots non codés du même bloc** —
-voir "Où la divergence se détecte".
+🔴 **Elle décide où reprendre** : le premier lot de la séquence sans
+verdict en PASS. 📌 **Aucun lot** — tous en PASS — **le Contrôleur, puis
+fin.**
 
-🔴 **Justifié par (b) uniquement.** Ne peut jamais être le Réalisateur.
+⚠️ **Des défauts non vides l'arrêtent** : le découpage n'a jamais été
+corrigé.
 
-#### Relecture par lot, jamais par bloc
+🔴 **Elle décide quand s'arrêter, et la liste est courte** : un blocage
+à décision vide · un lot qui échoue trois fois · `N` lots relus en
+PASS · le Contrôleur qui a fini · `stop.md`. ⚠️ **Sinon elle ne
+s'arrête jamais** — un FAIL isolé, un bloc terminé, une correction qui
+passe : elle continue.
 
-🔴 **Agent frais pour toute correction** — jamais celui qui a relu.
-*(18 tours et 0,66M mesurés contre un agent repris qui recharge son
-contexte.)*
+🔴 **Elle n'invoque jamais l'Arbitre.** 📌 **Le Détailleur et le
+Réalisateur l'appellent eux-mêmes**, l'attendent, et ne s'arrêtent que
+si le champ est revenu vide. ⚠️ **Un blocage qui lui parvient y est
+déjà passé** — le renvoyer demanderait deux fois.
 
-🔴 **Chaque lot est relu à sa réalisation, pas en fin de bloc.** Sinon
-une erreur sur le premier lot ne serait découverte qu'après que sept
-autres aient été codés dessus — exactement ce que l'alternance bloc par
-bloc évite déjà en amont.
+📌 **Une décision remplie n'est pas un arrêt** : elle invoque l'agent
+qu'elle nomme, sur le lot qu'elle nomme. ⚠️ **Même sur un lot qui porte
+déjà un PASS** — 🔴 **le Contrôleur signale les intentions manquantes
+après que tous les lots ont été relus, et un blocage est la façon dont
+elles reviennent.**
 
-⚠️ **Pas de vérification croisée entre les lots d'un bloc terminé.**
-Ce serait un filet, pas une boucle. Si le Cadreur a bien groupé, les
-lots d'un bloc partagent leur section de spec — une divergence entre
-eux signale un mauvais découpage, pas un mauvais code. **À revoir si
-l'usage montre des incohérences récurrentes.**
+🔴 **Quand elle s'arrête sur un blocage, les demandes de convention
+attendent** — ⚠️ **ne pas invoquer l'Architecte sur un lot qui n'a pas
+fini** : ce qu'il demande peut changer avec la décision.
 
----
+🔴 **Le compte porte sur les lots relus PASS**, pas sur les invocations
+— 📌 **le Détailleur tourne à chaque nouveau bloc sans entrer dans le
+compte.**
 
-### Le Contrôleur
+🔴 **Le Contrôleur ne tourne que si tous les lots de la séquence sont en
+PASS**, pas seulement ceux de cette exécution — ⚠️ **il compare le
+fichier produit à *toutes* les fiches**, et une fiche manquante lui
+ferait signaler une intention comme absente.
 
-*Une fois par cycle, quand toutes les fiches existent.*
+## `/9_controle` — décide le groupement, et ne le décide pas seule
 
-**Entrées** — le fichier produit de la fonctionnalité · toutes les
-fiches exécutables
+📌 **`/8_code` lance le Contrôleur tout seul une fois le dernier lot
+passé.** 🔴 **Cette commande sert à le relancer** — après que les fiches
+ont changé, après que ses propres règles ont changé, ou pour comparer
+deux états.
 
-**Actions** — pour chaque bloc du fichier produit, **phrase par
-phrase**, trois issues :
+**Elle construit la carte bloc → lots elle-même**, sans agent : 📌 **la
+traçabilité donne bloc → entrées, les ancres du découpage donnent
+entrée → lots**, et le croisement des deux donne la carte. 🔴 **Chaque
+bloc y figure**, un tiret quand aucun lot ne cite ses entrées.
 
-🔴 **L'unité est la phrase, jamais le bloc entier.** Un bloc qui porte
-onze intentions demande onze réponses — sept critères sur onze ne font
-pas une intention retrouvée. ⚠️ **Un bloc qui se lit comme un seul
-sujet peut en porter beaucoup** : une carte de navigation est un bloc,
-et chacun de ses chemins est une intention.
+🔴 **Puis un script groupe, et le groupement se prend tel quel.**
+⚠️ **Jamais de regroupement à la main, jamais de budget forcé** — 📌 **le
+découpage doit être reproductible depuis la même entrée.**
 
-| Issue | Ce qu'il écrit |
-|---|---|
-| **Retrouvée** | Le bloc, et la fiche qui la porte |
-| **Absente** | Le bloc, et ce qu'il décrivait |
-| **Douteuse** | Le bloc, et ce qui l'empêche de trancher |
+🔴 **Elle s'arrête si un lot de la séquence n'est pas en PASS** — 📌 **il
+lirait un jeu de fiches incomplet et signalerait une intention comme
+manquante quand elle est seulement pas encore écrite.**
 
-📌 **Une fiche porte souvent plusieurs blocs** — un lot groupe les
-entrées qui construisent une seule chose. ⚠️ **Confronter bloc par
-bloc quand même** : une fiche qui couvre quatre blocs peut en rater un
-cinquième.
+📌 **Un rapport existant n'est pas une raison de s'arrêter** — il en
+écrit un numéroté à côté, et c'est ainsi qu'on compare deux états.
 
-🔴 **Le critère : l'intention est-elle observable dans une signature ou
-dans un critère d'acceptation ?** Pas dans la prose d'une fiche — une
-fiche qui *mentionne* un bouton sans qu'aucun critère ne l'observe ne
-porte pas l'intention.
+## `/conventions` — hors de la boucle, lancée à la main
 
-📌 **Sur une correction ou une évolution, l'intention se retrouve
-surtout dans les critères** — les signatures existaient déjà. Un
-comportement corrigé se lit dans ce qui doit être observable après, pas
-dans un symbole créé.
+📌 **Après `/6_convertit`, avant `/7_lots`** — 🔴 **le Cadreur lit les
+conventions en entier ; elles doivent exister quand il le fait.**
 
-🔴 **Il ne tranche pas un doute.** Une intention qu'il n'arrive pas à
-rattacher part en douteuse, jamais en absente.
+⚠️ **`/cycle` ne l'appelle pas** — 📌 **le câblage attend que la grille
+ait été mesurée sur un cycle réel.**
 
-#### Ce qu'il ne fait jamais
+📌 **Le reste de cette commande appartient à l'amont** — voir
+`PROCESS_AMONT.md`.
 
-- 🔴 **Lire le code** — le Relecteur couvre fiche → code
-- 🔴 **Juger la qualité d'une fiche** — présence ou absence, rien
-  d'autre
-- 🔴 **Trancher un doute**
-- 🔴 **Relancer quoi que ce soit** — le Product Owner décide
+## `/deploie` — installe, et ne corrige rien
 
-**Sortie** — le rapport d'écarts : ce qui est décrit et ne se retrouve
-nulle part
+🔴 **Chaque appareil est identifié par son modèle, jamais par sa place
+dans la liste.** ⚠️ **L'identifiant de la montre change à chaque
+redémarrage du débogage sans fil** — 🔴 **relu à chaque exécution,
+jamais de mémoire ni d'un rapport précédent.**
 
-🔴 **Justifié par (a) et (b).** Il raisonne en intentions produit, pas
-en lots — contexte incompatible avec le Vérificateur, qui raisonne en
-séquence et en ancres. Et celui qui a converti, découpé ou détaillé ne
-peut pas constater qu'il a perdu quelque chose en route.
+🔴 **Un appareil manquant arrête tout.** ⚠️ **Ne jamais installer
+l'autre seul** : 📌 **un téléphone mis à jour contre une vieille version
+de la montre échoue d'une manière qui se lit comme un défaut de code.**
 
-📌 **Le Relecteur couvre fiche → code, le Contrôleur couvre produit →
-fiche.** Les deux mis bout à bout ferment la chaîne, sans qu'aucun
-agent relise du code complet.
+🔴 **Une installation ratée est un résultat** — le rapport dit ce qui a
+échoué et s'arrête là.
 
-🔴 **Rien ne repart en automatique.** Le Product Owner lit le rapport
-et décide s'il devient un fichier d'écarts pour le cycle bug fix.
+## `/audit_blocages` et `/audit_conventions` — l'orchestrateur seul
 
-⚠️ **Le coût de la découverte tardive est assumé** : les fiches
-n'existent toutes qu'à la fin, à cause de l'alternance bloc par bloc.
-Découvrir une intention perdue plus tôt supposerait de détailler tous
-les blocs d'avance — ce que l'alternance interdit délibérément.
+📌 **Aucun agent, aucune commande ne les appelle.** 🔴 **Elles lisent et
+elles rapportent ; elles ne changent rien.**
 
----
+🔴 **Elles s'ajoutent, elles ne réécrivent jamais** — 📌 **chaque passe
+note les fichiers qu'elle a lus, et la suivante les saute.** ⚠️ **C'est
+ce qui les rend peu chères à répéter.** 🔴 **Mais chacune relit ses
+propres constats en entier** : 📌 **un motif se voit à travers les
+passes, et une passe seule ne le verrait pas.**
 
-### Le Product Owner — hors boucle
+**Ce que l'audit des blocages cherche** — 🔴 **des noms, jamais des
+sujets.** 📌 **Deux blocages qui nomment un même symbole, fichier ou
+module sont un constat** — ⚠️ **grouper sur ce dont les blocages parlent
+serait un jugement**, et deux blocages tous deux *« sur un contrat
+élargi »* peuvent ne partager aucun nom.
 
-**Entrées** — l'application complète · le rapport d'écarts
+📌 **Puis ce qui compte vraiment** : 🔴 **une décision qui ne nomme rien
+sur quoi elle repose** — ni règle, ni entrée, ni symbole où le même
+problème est déjà résolu. ⚠️ **N'en nommant aucun, elle a inventé
+quelque chose.**
 
-**Sortie** — OK, ou ce qui cloche
+**Ce que l'audit des conventions cherche** — 📌 **ce que le cycle a
+ajouté** : une règle que la couverture ne trace à aucune entrée vient
+d'une demande, pas du corpus. ⚠️ **C'est une règle que personne n'a lue
+avant qu'elle ne lie tous les lots.**
 
-📌 Ce qu'aucun test ne dit : est-ce que ça a l'air juste, est-ce que le
-parcours est fluide, est-ce que le texte est bon.
+📌 **Et ce qu'une règle coûte** : 🔴 **une règle qu'aucun lot ne peut
+suivre dans sa propre portée** — elle demande ce qu'un lot ne peut pas
+fournir seul, et le blocage arrive bien plus tard, au détaillage.
+🔴 **Une règle que le découpage ne rencontre jamais** — ⚠️ **elle coûte
+une lecture à chaque lot et n'attrape rien.**
 
----
-
-## Modèle par agent
-
-**Cadreur, Vérificateur — Opus, systématique.** Ils décident de la
-structure entière ; une erreur ici se propage à tout le document
-technique. Le coût reste faible en absolu : une invocation chacun par
-document technique, pas par lot.
-
-**Détailleur — Opus.** 🔴 **Seize des soixante-six défauts d'un cycle
-de correction remontent à lui** — la signature qu'il écrit est ce
-contre quoi tout le bloc est codé. ⚠️ **Une invocation par bloc, pas
-par lot** : le coût reste borné.
-
-📌 **Mesuré ailleurs** : sur l'Architecte, le même passage de Sonnet à
-Opus a fait passer la prise de 34 défauts à 42, à grille identique.
-
-**Réalisateur — Sonnet, sans exception.** 🔴 **Pas de
-plancher par couche ni par type d'action.** L'ancienne matrice de
-risque (LOW/MEDIUM/HIGH) a été construite sur des steps traversant
-plusieurs couches ; on ne sait pas si ses planchers restent justifiés
-sur un lot mono-couche, isolé. Plutôt que deviner un nouveau plancher,
-on mesure.
-
-**Relecteur — Sonnet.** Sa checklist reste une vérification contre
-critères, pas de la conception.
-
-**Contrôleur — Sonnet.** Il constate une présence ou une absence, il ne
-juge ni la qualité ni la conception. ⚠️ **À réévaluer si les faux
-négatifs apparaissent** — reconnaître qu'une fiche porte bien une
-intention formulée autrement est de la compréhension, pas de la
-comparaison.
-
-### Comment le modèle du code s'ajuste, à l'usage
-
-**Le Relecteur qualifie la cause de chaque FAIL structurel** — erreur
-de compréhension du lot, ou limite de raisonnement (calcul mal conduit,
-cascade mal anticipée). Seule la seconde justifierait Opus.
-
-**Un seuil déclenche l'ajustement** : un type de lot ayant accumulé
-plusieurs FAIL structurels attribués au raisonnement passe en Opus par
-défaut pour ce type. *(Seuil non fixé — à poser sur les premières
-observations.)*
-
-⚠️ **Le premier document technique tourne sans filet de risque.** Une
-migration complexe ou un calcul critique s'exécute en Sonnet comme le
-reste, et une éventuelle limite de raisonnement se découvre après coup,
-pas avant. C'est le compromis accepté : mesurer plutôt que supposer.
-
-📌 **Ce pari se joue sur une application de test dédiée**, pas sur
-l'application en production — ce qui rend le risque acceptable pendant
-que le process s'éprouve.
+⚠️ **Aucune recommandation, aucune correction.** 🔴 **Elles rapportent
+ce que les fichiers disent** ; quoi en faire est au Product Owner.
 
 ---
 
-## Mode opératoire
+# LES FICHIERS
 
-### Où vivent les fichiers
+| Fichier | Écrit par | Lu par |
+|---|---|---|
+| `spec-technique.md` · `desc-bug.md` | L'amont · **Diagnostiqueur** *(inv. 2)* | Cadreur *(en entier)*, Vérificateur et Détailleur *(les entrées citées)* |
+| `bug-list.md` | Product Owner, hors ligne | Diagnostiqueur *(inv. 2)*, Fusionneur *(amont)* |
+| `investigation/<id>.md` | Diagnostiqueur *(inv. 1)* | Diagnostiqueur *(inv. 2)* |
+| `code/decoupage.md` | **Cadreur** | Vérificateur, Détailleur, Arbitre, `/9_controle` |
+| `code/sequence.md` | **Vérificateur** | 🔴 **La commande**, le Détailleur, le Cadreur *(ses défauts)* |
+| `code/<lot>/fiche-executable.md` | **Détailleur** | Réalisateur, Relecteur, Contrôleur |
+| `code/<lot>/compte-rendu.md` | **Réalisateur** | Relecteur · **grepé** par le Détailleur du bloc suivant |
+| `code/<lot>/verdict.md` | **Relecteur** | 🔴 **La commande**, le Réalisateur *(sur FAIL)*, l'Arbitre *(son statut seul)* |
+| `code/<lot>/reprise_realisateur.md` | Réalisateur, en s'éteignant | Le Réalisateur suivant |
+| `code/redecoupage.md` | **Arbitre** | Cadreur, Vérificateur *(qui l'archive)* |
+| `code/controle/<groupe>.md` | Contrôleur *(inv. 1)* | Contrôleur *(inv. 2)* |
+| `code/rapport-controle.md` | Contrôleur *(inv. 2)* | Product Owner |
+| `architecte/<demandeur>.md` | Cadreur · Détailleur · Réalisateur · Arbitre — **`## Verdict` par l'Architecte** | Architecte *(inv. 3)*, leur auteur |
+| `docs/TECHNICAL_CONVENTIONS.md` | **Architecte, seul** | Cadreur, Détailleur, Réalisateur, Relecteur, Arbitre — 🔴 **en entier** |
+| `docs/CURRENT_TECHNICAL_STATE.md` | **Réalisateur** | Détailleur, Réalisateur, Diagnostiqueur |
+| `tracabilite-full.md` | 🔴 **La commande `/9_controle`** | Le script de groupement |
+| `audit-blocages.md` · `audit-conventions.md` | 🔴 **L'orchestrateur** | Lui-même, passe après passe |
+| `blocked_<agent>.md` | L'agent · **Product Owner** pour la `## Decision` · **Arbitre** pour deux d'entre eux | L'agent, l'Arbitre, la commande *(cette ligne seule)* |
+| `stop.md` | Product Owner, à la main | 🔴 **La commande, depuis le checkout principal** |
 
-**Le même dossier que l'amont** : `docs/features/<nom>/`, dans un
-sous-dossier `code/`.
+📌 **Deux fichiers pilotent la boucle** : 🔴 **la séquence dit quel lot
+vient**, **le verdict dit s'il est passé.** ⚠️ **Tout le reste est lu
+par un agent ; ces deux-là sont lus par la commande.**
 
-    spec-technique.md         ← entrée, produite en amont
-    desc-produit.md           ← lu par le Contrôleur, produit en amont
+## Ce que l'état technique fait de particulier
 
-    code/
-      decoupage.md            Cadreur
-      sequence.md             Vérificateur
-      rapport-controle.md     Contrôleur
-      blocked_<agent>.md      Cadreur, Vérificateur, Contrôleur
+🔴 **Il est vivant** — le seul fichier de la chaîne aval qu'un agent
+réécrit lot après lot. 📌 **Il décrit ce qui existe, jamais l'histoire
+de ce qui a existé** : ⚠️ **ce qu'un lot a rendu faux disparaît.**
 
-      lot-01/
-        fiche-executable.md   Détailleur
-        compte-rendu.md       Réalisateur
-        verdict.md            Relecteur
-        blocked_<agent>.md    Détailleur, Réalisateur, Relecteur
+🔴 **Deux de ses sections se lisent en entier, le reste se grepe** —
+📌 **les pièges généraux et l'état mort** : ⚠️ **on ne peut pas greper
+une règle dont on ignore qu'elle s'applique à soi**, et c'est pour ça
+que ce sont des sections et non des entrées.
 
-📌 **Un dossier par lot** — ses trois fichiers vivent ensemble, et un
-lot se lit d'un coup d'œil.
+📌 **Un piège change une signature** pour le Détailleur, **et la façon
+d'écrire** pour le Réalisateur.
 
-🔴 **La reprise en découle** : le prochain lot est le premier de la
-séquence dont le dossier n'a pas de `verdict.md` en PASS.
-
-🔴 **Noms fixes** — c'est ce qui permet aux commandes de n'avoir qu'un
-seul argument : le nom de la feature.
-
-    /8_code panneau-calories 3
-
-### Trois commandes
-
-Chacune porte son propre mode — comme `/start_creating`.
-
-### `/7_decoupe <feature>`
-
-**Cadreur → Vérificateur**, jusqu'à zéro défaut constaté.
-
-🔴 **Trois tours maximum.** Un défaut signalé renvoie au Cadreur avec
-la liste des défauts ; au troisième tour sans convergence,
-l'orchestrateur **écrit `code/blocked_verificateur.md`** et s'arrête.
-
-📌 **Un rapport en console se perd, un fichier non.** Le Cadreur le
-relit à son tour suivant : une `## Decision` remplie est une
-instruction de découpage.
-
-**Sortie** : la séquence et les blocs. 📌 **C'est la pause naturelle** —
-tout est décidé, rien n'est codé.
-
-### `/8_code <feature> [N]`
-
-**Par défaut, un lot.** `N` en demande davantage.
-
-⚠️ **Le compteur porte sur les lots relus PASS**, pas sur les
-invocations : le Détailleur passe quand un bloc neuf commence, sans
-entrer dans le décompte.
-
-**Reprise** — 🔴 **le prochain lot est le premier de la séquence sans
-verdict PASS.** Une lecture, pas un scan : la séquence porte l'ordre et
-les blocs.
-
-**La boucle, par lot** :
-
-1. Si le bloc du lot n'a pas de fiches → **Détailleur** sur ce bloc
-2. **Réalisateur** → **Relecteur**
-3. FAIL → Réalisateur neuf, avec le verdict. 🔴 **Trois reprises
-   maximum** par lot, tous types de FAIL confondus
-4. ⚠️ **Si le verdict nomme des lots affectés par une divergence** →
-   Détailleur sur le bloc, pour réécrire leurs fiches seulement
-5. Lot suivant
-
-**Quand tous les lots ont un PASS** → **Contrôleur**, puis arrêt.
-
-### `/9_controle <feature>`
-
-**Le Contrôleur seul.** 📌 `/8_code` le lance déjà quand le dernier lot
-passe ; cette commande sert à le relancer — après que les fiches ont
-changé, après que ses propres règles ont changé, ou pour comparer deux
-états.
-
-🔴 **Il n'écrase jamais un rapport existant** : il écrit le numéro
-libre suivant à côté. ⚠️ **Et il n'ouvre jamais les précédents** — leur
-contenu lui dirait ce qu'une exécution antérieure a conclu, et il
-cesserait de chercher.
-
-### Où il s'arrête et rend la main
-
-🔴 **Un `blocked_*.md`**, quel qu'il soit — 📌 **à deux endroits** :
-`code/blocked_<agent>.md` pour le Cadreur, le Vérificateur et le
-Contrôleur, `code/<lot>/blocked_<agent>.md` pour les trois autres.
-
-🔴 **Le Vérificateur signale un défaut au troisième tour** — le
-découpage ne converge pas.
-
-🔴 **Un lot échoue trois fois.**
-
-🔴 **`N` lots ont été relus PASS.**
-
-🔴 **Le Contrôleur a fini** — le rapport d'écarts est à lire.
-
-⚠️ **Sinon il ne s'arrête jamais.** Un FAIL isolé, un bloc terminé, une
-correction qui passe : il continue.
-
-### Où une pause est impossible
-
-📌 **Une pause n'est sûre que là où un artefact est complet.**
-
-| Entre | Pourquoi non |
-|---|---|
-| Détailleur et Réalisateur, dans un bloc | Le Détailleur produit toutes les fiches du bloc en une invocation |
-| Réalisateur et Relecteur | Le code existe, non relu — l'état est indéterminé |
-| Une correction et sa relecture | Le lot n'a ni PASS ni FAIL |
+⚠️ **Ce document commande le Cadreur** : c'est contre lui qu'un lot est
+déclaré production ou modification.
 
 ---
 
-## Les trois cas d'entrée
+# LES MÉCANIQUES PROPRES À L'AVAL
 
-📌 **La chaîne aval ne voit qu'un document technique.** L'origine — une
-feature neuve, une évolution, une correction — se décide en amont et ne
-compte plus ici.
+*📌 **La forme des fichiers de blocage, l'écriture d'une sortie même
+vide, les chemins relatifs en worktree et l'enveloppe git des commandes
+vivent dans `PROCESS_AMONT.md`.** Ce qui suit est ce que l'aval y
+ajoute.*
 
-| Cas | Ce qu'il produit en aval |
-|---|---|
-| **Feature neuve** | Surtout des productions |
-| **Évolution** | Un mélange de productions et de modifications |
-| **Correction** | Presque uniquement des modifications |
+## Le blocage passe d'abord par l'Arbitre
 
-🔴 **Un seul mécanisme les couvre** : un lot déclare ce qu'il produit
-*et* ce qu'il modifie, et le Relecteur vérifie l'existence des
-premières, la nouvelle signature des secondes.
+🔴 **Un Détailleur ou un Réalisateur qui bloque ne s'arrête pas là** :
+📌 **il écrit son fichier, appelle l'Arbitre, et attend.** ⚠️ **Un
+blocage qui atteint la commande y est déjà passé.**
 
-⚠️ **Rien d'autre ne change.** Pas de mode, pas de branche — la
-différence est de proportion, pas de nature.
+📌 **Les autres agents n'ont pas ce recours** : 🔴 **ce sur quoi le
+Cadreur et le Vérificateur bloquent est mécanique**, et 🔴 **un blocage
+du Relecteur ou du Contrôleur dit que quelque chose manque** — l'agent
+qui le devait doit retourner.
+
+## Une décision peut renvoyer au découpage
+
+🔴 **C'est la seule issue qui traverse toute la chaîne à rebours.**
+📌 **L'Arbitre écrit ce que le découpage doit permettre** — ⚠️ **la
+contrainte, jamais la solution.**
+
+🔴 **Le champ qui compte est le dernier, et c'est celui qu'on rate** :
+📌 **nommer ce qui doit devenir possible, jamais comment couper pour
+l'obtenir.**
+
+## Les demandes de convention, quatre demandeurs
+
+🔴 **Quatre agents en écrivent** — le Cadreur, le Détailleur, le
+Réalisateur, l'Arbitre. 📌 **Tous décrivent ce qui leur manque, jamais
+la règle elle-même** : ⚠️ **ils ne savent pas si c'en est une**,
+l'Architecte le sait.
+
+🔴 **Trois d'entre eux ne bloquent jamais dessus** : le Détailleur et le
+Réalisateur écrivent la demande et continuent contre les conventions
+telles qu'elles sont. 📌 **Le Cadreur est l'exception** : ⚠️ **une
+convention qui interdit ce qu'un lot exige l'arrête**, et il écrit
+alors **deux fichiers** — le blocage, et la demande à côté. 🔴 **C'est
+leur présence conjointe que la commande lit** pour savoir s'il faut
+passer par l'Architecte ou rendre la main.
+
+⚠️ **Le Cadreur ne contourne jamais** — 📌 **ni en coupant le lot
+autrement, ni en déclarant moins que ce qu'il exige.** 🔴 **Les
+conventions ont été écrites avant le découpage, et le découpage est ce
+qui montre ce qu'elles ont manqué.**
+
+## Une demande laisse une trace dans ce que son auteur écrit
+
+🔴 **Le Cadreur la nomme dans son découpage, le Détailleur dans sa
+fiche, le Réalisateur dans son compte rendu.** ⚠️ **Sans ça, une
+demande écrite en passant est invisible** : 📌 **le Détailleur ne laisse
+aucun rapport, et ce champ est sa seule trace.**
+
+## La reprise d'un Réalisateur éteint
+
+🔴 **Quand la décision revient vide, il écrit `reprise_realisateur.md`
+et s'arrête.** 📌 **Un Réalisateur neuf reprendra le lot avec sa fiche,
+le fichier de blocage une fois rempli, et ce fichier.** ⚠️ **Il n'a rien
+de son contexte** — ce fichier est tout ce qu'il obtient.
+
+🔴 **Le champ qui compte est *En chantier*** — ⚠️ **du code à moitié
+écrit et non nommé est du code que le suivant découvre au build.**
+
+📌 **Il commite ce qui compile avant de s'arrêter** — 🔴 **jamais ce qui
+ne compile pas** — et dit dans ce champ ce qu'il a laissé non commité.
+
+⚠️ **Rien de tout ça quand la décision renvoie au découpage** :
+🔴 **le lot va changer de forme**, et une reprise décrirait un lot qui
+n'existe plus.
 
 ---
 
-## Questions ouvertes
+# CONTRADICTIONS RELEVÉES
 
-🟡 **Calibrer les tailles de bloc** — les valeurs par couche sont des
-estimations. 🔴 **Seule une investigation sur les logs d'agent peut
-les trancher** : tours, contexte réel, appels, cache contre
-chargement. ⚠️ **Un agent ne peut pas se mesurer lui-même** — il n'a
-aucun accès à son compteur.
+*Points où deux fichiers, ou un fichier avec lui-même, ne disent pas la
+même chose. Non tranchés ici.*
 
-🟡 **Poser le seuil de passage à Opus** sur le code — non fixé,
-à déterminer sur les premiers FAIL structurels qualifiés par le
-Relecteur.
+🟡 **Renommer ou supprimer un fichier de blocage appliqué.** Cinq
+agents — Vérificateur, Détailleur, Réalisateur, Relecteur, Contrôleur —
+disent **les deux dans le même fichier** : *« applique-la, puis renomme
+en `blocked_<agent>-NN.md` »*, puis, quelques lignes plus bas,
+*« 🔴 supprime le fichier une fois appliqué »*. 🔴 **Le Cadreur dit
+l'inverse explicitement** : *« renommer est ce qui le clôt — ne le
+supprime jamais »*. ⚠️ **Les fichiers numérotés sont décrits partout
+comme l'archive de ce sur quoi le cycle a déjà bloqué, que l'exécution
+suivante lit** — ce qui ne tient que si on renomme.
+
+🟡 **Ce que `/7_lots` écrase.** La commande annonce qu'elle **produit
+toujours un découpage** et qu'un `code/decoupage.md` existant est
+écrasé — *« la commande est le déclencheur, jamais l'état du
+dossier »*, la seule exception nommée étant un `code/redecoupage.md`.
+🔴 **Le Cadreur, lui, traite une reprise à froid sur des défauts** :
+*« ne corrige que les lots nommés »*, et **les dix gestes ne sont pas
+rejoués.** ⚠️ **Deux comportements pour un même appel.**
+
+🟡 **Comment `/8_code` invoque le Contrôleur.** Elle écrit *« quand tous
+les lots portent un PASS → `controleur`, puis stop »*, **une invocation,
+sans groupe.** 🔴 **Le Contrôleur exige que le prompt nomme ses blocs et
+ses fiches** — *« ni l'un ni l'autre n'est déduit »* — et son invocation
+1 est une passe par groupe, suivie d'un assemblage. 📌 **La machinerie
+qui construit ces groupes vit dans `/9_controle`** : la carte
+bloc → lots, puis le script de groupement. ⚠️ **`/8_code` n'en porte
+rien.**
+
+📌 **Un point vérifié, et il tient** : les modèles annoncés par
+`.claude/CLAUDE.md` — neuf agents en `opus`, dont `arbitre`, `cadreur`,
+`detailleur` et `verificateur` pour l'aval — correspondent exactement
+aux frontmatters, et aux modèles que `/7_lots` et `/8_code` passent.
