@@ -7,7 +7,11 @@ argument-hint: "<feature folder name> [N]"
 Act as the orchestrator, in **downstream coding mode**.
 
 **This command runs `detailleur`, `realisateur` and `relecteur` lot by
-lot, then `controleur` when every lot has passed.**
+lot.**
+
+📌 **It never invokes the Contrôleur** — 🔴 **he needs his blocks and
+his sheets named in the prompt**, and the grouping that names them
+lives in `/9_controle`.
 
 **The first argument is mandatory**: the feature folder name. Without
 it, ask for it and stop.
@@ -125,24 +129,17 @@ requests wait for the next run, on the block they belong to.
 📌 **No request, or every verdict filled** — carry on without invoking
 anything.
 
-**When every lot of the sequence carries a PASS** → **`controleur`**,
-then stop.
+**When every lot of the sequence carries a PASS** → **stop, and say
+so.**
 
-🔴 **Only on a feature cycle.** On a bug-fix cycle — the working folder
-carries `desc-bug.md` — **skip him and stop**: he compares the product
-file to the sheets, and there is no product file here.
+📌 **On a feature cycle, say that `/9_controle` is what comes next** —
+🔴 **run by hand.** ⚠️ **On a bug-fix cycle — the working folder carries
+`desc-bug.md` — nothing comes next**: the Contrôleur compares the
+product file to the sheets, and there is none here.
 
-🔴 **Every lot of the sequence, not every lot of this run.** `N` lots
-coded with two still pending means no Contrôleur — he compares the
-product file to *all* the sheets, and a missing one would make him
-report an intention as absent.
-
-📌 **When `N` happens to cover the last lots**, he runs before you hand
-back: reaching `N` and finishing the sequence are the same moment.
-
-🔴 **A `stop.md` on the last lot stops before him.** ⚠️ **He reads
-every sheet at once**, and a run halted mid-sequence has none to
-compare — re-running `/8_code` with no lot left invokes him.
+⚠️ **Every lot of the sequence, not every lot of this run.** 📌 **`N`
+lots coded with two still pending is not a finished sequence** — say
+how many remain.
 
 ⚠️ **The count is on lots reviewed PASS**, not on invocations: the
 Détailleur runs when a new block starts, without entering the count.

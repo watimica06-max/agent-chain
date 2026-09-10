@@ -167,6 +167,10 @@ file.
 ⚠️ **Anything left at the unnumbered name reads as a block still
 standing**, and the next run treats it as one.
 
+⚠️ **Renaming is what closes it** — 🔴 **never delete it.** 📌 **The
+numbered ones are the record of what this feature has already been
+blocked on**, and the next run reads them.
+
 **How you apply it, at invocation 1** — **to your own gap**, then run
 moves 1 to 5 as usual. 📌 **A decision naming another gap is not
 yours to apply.**

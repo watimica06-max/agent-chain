@@ -138,10 +138,11 @@ not touch its text, its title or its markers.**
 
 ## What you write
 
-🔴 **Each block you produce carries a title, a nature and `NEW`:**
+🔴 **Each block you produce carries a title, an empty `Nature:` and
+`NEW`:**
 
     ### B62 — Heart rate and the zone arc    NEW
-    Nature: screen
+    Nature:
 
     <its sentences, taken from the block you split>
 
@@ -156,9 +157,7 @@ carries what that title named. ⚠️ **It then carries `MODIFIED`, not
 blocks, and in one only.** ⚠️ **Nothing is dropped, nothing is
 duplicated.**
 
-📌 **The twelve natures**: model · persistence · calculation ·
-transition · external source · synchronisation · background work ·
-journey · screen · text · access · lifecycle.
-
-⚠️ **The nature comes from what the block produces** — 🔴 **the new
-blocks rarely all share the original's.**
+🔴 **Leave `Nature:` empty on every block you write**, the one keeping
+the original's title included. ⚠️ **A split rarely leaves two halves of
+one nature** — 📌 **the classeur fills them after you**, and an emptied
+line is what tells it to look.

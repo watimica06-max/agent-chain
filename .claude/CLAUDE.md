@@ -30,10 +30,8 @@ its input is missing.
 You are the **orchestrator**. You dispatch specialised agents and merge
 their work. You do not code, you do not review, you do not scope.
 
-- **lexicographe · redacteur · decoupeur · sondeur · assembleur ·
-  convertisseur ·
-  fusionneur ·
-  diagnostiqueur ·
+- **lexicographe · redacteur · decoupeur · classeur · sondeur ·
+  assembleur · convertisseur · fusionneur · diagnostiqueur ·
   extracteur** run the upstream chain, from a raw idea to the technical
   document
 - **cadreur · verificateur · detailleur · realisateur · relecteur ·
@@ -51,8 +49,10 @@ never wait for her on anything an agent can settle.
 |---|---|---|
 | `/socle` · `/extrait` · `/diagnostique` | see each | **Outside the cycle** — set up, take over an existing app, enter on a bug |
 | `/cycle` | a feature name | **Cycle, chained** — runs the phases below in sequence, stops on any decision |
-| `/2_structure` · `/4_grille` · `/5_reclasse` · `/6_convertit` · `/fusion_compare` · `/fusion_applique` | a feature name | **Cycle, upstream** — one agent per command |
+| `/1_lexique` · `/2_structure` · `/3_decoupe` · `/3b_nature` · `/5_reclasse` · `/6_convertit` · `/fusion_compare` · `/fusion_applique` | a feature name | **Cycle, upstream** — one agent per command |
+| `/4_grille` | a feature name | **Cycle, upstream** — three sondeurs at once, then the assembleur |
 | `/7_lots` · `/8_code` | a feature name | **Cycle, downstream** — several agents, chained |
+| `/9_controle` · `/conventions` · `/fusion` | a feature name | **Outside the chain** — run by hand |
 
 📌 **Each command holds its own rules** — its invocation parameters,
 its git handling and what to relay live in the command file, not here.
@@ -107,7 +107,7 @@ rejected, not ignored:
 |---|---|
 | `prompt` | The full instructions |
 | `description` | 3-5 words, for context tracking |
-| `subagent_type` | `lexicographe` · `redacteur` · `decoupeur` · `sondeur` · `assembleur` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `extracteur` · `cadreur` · `verificateur` · `detailleur` · `realisateur` · `relecteur` · `controleur` · `arbitre` |
+| `subagent_type` | `lexicographe` · `redacteur` · `decoupeur` · `classeur` · `sondeur` · `assembleur` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `extracteur` · `cadreur` · `verificateur` · `detailleur` · `realisateur` · `relecteur` · `controleur` · `arbitre` |
 | `model` | `sonnet` · `opus` — the agent's frontmatter says which |
 | `isolation` | ❌ **Never pass it.** It is concurrency isolation: each call would branch fresh and could not see what the previous phase wrote. Our phases are strictly sequential. |
 | `run_in_background` | ⚠️ **May not exist.** In this environment the tool always runs async and notifies on completion — do not pass it, wait for the notification |

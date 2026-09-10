@@ -57,14 +57,19 @@ domain.
 marker:**
 
     ### B7 — Rejecting invalid durations    MODIFIED
-    Nature: external source
+    Nature:
+
+🔴 **You write `Nature:` empty, always** — 📌 **the classeur fills it,
+after the decoupeur.** ⚠️ **The line is never omitted**: an absent line
+and a forgotten one read the same, and the classeur greps for the empty
+ones.
+
+⚠️ **A block already carrying a nature keeps it** — 📌 **you never
+empty a line the classeur filled**, unless the block's marker sends it
+back.
 
     An entry whose duration is negative or over 24 hours is ignored: it
     appears nowhere and produces no message.
-
-**The natures**: model · persistence · calculation · transition ·
-external source · synchronisation · background work · journey ·
-screen · text · access · lifecycle.
 
 **The two markers:**
 
@@ -338,12 +343,11 @@ output?**
 📌 **No near title, nothing to load** — create one.
 
 **3. File.** One block per subject, under the title found or created,
-🔴 **with the nature its output gives it** — one of the twelve listed
-under *What you write*. A block producing something displayed is
-`screen`, even when an event fires it; a block producing anything else
-takes the nature of what it produces.
+🔴 **with an empty `Nature:` line.**
 
-📌 **The trigger separates subjects, the output names their nature.**
+📌 **The classeur fills it**, after the decoupeur has split what needs
+splitting — ⚠️ **a block that gets split rarely keeps the nature it
+came with.**
 
 🔴 **And a different output separates too, on a shared trigger.** An
 exception tacked onto a rule — *"except when…"* — often produces
@@ -440,20 +444,20 @@ different trigger, or a different output, is another subject.
 |---|---|
 | Same trigger, same output | It merges into the block, as a sentence |
 | Same trigger and output, and it contradicts a sentence | It **replaces** that sentence, never sits beside it |
-| A different trigger, or a different output | 🔴 **It becomes a block of its own**, with the nature its output gives it |
+| A different trigger, or a different output | 🔴 **It becomes a block of its own**, with an empty `Nature:` |
 | It says the block already holds several | 🔴 **Split it** — one block per trigger |
 
 ⚠️ **The question's identifier says where the answer applies, not
 where it lives.** An answer to a question about B7 becomes its own
-block when its nature differs.
+block when its trigger or its output differs.
 
 **b. Split when the answer says to.**
 
 1. The original keeps its number and the subject its title names
 2. The new blocks take the next free numbers
-3. 🔴 **Each block gets the nature its own output gives it** — never
-   the original's by default. A subject split off because its trigger
-   differs rarely shares the nature it came from
+3. 🔴 **Each block gets an empty `Nature:`**, the original included —
+   ⚠️ a split rarely leaves two halves of one nature, and the classeur
+   fills them after you
 4. 🔴 **Grep the original's number across the product file** and load
    every block citing it — the split moved what they point at. Update
    each to name the block that now holds the subject.

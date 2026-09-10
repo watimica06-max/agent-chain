@@ -369,6 +369,10 @@ file.
 ⚠️ **Anything left at the unnumbered name reads as a block still
 standing**, and the next run treats it as one.
 
+⚠️ **Renaming is what closes it** — 🔴 **never delete it.** 📌 **The
+numbered ones are the record of what this feature has already been
+blocked on**, and the next run reads them.
+
 **How you apply it** — **to the element `## Where` names**, then carry
 on filing or producing from there.
 
@@ -396,8 +400,12 @@ other way round.
 Diagnostiqueur. It records what was ruled out, it holds no product
 content. Skip it.
 
-**The twelve natures, in this order — by what a block of that nature
-produces:**
+🔴 **Each block carries its nature on its `Nature:` line**, written by
+the classeur. 📌 **Read it; do not derive it again** — ⚠️ **the grid
+asked that block the questions of that nature**, and a second opinion
+here would close it against questions nobody asked.
+
+**The twelve, in the order the technical document takes them:**
 
 | Nature | It produces |
 |---|---|

@@ -39,9 +39,19 @@ the feature folder and nothing else.
 
 ## How it runs
 
-🔴 **This command always produces a split.** An existing
-`code/decoupage.md` or `code/sequence.md` is overwritten — **the
-command is the trigger, never the state of the folder.**
+🔴 **This command always produces a split** — 📌 **the command is the
+trigger, never the state of the folder.**
+
+⚠️ **What the Cadreur does with an existing one depends on what sits
+beside it**, and it is not yours to decide:
+
+| On disk | What it does |
+|---|---|
+| Nothing | A first split — the whole document |
+| `code/sequence.md` carrying `## Defects` | 🔴 **Corrects only the lots those defects name** — the rest stays |
+| `code/redecoupage.md` | 🔴 **Re-splits what coding sent back** — see below |
+
+📌 **Pass the feature folder; it reads the folder itself.**
 
 ⚠️ **Never restore a deleted file from git history.** A missing split
 means the Product Owner wants a new one; diagnosing why it went

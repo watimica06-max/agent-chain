@@ -283,6 +283,10 @@ file.
 ⚠️ **Anything left at the unnumbered name reads as a block still
 standing**, and the next run treats it as one.
 
+⚠️ **Renaming is what closes it** — 🔴 **never delete it.** 📌 **The
+numbered ones are the record of what this feature has already been
+blocked on**, and the next run reads them.
+
 ⚠️ **When the Arbitre called you, there is no blocking file to find** —
 📌 **it never writes one for you**, and you never wrote one at
 invocation 3.

@@ -430,6 +430,10 @@ file.
 ⚠️ **Anything left at the unnumbered name reads as a block still
 standing**, and the next run treats it as one.
 
+⚠️ **Renaming is what closes it** — 🔴 **never delete it.** 📌 **The
+numbered ones are the record of what this feature has already been
+blocked on**, and the next run reads them.
+
 **How you apply it** — **to the lot `## Where` names**, then 🔴 **walk
 the whole block as usual** before writing any sheet. ⚠️ **A settled
 block does not tell you the others hold.**
