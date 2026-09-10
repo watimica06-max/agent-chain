@@ -186,8 +186,9 @@ l'index et pas seulement les sections chargées. 🔴 **Un titre proche est
 un doute, et un doute se lève par une lecture** : même déclencheur, même
 sortie ?
 
-**Ranger.** 📌 **Le déclencheur sépare les sujets, la sortie nomme leur
-nature.**
+**Ranger.** 📌 **Le déclencheur sépare les sujets** — un bloc par sujet,
+sous le titre trouvé ou créé. 🔴 **Avec une ligne `Nature:` vide** :
+📌 **c'est le Classeur qui la remplit**, après le Découpeur.
 
 **Signaler ce qu'il ne comprend pas**, en place, dans le bloc :
 `**Clarification needed:**` — 🔴 **et jamais parce qu'il détecte un
@@ -205,9 +206,9 @@ resondé** — c'est ce que les sondeurs et le Découpeur grepent.
 
 **Intégrer, c'est se demander de chaque réponse où elle va** —
 🔴 **l'identifiant de la question dit où elle s'applique, pas où elle
-vit.** Une réponse à une question sur B7 devient un bloc à elle si sa
-nature diffère. **Même test qu'au geste 1** : même déclencheur, même
-sortie ?
+vit.** Une réponse à une question sur B7 devient un bloc à elle si son
+déclencheur ou sa sortie diffère. **Même test qu'au geste 1** : même
+déclencheur, même sortie ?
 
 🔴 **La réponse qui contredit une phrase la remplace**, elle ne s'assied
 pas à côté.
@@ -239,7 +240,7 @@ autre moitié aurait levées. **Le trou disparaît sans que personne le
 voie.**
 
 **Ce qui le déclenche** — une invocation, entre `/2_structure` et
-`/4_grille`, **à chaque tour**. Sur les blocs `NEW` et `MODIFIED`, ou
+`/3b_nature`, **à chaque tour**. Sur les blocs `NEW` et `MODIFIED`, ou
 sur tous au premier tour.
 
 🔴 **Une ligne `**Clarification needed:**` dans un bloc nommé
@@ -263,9 +264,70 @@ référence, un catalogue de valeurs.
 phrase, ni en ajouter une, ni en supprimer une, ni fusionner deux blocs.
 🔴 **Chaque phrase du bloc découpé atterrit dans un bloc et un seul.**
 
-📌 **Pourquoi si étroit** : c'est le seul agent qui touche au fichier
-produit sans être le Rédacteur. **Lui laisser reformuler, c'est deux
-plumes sur un document dont la fusion se fait phrase à phrase.**
+🔴 **Il laisse `Nature:` vide sur chaque bloc qu'il écrit**, celui qui
+garde le titre d'origine compris. ⚠️ **Un découpage laisse rarement deux
+moitiés d'une seule nature** — 📌 **et une ligne vidée est ce qui dit au
+Classeur de regarder.**
+
+📌 **Pourquoi si étroit** : c'est l'un des trois agents qui touchent au
+fichier produit, et le seul qui en déplace le texte. **Lui laisser
+reformuler, c'est deux plumes sur un document dont la fusion se fait
+phrase à phrase.**
+
+---
+
+## Le Classeur
+
+**À quoi il sert** — 📌 **La nature d'un bloc décide deux choses en
+aval.** 🔴 **Quelles questions la grille lui pose** — on ne demande pas à
+un bloc `screen` ce qu'on demande à un bloc `persistence`. 🔴 **Et quelle
+section du document technique le porte** — autrement dit, quelle couche
+du code.
+
+⚠️ **Une nature fausse ne se rattrape pas plus loin.** 📌 **La grille
+ferme le bloc sur les mauvaises questions**, et la fermeture se lit comme
+propre.
+
+🔴 **Pourquoi il existe** : **le Rédacteur choisissait la nature sur
+douze mots, le Convertisseur la re-dérivait sur douze définitions** —
+⚠️ **ils divergeaient, et personne ne le voyait.** 📌 **Un seul juge
+maintenant**, et le Convertisseur lit la ligne au lieu de la dériver.
+
+**Ce qui le déclenche** — une invocation, entre `/3_decoupe` et
+`/4_grille`, **à chaque tour.** 🔴 **Sur les blocs dont la ligne
+`Nature:` est vide, et sur ceux marqués `MODIFIED`.**
+
+📌 **C'est la ligne vide qui rend ça greppable** — 🔴 **le Rédacteur et
+le Découpeur écrivent `Nature:` sans rien après, jamais ne l'omettent.**
+⚠️ **Une ligne absente et une ligne oubliée se liraient pareil.**
+
+**La règle** — 🔴 **la nature d'un bloc est ce qu'il produit, jamais ce
+qui le déclenche.** 📌 **Un bloc qui produit un affichage est `screen`**,
+même déclenché par un événement ; **une règle déclenchée par un capteur
+prend la nature de ce qu'elle calcule.**
+
+⚠️ **Un cas d'échec ne nomme pas une nature** — 📌 **une lecture locale
+échoue aussi** : ce qui fait qu'un bloc est `external source` est d'où
+la donnée vient.
+
+🔴 **Une nature par bloc, toujours.** ⚠️ **Un bloc qui semble en vouloir
+deux a été mal découpé** — 📌 **il le dit plutôt que de choisir.**
+
+**Sur un bloc `MODIFIED` qui porte déjà une nature** — 🔴 **il repose la
+question et compare.** 📌 **Même réponse, il ne change rien** ;
+⚠️ **réponse différente, il écrit la nouvelle** — 🔴 **et ce bloc avait
+été fermé par la grille sur les mauvaises questions**, ce que son
+marqueur renvoie sonder.
+
+**La frontière** — 🔴 **Il écrit cette ligne, et rien d'autre.** Ni une
+phrase, ni un titre, ni un marqueur. 🔴 **Il ne découpe ni ne fusionne** :
+c'est le Découpeur. 🔴 **Il ne remplit pas une ligne déjà remplie**, sauf
+sur un bloc `MODIFIED`.
+
+⚠️ **Hésiter n'est pas bloquer** : 📌 **un bloc dont il pèse la nature
+entre deux prend celle que sa sortie nomme**, et il dit lesquelles il a
+pesées. 🔴 **Il bloque quand aucune nature ne convient** — 📌 **ce qui
+veut dire que le bloc porte deux sujets, ou aucun.**
 
 ---
 
@@ -399,6 +461,12 @@ Elle vit dans `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`, en deux
 parties — l'une à la fermeture, l'autre à la production. ⚠️ **À ne pas
 confondre avec la grille de cadrage produit**, que les sondeurs
 déroulent et qu'il n'ouvre jamais.
+
+🔴 **Il lit la nature sur la ligne `Nature:` du bloc, il ne la re-dérive
+jamais.** 📌 **Le Classeur l'a posée** — ⚠️ **et la grille a posé au bloc
+les questions de cette nature** : un second avis ici fermerait le bloc
+contre des questions que personne n'a posées. 📌 **Les douze lui servent
+dans l'ordre où le document technique les prend.**
 
 **Pourquoi l'invocation 1 supprime le document technique** — 🔴 **le
 fichier produit a bougé depuis qu'il a été écrit.** Le laisser
@@ -709,7 +777,7 @@ domaines déjà là ne sont pas les siens.
 
 | Opus | Sonnet |
 |---|---|
-| lexicographe · decoupeur · sondeur · convertisseur · architecte | redacteur · assembleur · fusionneur · extracteur |
+| lexicographe · decoupeur · sondeur · convertisseur · architecte | redacteur · classeur · assembleur · fusionneur · extracteur |
 
 📌 **Cinq portent `effort: high`** — redacteur, convertisseur,
 fusionneur, architecte, extracteur. ⚠️ **Aucune commande ne le passe** —
@@ -801,6 +869,7 @@ se lisent pareil.**
 | `/1_lexique` | lexicographe | `lexique.md` · `questions-lexicographe-NN.md` · `idees.md` tranché |
 | `/2_structure` | redacteur | `desc-produit.md` |
 | `/3_decoupe` | decoupeur | `desc-produit.md`, blocs découpés |
+| `/3b_nature` | classeur | `desc-produit.md`, natures posées |
 | `/4_grille` | sondeur ×3, puis assembleur | `questions-sondeur-NN.md` |
 | `/5_reclasse` | convertisseur, inv. 1 | `questions-convertisseur-NN.md` |
 | `/6_convertit` | convertisseur, inv. 2 | `spec-technique.md` · `tracabilite.md` |
@@ -870,6 +939,27 @@ le fichier produit.
 **Elle compte, elle ne vérifie pas** — 🔴 **jamais lire un bloc pour
 contrôler le travail.** 📌 **Les sondeurs sondent ce qu'il a produit ;
 c'est ça qui attrape un mauvais découpage.**
+
+## `/3b_nature` — décide s'il y a quelque chose à classer
+
+**Deux greps, et l'union de ce qu'ils rendent** : 🔴 **`-B1 '^Nature:$'`
+pour les blocs dont la nature est vide** — la ligne au-dessus de chaque
+trouvaille porte le bloc — **et `MODIFIED` pour ceux dont la nature a pu
+bouger avec eux.**
+
+📌 **Ni l'un ni l'autre ne rend rien** → 🔴 **elle n'invoque pas.** ⚠️
+**Elle le dit**, et passe à `/4_grille`.
+
+📌 **Un bloc à nature remplie et sans marqueur a été classé à un tour
+précédent**, et rien à son sujet n'a bougé depuis.
+
+🔴 **Elle compte en sortie** : `-c '^Nature:$'` doit rendre zéro —
+⚠️ **autre chose veut dire qu'un bloc est resté non classé**, et elle dit
+lequel.
+
+🔴 **Pourquoi c'est la commande** : 📌 **le Classeur ne grepe pas**, on
+lui nomme ses blocs. ⚠️ **Et c'est la commande qui voit si le compte est
+retombé à zéro** — l'agent ne relit pas son propre travail.
 
 ## `/4_grille` — décide les trois ordres et ce qui clôt la boucle
 
@@ -1006,11 +1096,11 @@ merge aussi** : le Product Owner doit le voir.
     /1_lexique  ⇄  questions            (invocations 1 et 2)
          │ vide
          ↓
-    /2_structure ──→ /3_decoupe ──→ /4_grille
-         ↑                                │
-         │                                ├─ des questions ─→ /1_lexique (3 puis 4)
-         │←───────────────────────────────┘                        │
-         │                                                          ↓
+    /2_structure ──→ /3_decoupe ──→ /3b_nature ──→ /4_grille
+         ↑                                              │
+         │                              des questions ──┤──→ /1_lexique (3 puis 4)
+         │←─────────────────────────────────────────────┘            │
+         │                                                            ↓
          │                                              (retour à /2_structure)
          │
          └── /4_grille vide ──→ /5_reclasse ──→ /6_convertit ──→ /conventions ──→ aval
@@ -1026,7 +1116,8 @@ merge aussi** : le Product Owner doit le voir.
 | `/1_lexique` 4 a tourné | `/2_structure` — 🔴 les réponses de la grille sont tranchées |
 | `/2_structure` a signalé une clarification | 🔴 **Répondre, puis `/2_structure`** — rien en aval ne tourne tant qu'un signalement tient |
 | `/2_structure` a écrit le fichier produit | `/3_decoupe` |
-| `/3_decoupe` a tourné | `/4_grille`, qu'il ait découpé ou non |
+| `/3_decoupe` a tourné | `/3b_nature`, qu'il ait découpé ou non |
+| `/3b_nature` a tourné, ou n'a rien eu à classer | `/4_grille` — 🔴 la grille pose à un bloc les questions de sa nature, et un bloc sans nature ne s'en verrait poser aucune |
 | `/4_grille` a levé des questions | 🔴 **Répondre, puis `/1_lexique`** — il tranche le vocabulaire que ces réponses apportent, avant que le Rédacteur les lise |
 | `/4_grille` est vide | `/5_reclasse` — le fichier produit est fermé |
 
@@ -1060,7 +1151,7 @@ fasse apparaître un nouveau problème est normal, pas un échec.**
 |---|---|---|
 | `idees.md` | Product Owner, hors ligne · **Lexicographe** pour les termes tranchés | Lexicographe, Rédacteur *(inv. 1)* |
 | `lexique.md` | Lexicographe | Lexicographe, Rédacteur |
-| `desc-produit.md` | **Rédacteur** · Découpeur *(découpes seules)* | Sondeur, Convertisseur, Fusionneur, Architecte |
+| `desc-produit.md` | **Rédacteur** · Découpeur *(découpes seules)* · Classeur *(la ligne `Nature:` seule)* | Sondeur, Convertisseur, Fusionneur, Architecte |
 | `cadrage-produit/par-bloc.md` · `par-question.md` · `par-nature.md` | Les trois sondeurs | Assembleur |
 | `cadrage-produit/questions.md` | Assembleur | La commande `/4_grille`, qui le recopie |
 | `questions-<agent>-NN.md` | L'agent émetteur · **Product Owner** pour les réponses | Son émetteur, le Rédacteur |
@@ -1218,22 +1309,29 @@ le fait qu'elle existe.
 *Points où deux fichiers ne disent pas la même chose. Non tranchés
 ici.*
 
-📌 **Cinq entrées ont été retirées**, corrigées dans les fichiers : le
+📌 **Six entrées ont été retirées**, tranchées dans les fichiers : le
 modèle du Rédacteur, la forme de la ligne `Block:`, les invocations que
-`/1_lexique` sait nommer, ce que `/fusion` enchaîne, et ce que
-`.claude/CLAUDE.md` dit des modèles.
+`/1_lexique` sait nommer, ce que `/fusion` enchaîne, ce que
+`.claude/CLAUDE.md` dit des modèles, et `desc-par-nature.md` —
+📌 **le Classeur pose la nature, le reclassement par nature reste au
+Convertisseur, et le fichier ne revient pas.**
 
-🟡 **`desc-par-nature.md` — en cours d'arbitrage.** `/2_structure` le
-supprime quand un `NEW` apparaît, **et aucun agent amont ne l'écrit** :
-il n'est nommé que par `/2_structure` et `cycle.md`. ⚠️ **Même entrée,
-même arbitrage** : l'invocation 1 du Convertisseur s'appelle *Closing*
-dans l'agent et *« Reclassifying »* dans `/5_reclasse`, et n'écrit aucun
-fichier de classement.
+🟡 **La route longue du Convertisseur ne passe pas par `/3b_nature`.**
+Son aller-retour dit qu'un `NEW` apparu renvoie à
+`/4_grille` → `/5_reclasse` → `/6_convertit`. 🔴 **Mais un bloc neuf
+porte une ligne `Nature:` vide** — ⚠️ **et la grille pose à un bloc les
+questions de sa nature.** 📌 **Sans classement, elle ne lui en pose
+aucune**, et le bloc traverse le tour fermé sur rien.
 
-🟡 **Ce que `.claude/CLAUDE.md` dit de la grille de cadrage** — 📌 **la
-moitié survivante d'une entrée dont l'autre moitié est corrigée.** Il
-annonce que le Rédacteur charge `GRILLE_CADRAGE_PRODUIT.md` par son
-nom ; 🔴 **le Rédacteur s'interdit d'ouvrir quoi que ce soit dans
+🟡 **Ce que `.claude/CLAUDE.md` dit de la grille de cadrage.** Il annonce
+que le Rédacteur charge `GRILLE_CADRAGE_PRODUIT.md` par son nom ;
+🔴 **le Rédacteur s'interdit d'ouvrir quoi que ce soit dans
 `docs/process/`**, et la grille que les sondeurs déroulent est
 `GRILLE_CADRAGE_PRODUIT_V2.md`. ⚠️ **Les deux fichiers coexistent dans
 `docs/process/`**, et seul le second est celui que la chaîne lit.
+
+🟡 **Deux résidus de l'arbitrage tranché**, et c'est sa mise en œuvre qui
+n'a pas suivi, non la décision. 📌 **`/2_structure` supprime toujours
+`desc-par-nature.md`** quand un `NEW` apparaît, et aucun agent ne
+l'écrit. 📌 **Et l'invocation 1 du Convertisseur s'appelle toujours
+*Closing* dans l'agent**, *« Reclassifying »* dans `/5_reclasse`.
