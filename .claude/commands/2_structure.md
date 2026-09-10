@@ -62,7 +62,7 @@ which questions are waiting.
 ```
 Agent(
   subagent_type="redacteur",
-  model="opus",
+  model="sonnet",
   description="Structure <name>",
   prompt="Feature folder: docs/features/<name>/.
           Invocation <1 — Structuring, or 2 — Integrating>.

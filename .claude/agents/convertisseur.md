@@ -174,7 +174,7 @@ advances once per invocation, never per question.
 restarts at Q1 in each file:
 
     ### Q1
-    Block: B7 — Rejecting invalid durations
+    Block: B7
     Question: what happens to an entry whose duration is zero?
     Answer:
 

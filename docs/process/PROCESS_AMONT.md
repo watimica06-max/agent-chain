@@ -5,14 +5,8 @@
 > aval, décrit dans `PROCESS_AVAL.md`.
 >
 > 🔴 **Aucun agent ne lit ce document.** Il dit pourquoi les agents sont
-> construits comme ils le sont — les décisions, pas leurs gestes.
-> ⚠️ **Il ne recopie ni un agent ni une commande** : ceux-là vivent dans
-> `.claude/agents/` et `.claude/commands/`, et les redire ici les ferait
-> diverger.
->
-> **Le test** : quelqu'un qui a ce document et pas les agents doit
-> pouvoir les réécrire, parce qu'il comprend ce que chaque règle
-> empêche.
+> construits comme ils le sont, y compris des règles envisagées puis
+> écartées.
 
 ---
 
@@ -28,1231 +22,1585 @@ précise que par les réponses qu'elle obtient. Ce n'est pas un défaut à
 corriger, c'est la nature du travail. Mais ça interdit d'appliquer tel
 quel le principe d'enchaînement silencieux de l'aval.
 
-📌 **D'où la forme de tout l'amont** : une boucle de fichiers de
-questions, remplis à la main, hors session, sur le temps du Product
-Owner.
+---
+
+## Les agents
+
+*Chacun est détaillé plus bas, "Les agents en détail".*
+
+### 1. Analyste
+
+**Recueille l'idée du Product Owner et produit le fichier descriptif de
+la fonctionnalité.** Deux invocations : structuration — qui traite
+aussi les réponses — et recherche des angles morts.
+
+**Connaît le document produit global** — sans lui, il demanderait *"que
+doit contenir cet écran ?"* là où la vraie question est *"l'écran
+existe, qu'est-ce que tu changes ?"*.
+
+⚠️ **Aucun dialogue** — le Product Owner écrit hors ligne, l'Analyste
+transcrit. Le cycle peut s'étaler sur plusieurs jours.
+
+### 2. Convertisseur
+
+📌 **Il applique `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — neuf
+fermetures en deux parties : nature et cohérence sur le fichier
+produit, puis traçabilité, rien perdu, unicité, accord entre entrées,
+liens déclarés, ressources et complétude sur le document technique.
+🔴 **La grille porte les tests, l'agent porte les gestes.**
+
+**Ferme le fichier produit sous l'angle technique, puis produit le
+document technique** pour le Cadreur. Deux invocations, séparées par un
+ping-pong de questions avec l'Analyste.
+
+📌 **Deux, pas une** : la première signale et attend tes réponses, la
+seconde traduit une fois le ping-pong clos.
+
+### 3. Fusionneur
+
+**Fusionne le fichier produit dans le document global, et produit un
+rapport de fusion.** Deux invocations, séparées par un ping-pong de
+questions comme pour le Convertisseur.
+
+🔴 **Ce rapport est le seul travail manuel du Product Owner** de toute
+la chaîne.
 
 ---
 
-## Le principe qui tient toute la chaîne
+### 4. Diagnostiqueur — cycle bug fix
 
-🔴 **Un agent ne regarde jamais le dossier.** On lui nomme le fichier
-qu'il lit, l'invocation qu'il est, les blocs qu'il traite. **La
-commande a regardé ; lui ne regarde pas une seconde fois.**
+**Confirme chaque écart dans le code** et produit `desc-bug.md`, le
+document technique d'un cycle de correction. **Deux invocations** :
+une investigation par écart, puis un assemblage.
 
-**Trois défaillances que ça empêche :**
+📌 **Il n'intervient que sur une correction de défaut** — voir "Les
+quatre points d'entrée".
 
-⚠️ **Un agent qui cherche ouvre ce qu'il ne doit pas lire.** La moitié
-des interdits de la chaîne portent sur des fichiers voisins — un
-fichier de questions d'un autre agent, `idees.md`, une version périmée
-du document technique.
-
-⚠️ **Un agent qui déduit son état d'un dossier se trompe de tour.**
-Quatre invocations du Lexicographe se distinguent par ce qui traîne à
-la racine ; c'est le rangement fait par les commandes qui les sépare,
-et lui n'a aucun moyen de le savoir.
-
-⚠️ **Un agent dont le dossier cible manque ne s'arrête pas — il
-cherche.** Il liste, il tente un chemin absolu, il écrit à côté.
-📌 **La commande crée le dossier avant d'invoquer**, et rien de tout ça
-n'arrive.
-
-🔴 **Corollaire** : ce que les commandes décident est aussi structurant
-que ce que les agents font. Les deux sont documentés ici.
+🔴 **Le cycle de correction ne repasse pas par la chaîne amont.** Le
+produit dit déjà ce qui est attendu ; une correction n'y ajoute rien.
+**`/diagnostique` → `/7_decoupe` → `/8_code`.**
 
 ---
 
-# LES AGENTS
+### 5. Extracteur — reprise d'une application existante
 
-*Neuf agents. Chacun existe parce qu'un agent voisin ne peut pas faire
-son travail sans se contredire.*
+**Construit le document global depuis le code**, quand il n'existe pas.
+Une invocation par domaine.
+
+📌 **Il n'intervient qu'une fois**, à la reprise d'un projet déjà codé.
 
 ---
 
-## Le Lexicographe
+## Les fichiers
 
-**À quoi il sert** — 📌 **Le Product Owner écrit librement, et c'est
-tout l'intérêt.** 🔴 **Une même chose y prend plusieurs noms** : un mot
-anglais et un français, un terme et son abréviation, un mot pour deux
-choses.
-
-⚠️ **Rien en aval ne rattrape ça.** Le Rédacteur transcrit fidèlement —
-🔴 **il porte l'ambiguïté dans soixante blocs**, et tous les agents
-suivants en héritent. **Le Lexicographe la lève à la source, dans le
-fichier d'idées lui-même.**
-
-📌 **C'est le seul agent qui écrit dans `idees.md`.**
-
-**Ce qui le déclenche** — 🔴 **Quatre invocations, deux boucles.**
-
-| # | Ce qu'elle fait | Quand |
+| Fichier | Écrit par | Lu par |
 |---|---|---|
-| 1 | Balaye les termes, lève les paires | Avant le fichier produit |
-| 2 | Applique les réponses, écrit `lexique.md` | idem |
-| 3 | Surveille les réponses de la grille | À chaque tour de grille |
-| 4 | Corrige ces réponses, complète le lexique | idem |
+| **Fichier d'idées** | Product Owner, hors ligne | Analyste |
+| **`bug-list.md`** *(bug fix)* | Product Owner, hors ligne | Diagnostiqueur |
+| **Fichier produit d'une fonctionnalité** | Analyste | Analyste, Convertisseur, Fusionneur |
+| **Fichier de bugs** *(bug fix)* | Diagnostiqueur | Cadreur *(process aval)* |
+| **Document produit global** | Fusionneur | Analyste, Product Owner |
+| **Document technique** | Convertisseur | Cadreur *(process aval)* |
+| **Plan de fusion** | Fusionneur, 1ʳᵉ invocation | Fusionneur, 2ᵉ invocation |
+| **Fichier de questions** | Convertisseur ou Fusionneur *(questions)*, Product Owner *(réponses)* | Son émetteur, Analyste, Product Owner |
+| **Rapport de fusion** | Fusionneur | Product Owner |
+| **Grille de cadrage produit** | Khatya, hors chaîne | Analyste, 2ᵉ invocation |
+| **Grille de fermeture technique** | Khatya, hors chaîne | Convertisseur, les deux invocations |
 
-    1 → questions → répondu → 2 → 1 → …          avant le produit
-    3 → questions → répondu → 4                  à chaque tour
+📌 **Le fichier d'idées n'a aucun format** — c'est le seul de la chaîne.
+Le structurer est le travail de l'Analyste.
 
-⚠️ **Un fichier de questions vide clôt l'une ou l'autre.**
+**Noms sur disque et emplacement** : voir "Mode opératoire".
 
-🔴 **1 et 2 ne tournent plus une fois `desc-produit.md` écrit.** 📌 Un
-terme changé alors laisserait soixante blocs portant l'ancien.
+📌 **Les deux premiers partagent la même structure** — décrite ci-après
+une seule fois. C'est ce qui rend la fusion mécanique au niveau
+structurel. Le troisième est d'une autre nature : structuré par couche
+technique.
 
-**Pourquoi 3 et 4 existent** — 🔴 **Les réponses du Product Owner
-portent des mots que personne n'a balayés.** Deux balayages sur ces
-réponses seules :
+### Le fichier d'idées
 
-📌 **Un terme retiré** — un grep sur `lexique.md` le trouve. ⚠️ **Ce
-n'est pas une question** : la décision est prise, l'invocation 4
-remplace.
+**Écrit par** le Product Owner, hors ligne. **Lu par** l'Analyste.
 
-📌 **Un synonyme neuf** — un mot que le lexique ne porte nulle part,
-désignant une chose qu'il porte déjà. 🔴 **C'est celui-là qui coûte** :
-aucun grep ne l'attrape, et il entre dans le fichier produit comme
-second nom d'une seule chose.
+🔴 **Aucun format, aucune règle de prose, écrit en français** — c'est
+tout l'intérêt. Le structurer et le traduire est le travail de
+l'Analyste.
 
-**Deux natures de mot, deux règles**
+📌 **C'est le seul document français de la chaîne.**
 
-| | Écrit | Ce qu'il devient |
-|---|---|---|
-| **Un texte affiché** | Entre guillemets, dans sa langue | Reste tel quel, partout |
-| **Un concept** | Sans guillemets | 🔴 **En anglais**, dès le fichier produit |
+**Aucune limite de volume non plus.** Un domaine riche produit un
+fichier riche : plusieurs centaines de lignes couvrant un seul domaine
+est un cas normal, pas un signal de mauvais découpage.
 
-⚠️ **Un même mot peut être les deux** — le bouton *« Démarrer »* et le
-concept *race start*. **Deux entrées, pas une.**
+📌 **Le seul critère est celui du domaine** : *ce que la feature fait,
+en une phrase, sans « et »*. Si elle en demande deux, ce sont deux
+cycles.
 
-**Ce que porte `lexique.md`** — deux sections, `## Tranché` et
-`## Non tranché`. 🔴 **Les termes retirés y sont écrits sous celui qui
-tient** — ⚠️ **c'est ce qui rend le grep de l'invocation 3 possible.**
-Les jeter les rendrait invisibles.
+**Structure suggérée, non imposée** : écrire par sujet plutôt qu'en flux
+continu — un paragraphe par écran, par règle, par mécanisme. L'Analyste
+décompose de toute façon, mais il se trompera moins.
 
-🔴 **Un terme tranché sans rival y va aussi** : le tour suivant grepe ce
-fichier, et ce qui n'y est pas n'existe pas.
+### Les deux fichiers produit
 
-**La frontière** — 🔴 **Il propose une lecture, jamais un terme.**
-📌 Trois lectures sont possibles — *deux noms d'une chose*, *deux choses
-distinctes*, *une abréviation locale* — et dire laquelle il voit est
-tout son travail. **Le vocabulaire appartient au Product Owner.**
+**Produits par** l'Analyste —
+*(fichier d'une fonctionnalité)* et le Fusionneur *(document global)*.
+**Lus par** tous les agents amont et le Product Owner.
 
-🔴 **Il n'ouvre jamais le fichier produit**, à aucune invocation. 📌 Ce
-qu'il dit est tranché ; ce qu'une réponse dit ne l'est pas.
+| Bloc | Contenu |
+|---|---|
+| Arborescence | Application, puis domaines |
+| Sections | Un sujet produit — écran, fonctionnalité, mécanisme |
+| Blocs | Un sujet chacun, avec son identifiant et sa nature |
+
+**Prose courte et descriptive, structure fixe et greppable.**
+
+🔴 **Structure identique pour les deux** — sinon la fusion devrait
+traduire, et ce serait le seul travail de la chaîne que personne ne
+relit.
+
+#### L'arborescence : application, domaines
+
+**Application** — ce qui ne dépend d'aucune fonctionnalité :
+authentification, langues, thème, politique de confidentialité.
+
+**Domaines** — un par ensemble fonctionnel cohérent, chacun avec ses
+sections.
+
+**Critère de création d'un domaine** : un ensemble dont on peut dire ce
+qu'il fait en une phrase, sans « et ».
+
+🔴 **Convention de niveaux, fixe** — c'est elle qui rend l'index
+greppable :
+
+    # Application            une fois, en tête du fichier
+    # Domaine : <nom>        un par domaine
+    ## <Section>
+    ### <Bloc>
+
+📌 **`#` pour l'application comme pour les domaines** : l'application
+n'est pas leur parent, c'est un pair qui porte le transverse. **L'index
+s'extrait sur `^#`** — les quatre niveaux d'un coup, ou `^##` pour les
+seules sections.
+
+**Aucun ordre imposé entre les sections d'un domaine.** Le document se
+lit par l'index, pas linéairement.
+
+⚠️ **Pas de troisième niveau**, même sur un domaine volumineux.
+
+🔴 **Un ensemble à cheval sur plusieurs domaines est un domaine**, qui
+consomme les autres — un tableau de bord n'appartient pas aux domaines
+qu'il affiche.
+
+📌 **Dans le fichier d'une fonctionnalité**, seuls les domaines touchés
+apparaissent — jamais l'arborescence complète.
+
+#### La structure interne
+
+**Une section regroupe ce qui parle du même sujet produit** — un écran,
+une fonctionnalité, un mécanisme.
+
+**Un bloc = un sujet.** Un comportement, une règle, un paramètre, un
+écran. Si un bloc parle de deux choses, on le sépare en deux blocs.
+
+🔴 **La séparation vient du produit, jamais de la technique.** La
+nature se pose ensuite.
+
+**Chaque bloc porte un identifiant et une nature**
+
+    ### B7 — Rejecting invalid durations
+    Nature: external source
+
+    An entry whose duration is negative or over 24 hours is ignored: it
+    appears nowhere and produces no message.
+
+**Le numéro est local au fichier d'une fonctionnalité**, attribué à
+l'écriture et jamais réattribué — il sert au fichier de questions à
+désigner un bloc précis, et à rien d'autre.
+
+🔴 **Il ne passe jamais dans le global.** Le Fusionneur ne le reprend
+pas : dans le global, un bloc n'a que son titre. Sinon deux features
+livreraient chacune leur `B7`.
+
+📌 **C'est le titre qui porte l'identité durable**, repris du document
+global quand le bloc y existe déjà — voir ci-dessous.
+
+**Les natures possibles** sont celles des douze sections du document
+technique : model · persistence · calculation · transition ·
+external source · synchronisation · background work · journey ·
+screen · text · access · lifecycle.
+
+⚠️ **Un bloc de plusieurs natures porte deux sujets** — le séparer.
+🔴 **Si c'est ambigu, l'Analyste pose la question**, autant
+de fois qu'il le faut. Jamais deux natures sur un bloc.
+
+#### Les règles d'écriture des fichiers produit
+
+**La prose**
+
+🔴 **Présent de l'indicatif, voix active.** *« L'écran affiche… »* —
+jamais *« il faudra afficher »* ni *« l'écran devrait »*.
+
+🔴 **Une phrase = une règle.** C'est ce qui rend la fusion phrase à
+phrase possible.
+
+**Interdits** : le futur, le conditionnel, l'impératif, le vocabulaire
+du changement — « nouveau », « désormais », « au lieu de ». ⚠️ **Et la
+justification** : une règle qui a besoin d'être expliquée doit être
+reformulée.
+
+**Nommer les choses comme l'utilisateur les voit**, jamais par les
+identifiants du code.
+
+🔴 **Tout s'écrit en anglais**, comme partout dans la chaîne d'agents.
+⚠️ **Sauf les libellés cités** : un texte affiché se décrit dans sa
+langue d'affichage.
+
+📌 **Le fichier d'idées est le seul document français** — le Product
+Owner l'écrit, l'Analyste traduit en structurant. Il traduit de même
+les réponses du fichier de questions.
+
+📌 **Quatre agents écrivent dans ces fichiers** — Analyste,
+Diagnostiqueur, Extracteur, Fusionneur. Sans règle explicite, quatre
+styles, et la fusion phrase à phrase ne reconnaîtrait plus les mêmes
+règles.
+
+**Créer une section**
+
+**Un titre nomme ce dont la section parle**, tel qu'un humain le
+désignerait — *« Écran d'ajout d'activité »*, pas *« Ajout »* ni un nom
+de classe.
+
+🔴 **Chercher avant de créer.** Un titre proche mais différent crée un
+doublon que rien ne rattrapera.
+
+**Créer quand aucune section existante ne traite ce sujet** — pas
+quand le sujet est nouveau dans la feature.
+
+**Créer un domaine**
+
+🔴 **Même critère que partout** : un ensemble dont on dit ce qu'il fait
+en une phrase, sans « et ».
+
+⚠️ **C'est rare.** Une section nouvelle se range presque toujours dans
+un domaine existant ; créer un domaine suppose que la feature
+introduise un ensemble fonctionnel entier.
+
+📌 **En cas de doute, ranger dans l'existant** — un domaine de trop
+fragmente le global durablement.
+
+**Les titres sont repris du document global**
+
+🔴 **Avant de créer une section, l'Analyste consulte le
+global.** Si une section traite déjà ce sujet, il **reprend son titre à
+l'identique**. Sinon, il en crée une.
+
+**Même mécanisme au niveau du bloc** : si le bloc révise une règle
+existante, il reprend le titre du bloc du global. Sinon, nouveau titre.
+
+⚠️ **S'il n'est pas sûr qu'une section existante corresponde, il
+demande.** Deux sections proches sous des noms différents produiraient
+deux entrées là où il n'y en a qu'une.
+
+**Ce que ça donne à la fusion** : titre connu → fusion dans l'entrée
+existante ; titre nouveau → insertion, rangée par cohérence — les
+écrans avec les écrans.
+
+🔴 **Deux niveaux d'identifiant, pas trois.** Un identifiant dit *où*
+fusionner, jamais *quoi remplacer à l'intérieur*.
+
+📌 **Le contenu se fusionne par compréhension** — c'est ce que le
+rapport de fusion soumet au Product Owner.
+
+**Les références sortantes sont marquées**
+
+Quand un bloc renvoie à autre chose — un écran, une donnée, un état,
+une règle — la destination est **nommée**, et 🔴 **marquée comme
+existante si elle est déjà dans le global** :
+
+> *« Le bouton Pas redirige vers l'écran de saisie des pas —
+> existant. »*
+
+📌 **C'est l'Analyste qui pose ce marqueur** : il est le seul
+à voir le global. Sans lui, le Convertisseur signalerait un faux
+manque, n'ayant aucun moyen de savoir que l'écran existe.
+
+⚠️ **Une référence à l'existant n'empêche pas sa révision dans le même
+fichier.** Le bloc renvoie à l'écran existant ; une autre section peut
+le réviser — les deux coexistent sans conflit.
+
+**Ce qui n'a pas à figurer**
+
+🔴 **Ce qui est hérité et inchangé ne se réécrit pas.** Si la politique
+de confidentialité, la rétention ou le consentement ne bougent pas, ils
+n'apparaissent pas dans le fichier d'une feature — le global les porte
+déjà.
+
+**Ils n'y figurent que s'ils changent** — et c'est alors une section à
+fusionner comme une autre.
+
+#### Comment le document global se lit
+
+🔴 **Par l'index, jamais en entier.** Extraire la liste des titres —
+domaines, sections, blocs — coûte un grep quel que soit le volume du
+fichier.
+
+**Tout agent qui le lit charge donc :**
+
+1. **L'index systématiquement** — quelques dizaines de lignes
+2. **Les seules sections dont il a besoin**, identifiées depuis l'index
+
+⚠️ **Un titre doit dire ce que sa section contient**, sinon l'index ne
+sert à rien. C'est le critère de qualité du global.
+
+📌 **Cette règle vaut pour les trois agents qui le lisent** — Analyste,
+Fusionneur, Diagnostiqueur. Elle rend la lecture indépendante de la
+taille du document.
+
+#### Ce qui est propre au document global
+
+**Il est vivant** — modifié fonctionnalité après fonctionnalité. Seul
+document du process à échapper au principe *« un fichier est écrit une
+fois »*. ⚠️ C'est le profil qui a produit trois fichiers devenus
+inexploitables : plusieurs écritures, sans contrôle systématique.
+
+🔴 **Il décrit l'état actuel, jamais l'historique.** Une entité révisée
+n'accumule pas ses versions : la description antérieure disparaît,
+remplacée par la nouvelle.
+
+🔴 **Il ne se révise pas pendant qu'un cycle aval tourne sur le même
+périmètre.** Une ancre posée par le Cadreur pointe vers un contenu qui
+peut être remplacé en cours de route — le référent disparaît sans
+laisser de trace.
+
+⚠️ **Non éprouvé** — une révision urgente peut survenir pendant un
+développement.
 
 ---
 
-## Le Rédacteur
+### `bug-list.md` — cycle bug fix
 
-**À quoi il sert** — Il transforme ce que le Product Owner écrit en
-fichier produit structuré. 🔴 **C'est le seul agent qui écrit
-`desc-produit.md`.**
+**Écrit par** le Product Owner, hors ligne, dans le dossier
+`bugfix-NN/` qu'il crée. **Lu par** le Diagnostiqueur.
 
-🔴 **Il ne converse jamais.** Le Product Owner écrit hors ligne et
-remplit les champs `Answer:` à la main. **Il transcrit, structure et
-traduit.**
+🔴 **Un écart par entrée, forme libre** — une phrase qui nomme ce qui
+ne va pas, et ce qui devrait être :
 
-🔴 **Il ne tranche jamais rien de produit.** Ce qui manque devient une
-question, pas une hypothèse.
+    - Le facteur de correction n'est jamais calculé. Il devrait
+      l'être à la fin de chaque kilomètre, et son résultat gardé sur
+      la course.
+    - L'écran de profil édite trois réglages ; le quatrième seuil de
+      zone n'a pas de handler.
 
-**Ce qui le déclenche** — deux invocations :
+📌 **Aucun vocabulaire fermé.** Ce qui compte est que chaque entrée
+nomme un comportement, pas un fichier.
 
-| # | Entrées | Sortie |
-|---|---|---|
-| 1 — Structurer | `idees.md` · `lexique.md` · l'index du global | Le fichier produit |
-| 2 — Intégrer | 🔴 **Le fichier de questions que le prompt nomme** · `lexique.md` · l'index du global | Le fichier produit, à jour |
+⚠️ **Sa source ne change rien** : constat à l'usage, ou intention
+absente relevée par le Contrôleur. **Ce qui entre dans le cycle est la
+décision du Product Owner.**
 
-📌 **L'invocation 2 sert tout fichier de questions rempli** — celui d'un
-sondeur, du Convertisseur, du Fusionneur, le sien. **Même travail quel
-que soit le demandeur.**
+---
 
-**Structurer, c'est quatre gestes** — 🔴 **et le premier porte tout le
-reste.**
+## Les fichiers de travail
 
-**Décomposer.** 🔴 **Ce que le Product Owner écrit est un flux, pas une
-liste.** Une phrase peut porter cinq sujets.
+*Produits en cours de chaîne, datés, jamais modifiés après leur
+dernière écriture — ils documentent ce que les agents ont compris et
+restent consultables pour du debug de process.*
 
-🔴 **Un sujet est un déclencheur et une sortie.** Deux déclencheurs, ou
-deux sorties, font deux sujets. ⚠️ **Lire ce qui déclenche, pas le
-sujet grammatical** — une phrase qui s'ouvre sur ce que l'utilisateur
-voit peut être déclenchée par un échec ou un minuteur.
+#### Le plan de fusion
+
+**Produit par** la première invocation du Fusionneur. **Lu par** la
+seconde, elle seule.
+
+| Bloc | Contenu |
+|---|---|
+| Décisions par phrase | Cinq verbes : `REPLACE` · `INSERT` · `KEEP` · `DELETE` · `PENDING` |
+| Phrases en attente | `PENDING`, avec l'identifiant de leur question |
+
+⚠️ **`DELETE` ne vient jamais du Fusionneur** — seulement d'une réponse
+confirmant qu'une règle ne tient plus.
+
+🔴 **Il ne réécrit rien** — il consigne des décisions, le texte reste
+dans le fichier produit et le global.
+
+#### Le fichier de questions
+
+**Produit par** le Convertisseur *(première invocation, ou seconde en
+cas de contradiction)* ou par le Fusionneur *(première invocation)*.
+**Répondu par** le Product Owner. **Lu par** son émetteur et
+l'Analyste.
+
+| Bloc | Contenu |
+|---|---|
+| Identifiant | Pour que la réponse revienne au bon endroit |
+| Bloc concerné | Son numéro et son titre |
+| Question | Ce qui manque, formulé |
+| Réponse | Vide à la création — **remplie à la main par le Product Owner**, en français |
+
+    ### Q3
+    Block: B7 — Rejecting invalid durations
+    Question: what happens to an entry whose duration is zero?
+    Answer:
+
+📌 **Questions en anglais, réponses en français** — l'Analyste traduit
+en intégrant.
+
+**Une question par entrée**, jamais groupées.
+
+**Prose** : la question formulée directement, sans préambule ni
+justification. 🔴 **C'est le seul fichier où un agent formule
+librement** — partout ailleurs il transcrit ou range.
+
+📌 **Quand il vient de l'invocation 2 de l'Analyste**, le fichier se
+termine par la liste des questions écartées. 🔴 **Elle reste là** : le
+fichier produit ne la porte pas.
+
+🔴 **L'Analyste marque chaque entrée qu'il a intégrée** —
+`[integrated: Bn]`, nommant le bloc où il a écrit. C'est ce qui permet
+à l'émetteur de vérifier la clôture sans comparer deux versions du
+fichier produit.
+
+🔴 **La réponse est consignée aux deux endroits** : ici, sous forme
+brute, et dans le bloc du fichier produit, intégrée en phrase
+descriptive. ⚠️ **Ce n'est pas une duplication qui peut diverger** —
+l'une nourrit l'autre, et le Convertisseur vérifie les deux.
+
+🔴 **Il ne propose jamais de réponse.** Formuler une hypothèse plausible
+reviendrait à trancher une décision produit.
+
+📌 **Une question disparaît quand sa réponse est consignée dans le
+fichier produit** — pas quand son champ *Réponse* est rempli.
+
+---
+
+### Les fichiers de blocage
+
+🔴 **Un agent qui ne peut pas produire écrit un fichier**, il ne se
+contente pas de le dire. Un message dans une réponse se perd ; un
+fichier reste.
+
+**Un nom par agent** — `blocked_analyste.md`, `blocked_convertisseur.md`,
+`blocked_fusionneur.md`, `blocked_diagnostiqueur.md`,
+`blocked_extracteur.md` — dans le dossier de la feature.
+
+| Bloc | Contenu |
+|---|---|
+| Ce qui bloque | Le fait constaté, pas son interprétation |
+| Où | Section, bloc, ou fichier concerné |
+| Ce qu'il faudrait pour reprendre | Une décision, une correction en amont, une donnée absente |
+
+⚠️ **Bloquer n'est pas signaler.** Un manque, une contradiction, une
+question : ça part dans le fichier de questions et le cycle continue.
+🔴 **On ne bloque que quand la production est impossible** — entrée
+absente, fichier attendu introuvable, prémisse fausse qui invalide tout
+le travail.
+
+📌 **Ne jamais bloquer par excès de prudence.** Le doute se signale, il
+ne bloque pas.
+
+### Écrire la sortie même vide
+
+🔴 **Un fichier de sortie s'écrit toujours, même sans contenu.** Un
+fichier de questions vide dit *« rien à signaler »* ; son absence dit
+*« l'agent n'a pas tourné »*. L'orchestrateur ne peut pas distinguer
+les deux autrement.
+
+---
+
+### Document technique
+
+**Produit par** le Convertisseur. **Lu par** le Cadreur.
+
+| Bloc | Contenu |
+|---|---|
+| Préambule | Ce qui cadre — jamais découpé en lots |
+| §1 à §12 | Le travail, par nature |
+
+**Structuré par nature de travail, pas par écran ni par
+fonctionnalité.** C'est ce qui permet au Cadreur de découper par
+couche sans décider d'architecture — il ne lit pas le code, il ne peut
+découper mécaniquement que si la spec sépare déjà les natures.
+
+**Sections numérotées**, stables : elles servent d'ancres aux lots. Un
+titre peut être renommé, un numéro non.
+
+#### La structure interne
+
+🔴 **Le préambule cadre, les sections décrivent le travail.** Un
+contenu qui ne produit aucun lot n'est pas une section.
+
+**Préambule — jamais découpé en lots**
+
+| Contenu | Ce que le Cadreur en fait |
+|---|---|
+| Intention du domaine, en une phrase | Critère pour trancher un doute |
+| Vocabulaire | Lève les ambiguïtés de lecture |
+| Hors périmètre explicite | L'empêche de découper ce qui n'est pas demandé |
+| Règles d'interface valables partout | Contraignent chaque lot d'écran, sans être un lot |
+| Dépendances vers d'autres domaines | Alimentent les besoins déclarés |
+
+**Sections — chacune produit des lots**
+
+| Section | Contenu |
+|---|---|
+| §1 Model | Entités, champs, contraintes, relations |
+| §2 Persistence | Stockage, index, migrations de schéma |
+| §3 Calculation | Règles avec entrées et sortie, ordre de résolution entre règles |
+| §4 Transition | Changements de statut, sur quel événement |
+| §5 External source | Imports, API, capteurs, permissions, hors ligne |
+| §6 Synchronisation | Entre appareils, avec un serveur, résolution de conflits |
+| §7 Background work | Tâches planifiées, notifications, événements système |
+| §8 Journey | Séquences d'écrans, branches, conditions de passage |
+| §9 Screen | Contenu, états, interactions, navigation |
+| §10 Text | Libellés, messages, langues |
+| §11 Access | Qui voit et fait quoi, rôles, partage |
+| §12 Lifecycle | Compte, export, suppression, consentements |
+
+📌 **Une section vide est une information**, pas un oubli : elle dit au
+Cadreur qu'il n'y a rien à faire de cette nature. On part de la liste
+complète et on laisse vide, jamais l'inverse.
+
+⚠️ **Sur une application entière**, une seule numérotation devient
+ingérable — plusieurs domaines produiraient cinquante règles en §3. La
+hiérarchie devient alors `§Activités.3`, `§Repas.3`.
+
+#### Les règles d'écriture du document technique
+
+**La prose**
+
+🔴 **Présent de l'indicatif, comme dans les fichiers produit — mais la
+précision prime sur la lisibilité.** Types, bornes, ordres explicites.
+
+🔴 **Une règle qui laisse un cas indéterminé n'est pas écrite.** C'est
+le critère : le Cadreur et le Détailleur doivent pouvoir en tirer un
+lot sans rien décider.
+
+⚠️ **Ici on nomme techniquement**, pas comme l'utilisateur voit les
+choses — c'est l'inverse des fichiers produit.
+
+**Une règle vit dans une seule section**
+
+🔴 **Jamais de duplication entre sections — on référence.** Une règle
+répétée à deux endroits diverge tôt ou tard.
+
+🔴 **Et toute dépendance se déclare, même sans duplication.** Une
+section qui a besoin d'une autre pour fonctionner la référence : la
+donnée qu'elle lit, le calcul dont elle affiche le résultat, la clé de
+texte qu'elle utilise, l'entité qu'elle persiste.
+
+⚠️ **C'est ce qui donne l'ordre d'exécution.** Un écran qui affiche une
+valeur calculée n'a aucune raison de recopier la règle — donc la seule
+interdiction de duplication ne déclencherait rien, et le Cadreur
+coderait l'écran avant son calcul.
+
+📌 **Effet secondaire** : une section qui ne dépend de rien et dont
+rien ne dépend est suspecte — isolée à tort, ou dépendances non
+déclarées. Le Vérificateur le voit mécaniquement.
+
+**La section propriétaire est celle qui répond à "d'où vient ce
+comportement", pas "où il se voit".** Une règle de calcul appartient
+aux calculs même si elle produit un affichage. Une contrainte de champ
+appartient à la persistance même si elle se manifeste à la saisie.
+
+**Syntaxe** : le numéro de section entre parenthèses, à l'endroit où la
+règle est mentionnée — *« Créée par la règle de réconciliation
+(§3.2). »* Une seule forme, pour que le Cadreur les extraie
+mécaniquement.
+
+**Cas éprouvés :**
+- *Répartition calorique par repas* — vient d'une règle de calcul →
+  §3. Le modèle et l'écran référencent.
+- *Signaux passifs de capteurs* — viennent d'une source → §5. Le
+  calcul de seuil et la transition référencent.
+- *Bornes d'un champ* — viennent du modèle → §1. L'écran référence
+  pour afficher l'erreur.
+- *Décisions en attente* — l'entité vient de la règle qui la crée →
+  §3. Le modèle référence.
+- *Matrice d'interaction entre deux domaines* — appartient au domaine
+  qui **l'applique**, jamais à ceux qu'elle concerne. Sinon les deux
+  se référencent mutuellement et le Cadreur détecte un cycle.
+
+📌 **Les références sont le mécanisme d'ordonnancement.** Un lot
+d'affichage qui référence une section de calcul en dépend — c'est ce
+que le Cadreur utilise pour ordonner, pas une commodité de lecture.
+
+---
+
+### Le rapport de fusion
+
+**Produit par** le Fusionneur. **Lu par** le Product Owner.
+
+| Bloc | Contenu |
+|---|---|
+| Sections nouvelles | Créées de toutes pièces |
+| Sections fusionnées | Ce qui a été remplacé, ce qui a été conservé |
+| Sections supprimées | S'il y en a |
+| Sections inchangées | La liste — si une section attendue y figure, c'est un signal |
+
+🔴 **Le Product Owner ne relit pas la fusion entière** : le rapport lui
+dit où regarder. C'est le seul domaine où personne d'autre ne peut
+juger.
+
+📌 **Artefact ponctuel, daté, jamais modifié.** Un log au sens strict —
+relu par aucun agent, il ne fait partie d'aucune chaîne.
+
+**Prose** : une ligne par élément, pas de rédaction. Il est lu une fois
+par le Product Owner, jamais parsé.
+
+## Les agents en détail
+
+### L'Analyste
+
+**Une feature à la fois, de périmètre borné.** 🔴 Si le recueil produit
+deux domaines sans lien — au sens du critère : *ce qu'il fait en une
+phrase, sans « et »* — **il le signale** : ce sont deux features.
+
+#### Deux invocations
+
+🔴 **Une invocation par jeu d'entrées.** Des entrées différentes
+signifient un contexte propre — chacune se charge de ce dont elle a
+besoin, et de rien d'autre.
+
+| # | Invocation | Entrées | Sortie |
+|---|---|---|---|
+| 1 | Structuration | Le fichier d'idées **ou** le dernier fichier de questions · le document global | Le fichier produit |
+| 2 | Grille | Le fichier produit · la grille de cadrage · le document global · le dernier fichier de questions, **grepé seulement** | Le fichier de questions suivant |
+
+🔴 **Aucune ne dialogue.** Le Product Owner écrit son fichier d'idées
+hors ligne et remplit les champs *Réponse* à la main. L'Analyste
+transcrit et structure — il ne converse jamais.
+
+📌 **L'invocation 1 sert aussi les questions du Convertisseur et du
+Fusionneur** — mêmes entrées, même travail.
+
+#### Invocation 1 — Structuration
+
+**Entrées** : le fichier d'idées du Product Owner — 🔴 **format
+totalement libre**, c'est tout l'intérêt · le document global, pour
+reprendre les titres existants. ⚠️ **Pas la grille** — elle n'intervient
+qu'en invocation 2.
+
+**Lecture du global** : l'index d'abord, puis les seules sections
+utiles — voir "Comment le document global se lit". 📌 **Le Product
+Owner peut nommer des sections** s'il sait déjà lesquelles sont
+touchées ; sinon l'agent les identifie depuis l'index.
+
+**Quatre gestes, dans cet ordre, sur chaque passage du fichier
+d'idées :**
+
+**1. Décomposer.** 🔴 **Ce que le Product Owner dit est un flux, pas une
+liste.** Une seule phrase peut contenir cinq sujets.
+
+🔴 **Un sujet est un déclencheur et une sortie.** Lire le passage en
+demandant : qu'est-ce qui déclenche ceci, et qu'est-ce que ça produit ?
+**Deux déclencheurs, ou deux sorties, font deux sujets.**
+
+⚠️ **Lire ce qui déclenche, pas le sujet grammatical.** Une phrase qui
+s'ouvre sur ce que l'utilisateur voit peut être déclenchée par un
+échec, un minuteur, ou un événement ailleurs.
 
 🔴 **La forme que le Product Owner donne à son idée n'est pas la forme
-de ses sujets.** ⚠️ **Une carte de navigation est le piège** : une seule
-forme, autant de sujets que de chemins — la transcrire d'un bloc
-enterre toutes les transitions sauf la première.
+de ses sujets.** Une phrase, une flèche, une ligne de tableau, un
+point de liste : **chacun se lit pour son propre déclencheur et sa
+propre sortie.**
 
-**Chercher le titre dans l'index du global**, par grep, sur tout
-l'index et pas seulement les sections chargées. 🔴 **Un titre proche est
-un doute, et un doute se lève par une lecture** : même déclencheur, même
-sortie ?
+⚠️ **Une carte de navigation est le piège** : une seule forme, autant
+de sujets que de chemins. **La transcrire d'un bloc enterre toutes les
+transitions sauf la première.**
 
-**Ranger.** 📌 **Le déclencheur sépare les sujets, la sortie nomme leur
-nature.**
+**2. Chercher le titre dans l'index du global.** 🔴 **Un grep, jamais
+une relecture.**
 
-**Signaler ce qu'il ne comprend pas**, en place, dans le bloc :
-`**Clarification needed:**` — 🔴 **et jamais parce qu'il détecte un
-trou.** Chercher les trous est le travail des sondeurs.
+🔴 **Un titre proche est un doute, et un doute se lève par une
+lecture.** Charger la section et lui appliquer le test du geste 1 :
+même déclencheur, même sortie ? **Oui** → le titre est repris.
+**Non** → il en crée un.
 
-**Les deux marqueurs** — 🔴 `NEW` sur tout bloc créé, `MODIFIED` sur
-tout bloc changé, ⚠️ **qu'une question l'ait nommé ou non.**
+⚠️ **Ce grep porte sur tous les titres de l'index**, pas seulement sur
+les sections chargées — c'est ce qui rattrape un conflit dans une
+section qu'on n'avait pas prévu de toucher.
 
-📌 **Ce ne sont pas la même chose** : un bloc neuf n'a jamais été fermé ;
-un bloc changé l'a été, contre un texte qui ne tient plus.
+**3. Ranger.** Un bloc par sujet, sous le titre trouvé ou créé, **avec
+la nature que sa sortie lui donne**.
 
-🔴 **Il efface tous les marqueurs avant d'écrire**, pour que seuls ceux
-du tour en cours restent. ⚠️ **Sans marqueur, le bloc ne sera jamais
-resondé** — c'est ce que les sondeurs et le Découpeur grepent.
+🔴 **Le déclencheur sépare les sujets, la sortie nomme leur nature.** Un
+bloc qui produit un affichage est `screen`, même déclenché par un
+événement ; un bloc qui produit autre chose prend la nature de ce qu'il
+produit.
 
-**Intégrer, c'est se demander de chaque réponse où elle va** —
-🔴 **l'identifiant de la question dit où elle s'applique, pas où elle
-vit.** Une réponse à une question sur B7 devient un bloc à elle si sa
-nature diffère. **Même test qu'au geste 1** : même déclencheur, même
-sortie ?
+🔴 **Une sortie différente sépare aussi, à déclencheur partagé.** Une
+exception greffée sur une règle — *« sauf quand… »* — produit souvent
+autre chose que la règle : c'est un bloc à part.
 
-🔴 **La réponse qui contredit une phrase la remplace**, elle ne s'assied
-pas à côté.
+📌 **Numérotation** : attribuée à l'écriture, jamais réattribuée — le
+fichier de questions désigne les blocs par leur numéro.
 
-📌 **Une réponse dont la question portait `Block: -` est là d'où vient
-le plus souvent un sujet neuf** — ⚠️ **elle a été posée de la
-fonctionnalité, et rien en elle ne dit où elle atterrit.**
+🔴 **Chaque bloc créé porte `NEW` sur sa ligne de titre.** L'invocation
+2 le grepe pour savoir lesquels fermer ; l'invocation 1 efface tous les
+marqueurs en premier geste, puis marque ce qu'elle crée.
 
-🔴 **Il marque chaque entrée intégrée** — `[integrated: B7]`, nommant
-tous les blocs où il a écrit. **En dernier**, une fois toutes les passes
-faites : un bloc créé en cours de route doit y figurer.
+**Quand il ne comprend pas** : 🔴 **il le signale sur place, jamais
+parce qu'il détecte un trou** — la grille n'intervient pas ici.
 
-**La frontière** — avec le Découpeur : 🔴 **il scinde ce qu'une réponse
-lui dit de scinder ; le Découpeur scinde ce qu'un bloc s'est révélé
-porter.** Avec les sondeurs : il signale en place ce qu'il ne comprend
-pas, eux cherchent ce que le document ne dit pas.
+**Le signalement vit dans le bloc concerné**, en fin de bloc :
+`**Clarification needed:** <ce qui est flou, et ce qu'il a transcrit>`.
+📌 **Il transcrit une lecture plutôt que de s'arrêter** — le bloc reste
+exploitable.
 
----
+**Cycle du marqueur** : l'invocation 2 le convertit en question avant
+même de dérouler la grille, l'invocation 1 le retire une fois la
+réponse intégrée, le Convertisseur vérifie qu'il n'en survit aucun.
 
-## Le Découpeur
+**Quand le Product Owner se contredit** : la dernière version
+s'applique, et **il signale ce qu'il a remplacé**. Jamais
+silencieusement.
 
-**À quoi il sert** — 📌 **Le Rédacteur écrit un bloc depuis un
-passage.** 🔴 **Un passage peut porter deux choses que rien ne déclenche
-pareil** — le bloc se lit alors comme un sujet quand il en porte deux.
+**Toujours en modification ciblée** : il ajoute le bloc concerné ou
+modifie celui qui change, jamais le fichier entier. Les titres de
+section et de bloc sont les ancres qui le permettent.
 
-⚠️ **Rien en aval ne le rattrape.** 📌 **Les sondeurs sondent le bloc
-comme un seul**, et ses propres réponses ferment les questions que son
-autre moitié aurait levées. **Le trou disparaît sans que personne le
-voie.**
+**Si le fichier d'idées couvre deux sujets sans lien** — au sens du
+critère : *ce qu'il fait en une phrase, sans « et »* — 🔴 **il s'arrête
+et écrit un fichier de blocage.** Deux features ne partagent pas un
+fichier produit.
 
-**Ce qui le déclenche** — une invocation, entre `/2_structure` et
-`/4_grille`, **à chaque tour**. Sur les blocs `NEW` et `MODIFIED`, ou
-sur tous au premier tour.
+**Sortie** : le fichier produit, au format. ⚠️ Incomplet à ce stade, et
+c'est normal.
 
-🔴 **Une ligne `**Clarification needed:**` dans un bloc nommé
-l'arrête** — ⚠️ ce bloc a été transcrit sur une lecture que personne n'a
-confirmée, et le découper figerait une forme qui va changer.
+#### Invocation 2 — Recherche des angles morts
 
-**La règle, une seule** — 🔴 **un bloc porte un déclencheur.**
+**Entrées** : le fichier produit · `docs/process/GRILLE_CADRAGE_PRODUIT.md`
+· le document global · le dernier fichier de questions, 🔴 **grepé,
+jamais lu** — son regard sur le fichier produit doit rester agnostique.
+⚠️ **Pas l'idée brute** — elle est déjà transcrite.
 
-📌 **Les valeurs que ce déclencheur peut prendre restent dedans** —
-⚠️ **un déclencheur qui distingue trois cas donne un bloc à trois cas,
-pas trois blocs.**
+**Sortie** : le fichier de questions, terminé par la liste des
+questions écartées :
 
-🔴 **Un autre déclencheur est un autre bloc.** ⚠️ **Deux données
-différentes sont deux déclencheurs**, même quand la question posée de
-chacune est la même.
+    ## Questions set aside
 
-📌 **Ce que rien ne déclenche est un bloc aussi** — une table de
-référence, un catalogue de valeurs.
+    - Synchronisation: no block of that nature
+    - Paid access: the feature touches no plan limit
 
-**La frontière** — 🔴 **Il déplace, il ne rédige pas.** Ni réécrire une
-phrase, ni en ajouter une, ni en supprimer une, ni fusionner deux blocs.
-🔴 **Chaque phrase du bloc découpé atterrit dans un bloc et un seul.**
+📌 **Par catégorie quand toute la catégorie l'est**, par question
+sinon. Une ligne chacune.
 
-📌 **Pourquoi si étroit** : c'est le seul agent qui touche au fichier
-produit sans être le Rédacteur. **Lui laisser reformuler, c'est deux
-plumes sur un document dont la fusion se fait phrase à phrase.**
+⚠️ **Elle ne touche pas au fichier produit** — les réponses arrivent en
+invocation 1.
 
----
+🔴 **Déclenchée par le Product Owner**, jamais de sa propre initiative.
 
-## Le Sondeur
+**Ce qu'il fait** : applique les parties 1, 2 et 5 de la grille aux
+blocs du fichier produit, puis la partie 4 une fois sur la feature.
 
-**À quoi il sert** — 📌 **Le fichier produit dit ce que
-l'application fait.** 🔴 **Ce qu'il ne dit pas, le code le décidera** —
-et personne ne saura qu'une décision a été prise.
+🔴 **Quels blocs** : tous au premier tour, **puis seulement ceux qu'une
+réponse a touchés ou créés.** Il les trouve par deux greps :
+`^Block:` dans le dernier fichier de questions, et `NEW` dans le
+fichier produit.
 
-**Il pose chaque question de la grille et écrit ce qui reste ouvert.**
+🔴 **Un grep, jamais un `Read`**, quelle que soit la taille du fichier
+de questions : son regard sur le fichier produit doit rester agnostique,
+et il cesse de l'être dès qu'une question entre dans son contexte.
 
-**Ce qui le déclenche** — 🔴 **Trois sondeurs en parallèle, sur le même
-document et la même grille, dans trois ordres de lecture différents** :
-bloc par bloc, question par question, nature par nature.
+📌 **`NEW` marque les blocs créés au tour précédent.** L'invocation 1
+efface tous les marqueurs en premier geste, puis marque ce qu'elle
+crée — d'un fichier d'idées, d'une scission, ou d'un sujet qu'aucun
+bloc ne couvrait.
 
-📌 **L'union de ce qu'ils lèvent est la sortie du tour** — ⚠️ **pas ce
-sur quoi ils s'accordent.**
+📌 **Un bloc qu'aucune réponse n'a touché a été fermé au tour
+précédent.** Le refermer serait un filet sous la grille : si elle
+laisse passer quelque chose, on corrige la grille, on ne la relance
+pas.
 
-🔴 **L'ordre de lecture est la seule chose qui les distingue**, et c'est
-la commande qui le nomme. ⚠️ **Un ordre dont l'un dérive est un ordre
-que personne n'a couvert.**
+🔴 **La grille génère les questions, elle ne les contient pas.** Il ne
+balaie pas une liste — il ferme chaque bloc et note ce qui ne se ferme
+pas.
 
-🔴 **Aucun ne lit la sortie d'un autre**, ni les questions d'un tour
-précédent. 📌 **Son regard sur le document doit rester agnostique** — il
-cesse de l'être dès qu'une question entre dans son contexte.
+| Issue | Ce qu'il en fait |
+|---|---|
+| Déjà répondue | Par le bloc lui-même, ou par le document global |
+| Trou | Posée au Product Owner |
+| Sans objet | Écartée — consignée en fin du fichier de questions |
 
-**Ce qu'il cherche** — 🔴 **un trou, et rien d'autre.** 📌 **Ce que le
-document ne dit pas et que le code devra décider.** ⚠️ **Pas une règle
-qu'il trouve étrange, pas une décision qu'il aurait prise autrement.**
+⚠️ **Seules les questions du bloc 4 peuvent être sans objet.** Les
+questions de fermeture s'appliquent toujours : un bloc a toujours un
+déclencheur, un effet et un état éteint, même si la réponse est
+« rien ».
 
-**Chaque question de la grille a trois issues :** le bloc la ferme —
-on passe ; le bloc la laisse ouverte — c'est un trou ; elle ne
-s'applique pas ici — on passe.
+**Comment il juge « sans objet »** : la question ne s'applique que si
+la feature touche ce qu'elle interroge. Une question de synchronisation
+est sans objet si aucun bloc ne porte cette nature.
 
-🔴 **Fermée veut dire que la réponse est là, dans les termes que la
-question demande** — ⚠️ **pas que le bloc traite le même sujet.**
-📌 **S'il faut interpréter pour la trouver, elle n'y est pas.**
+📌 **Le tri se fait donc sur les natures présentes dans le fichier**,
+pas sur une impression — c'est vérifiable.
 
-🔴 **En doute, il pose plutôt qu'il n'écarte** — 📌 une question écartée
-à tort ne revient jamais ; une question de trop coûte une ligne.
+🔴 **En cas de doute, il pose la question plutôt que d'écarter.** Une
+nature peut être absente parce qu'elle a été oubliée au recueil.
 
-**Quels blocs** — 🔴 **la passe A ne porte que sur les blocs que la
-commande nomme.** ⚠️ **Les passes B et C tournent en entier, à chaque
-tour** — 📌 **elles lisent le document tel qu'il est maintenant**, et ce
-qui a changé dans un bloc change ce qui se croise.
+**Comment il pose** : par groupes cohérents, un bloc de grille à la
+fois. Ni une par une, ni toutes d'un coup.
 
-**La frontière** — 🔴 **Il n'écrit jamais dans le fichier produit.**
-🔴 **Il ne ferme jamais un trou de passe A parce qu'un autre bloc y
-répond** — c'est le travail de la passe B, et d'elle seule.
+📌 **La grille est un outil de contrôle, pas un questionnaire.** Il
+arrive avec une liste de trous identifiés, jamais avec 150 questions.
 
-**La ligne `Block:`** — 🔴 **des identifiants seuls, séparés par des
-virgules.** ⚠️ **Un titre rend la ligne illisible à qui groupe par
-bloc.** 📌 **Plusieurs identifiants quand le trou est entre deux blocs**,
-`-` quand la question a été posée de la fonctionnalité.
+⚠️ **Itératif** : une réponse peut ouvrir un nouveau bloc de questions.
+Décider qu'une feature stocke des données ouvre tout le cycle de vie.
 
----
+**Critère d'arrêt de la boucle 2↔3** : toute question retenue a sa
+réponse dans le fichier produit — qu'elle vienne du recueil ou d'une
+question posée. 📌 **Vérifiable sur le fichier**, pas un jugement.
 
-## L'Assembleur
+#### Invocation 3 — Intégration des réponses
 
-**À quoi il sert** — 📌 **Trois lectures d'un même document lèvent le
-même trou sous deux formulations**, et le Product Owner y répondrait
-deux fois.
+*Déclenchée par un fichier de questions — de l'invocation 2, du
+Convertisseur ou du Fusionneur.*
 
-⚠️ **Il supprime ce qui est demandé deux fois, et rien d'autre.**
+**Entrées** : le fichier produit · le fichier de questions. ⚠️ **Ni la
+grille, ni le document global** — il ne fait que répondre.
 
-**Ce qui le déclenche** — une invocation, après les trois sondeurs. 🔴
-**La commande vérifie que les trois fichiers existent avant de
-l'appeler** — ⚠️ une fusion à laquelle il manque une lecture est une
-fusion dont personne ne peut se servir.
+📌 **Le Product Owner a rempli les champs *Réponse* à la main.**
+L'Analyste ne tranche rien — il transcrit.
 
-**Comment il compare** — 🔴 **bloc par bloc.** Il rassemble toutes les
-questions dont la ligne `Block:` nomme `B7`, les compare entre elles,
-puis passe au bloc suivant.
+**Ce qu'il fait** : pour chaque réponse, la transformer en phrase
+descriptive et 🔴 **l'intégrer au bloc concerné**, via l'identifiant.
 
-🔴 **Une question nommant deux blocs entre dans les deux groupes** —
-⚠️ **un trou entre deux blocs est levé des deux côtés**, et ne le
-comparer que dans un groupe laisse debout son jumeau dans l'autre.
+⚠️ **Si une réponse est ambiguë**, il ne peut pas reprendre le Product
+Owner en cours : il ajoute une entrée au fichier de questions, champ
+*Réponse* vide.
 
-🔴 **Jamais de comparaison entre groupes** — 📌 deux questions ne
-partageant aucun bloc sont deux questions différentes, quoi qu'elles
-disent.
+**Sorties** : le fichier produit à jour · le fichier de questions, ses
+entrées traitées.
 
-**Le critère** — 🔴 **deux questions sont la même quand répondre à
-l'une répond à l'autre.** ⚠️ **Répondre, pas formuler.** 📌 Trois
-lectures lèvent un trou sous trois angles — l'une part de ce qu'une
-table porte, l'autre de ce qu'un message promet, la troisième de ce
-qu'une règle accepte. **Lire au-delà de l'angle, jusqu'à la réponse qui
-fermerait.**
+#### Cahier des charges
 
-🔴 **En doute, garder les deux.** ⚠️ Un doublon coûte une réponse ; un
-trou supprimé coûte une ligne de code fausse.
+📌 **Entre deux sessions, il relit le fichier produit.** C'est son
+état, pas sa mémoire — un cycle peut s'étaler sur plusieurs jours.
 
-🔴 **Une question levée par un seul sondeur est gardée, toujours.**
-📌 **C'est exactement ce pour quoi on en lance trois** — ⚠️ **l'accord
-n'est pas le test.**
+**Entrées** — voir "Deux invocations" : chaque invocation charge son
+propre jeu. ⚠️ **Jamais** le code, `CURRENT_TECHNICAL_STATE.md` ni le
+document technique.
 
-**La frontière** — 🔴 **Il n'ouvre pas le fichier produit.** 📌 **Il
-compare des questions entre elles**, jamais à ce qui y répondrait.
-🔴 **Il ne réécrit aucune question**, même pour la raccourcir. Quand
-deux disent la même chose, il garde celle qui l'énonce le plus
-précisément.
+**Sortie** — le fichier produit de la fonctionnalité.
+
+**Ce qu'il ne fait jamais**
+- 🔴 Dérouler la grille comme un questionnaire
+- 🔴 Trancher une décision produit à la place du Product Owner
+- 🔴 Mettre deux natures sur un bloc, ou deux features dans un fichier
+- Écrire dans le document global — c'est le Fusionneur
 
 ---
 
-## Le Convertisseur
+### Le Convertisseur
 
-**À quoi il sert** — Il transforme le fichier produit en document
-technique numéroté, celui que le Cadreur découpe en lots.
+#### La grille de fermeture technique
 
-🔴 **Il ne tranche jamais rien.** Une contradiction entre blocs, une
-question sans réponse : il signale, il ne comble pas.
+**Il applique `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — neuf
+fermetures en deux parties. 🔴 **La grille porte les tests, l'agent
+porte les gestes.**
 
-🔴 **Il n'est pas le filet de la chaîne amont.** La grille de cadrage a
-balayé les précisions manquantes et les références pendantes, autant de
-passes qu'il l'a fallu. **Il lève ce qu'une lecture fraîche attrape, pas
-ce qu'elle a déjà couvert.**
-
-**Ce qui le déclenche** — deux invocations, séparées par un aller-retour
-de questions.
-
-| # | Ce qu'elle fait | Sortie |
+| Partie | Quand | Ce qu'elle ferme |
 |---|---|---|
-| 1 — Fermer | Partie 1 de la grille de fermeture sur chaque bloc | Un fichier de questions · 🔴 **supprime le document technique s'il existe** |
-| 2 — Produire | Partie 2, une fois toutes les sections remplies | `spec-technique.md` · `tracabilite.md` · un fichier de questions |
+| 1 | En fermant le produit | Nature · cohérence entre blocs |
+| 2 | En produisant | Traçabilité · rien perdu · unicité · accord entre entrées · liens déclarés · ressources · complétude |
 
-📌 **Deux, pas une** : ⚠️ **deux régimes différents.** La fermeture lit
-sans écrire ; la production traduit en termes techniques.
+**Une fermeture qui échoue est un signalement.**
 
-🔴 **La grille de fermeture porte les tests, l'agent porte les gestes.**
-Elle vit dans `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`, en deux
-parties — l'une à la fermeture, l'autre à la production. ⚠️ **À ne pas
-confondre avec la grille de cadrage produit**, que les sondeurs
-déroulent et qu'il n'ouvre jamais.
+🔴 **Ce qui n'en est pas un** : un bloc laconique mais complet (*« la
+fenêtre vaut 3 heures »* suffit), une précision que la grille de
+cadrage a déjà balayée, un bloc portant deux sujets — l'amont s'en
+charge — et **jamais un jugement de pertinence produit**.
 
-**Pourquoi l'invocation 1 supprime le document technique** — 🔴 **le
-fichier produit a bougé depuis qu'il a été écrit.** Le laisser
-enverrait l'invocation 2 en mise à jour ciblée sur un document qui ne
-correspond plus.
+📌 **Il ne pose jamais une question produit.** Il ne demande pas où va
+un bouton — il constate qu'une destination nommée n'a pas de
+description.
 
-**Deux régimes à l'invocation 2**, décidés par un seul test :
+📌 **Plus un marqueur de clarification survivant** : une
+`**Clarification needed:**` restée dans le fichier produit est une
+question sans réponse.
 
-| `spec-technique.md` | Ce qu'il fait |
+#### Le cycle de conversion
+
+**Première invocation — fermeture**
+
+Elle applique la partie 1 de la grille à chaque bloc et produit **un
+seul fichier** : le fichier de questions, chaque question portant
+l'identifiant du bloc qu'elle bloque.
+
+🔴 **Elle n'écrit aucun contenu technique.** Elle ferme, et signale ce
+qui ne ferme pas.
+
+🔴 **Il ne tranche jamais.** Décision produit absente, précision
+manquante, contradiction interne : il signale, il ne comble pas. *Il
+n'est pas le filet de la chaîne amont.*
+
+🔴 **Un problème ne bloque jamais le reste.** L'élément est marqué, le
+reclassement continue jusqu'au bout. *Un signalement par problème
+produirait un aller-retour par problème — et les réponses
+s'influencent : trancher les bornes d'une donnée change ce qu'on répond
+sur une autre.*
+
+**Le ping-pong**
+
+Le fichier de questions part au Product Owner, qui remplit les champs
+*Réponse* à la main. L'Analyste les intègre ensuite aux blocs du
+fichier produit — invocation 1.
+
+🔴 **Une question dont la réponse est consignée ne se repose jamais.**
+Le critère d'arrêt est le fichier de questions entièrement répondu, pas
+un nombre d'itérations.
+
+⚠️ **Si une réponse fait apparaître un nouveau problème**, il rejoint
+le fichier de questions au tour suivant. C'est normal, pas un échec.
+
+📌 **Ce qui remonte ici aurait dû être tranché en amont.** Un
+signalement est le signe que la grille de cadrage n'a pas posé la
+question, ou que le Product Owner n'y a pas répondu — pas que le
+Convertisseur est trop strict.
+
+**Première invocation, en terminant** : 🔴 **elle supprime le document
+technique s'il existe.** Le fichier produit a bougé depuis qu'il a été
+écrit, et le laisser enverrait la seconde invocation en mise à jour
+ciblée sur un document qui ne correspond plus.
+
+**Seconde invocation — production**
+
+🔴 **Elle regarde d'abord si le document technique existe.**
+
+| État | Ce qu'elle fait |
 |---|---|
 | Absent | Production complète |
 | Présent | 🔴 **Mise à jour ciblée** — grep `<<ASSUMED`, remplacer chaque marque par sa réponse, ne toucher à rien d'autre |
 
-**Ce qu'une question coûte** — 🔴 **la question à se poser est : sans
-ça, puis-je écrire la règle du tout ?**
+**En production complète**, elle reprend le fichier produit à jour, qui
+porte les réponses, et le lit en entier.
 
-| La réponse | Ce qu'il fait |
+🔴 **Ici elle reformule** — c'est sa valeur. *« La donnée la plus
+fiable gagne »* devient une règle exécutable : quel ordre de priorité,
+quelle comparaison. ⚠️ **Deux régimes, deux invocations** : le
+reclassement range sans toucher au contenu, la production traduit en
+termes techniques.
+
+🔴 **Elle ne décide rien de neuf.** Elle rend explicite ce que le bloc
+dit implicitement — la fermeture *Traçabilité* trace la limite.
+
+**Ce qu'une question coûte** :
+
+| Sans cette information | Ce qu'elle fait |
 |---|---|
-| **Non** — la règle n'existe pas sans | Demander, **n'écrire aucun document**, et supprimer celui qui existe |
-| **Oui, en supposant** | Demander, **et produire** — la supposition marquée sur place |
+| La règle n'existe pas | Elle demande, **n'écrit aucun document**, et supprime celui qui existe |
+| La règle s'écrit en supposant | Elle demande, **et produit** — la supposition marquée sur place |
 
-🔴 **La marque porte l'identifiant qui la lèvera** :
-`<<ASSUMED questions-convertisseur-04 Q2: …>>`. 📌 **Elle dit que la
-ligne est provisoire**, et où sa réponse viendra.
+🔴 **La marque porte la question qui la lèvera** :
+`<<ASSUMED questions-convertisseur-04 Q2: …>>`. ⚠️ **Le Cadreur bloque
+sur une seule** — une règle provisoire ne se découpe pas.
 
-**Ce qui devient une entrée numérotée** — 🔴 **une règle ou une table.**
+**Le préambule se remplit avant les sections**, entièrement repris du
+fichier produit :
+
+| Bloc du préambule | D'où il vient |
+|---|---|
+| Intention, vocabulaire, hors périmètre | Les sections de même objet du fichier produit |
+| Règles transversales | Les blocs déclarés valables partout |
+| Dépendances | Les références marquées *existantes* |
+
+🔴 **Une règle transversale contraint sans rien produire.** Un jeu de
+valeurs que le code doit écrire quelque part **produit**, même si tout
+le document le référence.
+
+📌 **Le test** : si personne ne l'écrit, est-ce que le code manque
+quelque chose ? **Oui → c'est une entrée numérotée**, pas un bloc de
+préambule. Les tokens d'un thème, un catalogue de formats, une table de
+seuils répondent oui.
+
+⚠️ **Rien n'y est déduit** — tout est transcrit.
+
+**Ce qui devient une entrée numérotée** : 🔴 **une règle ou une
+table.** Une règle a des entrées et une sortie ; une table est un jeu
+de valeurs que le code doit écrire quelque part.
 
 > **Une règle qu'on peut couper en deux règles complètes fait deux
 > entrées. Une qu'on ne peut pas couper sans laisser un cas ouvert
 > reste une.**
 
-⚠️ **Une entrée n'est pas un bloc produit.** 📌 **Le fichier produit
-sépare par déclencheur, pour fermer chaque comportement ; le document
-technique sépare par ce qui reste complet seul.** **Un bloc peut donner
-deux entrées, deux blocs une seule.**
+⚠️ **Une entrée n'est pas un bloc produit.** Le fichier produit sépare
+par déclencheur ; le document technique sépare par ce qui reste complet
+seul. **Un bloc peut donner deux entrées, deux blocs une seule.**
 
-🔴 **Numérotées à l'écriture, jamais renumérotées.** ⚠️ **Un lot cite
-`§3.7`**, et cette citation doit tenir d'une exécution à l'autre — d'où
-l'ordre de remplissage imposé, §1 à §12 puis l'ordre des blocs, sans
-aucun tri par jugement.
+🔴 **Il ne groupe pas en unités de travail.** Le Cadreur le fait, avec
+le document d'état sous les yeux. **Un groupement fait ici déciderait
+pour lui, à l'aveugle.**
 
-📌 **Une section vide est une information**, pas un oubli : elle dit au
-Cadreur qu'il n'y a rien de cette nature. **On part des douze et on
-laisse vide, jamais l'inverse.**
+**Ordre de remplissage** : les sections dans l'ordre §1 → §12 ; à
+l'intérieur, les entrées suivent l'ordre des blocs dont elles viennent.
+📌 **Aucun tri par jugement** — les citations du Cadreur casseraient
+d'une exécution à l'autre.
 
-**Le préambule** — 🔴 **il cadre, il ne produit aucun lot.** Entièrement
-repris du fichier produit, rien de déduit.
-
-🔴 **Une règle transversale contraint sans rien produire.** 📌 **Le
-test** : si personne ne l'écrit, est-ce que le code manque quelque
-chose ? **Oui → c'est une entrée numérotée**, pas un bloc de préambule.
-Les tokens d'un thème, un catalogue de formats, une table de seuils
-répondent oui.
-
-📌 **Les dépendances du préambule viennent du Rédacteur, pas de lui** —
-seul le Rédacteur a le global sous les yeux.
-
-**`tracabilite.md`** — 🔴 **une ligne par bloc du fichier produit**, dans
-l'ordre : son identifiant, son titre, les entrées qui portent au moins
-une de ses règles, ou un tiret.
-
-🔴 **Tous les blocs y figurent, ceux que rien ne porte compris** —
-⚠️ **un tiret dit qu'on a cherché et rien trouvé ; une ligne absente ne
-dit rien du tout.**
-
-📌 **Il le sait en écrivant** : chaque entrée est écrite depuis des
-blocs qu'il a sous les yeux. **Le fichier consigne ce qu'il a fait, ce
-n'est pas une seconde passe.**
-
-**La frontière** — 🔴 **Il ne groupe pas en unités de travail.** Le
-Cadreur le fait, avec le document d'état sous les yeux et les symboles
-grepés. **Un groupement fait ici déciderait pour lui, à l'aveugle.**
-
-🔴 **Il ne lit jamais le code**, ni le global, ni `idees.md`, ni un
-fichier de questions — sauf les entrées qu'une marque `<<ASSUMED`
-nomme.
+🔴 **Elle signale toute contradiction que le reclassement aurait
+introduite.** C'est sa raison d'être — un contexte frais voit ce que le
+premier passage ne pouvait pas voir. Un signalement à ce stade renvoie
+au ping-pong.
 
 ---
 
-## L'Architecte
+#### Cahier des charges
 
-**À quoi il sert** — Il écrit `docs/TECHNICAL_CONVENTIONS.md`, le
-fichier que chaque agent de code lit en entier avant d'écrire une
-ligne.
+**Entrées**
+- **Les deux invocations** : `GRILLE_FERMETURE_TECHNIQUE.md`
+- **Première invocation** : le fichier produit de la fonctionnalité
+- **Seconde invocation** : le fichier produit à jour, qui porte les
+  réponses. **Ou le document technique seul**, sur une mise à jour
+  ciblée
 
-🔴 **Il répond à *comment on code ici*, jamais à *quoi construire*.**
-Le quoi vit dans le document technique.
+⚠️ **Rien d'autre** : ni le code, ni `CURRENT_TECHNICAL_STATE.md`
+*(c'est le Cadreur qui le lit)*, ni la grille de cadrage, ni le
+document produit global *(c'est l'Analyste et le Fusionneur)*.
 
-🔴 **Une règle absente est une règle que personne ne réclamera.** Ce que
-ce fichier ne dit pas, chaque lot le tranche seul, et deux lots le
-tranchent différemment. **C'est le défaut qu'il existe pour empêcher.**
+🔴 **Jamais `idees.md`**, jamais un fichier de questions — sauf les
+entrées qu'une marque `<<ASSUMED` nomme, sur une mise à jour ciblée.
 
-**Ce qui le déclenche** — trois invocations :
+**Actions — première invocation**
+- Lire le fichier produit en entier, une fois — jamais partiellement :
+  une règle de calcul peut être décrite dans une section d'écran, et
+  inversement
+- Lancer la partie 1 de la grille de fermeture sur chaque bloc — une
+  fermeture qui échoue est signalée, le bloc n'est pas classé
+- Reclasser les autres selon leur nature
+- Supprimer le document technique s'il existe
 
-| # | Ce qu'elle fait | Entrées propres |
-|---|---|---|
-| 1 — Dériver | Écrit les conventions depuis les deux documents | `desc-produit.md` et `spec-technique.md` en entier · `tracabilite.md` |
-| 2 — Intégrer | Transforme ses propres réponses en règles | Son fichier de questions, répondu |
-| 3 — Demandes | Tranche ce qu'un agent de code a rencontré | `architecte/` · **le web · les fichiers de build** |
+**Actions — seconde invocation**
+- 🔴 **Regarder d'abord si le document technique existe** — présent :
+  mise à jour ciblée sur les `<<ASSUMED` et rien d'autre
+- Remplir le préambule, repris du fichier produit
+- Remplir les sections dans l'ordre §1 → §12 ; à l'intérieur, les
+  entrées dans l'ordre des blocs dont elles viennent
+- 🔴 **Lancer la partie 2 de la grille une fois toutes les sections
+  remplies** — pas en écrivant : une section grandit, et ce qu'elle
+  consomme n'apparaît qu'une fois debout
 
-🔴 **Les invocations 1 et 2 tournent sur un dossier de fonctionnalité
-seulement** — elles dérivent des deux documents d'une feature, et un
-cycle de correction n'en a ni l'un ni l'autre. 📌 **L'invocation 3 tourne
-sur l'un ou l'autre.**
+**Sorties — première invocation**
 
-⚠️ **`docs/TECHNICAL_CONVENTIONS.md` est partagé par tout le dépôt** —
-un seul fichier, quel que soit le cycle.
-
-🔴 **Il ne lit le code à aucune invocation** — ni source, ni schéma
-généré, ni manifeste. ⚠️ **Pas même pour savoir ce qu'un outil
-produit** : il nomme les outils, il ne les trouve pas.
-
-**Pourquoi l'invocation 1 n'ouvre aucun fichier de conventions** — 🔴
-**quel que soit son nom, y compris celui qu'une exécution antérieure de
-lui-même a laissé.** 📌 **Il écrit les conventions qu'un projet suivra.**
-Un projet qui en a déjà les a parce que quelqu'un a décidé ; **les
-relire serait dériver de sa propre sortie.**
-
-📌 **Les invocations 2 et 3 lisent celui en vigueur** — elles
-l'amendent, et on n'amende pas ce qu'on n'a pas lu.
-
-**Trois natures de manque, deux seulement sortent de l'agent :**
-
-| Le manque | Ce qu'il en fait |
+| Fichier | Contenu |
 |---|---|
-| **Couverture** — une question de comportement à laquelle le corpus ne répond nulle part | 🔴 **Il la lève.** La grille de cadrage a un trou |
-| **Conjonction** — la question naît entre deux entrées, chacune complète seule | 🔴 **Il la lève.** Aucune grille n'aurait pu la voir |
-| **Précision** — le comportement est tranché, à un grain plus grossier que le code | 📌 **Il tranche lui-même** et l'écrit |
+| Fichier de questions | Une question par problème, portant l'identifiant de l'élément qu'elle bloque |
 
-⚠️ **Une conjonction est invisible en amont, et pas par négligence.**
-Une grille de cadrage balaye sujet par sujet, et une arête entre deux
-entrées n'est le sujet de personne — 🔴 **et le graphe qui nomme les
-paires n'existe pas encore quand cette grille tourne.**
+**Sorties — seconde invocation** : le document technique, **et un
+fichier de questions dans tous les cas** — même vide. 📌 **Son absence
+se lirait comme *« cette invocation n'a pas tourné »*.**
 
-📌 **La troisième n'est pas un manque.** *Ce qui identifie un segment*,
-une fois que le produit a dit ce que l'utilisateur voit, est une
-décision technique. **La remonter ferait faire au produit un travail qui
-n'est pas le sien.**
+| Bloc | Contenu |
+|---|---|
+| Préambule | Intention, vocabulaire, hors périmètre, règles transversales, dépendances |
+| §1 à §12 | Le travail, par nature — sections vides incluses |
 
-**`couverture.md`** — une ligne par entrée du document technique, dans
-son ordre. 🔴 **`no rule` s'écrit en toutes lettres** : c'est ce qui
-sépare une entrée qu'on a regardée d'une entrée qu'on a manquée.
+**Structure** — sections numérotées, jamais seulement titrées : elles
+servent d'ancres. Une section sans contenu est écrite vide, pas omise.
 
-📌 **Puis une seconde table, une ligne par règle** : son entrée de
-grille, et si son test est mécanique ou une relecture. ⚠️ **C'est elle
-qui rend vérifiable l'exigence que toute règle à test mécanique soit
-câblée dans la commande de vérification.**
+**Ce qu'il ne fait jamais**
+- 🔴 Trancher une décision produit, même triviale
+- 🔴 Écrire dans le document produit global
+- 🔴 Décider qu'un service, une table ou un écran est nécessaire — le
+  découpage appartient au Cadreur
+- 🔴 Dupliquer une règle entre deux sections
+- Lire le code
 
-**Une règle qui en restreint une autre s'écrit dans les deux**, chacune
-nommant l'autre. 📌 **Un agent lit la règle large, y trouve son cas, et
-s'arrête.** 🔴 **Une restriction qu'il n'atteint jamais est une
-restriction qui n'existe pas.**
-
-**La frontière** — 🔴 **Il n'attend jamais le Product Owner** : il
-tranche, il refuse, ou il bloque, et il sort. 📌 **Attendre est le
-travail de l'Arbitre**, en aval.
-
-⚠️ **À l'invocation 3 il ne bloque pas du tout** — le refus s'écrit dans
-le `## Verdict` de la demande, parce que l'Arbitre tourne encore et
-attend. 🔴 **Un fichier de blocage laisserait deux agents suspendus à la
-même réponse.**
-
-🔴 **Un verdict porte le texte de la règle, pas seulement son numéro** —
-⚠️ **l'agent qui le lit n'ouvre pas le fichier de conventions**, il
-recopie ce que le verdict dit.
-
-📌 **Cet agent est à cheval sur les deux chaînes** : l'amont le dérive
-une fois par feature, l'aval lui envoie des demandes lot après lot.
+📌 **Les dépendances du préambule viennent de l'Analyste, pas de lui.**
+Écrire *"ce domaine alimente le calcul de dépense énergétique totale"*
+suppose de savoir que ce calcul existe ailleurs — seul l'Analyste a le
+document produit global sous les yeux. La grille pose
+la question ; le Convertisseur transcrit la réponse.
 
 ---
 
-## Le Fusionneur
+### Le Fusionneur
 
-**À quoi il sert** — Il fusionne le fichier produit d'une
-fonctionnalité dans le document produit global.
-
-🔴 **Une révision modifie et remplace, elle n'ajoute jamais à côté.**
+**Une révision modifie et remplace, elle n'ajoute jamais à côté.**
 L'insertion reste le cas normal pour ce qui est nouveau.
 
-📌 **Son rapport est le seul travail manuel du Product Owner de toute la
-chaîne.**
+#### Quand il intervient
 
-**Ce qui le déclenche** — 🔴 **en dernier**, une fois la conversion
-passée sans signalement.
+**En dernier**, après que la conversion a abouti sans signalement :
 
-⚠️ **Sinon le global décrirait un état que la spec ne produira jamais.**
+`Analyste → fichier produit → conversion → si le fichier de questions
+est entièrement répondu → fusion`
 
-| # | Ce qu'elle fait | Sortie |
-|---|---|---|
-| 1 — Comparer | Localise, compare, questionne. 🔴 **N'écrit rien dans le global** | `plan-fusion.md` · un fichier de questions |
-| 2 — Appliquer | Applique le plan, transpose, écrit le rapport | Le global à jour · `rapport-fusion.md` |
-| 3 — Décisions de correction | Lit les `bug-list.md` et dit lesquelles lignes sont du produit | Le global à jour · un fichier de questions |
+⚠️ **Sinon le global décrirait un état que la spec ne produira
+jamais** — une conversion qui bloque laisserait la documentation en
+avance sur la réalité.
 
-📌 **Le plan de fusion est ce que l'invocation 2 applique** — sans lui,
-la comparaison serait refaite de zéro.
+#### Le cycle du Fusionneur
 
-**L'unité de fusion** — 🔴 **la phrase descriptive, jamais le bloc
-entier.** ⚠️ **Une refonte remplace la structure d'une entrée, mais
-certaines règles survivent** : un point d'entrée, un accès depuis un
-autre écran, une règle de portée. **Remplacer en bloc les perd.**
+**Première invocation — comparer et questionner.** Il localise,
+compare, et produit **deux fichiers** : le **plan de fusion** — pour
+chaque phrase, remplacement, rien ou insertion — et le **fichier de
+questions**. 🔴 **Il n'écrit rien dans le global à ce stade.**
 
-**Trois niveaux de localisation** — la section par son titre, le bloc
-par son titre dans la section, la phrase contre le bloc existant.
-📌 **Le bloc borne la comparaison** : dix lignes, pas un document entier.
-🔴 **C'est la seconde raison d'être de la règle « un bloc, un sujet ».**
+📌 **Le plan de fusion est ce que la seconde invocation applique** —
+sans lui, la comparaison serait refaite de zéro.
+
+**Le ping-pong** — le fichier part à l'Analyste, qui l'intègre une fois
+répondu par le Product Owner. Même canal, même mécanique que pour le
+Convertisseur.
+
+**Seconde invocation — appliquer**, une fois le fichier entièrement
+répondu. Puis le rapport. 📌 **Sans question, il enchaîne immédiatement.**
+
+#### Comment il localise et compare
+
+**Phrase par phrase, dans le périmètre d'un bloc**
+
+🔴 **L'unité de fusion est la phrase descriptive, jamais le bloc
+entier.** Une refonte remplace la structure d'une entrée, mais
+certaines règles survivent — un point d'entrée, un accès depuis un
+autre écran, une règle de portée. Remplacer en bloc les perd.
+
+**Trois niveaux de localisation :**
+
+| Niveau | Comment |
+|---|---|
+| Section | Par son titre, repris du global |
+| Bloc | Par son titre, dans la section |
+| Phrase | Comparée au bloc existant, quelques lignes |
+
+📌 **Le bloc borne la comparaison.** Chercher une règle dans dix lignes
+n'est pas la chercher dans un document entier — c'est ce qui rend la
+fusion fiable, et c'est une seconde raison d'être de la règle « un
+bloc, un sujet ».
+
+**Pour chaque phrase du bloc nouveau, contre le bloc existant :**
+
+| Cas | Action |
+|---|---|
+| Elle décrit la même chose, autrement | Remplacement |
+| Elle décrit la même chose, à l'identique | Rien |
+| Aucune correspondance | Insertion |
 
 ⚠️ **C'est un travail de compréhension, pas de comparaison textuelle.**
 *« Trois éléments maximum »* et *« le nombre ne dépasse pas cinq »*
-décrivent la même règle avec d'autres mots — c'est un remplacement.
+décrivent la même règle avec des mots différents — c'est un
+remplacement, pas une insertion.
 
-**Cinq verbes** — `REPLACE`, `INSERT`, `KEEP`, `DELETE`, `PENDING`.
-🔴 **Une phrase qui ne tombe sous aucun veut dire que la comparaison
-n'est pas finie.** 📌 **`INIT` est l'exception** : sur un global vide, le
-plan est ce mot seul.
+**Transposer au présent descriptif** — voir "Les règles d'écriture des
+fichiers produit"
 
-⚠️ **`DELETE` ne vient jamais de lui** — seulement d'une réponse
-confirmant qu'une règle ne tient plus.
+🔴 **Toute marque de changement disparaît à l'insertion.** Le fichier
+produit dit ce qui change — *« un nouveau bouton en bas de la page »*.
+Le global dit ce qui est — *« un bouton en bas de la page »*.
 
-**Le seul cas qui appelle une question** — 🔴 **une règle du bloc
-existant sans aucune correspondance dans le bloc nouveau.**
-⚠️ **Le silence ne vaut pas suppression.**
+⚠️ « Nouveau », « désormais », « au lieu de », « on ajoute » : ce
+vocabulaire sert à coder, pas à décrire un état. Sans cette
+transposition, un bouton resterait « nouveau » indéfiniment.
 
-**La transposition au présent descriptif** — 🔴 **toute marque de
-changement disparaît à l'insertion.** Le fichier produit dit ce qui
-change — *« un nouveau bouton en bas de la page »*. Le global dit ce qui
-est. ⚠️ **Sans elle, un bouton resterait « nouveau » indéfiniment.**
+**Quand il demande**
 
-🔴 **Ni le numéro de bloc ni le marqueur `NEW` n'entrent dans le
-global** — là, un bloc n'a que son titre. **Sinon deux features
-livreraient chacune leur `B7`.**
+🔴 **Il applique sans question dans tous les cas ci-dessus.** La
+décision d'ajouter ou de réviser a été prise à l'invocation 1 de
+l'Analyste.
 
-**Le rapport** — 🔴 **le Product Owner ne relit pas la fusion entière** :
-le rapport lui dit où regarder. 📌 **Les sections inchangées y sont
-listées** — ⚠️ **une section qu'on attendait et qui y figure est un
-signal.**
+**Un seul cas appelle une question** : une règle du bloc existant sans
+aucune correspondance dans le bloc nouveau. ⚠️ **Le silence ne vaut pas
+suppression** — elle survit peut-être, ou n'a pas été discutée. Il
+demande plutôt que d'interpréter.
 
-**L'invocation 3, à part** — 🔴 **c'est le seul appel où la décision
-n'est pas dans un fichier produit.** Une correction tranche parfois
-quelque chose du produit, et rien ne le ramène. ⚠️ **Il lit ce qu'une
-correction a établi et dit si c'est du produit.** 📌 **La plupart des
-lignes sont techniques ; une liste entière sans rien à fusionner est le
-résultat normal.**
+**Où il écrit**
 
-🔴 **Une ligne sans section correspondante est une question**, jamais
-une insertion qu'il décide seul.
+**Modification ciblée, section par section.** 🔴 Jamais de réécriture
+intégrale du global : les titres sont les ancres qui le permettent.
 
-**La frontière** — 🔴 **Il ne décide pas ce qui se fusionne** : la
-décision a été prise quand le fichier produit a été structuré.
-🔴 **Il ne touche ni au document technique ni au code.** ⚠️ **Le global
-ne se révise pas pendant qu'un cycle aval tourne sur le même
-périmètre.**
+**Une section nouvelle se place dans son domaine**, à la suite des
+sections de même nature — les écrans avec les écrans. ⚠️ **Si le
+domaine n'existe pas**, il en crée un au niveau domaines.
+
+#### Cahier des charges
+
+**Entrées**
+- **Première invocation** : le fichier produit final · le document
+  global
+- **Seconde invocation** : le plan de fusion · son fichier de
+  questions, répondu · le document global
+
+⚠️ **Rien d'autre** : ni le document technique, ni le code.
+
+**Actions — première invocation**
+- Localiser : section par son titre, puis bloc par son titre
+- Dans un bloc localisé, phrase par phrase : remplacement, rien, ou
+  insertion
+- 🔴 **Ne rien écrire dans le global** — produire le fichier de
+  questions pour toute règle existante sans correspondance
+
+**Actions — seconde invocation**, le fichier de questions répondu
+- Appliquer les décisions, en modification ciblée
+- Transposer au présent descriptif — retirer toute marque de changement
+- Écrire le rapport, **après application**
+
+**Sorties**
+- **Première invocation** : le plan de fusion · le fichier de questions
+- **Seconde invocation** : le document global à jour · le rapport de
+  fusion, daté
+
+**Ce qu'il ne fait jamais**
+- 🔴 Décider ce qui se fusionne — la décision est dans le fichier
+  produit
+- 🔴 Supprimer une règle par omission
+- 🔴 Remplacer un bloc entier quand seules quelques phrases changent
+- 🔴 Conserver le vocabulaire du changement dans le global
+- 🔴 Reprendre le numéro d'un bloc ou sa marque `NEW` — dans le global,
+  un bloc n'a que son titre
+- Toucher au document technique
+
+### Le Diagnostiqueur
+
+*Cycle bug fix uniquement.*
+
+🔴 **Deux invocations, et la première tourne autant de fois qu'il y a
+d'écarts.** C'est le seul agent de la chaîne dans ce cas.
+
+| # | Invocation | Entrées | Sortie |
+|---|---|---|---|
+| 1 | Investigation | Un écart, dans le prompt · le code, en grep · le document d'état | `investigation/<id>.md` |
+| 2 | Assemblage | Tous les rapports · `bug-list.md`, pour l'ordre · la grille de fermeture technique | `desc-bug.md` |
+
+📌 **Pourquoi découper** : dix écarts dans un seul contexte, ce sont
+dix séries de greps qui s'accumulent. **Une investigation ne voit que
+son écart**, et rien de ce qu'elle cherche n'aide les autres.
+
+⚠️ **L'assemblage n'ouvre jamais le code** — les rapports portent tout.
+Un rapport qui ne suffit pas à écrire une entrée est un blocage.
+
+#### Invocation 1 — Investigation
+
+**Cinq gestes** :
+
+**1. Dériver les termes de recherche.** 🔴 **Un écart est écrit en
+comportement, pas en symboles** — *« le facteur n'est jamais
+calculé »* ne nomme aucune classe.
+
+**2. Confirmer** — `missing`, `wrong`, ou écarté.
+
+**3. Localiser — deux symboles.** Le **porteur**, qui portera la
+correction ; le **déclencheur**, ce qui doit l'appeler. 🔴 **Un écart
+sans porteur est écarté**, jamais deviné.
+
+📌 **Sur un appel manquant, le porteur est l'appelant** — c'est là que
+le code change.
+
+**4. Confirmer ce que la correction exige**, pas seulement ce qui
+manque. Chaque chose que la correction nomme — un déclencheur à
+observer, une valeur à passer, une signature à appeler — se grepe.
+🔴 **Hors de portée du porteur, ou inexistante : c'est un second
+manque**, et le rapport le dit.
+
+⚠️ **Une signature qui ne colle pas est le cas le plus discret** :
+l'appel existe, ses paramètres ne conviennent pas au cas décrit.
+
+**5. Relire chaque appelant contre le nouveau mécanisme.** 🔴 **Une
+correction qui change de mécanisme change les besoins de ses
+appelants.** Le nouveau mécanisme porte des exigences que l'écart ne
+nomme jamais.
+
+📌 **Le test, sur chaque appelant** : ce qu'il porte aujourd'hui, le
+nouveau mécanisme l'accepte-t-il ? **Celui qui ne peut pas y répondre
+est un second manque.**
+
+🔴 **Le porteur est le symbole, pas le fichier qui le réalise** — celui
+dont le reste du code dépend. Deux noms pour une chose seraient groupés
+en deux.
+
+🔴 **Un porteur par écart.** Si la correction touche plusieurs symboles
+inséparables, nommer celui qui porte le comportement. **Deux symboles
+qui ne découlent pas l'un de l'autre sont deux écarts.**
+
+**Sortie** — six champs : verdict, porteur, déclencheur, ce que le code
+fait aujourd'hui, ce qu'il doit faire, les termes cherchés.
+
+#### Invocation 2 — Assemblage
+
+**Quatre gestes**, numérotés 6 à 9 : donner une nature à chaque écart
+confirmé — celle
+du porteur ; écrire son entrée depuis les deux champs du rapport ;
+numéroter et ranger dans les douze sections ; **fermer le document**.
+
+🔴 **Trois fermetures de la grille technique, et trois seulement** —
+complétude, ressources, accord entre entrées. ⚠️ **Les six autres ne
+s'appliquent pas** : traçabilité et rien perdu se lisent contre un
+fichier produit, qui n'existe pas ici ; les autres portent sur une
+traduction qu'il n'a pas faite.
+
+📌 **Une fermeture qui échoue est un blocage**, pas une question —
+personne ne répond à une question dans ce cycle.
+
+**Sortie** — `desc-bug.md`, à la forme du document technique :
+préambule, douze sections par nature, entrées numérotées, plus la liste
+des écarts écartés.
+
+📌 **Chaque entrée nomme son porteur** — c'est ce sur quoi le Cadreur
+groupe.
+
+📌 **Aucun marqueur `NEW`** — rien ici ne passe par une grille.
 
 ---
 
-## L'Extracteur
+### L'Extracteur
 
-**À quoi il sert** — 🔴 **Reprise d'une application existante sans
-document global.** Il décrit ce que l'application **fait aujourd'hui**,
-en lisant son code.
+*Reprise d'une application existante sans document global. Une
+invocation par domaine, plus une passe application et une passe
+finale.*
 
-📌 **Sa sortie est de la documentation produit** : ce qu'un utilisateur
-voit, les règles, les valeurs — jamais comment c'est construit.
+**Entrées** : le code du domaine · les fichiers de langue ·
+la carte route↔écran, là où les conventions la placent. ⚠️ **Ni les
+documents
+produit existants** — il décrirait des décisions non implémentées — **ni
+`CURRENT_TECHNICAL_STATE.md`**, qui est un inventaire technique.
 
-**Ce qui le déclenche** — 🔴 **une passe par domaine**, plus une passe
-application en tête et une passe finale de recâblage. **Une seule fois
-dans la vie d'un projet.**
+**Sortie** : des sections au format du global — blocs, natures, titres.
+🔴 **Prose et création de titres** : voir "Les règles d'écriture des
+fichiers produit".
 
-**Ce qu'il lit** — 🔴 **`docs/TECHNICAL_CONVENTIONS.md` en entier** :
-c'est lui qui nomme les dossiers de code, les fichiers de langue et
-l'emplacement de la carte route↔écran. 📌 **Cette carte est ce qui lui
-dit si un écran est atteignable.**
+#### Ce qu'il décrit
 
-🔴 **Jamais `CURRENT_TECHNICAL_STATE.md`** — il lit le code directement.
-🔴 **Jamais les specs produit existantes** — le global décrit ce qui
-**est**, pas ce qui était prévu.
+| Objet | Ce qu'il en tire |
+|---|---|
+| Écran | Ce qui s'affiche, les libellés depuis les fichiers de langue, les conditions, ce que fait chaque action |
+| Service | La règle, ses entrées, sa sortie, ses valeurs |
+| Entité | Ses champs, leurs types et bornes |
+| Source externe | Ce qui est lu, avec quelles priorités |
 
-**Le niveau de détail** — 🔴 **ce qui vient du thème va dans la section
+**Niveau de détail** : 🔴 **ce qui vient du thème va dans la section
 thème, le reste est décrit.** Une couleur nommée depuis le thème n'est
-pas une décision d'écran ; une valeur en dur en est une.
+pas une décision d'écran ; une valeur écrite en dur dans le widget en
+est une.
 
-**Cinq balises greppables**, pour que le Product Owner les récupère par
-script :
+⚠️ **Une valeur en dur qui devrait venir du thème** est décrite quand
+même — le global décrit l'actuel — et signalée.
+
+#### Les passes
+
+**Une passe par domaine.** 📌 Si le découpage du code ne suit pas les
+domaines produit, le Product Owner indique quels dossiers correspondent
+à quel domaine.
+
+**Une passe application**, séparée — authentification, thème, langues,
+rétention : ce que le code porte sans appartenir à un domaine. 📌 **Elle
+se range en tête du fichier**, avant les domaines.
+
+**Ordre des sections dans un domaine** : celui de leur apparition dans
+le code. ⚠️ Sans consigne, deux passes sur le même domaine produiraient
+deux ordres.
+
+**Une passe finale de recâblage.** 🔴 Une référence vers un domaine pas
+encore extrait porte une balise `<<REF:name>>` ; la passe finale les
+résout toutes.
+
+#### Ce qu'il signale
+
+🔴 **Tout signalement porte une balise greppable**, pour être récupéré
+par script :
 
 | Balise | Sens |
 |---|---|
 | `<<REF:name>>` | Référence vers un domaine pas encore extrait — résolue à la passe finale |
 | `<<ORPHAN>>` | Écran ou service qui n'apparaît dans aucune route ni appel |
-| `<<HARD_STYLE>>` | Valeur de style en dur au lieu du thème |
+| `<<HARD_STYLE>>` | Valeur de style en dur qui devrait venir du thème |
 | `<<HARD_TEXT>>` | Texte affiché en dur au lieu des fichiers de langue |
 | `<<DOUBT>>` | Ce qu'il n'a pas su interpréter |
 
-📌 **Il ne tranche aucun de ces cas** — il décrit et il balise.
+📌 **Il ne tranche aucun de ces cas** — il décrit et signale.
 
-**La frontière** — 🔴 **Il ne corrige pas ce qui lui semble anormal.**
-**Le comportement observé *est* l'état actuel** ; le décrire tel quel
-est exactement ce qu'on veut. 🔴 **Il ne décrit pas ce qui n'est pas
-implémenté.** 🔴 **Il ne nomme ni fichier, ni classe, ni méthode** —
-c'est `CURRENT_TECHNICAL_STATE.md`.
+⚠️ **Les trois du milieu ne sont pas des décisions produit**, ce sont
+des anomalies techniques croisées en lisant. Le Product Owner les
+récupère par script et les envoie en aval — elles ne passent pas par le
+cycle bug fix.
 
-🔴 **Il ajoute son domaine au global, il ne le réécrit jamais** — les
-domaines déjà là ne sont pas les siens.
+#### Ce qu'il ne fait jamais
+
+- 🔴 Justifier — le global décrit, il n'explique pas
+- 🔴 Corriger ce qui lui semble anormal : **le comportement observé est
+  l'état actuel**, le décrire tel quel est exactement ce qu'on veut —
+  il peut le signaler par balise, jamais le réécrire
+- 🔴 Décrire ce qui n'est pas implémenté
+- 🔴 Nommer un fichier, une classe, une méthode — c'est
+  `CURRENT_TECHNICAL_STATE.md`
 
 ---
 
-## Qui tourne sur quel modèle
+## Mode opératoire
 
-*Porté par la frontmatter de chaque agent.*
+**Les cinq agents vivent dans `.claude/agents/`**, comme ceux de
+l'aval.
 
-| Opus | Sonnet |
+### Les quatre points d'entrée
+
+| Cas | Comment on entre |
 |---|---|
-| lexicographe · decoupeur · sondeur · convertisseur · architecte | redacteur · assembleur · fusionneur · extracteur |
+| **Feature sur application existante** | Le cas nominal — cycle complet, `/1_structure` à `/6_fusionne` |
+| **Application neuve** | `/socle` crée l'arborescence et un global vide. Puis **un cycle par domaine** — le premier remplit le global, les suivants le voient comme une application existante |
+| **Correction d'un défaut** | 🔴 **Deux cas à distinguer avant d'entrer** — voir ci-dessous |
+| **Reprise d'une application existante** | Aucun global — `/extrait` le construit depuis le code, un domaine à la fois, puis les cycles normaux s'appliquent |
 
-📌 **Cinq portent `effort: high`** — redacteur, convertisseur,
-fusionneur, architecte, extracteur. ⚠️ **Aucune commande ne le passe** —
-le paramètre n'existe pas sur l'appel.
+**Découper une application neuve en domaines** : le critère est le même
+que partout — *ce que le domaine fait, en une phrase, sans « et »*.
+⚠️ **Pas de liste type** : ranger un produit dans des cases génériques
+le déformerait. Les découpages fréquents — authentification et compte,
+réglages, un domaine par objet métier, tableau de bord — sont des
+exemples, pas un modèle.
 
----
+**Correction d'un défaut** — un cycle à part, avec son propre agent.
 
-# LA GRILLE DE CADRAGE PRODUIT
+**Le Product Owner crée `bugfix-NN/` et y écrit `bug-list.md`** — voir
+sa section pour la forme.
 
-*`docs/process/GRILLE_CADRAGE_PRODUIT_V2.md`. Les sondeurs la
-déroulent ; aucun autre agent ne l'ouvre.*
+**La chaîne** : `/diagnostique` → `/7_decoupe` → `/8_code`.
 
-🔴 **C'est un test de fermeture, pas une liste de sujets.** 📌 **Elle
-génère ses questions depuis les blocs présents.** ⚠️ **Ce qu'elle ne
-génère pas des blocs présents, elle ne le demande pas** — elle ne
-grandit jamais d'imagination.
+🔴 **Rien de la chaîne amont ne tourne** — ni l'Analyste, ni la grille,
+ni le Convertisseur, ni le Fusionneur. **Le produit dit déjà ce qui est
+attendu ; une correction n'y ajoute rien.**
 
-**Le critère de complétude** — 🔴 **un cadrage est complet quand rien ne
-pend.** Chaque élément a un déclencheur nommé et un effet nommé ; chaque
-nom qu'il cite pointe vers quelque chose de décrit, ou est défini sur
-place. **Un nom sans rien derrière est un trou.**
+📌 **`desc-bug.md` est le document technique du cycle** — le Cadreur le
+découpe comme il découpe une spec.
 
-## Trois passes, et elles lisent des choses différentes
-
-🔴 **Une fermeture appartient à une passe, jamais aux deux.**
-
-**Passe A — un bloc à la fois.** 📌 **Tout ce qu'un bloc ferme seul.**
-⚠️ **On répond depuis ce bloc seul** — 🔴 **qu'un autre bloc porte la
-réponse n'est pas la question de cette passe.**
-
-Quatre parties : fermer le bloc (ce qui le déclenche, ce qu'il
-consomme, ce qu'il produit, où il se dessine, ce qui départage une
-égalité) — 🔴 **y compris le revers, posé même quand la réponse est
-« rien »** : ce qui se passe quand le déclencheur cesse d'être vrai, ce
-que devient ce qui a déjà été produit, s'il peut se redéclencher.
-Puis rendre le bloc codable, **par les questions de sa nature et
-d'elles seules**. Puis les blocs sans déclencheur. Puis le test de
-clôture.
-
-🔴 **Le test de clôture écrit tout nom que le bloc emploie, avec la
-valeur que le bloc lui donne** — ⚠️ **même un nom qu'il ferme ici.**
-📌 **La passe B a besoin de tous pour trouver un nom qui vaut deux
-choses.**
-
-⚠️ **Un nom n'est pas seulement ce qui porte un nom propre** : *« les
-cinq lignes de zone »*, *« l'arc actif au repos »*, *« l'heure
-affichée »* en sont.
-
-**Passe B — les blocs les uns contre les autres.** 📌 **Tout ce qui
-n'apparaît qu'en les mettant ensemble.**
-
-🔴 **Elle lit les réponses de la passe A, jamais les blocs à nouveau.**
-📌 **On rassemble une colonne à travers tous les blocs, puis on la
-croise** — ⚠️ **jamais bloc par bloc**, ou on relit soixante fois ce
-qu'une colonne montre d'un coup.
-
-⚠️ **C'est ce qu'une chaîne n'atteint jamais.** 📌 **Une chaîne remonte
-ce qui consomme et descend ce qui produit ; deux blocs qui partagent un
-écran, ou un nom, ne font ni l'un ni l'autre** — 🔴 **seule une colonne
-prise en entier les montre.**
-
-🔴 **Chaque croisement pose la même question à sa réponse : est-ce que
-le bloc change ?** ⚠️ **Inchangé → le fil se ferme**, et le bloc est
-marqué *existant*. 🔴 **Changé → c'est un bloc à part entière, et
-personne d'autre ne l'écrira.**
-
-**Passe C — la fonctionnalité, une fois.** 📌 **Ce qu'aucun bloc ne
-lève, parce que ça n'appartient à aucun.** 🔴 **Les seules questions
-énumérées de la grille — courtes exprès.**
-
-## Deux mécaniques qui traversent la grille
-
-🔴 **Chaque question porte un identifiant** — `A1.3`, `A2.screen.2`,
-`C1.6`. ⚠️ **Qui répond écrit cet identifiant, exactement** — 📌 c'est
-ce qui rend les réponses d'un bloc comparables à celles d'un autre.
-
-🔴 **Une catégorie écartée est déclarée écartée**, jamais sautée en
-silence. ⚠️ **Une section sautée en silence et une section sans objet
-se lisent pareil.**
+⚠️ **Le Contrôleur ne tourne pas non plus** : il compare le fichier
+produit aux fiches, et il n'y a pas de fichier produit ici.
 
 ---
 
-# LES COMMANDES
+### Une commande par invocation
 
-*Ce que chacune décide, et pourquoi c'est elle qui décide.*
+🔴 **Aucune commande n'en appelle une autre.** Le Product Owner
+déclenche chacune à la main — il n'y a jamais deux agents enchaînés
+sans son intervention.
 
-| Commande | Agent(s) | Ce qu'elle produit |
+⚠️ **Une exception : `/extrait`.** L'extraction ne prend aucune
+décision produit — l'Extracteur décrit et balise, rien n'attend
+d'arbitrage entre deux domaines. La commande déclenche **un mode de
+`.claude/CLAUDE.md`** qui enchaîne : passe application, puis les
+domaines dans l'ordre, puis la passe de recâblage.
+
+📌 **Séquentiel, pas parallèle** : chaque domaine voit les précédents,
+donc balise moins. En parallèle, aucun ne verrait les autres et la
+passe de recâblage deviendrait énorme.
+
+**Ce que le Product Owner fournit** : la liste ordonnée des domaines
+avec leurs dossiers de code. L'orchestrateur ne la devine pas.
+
+| Commande | Agent | Ce qu'elle produit |
 |---|---|---|
-| `/1_lexique` | lexicographe | `lexique.md` · `questions-lexicographe-NN.md` · `idees.md` tranché |
-| `/2_structure` | redacteur | `desc-produit.md` |
-| `/3_decoupe` | decoupeur | `desc-produit.md`, blocs découpés |
-| `/4_grille` | sondeur ×3, puis assembleur | `questions-sondeur-NN.md` |
-| `/5_reclasse` | convertisseur, inv. 1 | `questions-convertisseur-NN.md` |
-| `/6_convertit` | convertisseur, inv. 2 | `spec-technique.md` · `tracabilite.md` |
-| `/conventions` | architecte | `TECHNICAL_CONVENTIONS.md` · `couverture.md` |
-| `/fusion_compare` | fusionneur, inv. 1 | `plan-fusion.md` · questions |
-| `/fusion_applique` | fusionneur, inv. 2 | Le global à jour · `rapport-fusion.md` |
-| `/fusion` | fusionneur | Reprise, par table de routage |
-| `/extrait` | extracteur, enchaîné | Le global entier, depuis le code |
+| `/socle` | — *(script)* | L'arborescence et un global vide, pour une application neuve |
+| `/extrait` | Extracteur, orchestré | Le global entier, depuis le code — reprise d'une application existante |
+| `/diagnostique` | Diagnostiqueur | `desc-produit.md` — cycle bug fix uniquement |
+| `/1_structure` | Analyste | `desc-produit.md` — depuis `idees.md`, ou depuis le dernier fichier de questions |
+| `/2_grille` | Analyste | `questions-analyste-NN.md` |
+| `/3_reclasse` | Convertisseur | `questions-convertisseur-NN.md` |
+| `/4_convertit` | Convertisseur | `spec-technique.md` |
+| `/5_compare` | Fusionneur | `plan-fusion.md`, `questions-fusionneur-NN.md` |
+| `/6_fusionne` | Fusionneur | global à jour, `rapport-fusion.md` |
 
-📌 **La numérotation suit la chaîne, pas les agents** — elle donne
+📌 **La numérotation suit la chaîne**, pas les agents — elle donne
 l'ordre d'exécution.
 
-## `/1_lexique` — décide laquelle des quatre invocations
+**Les commandes qui bouclent** — `/1_structure` et `/2_grille` — se
+relancent simplement tant qu'il reste des questions. Idem pour
+`/5_compare` et `/1_structure`.
 
-🔴 **Ce qui traîne à la racine du dossier décide.** 📌 **Le nom, jamais
-le numéro.**
+### Modèles
 
-| À la racine | Invocation |
+🔴 **Le Convertisseur et l'Architecte tournent en Opus.** 📌 **Onze des
+soixante-six défauts d'un cycle de correction remontent au premier**,
+et le second a mesuré l'écart : à grille identique, le passage de
+Sonnet à Opus a fait passer sa prise de 34 défauts à 42.
+
+⚠️ **Le coût est borné** : deux invocations par feature pour l'un, une
+pour l'autre.
+
+📌 **Le reste de l'amont est en Sonnet** — l'Analyste, le Fusionneur,
+le Diagnostiqueur, l'Extracteur.
+
+⚠️ **Deux phases restent candidates si la qualité ne suit pas** :
+
+| Phase | Ce qu'elle demande |
 |---|---|
-| Aucun fichier de questions | **1 — Balayage** |
-| `questions-lexicographe` seul | **2 — Tranchage** |
-| `questions-sondeur` seul | **3 — Surveillance** |
-| Les deux | **4 — Correction** |
+| Analyste, invocation 1 | Décomposer un flux libre en sujets et poser une nature — une mauvaise décomposition se propage jusqu'au code |
+| Fusionneur, invocation 1 | Reconnaître que deux formulations décrivent la même règle |
 
-🔴 **Pourquoi c'est la commande** : ⚠️ **c'est le rangement fait par
-`/2_structure` et `/4_grille` qui sépare ces quatre cas.** `/2_structure`
-range le fichier du lexicographe, `/4_grille` range tout ce qui n'est
-pas le sien. **L'agent ne voit pas cet état ; l'orchestrateur, si.**
+📌 **Les autres phases sont mécaniques** — trier sur des natures
+présentes, transcrire, appliquer un plan, vérifier trois points.
 
-🔴 **Elle décide aussi que `desc-produit.md` arrête 1 et 2, mais pas 3
-et 4** — le vocabulaire se tranche avant le fichier produit, jamais
-après.
+### Faire grandir la grille
 
-## `/2_structure` — décide ce qui devient périmé
+📌 **La grille n'énumère pas les cas.** Ce qu'elle ne génère pas depuis
+les blocs présents, elle ne le demande pas. Elle ne grandit jamais
+d'imagination — seulement quand une passe réelle a laissé passer
+quelque chose.
 
-**Elle décide l'invocation** : sans fichier de questions à la racine,
-1 ; avec un ou plusieurs, **quel que soit leur préfixe**, 2 sur le plus
-haut numéro. ⚠️ **Un `Answer:` vide l'arrête**, et elle dit lesquelles
-attendent.
-
-🔴 **Et elle décide ce qui est à jeter.** Elle grepe `NEW` dans le
-fichier produit : s'il y en a, elle supprime le document technique.
-
-⚠️ **Le fichier produit a gagné un bloc**, et tout ce qui a été
-construit depuis la version précédente est périmé — une mise à jour
-ciblée corrigerait un document qui ne correspond plus.
-
-📌 **`MODIFIED` seul ne déclenche rien** : ⚠️ **un bloc changé existe
-toujours sous le même identifiant**, et une mise à jour ciblée
-l'atteint.
-
-🔴 **Pourquoi c'est la commande** : c'est la seule à voir à la fois le
-marqueur et les fichiers d'aval. L'agent n'ouvre ni l'un ni l'autre.
-
-## `/3_decoupe` — décide quels blocs regarder
-
-**Premier tour** — aucun `questions-*.md` nulle part : 🔴 **tous les
-blocs.** **Tours suivants** — l'union de deux greps, `NEW` et
-`MODIFIED`.
-
-⚠️ **Elle ne grepe pas le fichier de questions** — 🔴 **un bloc qu'une
-réponse a touché porte `MODIFIED`**, et le second grep le trouve.
-
-🔴 **Elle décide aussi de s'arrêter** sur un `Clarification needed` dans
-le fichier produit.
-
-**Elle compte, elle ne vérifie pas** — 🔴 **jamais lire un bloc pour
-contrôler le travail.** 📌 **Les sondeurs sondent ce qu'il a produit ;
-c'est ça qui attrape un mauvais découpage.**
-
-## `/4_grille` — décide les trois ordres et ce qui clôt la boucle
-
-🔴 **Les trois appels `Agent(...)` partent dans un seul message.**
-⚠️ **Trois messages les font tourner en série** — 📌 ils ne partagent
-rien, et lancés ensemble le coût en temps est celui d'un seul sondeur.
-
-**Elle décide les blocs de la passe A** — l'union de trois greps :
-`^Block:` dans le dernier fichier de questions des sondeurs, `NEW` et
-`MODIFIED` dans le fichier produit. 🔴 **Une question nommant deux blocs
-les envoie tous les deux.** ⚠️ **Ça ne rétrécit que la passe A.**
-
-**Elle décide que la fusion peut avoir lieu** : 🔴 **les trois fichiers
-existent, sinon elle s'arrête** et dit lequel manque.
-
-**Et elle clôt la boucle** : 🔴 **elle recopie le fichier fusionné en
-`questions-sondeur-NN.md`**, renumérote à partir de `Q1`, retire la
-section `## Merge` — ⚠️ une note de travail, pas une question.
-📌 **Aucune question du tout → elle écrit le fichier vide. C'est ce qui
-termine la boucle.**
-
-🔴 **Elle crée `cadrage-produit/closed/` dans le worktree avant
-d'invoquer** — ⚠️ un agent dont le dossier cible manque cherche au lieu
-de s'arrêter.
-
-## `/5_reclasse` et `/6_convertit` — ne décident rien d'autre que l'enveloppe
-
-📌 **Elles nomment l'invocation, passent le dossier, et gèrent le
-rangement et le git.** ⚠️ **Ce qui tourne ensuite n'y est pas** — c'est
-l'agent qui le porte, dans sa table d'aller-retour.
-
-## `/conventions` — décide l'invocation, et se porte garante du relais
-
-🔴 **Elle parcourt la table du haut et s'arrête à la première ligne qui
-correspond :** une demande à `## Verdict` vide → 3 ; un
-`questions-architecte-NN.md` répondu → 2 ; rien de tel → 1.
-
-📌 **Elle décide aussi le dossier de travail** — la feature, ou un
-`bugfix-NN` pour l'invocation 3. ⚠️ **Chaque cycle porte son propre
-`architecte/`**, et une demande se traite dans le cycle qui l'a levée.
-
-🔴 **Elle s'arrête si `spec-technique.md` est absent** — l'agent en
-dérive, et la boucle amont n'y est pas encore arrivée. ⚠️ **Sauf à
-l'invocation 3**, qui juge une demande contre les conventions.
-
-🔴 **Elle dit explicitement quand le fichier de questions porte des
-questions.** ⚠️ **Une exécution qui a écrit une question sans le dire
-est une exécution dont la question est perdue** — 📌 **le Product Owner
-ne va pas fouiller le dossier.**
-
-⚠️ **Elle se lance à la main** — 🔴 **`/cycle` ne l'appelle pas**, et le
-câblage attend que la grille ait été mesurée sur un cycle réel.
-
-## `/fusion_compare`, `/fusion_applique`, `/fusion`
-
-📌 **Les deux premières sont une invocation chacune.**
-🔴 **`/fusion_applique` range en plus tous les `questions-*.md` de la
-racine une fois la fusion tenue** — **la branche de fusion s'arrête
-là.**
-
-📌 **`/fusion` est une table de routage à dix lignes**, parcourue du
-haut, qui décide *où reprendre* : erreur si le fichier produit manque,
-arrêt sur un blocage ou un `Answer:` vide, arrêt si `rapport-fusion.md`
-existe — la fusion est faite — sinon l'invocation qui correspond.
-
-🔴 **Une phase par exécution, jamais deux agents enchaînés** — chaque
-arrêt rend la main au Product Owner.
-
-## `/extrait` — décide la séquence, jamais le découpage
-
-📌 **La liste des domaines est une décision produit, jamais dérivée de
-l'arborescence** — 🔴 **sans elle, on n'extrait rien.** ⚠️ Un dossier
-peut porter deux sujets, un sujet s'étaler sur trois dossiers.
-
-**Trois temps** : la passe application, puis les domaines dans l'ordre
-de la liste, puis le recâblage.
-
-🔴 **Séquentiel, jamais parallèle** — 📌 **chaque domaine voit les
-précédents et balise moins.** En parallèle, aucun ne verrait les autres
-et la passe de recâblage deviendrait énorme.
-
-📌 **Un seul worktree pour toutes les passes**, pas un par passe.
-**Entre deux passes, elle grepe le titre du domaine dans le global** —
-🔴 **sans ça, une passe ratée passe inaperçue et son domaine manque
-simplement.**
-
-**Sur échec elle continue** — 📌 les domaines sont indépendants, et elle
-rapporte les domaines ratés à la fin.
-
-## L'enveloppe git, commune à toutes
-
-🔴 **Quatre gestes, dans cet ordre, avant d'invoquer :**
-
-**1. Ranger** tout `questions-*.md` de la racine dont le préfixe n'est
-pas celui de la phase, dans `questions/<agent>/`. 🔴 **Par `git mv`,
-jamais par une lecture-réécriture** — ⚠️ **les agents ne doivent pas
-ouvrir ces fichiers, et l'orchestrateur non plus.** 📌 **Le plus haut
-numéro du préfixe courant reste à la racine** : il porte la
-numérotation.
-
-**2. Commiter le dossier de la fonctionnalité.** ⚠️ **Le Product Owner
-remplit les `Answer:` à la main, hors session.** Un worktree part du
-dernier commit — **des réponses non commitées y sont invisibles**, et
-l'agent travaille sur un fichier périmé. *(Vu une fois : 186 lignes dans
-le worktree, 195 dans le checkout principal.)*
-
-**3. Créer le worktree depuis `HEAD` local**, et l'enregistrer.
-⚠️ **Ne jamais laisser l'outillage choisir la base** — 🔴 **son défaut
-est `origin/master`**, qui peut être plusieurs commits en retard.
-*(Vu une fois : une invocation entière perdue.)*
-
-**4. Entrer dans le worktree avant d'invoquer**, pas après un échec
-d'écriture. 🔴 **Le harnais bloque les écritures d'un sous-agent tant
-que la session n'est pas isolée** — ⚠️ **l'agent fait tout le travail
-avant de découvrir qu'il ne peut pas l'enregistrer**, et l'invocation
-entière est à refaire. *(Mesuré sur trois phases.)*
-
-**Puis, une fois l'agent rentré** : `git merge --no-ff`, `git push`,
-`git worktree remove`.
-
-🔴 **Le push fait partie du merge, pas d'un après-coup.** Une phase qui
-ne vit que sur la machine locale est perdue avec elle. ⚠️ **Un push qui
-échoue se rapporte, il ne se contourne pas.**
-
-🔴 **Merger avant de rendre la main, toujours** — ⚠️ **un `blocked_*.md`
-merge aussi** : le Product Owner doit le voir.
-
----
-
-# LA BOUCLE DU CYCLE
-
-*Portée par la section **What to run next** de chaque commande.*
-
-    /1_lexique  ⇄  questions            (invocations 1 et 2)
-         │ vide
-         ↓
-    /2_structure ──→ /3_decoupe ──→ /4_grille
-         ↑                                │
-         │                                ├─ des questions ─→ /1_lexique (3 puis 4)
-         │←───────────────────────────────┘                        │
-         │                                                          ↓
-         │                                              (retour à /2_structure)
-         │
-         └── /4_grille vide ──→ /5_reclasse ──→ /6_convertit ──→ /conventions ──→ aval
-                                                      │
-                                             /fusion_compare ──→ /fusion_applique
-
-**Les enchaînements, un par un :**
-
-| Ce qui vient de se passer | Ensuite |
+| Partie | Ce qui l'a fait grandir |
 |---|---|
-| `/1_lexique` 1 ou 3 a demandé quelque chose | Répondre, puis `/1_lexique` |
-| `/1_lexique` 2 a tourné, et 1 ne trouve plus rien | `/2_structure` |
-| `/1_lexique` 4 a tourné | `/2_structure` — 🔴 les réponses de la grille sont tranchées |
-| `/2_structure` a signalé une clarification | 🔴 **Répondre, puis `/2_structure`** — rien en aval ne tourne tant qu'un signalement tient |
-| `/2_structure` a écrit le fichier produit | `/3_decoupe` |
-| `/3_decoupe` a tourné | `/4_grille`, qu'il ait découpé ou non |
-| `/4_grille` a levé des questions | 🔴 **Répondre, puis `/1_lexique`** — il tranche le vocabulaire que ces réponses apportent, avant que le Rédacteur les lise |
-| `/4_grille` est vide | `/5_reclasse` — le fichier produit est fermé |
+| **1 — fermer le bloc** | Le voisinage. *Une chaîne remonte ce qui consomme et descend ce qui produit ; un voisin ne fait ni l'un ni l'autre — aucune fermeture ne l'atteignait.* |
+| **2 — rendre le bloc codable** | L'exhaustivité. *Une règle découpant un intervalle a laissé ses bornes indéfinies pendant quatre passes.* |
+| **4 — ce qu'aucune chaîne ne révèle** | Un trou constaté en aval — un `blocked.md`, une question produit remontée à l'implémentation |
+| **5 — test de clôture** | Le nom défini sur place. *Un texte affiché, une dimension et un élément existant ont traversé la chaîne sans jamais être définis.* |
 
-**L'aller-retour du Convertisseur** — 🔴 **une réponse revient toujours
-par `/2_structure` d'abord.** La suite dépend de ce qu'elle a changé :
+🔴 **La partie 3 n'a jamais grandi** — les éléments sans déclencheur
+sont rares et leur cadrage tient.
 
-| Après `/2_structure` | La route |
-|---|---|
-| Aucun `NEW` dans le fichier produit | 🔴 **Directement à l'invocation qui a demandé** |
-| Un `NEW` est apparu | `/4_grille` → `/5_reclasse` → `/6_convertit` — 📌 un bloc neuf n'a jamais été fermé, ni classé |
+⚠️ **Quatre points de croissance sur un seul cycle.** Le prochain doit
+en produire moins ; s'il en produit autant, le test de clôture n'est
+pas le bon instrument.
 
-⚠️ **La route longue repasse par `/5_reclasse`, qui supprime le document
-technique** — 📌 l'invocation 2 le produit alors en entier plutôt que de
-rapiécer un document périmé.
+### Où vivent les fichiers
 
-📌 **Les questions de l'invocation 2 créent rarement un bloc** : elles
-affûtent une phrase qui existe déjà.
+**Un dossier par feature** : `docs/features/<nom>/`, créé par le
+Product Owner, qui y dépose son fichier d'idées.
 
-**Le critère d'arrêt, partout** — 🔴 **un fichier de questions
-entièrement répondu, jamais un nombre d'itérations.** ⚠️ **Une question
-dont la réponse est consignée ne se repose jamais.** 📌 **Qu'une réponse
-fasse apparaître un nouveau problème est normal, pas un échec.**
+    idees.md · desc-produit.md · plan-fusion.md
+    spec-technique.md · rapport-fusion.md
 
----
+    questions-<agent>-01.md…      à la racine, le cycle en cours
+    questions/<agent>/            les cycles clos, un dossier par agent
 
-# LES FICHIERS
+    code/                         le process aval
 
-## Ce que la chaîne produit, et qui l'écrit
+**Un cycle de correction vit dans son propre dossier**, numéroté :
 
-| Fichier | Écrit par | Lu par |
-|---|---|---|
-| `idees.md` | Product Owner, hors ligne · **Lexicographe** pour les termes tranchés | Lexicographe, Rédacteur *(inv. 1)* |
-| `lexique.md` | Lexicographe | Lexicographe, Rédacteur |
-| `desc-produit.md` | **Rédacteur** · Découpeur *(découpes seules)* | Sondeur, Convertisseur, Fusionneur, Architecte |
-| `cadrage-produit/par-bloc.md` · `par-question.md` · `par-nature.md` | Les trois sondeurs | Assembleur |
-| `cadrage-produit/questions.md` | Assembleur | La commande `/4_grille`, qui le recopie |
-| `questions-<agent>-NN.md` | L'agent émetteur · **Product Owner** pour les réponses | Son émetteur, le Rédacteur |
-| `spec-technique.md` | Convertisseur *(inv. 2)* | Architecte, **Cadreur** *(aval)* |
-| `tracabilite.md` | Convertisseur *(inv. 2)* | Architecte *(inv. 1)* |
-| `docs/TECHNICAL_CONVENTIONS.md` | **Architecte, seul** | Tous les agents de code, Extracteur |
-| `couverture.md` | Architecte | Product Owner, une fois |
-| `architecte/<demande>.md` | Les agents d'aval · **Architecte** pour le `## Verdict` | Architecte *(inv. 3)*, leur auteur |
-| `plan-fusion.md` | Fusionneur *(inv. 1)* | Fusionneur *(inv. 2)*, elle seule |
-| `docs/PRODUIT_GLOBAL.md` | Fusionneur · Extracteur | Rédacteur, Fusionneur — 🔴 **par l'index** |
-| `rapport-fusion.md` | Fusionneur *(inv. 2)* | Product Owner |
-| `blocked_<agent>.md` | L'agent · **Product Owner** pour la `## Decision` | L'agent, et l'orchestrateur pour cette seule ligne |
-| `docs/process/GRILLE_*.md` | Product Owner, hors chaîne | Sondeur *(cadrage)* · Convertisseur *(fermeture)* · Architecte *(conventions)* |
+    bugfix-01/
+      bug-list.md                 Product Owner
+      desc-bug.md                 Diagnostiqueur, invocation 2
+      investigation/<id>.md       Diagnostiqueur, invocation 1
+      code/                       le process aval, à l'identique
 
-**Où ils vivent** — 🔴 **un dossier par fonctionnalité**,
-`docs/features/<nom>/`, créé par le Product Owner qui y dépose son
-fichier d'idées. 📌 **Le global est `docs/PRODUIT_GLOBAL.md`**, à part :
-il n'appartient à aucune feature.
+🔴 **Le Product Owner crée le dossier et y écrit `bug-list.md`** — les
+commandes ne le créent jamais.
+
+📌 **`/7_decoupe` et `/8_code` travaillent dans le `bugfix-NN` le plus
+haut s'il en existe un**, dans le dossier feature sinon. **Même
+structure des deux côtés** : le document technique à la racine, `code/`
+à côté.
+
+🔴 **Les fichiers de questions portent le nom de leur émetteur** —
+`questions-analyste-01.md`, `questions-convertisseur-01.md`,
+`questions-fusionneur-01.md`.
+
+**Chaque agent, avant d'écrire :** il range dans `questions/<agent>/`
+tout fichier de la racine dont le préfixe n'est pas le sien, cherche
+son dernier — à la racine, sinon dans son propre dossier — et écrit à
+la racine au numéro suivant.
+
+⚠️ **Un agent ne lit jamais un fichier qui n'est pas le sien.**
+
+📌 **Le process aval travaille dans le même dossier**, sous
+`code/` — voir `PROCESS_AVAL.md`.
 
 🔴 **Noms fixes** — c'est ce qui permet aux commandes de n'avoir qu'un
 seul argument : le nom du dossier.
 
-## Comment le global se lit
+    /1_structure partage-familial
 
-🔴 **Par l'index, jamais en entier.** ⚠️ **Il dépasse 250 Ko.** Un grep
-sur `^#` sort les titres — domaines, sections, blocs — quel que soit le
-volume ; on ne charge ensuite que les sections dont on a besoin.
+**Le document produit global** : `docs/PRODUIT_GLOBAL.md`, à la racine
+— permanent, il n'appartient à aucune feature.
 
-⚠️ **Un titre doit dire ce que sa section contient**, sinon l'index ne
-sert à rien. **C'est le critère de qualité du global.**
+## Questions ouvertes
 
-🔴 **Il décrit l'état actuel, jamais l'historique.** Une entité révisée
-n'accumule pas ses versions.
+*Des points que l'usage n'a pas encore tranchés.*
 
----
+🟡 **Stabilité de l'identifiant d'entrée** dans le document global.
+Moins critique depuis que la fusion se décide à la structuration —
+c'est le Product Owner qui désigne l'entrée à réviser, pas un agent qui
+la retrouve.
 
-# LES MÉCANIQUES COMMUNES
-
-*Inventées une fois, portées par presque tous les agents. Chacune
-empêche une défaillance précise.*
-
-## Le fichier de questions
-
-🔴 **Quatre lignes par entrée, sans exception**, et la numérotation
-repart à `Q1` dans chaque fichier :
-
-    ### Q1
-    Block: B7
-    Question: <ce qui manque, énoncé directement>
-    Answer:
-
-🔴 **La ligne `Answer:` s'écrit vide et ne s'omet jamais** — c'est là
-que le Product Owner écrit, à la main. **Une entrée sans elle est
-inutilisable.**
-
-📌 **Questions en anglais, réponses en français** — le Rédacteur traduit
-en intégrant.
-
-🔴 **Un trou, une question.** ⚠️ **Deux trous dans une entrée ne peuvent
-pas être répondus séparément**, et une fusion ne peut pas les
-distinguer.
-
-📌 **C'est le seul fichier où un agent formule librement** — partout
-ailleurs il transcrit ou range.
-
-🔴 **Il ne propose jamais de réponse.** Formuler une hypothèse plausible
-reviendrait à trancher une décision produit.
-
-**La numérotation avance d'une invocation, jamais d'une question** —
-📌 un fichier par invocation, portant toutes ses questions.
-
-## Écrire la sortie même vide
-
-🔴 **Un fichier de sortie s'écrit toujours, même sans contenu.** Un
-fichier de questions vide dit *« rien à signaler »* ; son absence dit
-*« l'agent n'a pas tourné »*. ⚠️ **L'orchestrateur ne peut pas
-distinguer les deux autrement**, et laisserait le fichier précédent
-passer pour le dernier.
-
-## Les marqueurs `NEW` et `MODIFIED`
-
-📌 **Ils disent quoi resonder au tour suivant.** 🔴 **Un bloc qu'aucun ne
-nomme a été fermé au tour précédent et n'a pas bougé depuis.**
-
-🔴 **Ils sont effacés avant chaque écriture** — seuls ceux du tour en
-cours doivent rester. ⚠️ **Un bloc changé sans `MODIFIED` ne sera jamais
-resondé.**
-
-## Le signalement en place — `**Clarification needed:**`
-
-📌 **Il transcrit une lecture plutôt que de s'arrêter** : le bloc reste
-exploitable pendant que la lecture se confirme.
-
-🔴 **Mais rien en aval ne tourne tant qu'un signalement tient.**
-⚠️ **Le Découpeur et les sondeurs s'arrêtent dessus** — un bloc
-transcrit sur une lecture non confirmée serait découpé ou fermé sur une
-forme qui va changer.
-
-📌 **Il vit dans le bloc, et le Rédacteur le retire en intégrant sa
-réponse.**
-
-## Les fichiers de blocage
-
-🔴 **Un agent qui ne peut pas produire écrit un fichier**, il ne se
-contente pas de le dire. ⚠️ **Un message dans une réponse se perd ; un
-fichier reste.**
-
-**Quatre titres** — ce qui bloque *(le fait, pas son interprétation)*,
-où, ce qu'il faudrait pour reprendre, et 🔴 **`## Decision`, écrite
-vide.** **C'est là que le Product Owner répond, et c'est le seul moyen
-qu'un blocage se lève.**
-
-⚠️ **Bloquer n'est pas signaler.** Un manque, une contradiction, une
-question : ça part dans le fichier de questions et le cycle continue.
-🔴 **On ne bloque que quand produire est impossible** — entrée absente,
-fichier attendu introuvable, prémisse fausse qui invalide tout le
-travail.
-
-📌 **Ne jamais bloquer par excès de prudence.**
-
-🔴 **La commande lit cette seule ligne `## Decision`** — vide, elle
-s'arrête ; remplie, **elle nomme le fichier dans le prompt.** ⚠️ **Un
-agent ne va jamais chercher un fichier de blocage lui-même** :
-l'orchestrateur a regardé, et ne l'aurait pas appelé sur une décision
-vide.
-
-🔴 **Une fois appliqué, le fichier est renommé** en
-`blocked_<agent>-NN.md`, ⚠️ **par `git mv`** : un fichier, sous un
-nouveau nom. 🔴 **Jamais une copie, une note ou un fichier vide laissé à
-l'ancien nom** — 📌 **tout ce qui reste au nom sans numéro se lit comme
-un blocage encore debout**, et l'exécution suivante s'arrête dessus.
-
-📌 **Les numérotés sont l'archive de ce sur quoi ce cycle a déjà
-bloqué** — 🔴 **l'exécution suivante les lit.**
-
-## Les chemins, dans un worktree
-
-🔴 **Tout chemin qu'un agent lit ou écrit est relatif** —
-`docs/features/…`, jamais `C:\…` ni `/…`. ⚠️ **Un chemin absolu pointe
-hors de la session isolée**, et l'écriture échoue.
-
-## Les marques greppables
-
-📌 **Deux agents laissent des marques dans leur propre sortie**, pour
-qu'un grep ou un script les récupère : `<<ASSUMED …>>` chez le
-Convertisseur, les cinq balises de l'Extracteur.
-
-🔴 **Une marque porte l'identifiant de ce qui la lèvera**, pas seulement
-le fait qu'elle existe.
-
----
-
-# CONTRADICTIONS RELEVÉES
-
-*Points où deux fichiers ne disent pas la même chose. Non tranchés
-ici.*
-
-🟡 **Le modèle du Rédacteur.** Sa frontmatter dit `model: sonnet`.
-`/2_structure` l'invoque avec `model="opus"` dans son propre bloc
-d'invocation, puis avec `model="sonnet"` dans son bloc *Invocation
-parameters*, quelques lignes plus bas. **Trois valeurs, deux dans le
-même fichier.**
-
-🟡 **La forme de la ligne `Block:`.** Le sondeur l'impose en
-identifiants seuls — *« pas de titre, pas de tiret, pas de prose »*,
-parce qu'un titre la rend illisible à qui groupe par bloc. L'assembleur
-dit tout recopier tel quel, **et son gabarit montre
-`Block: B7 — Rejecting invalid durations`**. `/4_grille` recopie ensuite
-son fichier sans rien reformuler. Le Convertisseur, le Fusionneur et le
-Rédacteur montrent eux aussi le gabarit avec titre.
-
-🟡 **Le nom de l'invocation 1 du Convertisseur.** L'agent l'appelle
-*Closing* et n'écrit aucun fichier de classement. `/5_reclasse` l'appelle
-*« invocation 1 — Reclassifying »*, et `/2_structure` supprime
-`desc-par-nature.md` quand un `NEW` apparaît. **Aucun agent amont ne
-produit ce fichier** ; il n'est nommé que par `/2_structure` et
-`cycle.md`.
-
-🟡 **Les invocations que `/1_lexique` sait nommer.** Sa table de routage
-sélectionne l'une des quatre, mais son gabarit d'invocation écrit
-`Invocation <1 or 2>`.
-
-🟡 **Ce que `/fusion` enchaîne.** Son en-tête annonce *« trois phases —
-le Rédacteur sur les listes de bugs, puis les deux invocations du
-Fusionneur »*, et sa note de la ligne 9 parle du fichier de questions
-que *« le Rédacteur »* écrit. **Sa table n'invoque que le Fusionneur**,
-invocations 1, 2 et 3 — et c'est l'invocation 3 du Fusionneur qui lit
-les `bug-list.md`.
-
-🟡 **Ce que `.claude/CLAUDE.md` dit des modèles et de la grille.** Il
-annonce que *« les onze sont en `sonnet` »* ; cinq agents amont portent
-`model: opus` en frontmatter. Il annonce aussi que le Rédacteur charge
-`GRILLE_CADRAGE_PRODUIT.md` par son nom ; le Rédacteur s'interdit
-d'ouvrir quoi que ce soit dans `docs/process/`, et la grille que les
-sondeurs chargent est `GRILLE_CADRAGE_PRODUIT_V2.md`.
+🟡 **Tenue de la règle de séquencement** — que se passe-t-il si une
+révision produit est nécessaire pendant qu'un cycle aval tourne ?

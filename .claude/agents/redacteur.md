@@ -165,7 +165,7 @@ existing domain. ⚠️ **When in doubt, file it under the existing one.**
 restarts at Q1 in each file.**
 
     ### Q1
-    Block: B7 — Rejecting invalid durations
+    Block: B7
     Question: what happens to an entry whose duration is zero?
     Answer:
 
@@ -181,7 +181,11 @@ transcribe.
 
 ### The `Block:` line
 
-🔴 **It names the block the question is about**, identifier and title.
+🔴 **Identifiers only, comma-separated, nothing else** — no title, no
+dash, no prose. ⚠️ **A title makes the line unreadable to whoever
+groups by block.**
+
+📌 **Several identifiers** when the question sits between blocks.
 
 📌 **`Block: -` when the question is about the feature and not about a
 block** — ⚠️ **and only then.**

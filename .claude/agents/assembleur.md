@@ -141,7 +141,7 @@ test.**
 **`<out>/questions.md`**, where `<out>` is the prompt's.
 
     ### Q1
-    Block: B7 — Rejecting invalid durations
+    Block: B7
     Question: <copied, word for word>
     Answer:
 

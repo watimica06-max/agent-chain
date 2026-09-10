@@ -89,8 +89,11 @@ reading list.
 🔴 **Every agent carries its own `model` and `effort` in its
 frontmatter.** Pass `model` on the call to match it.
 
-📌 **All eleven are `sonnet`.** The Product Owner escalates a given
-invocation to Opus when she asks for it — never on your own
+📌 **The agent's frontmatter says which model.** 🔴 **Nine carry
+`opus`** — `arbitre`, `architecte`, `cadreur`, `convertisseur`,
+`decoupeur`, `detailleur`, `lexicographe`, `sondeur`, `verificateur` —
+**the rest are `sonnet`.** ⚠️ **Pass what the frontmatter says**, never
+a model of your own choosing
 judgement.
 
 ---

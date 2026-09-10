@@ -6,8 +6,8 @@ argument-hint: "<feature folder name>"
 
 Act as the orchestrator, in **upstream mode**.
 
-**This command chains three phases** — the Rédacteur over the bug-fix
-lists, then the Fusionneur's two invocations.
+**This command chains three phases** — the Fusionneur over the bug-fix
+lists, then its two merge invocations.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
@@ -48,7 +48,7 @@ matches.**
 | 9 | A `bugfix-*/` folder, and no `questions-fusionneur-*` anywhere | **Fusionneur, invocation 3** |
 | 10 | Otherwise | **Fusionneur, invocation 1** |
 
-📌 **Row 9 fires once.** The Rédacteur writes a questions file even when
+📌 **Row 9 fires once.** The Fusionneur writes a questions file even when
 empty, and its presence is what says the pass has run — the
 `bugfix-*/` folders never go away.
 

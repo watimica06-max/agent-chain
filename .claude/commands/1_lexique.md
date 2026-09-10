@@ -83,7 +83,8 @@ Agent(
   model="opus",
   description="Sweep <name>'s vocabulary",
   prompt="The idea file: docs/features/<name>/idees.md.
-          Invocation <1 or 2>.
+          Invocation <1 — Sweeping, 2 — Settling,
+                       3 — Watching, or 4 — Correcting>.
           Write to docs/features/<name>/."
 )
 ```
