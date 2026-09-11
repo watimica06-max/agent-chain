@@ -152,14 +152,15 @@ the lexicon finds the same pair on every turn.
 
 **Three sweeps, in this order.**
 
-**1. The domain's terms.** 📌 **What the product names** — a thing, a
-state, an action, a measure, a screen — 🔴 **with how many times each
-appears, down to the terms that appear once.** ⚠️ **A rare term is where
-a synonym hides**: one sentence in one section naming what the rest of
-the file names otherwise.
+**1. The domain's terms** — 🔴 **what the code will have to build and
+name: a piece of data, an event, a state, an entity, a view** — with
+how many times each appears, down to the terms that appear once.
+⚠️ **A rare term is where a synonym hides**: one sentence in one
+section naming what the rest of the file names otherwise.
 
-⚠️ **Not the prose**, not the linking words. 📌 **What designates
-something in the product.**
+⚠️ **Not how a view looks** — its shapes, colours, type and spacing.
+**Not the variants of one displayed text** — the grid asks every block
+for its exact wording. **Not the prose**, not the linking words.
 
 **2. The pairs.** 🔴 **Two terms that could name one same thing:**
 
@@ -227,8 +228,11 @@ read as *this pass did not run*.
 
 **1. Read the questions file**, and it alone beside the idea file.
 
-**2. Apply each answer to the idea file.** 🔴 **Replace the terms the
-answer retires, everywhere they appear.** 🔴 **Then grep each retired
+**2. Apply each answer to the idea file.** 🔴 **Before applying, read
+the answers against each other and against `## Tranché`.** Two that
+cannot both hold are a question, and neither is applied.
+
+🔴 **Replace the terms the answer retires, everywhere they appear.** 🔴 **Then grep each retired
 term in the idea file: none expected**, save where the answer keeps
 it. ⚠️ **One left is an answer half applied** — replace it before you
 go on.

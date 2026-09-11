@@ -121,9 +121,20 @@ s'était arrêté aux termes fréquents. Quatre règles en sont nées :
 | Des paires déjà tranchées, redemandées : une réponse qui garde deux termes laisse le fichier d'idées inchangé | 🔴 **Dès le deuxième balayage, `## Tranché` est lu d'abord** — ce qu'il règle ne se repose jamais |
 | Un terme retiré oublié à trois endroits sur quatorze | 🔴 **Après remplacement, chaque terme retiré est grepé** — aucun attendu, sauf où la réponse le garde |
 | Une question sur un point final, une autre sur un participe contre son nom | 🔴 **Orthographe, ponctuation, forme grammaticale d'un même mot : pas une paire** |
+| La moitié des questions des tours 5 à 8 portait sur le graphisme et les variantes d'un libellé — sans risque pour le code, et repoussant à chaque tour | 🔴 **Le balayage ne porte que sur ce que le code construira et nommera** : donnée, événement, état, entité, écran |
+| Deux réponses d'un même tour appliquées toutes deux, alors que l'une rendait l'autre fausse | 🔴 **Avant d'appliquer, les réponses sont lues entre elles et contre `## Tranché`** — deux qui ne tiennent pas ensemble font une question |
 
 📌 **Aucune question ne venait d'une réécriture non demandée** — le
 règlement échange des mots, et s'en tient là.
+
+⚠️ **Le balayage par un modèle n'est pas exhaustif** : au tour 7, 29 des
+30 termes des paires trouvées tardivement ne figuraient dans aucun
+inventaire. 📌 **Un inventaire par script a été mesuré puis écarté** —
+92 à 96 % des termes retrouvés, mais trois quarts de prose à trier, et
+aucun rapprochement des synonymes sans mot commun. 🔴 **La réponse
+retenue est la portée**, pas l'outil : un périmètre assez petit pour
+qu'un balayage le couvre. ⚠️ **La valeur du Lexicographe reste à
+prouver** — elle se mesure sur ce que ses questions ont évité en aval.
 
 **Pourquoi 3 et 4 existent** — 🔴 **Les réponses du Product Owner
 portent des mots que personne n'a balayés.** Deux balayages sur ces
