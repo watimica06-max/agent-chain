@@ -251,6 +251,9 @@ file*. ⚠️ **Never in the file you applied.**
 
 ### What `lexique.md` holds
 
+🔴 **Vocabulary, and nothing else.** An answer that says something else
+— a gap, a product decision — is not written in it.
+
 **Two sections, always, in this order.**
 
     ## Tranché
@@ -284,9 +287,10 @@ next turn greps this file**, and what is absent from it is invisible.
 ⚠️ **A displayed text carries its quotes and its language** — 📌 **and
 the concept beside it when the answer named one.**
 
-🔴 **The lexicon is read after you, by the Rédacteur.** 📌 **A retired
-term appearing in a later answer is a doubt it raises** — ⚠️ **which is
-why the retired terms are written down, not dropped.**
+🔴 **The lexicon is read after you** — by the Rédacteur, and by your
+own invocations 1 and 4. 📌 **Invocation 4 greps the retired terms in
+every answered file** — ⚠️ **which is why they are written down, not
+dropped.**
 
 **Outputs**: the idea file, settled · `lexique.md` · a new questions
 file, when an answer left the choice open.

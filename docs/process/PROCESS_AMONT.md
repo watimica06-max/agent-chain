@@ -122,6 +122,7 @@ s'était arrêté aux termes fréquents. Quatre règles en sont nées :
 | Un terme retiré oublié à trois endroits sur quatorze | 🔴 **Après remplacement, chaque terme retiré est grepé** — aucun attendu, sauf où la réponse le garde |
 | Une question sur un point final, une autre sur un participe contre son nom | 🔴 **Orthographe, ponctuation, forme grammaticale d'un même mot : pas une paire** |
 | La moitié des questions des tours 5 à 8 portait sur le graphisme et les variantes d'un libellé — sans risque pour le code, et repoussant à chaque tour | 🔴 **Le balayage ne porte que sur ce que le code construira et nommera** : donnée, événement, état, entité, écran |
+| Une réponse signalant un manque, consignée dans le lexique : le Rédacteur l'y a lue et en a fait une question de trou | 🔴 **Le lexique ne porte que du vocabulaire** — un manque ou une décision produit n'y entre pas ; la grille les demande à leur place |
 | Deux réponses d'un même tour appliquées toutes deux, alors que l'une rendait l'autre fausse | 🔴 **Avant d'appliquer, les réponses sont lues entre elles et contre `## Tranché`** — deux qui ne tiennent pas ensemble font une question |
 
 📌 **Aucune question ne venait d'une réécriture non demandée** — le
@@ -199,6 +200,12 @@ question, pas une hypothèse.
 |---|---|---|
 | 1 — Structurer | `idees.md` · `lexique.md` · l'index du global | Le fichier produit · son fichier de questions |
 | 2 — Intégrer | 🔴 **Le fichier de questions que le prompt nomme** · `lexique.md` · l'index du global | Le fichier produit, à jour · son fichier de questions |
+
+📌 **Il lit `lexique.md` pour une raison** : le terme retenu pour chaque
+chose, et quelles chaînes sont des textes affichés, gardés tels quels,
+avec le concept que chacun porte. ⚠️ **Il n'y cherche plus les termes
+retirés dans les réponses** — l'invocation 4 du Lexicographe les a déjà
+remplacés, sur la route unique : c'était un filet.
 
 🔴 **Il ne lit que les entrées de son invocation, et rien d'autre** — ni
 le dossier d'une autre fonctionnalité, ni un fichier qu'une entrée cite.
@@ -1086,9 +1093,16 @@ lise.**
 
 ## `/3_decoupe` — décide quels blocs regarder
 
-**Premier tour** — aucun `questions-*.md` nulle part : 🔴 **tous les
-blocs.** **Tours suivants** — l'union de deux greps, `NEW` et
-`MODIFIED`.
+**Tant que la grille n'a pas tourné** — aucun `questions-sondeur-*.md`
+nulle part : 🔴 **tous les blocs.** **Ensuite** — l'union de deux greps,
+`NEW` et `MODIFIED`.
+
+⚠️ **Pas « aucun fichier de questions »** : le lexique en écrit toujours
+avant, et le Rédacteur efface tous les marqueurs quand il intègre. 📌
+**Cas observé** : une question du Rédacteur dès sa première invocation
+renvoyait à `/1_lexique` avant tout découpage ; à l'intégration, les
+`NEW` disparaissaient, et `/3_decoupe` n'aurait découpé que le bloc
+touché par la réponse.
 
 ⚠️ **Elle ne grepe pas le fichier de questions** — 🔴 **un bloc qu'une
 réponse a touché porte `MODIFIED`**, et le second grep le trouve.

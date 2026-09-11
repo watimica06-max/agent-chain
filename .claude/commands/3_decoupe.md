@@ -63,8 +63,11 @@ is a normal outcome.
 
 ## Which blocks it looks at
 
-**First turn — no `questions-*.md` anywhere:** 🔴 **every block.** 📌
-**Name none in the prompt.**
+**Until the grid has run once — no `questions-sondeur-*.md` anywhere:**
+🔴 **every block.** 📌 **Name none in the prompt.** ⚠️ **Other questions
+files say nothing here**: the Rédacteur strips every marker when it
+integrates, so a block written at its first invocation and never split
+carries none by the time you run.
 
 **Later turns — two greps in `desc-produit.md`:**
 

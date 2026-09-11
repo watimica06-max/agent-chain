@@ -313,7 +313,9 @@ state.
 ## INVOCATION 1 — Structuring
 
 **Inputs** — 📌 **`idees.md`**, free-form and in French, that is the
-point · **`lexique.md`** · **the global** · 🔴 **a blocking file, when
+point · **`lexique.md`** — the term that holds for each thing, and which
+strings are displayed texts, kept as written, with the concept each
+carries · **the global** · 🔴 **a blocking file, when
 the prompt names one.**
 
 🔴 **Grep the global's `^#` index, never read it whole** — it runs past
@@ -408,7 +410,8 @@ product file, which carries the current state only.
 ## INVOCATION 2 — Integrating
 
 **Inputs** — 🔴 **the questions file the prompt names**, and it alone ·
-**`lexique.md`** · **the global**, by its index · 🔴 **a blocking file,
+**`lexique.md`** — the same use as at invocation 1 · **the global**, by
+its index · 🔴 **a blocking file,
 when the prompt names one.**
 
 ⚠️ **Never `idees.md`** — 📌 **it is transcribed; the answers revise
@@ -488,19 +491,7 @@ telling three cases apart is one block with three cases.**
 what an answer tells you to; it splits what a block turned out to
 hold.**
 
-**d. Does any answer use a retired term?** 🔴 **`lexique.md` lists
-them, under the term that holds.**
-
-⚠️ **A hit is a doubt, and you flag it** — 📌 **the Product Owner wrote
-it without meaning to reopen a decision, or meant something the settled
-term does not cover.**
-
-📌 **Transcribe with the settled term meanwhile.**
-
-⚠️ **A term the lexicon carries nowhere is not a doubt** — 📌 **an
-answer brings new words, that is what answers do.**
-
-**e. Does any answer bring a subject no block covers?** 🔴 **Answer on
+**d. Does any answer bring a subject no block covers?** 🔴 **Answer on
 the title list from step 2**, not by loading blocks.
 
 📌 **The question is not "which answers were left over"** — an answer
@@ -516,15 +507,15 @@ lands.**
 against the title list and decide.** ⚠️ **Every block it lands in
 carries `MODIFIED`**, and a subject no title covers becomes a block.
 
-🔴 **If pass e finds nothing, do not open the global's index.** There
+🔴 **If pass d finds nothing, do not open the global's index.** There
 is no title to look up.
 
-**If pass e finds something**, the four moves of *When you read the
+**If pass d finds something**, the four moves of *When you read the
 idea file* apply to it.
 
-**f. Mark every entry you integrated** — append `[integrated: B7]` to
+**e. Mark every entry you integrated** — append `[integrated: B7]` to
 it in the questions file, naming every block you wrote into. 🔴 **Last,
-once passes a to e are done** — a block created at pass e has to appear
+once passes a to d are done** — a block created at pass d has to appear
 in that mark too.
 
 ---
