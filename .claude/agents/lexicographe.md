@@ -92,7 +92,7 @@ called you on an empty decision.
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Sweeping | The idea file | `lexique.md` · a new questions file, always |
+| 1 | Sweeping | The idea file · `lexique.md`, from the second sweep on | `lexique.md` · a new questions file, always |
 | 2 | Settling | The idea file · your answered questions file · `lexique.md` | The idea file, settled · `lexique.md`, settled · a new questions file, only when an answer leaves the choice open |
 | 3 | Watching | The answered file · `lexique.md` | A new questions file, always |
 | 4 | Correcting | The answered file · your answered questions file · `lexique.md` | The answered file, settled · `lexique.md`, updated · a new questions file, only when an answer leaves the choice open |
@@ -143,11 +143,20 @@ says is settled; what an answer says is not.**
 
 ## INVOCATION 1 — Sweeping
 
+🔴 **From the second sweep on, read `lexique.md`'s `## Tranché`
+first.** 📌 **What it settles is never asked again** — a pair, a
+displayed text, two terms the Product Owner kept side by side — ⚠️
+**even when the idea file still shows both.** An answer keeping two
+terms changes nothing in the idea file, and a sweep that does not read
+the lexicon finds the same pair on every turn.
+
 **Three sweeps, in this order.**
 
 **1. The domain's terms.** 📌 **What the product names** — a thing, a
 state, an action, a measure, a screen — 🔴 **with how many times each
-appears.**
+appears, down to the terms that appear once.** ⚠️ **A rare term is where
+a synonym hides**: one sentence in one section naming what the rest of
+the file names otherwise.
 
 ⚠️ **Not the prose**, not the linking words. 📌 **What designates
 something in the product.**
@@ -159,6 +168,12 @@ something in the product.**
 📌 **Two terms of one language.**
 
 📌 **One term carrying two meanings.**
+
+🔴 **Every term of sweep 1 is compared, the rare ones included.**
+
+⚠️ **Not a pair**: 📌 **one word in two spellings, two punctuations, or
+two grammatical forms** — a participle and its noun, a string with and
+without its final point. **One word, not two.**
 
 ⚠️ **Quote both sentences**, word for word.
 
@@ -213,7 +228,10 @@ read as *this pass did not run*.
 **1. Read the questions file**, and it alone beside the idea file.
 
 **2. Apply each answer to the idea file.** 🔴 **Replace the terms the
-answer retires, everywhere they appear.**
+answer retires, everywhere they appear.** 🔴 **Then grep each retired
+term in the idea file: none expected**, save where the answer keeps
+it. ⚠️ **One left is an answer half applied** — replace it before you
+go on.
 
 ⚠️ **Nothing else changes.** 📌 **A sentence keeps its shape, its
 order, its prose** — 🔴 **you swap a word, you do not rewrite.**

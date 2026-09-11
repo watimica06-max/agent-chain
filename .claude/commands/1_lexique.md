@@ -92,6 +92,7 @@ Agent(
   model="opus",
   description="Sweep <name>'s vocabulary",
   prompt="The idea file: docs/features/<name>/idees.md.
+          <When it exists: The lexicon: docs/features/<name>/lexique.md.>
           Invocation <1 — Sweeping, 2 — Settling,
                        3 — Watching, or 4 — Correcting>.
           <At 3 and 4: The answered file:

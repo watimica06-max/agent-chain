@@ -110,6 +110,21 @@ aux invocations 2 et 4, un nouveau fichier seulement si une réponse
 laisse le choix ouvert — jamais vide**, sinon il se lirait comme en
 attente d'être appliqué.
 
+**Ce qu'un balayage doit tenir** — *(investigation sur trois tours
+d'une fonctionnalité réelle)* : 🔴 **le deuxième balayage a trouvé 26
+paires que le premier pouvait voir**, aux mêmes lignes — le premier
+s'était arrêté aux termes fréquents. Quatre règles en sont nées :
+
+| Défaut observé | Règle |
+|---|---|
+| Des paires ratées, cachées dans des termes à une ou deux occurrences | 🔴 **Tout terme, jusqu'à une seule occurrence** — un synonyme se cache dans une phrase isolée |
+| Des paires déjà tranchées, redemandées : une réponse qui garde deux termes laisse le fichier d'idées inchangé | 🔴 **Dès le deuxième balayage, `## Tranché` est lu d'abord** — ce qu'il règle ne se repose jamais |
+| Un terme retiré oublié à trois endroits sur quatorze | 🔴 **Après remplacement, chaque terme retiré est grepé** — aucun attendu, sauf où la réponse le garde |
+| Une question sur un point final, une autre sur un participe contre son nom | 🔴 **Orthographe, ponctuation, forme grammaticale d'un même mot : pas une paire** |
+
+📌 **Aucune question ne venait d'une réécriture non demandée** — le
+règlement échange des mots, et s'en tient là.
+
 **Pourquoi 3 et 4 existent** — 🔴 **Les réponses du Product Owner
 portent des mots que personne n'a balayés.** Deux balayages sur ces
 réponses seules :
