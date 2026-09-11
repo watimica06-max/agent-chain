@@ -441,8 +441,8 @@ passe A restreinte, la passe B croisait des colonnes incomplètes.**
 change change ses croisements avec tous les autres.
 
 **Le relevé** — `cadrage-produit/releve.md` : 🔴 **pour chaque bloc, les
-réponses que la passe B croise** — `A1.1` à `A1.4` et la liste des noms
-d'`A4` — **chacune sous son identifiant de grille.** 📌 **C'est là que
+réponses que la passe B croise** — `A1.1` à `A1.4`, `A1.9` et la liste
+des noms d'`A4` — **chacune sous son identifiant de grille.** 📌 **C'est là que
 l'identifiant sert** : il rend les réponses d'un bloc comparables à
 celles d'un autre. ⚠️ **Une question posée au Product Owner n'en porte
 aucun.**
@@ -974,6 +974,16 @@ personne d'autre ne l'écrira.**
 **Passe C — la fonctionnalité, une fois.** 📌 **Ce qu'aucun bloc ne
 lève, parce que ça n'appartient à aucun.** 🔴 **Les seules questions
 énumérées de la grille — courtes exprès.**
+
+📌 **Trois questions ajoutées, passées à six critères** — règle
+générale, bornée, qui attrape un défaut observé, sans ambiguïté, sans
+exemple ni justification, en vocabulaire universel : **`A1.9`** (ce
+qu'un bloc interdit ou conditionne hors de sa propre sortie), croisée
+en **`B1.8`** avec ce que les autres déclenchent ou produisent — la
+seule forme de contradiction entre blocs qu'un croisement de colonnes
+peut voir ; **`C1.7`** (deux parties installées ou mises à jour
+séparément, dont les versions diffèrent) ; et, en `external exchange`,
+**un exemple réel** d'un format qu'un autre système décide.
 
 ⚠️ **« Quels termes trancher avant d'écrire les règles ? » en est sortie**
 — 📌 **c'est le travail du Lexicographe**, créé pour ça. La garder, c'était

@@ -90,6 +90,13 @@ Kept, recomputed, deleted.
 **`A1.8` Can it be set off again?**
 Finding the earlier state, or clean.
 
+## Beyond its output
+
+**`A1.9` What does it rule out, or allow only under a condition,
+outside its own output?**
+🔴 **A block that says nothing rules nothing out** — silence answers
+it, and is never a gap. 📌 **It feeds `B1.8`.**
+
 ---
 
 # A2 — Make the block codable
@@ -104,7 +111,7 @@ Finding the earlier state, or clean.
 | persistence | **1** Stored or recomputed? · **2** 🔴 If something can be stored incomplete: what does it hold then — the absence, or an empty value? · **3** How long does it live, and what becomes of it after? |
 | calculation | **1** Inputs, output, rule for each case? · **2** And when an input is missing? · **3** What values can its output take, and which are acceptable? 🔴 See below |
 | transition | **1** What event triggers it? · **2** What states exist, reachable from which? 🔴 See exhaustiveness below |
-| external exchange | **1** What if it fails, is unavailable, returns invalid data — on the way in or out? · **2** 🔴 What makes two incoming things the same one — and what happens to the second? |
+| external exchange | **1** What if it fails, is unavailable, returns invalid data — on the way in or out? · **2** 🔴 What makes two incoming things the same one — and what happens to the second? · **3** When it reads data whose structure another system decides: one real instance of it, copied unaltered? |
 | synchronisation | **1** Rule when two versions diverge? · **2** What the user sees during, and on failure? · **3** 🔴 What identifies one same thing seen from both sides? And to which changes does a mirrored copy update — the list being closed |
 | presentation | **1** What is shown or told, where, what each action does? · **2** What is shown with no data, loading, on failure? · **3** 🔴 What the user has in progress on this view is kept when they leave and come back, or lost — say which, for each thing they can have in progress · **4** Conditions for moving on to the next view? · **5** What if the user goes back, or abandons? |
 | access | **1** Who sees, who changes? · **2** What does someone who cannot? |
@@ -236,8 +243,8 @@ answerable from one.
 ## What pass A left you
 
 🔴 **Every crossing below reads the record** — pass A's answers to
-`A1.1`–`A1.4` and `A4`'s list, taken on every block — **never the
-blocks again:**
+`A1.1`–`A1.4`, `A1.9` and `A4`'s list, taken on every block — **never
+the blocks again:**
 
 | What you cross | Where it is |
 |---|---|
@@ -246,6 +253,7 @@ blocks again:**
 | Where it draws | `A1.4` |
 | When it fires | `A1.1` — 📌 **a block writes when its trigger fires** |
 | Every name it uses, with its value | `A4`'s list |
+| What it rules out or conditions | `A1.9` |
 
 📌 **Gather one of these across every block, then cross it** — 🔴 **never
 block by block**, or you re-read sixty times what one column shows at
@@ -282,6 +290,10 @@ is declared, not produced**, and nothing in `Produces` carries it.
 
 **`B1.7` One name carrying two values.**
 📌 **See B2.**
+
+**`B1.8` A block rules out or conditions what another block sets off or
+produces.**
+🔴 **One of the two gives way, or the condition is written in both.**
 
 ## What a crossing costs
 
@@ -350,7 +362,11 @@ good?**
 permission** — a refused sensor and a refused link do not leave the
 same application behind.
 
-⚠️ **These two are the only C1 questions with several instances.**
+**`C1.7` Does it span parts installed or updated independently of each
+other?**
+🔴 **For each pair: what happens when their versions differ?**
+
+⚠️ **These three are the only C1 questions with several instances.**
 📌 **Everything else here is asked once**; these are asked once per
 thing they name.
 

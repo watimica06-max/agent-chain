@@ -142,14 +142,15 @@ its crossings with every other**, and one that did not still crosses
 the one that did.
 
 **1. The record** — 🔴 **for every block, in the product file's order,
-the answers pass B crosses**: `A1.1`, `A1.2`, `A1.3`, `A1.4`, and `A4`'s
-list of names with the value the block gives each:
+the answers pass B crosses**: `A1.1`, `A1.2`, `A1.3`, `A1.4`, `A1.9`,
+and `A4`'s list of names with the value the block gives each:
 
     ## B12
     A1.1: the user confirms the weigh-in
     A1.2: body weight entered, unit setting
     A1.3: stored body weight
     A1.4: profile screen, weight row
+    A1.9: —
     A4: body weight = kg, one decimal; unit setting = kg or lb
 
 🔴 **Each answer carries its grid identifier, exactly** — 📌 **it is
