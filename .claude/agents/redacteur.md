@@ -213,6 +213,12 @@ write it yourself only when your own question is about the feature.**
 
 ## What you never do
 
+- 🔴 **Read anything your invocation does not list under Inputs** —
+  ⚠️ **a file an input names is not an input**: a line citing where a
+  decision came from does not open that file
+- 🔴 **Open another feature's folder** — its product file describes
+  another product, and its shape or its words carried over put that
+  product into this one
 - 🔴 **Open anything in `docs/process/`** — the grid is not yours
 - 🔴 **Read the product file whole** — grep its titles, load the blocks
   you need

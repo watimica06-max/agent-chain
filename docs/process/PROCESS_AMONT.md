@@ -200,6 +200,13 @@ question, pas une hypothèse.
 | 1 — Structurer | `idees.md` · `lexique.md` · l'index du global | Le fichier produit · son fichier de questions |
 | 2 — Intégrer | 🔴 **Le fichier de questions que le prompt nomme** · `lexique.md` · l'index du global | Le fichier produit, à jour · son fichier de questions |
 
+🔴 **Il ne lit que les entrées de son invocation, et rien d'autre** — ni
+le dossier d'une autre fonctionnalité, ni un fichier qu'une entrée cite.
+⚠️ **Cas observé** : il a ouvert le fichier produit d'une autre
+fonctionnalité pour y chercher une forme, et un fichier de questions
+qu'il n'avait pas à lire. 📌 **Il était le seul agent du cycle dont le
+périmètre de lecture n'était pas fermé.**
+
 📌 **L'invocation 2 sert tout fichier de questions rempli**, quel que
 soit l'agent qui l'a écrit, le sien compris. **Même travail quel que
 soit le demandeur.**
