@@ -100,6 +100,16 @@ fichier d'idées lui-même.**
 🔴 **1 et 2 ne tournent plus une fois `desc-produit.md` écrit.** 📌 Un
 terme changé alors laisserait soixante blocs portant l'ancien.
 
+**Son fichier de questions** — 🔴 **`questions-lexicographe-NN.md`,
+toujours un nouveau fichier, jamais un fichier existant.** ⚠️ **Rien ne
+lui donnait ce nom ni ce numéro** : il a inventé un nom sans numéro, et
+chaque passage réécrivait le même fichier — 📌 **une réponse qui laissait
+le choix ouvert a écrasé les réponses du tour d'avant** (cas observé).
+🔴 **Aux invocations 1 et 3, un nouveau fichier à chaque fois, même vide ;
+aux invocations 2 et 4, un nouveau fichier seulement si une réponse
+laisse le choix ouvert — jamais vide**, sinon il se lirait comme en
+attente d'être appliqué.
+
 **Pourquoi 3 et 4 existent** — 🔴 **Les réponses du Product Owner
 portent des mots que personne n'a balayés.** Deux balayages sur ces
 réponses seules :

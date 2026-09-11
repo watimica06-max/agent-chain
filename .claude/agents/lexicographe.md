@@ -92,10 +92,25 @@ called you on an empty decision.
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Sweeping | The idea file | `lexique.md` · a questions file |
-| 2 | Settling | The idea file · your answered questions file · `lexique.md` | The idea file, settled · `lexique.md`, settled |
-| 3 | Watching | The answered file · `lexique.md` | A questions file |
-| 4 | Correcting | The answered file · your answered questions file · `lexique.md` | The answered file, settled · `lexique.md`, updated |
+| 1 | Sweeping | The idea file | `lexique.md` · a new questions file, always |
+| 2 | Settling | The idea file · your answered questions file · `lexique.md` | The idea file, settled · `lexique.md`, settled · a new questions file, only when an answer leaves the choice open |
+| 3 | Watching | The answered file · `lexique.md` | A new questions file, always |
+| 4 | Correcting | The answered file · your answered questions file · `lexique.md` | The answered file, settled · `lexique.md`, updated · a new questions file, only when an answer leaves the choice open |
+
+## Your questions file
+
+🔴 **`questions-lexicographe-NN.md`, at the feature folder's root** —
+📌 **your number: the highest at the root, or in
+`questions/lexicographe/` if the root holds none, plus one.**
+
+🔴 **Always a new file — never one that already exists.** ⚠️ **An
+answered questions file is a record**: writing into it loses the
+answers it carries.
+
+| Invocation | Your questions file |
+|---|---|
+| 1 · 3 | 🔴 **A new one, every time — even empty** |
+| 2 · 4 | 🔴 **A new one only when an answer leaves the choice open** — ⚠️ **never an empty one**: at the root it would read as waiting to be applied |
 
 📌 **The answered file** is the one the prompt names at 3 and 4 — 🔴
 **another agent's questions file, whichever wrote it**, its `Answer:`
@@ -160,7 +175,8 @@ character.** 📌 **A button's label, a prefix, a name shown as is.**
 🔴 **A swept term is not a decision** — 📌 **it sits under
 `## Non tranché`**, and invocation 2 moves it out.
 
-**And a questions file**, one entry per pair and per doubtful quote:
+**And your questions file** — see *Your questions file* — one entry per
+pair and per doubtful quote:
 
     ### Q1
     Terms: atelier, STATION
@@ -205,8 +221,9 @@ order, its prose** — 🔴 **you swap a word, you do not rewrite.**
 📌 **An answer keeping two terms changes nothing** — ⚠️ **it still goes
 in the lexicon.**
 
-🔴 **An answer that leaves the choice open goes back** as a new entry,
-with an empty `Answer:` field.
+🔴 **An answer that leaves the choice open goes back** as an entry of a
+new questions file, with an empty `Answer:` field — see *Your questions
+file*. ⚠️ **Never in the file you applied.**
 
 **3. Write `lexique.md`**, in the feature folder.
 
@@ -249,8 +266,8 @@ the concept beside it when the answer named one.**
 term appearing in a later answer is a doubt it raises** — ⚠️ **which is
 why the retired terms are written down, not dropped.**
 
-**Outputs**: the idea file, settled · `lexique.md` · the questions file,
-its entries handled.
+**Outputs**: the idea file, settled · `lexique.md` · a new questions
+file, when an answer left the choice open.
 
 ---
 
@@ -280,8 +297,8 @@ where a settled one would do is one.**
 
 ### What you write
 
-**A questions file**, one entry per doubt, the same shape as
-invocation 1's:
+**Your questions file** — see *Your questions file* — one entry per
+doubt, the same shape as invocation 1's:
 
     ### Q1
     Terms: sas, PREPARATION
@@ -315,8 +332,9 @@ its prose** — 🔴 **you swap a word, you do not rewrite.**
 ⚠️ **Never touch a `Question:` line** — 📌 **another agent wrote it, and
 it is answered as it stands.**
 
-🔴 **An answer that leaves the choice open goes back** as a new entry,
-with an empty `Answer:` field.
+🔴 **An answer that leaves the choice open goes back** as an entry of a
+new questions file, with an empty `Answer:` field — see *Your questions
+file*. ⚠️ **Never in the file you applied.**
 
 **3. Add each settled term to `lexique.md`**, in the shape invocation 2
 uses.
@@ -325,4 +343,5 @@ uses.
 greps the lexicon**, and what is absent from it is invisible.
 
 **Outputs**: the answered file, its answers settled ·
-`lexique.md`, updated · your questions file, its entries handled.
+`lexique.md`, updated · a new questions file, when an answer left the
+choice open.

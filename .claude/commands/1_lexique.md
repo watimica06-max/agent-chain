@@ -120,15 +120,21 @@ notifies on completion. Do not pass it; wait for the notification.
 standing**, and the next run stops on it.
 
 🔴 **After 2 or 4, file the lexicographe's questions file it applied**,
-into `questions/lexicographe/`, inside the worktree before the merge — ⚠️ **left at the root, it would read
-as waiting again**, and the next run would take it for invocation 2.
+into `questions/lexicographe/`, inside the worktree before the merge —
+⚠️ **left at the root, it would read as waiting again**, and the next
+run would take it for invocation 2. 📌 **A new
+`questions-lexicographe-NN.md` it wrote stays at the root** — an answer
+left the choice open, and it waits on the Product Owner.
 
 **After every invocation** — 🔴 **check `lexique.md` exists**, and grep
 its two counts: `retenu` for what is settled, the lines under
 `## Non tranché` for what is not.
 
-**After 1 or 3** — 🔴 **grep `^### Q` in the questions file** and
-count. 📌 **Say how many.**
+**After 1 or 3** — 🔴 **grep `^### Q` in the new
+`questions-lexicographe-NN.md`** and count. 📌 **Say how many.**
+
+**After 2 or 4** — 📌 **say whether it wrote a new one**, and how many
+entries it holds.
 
 ⚠️ **A missing file stops the command** — say which.
 
@@ -196,9 +202,11 @@ too**: the Product Owner has to see it.
 | It wrote a blocking file | 📌 Fill its `## Decision`, then `/1_lexique` again |
 | 1 asked something | 📌 Answer them, then `/1_lexique` again |
 | 1 asked nothing | 📌 `/2_structure` — 🔴 the vocabulary is settled |
-| 2 ran | 📌 `/1_lexique` again — 🔴 a settled term can uncover a pair |
+| 2 wrote a new questions file | 📌 Answer it, then `/1_lexique` again |
+| 2 wrote none | 📌 `/1_lexique` again — 🔴 a settled term can uncover a pair |
 | 3 ran | 📌 **Answer its questions if it asked any, then `/1_lexique` again** — 🔴 4 replaces the retired terms the answers carry, questions or not |
-| 4 ran | 📌 `/2_structure` — 🔴 the answers are settled |
+| 4 wrote a new questions file | 📌 Answer it, then `/1_lexique` again |
+| 4 wrote none | 📌 `/2_structure` — 🔴 the answers are settled |
 
 🔴 **Nothing else is yours**: no risk level, no
 `TaskCreate`, no reading of what a term means.
