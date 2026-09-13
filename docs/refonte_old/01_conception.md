@@ -40,19 +40,6 @@ Compiled, tested, merged code comes out the other end.**
 📌 **It describes either an application, or a feature to add to an
 application that already exists.**
 
-🔴 **One real `idees.md` sits at `docs/refonte/idees-exemple.md`.** 📌
-**Read it — it is what the system takes in.**
-
-⚠️ **It is one example, and an imperfect one.** 📌 **Its shape, its
-gaps and its subject are one person writing about one product on one
-day** — 🔴 **a system designed around what this file happens to do
-would not survive the next one.** ⚠️ **Design for what any such file
-brings.**
-
-📌 **This one runs to twelve hundred lines**, and describes a product
-in a few hundred behaviours. 🔴 **No agent holds that in one
-context.**
-
 ⚠️ **It is almost always incomplete, and not because it is badly
 written.** The person describes what they want to see, and leaves
 decisions open without knowing it — what shows when there is nothing,
@@ -256,5 +243,3 @@ everything as equally settled.
 - 🔴 **Read anything outside what this file names**
 - 🔴 **Design against a chain you imagine we have** — you have not seen
   ours, and that is deliberate
-- 🔴 **Design for the one file you were given** — it is an example of
-  what comes in, never the specification
