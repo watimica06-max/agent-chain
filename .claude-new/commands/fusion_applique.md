@@ -15,11 +15,56 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 ---
 
+## Before anything else
+
+🔴 **Three tests, in this order** — 📌 **stop at the first that fires:**
+
+| | |
+|---|---|
+| `rapport-fusion.md` exists | 🔴 **Stop** — 📌 **the merge is done** |
+| `plan-fusion.md` absent | 🔴 **Stop** — 📌 **invocation 1 has not run**: say to use `/fusion_compare` |
+| A root `questions-fusionneur-*.md` with an empty `Answer:` | 🔴 **Stop** — 📌 **relay which questions wait** |
+
+---
+
 ## What you read
 
-Nothing. Each agent declares its own inputs; you pass the feature
-folder and nothing else. `CLAUDE.md`'s standing reading rules apply:
-never open `CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+**Only whether those three files are there, and one grep for an empty
+`Answer:`.** 📌 **Counts, never content** — each agent declares its own
+inputs; you pass the feature folder and nothing else. `CLAUDE.md`'s
+standing reading rules apply:
+never open `CURRENT_TECHNICAL_STATE.md`.
+
+---
+
+## Git, before invoking
+
+🔴 **Commit the feature folder**, before creating the worktree:
+
+    git add docs/features/<name>/ && git commit -m "chore: answers"
+
+⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
+session.** A worktree branches from the last commit — uncommitted
+answers are invisible inside it, and the agent works on a stale
+`questions.md`. *(Seen once: 186 lines in the worktree, 195 in the main
+checkout.)*
+
+📌 **Nothing to commit is a normal outcome** — carry on.
+
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. An agent
+would then work on stale content and its output would have to be
+discarded. *(Seen once: a whole invocation lost that way.)*
+
+📌 **Enter the worktree before invoking the agent**, not after it
+fails — the harness blocks a subagent's writes until the session is
+isolated. *(Measured on three
+phases: the agent does the full job, cannot write, and the whole
+invocation is redone.)*
 
 ---
 
@@ -52,34 +97,7 @@ and each reads what the previous one wrote.
 
 ---
 
-## Git, in this mode
-
-🔴 **Commit the feature folder**, before creating the worktree:
-
-    git add docs/features/<name>/ && git commit -m "chore: answers"
-
-⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
-session.** A worktree branches from the last commit — uncommitted
-answers are invisible inside it, and the agent works on a stale
-`questions.md`. *(Seen once: 186 lines in the worktree, 195 in the main
-checkout.)*
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. An agent
-would then work on stale content and its output would have to be
-discarded. *(Seen once: a whole invocation lost that way.)*
-
-📌 **Enter the worktree before invoking the agent**, not after it
-fails — the harness blocks a subagent's writes until the session is
-isolated. *(Measured on three
-phases: the agent does the full job, cannot write, and the whole
-invocation is redone.)*
+## Git, once it has reported
 
 **Then, once the agent reports:**
 
@@ -116,6 +134,6 @@ does not exist**, and commit the moves.
 ## What you relay
 
 The agent's own report, and nothing more. 🔴 **Nothing else is yours**:
-no phase chain, no risk level, no `TaskCreate`.
+no phase chain.
 
 **If it returns a `blocked_*.md`**: relay it and stop.

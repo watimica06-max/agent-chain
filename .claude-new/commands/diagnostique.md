@@ -41,6 +41,35 @@ them.**
 
 ---
 
+## Git, before invoking
+
+🔴 **Commit the feature folder**, before creating the worktree:
+
+    git add docs/features/<name>/ && git commit -m "chore: answers"
+
+⚠️ **The Product Owner writes `bug-list.md` by hand, outside this
+session.** A worktree branches from the last commit — an uncommitted
+gap file is invisible inside it.
+
+📌 **Nothing to commit is a normal outcome** — carry on.
+
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. An agent
+would then work on stale content and its output would have to be
+discarded. *(Seen once: a whole invocation lost that way.)*
+
+📌 **Enter the worktree before invoking the agent**, not after it
+fails — the harness blocks a subagent's writes until the session is
+isolated. *(Measured on three
+phases: the agent does the full job, cannot write, and the whole
+invocation is redone.)*
+
+---
+
 ## How it runs
 
 **Two phases, in this order.**
@@ -102,32 +131,7 @@ notifies on completion. Do not pass it; wait for the notification.
 
 ---
 
-## Git, in this mode
-
-🔴 **Commit the feature folder**, before creating the worktree:
-
-    git add docs/features/<name>/ && git commit -m "chore: answers"
-
-⚠️ **The Product Owner writes `bug-list.md` by hand, outside this
-session.** A worktree branches from the last commit — an uncommitted
-gap file is invisible inside it.
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. An agent
-would then work on stale content and its output would have to be
-discarded. *(Seen once: a whole invocation lost that way.)*
-
-📌 **Enter the worktree before invoking the agent**, not after it
-fails — the harness blocks a subagent's writes until the session is
-isolated. *(Measured on three
-phases: the agent does the full job, cannot write, and the whole
-invocation is redone.)*
+## Git, once it has reported
 
 **Then, once phase 2 reports:**
 
@@ -151,11 +155,20 @@ an unmerged branch is invisible to the next one. ⚠️ **A
 ## What you relay
 
 The agent's own report, and nothing more. 🔴 **Nothing else is yours**:
-no phase chain, no risk level, no `TaskCreate`.
+no phase chain.
 
 **If an agent returns a blocking file**: relay it. 📌 **In phase 1 it
 is `investigation/blocked_<id>.md` and the other calls carry on**;
 in phase 2 it is `blocked_diagnostiqueur.md` and you stop.
+
+🔴 **Its `## Decision` filled, run `/diagnostique` again** — 📌 **name
+the file in the agent's prompt**, and 🔴 **rename it once the agent
+reports having applied it**:
+
+    git mv blocked_diagnostiqueur.md blocked_diagnostiqueur-NN.md
+
+📌 **`NN`: the highest in the folder plus one, `01` when there is
+none.** ⚠️ **The agent has no tool that removes a file.**
 
 ⚠️ **A phase-1 block does not cancel phase 2** — invocation 2 counts
 the reports against `bug-list.md` and blocks itself if one is missing.

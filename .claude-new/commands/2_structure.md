@@ -26,8 +26,9 @@ Feature folder: `docs/features/$ARGUMENTS/`
   after
 - **The `## Decision` heading of `blocked_redacteur.md`**, when there is
   one — 📌 **that heading alone**
-- **A grep for an empty `Answer:`** in the file to integrate, and in the
-  lexicographe's
+- **A grep for an empty `Answer:` with no `Défaut:` line** in the file
+  to integrate, and in the lexicographe's — 📌 **an entry carrying a
+  `Défaut:` is answered by silence**
 - **A grep of `^### Q`** in the questions file the agent wrote
 
 📌 **You pass the agent the file it reads; it does not look for
@@ -35,131 +36,11 @@ itself.** 🔴 **You never read a questions file's entries** — the greps
 above are counts, not reading.
 
 ⚠️ **`CLAUDE.md`'s standing reading rules apply**: never open
-`CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+`CURRENT_TECHNICAL_STATE.md`.
 
 ---
 
-## How it runs
-
-**First, the lexicographe's questions file.** 🔴 **Grep it for an empty
-`Answer:` before touching it** — ⚠️ **one hit and you stop**, and say
-which questions wait: `/1_lexique` has not finished.
-
-📌 **Nothing waiting → file it**, 🔴 **the choice of invocation below
-reads the root after it:**
-
-    git mv docs/features/<name>/questions-lexicographe-NN.md \
-           docs/features/<name>/questions/lexicographe/
-
-⚠️ **A file put away in `questions/lexicographe/` is read by no command
-again** — 📌 **filing an unanswered one loses its answers for good.**
-
-⚠️ **`/1_lexique` reads the root to know which invocation it is** — 📌
-**a lexicographe file left there and an answered file beside it read as
-its fourth**, when its work is done.
-
-📌 **Create `questions/lexicographe/` if it does not exist.** ⚠️
-**Nothing to file is a normal outcome.** 📌 **What remains at the root
-is the file to integrate — one at most.**
-
-**Then, the blocking file.** 🔴 **Does `blocked_redacteur.md` sit in
-the feature folder?**
-
-| | What you do |
-|---|---|
-| Absent | 📌 Carry on |
-| Its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands |
-| Its `## Decision` is filled | 📌 **Name it in the prompt**, beside the file to read |
-
-⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
-file.
-
-**Then, which invocation and which file:**
-
-| At the root | Invocation | What you name |
-|---|---|---|
-| No questions file, **and no `desc-produit.md`** | **1 — Structuring** | `idees.md` |
-| No questions file, **and a `desc-produit.md`** | 🔴 **Stop** — 📌 **the idea file is transcribed once**; say `/3_decoupe` comes next | — |
-| One, **with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to integrate**; say `/3_decoupe` | — |
-| One, any prefix | **2 — Integrating** | 🔴 **That one** |
-| More than one | 🔴 **Stop** — a filing failed; say which files | — |
-
-⚠️ **A second invocation 1 over an existing product file renumbers or
-duplicates every block** — 📌 **and every filed question then points at
-the wrong one.**
-
-⚠️ **Any prefix** — 📌 the agent integrates the answers whichever agent
-asked.
-
-🔴 **If it carries an empty `Answer:`** — 📌 **stop**, and say
-which questions are waiting.
-
-```
-Agent(
-  subagent_type="redacteur",
-  model="sonnet",
-  description="Structure <name>",
-  prompt="Feature folder: docs/features/<name>/.
-          Invocation <1 — Structuring, or 2 — Integrating>.
-          Read: <idees.md, or questions-<agent>-NN.md>.
-          <Plus: blocked_redacteur.md, its decision is filled.>"
-)
-```
-
-🔴 **Name the file, always** — ⚠️ **the agent opens that one and no
-other.**
-
-### Once it has run
-
-🔴 **Did the run create a `NEW` block?** 📌 **Grep `NEW` in
-`desc-produit.md`** — ⚠️ **and only then:**
-
-    rm -rf docs/features/<name>/par-genre/ \
-           docs/features/<name>/desc-par-nature.md \
-           docs/features/<name>/spec-technique.md
-
-📌 **Nothing there → nothing to delete**, a normal outcome.
-
-⚠️ **Why**: those two are derived from the product file. 🔴 **A block
-created after the conversion leaves a `spec-technique.md` that does not
-carry it** — the split and the coding then run on a technical document
-missing a block, and the gap surfaces at the controleur.
-
-🔴 **Say which files you deleted**, or that none needed it.
-
-🔴 **A blocking file you named is filed:**
-
-    git mv docs/features/<name>/blocked_redacteur.md \
-           docs/features/<name>/blocked_redacteur-NN.md
-
-📌 **`NN`: the highest `blocked_redacteur-NN.md` in the folder plus
-one — `01` when there is none.**
-
-⚠️ **Anything left at the unnumbered name reads as a block still
-standing**, and the next run stops on it.
-
-🔴 **At invocation 2, file the questions file it integrated**, into
-`questions/<agent>/`, inside the worktree before the merge — 📌 **integrated, it waits for nothing**; ⚠️ **left
-at the root beside the Rédacteur's own, the next command could not tell
-which one waits.**
-
-🔴 **Check `questions-redacteur-NN.md` was written** — ⚠️ **a missing one
-stops the command**: the agent says it writes one every time.
-
-🔴 **Never paraphrase the agent's process in your invocation** — not
-its inputs, its checks, its output format. It reads its own
-instructions.
-
-❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
-either** — in this environment the Agent tool always runs async and
-notifies on completion. Do not pass it; wait for the notification.
-
-❌ **Never pass `isolation`** — the phases are sequential
-and each reads what the previous one wrote.
-
----
-
-## Git, in this mode
+## Git, before invoking
 
 📌 **The lexicographe's questions file was filed first** — see *How it
 runs*.
@@ -190,6 +71,155 @@ fails — the harness blocks a subagent's writes until the session is
 isolated. *(Measured on three
 phases: the agent does the full job, cannot write, and the whole
 invocation is redone.)*
+
+---
+
+## How it runs
+
+**First, the lexicographe's questions file.** 🔴 **Grep it for an empty
+`Answer:` before touching it** — ⚠️ **one hit and you stop**, and say
+which questions wait: `/1_lexique` has not finished.
+
+📌 **Nothing waiting → file it**, 🔴 **the choice of invocation below
+reads the root after it:**
+
+    git mv docs/features/<name>/questions-lexicographe-NN.md \
+           docs/features/<name>/questions/lexicographe/
+
+⚠️ **A file put away in `questions/lexicographe/` is read by no
+command** — 📌 **unlike `questions/qualifieur/` and
+`questions/classeur/`**, which `/3a_genre` and `/3b_nature` reopen to
+give their agent its own last file. ⚠️ **Here
+again** — 📌 **filing an unanswered one loses its answers for good.**
+
+⚠️ **`/1_lexique` reads the root to know which invocation it is** — 📌
+**a lexicographe file left there and an answered file beside it read as
+its fourth**, when its work is done.
+
+📌 **Create `questions/lexicographe/` if it does not exist.** ⚠️
+**Nothing to file is a normal outcome.** 📌 **What remains at the root
+is the file to integrate — one at most.**
+
+**Then, the blocking file.** 🔴 **Does `blocked_redacteur.md` sit in
+the feature folder?**
+
+| | What you do |
+|---|---|
+| Absent | 📌 Carry on |
+| Its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands |
+| Its `## Decision` is filled | 📌 **Name it in the prompt**, beside the file to read |
+
+⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
+file.
+
+**Then, which invocation and which file:**
+
+| At the root | Invocation | What you name |
+|---|---|---|
+| No questions file, **and no `desc-produit.md`** | **1 — Structuring** | `idees.md` |
+| 🔴 **A `blocked_decoupeur.md`, `blocked_qualifieur.md` or `blocked_classeur.md` with a filled `## Decision`** | **2 — Integrating** | 🔴 **That file** — 📌 **all three block on something only a rewrite of the block settles**, and rewriting is yours |
+| One of the three with an **empty** `## Decision` | 🔴 **Stop** — say the decision is still to write | — |
+| No questions file, **and a `desc-produit.md`** | 🔴 **Stop** — 📌 **the idea file is transcribed once**; say `/3_decoupe` comes next | — |
+| One, **with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to integrate**; say `/3_decoupe` | — |
+| One, any prefix | **2 — Integrating** | 🔴 **That one** |
+| More than one | 🔴 **Stop** — a filing failed; say which files | — |
+
+⚠️ **A second invocation 1 over an existing product file renumbers or
+duplicates every block** — 📌 **and every filed question then points at
+the wrong one.**
+
+⚠️ **Any prefix** — 📌 the agent integrates the answers whichever agent
+asked.
+
+🔴 **If it carries an empty `Answer:` with no `Défaut:` line** — 📌
+**stop**, and say which questions are waiting.
+
+⚠️ **An entry whose `Answer:` is empty **and** that carries a `Défaut:`
+line is answered** — 📌 **silence accepts the proposal**, and that is
+what the line exists for. 🔴 **Test both**: `^Answer:\s*$` with no
+`Défaut:` above it in the same entry.
+
+```
+Agent(
+  subagent_type="redacteur",
+  model="sonnet",
+  description="Structure <name>",
+  prompt="Feature folder: docs/features/<name>/.
+          Invocation <1 — Structuring, or 2 — Integrating>.
+          Read: <idees.md, or questions-<agent>-NN.md>.
+          <Plus: blocked_redacteur.md, its decision is filled.>"
+)
+```
+
+🔴 **Name the file, always** — ⚠️ **the agent opens that one and no
+other.**
+
+### Once it has run
+
+🔴 **Any stop from here on merges first.** ⚠️ **The agent has written in
+the worktree** — 📌 **stopping before the merge loses the whole
+invocation**, and a worktree holding unmerged work never self-cleans.
+🔴 **Merge, push, remove the worktree, and then report.**
+
+🔴 **Did the run create a `NEW` block?** 📌 **Grep `NEW` in
+`desc-produit.md`** — ⚠️ **and only then:**
+
+    rm -rf docs/features/<name>/par-genre/ \
+           docs/features/<name>/desc-par-nature.md \
+           docs/features/<name>/spec-technique.md
+
+📌 **Nothing there → nothing to delete**, a normal outcome.
+
+⚠️ **Why**: all three are derived from the product file. 🔴 **A block
+created after the conversion leaves a `spec-technique.md` that does not
+carry it** — the split and the coding then run on a technical document
+missing a block, and the gap surfaces at the controleur.
+
+🔴 **Say which files you deleted**, or that none needed it.
+
+🔴 **A blocking file you named is filed:**
+
+    git mv docs/features/<name>/blocked_redacteur.md \
+           docs/features/<name>/blocked_redacteur-NN.md
+
+📌 **`NN`: the highest `blocked_redacteur-NN.md` in the folder plus
+one — `01` when there is none.**
+
+⚠️ **Anything left at the unnumbered name reads as a block still
+standing**, and the next run stops on it.
+
+🔴 **A `blocked_decoupeur.md` it applied is renamed** —
+`blocked_decoupeur-NN.md`, the highest in the folder plus one. ⚠️
+**Left at the unnumbered name it reads as a block still standing**, and
+`/3_decoupe` stops on it.
+
+🔴 **It wrote a blocking file: file nothing** — 📌 **it integrated
+nothing.** ⚠️ **Filed, the questions would be out of reach when the
+decision comes back.**
+
+🔴 **At invocation 2, file the questions file it integrated**, into
+`questions/<agent>/`, inside the worktree before the merge — 📌
+**integrated, it waits for nothing**; ⚠️ **left
+at the root beside the Rédacteur's own, the next command could not tell
+which one waits.**
+
+🔴 **Check `questions-redacteur-NN.md` was written** — ⚠️ **a missing one
+stops the command**: the agent says it writes one every time.
+
+🔴 **Never paraphrase the agent's process in your invocation** — not
+its inputs, its checks, its output format. It reads its own
+instructions.
+
+❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
+either** — in this environment the Agent tool always runs async and
+notifies on completion. Do not pass it; wait for the notification.
+
+❌ **Never pass `isolation`** — the phases are sequential
+and each reads what the previous one wrote.
+
+---
+
+## Git, once it has reported
 
 **Then, once the agent reports:**
 
@@ -225,7 +255,6 @@ The agent's own report.
 | Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a flag stands until answered, and nothing downstream runs meanwhile |
 | Its questions file is empty | 📌 `/3_decoupe` — 🔴 a new block is split, classed and framed before the Convertisseur reads it |
 
-🔴 **Nothing else is yours**: no phase chain, no risk level, no
-`TaskCreate`.
+🔴 **Nothing else is yours**: no phase chain.
 
 **If it returns a `blocked_*.md`**: relay it and stop.

@@ -24,7 +24,7 @@ Feature folder: `docs/features/$ARGUMENTS/`
 🔴 **Greps, and nothing else.** 📌 **You never open a block.**
 
 ⚠️ **`CLAUDE.md`'s standing reading rules apply**: never open
-`CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+`CURRENT_TECHNICAL_STATE.md`.
 
 ---
 
@@ -69,6 +69,11 @@ is a normal outcome.
 **Until the grid has run once — no `questions-sondeur-*.md` anywhere:**
 🔴 **every block.** 📌 **Name none in the prompt.**
 
+⚠️ **The markers are still there, whatever earlier turns did** — 📌 **the
+Rédacteur strips them only once a grid turn has consumed them.** 🔴 **So
+they say nothing about what you have already looked at**, and every
+block is yours until the grid has run.
+
 **Later turns — two greps in `desc-produit.md`:**
 
 | Grep | What it names |
@@ -88,6 +93,34 @@ carries `MODIFIED`**, and the second grep finds it.
 📌 **Neither grep returns anything** — 🔴 **invoke nothing.** 📌
 **Commit what the filing moved, if anything, and push** — no worktree.
 Say there is nothing to split, and go to *What you relay*.
+
+---
+
+## Git, before invoking
+
+🔴 **Commit the feature folder before creating the worktree:**
+
+    git add docs/features/<name>/ && git commit -m "chore: answers"
+
+⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
+session.** A worktree branches from the last commit — uncommitted
+answers are invisible inside it.
+
+📌 **Nothing to commit is a normal outcome** — carry on.
+
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. The agent
+would then work on stale content and its output would have to be
+discarded. *(Seen once: a whole invocation lost that way.)*
+
+📌 **Enter the worktree before invoking**, not after a write fails —
+the harness blocks a subagent's writes until the session is isolated.
+*(Measured on three phases: the agent does the full job, cannot write,
+and the whole invocation is redone.)*
 
 ---
 
@@ -137,31 +170,7 @@ what it produced; that is what catches a bad split.**
 
 ---
 
-## Git, in this mode
-
-🔴 **Commit the feature folder before creating the worktree:**
-
-    git add docs/features/<name>/ && git commit -m "chore: answers"
-
-⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
-session.** A worktree branches from the last commit — uncommitted
-answers are invisible inside it.
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. The agent
-would then work on stale content and its output would have to be
-discarded. *(Seen once: a whole invocation lost that way.)*
-
-📌 **Enter the worktree before invoking**, not after a write fails —
-the harness blocks a subagent's writes until the session is isolated.
-*(Measured on three phases: the agent does the full job, cannot write,
-and the whole invocation is redone.)*
+## Git, once it has reported
 
 **Then, once it has reported:**
 
@@ -189,6 +198,11 @@ too**: the Product Owner has to see it.
 named.** ⚠️ **They have to match** — 📌 **a short list is a partial
 sweep**, and nothing else can see it: you may not open a block to
 check.
+
+🔴 **A short list: invoke the decoupeur again on the blocks it did not
+reach**, and nothing else. 📌 **Twice at most** — ⚠️ **still short at
+the second, stop and say which blocks were never looked at**: the split
+is incomplete and `/3a_genre` would run on it.
 
 ⚠️ **On a turn that named every block**, its list is what tells you it
 reached the end.

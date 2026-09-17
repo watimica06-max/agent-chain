@@ -41,11 +41,21 @@ Feature folder: `docs/features/$ARGUMENTS/`
 📌 **Greps and copies** — ⚠️ **you read no block to decide anything.**
 
 ⚠️ **`CLAUDE.md`'s standing reading rules apply**: never open
-`CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+`CURRENT_TECHNICAL_STATE.md`.
 
 ---
 
 ## Before anything else
+
+🔴 **First, the grid has to have closed.** 📌 **A
+`questions-sondeur-NN.md` holding no `### Q`, at the root or filed**,
+and — when the feature attaches to the global — 📌 **a
+`questions-existant-NN.md` too.** ⚠️ **Neither there, or one holding
+questions** → 🔴 **stop**: say to run `/4_grille`.
+
+⚠️ **This command is what closes the upstream** — 📌 **it writes the
+views every later step reads**, and a product file still open would be
+split on a state about to change.
 
 🔴 **Grep `-c '^Genre:$'` in `desc-produit.md`** — it must return zero.
 ⚠️ **Anything else means a block was left unqualified**: 📌 say which,
@@ -58,6 +68,13 @@ says `comportement`. ⚠️ **One hit and you stop**: say which, and that
 
 📌 **A block of any other genre carries an empty `Nature:`, and that is
 right** — 🔴 **only a behaviour has one.**
+
+🔴 **Grep `^### Q` in each before touching it** — 📌 **a file holding
+questions is not yours to file**: ⚠️ **it waits on an answer, or its
+answers were never integrated.** 🔴 **Stop and say which.**
+
+📌 **Filed, it is read by no command again** — ⚠️ **and its answers are
+lost for good.**
 
 🔴 **File every root `questions-*.md`**, by `git mv`:
 
@@ -76,7 +93,8 @@ is a normal outcome.
 
 ## What you write — 1. The split by genre
 
-**Six files, at the feature folder's root, replaced whole:**
+**Six files, under `par-genre/` in the feature folder, replaced
+whole:**
 
 | File | Who reads it |
 |---|---|
@@ -84,6 +102,12 @@ is a normal outcome.
 | `par-genre/transverses.md` | 📌 **Every nature invocation of the Convertisseur** |
 | `par-genre/directives.md` | The Architecte |
 | `par-genre/references.md` | The Convertisseur — its Text section |
+
+🔴 **The file name is the genre, plural, without accent, a hyphen for a
+space** — 📌 `référence` → `references.md`, `hors périmètre` →
+`hors-perimetre.md`. ⚠️ **You grep the genre as the block writes it,
+accents included** — 🔴 **`^Genre: référence$`**, never the file name.
+
 | `par-genre/hors-perimetre.md` | The Convertisseur — its preamble |
 | `par-genre/recette.md` | 🔴 **The Product Owner**, handed back by `/9_controle` |
 
@@ -117,6 +141,7 @@ file**: 📌 **only a behaviour has a nature.**
     ## model
 
     ### B3 — Race segment structure
+    Genre: comportement
     Nature: model
 
     <its text>
@@ -127,7 +152,8 @@ file**: 📌 **only a behaviour has a nature.**
 
 🔴 **The eight natures, in this order, one heading each** — `model`,
 `persistence`, `calculation`, `transition`, `external exchange`,
-`synchronisation`, `presentation`, `access`. 📌 **A nature no block carries still gets its
+`synchronisation`, `presentation`, `access`. 📌 **A nature no block
+carries still gets its
 heading**, with `*(none)*` under it.
 
 🔴 **Under each, every block whose `Nature:` line carries it**, in the
@@ -176,5 +202,4 @@ under each nature.**
 
 📌 `/6_convertit`.
 
-🔴 **Nothing else is yours**: no phase chain, no risk level, no
-`TaskCreate`.
+🔴 **Nothing else is yours**: no phase chain.

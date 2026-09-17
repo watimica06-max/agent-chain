@@ -364,6 +364,8 @@ on?**
 construction; a dated value only from its date.
 
 **`C1.2` What is out of scope, though one might think it in?**
+🔴 **The out-of-scope blocks answer this one.** 📌 **What they already
+carry is not asked again** — ⚠️ **the Product Owner wrote it once.**
 
 **`C1.3` Are the displayed terms the product's or the code's?**
 🔴 Internal naming never surfaces on screen.

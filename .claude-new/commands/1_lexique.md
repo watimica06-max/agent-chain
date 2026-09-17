@@ -56,6 +56,7 @@ never the number.**
 | No questions file | **1 — Sweeping** |
 | `questions-lexicographe` alone, **with no `### Q`** | 🔴 **Invoke nothing** — the loop ended. 📌 **Say so, and say `/2_structure`** |
 | `questions-lexicographe` alone | **2 — Settling** |
+| Another agent's questions file alone, **with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to watch**; say `/2_structure` |
 | Another agent's questions file alone | **3 — Watching** |
 | Another agent's, and `questions-lexicographe` | **4 — Correcting** |
 | Two files of other agents | 🔴 **Stop** — a filing failed; say which files |
@@ -67,13 +68,19 @@ wrote it — 🔴 **3 and 4 name it in the prompt.**
 read** — 🔴 **which is what keeps these four apart**: the root holds at
 most the file waiting on you, and yours.
 
-**A file with an empty `Answer:`** → 🔴 **stop**, and say which
-questions are waiting.
+**A file with an empty `Answer:` and no `Défaut:` line** → 🔴 **stop**,
+and say which questions are waiting.
+
+⚠️ **An entry whose `Answer:` is empty **and** that carries a `Défaut:`
+line is answered** — 📌 **silence accepts the proposal**, and that is
+what the line exists for. 🔴 **Test both**: `^Answer:\s*$` with no
+`Défaut:` above it in the same entry.
 
 📌 **After 2, run 1 again** — 🔴 **a settled term can uncover a pair the
 first sweep could not see.**
 
-📌 **After 4, the answered file is clean** — 🔴 **run `/2_structure`.**
+📌 **After 4, the answered file is clean** — 🔴 **unless 4 asked
+something itself**: see *What you relay*.
 
 ⚠️ **An empty questions file ends a loop.**
 
@@ -82,6 +89,51 @@ run on every turn of the grid and of the conversion. ⚠️ **It stops 1
 and 2**: the vocabulary is settled before the product file exists,
 never after — a term changed then would leave sixty blocks carrying the
 old one.
+
+🔴 **On that stop, say `/2_structure`** — 📌 **the vocabulary is settled
+and the product file is where the work is now.** ⚠️ **A stop that names
+no next step leaves the Product Owner to guess.**
+
+---
+
+## Git, before invoking
+
+🔴 **Decide the invocation first** — see *Which invocation*. ⚠️ **This
+command is the only one of the cycle that reads a questions file to
+decide what it is**: filing before deciding would move the very file
+that says it.
+
+🔴 **Then file nothing you have not identified.** 📌 **The root holds at
+most two files, and the invocation you just chose names them both**:
+the lexicographe's, and the answered one.
+
+⚠️ **Anything else at the root means a filing failed upstream** — 🔴
+**stop, and say which files.** 📌 **Never move one of them**: an
+answered questions file put away in `questions/<agent>/` is read by no
+command again, and the Product Owner's answers are lost.
+
+📌 **Nothing to file before invoking is the normal case.**
+
+🔴 **Then commit the feature folder**, before creating the worktree:
+
+    git add docs/features/<name>/ && git commit -m "chore: answers"
+
+⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
+session.** A worktree branches from the last commit — uncommitted
+answers are invisible inside it, and the agent settles nothing.
+
+📌 **Nothing to commit is a normal outcome** — carry on.
+
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. *(Seen
+once: a whole invocation lost that way.)*
+
+📌 **Enter the worktree before invoking**, not after a write fails —
+the harness blocks a subagent's writes until the session is isolated.
 
 ---
 
@@ -128,6 +180,9 @@ notifies on completion. Do not pass it; wait for the notification.
     git mv docs/features/<name>/blocked_lexicographe.md \
            docs/features/<name>/blocked_lexicographe-NN.md
 
+📌 **`NN`: the highest `blocked_lexicographe-NN.md` in the folder plus
+one — `01` when there is none.**
+
 ⚠️ **Anything left at the unnumbered name reads as a block still
 standing**, and the next run stops on it.
 
@@ -156,44 +211,7 @@ them, not you.**
 
 ---
 
-## Git, in this mode
-
-🔴 **Decide the invocation first** — see *Which invocation*. ⚠️ **This
-command is the only one of the cycle that reads a questions file to
-decide what it is**: filing before deciding would move the very file
-that says it.
-
-🔴 **Then file nothing you have not identified.** 📌 **The root holds at
-most two files, and the invocation you just chose names them both**:
-the lexicographe's, and the answered one.
-
-⚠️ **Anything else at the root means a filing failed upstream** — 🔴
-**stop, and say which files.** 📌 **Never move one of them**: an
-answered questions file put away in `questions/<agent>/` is read by no
-command again, and the Product Owner's answers are lost.
-
-📌 **Nothing to file before invoking is the normal case.**
-
-🔴 **Then commit the feature folder**, before creating the worktree:
-
-    git add docs/features/<name>/ && git commit -m "chore: answers"
-
-⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
-session.** A worktree branches from the last commit — uncommitted
-answers are invisible inside it, and the agent settles nothing.
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. *(Seen
-once: a whole invocation lost that way.)*
-
-📌 **Enter the worktree before invoking**, not after a write fails —
-the harness blocks a subagent's writes until the session is isolated.
+## Git, once it has reported
 
 **Then, once it has reported:**
 
@@ -228,7 +246,6 @@ too**: the Product Owner has to see it.
 | 4 wrote a new questions file | 📌 Answer it, then `/1_lexique` again |
 | 4 wrote none | 📌 `/2_structure` — 🔴 the answers are settled |
 
-🔴 **Nothing else is yours**: no risk level, no
-`TaskCreate`, no reading of what a term means.
+🔴 **Nothing else is yours**: no reading of what a term means.
 
 **If it returns `blocked_lexicographe.md`**: relay it and stop.

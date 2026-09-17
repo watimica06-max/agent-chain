@@ -16,19 +16,20 @@ absent**, never rewrite the file:
     docs/features/*/stop.md
     docs/features/*/stop1.md
 
-📌 **`/cycle` creates `stop1.md` in each feature folder.** Renaming it
-to `stop.md` halts the chain before the next phase; neither is ever
-committed.
+📌 **A `stop.md` in a feature folder halts the command that reads it,
+before its next step.** 🔴 **`stop1.md` is the same file disarmed** — 📌
+**the Product Owner renames one into the other to halt and to resume.**
+⚠️ **Neither is ever committed**, which is why both are ignored.
 
 **Downstream** — what the code chain reads and writes:
 
 - `docs/CURRENT_TECHNICAL_STATE.md` — with `# Technical state` as its
-  only line. 🔴 **The Cadreur blocks without it**, and the Réalisateur
-  writes into it from the first lot
-- `docs/TECHNICAL_CONVENTIONS.md` — 🔴 **not created empty.** It holds
-  the project's own coding conventions, and the Détailleur, the
-  Réalisateur and the Relecteur all read it. **Say it has to be written
-  by hand before `/7_lots` runs**, and create nothing
+  only line. 📌 **The Réalisateur writes into it from the first lot**,
+  and the Détailleur, the Diagnostiqueur and the Arbitre read it. ⚠️
+  **Not the Cadreur**: it establishes what the code carries by grep
+- `docs/TECHNICAL_CONVENTIONS.md` — 🔴 **create nothing.** 📌 **The
+  Architecte writes it, at `/conventions`** — ⚠️ **which runs by hand
+  after `/6_convertit` and before `/7_lots`.** 🔴 **Say so**
 
 🔴 **Stop if `docs/PRODUIT_GLOBAL.md` already exists.** This command is
 for a new application, and overwriting the global would lose every
@@ -37,7 +38,8 @@ domain in it.
 **Then report what the Product Owner still has to provide before the
 chain runs end to end:**
 
-- `docs/TECHNICAL_CONVENTIONS.md`, written by hand
+- `docs/TECHNICAL_CONVENTIONS.md` — 📌 **by running `/conventions`**,
+  not by hand
 - the `technical-state-format` skill, which the Réalisateur loads
   before writing to `CURRENT_TECHNICAL_STATE.md`
 

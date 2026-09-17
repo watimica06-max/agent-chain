@@ -23,7 +23,13 @@ feature's.
 
 ## What you read
 
-**Every `code/**/blocked_*-NN.md`** — the settled ones, numbered.
+**Every `blocked_*-NN.md` of the working folder** — the settled ones,
+numbered. 🔴 **Three places**: `code/**/`, the folder's own root
+*(`blocked_architecte`, `blocked_diagnostiqueur`)*, and
+`investigation/` *(a `/diagnostique` phase 1)*.
+
+⚠️ **A glob on `code/**/` alone misses two families** — 📌 **and the
+audit would report a feature as having blocked on nothing.**
 
 📌 **And `code/**/blocked_*.md` without a number** — one still standing.
 ⚠️ **Read it and list it under `### Still open`**: a block waiting for a

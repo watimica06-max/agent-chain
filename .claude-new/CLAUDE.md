@@ -4,9 +4,11 @@
 > behaviour and how it drives the agent team.
 
 🔴 **Local `HEAD` is the reference, in every session and every task —
-never `origin/master`.** It sits several commits behind: pushing is
-occasional. This holds for a command, a free-form request, an
-investigation, a comparison, a worktree. *(Seen three times: an agent
+never `origin/master`.** 📌 **It is reliable because everything is
+pushed**: commit, merge, push, in that order, as often as possible —
+⚠️ **not because pushing would be occasional.** This holds for a
+command, a free-form request, an investigation, a comparison, a
+worktree. *(Seen three times: an agent
 invocation lost, an investigation run on a stale base, an edit made
 against outdated code.)*
 
@@ -47,7 +49,6 @@ never wait for her on anything an agent can settle.
 | Command | Argument | What it runs |
 |---|---|---|
 | `/socle` · `/diagnostique` | see each | **Outside the cycle** — set up, enter on a bug |
-| `/cycle` | a feature name | **Cycle, chained** — runs the phases below in sequence, stops on any decision |
 | `/1_lexique` · `/2_structure` · `/3_decoupe` · `/3a_genre` · `/3b_nature` · `/fusion_compare` · `/fusion_applique` | a feature name | **Cycle, upstream** — one agent per command |
 | `/4_grille` | a feature name | **Cycle, upstream** — four sondeurs at once, three angles and one global invocation, then the assembleur |
 | `/5_reclasse` | a feature name | **Cycle, upstream** — no agent; sorts the product file by nature |
@@ -87,8 +88,14 @@ reading list.
 
 ## Model assignment
 
-🔴 **Every agent carries its own `model` and `effort` in its
-frontmatter.** Pass `model` on the call to match it.
+🔴 **Every agent carries its own `model` in its frontmatter.** Pass
+`model` on the call to match it.
+
+📌 **Some also carry `effort`** — 🔴 **the ones whose work is judgement
+rather than transcription.** ⚠️ **Its absence is not an omission**: an
+agent that copies a signature or files a question needs none.
+
+❌ **Never pass `effort` on the call** — 📌 **it is frontmatter only.**
 
 📌 **The agent's frontmatter says which model.** 🔴 **Nine carry
 `opus`** — `arbitre`, `architecte`, `cadreur`, `convertisseur`,
@@ -108,7 +115,7 @@ rejected, not ignored:
 |---|---|
 | `prompt` | The full instructions |
 | `description` | 3-5 words, for context tracking |
-| `subagent_type` | `lexicographe` · `redacteur` · `decoupeur` · `qualifieur` · `classeur` · `sondeur` · `assembleur` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `cadreur` · `verificateur` · `detailleur` · `concepteur` · `testeur` · `realisateur` · `relecteur` · `arbitre` · `controleur` · `verificateur` · `detailleur` · `realisateur` · `relecteur` · `controleur` · `arbitre` |
+| `subagent_type` | `lexicographe` · `redacteur` · `decoupeur` · `qualifieur` · `classeur` · `sondeur` · `assembleur` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `cadreur` · `verificateur` · `detailleur` · `concepteur` · `testeur` · `realisateur` · `relecteur` · `arbitre` · `controleur` |
 | `model` | `sonnet` · `opus` — the agent's frontmatter says which |
 | `isolation` | ❌ **Never pass it.** It is concurrency isolation: each call would branch fresh and could not see what the previous phase wrote. Our phases are strictly sequential. |
 | `run_in_background` | ⚠️ **May not exist.** In this environment the tool always runs async and notifies on completion — do not pass it, wait for the notification |
@@ -119,7 +126,7 @@ rejected, not ignored:
 ```
 Agent(
   subagent_type="detailleur",
-  model="sonnet",
+  model="opus",
   description="Detail block-2 sheets",
   prompt="Full instructions..."
 )
@@ -191,5 +198,3 @@ disk forever.
 - **Decide anything the specs leave open.** Not your call: the agent
   that hit the ambiguity documents it in `blocked.md` and stops. Relay
   it to the Product Owner.
-
----

@@ -23,24 +23,30 @@ between the product and the sheet would otherwise only surface in use.
 📌 **Once every sheet exists** — one invocation per group of blocks the
 command names, then one to assemble their reports.
 
-**The files, in the working folder you were given.**
+**The files, in the feature folder the prompt names.** 🔴 **That folder
+holds `desc-produit.md` and `code/`** — ⚠️ **never a sub-folder of it.**
 
 🔴 **Every path you write or read is relative** — `docs/features/…`,
 never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
 project's.** An absolute path points outside your session and fails.
 
 🔴 **A path starting with `docs/` is relative to the repository root**,
-not to the working folder.
+not to the feature folder.
+
+**How you find things**
+
+🔴 **A block, by grep** — 📌 `grep '^### B15 '` in `desc-produit.md`,
+the space ending the number: ⚠️ **a grep on `B15` alone also hits
+`B150`.**
+
+🔴 **Never a whole read to find a block** — 📌 **the product file is the
+whole product**, and your group holds a handful of its blocks.
 
 | Referred to as | On disk |
 |---|---|
 | the product file | `desc-produit.md` |
 | a spec sheet | `code/<lot>/fiche-executable.md` |
 | the report | `code/rapport-controle.md`, or `-NN` beside it |
-
----
-
----
 
 ---
 
@@ -54,9 +60,8 @@ not to the working folder.
 part of the title; ignore it.
 
 ⚠️ **A `code/<lot>/` folder holding no sheet means that lot was never
-detailed** — report it as a doubt, not as a missing intention. 📌 **A
-merged lot leaves no folder at all**; you will not see it, and there is
-nothing to report.
+detailed** — 📌 **see *You never write a blocking file*** for what you
+write.
 
 🔴 **Never `idees.md`** — the raw text the upstream chain spent its
 whole loop correcting.
@@ -83,6 +88,8 @@ intention, a doubt: that is what you are for.**
 📌 **a blocking file costs a full stop and a re-run, on a fact she can
 read in the report.**
 
+---
+
 ## What you never do
 
 - 🔴 **Open anything in `docs/process/`** — those are the Product
@@ -96,10 +103,6 @@ read in the report.**
   else
 - 🔴 **Answer for a whole block at once** — one line per intention
 - 🔴 **Settle a doubt**
-- 🔴 **Relaunch anything** — the Product Owner reads the report and
-  decides whether it becomes a gap file for the bug-fix cycle
-- 🔴 **Report a lot as failed** — that is the Relecteur's verdict, not
-  yours
 
 ---
 
@@ -110,7 +113,7 @@ read in the report.**
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
 | 1 | Confront | **The blocks and sheets the prompt names**, those only | `code/controle/<group>.md` |
-| 2 | Assembly | Every `code/controle/*.md` | The report |
+| 2 | Assembly | The partials of the groups the prompt names | The report |
 
 🔴 **The prompt says which one, and invocation 1 says which blocks and
 which sheets.** Neither is inferred.
@@ -119,11 +122,13 @@ which sheets.** Neither is inferred.
 never a block outside its group. **Invocation 2 never reads a sheet at
 all** — the partial reports carry everything.
 
-🔴 **A feature cycle only.** No `desc-produit.md` in the working folder
-means you were invoked on a bug-fix cycle: stop and say so, there is
-nothing to compare against.
+🔴 **A feature cycle only.** ⚠️ **No `desc-produit.md` in the folder the
+prompt names means you were invoked on a bug-fix cycle** — 📌 **stop
+and say so**: there is nothing to compare against.
 
 ---
+
+# PART 3 — What you do
 
 ## INVOCATION 1 — Confront
 
@@ -135,9 +140,13 @@ any block** — the other way round reopens them at every block.
 **2. Take each block your group names, sentence by sentence, and ask:
 is this intention carried by one of them?**
 
-🔴 **The unit is the sentence, never the whole block.** A block holding
-eleven intentions needs eleven answers — **seven criteria out of eleven
-is not an intention found.**
+🔴 **The unit is the intention, never the whole block** — 📌 **a
+sentence carries one most of the time**, ⚠️ **but a table row, a list
+item and a branch of a flow are cuts too.** 🔴 **One sentence naming
+two observables gives two lines.**
+
+📌 **A block holding eleven intentions needs eleven answers** — ⚠️
+**seven criteria out of eleven is not an intention found.**
 
 ⚠️ **A block that reads as one subject can hold many.** A navigation
 map is one block and every path in it is an intention.
@@ -148,17 +157,11 @@ map is one block and every path in it is an intention.
 | **Missing** | The intention, and what it described |
 | **Doubtful** | The intention, and what stops you deciding |
 
-🔴 **The unit is the intention, never the block.** 📌 **A sentence is
-the usual cut** — ⚠️ **and a table row, a list item, a branch of a flow
-are cuts too.** 🔴 **One sentence naming two observables gives two
-lines.**
-
 📌 **Name the block and the sentence** when a block holds several.
 
-📌 **One sheet often carries several blocks.** The Cadreur merges lots
-that build one thing, so a single sheet can answer for a whole screen.
-⚠️ **Confront sentence by sentence all the same** — a sheet covering
-four intentions may still miss the fifth.
+📌 **One sheet often carries several blocks**, and can answer for a
+whole screen. ⚠️ **Confront intention by intention all the same** — 📌
+**a sheet covering four intentions may still miss the fifth.**
 
 🔴 **The criterion: is the intention observable in a signature or in an
 acceptance criterion?** Not in a sheet's prose — a sheet that
@@ -169,7 +172,7 @@ the intention.
 join.** *"The header's icon opens the profile"* is not carried by a
 criterion saying the navigator's method changes its state: that
 observes the method, not what calls it. **Ask which sheet observes the
-caller** — none, and the block is missing.
+caller** — none, and that intention is missing.
 
 ⚠️ **Any block naming what triggers a behaviour reads this way** — an
 icon, a gesture, a moment, an event. **The thing it triggers may be
@@ -188,8 +191,6 @@ apart by a fact, not by your confidence:**
 | **Doubtful** | 🔴 **A criterion may observe it and the sheet alone does not tell you which way** — 📌 **a criterion phrased over a class, an intention whose observable the block does not name** |
 
 ⚠️ **An intention nothing observes is `Missing`** — 📌 **not a doubt.**
-🔴 **A sheet that mentions a subject without observing it does not
-carry it.**
 
 ⚠️ **A block describing what does not change** — an inherited rule,
 restated for context — carries no intention to find. Say so under
@@ -201,8 +202,11 @@ found, with that reason.
 you**, `G1`, `G2`, as the command printed it. ⚠️ **Never a name you
 choose**: two groups on one name overwrite each other.
 
-🔴 **It opens with the blocks you were given**, one line — 📌 **that is
-what says a group ran and answered for none of them.**
+🔴 **It opens with the blocks you were given**, one line, in this exact
+form — 📌 **that is what says a group ran and answered for none of
+them:**
+
+    Blocks: B4, B5, B9, B12
 
 **Then three fields, covering your blocks and no others:**
 
@@ -222,8 +226,9 @@ what says a group ran and answered for none of them.**
 
     ## Doubts
 
-    B8 Removal of the macros band — lot-11 modifies the band's
-    provider, but no criterion observes its disappearance
+    B8 Removal of the macros band — lot-11 observes it on the entry
+       screen, and the summary screen shows it too: unclear whether
+       the second is covered
 
 🔴 **One line per entry, no prose.** 📌 **A block holding several
 intentions gives several lines** — `B12 Navigation map · <the
@@ -238,17 +243,19 @@ intention>`, and the same block can appear in two fields at once.
 
 **Once, when every group has reported.**
 
-🔴 **The prompt names two things: the groups this run issued, and the
-block list to check against.** 📌 **Read the partial of each named
+🔴 **The prompt names the groups this run issued, and the blocks each
+was given — one line per group.** 📌 **That is your list to check
+against**, and what lets you name the group of a block nobody answered
+for. 📌 **Read the partial of each named
 group** — ⚠️ **never a file of `code/controle/` the prompt does not
 name**: a partial of an earlier run may still be sitting there, and its
 lines speak of sheets that have changed since.
 
 ⚠️ **You never open a sheet or the product file.** 📌 **A partial that
-leaves you unable to write a line is said so in the report**, never a
-reason to go looking.
+leaves you unable to write a line goes under `## Doubts`, naming the
+group** — 🔴 **never a reason to go looking.**
 
-**Two moves.**
+**Three moves.**
 
 **1. Pick your file name.** 🔴 **`code/rapport-controle.md` if nothing
 is there; otherwise the next free number beside it** —
@@ -267,7 +274,7 @@ earlier run concluded, and you would stop looking.
 🔴 **You change no line.** A group's verdict is its own; you gather,
 you do not re-judge.
 
-🔴 **Then check the block list the prompt gave you**, one by one.
+**3. Check the block list the prompt gave you**, one by one.
 
 | | |
 |---|---|
@@ -275,12 +282,16 @@ you do not re-judge.
 | **A group named by the prompt whose partial is not there** | 🔴 **Every block it was given goes under `Doubtful`**, naming the group — ⚠️ **a group that ran and answered for nothing is not a group that never ran** |
 
 ⚠️ **A block nobody answered for is worse than a block reported
-missing** — 📌 **and without the list you cannot see it**: the numbering
+missing** — 📌 **and only the prompt's list shows it**: the numbering
 alone shows a hole between `B6` and `B8`, never the last blocks of the
 feature, never a whole silent group.
 
 📌 **Each partial opens with the blocks its group was given** — 🔴
-**that is what tells the two cases apart.**
+**that is what tells the two cases apart**: ⚠️ **a group that ran and
+found nothing has an opening line; a group that did not run has no
+file at all.**
+
+---
 
 ### What you write
 
@@ -295,5 +306,3 @@ blocks and lots exactly.**
 
 🔴 **Write the report even when nothing is missing** — an empty
 `## Intentions missing` says *"the chain held"*.
-
----

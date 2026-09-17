@@ -26,7 +26,7 @@ Feature folder: `docs/features/$ARGUMENTS/`
 never read a block, an entry or a question for what it says.**
 
 ⚠️ **`CLAUDE.md`'s standing reading rules apply**: never open
-`CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+`CURRENT_TECHNICAL_STATE.md`.
 
 ---
 
@@ -64,6 +64,10 @@ file.
     git mv docs/features/<name>/questions-<agent>-NN.md \
            docs/features/<name>/questions/<agent>/
 
+⚠️ **Never `questions-architecte-*.md`** — 🔴 **leave it at the root**:
+📌 **it waits for `/conventions`, which is the only command that reads
+it.**
+
 📌 **This command reads none of them.** 🔴 **A questions file stays at
 the root only while it waits to be answered or integrated** — ⚠️ **the
 next one written has to be the only one there.**
@@ -72,7 +76,8 @@ next one written has to be the only one there.**
 those files, and neither should you.
 
 🔴 **And every `convertisseur/questions-*.md` the last run wrote**, into
-`convertisseur/closed/`, each under the next free number:
+`convertisseur/closed/`, each under the next free number — 📌 **and
+every answered `technique-<nature>.md` with them**:
 
     git mv docs/features/<name>/convertisseur/questions-presentation.md \
            docs/features/<name>/convertisseur/closed/questions-presentation-NN.md
@@ -123,7 +128,8 @@ the lines under its `## <nature>` heading, up to the next `## `. 📌
 | Its part differs from `convertisseur/<nature>-input.md`, or that file is absent | 🔴 **Runs** |
 | `convertisseur/<nature>.md` is absent, **and its part changed** | 🔴 **Runs** — its last run wrote no section |
 | `convertisseur/<nature>.md` holds `<<ASSUMED`, **and its part changed** | 🔴 **Runs** — ⚠️ **a mark is lifted only by writing its section again** |
-| Either of the two, **and its part is byte-identical** | 📌 **Waits** — 🔴 **it does not run.** ⚠️ **It would read the same blocks, meet the same gap and ask the same question**: one opus invocation for a known result |
+| 🔴 **Its `convertisseur/technique-<nature>.md` holds an answered question** | 🔴 **Runs** — 📌 **whatever its blocks did**: ⚠️ **a technical answer changes no block**, and without this row it would wait for ever. 📌 **Name the file in its prompt**. |
+| Either of the two, **its part byte-identical, and no answered technical file** | 📌 **Waits** — 🔴 **it does not run.** ⚠️ **It would read the same blocks, meet the same gap and ask the same question**: one opus invocation for a known result |
 | `convertisseur/blocked_<nature>.md` carries a filled `## Decision` | 🔴 **Runs** — ⚠️ **a decision is applied only by the invocation it is named to** |
 | None of the above | 📌 **Kept as it stands** |
 
@@ -145,7 +151,7 @@ what the next run compares against.**
 
 | | What you do |
 |---|---|
-| `spec-technique.md` exists, holds no `<<ASSUMED` and no `[B`, no nature's files were just deleted, and `blocked_transversal.md` carries no filled `## Decision` | 🔴 **Nothing to write** — say the document stands, and go to *Once it has run* |
+| `spec-technique.md` exists, holds no `<<ASSUMED` and no `[B`, no nature's files were just deleted, no nature is waiting on an answered technical file, and `blocked_transversal.md` carries no filled `## Decision` | 🔴 **Nothing to write** — say the document stands, and go to *Once it has run* |
 | Otherwise | 📌 **Skip to the assembly** — the document has to be built again around what stands |
 
 ---
@@ -162,6 +168,7 @@ Agent(
   description="Convert <name>, <nature>",
   prompt="Feature folder: docs/features/<name>/.
           Invocation 1 — Nature: <nature>.
+          <Plus: convertisseur/technique-<nature>.md, its question is answered.>
           <Plus: convertisseur/blocked_<nature>.md, its decision is filled.>"
 )
 ```
@@ -179,11 +186,14 @@ merge loses them all**, the blocking file included, and the Product
 Owner sees nothing. 🔴 **Merge, push, remove the worktree, then
 report.**
 
-🔴 **Then check each wrote
-`convertisseur/questions-<nature>.md` — 🔴 **and, when it wrote its
-section, `convertisseur/<nature>-notes.md`**: the references and the
-traceability are built from it. ⚠️ **A missing one stops the command**
-— say which nature and which file, and go no further.
+🔴 **Then check each wrote `convertisseur/questions-<nature>.md`**, and
+— 🔴 **when it wrote its section** — `convertisseur/<nature>-notes.md`:
+📌 **the references and the traceability are built from it.**
+
+📌 **`convertisseur/technique-<nature>.md` is written only when the
+nature had a technical question** — ⚠️ **its absence is not a defect.** ⚠️ **A
+missing one stops the command**
+— say which nature and which file. 📌 **Merge first**, as above.
 
 ---
 
@@ -258,6 +268,11 @@ Agent(
 `convertisseur/questions-transversal.md` exist.** ⚠️ **A missing one
 stops the command** — say which.
 
+📌 **An `<<ASSUMED` mark left beside an answered technical file is a
+nature that did not apply its answer** — ⚠️ **say which, and run it
+again.** 📌 **A mark beside an unanswered file is normal**: the question
+is waiting.
+
 🔴 **Grep `[B` in `spec-technique.md`.** 📌 **What remains beside a
 questions file that holds questions is one of them.** ⚠️ **What remains
 beside an empty questions file is a reference the run missed** — 🔴 **a
@@ -278,6 +293,10 @@ line dropped there is invisible everywhere else.
 root** — the highest number in `questions/convertisseur/`, plus one;
 ⚠️ the root holds none by now.
 
+⚠️ **A `technique-<nature>.md` never goes into the merged file** — 🔴
+**it is technical, and the Product Owner answers it in place**: 📌 **the
+merged file carries the product questions alone.**
+
 📌 **What goes in: the files this run wrote** — the natures in section
 order, then `questions-transversal.md`.
 
@@ -297,10 +316,17 @@ the same way:
     git mv docs/features/<name>/convertisseur/blocked_<nature>.md \
            docs/features/<name>/convertisseur/blocked_<nature>-NN.md
 
+📌 **`NN`: the highest `blocked_<nature>-NN.md` in `convertisseur/`
+plus one — `01` when there is none.**
+
 ⚠️ **Anything left at the unnumbered name reads as a block still
 standing**, and the next run stops on it.
 
-**Then:**
+---
+
+## Git, once it has reported
+
+**Then, once it has reported:**
 
 1. `git merge --no-ff <branch>` from the main checkout root
 2. `git push`
@@ -321,7 +347,8 @@ an unmerged branch is invisible to the next one. ⚠️ **A
 
 ## What you relay
 
-📌 **Which natures ran, which were kept, how many questions, and how
+📌 **Which natures ran, which were kept, which are waiting on an
+answered technical file, how many questions, and how
 many `<<ASSUMED` marks the document holds** — a grep.
 
 **What to run next** — 📌 **indications for the Product Owner.**
@@ -333,13 +360,13 @@ many `<<ASSUMED` marks the document holds** — a grep.
 | **A blocking file and questions together** | 🔴 **Answer the questions first**, then fill the decision, then `/6_convertit` — ⚠️ **the other way round, the rerun files the unanswered questions away as if they had been integrated** |
 | **Technical questions only** | 🔴 **Answer them, then `/6_convertit`** — 📌 **the short loop**: a technical answer changes no block, so nothing upstream has to run again |
 | **Product questions, alone or with technical ones** | 📌 **Answer them, then `/1_lexique`** — 🔴 **the long loop.** ⚠️ **Answer the technical ones too**: the agent integrates both when its turn comes round |
+| **A nature is waiting** on an unanswered technical question | 🔴 **Answer it, then `/6_convertit`** — 📌 **the document does not stand while one waits** |
+| Wrote an empty questions file, or found the document standing | 📌 `/conventions`, then `/7_lots` — 🔴 the Cadreur reads the conventions in full. 📌 The merge, `/fusion_compare`, branches off here whenever you choose |
 
 ⚠️ **The short loop is an exception to the standing rule that every
 answer goes back through `/1_lexique`** — 📌 **a technical answer brings
 no product vocabulary**, and touches no block.
-| Wrote an empty questions file, or found the document standing | 📌 `/conventions`, then `/7_lots` — 🔴 the Cadreur reads the conventions in full. 📌 The merge, `/fusion_compare`, branches off here whenever you choose |
 
-🔴 **Nothing else is yours**: no phase chain, no risk level, no
-`TaskCreate`.
+🔴 **Nothing else is yours**: no phase chain.
 
 **If an agent returns a blocking file**: relay it and stop.

@@ -46,8 +46,8 @@ last one**: `Answer:` lines with nothing after them, and `^### Q`.
 📌 **After `/6_convertit`, before `/7_lots`.** The Cadreur reads the
 conventions in full; they have to exist when it does.
 
-⚠️ **Run by hand** — 🔴 **`/cycle` does not call it**, and wiring it in
-waits until the grid has been measured on a real cycle.
+⚠️ **Run by hand** — 🔴 **no command chains it**: 📌 **it sits between
+`/6_convertit` and `/7_lots`**, and the Product Owner runs it there.
 
 🔴 **Stop if `spec-technique.md` is absent** — say so. The agent derives
 from it, and the upstream loop has not reached it yet. ⚠️ **Invocation 3
@@ -67,23 +67,37 @@ matches.**
 | The folder holds | What you invoke |
 |---|---|
 | A `blocked_architecte.md` with an empty `## Decision` | 🔴 **Nothing** — relay it and stop |
+| 🔴 **A `blocked_architecte.md` with a filled `## Decision`** | 📌 **The invocation its `## Invocation` line names** — 🔴 **name the file in the prompt** |
 | A request in `architecte/` with an empty `## Verdict` | **Invocation 3 — Requests** |
 | A `questions-architecte-NN.md` at the root with an empty `Answer:` | 🔴 **Nothing** — say which questions wait |
 | A `questions-architecte-NN.md` at the root, **answered** | **Invocation 2 — Integrating** |
 | A `questions-architecte-NN.md` at the root with **no `### Q`** | 🔴 **Nothing** — the derivation asked nothing. 📌 **Say `/7_lots`** |
-| **No `couverture.md` at the working folder's root** | **Invocation 1 — Deriving** |
-| **A `couverture.md`, and `docs/TECHNICAL_CONVENTIONS.md` exists** | 🔴 **Invocation 4 — Completing** |
+| 🔴 **No `docs/TECHNICAL_CONVENTIONS.md`** | **Invocation 1 — Deriving** — 📌 **the first derivation this repository ever had** |
+| **It exists, and no `couverture.md` at the working folder's root** | 🔴 **Invocation 4 — Completing** — ⚠️ **on a feature folder only**: 📌 **a `bugfix-NN` carries no technical document of its own to walk** |
+| **It exists, and a `couverture.md` is there** | 📌 **Nothing to do** — say `/7_lots` |
 | Nothing of the sort | 📌 **Nothing to do** — say `/7_lots` |
 
 🔴 **The last rows are what stops a silent rewrite.** ⚠️ **Invocation 1
 opens no existing conventions file and writes it afresh** — 📌 **every
-rule invocation 3 added since would be lost.** 🔴 **This feature's own
-`couverture.md` is the test**: invocation 1 alone writes it, and it
-tells a feature never derived from one already done.
+rule invocation 3 added since would be lost.**
+
+🔴 **The test is the conventions file, never `couverture.md`.** ⚠️
+**`couverture.md` is written per feature**, so a second feature has
+none — 📌 **and a test on it would send every feature but the first
+through invocation 1.**
+
+📌 **`couverture.md` tells something else**: whether this feature has
+already been walked. 🔴 **That is the third row**, and it is what makes
+the command idempotent.
 
 📌 **An integrated questions file leaves the root** — 🔴 **filed after
 invocation 2**, ⚠️ **otherwise every later run matches its row again and
 integrates the same answers twice.**
+
+🔴 **Give the agent its questions file number in the prompt** — 📌 **the
+highest `questions-architecte-NN.md` in the root and in
+`questions/architecte/` together, plus one**; ⚠️ **`01` when there is
+none.** 📌 **It never lists a folder to find it.**
 
 📌 **Invocation 3 runs on a working folder** — a feature, or a
 `bugfix-NN` inside it. ⚠️ **Each cycle holds its own `architecte/`**,
@@ -91,35 +105,7 @@ and a request is treated in the cycle that raised it.
 
 ---
 
-## How it runs
-
-**What you do**: invoke the agent via `Agent()` with the feature folder
-and which invocation it is — and nothing else.
-
-🔴 **Never paraphrase the agent's process in your invocation** — not
-its inputs, its checks, its output format. It reads its own
-instructions.
-
-### Invocation parameters
-
-```
-Agent(
-  subagent_type="architecte",
-  model="opus",
-  description="conventions <feature>",
-  prompt="Feature folder: docs/features/<name>/. Invocation 1 — Deriving."
-)
-```
-
-❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
-either** — in this environment the Agent tool always runs async and
-notifies on completion. Do not pass it; wait for the notification.
-
-❌ **Never pass `isolation`.**
-
----
-
-## Git, in this mode
+## Git, before invoking
 
 🔴 **File away every root `questions-*.md` whose prefix is not
 `architecte`:**
@@ -130,8 +116,10 @@ notifies on completion. Do not pass it; wait for the notification.
 ⚠️ **`git mv`, never a read-and-rewrite** — the agent must not open
 those files, and neither should you.
 
-🔴 **And every `questions-architecte-*.md` but the highest** — the last
-one stays at the root, it carries the numbering.
+🔴 **And every integrated `questions-architecte-*.md`** — 📌 **nothing
+stays at the root to carry the numbering**: ⚠️ **you give the agent its
+number in the prompt**, counting the root and `questions/architecte/`
+together.
 
 📌 **Create `questions/<agent>/` if it does not exist.**
 
@@ -155,6 +143,48 @@ answers are invisible inside it, and the agent works on a stale file.
 📌 **Enter the worktree before invoking the agent**, not after it
 fails — the harness blocks a subagent's writes until the session is
 isolated.
+
+🔴 **The agent reports having applied a decision → rename its blocking
+file:**
+
+    git mv <folder>/blocked_architecte.md <folder>/blocked_architecte-NN.md
+
+📌 **`NN`: the highest in that folder plus one, `01` when there is
+none.** ⚠️ **The agent has no tool that removes a file** — 🔴 **left at
+the unnumbered name, the next run stops on it.**
+
+---
+
+## How it runs
+
+**What you do**: invoke the agent via `Agent()` with the feature folder
+and which invocation it is — and nothing else.
+
+🔴 **Never paraphrase the agent's process in your invocation** — not
+its inputs, its checks, its output format. It reads its own
+instructions.
+
+### Invocation parameters
+
+```
+Agent(
+  subagent_type="architecte",
+  model="opus",
+  description="conventions <feature>",
+  prompt="Feature folder: docs/features/<name>/. Invocation 1 — Deriving.
+          Your questions file number: NN."
+)
+```
+
+❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
+either** — in this environment the Agent tool always runs async and
+notifies on completion. Do not pass it; wait for the notification.
+
+❌ **Never pass `isolation`.**
+
+---
+
+## Git, once it has reported
 
 **Then, once the agent reports:**
 
@@ -193,6 +223,7 @@ Owner would otherwise learn of it from a file listing, at best.**
 |---|---|
 | It raised questions | 📌 **Answer them, then `/conventions`** |
 | It raised a **product question** | 🔴 **The framing grid did not close the product** — ⚠️ **the Product Owner decides**: back into the loop, or corrected by hand |
+| It raised an **`inconsistency`** | 🔴 **The technical document is wrong** — 📌 **say which entry**: the fix is upstream, in `/6_convertit`, not here |
 | It wrote a blocking file | 📌 **Fill its `## Decision`, then `/conventions`** |
 | It asked nothing, or everything is integrated | 📌 `/7_lots` |
 

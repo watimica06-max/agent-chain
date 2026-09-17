@@ -38,11 +38,50 @@ the lots. ⚠️ **Never a lot's content.**
 and nothing else.
 
 `CLAUDE.md`'s standing reading rules apply: never open
-`CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+`CURRENT_TECHNICAL_STATE.md`.
+
+---
+
+## Git, before invoking
+
+🔴 **File away every root `questions-*.md` first** — the upstream loop
+is over and nothing downstream reads them:
+
+    git mv docs/features/<name>/questions-<agent>-NN.md \
+           docs/features/<name>/questions/<agent>/
+
+⚠️ **`git mv`, never a read-and-rewrite.** 📌 **Create the folder if it
+does not exist.**
+
+🔴 **Then commit the feature folder**, before creating the worktree:
+
+    git add docs/features/<name>/ && git commit -m "chore: pre-split"
+
+📌 **Nothing to commit is a normal outcome** — carry on.
+
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. An agent
+would then work on stale content and its output would have to be
+discarded. *(Seen once: a whole invocation lost that way.)*
+
+📌 **Enter the worktree before invoking the agent**, not after it
+fails — the harness blocks a subagent's writes until the session is
+isolated.
 
 ---
 
 ## How it runs
+
+🔴 **First, remove `code/blocked_verificateur.md` if it is there** — 📌
+**`git rm`.** ⚠️ **It belongs to the previous run**: its cause is either
+fixed, and the file is a lie, or still there, and the Vérificateur
+writes it again. 🔴 **Nothing else retires it** — 📌 **it carries no
+`## Decision`, so no rename closes it**, and every later audit would
+list it as a block still waiting.
 
 🔴 **The command is the trigger, never the state of the folder** — 📌
 **it produces a split in every state but one.**
@@ -57,6 +96,16 @@ beside it**, and it is not yours to decide:
 | Nothing | A first split — the whole document |
 | `code/sequence.md` whose `## Defects` **carries lines** | 🔴 **Corrects only the lots those defects name** — the rest stays |
 | `code/redecoupage.md` | 🔴 **Re-splits what coding sent back** — see below |
+
+🔴 **The Cadreur reports the split holds and `code/redecoupage.md` can
+be archived** → 📌 **rename it yourself**:
+
+    git mv code/redecoupage.md code/redecoupage-NN.md
+
+📌 **`NN`: the highest in the folder plus one, `01` when there is
+none.** ⚠️ **Only on a round whose `## Defects` is empty** — 🔴 **left at
+the unnumbered name, every later run dispatches to block C**, and
+`/8_code` sends the split back for ever.
 
 📌 **Pass the feature folder; it reads the folder itself.**
 
@@ -74,7 +123,8 @@ instructions**, and this command says so itself.
 
 📌 **They know what to do with it** — the Cadreur leaves the coded lots
 closed and adds lots for what has to change, the Vérificateur keeps
-them where they ran and archives the file when the sequence is
+them where they ran and writes `## Redécoupage: archivable` when the
+sequence is
 written.
 
 **One invocation: `cadreur`.** 🔴 **It calls the Vérificateur itself**,
@@ -167,35 +217,7 @@ would compete with them.
 
 ---
 
-## Git, in this mode
-
-🔴 **File away every root `questions-*.md` first** — the upstream loop
-is over and nothing downstream reads them:
-
-    git mv docs/features/<name>/questions-<agent>-NN.md \
-           docs/features/<name>/questions/<agent>/
-
-⚠️ **`git mv`, never a read-and-rewrite.** 📌 **Create the folder if it
-does not exist.**
-
-🔴 **Then commit the feature folder**, before creating the worktree:
-
-    git add docs/features/<name>/ && git commit -m "chore: pre-split"
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. An agent
-would then work on stale content and its output would have to be
-discarded. *(Seen once: a whole invocation lost that way.)*
-
-📌 **Enter the worktree before invoking the agent**, not after it
-fails — the harness blocks a subagent's writes until the session is
-isolated.
+## Git, once it has reported
 
 **Then, once the split holds:**
 
@@ -218,8 +240,8 @@ carry on.
 ## What you relay
 
 **Where the split stands**: how many lots, how many blocks, and any
-defect left. 🔴 **Nothing else is yours** — no risk level, no
-`TaskCreate`, no judgement on the split itself, and no reading of git
+defect left. 🔴 **Nothing else is yours** — no judgement on the split
+itself, and no reading of git
 history to explain what a run found.
 
 **If an agent returns a `blocked_*.md`**: 🔴 **relay it and stop**,

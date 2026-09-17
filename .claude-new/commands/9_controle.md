@@ -12,19 +12,27 @@ once more to assemble.**
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
 
-Feature folder: `docs/features/$ARGUMENTS/`
-
-🔴 **Always the feature folder itself, never a `bugfix-NN/`.** The
-Contrôleur confronts the product file with the sheets built from it,
-and both live here — a correction cycle has neither.
+**The argument is the working folder** —
+`docs/features/<name>/`, or `docs/features/<name>/bugfix-NN/`.
 
 📌 **Every path below is relative to it.**
+
+🔴 **Which cycle you are on is read from the folder name** — 📌 **a
+`bugfix-NN` segment means a correction cycle.**
+
+| | What runs |
+|---|---|
+| **A feature folder** | 🔴 **All six phases** |
+| **A `bugfix-NN/`** | 📌 **Phases 4 to 6 only** — ⚠️ **the Contrôleur confronts a product file with the sheets built from it, and a correction cycle has neither** |
 
 ---
 
 ## What you read
 
-**Only whether `desc-produit.md` is there**, and whether every lot of
+📌 **At phase 1**: `tracabilite.md`, and the `Anchor:` lines of
+`code/decoupage.md` **by grep** — 🔴 **never either file whole.**
+
+**Then only whether `desc-produit.md` is there**, and whether every lot of
 `code/sequence.md` carries a `verdict.md` in PASS.
 
 ⚠️ **Nothing else.** `CLAUDE.md`'s standing reading rules apply.
@@ -46,15 +54,16 @@ else:**
 Contrôleur runs on the main cycle alone** — 📌 **a correction cycle has
 no product file**, and there is nothing to confront.
 
-🔴 **`desc-produit.md` absent, on the main cycle** — 📌 **say so and
+🔴 **`desc-produit.md` absent, on a feature folder** — 📌 **say so and
 stop**: there is nothing to confront the sheets with.
 
-📌 **On a correction cycle** — 🔴 **phases 1 to 3 do not run.** ⚠️ **The
-other two deliverables do.**
-
 🔴 **Stop if a lot of the sequence has no `verdict.md` in PASS** — name
-it. He would read an incomplete set of sheets and report an intention
-as missing when it is merely unwritten.
+it. 📌 **On a correction cycle, the sequence and the lots are the
+bugfix folder's own** — ⚠️ **phases 4 to 6 read `code/` under the
+working folder, whichever it is.**
+
+⚠️ **He would otherwise read an incomplete set of sheets** — 📌 **and
+report an intention as missing when it is merely unwritten.**
 
 📌 **An existing `rapport-controle.md` is not a reason to stop.** He
 writes the next free number beside it; that is how two states are
@@ -62,17 +71,66 @@ compared.
 
 ---
 
+## Git, before invoking
+
+🔴 **Commit the feature folder first**, before creating the worktree:
+
+    git add docs/features/<name>/ && git commit -m "chore: pre-control"
+
+📌 **Nothing to commit is a normal outcome** — carry on.
+
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. An agent
+would then work on stale content and its output would have to be
+discarded.
+
+📌 **Enter the worktree before invoking the agent**, not after it
+fails — the harness blocks a subagent's writes until the session is
+isolated.
+
+---
+
 ## How it runs
 
-**Three phases.**
+**Six phases.**
+
+🔴 **`tracabilite.md` absent, on a feature folder** — 📌 **phase 1 reads
+it**: say so and stop, the conversion did not finish.
+
+📌 **`code/recette.md` absent** — ⚠️ **normal, not a stop**: no lot had
+a criterion beyond a test. 🔴 **Phase 4 then builds from
+`par-genre/recette.md` alone**, and says the other source was empty.
 
 ### Phase 1 — build the block-to-lot map
 
 🔴 **Two greps and a crossing**, no agent.
 
+🔴 **Keep the blocks carrying `Genre: comportement` alone** — 📌 **the
+other four genres produce no lot by construction**, and each is taken
+up elsewhere:
+
+| Genre | Where it is taken up |
+|---|---|
+| `recette` | 📌 **Phase 4** — `par-genre/recette.md` feeds `code/recette-ordonnee.md` |
+| `directive` | 📌 **The Architecte** turned it into a conventions rule |
+| `référence` | 📌 **The Convertisseur**, §9 Text of the technical document |
+| `hors périmètre` | ⚠️ **Set aside by the Product Owner, explicitly** |
+
+⚠️ **Say how many blocks you kept and how many each genre set aside** —
+🔴 **so none of them reads as dropped.**
+
 **a.** `tracabilite.md` gives block → entries.
 
 **b.** The `Anchor:` fields of `code/decoupage.md` give entry → lots.
+
+🔴 **Plus its `## Entries with no lot` section** — 📌 **an entry the code
+already carries**: ⚠️ **mark those entries `carried`**, never as a block
+with no lot. 🔴 **Without it the Contrôleur reports their intentions
+missing**, and they were built before this feature ran.
 
 **c.** Cross them into `tracabilite-full.md`, at the feature folder's
 root.
@@ -87,6 +145,14 @@ lots that build its entries, deduplicated:
 📌 **Two spaces at least after the identifier**; nothing else on the
 line, no title, no prose, no header. **That is the format the script
 parses.**
+
+**d.** 🔴 **Check the crossing before going on** — 📌 **count the blocks
+of `tracabilite.md` and the lines of `tracabilite-full.md`**: ⚠️ **they
+match, or a block was lost in the join.**
+
+🔴 **And grep every lot of `code/decoupage.md` in it** — 📌 **a lot
+appearing in no line built no entry any block names**, which is either
+a split defect or a crossing defect. ⚠️ **Say which lots, and stop.**
 
 🔴 **Every block appears.** A block whose entries no lot cites gets a
 dash — it still needs an answer, and the group carrying it reads no
@@ -125,6 +191,7 @@ Agent(
   description="control G1 <feature>",
   prompt="Feature folder: docs/features/<name>/.
           Invocation 1 — Confront.
+          Group: G1.
           Blocks: B15, B53, B54, B56.
           Sheets: code/lot-29, code/lot-43, code/lot-44."
 )
@@ -145,8 +212,10 @@ Agent(
   prompt="Feature folder: docs/features/<name>/.
           Invocation 2 — Assembly.
           Groups issued this run: G1, G2, G3.
-          Blocks to account for: B1, B2, B3, ... (or: the G<n> lines
-          of tracabilite-full.md)."
+          Blocks per group, one line each:
+            G1: B1, B2, B3
+            G2: B4, B5
+            ..."
 )
 ```
 
@@ -169,7 +238,7 @@ notifies on completion. Do not pass it; wait for the notification.
 
 🔴 **Two sources**: 📌 **`code/recette.md`**, the lines the testeur wrote
 lot by lot, **and `par-genre/recette.md`**, what the Product Owner said
-he wanted to check himself.
+she wanted to check herself.
 
 🔴 **Order it by state, never by intention.**
 
@@ -197,14 +266,23 @@ resets in the middle.
 
 ### Phase 5 — the register of escaped product questions
 
-🔴 **Two sources**: 📌 **the `Doubtful` and `Missing` fields of
-`code/rapport-controle*.md`** — the latest one — **and the product
-questions the Arbitre handed back**, in the `blocked_<agent>-NN.md`
-files of the working folder.
+🔴 **Two sources**: 📌 **the `## Doubts` and `## Intentions missing`
+sections of `code/rapport-controle*.md`** — the latest one — **and the product
+questions the Arbitre handed back**, in the numbered blocking files.
+
+🔴 **They sit at two depths** — 📌 **`code/blocked_*-NN.md`** for the
+Cadreur and the Détailleur, **`code/<lot>/blocked_*-NN.md`** for the
+four agents of the loop. ⚠️ **Glob both** — 🔴 **the unnumbered ones are
+still open**, and not yours to read.
 
 🔴 **One case per line, and you conclude nothing.** ⚠️ **No class
 proposed, no grid change suggested** — 📌 **an isolated case says
 nothing; ten together let a shape show.**
+
+📌 **Its reader is the Product Owner, across cycles** — 🔴 **she decides
+whether a recurring kind of escaped question becomes an entry of
+`GRILLE_CADRAGE_PRODUIT_V2.md`.** ⚠️ **Append, never overwrite**: the
+file is the record of every cycle, not of this one.
 
 **Write `code/registre-questions.md`.**
 
@@ -216,7 +294,7 @@ is no control report.
 🔴 **A product question settled during the coding went into a sheet** —
 📌 **never into the product file, never into the global.**
 
-🔴 **Gather them from the `blocked_<agent>-NN.md` files**: 📌 **every
+🔴 **Gather them from the same two depths as phase 5**: 📌 **every
 `## Decision` that settles what the application does**, as opposed to
 how it is built.
 
@@ -232,26 +310,7 @@ even empty** — 📌 **its absence would read as *the phase did not run*.**
 
 ---
 
-## Git, in this mode
-
-🔴 **Commit the feature folder first**, before creating the worktree:
-
-    git add docs/features/<name>/ && git commit -m "chore: pre-control"
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. An agent
-would then work on stale content and its output would have to be
-discarded.
-
-📌 **Enter the worktree before invoking the agent**, not after it
-fails — the harness blocks a subagent's writes until the session is
-isolated.
+## Git, once it has reported
 
 **Then, once the agent reports:**
 
@@ -277,7 +336,7 @@ carry on.
 |---|---|
 | `code/rapport-controle-NN.md` | 📌 **Main cycle only** |
 | `code/recette-ordonnee.md` | 🔴 **What the Product Owner checks by hand** |
-| `code/registre-questions.md` | — |
+| `code/registre-questions.md` | 🔴 **Read by the Product Owner, across cycles** — 📌 **a kind of product question that keeps escaping upstream is a question the framing grid is missing** |
 | `code/decisions-produit.md` | 📌 **Read by the Rédacteur at `/fusion`** |
 
 🔴 **Nothing else is yours**: no reading of those files, no summary of

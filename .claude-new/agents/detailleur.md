@@ -57,8 +57,6 @@ block. 📌 **Its shape is below**; read it before you start.
 
 ---
 
----
-
 ## What you read
 
 - **`code/sequence.md`** — 🔴 **the orchestration names your block in
@@ -88,9 +86,7 @@ A grep, not a file read.
 🔴 **Nothing else.** Not the product file, neither grid, no upstream
 questions file.
 
-📌 **The Vérificateur read these same sections — not a duplicate.** He
-looked for whether the citations hold; you look for the rules to
-turn into signatures.
+📌 **You look for the rules to turn into signatures.**
 
 ---
 
@@ -110,6 +106,7 @@ That is a split defect, not a decision to take here.
 | The contradiction | What it means |
 |---|---|
 | A production that already exists, or the reverse | The lot was declared against a stale state document |
+| A production that exists **with an empty body** | 🔴 **Not a contradiction** — 📌 **a concepteur declared it before the block came back from a redécoupage**: ⚠️ **treat it as absent**, the lot still has to build it |
 | A need whose symbol exists but does not carry what the lot asks | The lot needs a modification nobody declared |
 
 📌 **Modification is the normal case on an existing application.**
@@ -148,15 +145,15 @@ platform requires of them, and it accepts only one. 📌 **The
 conventions name what that requirement is** — 🔴 **read them rather
 than assume a form.**
 
-⚠️ **The sheet says it, it does not decide it** — the conventions name
-the mechanism, and a base that follows from a mechanism they name is
+📌 **The conventions name the mechanism**, and a base that follows from
+a mechanism they name is
 not yours to change.
 
 | Written | Not enough |
 |---|---|
 | `observe()` → **a nullable stream of the entity** — null until one has ever been received | The type alone: null could mean *not yet* loaded |
 | `observeAll()` → **a stream of a list** — most recent first, empty when none | The type alone: order and empty case are guesses |
-| `delta(a, b): Long` — milliseconds, signed, negative means ahead | `Long` alone: unit and sign are guesses |
+| `delta(a, b): a signed duration` — milliseconds, signed, negative means ahead | `Long` alone: unit and sign are guesses |
 
 **The name** — the rule's, in the product's vocabulary, never the
 structure's. `reconcile`, not `processEntries`.
@@ -186,11 +183,6 @@ produced is one** — *this field takes that value*. 🔴 **So is
 everything an entry states without producing anything**: something
 being present, absent, constant, positioned relative to another, of a
 given form, counted, or forbidden.
-
-🔴 **The second kind is the one that goes missing.** ⚠️ **It reads as
-description rather than as work**, because nothing is computed —
-📌 **and it is exactly what nobody will notice is absent**, since no
-calculation fails without it.
 
 **Two tests, and an entry's assertion passes both:**
 
@@ -249,6 +241,12 @@ fields:
     ActivityEntry — pre-existing
     ReconciliationResult — produced by lot-02
 
+    ## Files
+
+    activity/ActivityReconciliationService.kt
+    activity/ActivityEntry.kt
+    ActivityReconciliationServiceTest.kt
+
     ## Conventions
 
     §3 · a rule needing the platform's ambient handle is in the wrong module
@@ -257,6 +255,14 @@ fields:
     ## Requests
 
     architecte/detailleur-lot-04.md
+
+🔴 **`## Files` carries the lot's `Modifies` and `Touches`, copied from
+`code/decoupage.md`** — 📌 **one path per line, no distinction between
+the two.** ⚠️ **The agents downstream may not open the lot list**: 🔴
+**without this field, *« a file the sheet does not declare »* is every
+file**, and the checks that key on it never fire.
+
+📌 **A dash when the lot creates everything it touches.**
 
 📌 **`## Requests` names the conventions requests this lot raised, or a
 dash** — 🔴 **without it nobody knows one was written**: you leave no
@@ -275,32 +281,37 @@ memory is the first cause of divergence.
 
 ## When you cannot produce
 
-🔴 **Write `code/<lot>/blocked_detailleur.md`** — do not
+🔴 **Write `code/blocked_detailleur.md`** — 📌 **at the split's root,
+not under a lot**: it may carry stops on several — do not
 merely say it.
 
 ⚠️ **Blocking is not choosing.** 🔴 **You block on an ambiguous
 rule** — one you cannot turn into a criterion — **on a grep that
 contradicts the lot's declaration**, or on a missing input.
 
-**Its shape** — four headings, the last one left empty:
+**Its shape** — 🔴 **one `## Blocking N` per stop**, even when there is
+only one, and 🔴 **one `## Decision` at the end**, whatever the count.
 
-    ## What blocks
+    ## Blocking 1 — lot-04
+
+    ### What blocks
 
     <the fact, in one sentence>
 
-    ## Where
+    ### Where
 
     <the lot, section or file>
 
-    ## To resume
+    ### To resume
 
     <the decision or fix needed>
 
     ## Decision
 
-    <left empty>
+    <left empty — one numbered answer per blocking>
 
-🔴 **The `## Decision` heading is written empty, and never omitted.**
+🔴 **The `## Decision` heading is written empty, and never omitted** —
+📌 **the Arbitre answers each blocking there, numbered.**
 
 📌 **Never block out of caution.** A terse but complete rule is not
 ambiguous.
@@ -318,7 +329,7 @@ Agent(
   model="opus",
   description="Settle <lot>",
   prompt="Working folder: <the working folder>.
-          Blocking file: code/<lot>/blocked_detailleur.md."
+          Blocking file: code/blocked_detailleur.md."
 )
 ```
 
@@ -330,13 +341,18 @@ returned is an acknowledgement; the answer is in `## Decision`.**
 
 | `## Decision` | What you do |
 |---|---|
-| Filled | 🔴 **Apply it, rename the file `blocked_detailleur-NN.md`, and detail the block** — the walk you did still holds |
+| Filled | 🔴 **Apply it and detail the block** — 📌 **say in your report that you did**; the orchestration renames the file. ⚠️ **The walk you did still holds** |
 | Filled, and it sends the lot back to the split | 🔴 **Write no sheet.** The split is about to change, and every sheet of an uncoded lot is deleted with it |
+| Some numbers answered, others not | 🔴 **Apply the answered ones** — 📌 **stop on the entries they do not cover** |
 | Still empty | 📌 **The Arbitre could not settle it and the Product Owner has not either** — stop, leaving the block as it stands |
 
-🔴 **You have written no sheet at this point** — ⚠️ **the walk comes
+📌 **On a stop in the walk, no sheet is written** — ⚠️ **the walk comes
 before the moves**, and that is what makes a return to the split cost
 nothing but the reading.
+
+⚠️ **On a stop at move 4 of a later lot, the sheets already written
+stay** — 📌 **the entry says which lot stopped**, and a rerun details
+the rest.
 
 ---
 
@@ -384,7 +400,8 @@ same lot takes a suffix**: `detailleur-<lot>-2.md`.
   was built
 - 🔴 **Decide where the code goes** — the Réalisateur does, from the
   conventions
-- 🔴 **Write a sheet before walking the whole block** — what you write
+- 🔴 **Write a sheet before walking the whole block** — 📌 **except in
+  divergence mode**, where the walk does not run — what you write
   is lost if the split goes back
 - 🔴 **Stop on a block without calling the Arbitre** — it settles most
   of them
@@ -409,44 +426,22 @@ same lot takes a suffix**: `detailleur-<lot>-2.md`.
 
 ## When you resume after a blocking file
 
-🔴 **First thing, every run: look for
-`code/<lot>/blocked_detailleur.md`, for every lot of your block.** 📌
-**Several `blocked_detailleur-NN.md` beside it are settled ones** —
-read them, they say what was already decided on this lot.
+🔴 **First thing, every run: look for `code/blocked_detailleur.md`**, at
+the split's root. 📌 **Several `blocked_detailleur-NN.md` beside it are
+settled ones** — read them, they say what was already decided on this
+block.
 
 | It holds | What you do |
 |---|---|
 | Nothing, or no such file | Carry on normally |
 | A `## Decision` still empty | 🔴 **Call the Arbitre on it**, as *When you cannot produce* says — the last run left it unsettled |
-| A `## Decision` filled | Apply it, then rename it `blocked_detailleur-NN.md`, next free number |
+| A `## Decision` reading `Not settled here.` | 🔴 **Nothing was settled** — 📌 **the Arbitre says whose it is**: ⚠️ **stop, and relay that line** |
+| A `## Decision` filled | 📌 **Apply it, and say in your report that you did** — 🔴 **the orchestration renames the file** |
 | A `## Decision` sending the lot back to the split, **and `code/redecoupage.md` is still there** | 🔴 **Stop.** The split has not been redone — say the block is waiting on it |
-| The same, **and `code/redecoupage.md` is gone** | 📌 **The split was redone** — 🔴 **rename the file to its numbered form and detail the block** |
+| The same, **and `code/redecoupage.md` is gone** | 📌 **The split was redone** — 🔴 **detail the block, and say in your report that the decision was applied** |
 
-🔴 **Renaming means renaming** — ⚠️ **`git mv`, or the equivalent**:
-one file, under a new name. 📌 **Never write the numbered one and leave
-something at the old name** — not a copy, not a note, not an empty
-file.
-
-⚠️ **Anything left at the unnumbered name reads as a block still
-standing**, and the next run treats it as one.
-
-⚠️ **Renaming is what closes it** — 🔴 **never delete it.** 📌 **The
-numbered ones are the record of what this feature has already been
-blocked on**, and the next run reads them.
-
-**How you apply it** — **to the lot `## Where` names**, then 🔴 **walk
-the whole block as usual** before writing any sheet. ⚠️ **A settled
-block does not tell you the others hold.**
-
-🔴 **The decision replaces what the cited entry said on that point** —
-write the sheet against the decision, not the entry.
-
-🔴 **Rename the file once applied**, by `git mv`, to
-`blocked_<agent>-NN.md` — the highest number beside it, plus one.
-⚠️ **Never delete it, never leave anything at the unnumbered name**:
-📌 **the numbered ones are the record of what this cycle blocked on**,
-and the next run reads them; anything left unnumbered reads as a block
-still standing, and the next run stops on it.
+🔴 **You never rename it** — 📌 **you have no tool that removes a
+file.** ⚠️ **The orchestration does it**, once you have reported.
 
 ---
 
@@ -459,10 +454,11 @@ the block** — 📌 **the same reading move 1 does, on all of them at
 once.**
 
 🔴 **And, per lot, one grep of the symbol it declares as produced or
-modified**, on the code folders. ⚠️ **Two of your three block causes
-show only in a grep** — 📌 **without it the walk finds them after the
-earlier sheets are written**, and *« you have written no sheet at this
-point »* is false.
+modified** — 📌 **on the code folders the conventions name**, which move
+4 also uses.
+
+⚠️ **One of your three block causes shows only in a grep** — 📌 **without
+it the walk meets it after the earlier sheets are written.**
 
 **A lot that already carries a sheet**
 
@@ -474,7 +470,8 @@ point »* is false.
 
 **Several stops in one walk**
 
-🔴 **One blocking file, with one entry per stop** — 📌 **you go to the
+🔴 **One blocking file for the block, `code/blocked_detailleur.md`, with
+one entry per stop** — 📌 **you go to the
 end of the walk and file everything you found.**
 
     ## Blocking 1 — lot-04
@@ -491,7 +488,7 @@ end of the walk and file everything you found.**
 
     ## Decision
 
-    <left empty — one answer per blocking, numbered>
+    <left empty — one numbered answer per blocking>
 
 📌 **Each entry carries its own lack and its own question** — ⚠️ **and,
 when you see it, what it depends on**: *« this one only has a meaning
@@ -521,12 +518,12 @@ kept if the split holds.** ⚠️ **A block sent back to the split has every
 uncoded sheet deleted** — 🔴 **detailing eight lots to lose them with
 the two that blocked is eight lots detailed twice.**
 
-📌 **And what stops you shows in the entries**, which you open anyway —
-🔴 **walking first costs no reading you were not doing.**
-
 ---
 
-## The eight moves, per lot of the block
+## The nine moves
+
+📌 **Moves 1 and 2 run once, in the walk** — 🔴 **moves 3 to 9 run per
+lot of the block.**
 
 **1. Open every entry the lot cites** — 🔴 **a lot often cites
 several**, and together they describe one thing to build. Read them all
@@ -556,8 +553,11 @@ means the signature takes a range, not a date.
 see *Deriving a signature from a rule*.
 
 📌 **The naming conventions apply here**, nowhere else, and 🔴 **the
-preamble's `Vocabulary` fixes the terms** — a signature never renames
-what the feature already calls something.
+preamble's `Vocabulary` fixes the terms.**
+
+⚠️ **A `desc-bug.md` has none** — 📌 **the terms are the feature's,
+already in the code.** 🔴 **A signature never renames what the feature
+already calls something.**
 
 **4. Grep every symbol the signature uses**, before writing it down —
 confirmed by grep, never from memory.
@@ -568,8 +568,14 @@ name** — `Grep(pattern, path: "<folder>")`, never a bare pattern.
 ⚠️ **A search without a path sweeps `docs/` and the build output**, and
 returns old plans and generated code as if they were the codebase.
 
-⚠️ **The conventions name no code folder** — 🔴 **that is a conventions
-request**, and the lot waits on it. 📌 **Never a bare grep instead.**
+⚠️ **The conventions name no code folder** — 🔴 **you block, and the
+whole block waits.** 📌 **The walk runs before any lot**, and without
+the folders it cannot run at all: 🔴 **write the request and the
+blocking file.** ⚠️ **Never a bare grep instead.**
+
+📌 **That is the one conventions request you block on** — 🔴 **every
+other one you write and carry on**, see *When the conventions fall
+short*.
 
 🔴 **And grep it on `docs/CURRENT_TECHNICAL_STATE.md` too** — 📌 **two
 greps per symbol, not one.**
@@ -581,8 +587,7 @@ files it under that symbol.
 |---|---|
 | Found in the code | It exists — move 5 says where it came from |
 | Not found, and a lot of this block produces it | Legitimate — this block will build it |
-| Not found, and an earlier lot **of this block** produces it | Legitimate — it exists by the time this one runs |
-| Not found, and a lot **of an earlier block** was to produce it | 🔴 **A block** — 📌 **that lot is coded and reviewed**: the symbol is not there, or it was built under another name. ⚠️ **Name the lot that promised it** |
+| Not found, and a lot **of an earlier block** was to produce it | 🔴 **You block** — 📌 **that lot is coded and reviewed**: the symbol is not there, or it was built under another name. ⚠️ **Name the lot that promised it** |
 | Not found, and it comes from the framework or a declared dependency | Legitimate — the project does not own it |
 | Not found, and none of the above | 🔴 **Stop.** The lot list is wrong, or the sequence put this block too early |
 
@@ -625,15 +630,20 @@ and nobody could foresee.
 **8. Write `## Dependencies`** — 🔴 **from what moves 4 and 5
 classified**: 📌 **one line per type the signature uses and this lot
 does not produce**, with where it comes from — *pre-existing*, or
-*produced by lot-NN*.
+*produced by lot-NN*. 📌 **A framework type is *pre-existing*.**
 
 ⚠️ **A type this lot produces has no line** — 📌 **it is in
 `## Signatures`.**
 
-**9. Name the conventions this lot has to hold.** 🔴 **Every 🔴 rule of
-`TECHNICAL_CONVENTIONS.md` bearing on what the lot touches** — the
-libraries its layer uses, where its strings live, what a symbol of its
-kind is built on, which modules its own may import.
+**9. Name the conventions this lot has to hold.** 🔴 **Every rule of
+`TECHNICAL_CONVENTIONS.md` marked `spécifique` that bears on what this
+lot touches** — the libraries its layer uses, where its strings live,
+what a symbol of its kind is built on, which modules its own may
+import.
+
+⚠️ **Never a `permanente` one** — 📌 **the Réalisateur reads those
+whole, whatever the lot.** 🔴 **What you name is the rest**: a
+`spécifique` rule nobody names is a rule nobody applies.
 
 📌 **You read the conventions whole; the Réalisateur codes against the
 sheet.** A rule you do not name is a rule he will not apply, and the
@@ -644,21 +654,22 @@ Relecteur will not know to look for.
 
 ---
 
----
-
----
-
----
-
----
-
 ## When a verdict sends the block back
+
+🔴 **The prompt says `Mode: divergence`** — 📌 **without that line you
+are in the ordinary mode**, whatever else it names. ⚠️ **The two treat
+the same lot in opposite ways**: 🔴 **ordinary skips a lot that has a
+sheet, divergence rewrites it.**
 
 **A divergence found on a coded lot makes the sheets of the block's
 uncoded lots false** — they were written against a signature the code
 does not carry.
 
-📌 **The prompt names the affected lots** — 🔴 **you read no verdict
+⚠️ **A filled decision on a lot the prompt does not name** — 🔴 **leave
+it**: 📌 **you rewrite only the named ones**, and the next ordinary run
+applies it.
+
+📌 **The prompt names the affected lots** — 🔴 **you read no divergence verdict
 file.**
 
 **What this mode runs, against the normal one:**
@@ -673,9 +684,3 @@ file.**
 🔴 **Rewrite only those sheets**, against the signature the code
 actually carries — grep it. ⚠️ **Leave the coded lots alone**: their
 sheets describe what was built.
-
----
-
----
-
----

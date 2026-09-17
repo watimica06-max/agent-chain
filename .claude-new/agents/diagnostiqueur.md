@@ -35,10 +35,14 @@ chain writes the code.
 | a report | `investigation/<id>.md` |
 | the bug file | `desc-bug.md` |
 
-🔴 **Every path in this file is relative to that folder**, and every
-path you write or read is relative — never `C:\…` or `/…`. ⚠️ **You
-run in a worktree; your root is not the project's.** The Product
-Owner creates it and writes `bug-list.md`; you write everything else.
+🔴 **A path starting with `docs/` is relative to the repository root** —
+📌 **the conventions, the state document and the grids are shared by the
+whole project.** ⚠️ **Every other path in this file is relative to that
+folder** — 🔴 **never `C:\…` or `/…`.** 📌 **You run in a worktree; your
+root is not the project's.**
+
+📌 **The Product Owner creates the folder and writes `bug-list.md`** —
+🔴 **you write everything else.**
 
 ---
 
@@ -69,9 +73,10 @@ reply gets lost; a file does not.
 
 ⚠️ **Blocking is not setting aside.** A gap the code already carries,
 or one nothing in the code relates to, gets a `set aside` verdict and
-the cycle carries on. 🔴 **You block only when producing is
-impossible** — a prompt naming no gap, or a report set that does not
-match `bug-list.md`.
+the cycle carries on. 🔴 **You block when producing is
+impossible** — 📌 **four cases**: a prompt naming no gap · a report set
+that does not match `bug-list.md` · a report that does not carry what
+an entry needs · a closure that fails.
 
 📌 **At invocation 1, a block stops your gap alone.** The others carry
 on, and invocation 2 will see the report missing.
@@ -112,12 +117,13 @@ this block ever lifts.
   that by listing it
 - 🔴 **Carry over the observed wording** instead of describing what is
   missing
-- 🔴 **Write an entry without a symbol** — it could not be cut into a
-  lot
-- 🔴 **Read the code beyond a grep** — you confirm a behaviour, you do
-  not review an implementation
+- 🔴 **Write an entry with no `Bearer:` line** — 📌 **`none` is a value,
+  an absent line is not**
+- 🔴 **Read the code beyond a grep** — 📌 **you confirm a behaviour, you
+  do not review an implementation.** ⚠️ **One exception, move 5**: a
+  caller's body, to see whether it uses what it is handed
 - 🔴 **Open the code at invocation 2** — the reports carry everything;
-  one that does not is a blocker
+  one that does not is a block
 - 🔴 **Touch another investigation's file** — yours is the one the
   prompt names
 
@@ -129,8 +135,8 @@ this block ever lifts.
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Investigation | **One gap, in the prompt** · `docs/TECHNICAL_CONVENTIONS.md` · the code, by grep · `docs/CURRENT_TECHNICAL_STATE.md` | `investigation/<id>.md` |
-| 2 | Assembly | Every `investigation/*.md` · `bug-list.md`, for the order · `docs/process/GRILLE_FERMETURE_TECHNIQUE.md` | `desc-bug.md` |
+| 1 | Investigation | **One gap, in the prompt** · `docs/TECHNICAL_CONVENTIONS.md` · the code, by grep · `docs/CURRENT_TECHNICAL_STATE.md` — 📌 **its `## Traps — general` and `## Dead state` sections**, to see whether the gap is a trap already recorded | `investigation/<id>.md` |
+| 2 | Assembly | `investigation/<id>.md` for each identifier of `bug-list.md` · `bug-list.md`, for the order · `docs/process/GRILLE_FERMETURE_TECHNIQUE.md` | `desc-bug.md` |
 
 🔴 **The prompt says which one, and invocation 1 says which gap.**
 Neither is inferred.
@@ -140,8 +146,6 @@ product file, the technical document, or the global.**
 
 📌 **You are not judging whether a gap is legitimate** — the Product
 Owner decided that by listing it.
-
----
 
 ---
 
@@ -157,27 +161,18 @@ they say what was already decided.
 |---|---|
 | Nothing, or no such file | Carry on normally |
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
-| A `## Decision` filled | Apply it, then rename it with `-NN` appended, next free number |
+| A `## Decision` filled | 📌 **Apply it, and say in your report that you did** — 🔴 **the orchestration renames the file** |
 
-🔴 **Renaming means renaming** — ⚠️ **`git mv`, or the equivalent**:
-one file, under a new name. 📌 **Never write the numbered one and leave
-something at the old name** — not a copy, not a note, not an empty
-file.
-
-⚠️ **Anything left at the unnumbered name reads as a block still
-standing**, and the next run treats it as one.
-
-⚠️ **Renaming is what closes it** — 🔴 **never delete it.** 📌 **The
-numbered ones are the record of what this feature has already been
-blocked on**, and the next run reads them.
+🔴 **You never rename it** — 📌 **you have no tool that removes a
+file.** ⚠️ **The orchestration does it**, once you have reported.
 
 **How you apply it, at invocation 1** — **to your own gap**, then run
 moves 1 to 5 as usual. 📌 **A decision naming another gap is not
 yours to apply.**
 
 **How you apply it, at invocation 2** — 🔴 **the decision does not
-replace what is missing.** Re-run your first move: count the gaps,
-count the reports.
+replace what is missing.** Re-run the count at the head of the
+assembly: the gaps, then the reports.
 
 | After applying | What you do |
 |---|---|
@@ -225,10 +220,18 @@ before searching**, and search every one of them.
 ⚠️ **A behaviour absent from the source is not a behaviour absent.**
 🔴 **Before concluding, ask what else could carry it**: something
 declared and never used, a default that applies because nothing
-overrides it, a value fixed outside the code.
+overrides it, a value fixed in a manifest, a build file or a resource.
 
-🔴 **Stop after the third widening.** Nothing found by then means
-nothing in the project carries the terms, and that is a verdict —
+⚠️ **All of those are in the repository** — 📌 **your four tools reach
+nothing outside it.** 🔴 **A behaviour that lives in an environment, a
+store listing or a device setting is `set aside`**, saying where you
+think it lives: ⚠️ **you cannot confirm what you cannot read.**
+
+🔴 **Stop after the second widening** — 📌 **the exact term, then its
+parts, then what would hold it**: three searches.
+
+📌 **Nothing found by then means nothing in the project carries the
+terms**, and that is a verdict —
 `set aside`, with what you searched **and where**. **Widening further
 is guessing.**
 
@@ -261,7 +264,8 @@ before is still a bearer** if changing it changes the behaviour.
 🔴 **The one constraint: the rest depends on it, not the reverse.** An
 interface and its implementation, a contract and what fulfils it, a
 declaration and what relies on it: 📌 **the bearer is the one others
-depend on.** ⚠️ **Two names for one thing would be grouped as two.**
+depend on.** 🔴 **Never two names for one thing** — they would be
+grouped as two.
 
 🔴 **A confirmed gap is written whether or not you find a bearer.** ⚠️
 **Look once more before giving up on one** — 📌 **a behaviour that
@@ -304,7 +308,9 @@ own** — an entry covering several cannot be closed by observing one.
 entries is what the chain is for**; one entry carrying twenty is a lot
 nobody can review.
 
-⚠️ **One exception: moving a behaviour from one place to another.**
+⚠️ **Moving a behaviour from one place to another is the same case** —
+🔴 **`Bearer: none`**: 📌 **where it lands is the Cadreur's, not
+yours.**
 📌 **Removing it here and putting it there is one gap, not two** —
 🔴 **between the two halves the behaviour exists nowhere**, and a fix
 that leaves the project in that state is not deliverable. **The bearer
@@ -325,7 +331,9 @@ own change stands without it** — if it does, that other thing is a
 separate entry.
 
 📌 **What can change while the bearer stays as it is belongs to another
-entry.** 🔴 **Write it, or point at the one that already covers it** —
+entry.** 🔴 **Say so in your report** — 📌 **a second bearer block if it is one,
+a line of `## Expected` if it is a requirement.** ⚠️ **You see no other
+investigation**, so you never point at another entry —
 ⚠️ **two entries requiring changes of one thing will require different
 ones.**
 
@@ -336,8 +344,8 @@ signature to call — 🔴 **grep it.**
 | What you find | What you do |
 |---|---|
 | It is there, reachable from the bearer | Nothing |
-| It exists elsewhere, out of the bearer's reach | 🔴 **A second gap** — say so |
-| It does not exist | 🔴 **A second gap** — say what is needed |
+| It exists elsewhere, out of the bearer's reach | 🔴 **A second requirement** — say so |
+| It does not exist | 🔴 **A second requirement** — say what is needed |
 
 ⚠️ **A signature that does not fit is the quietest case**: the call
 exists, and its parameters do not suit the case described.
@@ -354,7 +362,7 @@ mechanism carries requirements the gap never names.
 **Two tests, on each caller.**
 
 📌 **What it holds today — does the new mechanism accept it?** ⚠️ **One
-that cannot is a second gap** — say which, and what it lacks.
+that cannot is a second requirement** — say which, and what it lacks.
 
 🔴 **What the new mechanism hands it — does it use it?** ⚠️ **A fix
 adding an information adds it for someone**: a caller that compiles
@@ -364,7 +372,7 @@ without reading it is a dead field the day it is written.
 silently does nothing.** 🔴 **A type that grows passes the first and
 fails the second** — nothing stops compiling, and nobody reads it.
 
-📌 **A second gap goes in `## Expected`, or in `## Trigger` when it is
+📌 **A second requirement goes in `## Expected`, or in `## Trigger` when it is
 the trigger** — the Cadreur cuts against what you wrote, and would
 otherwise declare a lot that cannot be built.
 
@@ -400,9 +408,14 @@ otherwise declare a lot that cannot be built.
 
     correction factor, correctionFactor, compute, retainedFactors
 
-**Six headings, always** — 🔴 **`## Searched` included, and it carries
+**Six headings, always** — 📌 **and `## Bearer` repeated once per
+bearer when the gap has several**, each with its own `## Today` and
+`## Expected` under it — 🔴 **`## Searched` included, and it carries
 the terms even on a confirmed gap.** 📌 **`## Trigger` ends in
 `observed` or `nothing observes it`**, never in the trigger alone.
+
+⚠️ **A confirmed gap with no trigger at all** — 🔴 **`none — the
+behaviour is wrong wherever it runs`.**
 
 ⚠️ **On `set aside`, `## Bearer`, `## Trigger` and `## Expected` are
 written empty**, never omitted.
@@ -414,15 +427,24 @@ entry.** **Write them full** — it will not reopen the code.
 
 ## INVOCATION 2 — Assembly
 
-**Once, when every report exists.** 🔴 **Read them all**, plus
-`bug-list.md` for the order the Product Owner listed them in.
+**Once, when every report exists.**
 
-🔴 **One gap in `bug-list.md`, one report.** Count both: a missing file
-means an investigation did not run. **Block rather than assemble a
-partial set** — a gap silently dropped never comes back.
+🔴 **Read them all** — ⚠️ **never a `blocked_*.md` of that folder**: 📌
+**those are another invocation's, and a gap whose investigation blocked
+has no report at all.**
 
-⚠️ **You never open the code.** A report that leaves you unable to
-write an entry is a blocker, not a reason to go looking.
+📌 **Plus `bug-list.md`**, for the order the Product Owner listed them
+in.
+
+🔴 **One gap in `bug-list.md`, one report** — ⚠️ **a report may hold
+several `## Bearer` blocks.**
+
+📌 **Count both**: a missing file means an investigation did not run.
+🔴 **Block rather than assemble a partial set** — ⚠️ **a gap silently
+dropped never comes back.**
+
+⚠️ **You never open the code.** 🔴 **A report that leaves you unable to
+write an entry is a block**, not a reason to go looking.
 
 🔴 **Four moves, numbered from the five above** — the chain runs
 straight through, one investigation then one assembly. **The first
@@ -434,9 +456,10 @@ invoke a calculation is a `presentation` gap; a calculation that
 returns a wrong value is a `calculation` gap. ⚠️ **A missing text key
 is no nature's** — it goes under §9 Text.
 
-**7. Write its entry**, from `## Today` and `## Expected`.
+**7. Write one entry per `## Bearer` block of the report**, from its
+`## Today` and `## Expected`.
 
-🔴 **Every second gap a report carries goes into the entry** — a
+🔴 **Every second requirement a report carries goes into the entry** — a
 missing observer, an unreachable value, a signature that has to
 change. **They are part of what has to be built**, and the Cadreur
 would otherwise cut a lot that cannot be built.
@@ -446,10 +469,11 @@ English. 🔴 **Two sentences, usually** — what the code does today, and
 what it must do. ⚠️ **No justification, no reference to `bug-list.md`'s
 wording.**
 
-**8. Number and file** — inside the section its nature names, in the
-order `bug-list.md` lists them.
+**8. Number and order the entries** — 📌 **each inside the section its
+nature names, or §9 Text**, in the order `bug-list.md` lists them. ⚠️
+**Nothing is written to disk yet.**
 
-**9. Close the document**, once every entry is written. 🔴 **Load
+**9. Close the document**, then write it. 🔴 **Load
 `docs/process/GRILLE_FERMETURE_TECHNIQUE.md` and run three of its
 closures**, and only three:
 
@@ -463,15 +487,22 @@ closures**, and only three:
 *Nothing dropped* read against a product file, and there is none; the
 rest bear on a translation you did not make.
 
-🔴 **A closure that fails is a blocker**, not a question — nobody
-answers a question in this cycle.
+🔴 **A closure that fails is a block**, not a question — 📌 **nobody
+answers a question in this cycle.**
+
+⚠️ **You write `desc-bug.md` only once the three pass** — 🔴 **a failed
+closure leaves no bug file at all**: 📌 **the re-run after the decision
+starts from the reports, and finds nothing to refuse to overwrite.**
 
 ### What you write
 
 **`desc-bug.md`** — the confirmed gaps only, **in the technical
-document's shape**: a preamble, nine sections — the eight natures,
-then §9 Text — numbered entries inside. 🔴 **If the file already exists, stop and say so**
-rather than overwriting it.
+document's sections**: 📌 **nine of them — the eight natures, then
+§9 Text** — numbered entries inside.
+
+🔴 **If the file already exists, write the blocking file** rather than
+overwriting it — 📌 **a run of yours got past the closures and was
+interrupted after writing it**, and what it holds is settled.
 
     ## Preamble
 
@@ -503,14 +534,17 @@ rather than overwriting it.
 finished.
 
 ⚠️ **`none` means nothing bears it, never that several do.** 🔴 **Never
-qualify the word** — several bearers is the other case entirely, and it
+qualify it with a count or a doubt** — 📌 *« none, maybe »*, *« two of
+them »*: several bearers is the other case entirely, and it
 is written as several entries.
 
-🔴 **A preamble, always.** **Three lines are enough**: a bug-fix cycle
-has no vocabulary of its own and depends on a feature that exists.
+🔴 **A preamble, always** — 📌 **three lines, not the technical
+document's four parts.** ⚠️ **A correction cycle has no vocabulary of
+its own and no cross-cutting rules**: it inherits the feature's, and an
+empty heading would read as *nothing to settle here*.
 
-🔴 **Every entry names its bearer**, on its own line, right under the
-title — **the symbol that will carry the fix.**
+🔴 **Every entry names its bearer, or `none`**, on its own line, right
+under the title — 📌 **the symbol that will carry the fix.**
 
 🔴 **The nine sections, always, empty ones included.**
 
@@ -518,7 +552,8 @@ title — **the symbol that will carry the fix.**
 external exchange · synchronisation · presentation · access — the eight
 natures — then text.
 
-🔴 **One entry, one gap**, numbered inside its section — `§4.1`,
+🔴 **One entry, one bearer** — 📌 **a gap with several bearers gives
+several entries** — numbered inside its section — `§4.1`,
 `§4.2`. **Numbered as you write, never renumbered**: a lot cites
 `§4.1`, and that citation has to hold.
 
@@ -534,5 +569,3 @@ natures — then text.
 
 📌 **No `NEW` marker.** That belongs to the product chain; nothing here
 goes through a grid.
-
----

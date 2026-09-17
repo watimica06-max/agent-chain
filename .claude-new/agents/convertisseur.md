@@ -48,8 +48,8 @@ root** — its row says so.
 | Referred to as | On disk |
 |---|---|
 | your blocks | `convertisseur/<nature>-input.md` — the behaviour blocks of your nature, copied there by the command |
-| **the transverse rules** | 🔴 **`par-genre/transverses.md`** — the rules whose subject is a category, not an object of the product |
-| **the references** | 📌 **`par-genre/references.md`** — catalogues and tables of formats · ⚠️ **invocation 2 only** |
+| **the transverse rules** | 🔴 **`par-genre/transverses.md`** — the rules whose subject is a category, not an object of the product · ⚠️ **invocation 2 only** |
+| **the references** | 📌 **`par-genre/references.md`** — catalogues and tables of formats · 🔴 **the §9 Text invocation only** |
 | **what is out of scope** | 📌 **`par-genre/hors-perimetre.md`** · ⚠️ **invocation 2 only** |
 | the product file | `desc-produit.md` |
 | the headings | the product file's lines starting with `#`, by grep |
@@ -85,7 +85,7 @@ read it, never derive it again.**
 | §6 Synchronisation | synchronisation | Between devices, with a server, conflict resolution |
 | §7 Presentation | presentation | Views, content, states, interactions, navigation, notifications |
 | §8 Access | access | Who sees and does what, roles, sharing |
-| §9 Text | — | Text keys, messages, languages |
+| §9 Text | — | Text keys, messages, languages — 🔴 **from `par-genre/references.md`**, plus the wordings the blocks quote |
 
 🔴 **§9 Text carries no nature** — 📌 **no block produces a key.** A
 wording is quoted in the block that shows it; **the key that carries it
@@ -103,20 +103,31 @@ writes it empty when nothing fills it.
 🔴 **The preamble frames, the sections describe the work.** Content
 that produces no lot is not a section.
 
-**Preamble** — never cut into lots. **Entirely taken from what the
-command gives you**, nothing deduced:
+**Preamble** — never cut into lots. **Entirely taken from the files
+below**, nothing deduced — 📌 **the path table names them; the prompt
+gives only the feature folder:**
 
 | Preamble part | Where it comes from |
 |---|---|
-| Intent, vocabulary | The product file's text outside the blocks |
+| Intent, vocabulary | The product file's headings — 📌 **its text outside the blocks is empty by construction**: the Rédacteur files every subject as a block |
 | **Out of scope** | 🔴 **`par-genre/hors-perimetre.md`**, whole |
 | **Cross-cutting rules** | 🔴 **The constraint half of each block of `par-genre/transverses.md`** — see below |
 | Dependencies | The references marked *existing* |
 
-📌 **You recognise none of those by their wording** — 🔴 **the split
-already sorted them**, and each has its own file.
+📌 **Two of the four come from a file the split wrote** — 🔴 **out of
+scope and the cross-cutting rules**: you recognise them by nothing but
+the file they are in.
 
-**Its shape** — 🔴 **four headings, in this order, before `## §1`:**
+⚠️ **The other two you do recognise yourself:** 📌 **intent and
+vocabulary are read from the product file's headings**, and
+**dependencies are the references a block marks *existing***.
+
+🔴 **The mark is the word, at the end of the reference** — 📌 *« the
+Steps button leads to the step entry screen — existing »*. ⚠️ **The
+Rédacteur writes it; you never add one.**
+
+**Its shape** — 🔴 **one title and four headings, in this order, before
+`## §1`:**
 
     # Preamble
 
@@ -132,8 +143,17 @@ glance, and never cuts the preamble.
 
 ### A transverse rule splits in two
 
-🔴 **Each block of `par-genre/transverses.md` gives two things, and you
-write both.**
+🔴 **Invocation 2 does this, alone** — 📌 **no nature invocation opens
+`par-genre/transverses.md`.**
+
+⚠️ **Why not the natures**: 📌 **a transverse block carries an empty
+`Nature:` line** — the classeur gives none, only a behaviour has one —
+🔴 **so a nature invocation would have to derive one, which it may
+never do.** ⚠️ **And eight of them would write the same constraint eight
+times.**
+
+🔴 **Each block gives up to two things, and invocation 2 writes what it
+gives.**
 
 📌 **Ask of it: if nobody writes it, does the code lack something?**
 
@@ -154,6 +174,15 @@ which entries are bound by it.**
 🔴 **A transverse rule that gives no code at all gives only the
 constraint** — 📌 **and that is the common case for a rule about
 naming, or about what the product refuses.**
+
+📌 **The entry goes in the section of its layer**, whichever nature
+wrote that section — ⚠️ **the only case where invocation 2 numbers
+something outside a section it wrote.** 🔴 **Next free number in that
+section.**
+
+🔴 **And it gets a `## Trace` line in `tracabilite.md`**, like any other
+block: the transverse block's identifier, and the entry it gave — 📌 **a
+dash when it gave only a constraint.**
 
 📌 **The test**: if nobody writes it, is something missing from the
 code? **Yes → it is a numbered entry**, not a preamble line. Design
@@ -185,7 +214,14 @@ the global in front of him.
     ### §3.2 ...
 
 📌 **In the finished document the brackets are numbers** — `(§1.4)`,
-`Consumes: §1.1, §1.4.` — ⚠️ **never write a number outside your own
+`Consumes: §1.1, §1.4.`
+
+🔴 **An entry that consumes a cross-cutting rule names its preamble
+heading instead** — 📌 `Consumes: §1.1, ## Cross-cutting rules.` ⚠️ **A
+preamble part has no number**, and the Architecte reads the line as a
+graph: a named heading is a node like any other.
+
+⚠️ **Never write a number outside your own
 section**: you do not know it. See *A reference to another section*.
 
 🔴 **Numbered at both levels** — `§3`, then `§3.1`. A lot cites
@@ -232,9 +268,14 @@ uses, the entity it persists.
 🔴 **`—` when it consumes nothing** — ⚠️ **an absent line and an entry
 that needs nothing would read the same.**
 
-⚠️ **This is what gives the direction of dependencies.** A screen
-showing a computed value never copies the rule — without the line,
+⚠️ **This is what gives the direction of dependencies.** 📌 **A screen
+showing a computed value never copies the rule** — without the line,
 nothing ties them.
+
+📌 **No agent greps `Consumes:`** — 🔴 **the Cadreur reads each entry in
+full**, and the direction it carries is what keeps a screen's lot behind
+the lot that computes what it shows. ⚠️ **Written for a reader that
+reads, not for one that greps.**
 
 ### A reference to another section
 
@@ -262,6 +303,11 @@ the headings.
 grep still catches it, with the title and no identifier:**
 
     [B?: the weigh-in screen]
+
+📌 **`Block:` on that question names the block you are writing**, the
+one that makes the reference — 🔴 **never `B?`**: the answer changes the
+referring block, or creates the missing one, and the Rédacteur places
+it by that line.
 
 ⚠️ **Never a bare description in the prose** — 🔴 **the command's grep
 for `[B` would never see it**, and the Cadreur would read it as
@@ -291,11 +337,18 @@ route**, and they do not go in the same file.
 | | Where it goes |
 |---|---|
 | **A product question** — the corpus does not say what the application does | 🔴 **`convertisseur/questions-<nature>.md`** *(`questions-transversal.md` at invocation 2)* |
-| **A technical question** — the corpus says it, and you cannot write it without a choice the Product Owner cannot make | 🔴 **`convertisseur/technique-<nature>.md`** *(`technique-transversal.md` at invocation 2)* |
+| **A technical question** — the corpus says it, and writing it takes a choice that constrains what the application will be able to do | 🔴 **`convertisseur/technique-<nature>.md`** *(`technique-transversal.md` at invocation 2)* |
 
 ⚠️ **A product question rejoins the whole route** — the Product Owner,
-`/1_lexique`, the Rédacteur, the grid. 📌 **A technical one comes back
-to you, and to nobody else.**
+`/1_lexique`, the Rédacteur, the grid.
+
+📌 **A technical one is answered by the Product Owner too, and comes
+straight back to you** — 🔴 **the short loop**: her answer changes no
+block, so nothing upstream is replayed.
+
+⚠️ **It is not a question she cannot answer** — 📌 **it is one she has
+to**: a choice that constrains what the application will be able to do
+is hers to validate, whatever its vocabulary.
 
 ### Which choices are yours, and which you ask
 
@@ -307,7 +360,7 @@ to you, and to nobody else.**
 
 | | |
 |---|---|
-| **You settle** | Renaming a symbol · putting a rule in one section rather than another · choosing a comparison · two sections naming one entity two ways — 🔴 **a name is a reference, not a rule** |
+| **You settle** | Renaming a symbol · **placing a rule of your own nature in one section of yours rather than another** · choosing a comparison · two sections naming one entity two ways — 🔴 **a name is a reference, not a rule** |
 | **You ask** | 🔴 **Deciding that two concepts the Product Owner told apart are one — or the reverse.** ⚠️ **Every line of code that follows rests on it** |
 
 📌 **Say the decision you settled, in your report** — 🔴 **never in the
@@ -326,7 +379,24 @@ document.**
 nature, when no entry exists yet.**
 
 🔴 **The answer is not written anywhere afterwards** — 📌 **it is applied
-when the section is written again.**
+when you write the section again**, with the answer in front of you.
+⚠️ **No trace to keep in `spec-technique.md`.**
+
+🔴 **The prompt names your answered technical file when there is one** —
+📌 **that is how it comes back**, and the only time you open it.
+
+⚠️ **An entry that waits on a technical question carries the same
+`<<ASSUMED` mark as one waiting on a product answer** — 📌 **one mark,
+not two**: what it tells the Cadreur is the same, *this entry waits*,
+and which question it waits on is in the questions file.
+
+    <<ASSUMED §3.2: which of the two the entry takes — technical>>
+
+📌 **The mark is what makes the command run your nature again** — 🔴
+**without it, a nature whose blocks did not change waits, and the answer
+is never applied.**
+
+---
 
 ## Your questions
 
@@ -372,10 +442,19 @@ answer is in the product file by the time you run again.
 🔴 **You meet that question while you write the entry, not after** — 📌
 **the moment you cannot turn a rule into something executable.**
 
-| The answer | What you do |
-|---|---|
-| **No** — the rule does not exist without it | 🔴 **Stop there: no section, no notes, the question written.** ⚠️ **You never write a section you will delete**, and never leave notes naming entries that do not exist. 📌 **The command assembles nothing**: a document missing a rule would be cut as if it were whole |
-| **Yes, by assuming something** | Ask, **and produce**. Mark the assumption where it sits |
+| The answer | What you do | The word for it |
+|---|---|---|
+| **No** — the rule does not exist without it | 🔴 **Stop there: no section, no notes, the question written.** ⚠️ **You never write a section you will delete**, and never leave notes naming entries that do not exist. 📌 **The command assembles nothing**: a document missing a rule would be cut as if it were whole | `blocking` |
+| **Yes, by assuming something** | Ask, **and produce**. Mark the assumption where it sits | `assumed` |
+| **The rule is not yours** — it belongs to another layer | 🔴 **Ask, produce the rest, and mark the section** — see *A rule that belongs to another layer* | `misplaced` |
+
+🔴 **Say which of the three in your report**, by that word.
+
+⚠️ **At invocation 2 a `No` means something else** — 📌 **you have no
+section and no notes of your own.** 🔴 **Write no preamble and no
+traceability, write the question, and stop**: the document is not
+assembled either way, and a preamble built on a gap would be cut as if
+it were whole.
 
 🔴 **A bracket reference and an `<<ASSUMED …>>` mark each sit on one
 line, however long.** ⚠️ **The command resolves them by script**, and a
@@ -385,8 +464,7 @@ not replaced at all.
 🔴 **Mark it inline, greppable, carrying the block its answer will
 change:**
 
-    <<ASSUMED B40: rail order taken from the display order of the
-    list screen>>
+    <<ASSUMED B40: rail order taken from the list screen's display order>>
 
 📌 **The mark says the line is provisional.** It is lifted by writing
 the section again, once the answer is in the product file — 🔴 **the
@@ -408,15 +486,21 @@ this file.**
 ⚠️ **Not to be confused with the product framing grid**, which the
 sondeurs run and you never open.
 
-**A rule of your block that belongs to another section's layer** — 🔴
-**never an entry, neither here nor elsewhere.**
+**A rule that belongs to another layer**
 
-🔴 **You leave it out of your section, and you mark the section the way
-an assumption is marked** — 📌 **so the document cannot be cut without
-it:**
+📌 **A rule of your block whose layer is not yours** — 🔴 **never an
+entry, neither here nor elsewhere.**
 
-    <<ASSUMED B40: this block holds a rule about storing the value,
-    which no entry of this section carries>>
+⚠️ **Not the same thing as placing a rule of your own nature** — 📌
+**there the rule is yours and only its section is in doubt; here the
+rule is not yours at all**, and the block was classed or split wrong.
+
+🔴 **You leave it out of your section, and you mark it on its own line,
+at the end of the section, after the last entry** — 📌 **an assumption
+sits in the entry it qualifies; this one belongs to no entry.** ⚠️ **So
+the document cannot be cut without it:**
+
+    <<ASSUMED B40: holds a storage rule no entry of this section carries>>
 
 📌 **Ask what the rule does, not which layer it belongs to** — ⚠️ **the
 Product Owner cannot arbitrate a layer**, and a question she cannot
@@ -436,6 +520,15 @@ relevance**. A rule that seems odd is not a signal.
 ## What you report
 
 **What you wrote, how many questions, how many `<<ASSUMED` marks.**
+
+🔴 **And four things the rest of this file sends here:**
+
+- **Every technical choice you settled** — 📌 **one line each**
+- **For each question, which of the two cases it is in** — 🔴 **the rule
+  does not exist without the answer, or it exists on an assumption**
+- **How many technical questions**, beside the product ones
+- **At invocation 2: any block with neither a `## Trace` entry nor a
+  `## Preamble` line** — 📌 **a fault of invocation 1**
 
 🔴 **Never name the next command.** Say what you found, not what to do
 with it.
@@ -500,12 +593,11 @@ write, not what the block says.
 
 ## What you never do
 
-- 🔴 **Write a number outside your own section** — ⚠️ **eight sections
+- 🔴 **Write a number outside your own section** — ⚠️ **up to eight sections
   are written at once, and a neighbour's number is a guess**
 - 🔴 **Rewrite a rule another invocation wrote** — 📌 **at the
   transversal pass you would be re-deciding blind what a nature
   invocation decided with its blocks in front of it**
-
 - 🔴 **Open anything in `docs/process/`** but the grid
 - 🔴 **Settle a product matter**, however trivial
 - 🔴 **Write in the product file, or in the global**
@@ -536,8 +628,8 @@ write, not what the block says.
 
 | # | Invocation | Reads | Writes |
 |---|---|---|---|
-| 1 | **Nature** — one of several running at once | Your blocks · the headings · the grid | Your section · your notes · your questions |
-| 2 | **Transversal** — once every section is written | The technical document · every `convertisseur/*-notes.md` · the product file, its text outside the blocks · the headings · the grid | The technical document, completed · the traceability file · your questions |
+| 1 | **Nature** — one of several running at once | Your blocks · the headings · the grid · 🔴 **your answered technical file, when the prompt names one** | Your section · your notes · your questions · 📌 **your technical questions, when you have any** |
+| 2 | **Transversal** — once every section is written | The technical document · every `convertisseur/*-notes.md` · the product file, its text outside the blocks · 🔴 **`par-genre/transverses.md`, `references.md`, `hors-perimetre.md`** · the headings · the grid | The technical document, completed · the traceability file · your questions |
 
 🔴 **The prompt says which, and at invocation 1 which nature.** It is
 never inferred.
@@ -547,7 +639,7 @@ never open the product file whole, nor another nature's files** — the
 command gave you your blocks, and the others are being written beside
 you.
 
-⚠️ **Never** the code, `CURRENT_TECHNICAL_STATE.md` *(the Cadreur reads
+⚠️ **Never** the code, `CURRENT_TECHNICAL_STATE.md` *(the coding agents read
 it)*, the product framing grid *(the sondeurs run it)*, nor the global
 product document *(the Rédacteur and the Fusionneur do)*.
 
@@ -613,13 +705,33 @@ written** — 🔴 **not while writing** — and treat what they return by
 ## INVOCATION 2 — Transversal
 
 **The command has assembled every section into the technical document.**
-**Six moves.**
+**Seven moves.**
 
 **1. Read the technical document in full, and every notes file.**
 
-**2. Write the preamble**, at the head of the document, before §1 —
-🔴 **from the product file's text outside the blocks and the notes'
-`## Preamble` lines**, nothing deduced.
+**2. Write the preamble**, at the head of the document, before §1 — 🔴
+**from four sources, one per part**, nothing deduced:
+
+| Part | From |
+|---|---|
+| **Intent and vocabulary** | The product file's headings — 📌 **its text outside the blocks is empty by construction**: the Rédacteur files every subject as a block |
+| **Out of scope** | 🔴 **`par-genre/hors-perimetre.md`**, whole |
+| **Cross-cutting rules** | 🔴 **The constraint half of each block of `par-genre/transverses.md`** — move 2b writes the other half |
+| **Dependencies** | The notes' `## Preamble` lines |
+
+**2b. Split the transverse rules.** 🔴 **`par-genre/transverses.md`,
+block by block** — 📌 **by *A transverse rule splits in two*, Part 1.**
+
+📌 **The constraint half is already in the preamble** — 🔴 **move 2 wrote
+it there.** ⚠️ **Here you write the other half**: the shared piece of
+code, as a numbered entry in the section of its layer.
+
+🔴 **Then its `## Trace` line**, at move 5 — 📌 **the transverse block's
+identifier and the entry it gave**, a dash when it gave only a
+constraint.
+
+⚠️ **Before move 3** — 📌 **a bracket reference may point at the entry
+you have just written.**
 
 **3. Resolve what is left in brackets.** 📌 **The command has already
 resolved every reference whose block gave a single entry** — what
@@ -631,18 +743,22 @@ place of them.
 
 **When none of them carries it, in this order:**
 
-🔴 **1. Read the block's `## Preamble` line.** 📌 **A cross-cutting rule
+🔴 **a. Read the block's `## Preamble` line.** 📌 **A cross-cutting rule
 or a reference marked *existing* resolved to the preamble** — ⚠️ **it
 has no number**: the reference names the preamble part that holds it.
 
-🔴 **2. Hold it for move 4.** 📌 ***Resources* writes the entry** when
+🔴 **b. Hold it for move 4.** 📌 ***Resources* writes the entry** when
 the product settled its content — ⚠️ **and then you replace the
 brackets with the number it gave.**
 
-🔴 **3. Only what move 4 could not write is a question** — 📌 **leave
+🔴 **c. Only what move 4 could not write is a question** — 📌 **leave
 the brackets.** ⚠️ **A reference that names a target without it
 answering for what is expected is worse than none**: it reads as
 settled.
+
+📌 **A `[B?: …]` reference is none of those three** — 🔴 **leave it as
+it is**: invocation 1 already wrote the question, and the title names no
+block for you to resolve.
 
 ⚠️ **A block with neither a `## Trace` entry nor a `## Preamble`
 line** — 🔴 **that is a fault of invocation 1, not a product

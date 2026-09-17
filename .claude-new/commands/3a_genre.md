@@ -25,7 +25,7 @@ Feature folder: `docs/features/$ARGUMENTS/`
 🔴 **Greps, and nothing else.** 📌 **You never open a block.**
 
 ⚠️ **`CLAUDE.md`'s standing reading rules apply**: never open
-`CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+`CURRENT_TECHNICAL_STATE.md`.
 
 ---
 
@@ -42,22 +42,44 @@ Feature folder: `docs/features/$ARGUMENTS/`
 ⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
 file.
 
+🔴 **Give the agent its questions file number in the prompt** — 📌 **the
+highest `questions-qualifieur-NN.md` in the root and in `questions/qualifieur/`
+together, plus one**; ⚠️ **`01` when there is none.** 🔴 **It never lists
+a folder to find it** — it has no `Glob`.
+
 🔴 **Then, the questions file it wrote last turn.** 📌 **The highest
-`questions-qualifieur-NN.md` under `questions/qualifieur/`** — ⚠️ **name it in the
+`questions-qualifieur-NN.md`, at the root or under `questions/qualifieur/`** —
+⚠️ **the root first**: a file answered and not yet filed sits there,
+and looking only in the folder would file it unseen — ⚠️ **name it in the
 prompt when it holds at least one `### Q`.**
 
 📌 **It applies those answers before it derives** — 🔴 **an answer that
 changed no block lands nowhere else.**
+
+🔴 **File it once the agent reports having applied it** — 📌
+`questions/qualifieur/`. ⚠️ **Left at the root it is named again next turn**,
+and the same answers are applied twice.
 
 🔴 **Grep `Clarification needed` in `desc-produit.md`.**
 
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
 one**, and that `/2_structure` has to run first.
 
+🔴 **Grep `^### Q` in each before touching it** — 📌 **a file holding
+questions is not yours to file**: ⚠️ **it waits on an answer, or its
+answers were never integrated.** 🔴 **Stop and say which.**
+
+📌 **Filed, it is read by no command again** — ⚠️ **and its answers are
+lost for good.**
+
 🔴 **File every root `questions-*.md`**, by `git mv`:
 
     git mv docs/features/<name>/questions-<agent>-NN.md \
            docs/features/<name>/questions/<agent>/
+
+⚠️ **Never `questions-architecte-*.md`** — 🔴 **leave it at the root**:
+📌 **it waits for `/conventions`, which is the only command that reads
+it.**
 
 📌 **This command reads none of them.** 🔴 **A questions file stays at
 the root only while it waits to be answered or integrated** — ⚠️ **the
@@ -76,7 +98,7 @@ is a normal outcome.
 | Grep | What it names |
 |---|---|
 | `grep -B1 '^Genre:$'` | 🔴 **The blocks whose genre is empty** — the line above each hit carries the block |
-| `MODIFIED` | The blocks changed last turn, whose genre may have moved with them |
+| `grep '^### .*MODIFIED'` | The blocks changed last turn, whose genre may have moved with them |
 
 📌 **Neither returns anything** → 🔴 **do not invoke.** 📌 **Commit
 what the filing moved, if anything, and push** — no worktree. ⚠️ **Say
@@ -90,6 +112,28 @@ and the decoupeur write `Genre:` with nothing after it, never omit it.
 
 ---
 
+## Git, before invoking
+
+🔴 **Commit the feature folder before creating the worktree:**
+
+    git add docs/features/<name>/ && git commit -m "chore: answers"
+
+📌 **Nothing to commit is a normal outcome** — carry on.
+
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. The agent
+would then work on stale content and its output would have to be
+discarded. *(Seen once: a whole invocation lost that way.)*
+
+📌 **Enter the worktree before invoking**, not after a write fails —
+the harness blocks a subagent's writes until the session is isolated.
+
+---
+
 ## The invocation
 
 ```
@@ -99,6 +143,7 @@ Agent(
   description="Qualify <name>",
   prompt="The product file: docs/features/<name>/desc-produit.md.
           Look at these blocks: <B7, B62, B63>.
+          Your questions file number: NN.
           <Plus: your answered questions file:
            docs/features/<name>/questions/qualifieur/questions-qualifieur-NN.md.>
           <Plus: blocked_qualifieur.md, its decision is filled.>"
@@ -127,6 +172,12 @@ notifies on completion. Do not pass it; wait for the notification.
 ⚠️ **Anything left at the unnumbered name reads as a block still
 standing**, and the next run stops on it.
 
+🔴 **Every stop below merges first.** ⚠️ **The agent has written
+its lines in the worktree** — 📌 **stopping before the merge loses the
+whole invocation, and a worktree holding unmerged work never
+self-cleans.** 🔴 **Merge, push, remove the worktree, and then report
+the defect.**
+
 🔴 **Grep `-c '^Genre:$'` in `desc-produit.md`.** 📌 **Zero is what you
 expect** — ⚠️ **anything else means a block was left unqualified**, and
 you say which.
@@ -136,11 +187,6 @@ you say which.
 🔴 **Check `questions-qualifieur-NN.md` was written** — ⚠️ **a missing one is a
 defect of the run**: the agent writes one every time.
 
-🔴 **Any stop from here on merges first.** ⚠️ **The agent has written
-its lines in the worktree** — 📌 **stopping before the merge loses the
-whole invocation, and a worktree holding unmerged work never
-self-cleans.** 🔴 **Merge, push, remove the worktree, and then report
-the defect.**
 🔴 **Grep `^### Q` in it** and say how many questions it holds.
 
 🔴 **Never read a block to check its work.** 📌 **A wrong genre is
@@ -149,25 +195,7 @@ produces nothing, and the grid probes what it left in.
 
 ---
 
-## Git, in this mode
-
-🔴 **Commit the feature folder before creating the worktree:**
-
-    git add docs/features/<name>/ && git commit -m "chore: answers"
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. The agent
-would then work on stale content and its output would have to be
-discarded. *(Seen once: a whole invocation lost that way.)*
-
-📌 **Enter the worktree before invoking**, not after a write fails —
-the harness blocks a subagent's writes until the session is isolated.
+## Git, once it has reported
 
 **Then, once it has reported:**
 
@@ -190,7 +218,7 @@ too**: the Product Owner has to see it.
 📌 **How many blocks were qualified**, which changed genre, and how many
 questions.
 
-🔴 **Nothing else is yours**: no risk level, no `TaskCreate`, no
+🔴 **Nothing else is yours**: no
 reading of what a block says.
 
 **What to run next** — 📌 **indications for the Product Owner.**
@@ -200,7 +228,7 @@ reading of what a block says.
 |---|---|
 | It wrote a blocking file, **naming a genre it could not settle** | 📌 Fill its `## Decision`, then `/3a_genre` again |
 | It wrote a blocking file **and** a questions file with questions | 🔴 **Fill the decision first, then answer, then `/1_lexique`** — 📌 both end in the Rédacteur's hands |
-| A `## Decision` names a rewrite | 🔴 **`/1_lexique`**, then the route back — ⚠️ **this command cannot act on a rewrite** |
+| A `## Decision` names a rewrite | 🔴 **`/2_structure`** — 📌 **it names the blocking file to the Rédacteur, which rewrites the block.** ⚠️ **Then `/1_lexique` if the rewrite brought vocabulary, and the route back** |
 | A `## Decision` names a genre outside the list | 🔴 **Nothing runs** — ⚠️ **the tables have to carry it first**; say so |
 | 🔴 **The `^Genre:$` count is non-zero and no blocking file explains it** | 📌 **Say which blocks, and run `/3a_genre` again** — ⚠️ **a line left empty by neither a block nor a decision is a defect of the run** |
 | Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a genre in doubt is settled before the classeur gives a nature |

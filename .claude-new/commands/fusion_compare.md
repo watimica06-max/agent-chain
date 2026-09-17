@@ -15,44 +15,23 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 ---
 
+## Before anything else
+
+🔴 **`desc-produit-fusion.md` absent → stop.** 📌 **Say to run `/fusion`
+first** — ⚠️ **only its Rédacteur row writes that file**, and the
+Fusionneur reads it and nothing else.
+
+---
+
 ## What you read
 
 Nothing. Each agent declares its own inputs; you pass the feature
 folder and nothing else. `CLAUDE.md`'s standing reading rules apply:
-never open `CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+never open `CURRENT_TECHNICAL_STATE.md`.
 
 ---
 
-## How it runs
-
-**What you do**: invoke the agent via `Agent()` with the feature folder
-and which invocation it is — and nothing else.
-
-🔴 **Never paraphrase the agent's process in your invocation** — not
-its inputs, its checks, its output format. It reads its own
-instructions.
-
-### Invocation parameters
-
-```
-Agent(
-  subagent_type="<agent>",
-  model="sonnet",
-  description="<phase> <feature>",
-  prompt="Feature folder: docs/features/<name>/. <Which invocation>."
-)
-```
-
-❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
-either** — in this environment the Agent tool always runs async and
-notifies on completion. Do not pass it; wait for the notification.
-
-❌ **Never pass `isolation`** — the phases are sequential
-and each reads what the previous one wrote.
-
----
-
-## Git, in this mode
+## Git, before invoking
 
 🔴 **Before invoking, move every root `questions-*.md` whose prefix is
 not `fusionneur`:**
@@ -95,6 +74,39 @@ isolated. *(Measured on three
 phases: the agent does the full job, cannot write, and the whole
 invocation is redone.)*
 
+---
+
+## How it runs
+
+**What you do**: invoke the agent via `Agent()` with the feature folder
+and which invocation it is — and nothing else.
+
+🔴 **Never paraphrase the agent's process in your invocation** — not
+its inputs, its checks, its output format. It reads its own
+instructions.
+
+### Invocation parameters
+
+```
+Agent(
+  subagent_type="<agent>",
+  model="sonnet",
+  description="<phase> <feature>",
+  prompt="Feature folder: docs/features/<name>/. <Which invocation>."
+)
+```
+
+❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
+either** — in this environment the Agent tool always runs async and
+notifies on completion. Do not pass it; wait for the notification.
+
+❌ **Never pass `isolation`** — the phases are sequential
+and each reads what the previous one wrote.
+
+---
+
+## Git, once it has reported
+
 **Then, once the agent reports:**
 
 1. `git merge --no-ff <branch>` from the main checkout root
@@ -117,6 +129,6 @@ an unmerged branch is invisible to the next one. ⚠️ **A
 ## What you relay
 
 The agent's own report, and nothing more. 🔴 **Nothing else is yours**:
-no phase chain, no risk level, no `TaskCreate`.
+no phase chain.
 
 **If it returns a `blocked_*.md`**: relay it and stop.

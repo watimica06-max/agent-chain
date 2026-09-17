@@ -45,13 +45,15 @@ whether to escalate.
 **On the final verdict of a lot**, its `## Symbol divergences` field
 too.
 
-🔴 **Every `blocked_*.md` of the lot** — 📌 **whether its `## Decision`
+🔴 **Every `blocked_*.md` of the lot, and `code/blocked_detailleur.md`
+at the split's root** — 📌 **the Détailleur blocks on a block, not on a
+lot.** 📌 **Whether its `## Decision`
 is filled**, nothing more of it.
 
 📌 **Nothing else.** Each agent declares its own inputs.
 
 `CLAUDE.md`'s standing reading rules apply: never open
-`CURRENT_TECHNICAL_STATE.md` or `CALIBRATION_RISK_LEVEL.md`.
+`CURRENT_TECHNICAL_STATE.md`.
 
 ---
 
@@ -71,6 +73,31 @@ corrected. Run `/7_lots` first.
 
 ---
 
+## Git, before invoking
+
+🔴 **Commit the feature folder first**, before creating the worktree:
+
+    git add docs/features/<name>/ && git commit -m "chore: pre-code"
+
+📌 **Nothing to commit is a normal outcome** — carry on.
+
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. An agent
+would then work on stale content and its output would have to be
+discarded.
+
+📌 **One worktree for the whole run**, not one per lot. Enter it before
+invoking anything.
+
+⚠️ **The `realisateur` commits inside it, lot by lot.** That is his;
+you do not commit for him.
+
+---
+
 ## The loop, per lot
 
 **1.** 🔴 **No `code/<lot>/fiche-executable.md`** → **`detailleur`** on
@@ -82,8 +109,8 @@ Réalisateur would run on a lot with no sheet.
 
 | | |
 |---|---|
-| **`concepteur`** | 🔴 **Writes the declarations with empty bodies and compiles** |
-| **`testeur`** | 🔴 **Writes one test per criterion, and checks each fails red** |
+| **`concepteur`** | 🔴 **Writes the declarations with empty bodies and compiles** — 📌 **skipped when `code/<lot>/conception.md` is there.** ⚠️ **Relay its `## Placements not settled by the conventions` line when it carries one**: the conventions do not say where a kind of symbol lives, and only the Product Owner can have that added |
+| **`testeur`** | 🔴 **Writes one test per criterion, and checks each fails red** — 📌 **skipped when `code/<lot>/tests.md` is there** |
 | **`realisateur`** | 🔴 **Fills the bodies until the tests pass** |
 
 ⚠️ **Each waits for the one before it.** 📌 **The testeur needs
@@ -100,14 +127,28 @@ declarations to call**; the realisateur needs red tests to turn green.
 `## Outside the lot` rests on that list.
 
 📌 **An empty list means the realisateur committed nothing** — 🔴 **that
-counts as a failed attempt, and the Relecteur is not invoked.**
+counts as a failed attempt, and the Relecteur is not invoked.** ⚠️
+**Increment `## Attempts` yourself then**: 📌 **nobody else writes that
+verdict**, and the count would stall.
 
 📌 **If `code/<lot>/reprise_realisateur.md` is there**, 🔴 **name it in
 the Réalisateur's prompt**: a run before it got part of the lot done
 and wrote what it left. ⚠️ **Without it, it starts the lot again.**
 
-**4.** On FAIL → a **fresh `realisateur`**, with the verdict. 🔴 **Three
-retries maximum per lot**, all FAIL types counted together.
+**4.** On FAIL → a **fresh `realisateur`**, with the verdict, **then the
+`relecteur` again on the same lot** — 📌 **one retry is one fix and one
+review.** ⚠️ **The new verdict replaces the old**, at the same path.
+
+🔴 **`## Attempts` reaching 3 stops the lot** — 📌 **three codings, the
+first included.** ⚠️ **Relay the last verdict and stop**: the lot is
+the Product Owner's.
+
+📌 **No `## Attempts` line in a verdict** — 🔴 **read it as 1** and say
+so: a verdict written without it is a defect of the Relecteur.
+
+🔴 **An attempt that committed nothing counts** — 📌 **increment it
+yourself in the verdict** when no Relecteur ran, ⚠️ **or three empty
+runs would never reach the cap.**
 
 🔴 **The count lives on disk, not in this run's memory** — 📌 **the
 `## Attempts` line of `code/<lot>/verdict.md`**, which the Relecteur
@@ -115,24 +156,50 @@ writes. ⚠️ **Otherwise a run stopped for any reason restarts the count
 at zero**, and a lot that cannot pass is retried three times per run for
 ever.
 
-📌 **`Cause: reasoning` twice on one lot** → 🔴 **the third realisateur
-is passed `opus`.** ⚠️ **A reasoning failure retried on the same model
-is the retry that fails three times and stops on the Product Owner.**
+📌 **`## Causes so far` of the last verdict holds `reasoning` twice** →
+🔴 **the third realisateur is passed `opus`.** ⚠️ **A reasoning failure
+retried on the same model is the retry that fails three times and
+stops on the Product Owner.**
 
 **4b.** 🔴 **Before invoking anything on a lot, look for a
-`blocked_*.md` with an empty `## Decision`** — 📌 **in `code/<lot>/`.**
-⚠️ **Stop there and say the decision is still to write**: invoking again
-re-raises the same block.
+`blocked_*.md` in `code/<lot>/`, and `code/blocked_detailleur.md`:**
+
+| | |
+|---|---|
+| **Its `## Decision` is empty** | 🔴 **Stop** — ⚠️ **invoking again re-raises the same block** |
+| **Filled** | 📌 **Name it in the agent's prompt**, and 🔴 **rename it once the agent reports having applied it**:<br>📌 **At the path it sits at** — `code/<lot>/` for the four agents of the loop, `code/` for the detailleur.<br>`git mv code/<lot>/blocked_<agent>.md code/<lot>/blocked_<agent>-NN.md`<br>📌 **`NN`: the highest in that folder plus one, `01` when there is none** |
+
+🔴 **The rename is yours, never the agent's** — 📌 **none of the five has
+a tool that removes a file.** ⚠️ **Left at the
+unnumbered name, the decision is applied again on every later run**, and
+`/9_controle` cannot tell a settled block from a standing one.
 
 **5.** ⚠️ **If the lot's final verdict carries `## Symbol divergences`
 naming affected lots** → **`detailleur`** on the block, to rewrite those
-sheets only. Say which lots in the prompt.
+sheets only:
+
+```
+Agent(
+  subagent_type="detailleur", model="opus",
+  description="Propagate <block>, <feature>",
+  prompt="Working folder: <the working folder>. Your block: <block>.
+          Mode: divergence.
+          Affected lots: lot-07, lot-09.
+          <Plus: code/blocked_detailleur.md, its decision is filled.>"
+)
+```
+
+🔴 **The `Mode:` line is what tells the two apart** — ⚠️ **without it
+the agent runs its ordinary mode and skips every lot that has a
+sheet**: 📌 **the propagation silently does not happen.**
 
 🔴 **On the final verdict only** — 📌 **never on a FAIL about to be
 retried**: the retry may revert the very signature you propagated.
 
-📌 **You read two fields of a verdict** — 🔴 **`## Status` and
-`## Symbol divergences`**, and nothing else.
+📌 **You read four fields of a verdict** — 🔴 **`## Status`,
+`## Attempts`, `## Causes so far` and `## Symbol divergences`.** ⚠️
+**Never `## Findings`**: 📌 **that is the fresh Réalisateur's, not
+yours.**
 
 **6. Look for `stop.md` at the feature folder's root** — 🔴 **from the
 main checkout, never from a worktree**: a worktree holds a copy frozen
@@ -187,10 +254,13 @@ anything.
 so.** 🔴 **You never invoke the Contrôleur** — 📌 **it needs a grouping
 this command does not hold**, and `/9_controle` builds it.
 
-📌 **On a feature cycle, say that `/9_controle` is what comes next** —
-🔴 **run by hand.** ⚠️ **On a bug-fix cycle — the working folder carries
-`desc-bug.md` — nothing comes next**: the Contrôleur compares the
-product file to the sheets, and there is none here.
+📌 **Say that `/9_controle` is what comes next** — 🔴 **run by hand, on
+both cycles.**
+
+⚠️ **On a bug-fix cycle the Contrôleur does not run** — 📌 **it compares
+the product file to the sheets, and there is none here.** 🔴 **The other
+phases do**: the manual list, the register, and the product decisions
+the Rédacteur needs at `/fusion`.
 
 ⚠️ **Every lot of the sequence, not every lot of this run.** 📌 **`N`
 lots coded with two still pending is not a finished sequence** — say
@@ -207,7 +277,8 @@ Détailleur runs when a new block starts, without entering the count.
 Agent(
   subagent_type="concepteur", model="sonnet",
   description="Declare <lot>",
-  prompt="Working folder: <the working folder>. Your lot: <lot>."
+  prompt="Working folder: <the working folder>. Your lot: <lot>.
+          <Plus: code/<lot>/blocked_concepteur.md, its decision is filled.>"
 )
 ```
 
@@ -215,7 +286,8 @@ Agent(
 Agent(
   subagent_type="testeur", model="sonnet",
   description="Test <lot>",
-  prompt="Working folder: <the working folder>. Your lot: <lot>."
+  prompt="Working folder: <the working folder>. Your lot: <lot>.
+          <Plus: code/<lot>/blocked_testeur.md, its decision is filled.>"
 )
 ```
 
@@ -251,7 +323,7 @@ and `relecteur` on `sonnet`** — they work against a sheet already
 written.
 
 ⚠️ **One exception** — 📌 **a third `realisateur` on a lot whose verdict
-carried `Cause: reasoning` twice runs on `opus`.**
+holds `reasoning` twice in `## Causes so far` runs on `opus`.**
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
 either** — in this environment the Agent tool always runs async and
@@ -269,16 +341,28 @@ to the split.** 📌 **The Arbitre wrote `code/redecoupage.md`**, and the
 agent stopped — ⚠️ **the Détailleur without writing a sheet, the
 Réalisateur after dropping its code.**
 
-🔴 **Count the redécoupages of this run** — 📌 **`code/redecoupage-NN.md`
-in the folder, the highest number.** ⚠️ **At the third, you stop
-instead of running `/7_lots`.**
+🔴 **Count the redécoupages of this feature** — 📌 **the archived
+`code/redecoupage-NN.md` files, plus the one now at
+`code/redecoupage.md`.** ⚠️ **The count reaching three, you stop instead
+of running `/7_lots`.**
 
-📌 **Relay the Cadreur's `## Ce qui revient`** — 🔴 **what keeps coming
-back, and what the split could not carry.** ⚠️ **A third round says the
-split is not the problem the split can solve**, and the Product Owner
-decides.
+📌 **Across runs, not within one** — 🔴 **the archived files are the
+count**, and a run stopped and resumed does not start it over.
 
-**Otherwise, run `/7_lots` on this working folder**, and wait for it.
+📌 **Relay the `## Ce qui revient` and `## Ce que j'en fais` of
+`code/redecoupage.md`** — 🔴 **the Cadreur wrote them there at the end of
+its round.** ⚠️ **A third round says the split is not the problem the
+split can solve**, and the Product Owner decides.
+
+🔴 **Commit first, inside your worktree** — 📌 **`git add` and
+`git commit` on everything the lots coded this run.**
+
+⚠️ **`/7_lots` creates its worktree from `HEAD`** — 📌 **and you are in a
+worktree of your own**: uncommitted, none of this run's lots are in the
+`HEAD` it branches from. 🔴 **The Vérificateur would then see no
+`PASS`**, and the Cadreur could re-cut lots already coded.
+
+**Then run `/7_lots` on this working folder**, and wait for it.
 ⚠️ **Then carry on your loop** — 📌 **you do not hand back, and the
 Product Owner
 is not waiting on anything.**
@@ -313,11 +397,15 @@ relay what it said. **There is no split to code against.**
 blocking file was never closed**: say which file, and stop.
 
 🔴 **A `blocked_*.md` whose `## Decision` is still empty**, wherever it
-sits — 📌 **two places**: `code/<lot>/blocked_<agent>.md` for the five
-agents of the loop, and
-🔴 **`blocked_architecte.md` at the working folder's root** — ⚠️ **it
-blocks on a missing input, and the next lot's Détailleur would run
-against conventions that were not amended.**
+sits — 📌 **three places:**
+
+- `code/<lot>/blocked_<agent>.md` — 📌 **the concepteur, the testeur,
+  the realisateur and the relecteur**
+- `code/blocked_detailleur.md` — 🔴 **at the split's root**: it blocks
+  on a block, not on a lot
+- `blocked_architecte.md` at the working folder's root — ⚠️ **it blocks
+  on a missing input**, and the next lot's Détailleur would run against
+  conventions that were not amended
 
 🔴 **You never invoke the Arbitre.** 📌 **The Détailleur and the
 Réalisateur call it themselves**, wait for it, and only stop when the
@@ -326,6 +414,12 @@ through it** — sending it again would ask twice.
 
 📌 **The Relecteur and the Contrôleur do not call it either** — 🔴 their
 blocks say something is missing, not something to settle.
+
+| What a Relecteur block names missing | What you do |
+|---|---|
+| **The report** | 🔴 **A fresh `realisateur`** — 📌 **counted as an attempt** |
+| **The sheet** | 🔴 **`detailleur` on the block** |
+| **Anything else** | 📌 **Relay it and stop** |
 
 ⚠️ **Unless a Détailleur's or a Réalisateur's `## Decision` sends the
 lot back to the split.** 🔴 **That is not a stop** — see *When the
@@ -358,28 +452,7 @@ fix that passes: carry on.
 
 ---
 
-## Git, in this mode
-
-🔴 **Commit the feature folder first**, before creating the worktree:
-
-    git add docs/features/<name>/ && git commit -m "chore: pre-code"
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. An agent
-would then work on stale content and its output would have to be
-discarded.
-
-📌 **One worktree for the whole run**, not one per lot. Enter it before
-invoking anything.
-
-⚠️ **The `realisateur` commits inside it, lot by lot.** That is his;
-you do not commit for him.
+## Git, once it has reported
 
 **When the run ends:**
 

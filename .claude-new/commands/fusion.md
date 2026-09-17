@@ -6,8 +6,9 @@ argument-hint: "<feature folder name>"
 
 Act as the orchestrator, in **upstream mode**.
 
-**This command chains three phases** — the Fusionneur over the bug-fix
-lists, then its two merge invocations.
+**This command chains four phases** — the Rédacteur folding the coding
+decisions in, the Fusionneur over the bug-fix lists, then its two merge
+invocations.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
 for it and stop — never guess which feature is meant.
@@ -39,24 +40,50 @@ matches.**
 |---|---|---|
 | 1 | `desc-produit.md` absent | 🔴 **Error** — say so and stop |
 | 2 | A `blocked_*.md` with an empty `## Decision` | 🔴 **STOP** — relay it |
-| 3 | A `blocked_*.md` with a filled `## Decision` | The agent it names, at the invocation it names |
+| 3 | A `blocked_*.md` with a filled `## Decision` | 📌 **The agent its name carries**, at the invocation its `## Invocation` line names |
 | 4 | `rapport-fusion.md` exists | 🔴 **STOP** — the merge is done |
 | 5 | A root questions file with an empty `Answer:` | 🔴 **STOP** — relay it |
-| 6 | `questions-fusionneur-NN.md`, answered | **Fusionneur, invocation 2** |
-| 7 | `plan-fusion.md` exists | **Fusionneur, invocation 2** |
-| 8 | `questions-fusionneur-NN.md`, answered, and a `bugfix-*/` folder | **Fusionneur, invocation 3** |
-| 9 | A `bugfix-*/` folder, and no `questions-fusionneur-*` anywhere | **Fusionneur, invocation 3** |
-| 10 | 🔴 **`desc-produit-fusion.md` absent** | **Rédacteur, invocation 3 — Merging** |
+| 6 | 🔴 **`desc-produit-fusion.md` absent** | **Rédacteur, invocation 3 — Merging** |
+| 7 | 🔴 **`questions-fusionneur-NN.md` holding `### Q`, answered**, and no `plan-fusion.md` | **Fusionneur, invocation 3** |
+| 8 | A `bugfix-*/` folder, and no `questions-fusionneur-*` anywhere | **Fusionneur, invocation 3** |
+| 9 | `questions-fusionneur-NN.md`, answered — 📌 **empty, or its questions resolved** | **Fusionneur, invocation 2** |
+| 10 | `plan-fusion.md` exists | **Fusionneur, invocation 2** |
 | 11 | Otherwise | **Fusionneur, invocation 1** |
 
-📌 **Row 9 fires once.** The Fusionneur writes a questions file even when
+🔴 **The order of these rows is the routing.** ⚠️ **The Rédacteur comes
+before every Fusionneur row**: it writes the source the Fusionneur
+reads, and a Fusionneur invocation above it would run on a file that
+does not exist.
+
+⚠️ **And a `bugfix-*/` folder comes before the row without it** — 📌
+**the two conditions differ by that folder alone**, and the general one
+placed first would shadow the specific: a correction cycle would go to
+invocation 2, which needs a plan no invocation wrote.
+
+📌 **Row 8 fires once.** The Fusionneur writes a questions file even when
 empty, and its presence is what says the pass has run — the
 `bugfix-*/` folders never go away.
 
-⚠️ **Row 9 covers every `bugfix-NN` at once**, not the last one. **A
-feature with no bug-fix cycle goes straight to row 10.**
+🔴 **An empty one sends the next run to row 9, not back to row 7** — 📌
+**row 7 tests `### Q`**, so a pass that asked nothing does not repeat
+itself. ⚠️ **Without that test, row 7 would fire on its own output**,
+for ever.
 
-🔴 **Row 10 runs once, before the merge ever starts.** 📌 **The
+⚠️ **Row 8 covers every `bugfix-NN` at once**, not the last one. **A
+feature with no bug-fix cycle never matches rows 7 or 8.**
+
+🔴 **Row 6 fired: copy the product file, then invoke.** 📌 **In that
+order** — ⚠️ **the row tests the copy's absence**, so copying first
+would make it never fire:
+
+    cp docs/features/<name>/desc-produit.md \
+       docs/features/<name>/desc-produit-fusion.md
+
+📌 **The agent has no tool that copies** — ⚠️ **and a whole read
+followed by a whole write truncates in silence.** 🔴 **It amends the
+copy; you make it.**
+
+🔴 **Row 6 runs once, before the merge ever starts.** 📌 **The
 Rédacteur folds into `desc-produit-fusion.md` the product decisions
 settled while the code was written** — ⚠️ **they went into sheets, and
 would otherwise reach neither the product file nor the global.**
@@ -71,39 +98,7 @@ Fusionneur must never have to choose its source.**
 
 ---
 
-## How it runs
-
-**One phase per run.** 🔴 **Never chain two agents** — each stop hands
-back to the Product Owner, and the next run picks the table up again.
-
-**What you do**: invoke the agent via `Agent()` with the feature folder
-and which invocation it is — and nothing else.
-
-🔴 **Never paraphrase the agent's process in your invocation** — not
-its inputs, its checks, its output format. It reads its own
-instructions.
-
-### Invocation parameters
-
-```
-Agent(
-  subagent_type="<agent>",
-  model="sonnet",
-  description="<phase> <feature>",
-  prompt="Feature folder: docs/features/<name>/. <Which invocation>."
-)
-```
-
-❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
-either** — in this environment the Agent tool always runs async and
-notifies on completion. Do not pass it; wait for the notification.
-
-❌ **Never pass `isolation`** — the phases are sequential and each
-reads what the previous one wrote.
-
----
-
-## Git, in this mode
+## Git, before invoking
 
 🔴 **Before invoking, move every root `questions-*.md` whose prefix is
 not the one the phase you are about to run writes:**
@@ -142,6 +137,42 @@ discarded.
 fails — the harness blocks a subagent's writes until the session is
 isolated.
 
+---
+
+## How it runs
+
+**One phase per run.** 🔴 **Never chain two agents** — each stop hands
+back to the Product Owner, and the next run picks the table up again.
+
+**What you do**: invoke the agent via `Agent()` with the feature folder
+and which invocation it is — and nothing else.
+
+🔴 **Never paraphrase the agent's process in your invocation** — not
+its inputs, its checks, its output format. It reads its own
+instructions.
+
+### Invocation parameters
+
+```
+Agent(
+  subagent_type="<agent>",
+  model="sonnet",
+  description="<phase> <feature>",
+  prompt="Feature folder: docs/features/<name>/. <Which invocation>."
+)
+```
+
+❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
+either** — in this environment the Agent tool always runs async and
+notifies on completion. Do not pass it; wait for the notification.
+
+❌ **Never pass `isolation`** — the phases are sequential and each
+reads what the previous one wrote.
+
+---
+
+## Git, once it has reported
+
 **Then, once the agent reports:**
 
 1. `git merge --no-ff <branch>` from the main checkout root
@@ -161,8 +192,16 @@ merges too**: the Product Owner has to see it.
 
 ---
 
+🔴 **The agent reports having applied a decision → rename its blocking
+file:**
+
+    git mv <folder>/blocked_<agent>.md <folder>/blocked_<agent>-NN.md
+
+📌 **`NN`: the highest in that folder plus one, `01` when there is
+none.** ⚠️ **The agent has no tool that removes a file** — 🔴 **left at
+the unnumbered name, the next run stops on it.**
+
 ## What you relay
 
 The agent's own report, and **which row of the table fired**. 🔴
-**Nothing else is yours**: no phase chain, no risk level, no
-`TaskCreate`.
+**Nothing else is yours**: no phase chain.

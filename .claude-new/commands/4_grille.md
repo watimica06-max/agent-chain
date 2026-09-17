@@ -48,6 +48,7 @@ another:**
 | `cadrage-produit/blocked_par-question.md` | The sondeur reading question by question |
 | `cadrage-produit/blocked_par-nature.md` | The sondeur reading by nature |
 | `cadrage-produit/blocked_global.md` | The global invocation |
+| `blocked_existant.md`, **at the feature root** | 🔴 **The second time** — 📌 **not under `cadrage-produit/`** |
 | `blocked_assembleur.md`, at the feature folder's root | The assembleur |
 
 | | What you do |
@@ -146,9 +147,101 @@ a *défaut*, not a gap the Product Owner has to close by hand.
 🔴 **Every turn, whatever moved** — ⚠️ **a transverse rule reaches blocks
 that did not move**, and the angles need it whether or not it changed.
 
-📌 **Neither grep returns anything, on a later turn** → 🔴 **the first
-time is closed.** 📌 **Nothing moved since a turn whose questions are
-answered** — ⚠️ **and that is when the second time runs**: see below.
+## The out-of-scope blocks
+
+🔴 **A third grep, `grep -B1 '^Genre: hors périmètre$'`** — 📌 **and
+their identifiers go in the global invocation's prompt only.**
+
+⚠️ **Not to the three angles** — 📌 **what they answer is `C1.2`, a pass
+C question asked once on the feature**, and pass C is the global's.
+
+🔴 **The Product Owner already wrote what she excludes** — ⚠️ **without
+them the grid asks him a second time**, and she answers what he has
+already answered.
+
+🔴 **What closes the first time is a `questions-sondeur-NN.md` at the
+root holding no `### Q`** — 📌 **grep it before the two greps below.**
+⚠️ **One exists and is empty → the first time is closed**, and the
+second time runs: see below.
+
+⚠️ **Never *no marker returned*** — 📌 **markers are stripped by the
+Rédacteur when it integrates a questions file that holds questions.** 🔴
+**An empty one is integrated by nobody**, so the markers stay, and a
+test on them would send the grid round for ever on a feature it has
+nothing left to ask about.
+
+📌 **Neither grep returns anything, and no empty file at the root** →
+🔴 **stop and say so**: nothing moved and nothing closed the turn —
+⚠️ **a run produced no questions file at all.**
+
+---
+
+## Git, before invoking
+
+🔴 **Before invoking, file every root `questions-*.md`:**
+
+    git mv docs/features/<name>/questions-<agent>-NN.md \
+           docs/features/<name>/questions/<agent>/
+
+⚠️ **Never `questions-architecte-*.md`** — 🔴 **leave it at the root**:
+📌 **it waits for `/conventions`, which is the only command that reads
+it.**
+
+📌 **This command reads none of them.** 🔴 **A questions file stays at
+the root only while it waits to be answered or integrated** — ⚠️ **the
+next one written has to be the only one there.**
+
+⚠️ **`git mv`, never a read-and-rewrite** — the agents must not open
+those files, and neither should you.
+
+🔴 ⚠️ **Not on a turn that re-ran the merge alone** — 🔴 **those four files
+are what it just read**, and filing them would take them from under it.
+
+**Otherwise, the previous turn's six `cadrage-produit/` files:**
+
+    git mv docs/features/<name>/cadrage-produit/par-bloc.md \
+           docs/features/<name>/cadrage-produit/closed/par-bloc-NN.md
+
+📌 **The same for `par-question.md`, `par-nature.md`, `global.md`,
+`releve.md` and `questions.md`.**
+
+📌 **Create `questions/<agent>/` and `cadrage-produit/closed/` if they
+do not exist.**
+
+🔴 **Then commit the feature folder**, before creating the worktree:
+
+    git add docs/features/<name>/ && git commit -m "chore: answers"
+
+⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
+session.** A worktree branches from the last commit — uncommitted
+answers are invisible inside it, and an agent works on a stale
+`questions.md`. *(Seen once: 186 lines in the worktree, 195 in the main
+checkout.)*
+
+📌 **Nothing to commit is a normal outcome** — carry on.
+
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. An agent
+would then work on stale content and its output would have to be
+discarded. *(Seen once: a whole invocation lost that way.)*
+
+📌 **Enter the worktree before invoking**, not after a write fails —
+the harness blocks a subagent's writes until the session is isolated.
+*(Measured on three phases: the agent does the full job, cannot write,
+and the whole invocation is redone.)*
+
+🔴 **Then, inside the worktree, create the folder the agents write
+into:**
+
+    mkdir -p docs/features/<name>/cadrage-produit/closed
+
+⚠️ **An agent whose target folder is missing does not stop** — 📌 **it
+searches**: it lists the folder, tries an absolute path. 🔴 **Create the
+folder and none of that happens.**
 
 ---
 
@@ -184,12 +277,19 @@ Agent(
             <B12 → ## Activity screen>
             <B40 → ## Steps panel>
           Write to docs/features/<name>/questions-existant-NN.md.
-          <Plus: docs/features/<name>/blocked_existant.md, its decision is filled.>"
+          Your blocking file, if you cannot produce:
+            docs/features/<name>/blocked_existant.md.
+          <Plus: that same file, its decision is filled.>"
 )
 ```
 
 📌 **`NN`: the highest `questions-existant-NN.md` in
 `questions/existant/`, plus one** — ⚠️ **`01` when there is none.**
+
+🔴 **It wrote `blocked_existant.md`** — 📌 **relay it and stop.** ⚠️
+**Its decision filled, `/4_grille` runs the second time again**, naming
+the file in the prompt; 🔴 **rename it `blocked_existant-NN.md` once the
+agent reports having applied it.**
 
 🔴 **No merge** — 📌 **one reading, one file.** ⚠️ **The assembleur
 merges the four of the first time, and them alone.**
@@ -267,6 +367,7 @@ Agent(
           The grid: docs/process/GRILLE_CADRAGE_PRODUIT_V2.md.
           Invocation 2 — Global: every behaviour block: <list>.
           The transverse blocks, to hold beside them: <list — or: none>.
+          The out-of-scope blocks: <list — or: none>.
           Write the record to docs/features/<name>/cadrage-produit/releve.md.
           Write to docs/features/<name>/cadrage-produit/global.md.
           <Plus: docs/features/<name>/cadrage-produit/blocked_global.md, its decision is filled.>"
@@ -287,13 +388,14 @@ write different ones**, and none reads what another wrote.
 
 ## Then the merge
 
-🔴 **First, does any `cadrage-produit/blocked_*.md` sit at its
+🔴 **First, does any `cadrage-produit/blocked_*.md`, or
+`blocked_existant.md` at the feature root, sit at its
 unnumbered name?** 📌 **One is enough** — ⚠️ **no merge this turn, and
 no questions file at the root.** 🔴 **Relay it and stop.**
 
-⚠️ **A sondeur that blocked can still have left a file** — whole or
-partial. 📌 **The existence check below would pass it**, and the turn
-would be written as if four full readings were in it.
+⚠️ **A sondeur that blocked writes no questions file** — 📌 **so the
+existence check below would fire on it**, and report as missing a
+reading that stopped for a reason you can read.
 
 🔴 **Then check the four questions files exist, and the record.** ⚠️ **A
 merge missing one reading is a merge nobody can trust.**
@@ -356,65 +458,7 @@ what ends the loop.**
 
 ---
 
-## Git, in this mode
-
-🔴 **Before invoking, file every root `questions-*.md`:**
-
-    git mv docs/features/<name>/questions-<agent>-NN.md \
-           docs/features/<name>/questions/<agent>/
-
-📌 **This command reads none of them.** 🔴 **A questions file stays at
-the root only while it waits to be answered or integrated** — ⚠️ **the
-next one written has to be the only one there.**
-
-⚠️ **`git mv`, never a read-and-rewrite** — the agents must not open
-those files, and neither should you.
-
-🔴 **And the previous turn's six `cadrage-produit/` files:**
-
-    git mv docs/features/<name>/cadrage-produit/par-bloc.md \
-           docs/features/<name>/cadrage-produit/closed/par-bloc-NN.md
-
-📌 **The same for `par-question.md`, `par-nature.md`, `global.md`,
-`releve.md` and `questions.md`.**
-
-📌 **Create `questions/<agent>/` and `cadrage-produit/closed/` if they
-do not exist.**
-
-🔴 **Then commit the feature folder**, before creating the worktree:
-
-    git add docs/features/<name>/ && git commit -m "chore: answers"
-
-⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
-session.** A worktree branches from the last commit — uncommitted
-answers are invisible inside it, and an agent works on a stale
-`questions.md`. *(Seen once: 186 lines in the worktree, 195 in the main
-checkout.)*
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. An agent
-would then work on stale content and its output would have to be
-discarded. *(Seen once: a whole invocation lost that way.)*
-
-📌 **Enter the worktree before invoking**, not after a write fails —
-the harness blocks a subagent's writes until the session is isolated.
-*(Measured on three phases: the agent does the full job, cannot write,
-and the whole invocation is redone.)*
-
-🔴 **Then, inside the worktree, create the folder the agents write
-into:**
-
-    mkdir -p docs/features/<name>/cadrage-produit/closed
-
-⚠️ **An agent whose target folder is missing does not stop** — 📌 **it
-searches**: it lists the folder, tries an absolute path. 🔴 **Create the
-folder and none of that happens.**
+## Git, once it has reported
 
 **Then, once every agent has reported:**
 
@@ -437,8 +481,9 @@ merges too**: the Product Owner has to see it.
 
 ## What you relay
 
-📌 **How many questions each reading raised**, and how many the merge
-kept.
+📌 **How many questions each reading raised, and how many the merge
+kept** — 🔴 **both from the assembleur's report**, never a count of
+your own.
 
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
@@ -452,7 +497,6 @@ kept.
 | **Second time** — `questions-existant-NN.md` holds questions | 📌 **Answer them, then `/1_lexique`** — ⚠️ **an arbitration becomes a block, like any other answer** |
 | **Second time** — it is empty, or had already run | 📌 `/5_reclasse` — 🔴 the product file is closed |
 
-🔴 **Nothing else is yours**: no risk level, no
-`TaskCreate`, no reading of what the questions say.
+🔴 **Nothing else is yours**: no reading of what the questions say.
 
 **If an agent returns a `blocked_*.md`**: relay it and stop.
