@@ -163,6 +163,11 @@ READ-ONLY. Modify nothing. Write one file:
 docs/verification2/plans/conflits.md
 
 Read the twenty-one plans in `docs/verification2/plans/`.
+
+🔴 **Plus `docs/verification2/plans/a-trancher.md`** — 📌 **the questions
+the Product Owner has settled since wave 1**: ⚠️ **a `Decision:` there
+supersedes what a plan said about that finding.**
+
 🔴 **Plus, for step 3, the files their `Cited:` lines name.**
 
 ---
@@ -262,16 +267,21 @@ on a line neither had read.**
 📌 **This table is what wave 3 applies.** 🔴 **It supersedes the plans**
 — ⚠️ **an agent applies this list, not its own file.**
 
-**Then, the conflicts:**
+**Then, the conflicts** — 🔴 **one section each, not a table**: 📌 **the
+Product Owner writes into this file.**
 
-    | # | Kind | Plans | What is wrong |
+    ### <identifier> — <short title>
 
-- **`Kind`** — `divergent` · `cited` · `owner`
-- **`What is wrong`** — 🔴 **one sentence**, ⚠️ **and for a `cited`
-  conflict, both quotations**
+    Kind: divergent | cited | owner
+    Plans: <the plans involved>
+    What is wrong: <one sentence>
+    Quotations: <for a `cited` conflict, both — otherwise —>
 
-📌 **Do not resolve a conflict.** 🔴 **The Product Owner arbitrates**,
-and a conflicted entry stays out of the first table until then.
+    Arbitration:
+
+🔴 **Leave `Arbitration:` empty.** ⚠️ **Do not resolve a conflict, and
+do not suggest a resolution** — 📌 **the Product Owner writes there**,
+and a conflicted entry stays out of the first table until she has.
 ```
 
 ---

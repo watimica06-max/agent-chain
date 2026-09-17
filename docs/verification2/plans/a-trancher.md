@@ -22,8 +22,19 @@ Options:
 
 Where: arbitre.md L3, L178-181, L223-224, L379, L439-462 ↔ CLAUDE.md L146; 8_code.md L93-94, L204-206, L428-429, L437-439, L463-466; detailleur.md L347; realisateur.md L318
 
-Decision:
+Decision: **Keep the wait exactly as it is.** The mechanism was settled before
+this round and its reasoning holds: it gains a full `/8_code` cycle when
+the Product Owner is at the keyboard, and costs nothing when she is
+not — the stop at twenty minutes is the same stop she would have had.
 
+🔴 **One branch is missing and it is technical**: the file says what to
+do when twenty minutes pass empty, and nothing when the answer appears.
+Write it — the Arbitre applies the answer and carries on with its turn.
+
+🔴 **For the *rule in force that is now wrong* row (L379)**: once the
+answer is in the field, the Arbitre writes the `architecte/` request
+with it and calls the Architecte. The row already announces that route;
+it had no gesture.
 ---
 
 ### architecte F21 — who carries a missing form back to the grid
@@ -41,8 +52,16 @@ Options:
 
 Where: docs-new/process/GRILLE_CONVENTIONS.md L50-52 ↔ architecte.md L294, L546-547, L594-595; conventions.md L224
 
-Decision:
+Decision: **The Architecte raises it in its questions file, under a fifth `Kind:`
+— `forme`.**
 
+🔴 **It is the only route that reaches the Product Owner.** A request in
+`architecte/` would have the agent itself as its reader, and the next
+invocation 3 would have to refuse it; a report line is read once and
+lost, which is the file's own argument at L594-595.
+
+📌 **Cost**: the four-word list at L546-547 becomes five, and
+`/conventions` relays the file as it already does.
 ---
 
 ### architecte chemins-amont F19 — what "back into the loop" means for a `coverage` answer
@@ -61,8 +80,17 @@ The guard (1_lexique and 2_structure never take the file as the answered one) is
 
 Where: conventions.md L225 ↔ architecte.md L646-649
 
-Decision:
+Decision: **Corrected by hand, and the behaviour goes to the next cycle.**
 
+🔴 **Keep the route of L646-649 alone** — the behaviour enters the
+product file, and no upstream turn is re-run.
+
+📌 **Why**: re-running the loop costs a full upstream cycle per coverage
+question, and leaves `couverture.md` stale in its wake.
+
+⚠️ **What it leaves open**: the block is in the product file, the
+technical document does not see it, no lot builds it. 📌 **It is built
+in the next cycle, as a new behaviour** — conventions.md L225 says so.
 ---
 
 ### classeur renommages F10 — the `/2_structure` table when a filled `blocked_classeur.md` and an answered questions file sit at the root together
@@ -79,8 +107,15 @@ Options:
 
 Where: 3b_nature.md L235 ↔ 2_structure.md L117-125; redacteur.md L527-528
 
-Decision:
+Decision: **The relay of `/3b_nature` asks for the answers first, the decision
+second.**
 
+🔴 **No command changes and no rule is relaxed.** The other two options
+made the Rédacteur tolerate one more input, or created a run whose only
+output is a rewrite.
+
+📌 **Cost**: the blocked block is treated one turn later. 📌 **Amend
+`3b_nature.md` L235 to reverse the order.**
 ---
 
 ### commandes chemins-amont F16 — The `<<ASSUMED` mark of a nature whose product answer changed no block
@@ -99,10 +134,28 @@ The F16 entry above applies what `decisions.md` settled and stops here; the Owne
 
 Where: convertisseur.md L32, L388-390, L464-466, L468-470 ↔ 6_convertit.md L132; decisions.md (chemins-amont.md F16)
 
-Decision:
+Decision: **`/6_convertit` gains a dispatch row: a nature carrying `<<ASSUMED`
+whose product question is answered **runs**, its part unchanged.**
 
----
+🔴 **The table already holds the shape.** Row 130 runs a nature carrying
+`<<ASSUMED` *when its part changed*; row 132 makes it **wait** when the
+part is byte-identical — ⚠️ **which is exactly this case, and it waits
+for ever.**
 
+📌 **Row 131 shows the chain already accepts a run for a known result**:
+*« Runs — whatever its blocks did »*, for a technical answer. 🔴 **The
+new row is its product twin.**
+
+📌 **Why not the other two**: lifting the mark by script would leave
+standing an assumption nobody validated — the answer said *the blocks
+are right as they are*, not *the assumed line is right*. 🔴 **And
+writing no `<<ASSUMED` at all would leave the Cadreur blind**: ⚠️ **it
+never opens a questions file** (cadreur.md L263, L390), so the inline
+mark is its only signal.
+
+📌 **Cost**: one opus invocation per such nature. ⚠️ **The agent re-reads
+the blocks with the answer in hand and rewrites the section** — 📌
+**which is what lifts the mark properly.**
 ### concepteur renommages F16 — A symbol that depends on nothing, in a lot of only-new files
 
 Question: renommages F16 gives the fallback "the module of the one it depends on most". A symbol with no dependency at all — a root type, a constant holder — has none.
@@ -116,8 +169,13 @@ Options:
 
 Where: concepteur.md ↔ decisions.md (renommages F16)
 
-Decision:
+Decision: **The module the lot's other symbols land in, and say so in the
+report.** 📌 **When the lot has none: the module the `architecte/`
+request names.**
 
+⚠️ **Never a blocking file** — the Architecte settles the placement at
+move 7 in any case, and a block for it would cost a Product Owner
+round-trip for nothing.
 ---
 
 ### concepteur chemins-aval F09 — The declarations of a re-cut lot, already in the code
@@ -134,7 +192,24 @@ Options:
 
 Where: concepteur.md L162-165, L237 ↔ realisateur.md L335-337
 
-Decision:
+Decision: **The orchestration reverts the re-cut lots' commits before `/7_lots`.**
+
+🔴 **Same decision as `detailleur F21` and `realisateur chemins-aval
+F08`** — the four questions of that family have one answer.
+
+📌 **Why**: it asks no new gesture of an agent (`/8_code` has `Bash` and
+already does git); it breaks no rule (the other options required an
+agent to read a stale declaration as one to rewrite, the opposite of
+what its file says); and it leaves a `HEAD` that compiles, which the
+next lot's Concepteur needs.
+
+📌 **The revert is cleaner than it looks.** 🔴 **The Cadreur never
+touches a lot whose `verdict.md` carries PASS** (cadreur.md L270, L879),
+so a lot that is dropped, re-cut or found false is always the one in
+flight — ⚠️ **the last in the history, with nothing coded after it.**
+
+⚠️ **Should a conflict arise all the same**: 🔴 **the command resolves
+none — it stops and says so.**
 
 ---
 
@@ -151,8 +226,15 @@ Options:
 
 Where: 8_code.md L124-125, L153-157 ↔ relecteur.md L390; concepteur.md L94
 
-Decision:
+Decision: **A commit-message rule for the three committing agents:
+`<lot>: <what the commit carries>`.**
 
+🔴 **Why not the `HEAD` sha**: a sha held in the run's memory is lost
+when a run restarts mid-lot — the exact trap `8_code.md` L153-157 names
+for `## Attempts`. 📌 **A message is read from disk.**
+
+📌 **Cost**: one line in `concepteur.md`, `testeur.md` and
+`realisateur.md`, and a `git log` gesture in `/8_code`.
 ---
 
 ### controleur F12 — What names, on a correction cycle, the block a lot built
@@ -171,8 +253,20 @@ Options:
 
 Where: diagnostiqueur.md L51, L254 ↔ 9_controle.md L345-346; decisions.md L91-97
 
-Decision:
+Decision: **Option (a): the `B<n>` travels.**
 
+🔴 **The Product Owner writes the block identifier in `bug-list.md`**
+when the gap comes from a control report — it is already there in the
+report line. 📌 **The Diagnostiqueur carries it into `desc-bug.md`, the
+Cadreur into the lot list.**
+
+⚠️ **Why not the other two**: (b) greps whatever happens to be there;
+(c) marks as built a gap the diagnosis set aside — the case
+`decisions.md` forbids.
+
+📌 **What it costs the Product Owner**: one identifier to copy, and only
+when the gap comes from a control report. ⚠️ **A gap she adds from use
+carries none and stays unmarked** — that is accepted.
 ---
 
 ### controleur F02 — Whether the two "never this file" lines of L66-71 were kept on purpose
@@ -185,8 +279,10 @@ The plan writes: finish the pass, unless the Product Owner says otherwise — se
 
 Where: controleur.md L66-71
 
-Decision:
+Decision: **Finish the pass: remove the two lines.**
 
+🔴 **The index records neither the pass nor a refusal** — nothing
+attests to a deliberate decision to keep them.
 ---
 
 ### convertisseur 1 — Who reads `par-genre/transverses.md`
@@ -208,8 +304,20 @@ Options:
 
 Where: docs/refonte/modifications.md L547 ↔ convertisseur.md L146-147, L149-153, L178-179; 5_reclasse.md L102
 
-Decision:
+Decision: **Invocation 2 alone — the file's route, not the demand's.**
 
+🔴 **The second ground is decisive**: eight invocations would write the
+same constraint eight times, and two natures can each claim one
+transverse rule, or neither can.
+
+⚠️ **The first ground is false and must be corrected in the file**:
+invocation 2 already derives a layer with no blocks in front of it
+(L178-179). 🔴 **The reason to write at L149-153 is cost and a single
+writer, never impossibility.**
+
+📌 **Cost**: `modifications.md` L547 and `5_reclasse.md` L102 are
+corrected to say invocation 2. 📌 **F10, F11 and D-16 stand as
+written.**
 ---
 
 ### convertisseur 2 — Where a leftover `[B<n>: …]` is caught — decided above, flagged here
@@ -220,8 +328,10 @@ Options: F22's decision (the Cadreur greps `[B`) — or the alternative above, a
 
 Where: convertisseur.md L292-294 ↔ cadreur.md (F22, passages-amont F05)
 
-Decision:
+Decision: **The Cadreur greps `[B`** — the decision already taken, confirmed.
 
+🔴 **The alternative would lose the reference's expectation text**
+(L292-294), which is what resolves it later.
 ---
 
 ### decoupeur F01 — the `Clarification needed` stop: restore it, or record its removal
@@ -237,8 +347,15 @@ Options:
 
 Where: docs/refonte/modifications.md L318 ↔ decoupeur.md L135-137; 3_decoupe.md L44-47, L215
 
-Decision:
+Decision: **Record the removal. Do not restore the stop.**
 
+🔴 **The stop had one outcome, a reply the file itself says gets lost.**
+Restoring it means adding a second blocking cause to an agent built
+around one, to guard against the disappearance of a grep no command has
+removed.
+
+📌 **Cost**: one index line in `docs/refonte/modifications.md` L318,
+outside this campaign's perimeter — 🔴 **note it in `todo.md`.**
 ---
 
 ### decoupeur F17 — who merges two blocks
@@ -254,8 +371,17 @@ Options:
 
 Where: decoupeur.md L92-96, L110, L248-249 ↔ redacteur.md L527-540; qualifieur.md L214; classeur.md L181
 
-Decision:
+Decision: **Nobody merges. The signal reaches the Product Owner and she decides
+case by case.**
 
+🔴 **Why not a route**: making the Rédacteur merge on a decision needs a
+relay, a `MODIFIED` marker and a retired number to redirect — for a
+defect whose cost is that the grid probes one behaviour twice.
+
+⚠️ **The real risk is named**: the two blocks can receive divergent
+answers, and the sondeur has no rule for that. 📌 **`decoupeur F13`
+relays the signal**, and the Product Owner merges by hand when it
+bothers her.
 ---
 
 ### detailleur F21 — The declarations and tests committed against a sheet the review found false
@@ -272,8 +398,20 @@ Options:
 
 Where: detailleur.md (F21) ↔ concepteur.md L200-201; testeur.md
 
-Decision:
+Decision: **The orchestration reverts the lot's commits, deletes the sheet, and
+runs the Détailleur in its ordinary mode.**
 
+📌 **The skip is what does it**: 🔴 **the ordinary mode passes over a lot
+that has a sheet and no `PASS`** (detailleur.md L468) — ⚠️ **with the
+sheet gone, the lot is detailed again.**
+
+🔴 **Same decision as `concepteur chemins-aval F09` and `realisateur
+chemins-aval F08`.**
+
+🔴 **And `/8_code` passes the verdict's `## Findings` in the
+Détailleur's prompt** — 📌 **a parameter, not a new mode.** ⚠️ **Without
+it the agent rewrites from the same entries and can reproduce the
+defect**, which is the failing the report names.
 ---
 
 ### diagnostiqueur F10 — the state document is read, and nothing follows
@@ -297,8 +435,15 @@ F04's decision applies only under the second option.
 
 Where: diagnostiqueur.md L138 ↔ L205-377, L238-246
 
-Decision:
+Decision: **Keep it as a search aid.** A trap or a dead symbol already recorded is
+named in `## Today`, and for dead state feeds move 3's bearer search.
+🔴 **The verdict is unchanged.**
 
+⚠️ **Why not drop it**: it would deprive the investigation of a known
+fact. 🔴 **Why not a verdict input**: a recorded trap is a pitfall, not
+a fix — the gap stands regardless.
+
+📌 **F04's decision applies.**
 ---
 
 ### qualifieur 1 — A *transverse-or-behaviour* doubt — silent, or a question (F12, F01, F05)
@@ -317,8 +462,21 @@ The plan stops here for F12's policy; its price statement is corrected whichever
 
 Where: qualifieur.md L140-141, L145-147 ↔ 4_grille.md L139-140, L142
 
-Decision:
+Decision: **Ask on the `transverse` doubt only. The four other doubts stay
+silent.**
 
+🔴 **The stated price of the silence is false for that one genre**: a
+`transverse` filed `comportement` is absent from the list the sondeurs
+hold (4_grille.md L139-140), so every block it reaches raises the gap as
+a question answered by hand — 📌 **once per block.**
+
+📌 **One question before `/3b_nature` against one per block after.**
+
+⚠️ **The four other doubts keep their silence** — the dozens of
+questions D3 feared came from them.
+
+🔴 **Correct the asymmetry's price statement at L143-145** whichever way
+it reads today.
 ---
 
 ### qualifieur 2 — A two-genre block — how it gets back to the decoupeur (F14, F06, F02)
@@ -337,8 +495,18 @@ The plan stops here for F14; F06's decision holds only under the second or third
 
 Where: qualifieur.md L88-91, L209 ↔ 3a_genre.md L227-235; 3_decoupe.md L81-82; decoupeur.md L65-67; 2_structure.md L120
 
-Decision:
+Decision: **The qualifieur blocks on it, and the majority-genre rule goes away.**
 
+🔴 **Keeping the majority genre sends out of the grid a block that
+carries a behaviour** — exactly the silent hole L145-147 says never to
+open.
+
+📌 **The route exists**: `2_structure.md` L120 already says all three
+agents block on what only a rewrite settles. **The Rédacteur rewrites
+with `MODIFIED`, `/3_decoupe` splits.**
+
+⚠️ **Cost**: one Product Owner round-trip per badly split block. 📌
+**L88-91 is removed, and F06 goes with it.**
 ---
 
 ### realisateur F11 — what the reprise leaves in the tree
@@ -364,8 +532,20 @@ The second option is consistent with every 🔴 rule now in force (L385 *never c
 
 Where: realisateur.md L385-386 ↔ realisateur.md L475; 8_code.md L112, L463-466; docs/refonte/passes/realisateur.md C3
 
-Decision:
+Decision: **`git restore` the non-compiling piece before stopping. `En chantier`
+says what was written and undone, and where.**
 
+🔴 **A `HEAD` that does not compile stops every lot after it**: the next
+lot's Concepteur compiles its declarations in its own worktree
+(concepteur.md L212), and the Testeur runs the older tests. ⚠️ **Both
+would fail on code that has nothing to do with them.**
+
+📌 **The reviewer's lean predates the Concepteur and the Testeur** —
+with them, a broken `HEAD` blocks two more agents per lot.
+
+📌 **Consistent with every 🔴 rule in force**: L385 *never commit what
+does not compile*, L475, `8_code.md` L463-466. 🔴 **F13's `En chantier`
+handling follows this.**
 ---
 
 ### realisateur chemins-aval F08 — the dropped lot's declarations and tests stay committed
@@ -390,8 +570,16 @@ The first is the cheapest in rules and the riskiest in git; the choice sits with
 
 Where: realisateur.md L335-338 ↔ testeur.md L228-232; 8_code.md L357-366
 
-Decision:
+Decision: **The orchestration reverts the dropped lot's commits.**
 
+🔴 **Same decision as `concepteur chemins-aval F09` and `detailleur
+F21`.**
+
+📌 **The Réalisateur is right as written** — its `git restore` covers
+its own edits, and nothing changes there.
+
+⚠️ **The git risk is accepted and bounded**: 🔴 **a conflict stops the
+command, which says so and resolves nothing.**
 ---
 
 ### redacteur F19 — a block created at invocation 3, and its `Nature:`
@@ -408,8 +596,14 @@ Options:
 
 Where: redacteur.md L455, L703-705 ↔ fusionneur.md L386-387
 
-Decision:
+Decision: **The Fusionneur drops an empty `Nature:` line at merge.**
 
+🔴 **Why not forbid the block**: `/fusion` would stop on every such
+decision. 🔴 **Why not leave the line**: the global would carry a field
+nobody can ever fill — no classeur runs after `/fusion`.
+
+📌 **Consistent with what is already settled**: the Fusionneur already
+drops `Genre:` and `Global:`.
 ---
 
 ### redacteur F01 — the residual gap the `## Relevé` clause aimed at
@@ -425,8 +619,13 @@ Options:
 
 Where: redacteur.md (F01) ↔ lexicographe.md L162-166, L285-287, L464-466
 
-Decision:
+Decision: **Leave it as the index asks — `## Tranché` alone.**
 
+🔴 **The gain is one second English rendering caught**; the cost is two
+Lexicographe rules reopened (L162-166, L285-287) and a second writer
+inside `## Relevé`.
+
+📌 **Note it in `todo.md`**: if the case shows up, it was foreseen.
 ---
 
 ### relecteur F19 — The route of `Cause: sheet` (relecteur.md F19 · passages-aval.md F02 · chemins-aval.md F03)
@@ -445,8 +644,22 @@ Whichever is chosen, realisateur.md L519-520 (two rows, no `sheet`) and relecteu
 
 Where: relecteur.md L167-169, L407 ↔ detailleur.md L672-673; concepteur.md L163-164; 8_code.md L422; realisateur.md L519-520
 
-Decision:
+Decision: **Option A — delete and re-detail**, with the report's objection closed.
 
+🔴 **`/8_code` reverts the lot's commits, deletes
+`fiche-executable.md`, `conception.md` and `tests.md`, and runs the
+Détailleur on the block in its ordinary mode.**
+
+🔴 **And it passes the verdict's `## Findings` in the prompt** — 📌 **a
+parameter, not a third mode.** ⚠️ **That closes the objection the
+report raises**: without it the Détailleur rewrites from the same
+entries and can reproduce the defect.
+
+📌 **The leftover code the option is faulted for is handled by the
+revert** — the same decision as the git family above.
+
+🔴 **`realisateur.md` L519-520 and `relecteur.md` L167-169, L407 follow
+this.**
 ---
 
 ### relecteur F12 — Who reads a reservation
@@ -463,10 +676,19 @@ Options:
 
 Where: relecteur.md (F12) ↔ 8_code.md L200-201; docs/refonte/passes/relecteur.md L328-335
 
-Decision:
+Decision: **`/9_controle` reads it at phase 1 and relays it.**
 
----
+🔴 **The command, not the agent.** ⚠️ **The Contrôleur's reading list is
+the partials alone** — 📌 **it is `/9_controle` that opens every
+`verdict.md`** (9_controle.md L36, L60), and it already tests their
+`## Status`.
 
+📌 **A reservation says « it passes, but it is worth looking at »** —
+🔴 **relayed with the run's other indications, it reaches the Product
+Owner at the one moment she reviews the whole feature.**
+
+📌 **Cost**: one line in what `/9_controle` relays. ⚠️ **Never a
+verdict, never a block, and no new input on any agent.**
 ### sondeur 1 — The *défaut*'s second ground — « a pattern the file already follows » (F02, F09)
 
 Question: The refonte's §3 (modifications.md L395) and its grid (docs-new/process/GRILLE_CADRAGE_PRODUIT_V2.md L38-41) give a *défaut* two grounds: a transverse rule, or a pattern the file already follows. The agent (sondeur.md L398-400) keeps the first and forbids the second, with a reason: a pass A question « stands on its block alone » (L332-333, L399-400), and under the C22 reading rule an angle reads only the blocks the prompt names (L43, L63-65) — on a later turn, the blocks that follow the pattern are ones it may not open. One sondeur reads the grid whole (L44) and the other rule is in its own file; the merge cannot tell the two forms apart.
@@ -483,3 +705,21 @@ Options:
 Related, same lines, not blocking: §3 (modifications.md L397-398) asks for « la référence du paragraphe qui la fonde »; the agent quotes the words (L391, L394-395). Report Part 2 A-§3 (b) records it as `other`. Whichever option wins, say which of the two forms the `Défaut:` line carries.
 
 Where: docs/refonte/modifications.md L395, L397-398; docs-new/process/GRILLE_CADRAGE_PRODUIT_V2.md L38-41 ↔ sondeur.md L43-44, L63-65, L169, L219-220, L306, L332-333, L391, L394-396, L398-400
+
+Decision: **Option (a) — the transverse rule alone, and the grid aligns.**
+
+🔴 **It is the only option consistent with the reading rule**: an angle
+reads only the blocks the prompt names, so on a later turn it cannot see
+the blocks that carry the pattern.
+
+⚠️ **Restoring the second ground would need the reading rules
+reopened** — and only the global invocation could ground it, which does
+not run pass A.
+
+📌 **Cost**: a gap a same-file pattern would have grounded becomes an
+obligatory question — more lines for the Product Owner to write. 🔴
+**Accepted.**
+
+📌 **`GRILLE_CADRAGE_PRODUIT_V2.md` L38-41 and `modifications.md` L395
+align to the agent.** 📌 **And the `Défaut:` line carries the quoted
+words, as the agent writes them today.**
