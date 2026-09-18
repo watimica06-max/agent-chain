@@ -487,7 +487,7 @@ when the file exists, and relays it as done.
 has no report at all.**
 
 📌 **Plus `bug-list.md`**, for the order the Product Owner listed them
-in.
+in — ⚠️ **and for the `B<n>` a gap carries**, see *What you write*.
 
 🔴 **One gap in `bug-list.md`, one report** — ⚠️ **a report may hold
 several `## Bearer` blocks.**
@@ -612,6 +612,18 @@ natures — then text.
 several entries** — numbered inside its section — `§4.1`,
 `§4.2`. **Numbered as you write, never renumbered**: a lot cites
 `§4.1`, and that citation has to hold.
+
+🔴 **A gap `bug-list.md` marks with a `B<n>` — the block a control
+report found unbuilt — hands it to every entry it gives**: 📌 **the
+identifier closes the entry's title, in parentheses**:
+
+    ### §4.1 Correction factor never computed (B12)
+
+⚠️ **The Cadreur copies it beside the citation in the lot's `Anchor:`
+line, and `/9_controle` marks the block `carried` from there** — 🔴
+**an entry that drops it leaves the block reported missing at the next
+control.** 📌 **A gap the Product Owner raised from use carries no
+`B<n>`**, and its entries carry none.
 
 **Then the gaps set aside** — 🔴 **one line each, its report's
 `## Today` copied as the reason**:

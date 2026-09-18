@@ -131,7 +131,7 @@ j'en fais`** — 📌 **you relay both, on every redécoupage**, see *What
 you relay*. ⚠️ **Renamed first, the file carries a number you would
 have to guess.**
 
-📌 **Pass the feature folder; it reads the folder itself.**
+📌 **Pass the working folder; it reads the folder itself.**
 
 ⚠️ **Never restore a deleted file from git history.** A missing split
 means the Product Owner wants a new one; diagnosing why it went

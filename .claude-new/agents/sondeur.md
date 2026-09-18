@@ -341,7 +341,7 @@ pass B's** — ⚠️ **a pass A question stands on its block alone.**
 
 ⚠️ **A question they already answer is not asked at all** — 📌 **neither
 obligatory nor *défaut***: 🔴 **she wrote it once, and asking again makes
-him answer what she has already answered.**
+her answer what she has already answered.**
 
 📌 **`C1.2` is the one that fires on them** — ⚠️ **and a scope question
 they do not cover is still asked**, as it always was.

@@ -42,7 +42,7 @@ matches.**
 |---|---|---|
 | 1 | `desc-produit.md` absent | 🔴 **Error** — say so and stop |
 | 2 | A `blocked_*.md` with an empty `## Decision` | 🔴 **STOP** — relay it |
-| 3 | A `blocked_*.md` with a filled `## Decision` | 📌 **The agent its name carries**, at the invocation its `## Invocation` line names |
+| 3 | A `blocked_*.md` with a filled `## Decision` | 📌 **The agent its name carries**, at the invocation its `## Invocation` line names — 🔴 **name the file in the prompt** |
 | 4 | `rapport-fusion.md` exists | 🔴 **STOP** — the merge is done |
 | 5 | A root questions file with an empty `Answer:` | 🔴 **STOP** — relay it |
 | 6 | 🔴 **`desc-produit-fusion.md` absent** | **Rédacteur, invocation 3 — Merging** |
@@ -197,12 +197,16 @@ Agent(
   model="sonnet",
   description="<phase> <feature>",
   prompt="Feature folder: docs/features/<name>/. <Which invocation>.
-          [Questions file number: <NN>.]"
+          [Questions file number: <NN>.]
+          [Blocking file: <folder>/blocked_<agent>.md, its `## Decision`
+          filled.]"
 )
 ```
 
-📌 **The bracketed line on every Fusionneur invocation, never on the
-Rédacteur's.**
+📌 **The first bracketed line on every Fusionneur invocation, never on
+the Rédacteur's.** 📌 **The second only when row 3 fired** — 🔴 **the
+agent applies the decision and says so in its report**, see *Git, once
+it has reported*.
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
 either** — in this environment the Agent tool always runs async and

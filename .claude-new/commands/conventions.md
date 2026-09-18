@@ -19,7 +19,7 @@ Feature folder: `docs/features/<first argument>/` — 🔴 **the first
 argument only**; ⚠️ **`$ARGUMENTS` holds both when a second names a
 `bugfix-NN`.**
 
-🔴 **Invocations 1 and 2 run on the feature folder, never on a
+🔴 **Invocations 1, 2 and 4 run on the feature folder, never on a
 `bugfix-NN/`.** Conventions are derived from a feature's own two
 documents, and a correction cycle has neither.
 

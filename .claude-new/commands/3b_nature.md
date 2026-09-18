@@ -67,6 +67,10 @@ give their agent its own last file.
     git mv docs/features/<name>/questions-<agent>-NN.md \
            docs/features/<name>/questions/<agent>/
 
+⚠️ **Never `questions-architecte-*.md`** — 🔴 **leave it at the root**:
+📌 **it waits for `/conventions`, which is the only command that reads
+it.**
+
 📌 **This command reads none of them.** 🔴 **A questions file stays at
 the root only while it waits to be answered or integrated** — ⚠️ **the
 next one written has to be the only one there**, or the next command

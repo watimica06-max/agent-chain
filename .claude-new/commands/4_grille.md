@@ -451,9 +451,6 @@ merge missing one reading is a merge nobody can trust.**
 | Its blocking file sits beside it | 🔴 **Relay it and stop** — 📌 **a decision awaits the Product Owner**, and the reading will resume from it |
 | No blocking file either | 🔴 **Stop** — 📌 **say which reading produced nothing, and to run `/4_grille` again** |
 
-⚠️ **A sondeur that blocked writes no questions file** — 📌 **so the
-existence check fires on it, and *missing* is the wrong word for it.**
-
 ```
 Agent(
   subagent_type="assembleur", model="sonnet",

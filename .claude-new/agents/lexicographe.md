@@ -512,7 +512,7 @@ carries no quotes, or the reverse.** 🔴 **Same test as invocation 1**:
 a term is displayed when it reaches the screen character for character.
 
 ⚠️ **This is where most displayed texts arrive** — 📌 **an answer to the
-grid is where the Product Owner writes a label**, and sshe writes it
+grid is where the Product Owner writes a label**, and she writes it
 quoted or not. 🔴 **Unquoted, it reaches the Rédacteur as a concept and
 is written in English.**
 

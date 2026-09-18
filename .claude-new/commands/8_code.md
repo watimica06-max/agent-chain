@@ -6,8 +6,8 @@ argument-hint: "<feature folder name> [N]"
 
 Act as the orchestrator, in **downstream coding mode**.
 
-**This command runs `detailleur`, `realisateur` and `relecteur` lot by
-lot.**
+**This command runs `detailleur`, `concepteur`, `testeur`, `realisateur`
+and `relecteur` lot by lot.**
 
 📌 **It never invokes the Contrôleur** — 🔴 **he needs his blocks and
 his sheets named in the prompt**, and the grouping that names them
@@ -378,10 +378,12 @@ this command does not hold**, and `/9_controle` builds it.
 hand, on both cycles**, ⚠️ **with the feature name, never a path**: it
 derives the working folder from it as this command does.
 
-⚠️ **On a bug-fix cycle the Contrôleur does not run** — 📌 **it compares
-the product file to the sheets, and there is none here.** 🔴 **The other
-phases do**: the manual list, the register, and the product decisions
-the Rédacteur needs at `/fusion`.
+⚠️ **On a bug-fix cycle `/9_controle` reads two folders** — 📌 **phases
+1 to 3 run on the feature folder**, whose product file the Contrôleur
+confronts with the feature's sheets, the corrected blocks marked
+`carried`; 🔴 **phases 4 to 6 run on the working folder**: the manual
+list, the register, and the product decisions the Rédacteur needs at
+`/fusion`.
 
 ⚠️ **Every lot of the sequence, not every lot of this run.** 📌 **`N`
 lots coded with two still pending is not a finished sequence** — say
