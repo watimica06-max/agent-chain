@@ -24,9 +24,11 @@ before its next step.** 🔴 **`stop1.md` is the same file disarmed** — 📌
 **Downstream** — what the code chain reads and writes:
 
 - `docs/CURRENT_TECHNICAL_STATE.md` — with `# Technical state` as its
-  only line. 📌 **The Réalisateur writes into it from the first lot**,
-  and the Détailleur, the Diagnostiqueur and the Arbitre read it. ⚠️
-  **Not the Cadreur**: it establishes what the code carries by grep
+  only line. 📌 **Two agents write into it — the Réalisateur from the
+  first lot, the Arbitre for the platform trap it settles a block
+  with** — and the Détailleur, the Diagnostiqueur and the Arbitre read
+  it. ⚠️ **Not the Cadreur**: it establishes what the code carries by
+  grep
 - `docs/TECHNICAL_CONVENTIONS.md` — 🔴 **create nothing.** 📌 **The
   Architecte writes it, at `/conventions`** — ⚠️ **which runs by hand
   after `/6_convertit` and before `/7_lots`.** 🔴 **Say so**
@@ -40,8 +42,8 @@ chain runs end to end:**
 
 - `docs/TECHNICAL_CONVENTIONS.md` — 📌 **by running `/conventions`**,
   not by hand
-- the `technical-state-format` skill, which the Réalisateur loads
-  before writing to `CURRENT_TECHNICAL_STATE.md`
+- the `technical-state-format` skill, which the Réalisateur and the
+  Arbitre load before writing to `CURRENT_TECHNICAL_STATE.md`
 
 📌 **Neither blocks the upstream chain** — only `/7_lots` onward.
 

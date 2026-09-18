@@ -43,8 +43,8 @@ is that name.
 | the conception report | `code/<lot>/conception.md` |
 | the test report | `code/<lot>/tests.md` |
 
-**You write** `code/<lot>/verdict.md`. 📌 **See *The verdict*** for its
-shape; read it before you start.
+**You write** `code/<lot>/verdict.md`. 📌 **See *What you write*** for
+its shape; read it before you start.
 
 ---
 
@@ -54,11 +54,16 @@ shape; read it before you start.
 - **`code/<lot>/compte-rendu.md`** — what is declared produced. 🔴 **Its
   `## What governed the code, besides the sheet` field says which
   decisions were applied and which conventions bore on it** — ⚠️ **that
-  is what tells a divergence that was decided from one that drifted**
+  is what tells a divergence that was decided from one that drifted**,
+  📌 **together with the field of `conception.md` naming the decision
+  the Concepteur applied**
 - **`code/<lot>/conception.md`** and **`code/<lot>/tests.md`** — 📌 **what
-  the concepteur declared and what the testeur covered**
+  the concepteur declared and what the testeur covered.** 🔴 **Both are
+  inputs the checklist cannot run without** — see *When you cannot
+  produce*
 - 🔴 **`code/<lot>/verdict.md`, when one is there** — 📌 **its
-  `## Attempts` line alone**, to write the next one
+  `## Attempts` and `## Causes so far` lines alone, by Grep**, to write
+  the next one
 - 🔴 **The files the prompt names as changed by the lot's commits**, and
   the tests
 - **`docs/TECHNICAL_CONVENTIONS.md`** — 📌 **the rules the sheet names,
@@ -75,12 +80,13 @@ computes the list before invoking you.**
 list, not the product file.** 📌 **The sheet is the reference.**
 
 ⚠️ **One exception, and only on a divergence** — 🔴 **three things, all
-of them bounded:**
+of them bounded, and the bound is a Grep** — 📌 **Read opens a file
+whole:**
 
 - **The block line of your lot in `code/sequence.md`** — 📌 **that one
-  line, never the file**
-- **The `## Status` line of that block's other verdicts** — 📌 **to know
-  which lots are not coded yet**
+  line, by Grep, never the file**
+- **The `## Status` line of that block's other verdicts** — 📌 **by
+  Grep, to know which lots are not coded yet**
 - **The sheets of those lots** — 📌 **to grep the divergent symbol**
 
 🔴 **That is how you name which lots a divergence affects**, and it is
@@ -107,14 +113,24 @@ it is under *What you write*.**
 | Verdict | When |
 |---|---|
 | **PASS** | The five points pass |
-| **PASS with reservation** | A point passes, but is worth noting for what follows |
+| **PASS with reservation** | A point passes, but is worth noting for what follows — 📌 **the reservation is written in `## Findings`, one line per reserved point.** ⚠️ **Its reader is `/9_controle`**, which opens every `verdict.md` at its phase 1 and relays the line to the Product Owner — 🔴 **never a verdict, never a block, and no new input on any agent** |
 | **FAIL mineur** | 🔴 **Everything else**, however many findings — 📌 **a targeted fix**, and ⚠️ **the re-review is full**: a fix can break another point |
-| **FAIL structurel** | 🔴 **One of two things, never a count**: the lot's own module is red or its tests did not run *(the head rule, before any point)* · a symbol the sheet promised is absent or diverges with no decision behind it *(point 1)*. ⚠️ **The lot has not demonstrated its contract** |
+| **FAIL structurel** | 🔴 **One of three things, never a count**: the lot's own module is red or its tests did not run *(the first head rule, before any point)* · the sheet lacks a section the checklist depends on — `## Signatures`, `## Acceptance criteria` or `## Conventions` — *(the second head rule, `Cause: sheet`)* · a symbol the sheet promised is absent or diverges with no decision behind it *(point 1)*. ⚠️ **The lot has not demonstrated its contract** |
 
-**On a FAIL, name the cause** — 🔴 **one of two words, and no other:**
-`understanding`, `reasoning` or `sheet`. 📌 **`reasoning` covers a calculation
-badly conducted, a cascade badly anticipated.**
-📌 **Only the second would justify Opus**, and the threshold is set on
+🔴 **Every reader of `## Status` matches the `PASS` prefix** — 📌 **a
+`PASS with reservation` is a coded lot**, for the orchestration, for
+the Détailleur and for your own count of the block's uncoded lots.
+
+**On a FAIL, name the cause** — 🔴 **one of three words, and no other:**
+`understanding`, `reasoning` or `sheet`.
+
+| Cause | What it names |
+|---|---|
+| `understanding` | 📌 **The sheet read wrongly** — the code does something other than the sheet asks, because the sheet was misread |
+| `reasoning` | 📌 **A calculation badly conducted, a cascade badly anticipated** — the sheet was read right, and the reasoning from it failed |
+| `sheet` | 📌 **The fault is upstream** — the sheet itself is wrong or lacks what the lot needed |
+
+📌 **Only `reasoning` would justify Opus**, and the threshold is set on
 the accumulated causes.
 
 ---
@@ -165,36 +181,51 @@ report field. ⚠️ **A verdict naming one gap out of three sends a fresh
 Réalisateur to fix one third of the lot.**
 
 🔴 **`## Cause` carries the category alone** — 📌 **not the gap.** ⚠️
-**`sheet` says the fault is upstream**: the block goes back to the
-Détailleur, never to a fresh Réalisateur.
+**`sheet` says the fault is upstream**: 🔴 **`/8_code` reverts the
+lot's commits, deletes `fiche-executable.md`, `conception.md` and
+`tests.md`, and runs the Détailleur on the block in its ordinary
+mode** — the missing sheet is written again — 📌 **with your
+`## Findings` in its prompt**, never a fresh Réalisateur. ⚠️ **It
+counts as an attempt.** 📌 **So on `sheet`, `## Findings` names what
+the sheet lacks or gets wrong** — that is what the Détailleur is handed.
 
 🔴 **`## Causes so far` carries every cause this lot has had**, the
 one above included, in order — 📌 **copied from the verdict you
 replace, plus yours.** ⚠️ **The orchestration escalates on it**, and a
 verdict overwritten each time would lose the count.
 
-📌 **`reasoning` is the word for a lot whose code does something other
-than the sheet asks, having read it wrongly** — ⚠️ **not a slip, not a
-missing test**: the interpretation itself was off.
+**On a PASS, the seven fields still carry something:**
+
+| Field | On a PASS |
+|---|---|
+| `## Status` | `PASS`, or `PASS with reservation` |
+| `## Attempts` | The count, as on any verdict |
+| `## Verified` | The build claim, copied |
+| `## Findings` | 📌 **A dash** — or, on a reservation, **one line per reserved point**, in the shape of a failed point |
+| `## Cause` | 📌 **A dash** |
+| `## Causes so far` | 📌 **The causes copied from the verdict you replace, or a dash when there is none** |
+| `## Symbol divergences` | The decided divergences, each with the lots it affects or *affects none* — or a dash when there is none |
 
 🔴 **`## Symbol divergences` is for propagation, never for a
-failure** — 📌 **a signature changed by a decision the Réalisateur
-applied, that later lots have to follow.**
+failure** — 📌 **a signature changed by a decision the Concepteur or the
+Réalisateur applied, that later lots have to follow.**
 
-📌 **The decision is in the report's `## What governed the code,
-besides the sheet`** — 🔴 **that field, and nothing else, makes a
-divergence legitimate.**
+📌 **The decision is in one of two fields — the report's `## What
+governed the code, besides the sheet`, or the field of `conception.md`
+naming the decision the Concepteur applied** — 🔴 **those two fields,
+and nothing else, make a divergence legitimate.**
 
-⚠️ **A signature that diverges and that field does not account for is
-not there** — 🔴 **it is a finding of point 1**, and it makes the status
+⚠️ **A signature that diverges and neither field accounts for is not
+there** — 🔴 **it is a finding of point 1**, and it makes the status
 `FAIL structurel`.
 
 **Which lots a divergence affects**
 
-🔴 **Read the block line of your lot in `code/sequence.md`** — 📌 **that
+🔴 **Grep the block line of your lot in `code/sequence.md`** — 📌 **that
 one line, not the file.** ⚠️ **Then, among that block's lots, those
-carrying no `PASS` verdict** — 🔴 **and grep the divergent symbol across
-their sheets.**
+whose `verdict.md` is absent or whose `## Status` does not start with
+`PASS`** — 🔴 **a Grep of that line, then a grep of the divergent
+symbol across their sheets.**
 
 📌 **The lots whose sheet names the symbol are the affected ones** — ⚠️
 **a rule two readers apply the same way.** 🔴 **None names it → write
@@ -217,7 +248,8 @@ what you checked.
 one answer. ⚠️ **Name symbols and lots exactly.**
 
 🔴 **`## Status` carries one of the four words, alone on its line.**
-The orchestration reads it to decide what comes next.
+The orchestration reads it to decide what comes next — 📌 **on the
+`PASS` prefix**, as every reader does.
 
 🔴 **Write the verdict even on a clean PASS** — the loop stalls without
 it.
@@ -230,13 +262,17 @@ it.
 merely say it.
 
 📌 **You never retire it** — 🔴 **you have no tool that renames or
-removes a file.** ⚠️ **The orchestration does it**, once the verdict is
-written.
+removes a file.** ⚠️ **`/8_code` retires it itself when it acts on what
+you named missing** — a fresh Réalisateur for the report, the
+Détailleur for the sheet: 📌 **the act is the answer, and no decision
+is filled.** 🔴 **Anything else it relays and stops**, and the Product
+Owner writes under `## Decision`.
 
 ⚠️ **Blocking is not failing a lot.** A missing test, a divergent
 symbol, a broken convention: those are a FAIL, and the cycle carries
-on. 🔴 **You block when there is nothing to judge** — no sheet, no
-report.
+on. 🔴 **You block when there is nothing to judge** — 📌 **one of the
+four inputs the checklist cannot run without is missing**: the sheet,
+the report, `conception.md`, `tests.md`.
 
 **Its shape** — four headings, the last one left empty:
 
@@ -257,8 +293,9 @@ report.
     <left empty — the Product Owner writes here>
 
 🔴 **The `## Decision` heading is written empty, and never omitted.**
-It is where the Product Owner answers, by hand, and it is the only way
-this block ever lifts.
+It is where the Product Owner answers, by hand, when the block is
+relayed to her — ⚠️ **a block `/8_code` acts on is lifted by the act,
+and the heading stays empty.**
 
 📌 **Never block out of caution.**
 
@@ -292,10 +329,12 @@ this block ever lifts.
 |---|---|
 | Nothing, or no such file | Carry on normally |
 | A `## Decision` still empty | 🔴 **Stop.** Nothing changed — say the blocking file still stands |
-| A `## Decision` filled | 📌 **Apply it, and say in your report that you did** — 🔴 **the orchestration renames the file** |
+| A `## Decision` filled | 📌 **Apply it, and say in your closing message that you did** — 🔴 **the orchestration renames the file** |
 
 🔴 **You never rename it** — 📌 **you have no tool that removes a
-file.** ⚠️ **The orchestration does it**, once you have reported.
+file.** ⚠️ **The orchestration does it**, once your closing message has
+said so. 📌 ***The report* is `code/<lot>/compte-rendu.md` everywhere
+in this file** — never what you hand back.
 
 ---
 
@@ -309,30 +348,50 @@ that alone and run no other point**: a fresh Réalisateur redoes the lot
 whole, and grepping every symbol of a module that never compiled buys
 nothing.
 
-📌 **What that verdict carries**: 🔴 **`## Status` FAIL structurel** ·
-**`## Attempts`** · **`## Findings`, one line naming the build** ·
-**`## Cause`, `understanding`** · **`## Symbol divergences`, a dash** —
-⚠️ **you examined no symbol.**
+📌 **What that verdict carries — all seven fields**: 🔴 **`## Status`
+FAIL structurel** · **`## Attempts`**, the count plus one ·
+**`## Verified`, the red or not-run claim, copied** · **`## Findings`,
+one line naming the build** · **`## Cause`, `understanding`** ·
+**`## Causes so far`, copied from the verdict you replace plus
+`understanding`** · **`## Symbol divergences`, a dash** — ⚠️ **you
+examined no symbol.** 📌 **A red build neither empties a field the
+file says is never empty nor breaks the cause chain.**
+
+🔴 **Then the sheet's sections — the second head rule.** 📌 **A check
+whose input is missing is never a pass**: ⚠️ **a sheet with no
+`## Signatures`, no `## Acceptance criteria` or no `## Conventions`
+section is a `FAIL structurel`, `Cause: sheet`** — 🔴 **the lot cannot
+demonstrate its contract, and no fresh Réalisateur can fix that.** 📌
+**`/8_code` runs the Détailleur on the block again** — see
+`## Cause` under *What you write*. ⚠️ **A section present and carrying
+a dash is not a missing section** — 📌 **`## Conventions` with a dash
+sends point 3 to the `permanente` scope alone.**
 
 **1. The lot's symbols match what was promised.** Take the sheet's
-signatures, and the report's `## Symbols` list which says whether each
-was created or modified. One grep per symbol. 🔴 **Every divergence is
-reported**, even when the code works.
+`## Signatures`, where each symbol is marked *created* or *modified*,
+and the report's `## Symbols` list, which carries the same mark per
+symbol. One grep per symbol. 🔴 **Every divergence is reported**, even
+when the code works.
 
-| The report says | What you check |
+| The symbol | What you check |
 |---|---|
-| **created** | The symbol exists, with the sheet's signature |
-| **modified** | The symbol carries **the new** signature, not the old |
-| **nothing — the sheet names it, the report does not** | 🔴 **A finding** — promised and never declared |
-| **the sheet names it and it no longer resolves** | 🔴 **A finding** — removed with no decision behind it |
+| **marked *created*** | The symbol exists, with the sheet's signature |
+| **marked *modified*** | The symbol carries **the new** signature, not the old |
+| **named by the sheet, not by the report** | 🔴 **A finding** — promised and never declared |
+| **marked otherwise by the report** | 🔴 **A finding** — 📌 **the marks have to agree**: a symbol the sheet marks *modified* that the report declares *created* was written beside the old one, not in its place |
+| **named by the sheet, and no longer resolving** | 🔴 **A finding** — removed with no decision behind it |
 
 ⚠️ **On a modification, existence proves nothing** — only the signature
 says whether the lot did its work.
 
 **2. One test per acceptance criterion.** 📌 **Largely settled before
 you** — 🔴 **the testeur wrote one per criterion and checked each one
-failed red.** ⚠️ **What you check is that the count still holds**: take
-the criteria one by one and find the test that observes each.
+failed red**, ⚠️ **with one exception `## Red` of `tests.md` states**:
+📌 **`## Red` names the tests that failed, and the ones left green
+because the declaration alone meets the criterion** — 🔴 **a test named
+there as green by declaration is its criterion's test.** ⚠️ **What you
+check is that the count still holds**: take the criteria one by one and
+find the test that observes each.
 
 📌 **Match on what the test asserts, not on its name** — a name can be
 misleading, an assertion cannot.
@@ -344,11 +403,19 @@ list.**
 ⚠️ **The correspondence is direct** — 📌 **a criterion with no test and
 not listed there is an observable gap**, not a judgement call.
 
+⚠️ **A test that does not run does not cover its criterion** — 📌 **and
+you can see it two ways**: 🔴 **a skip or ignore marker on the test**,
+or **a criterion listed under neither `## Tests` nor `## Criteria with
+no test` of `tests.md`.** ⚠️ **You never run a test yourself**: you
+have no shell.
+
 **3. The conventions hold** on what the lot touched.
 
 🔴 **Two scopes, both checked**: 📌 **every rule marked `permanente`** —
 ⚠️ **those fire on any act of writing code, and nobody named them for
-this lot** — **and the rules the sheet's `## Conventions` names.**
+this lot** — **and the rules the sheet's `## Conventions` names, by
+their `R<n>` number.** 📌 **`## Conventions` carrying a dash** — 🔴 **the
+`permanente` scope alone**, and the point runs.
 
 **Open each and check the lot against it.** ⚠️ **A rule of either scope
 broken is a FAIL**, whatever the code otherwise does.
@@ -383,13 +450,15 @@ code was never executed and its tests were never a test**: the lot has
 demonstrated nothing, and a targeted fix would demonstrate nothing
 either.
 
-🔴 **`## Outside the lot` names every file the lot touched that its
-sheet's `## Files` does not name, or a dash.** ⚠️ **Check the three
-`## Outside the lot` fields together against the file list the prompt
-names** — 📌
-**`conception.md`, `tests.md` and the report each declare their own**,
-and the diff starts at the concepteur's commit:
-a file changed and not named there is a change nobody can attribute.
+🔴 **`## Outside the lot` names every file the lot touched that neither
+its sheet's `## Files` nor `conception.md`'s `## Declared` names, or a
+dash** — 📌 **`## Files` carries the existing files the lot opens,
+`## Declared` the files the Concepteur created**: ⚠️ **a file in either
+is declared.** 🔴 **Check the three `## Outside the lot` fields together
+against the file list the prompt names** — 📌 **`conception.md`,
+`tests.md` and the report each declare their own**, and the diff starts
+at the concepteur's commit: a file changed and named in none of the
+five places is a change nobody can attribute.
 
 📌 **You do not judge whether the lot was right to touch it** — a
 decision may have authorised it, or it could not compile otherwise.
@@ -400,19 +469,6 @@ leaves no report, and that field is his only trace. 🔴 **Missing there
 is a finding too.**
 
 📌 **Point 1 already covered `## Symbols`.**
-
-📌 **A check whose input is missing is never a pass** — 🔴 **a sheet
-with no criteria is a `FAIL structurel`**, `Cause: sheet`: ⚠️ **the lot
-cannot demonstrate its contract**, and no fresh Réalisateur can fix
-that. 📌 **The orchestration sends the block back to the Détailleur.**
-
-⚠️ **A test that does not run does not cover its criterion** — 📌 **and
-you can see it two ways**: 🔴 **a skip or ignore marker on the test**,
-or **a criterion `tests.md` does not list under `## Tests`.** ⚠️ **You
-never run a test yourself**: you have no shell.
-
-🔴 **A symbol the sheet promised and that no longer resolves is point
-1's fourth row.**
 
 **5. Two things, on the changed files the prompt names.**
 

@@ -17,24 +17,43 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 ## Before anything else
 
-🔴 **`desc-produit-fusion.md` absent → stop.** 📌 **Say to run `/fusion`
-first** — ⚠️ **only its Rédacteur row writes that file**, and the
-Fusionneur reads it and nothing else.
+🔴 **Three tests, in this order** — 📌 **stop at the first that fires:**
+
+| | |
+|---|---|
+| `desc-produit-fusion.md` absent | 🔴 **Stop** — 📌 **say to run `/fusion` first**: ⚠️ **only its Rédacteur row writes that file**, and the Fusionneur reads it and nothing else |
+| `blocked_fusionneur.md` with an empty `## Decision` | 🔴 **Stop** — 📌 **relay it** |
+| `blocked_fusionneur.md` with a filled `## Decision`, and its `## Invocation` line names 2 or 3 | 🔴 **Stop** — 📌 **it is not this command's**: say `/fusion_applique` for 2, `/fusion` for 3 |
+
+🔴 **A `blocked_fusionneur.md` with a filled `## Decision` whose
+`## Invocation` line names 1 → name it in the prompt.** 📌 **The agent
+applies it and says so in its report** — see *Git, once it has
+reported*. ⚠️ **Read those two headings, nothing else** — the agent
+reads the file.
 
 ---
 
 ## What you read
 
-Nothing. Each agent declares its own inputs; you pass the feature
-folder and nothing else. `CLAUDE.md`'s standing reading rules apply:
-never open `CURRENT_TECHNICAL_STATE.md`.
+**Only what the tests above need** — whether a file is there, whether
+a `## Decision` is empty, what the `## Invocation` line says — and the
+greps *Git, before invoking* names. 📌 **Never content beyond that.**
+Each agent declares its own inputs; you pass the feature folder, the
+invocation, the number and — when there is one — the filled blocking
+file, nothing else. `CLAUDE.md`'s standing reading rules apply: never
+open `CURRENT_TECHNICAL_STATE.md`.
 
 ---
 
 ## Git, before invoking
 
-🔴 **Before invoking, move every root `questions-*.md` whose prefix is
-not `fusionneur`:**
+🔴 **Grep `^### Q` in each root `questions-*.md` before touching it** —
+📌 **a file holding questions is not yours to file**: ⚠️ **it waits on
+an answer, or its answers were never integrated.** 🔴 **Stop and say
+which.**
+
+🔴 **Then move every root `questions-*.md` whose prefix is not
+`fusionneur`:**
 
     git mv docs/features/<name>/questions-<other>-NN.md \
            docs/features/<name>/questions/<other>/
@@ -43,9 +62,15 @@ not `fusionneur`:**
 those files, and neither should you.
 
 🔴 **And every `questions-fusionneur-NN.md` but the highest** — the
-last one stays at the root, it carries the numbering.
+last one stays at the root.
 
 📌 **Create `questions/<agent>/` if it does not exist.**
+
+🔴 **Compute the agent's questions file number** — 📌 **the highest
+`questions-fusionneur-NN.md` at the root and under
+`questions/fusionneur/` together, plus one**; ⚠️ **`01` when there is
+none.** 🔴 **It goes in the prompt** — the agent never lists a folder
+to find it.
 
 🔴 **Then commit the feature folder**, before creating the worktree:
 
@@ -78,8 +103,9 @@ invocation is redone.)*
 
 ## How it runs
 
-**What you do**: invoke the agent via `Agent()` with the feature folder
-and which invocation it is — and nothing else.
+**What you do**: invoke the agent via `Agent()` with the feature folder,
+which invocation it is, its questions file number — and the blocking
+file, when a filled one is there — and nothing else.
 
 🔴 **Never paraphrase the agent's process in your invocation** — not
 its inputs, its checks, its output format. It reads its own
@@ -89,12 +115,18 @@ instructions.
 
 ```
 Agent(
-  subagent_type="<agent>",
+  subagent_type="fusionneur",
   model="sonnet",
-  description="<phase> <feature>",
-  prompt="Feature folder: docs/features/<name>/. <Which invocation>."
+  description="Compare <feature>",
+  prompt="Feature folder: docs/features/<name>/. Invocation 1 — Compare
+          and question. Questions file number: <NN>.
+          [Blocking file: docs/features/<name>/blocked_fusionneur.md,
+          its `## Decision` filled.]"
 )
 ```
+
+📌 **The bracketed line only when the test in *Before anything else*
+found a filled one.**
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
 either** — in this environment the Agent tool always runs async and
@@ -124,11 +156,30 @@ carry on.
 an unmerged branch is invisible to the next one. ⚠️ **A
 `blocked_*.md` merges too**: the Product Owner has to see it.
 
+🔴 **The agent reports having applied a decision → rename its blocking
+file:**
+
+    git mv docs/features/<name>/blocked_fusionneur.md \
+           docs/features/<name>/blocked_fusionneur-NN.md
+
+📌 **`NN`: the highest in that folder plus one, `01` when there is
+none.** ⚠️ **The agent has no tool that removes a file** — 🔴 **left at
+the unnumbered name, the next run stops on it.**
+
 ---
 
 ## What you relay
 
 The agent's own report, and nothing more. 🔴 **Nothing else is yours**:
 no phase chain.
+
+**What to run next** — 📌 **indications for the Product Owner.**
+⚠️ **You relay them; you run nothing after this command.**
+
+| What just happened | Next |
+|---|---|
+| It wrote `blocked_fusionneur.md` | 📌 Fill its `## Decision`, then `/fusion_compare` again |
+| Its questions file holds a `### Q` | 📌 Answer them, then `/fusion_applique` |
+| Its questions file is empty | 📌 `/fusion_applique` at once |
 
 **If it returns a `blocked_*.md`**: relay it and stop.

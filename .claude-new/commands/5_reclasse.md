@@ -47,11 +47,19 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 ## Before anything else
 
-🔴 **First, the grid has to have closed.** 📌 **A
-`questions-sondeur-NN.md` holding no `### Q`, at the root or filed**,
-and — when the feature attaches to the global — 📌 **a
-`questions-existant-NN.md` too.** ⚠️ **Neither there, or one holding
-questions** → 🔴 **stop**: say to run `/4_grille`.
+🔴 **First, the grid has to have closed.** 📌 **The highest-numbered
+`questions-sondeur-NN.md` and the highest-numbered
+`questions-existant-NN.md`, each present and holding no `### Q`** —
+⚠️ **wherever each sits, at the root or filed under
+`questions/sondeur/` and `questions/existant/`**: 🔴 **glob both places
+and test the highest `NN` alone** — 📌 **an earlier turn's file holds
+its answered questions, and says nothing about the grid.**
+
+📌 **Both files, whether or not the feature attaches to the global** —
+⚠️ **`/4_grille`'s second time writes `questions-existant-NN.md` empty
+when no block carries `Global:`**, so its absence means the second time
+never ran. 🔴 **Either missing, or the highest holding a `### Q`** →
+🔴 **stop**: say to run `/4_grille`.
 
 ⚠️ **This command is what closes the upstream** — 📌 **it writes the
 views every later step reads**, and a product file still open would be
@@ -99,7 +107,7 @@ whole:**
 | File | Who reads it |
 |---|---|
 | `par-genre/comportements.md` | 🔴 **This command's second move**, then the Convertisseur |
-| `par-genre/transverses.md` | 📌 **Every nature invocation of the Convertisseur** |
+| `par-genre/transverses.md` | 📌 **The Convertisseur — its invocation 2, alone**: ⚠️ **no nature invocation opens it** |
 | `par-genre/directives.md` | The Architecte |
 | `par-genre/references.md` | The Convertisseur — its Text section |
 

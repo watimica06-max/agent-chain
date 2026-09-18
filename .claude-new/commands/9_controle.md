@@ -10,30 +10,44 @@ Act as the orchestrator, in **downstream mode**.
 once more to assemble.**
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. ⚠️ **A name,
+never a path** — 📌 **you derive the folders from it**, as `/7_lots`,
+`/8_code` and `/audit_conventions` do.
 
-**The argument is the working folder** —
-`docs/features/<name>/`, or `docs/features/<name>/bugfix-NN/`.
+**Feature folder**: `docs/features/<name>/`.
 
-📌 **Every path below is relative to it.**
+🔴 **The working folder is the highest `bugfix-NN/` in it, if there is
+one; the feature folder itself otherwise.** 📌 **A `bugfix-NN/` working
+folder means a correction cycle** — the lots just coded are its own.
 
-🔴 **Which cycle you are on is read from the folder name** — 📌 **a
-`bugfix-NN` segment means a correction cycle.**
+🔴 **The six phases do not all read the same folder:**
 
-| | What runs |
+| Phases | Folder |
 |---|---|
-| **A feature folder** | 🔴 **All six phases** |
-| **A `bugfix-NN/`** | 📌 **Phases 4 to 6 only** — ⚠️ **the Contrôleur confronts a product file with the sheets built from it, and a correction cycle has neither** |
+| **1 to 3** | 🔴 **The feature folder, always** — 📌 **the product file, its map, the sheets the feature cut and the report live there**, and a correction cycle has no product file to confront |
+| **4 to 6** | 🔴 **The working folder** — 📌 **the lots just coded, their `code/recette.md`, their blocking files** |
+
+📌 **Every `code/` path below is under the folder its phase names.**
+⚠️ **Two files sit at the feature folder's root whatever the working
+folder** — `par-genre/recette.md` and `registre-questions.md`; each
+phase that reads or writes them says so.
 
 ---
 
 ## What you read
 
-📌 **At phase 1**: `tracabilite.md`, and the `Anchor:` lines of
-`code/decoupage.md` **by grep** — 🔴 **never either file whole.**
+📌 **At phase 1**: `tracabilite.md`, the `Anchor:` lines of
+`code/decoupage.md` and, for each `bugfix-NN/` of the feature folder,
+the `Anchor:` lines of its own `code/decoupage.md` **by grep** — 🔴
+**never any of those files whole.**
 
-**Then only whether `desc-produit.md` is there**, and whether every lot of
-`code/sequence.md` carries a `verdict.md` in PASS.
+**Then only whether `desc-produit.md` is there**, and whether every lot
+of `code/sequence.md` — the sequences *When it runs* names — carries a
+`verdict.md` whose `## Status` opens on `PASS` — 📌 **the prefix**: ⚠️ **a `PASS with reservation` is a coded
+lot.** 🔴 **Its reserved points sit under `## Findings`, one line
+each** — copy them, with the lot's name, for *What you relay*. ⚠️
+**Never a verdict on them, never a block, and no agent is handed
+them.**
 
 ⚠️ **Nothing else.** `CLAUDE.md`'s standing reading rules apply.
 
@@ -50,24 +64,29 @@ else:**
 | **The register of escaped product questions** | 📌 **Gathered, never concluded** |
 | **The product decisions taken while coding** | 📌 **One file per cycle**, for the Rédacteur |
 
-🔴 **It runs on the main cycle and on every correction cycle.** ⚠️ **The
-Contrôleur runs on the main cycle alone** — 📌 **a correction cycle has
-no product file**, and there is nothing to confront.
+🔴 **It runs after the main cycle and after every correction cycle.**
+⚠️ **The Contrôleur confronts the feature's product file with the
+feature's sheets, every time** — 📌 **a correction cycle has no product
+file, and its sheets are never confronted**: 🔴 **the blocks it built
+reach the Contrôleur marked `carried`, through the map of phase 1.**
 
-🔴 **`desc-produit.md` absent, on a feature folder** — 📌 **say so and
-stop**: there is nothing to confront the sheets with.
+🔴 **`desc-produit.md` absent from the feature folder** — 📌 **say so
+and stop**: there is nothing to confront the sheets with.
 
-🔴 **Stop if a lot of the sequence has no `verdict.md` in PASS** — name
-it. 📌 **On a correction cycle, the sequence and the lots are the
-bugfix folder's own** — ⚠️ **phases 4 to 6 read `code/` under the
-working folder, whichever it is.**
+🔴 **Stop if a lot of a sequence has no `verdict.md` whose `## Status`
+opens on `PASS`** — name it. 📌 **Two sequences when the working folder
+is a `bugfix-NN/`**: ⚠️ **the feature folder's, whose sheets phases 1
+to 3 confront, and the working folder's, whose lots phases 4 to 6
+read.**
 
 ⚠️ **He would otherwise read an incomplete set of sheets** — 📌 **and
 report an intention as missing when it is merely unwritten.**
 
 📌 **An existing `rapport-controle.md` is not a reason to stop.** He
 writes the next free number beside it; that is how two states are
-compared.
+compared — ⚠️ **the report before a correction cycle, and the one
+after it, where the blocks that cycle built read `carried` instead of
+missing.**
 
 ---
 
@@ -98,12 +117,13 @@ isolated.
 
 **Six phases.**
 
-🔴 **`tracabilite.md` absent, on a feature folder** — 📌 **phase 1 reads
-it**: say so and stop, the conversion did not finish.
+🔴 **`tracabilite.md` absent from the feature folder** — 📌 **phase 1
+reads it**: say so and stop, the conversion did not finish.
 
-📌 **`code/recette.md` absent** — ⚠️ **normal, not a stop**: no lot had
-a criterion beyond a test. 🔴 **Phase 4 then builds from
-`par-genre/recette.md` alone**, and says the other source was empty.
+📌 **`code/recette.md` absent from the working folder** — ⚠️ **normal,
+not a stop**: no lot had a criterion beyond a test. 🔴 **Phase 4 then
+builds from `par-genre/recette.md` alone**, and says the other source
+was empty.
 
 ### Phase 1 — build the block-to-lot map
 
@@ -120,8 +140,9 @@ up elsewhere:
 | `référence` | 📌 **The Convertisseur**, §9 Text of the technical document |
 | `hors périmètre` | ⚠️ **Set aside by the Product Owner, explicitly** |
 
-⚠️ **Say how many blocks you kept and how many each genre set aside** —
-🔴 **so none of them reads as dropped.**
+⚠️ **Say how many blocks you kept, how many each genre set aside, and
+how many are marked `carried`** — 🔴 **so none of them reads as
+dropped.**
 
 **a.** `tracabilite.md` gives block → entries.
 
@@ -132,19 +153,36 @@ already carries**: ⚠️ **mark those entries `carried`**, never as a block
 with no lot. 🔴 **Without it the Contrôleur reports their intentions
 missing**, and they were built before this feature ran.
 
+**b'.** 🔴 **The blocks a correction cycle built** — 📌 **grep `(B<n>)`
+in the `Anchor:` lines of every `bugfix-NN/code/decoupage.md` under the
+feature folder**: the Cadreur writes there, on a bug-fix cycle, the
+block identifier the gap came from —
+
+    Anchor: §2.3 — Correction factor kept on the race (B12)
+
+⚠️ **Every block found there is marked `carried`**: 🔴 **its missing
+intentions were built, elsewhere**, and none of the feature's sheets
+shows it. 📌 **A gap the Product Owner raised from use carries no
+`B<n>`** and marks nothing — that is accepted.
+
 **c.** Cross them into `tracabilite-full.md`, at the feature folder's
 root.
 
 🔴 **One line per block, in block order** — its identifier, then the
-lots that build its entries, deduplicated:
+lots that build its entries, deduplicated; 📌 **then the word
+`carried` when b' marked the block**, after the lots or after the dash:
 
     B1   lot-01
     B43  lot-21, lot-30, lot-33
     B59  —
+    B60  lot-12  carried
+    B61  —  carried
 
 📌 **Two spaces at least after the identifier**; nothing else on the
 line, no title, no prose, no header. **That is the format the script
-parses.**
+parses** — ⚠️ **it reads the identifier and the `lot-NN` references,
+and ignores the mark**: the lots stay on the line so the grouping and
+the check in **d** still see them.
 
 **d.** 🔴 **Check the crossing before going on** — 📌 **count the blocks
 of `tracabilite.md` and the lines of `tracabilite-full.md`**: ⚠️ **they
@@ -173,6 +211,10 @@ from the same input.
 📌 **A `|` inside a `G<n>` line separates atoms**, not groups.
 **Everything on one such line is one group.**
 
+⚠️ **The script prints identifiers alone** — 🔴 **the `carried` mark
+does not survive it.** 📌 **Read it back from `tracabilite-full.md`
+when you write each group's prompt**, in phase 3.
+
 ### Phase 3 — one Contrôleur per group, then one to assemble
 
 **What you do**: invoke the agent via `Agent()` with the feature folder
@@ -192,10 +234,19 @@ Agent(
   prompt="Feature folder: docs/features/<name>/.
           Invocation 1 — Confront.
           Group: G1.
-          Blocks: B15, B53, B54, B56.
+          Blocks: B15, B53 (carried), B54, B56.
           Sheets: code/lot-29, code/lot-43, code/lot-44."
 )
 ```
+
+🔴 **The folder is the feature folder, on both cycles** — 📌 **the
+product file and the sheets it confronts are there.**
+
+🔴 **A block marked `carried` in `tracabilite-full.md` carries
+`(carried)` after its identifier in `Blocks:`** — 📌 **that is how the
+mark reaches the agent**, which writes one found line for it and reads
+no sheet for it. ⚠️ **Its lots stay in `Sheets:`** when another block
+of the group cites them; otherwise leave them out.
 
 🔴 **Empty `code/controle/` before issuing the groups** — 📌 **the
 partials of an earlier run would otherwise still be there.**
@@ -219,7 +270,9 @@ Agent(
 )
 ```
 
-🔴 **Name the groups this run issued, and the full block list.** ⚠️
+🔴 **Name the groups this run issued, and the full block list** — 📌
+**identifiers alone, no `(carried)` here**: assembly reads the list
+against each partial's opening line, and the mark is not a block. ⚠️
 **Without the groups, a partial left by an earlier run is merged with
 this run's** — 📌 **and its lines speak of sheets that have changed
 since.** ⚠️ **Without the block list, a group that wrote nothing is
@@ -237,8 +290,13 @@ notifies on completion. Do not pass it; wait for the notification.
 ### Phase 4 — the manual list
 
 🔴 **Two sources**: 📌 **`code/recette.md`**, the lines the testeur wrote
-lot by lot, **and `par-genre/recette.md`**, what the Product Owner said
-she wanted to check herself.
+lot by lot, in the working folder, **and `par-genre/recette.md`**, what
+the Product Owner said she wanted to check herself.
+
+🔴 **`par-genre/recette.md` sits at the feature folder's root, and
+nowhere else** — `/5_reclasse` writes it there, on the main cycle. ⚠️
+**On a correction cycle it is not in the working folder**: 📌 **look for
+it one level up, at the feature folder's root**, and use it from there.
 
 🔴 **Order it by state, never by intention.**
 
@@ -262,13 +320,15 @@ abandoned** — 🔴 **not because it was useless, but because it was
 unusable**: thousands of unordered tests, with deletions and data
 resets in the middle.
 
-**Write `code/recette-ordonnee.md`.**
+**Write `code/recette-ordonnee.md`**, in the working folder.
 
 ### Phase 5 — the register of escaped product questions
 
 🔴 **Two sources**: 📌 **the `## Doubts` and `## Intentions missing`
-sections of `code/rapport-controle*.md`** — the latest one — **and the product
-questions the Arbitre handed back**, in the numbered blocking files.
+sections of `code/rapport-controle*.md`** — the latest one, in the
+feature folder: the one phase 3 just wrote — **and the product
+questions the Arbitre handed back**, in the numbered blocking files of
+the working folder.
 
 🔴 **They sit at two depths** — 📌 **`code/blocked_*-NN.md`** for the
 Cadreur and the Détailleur, **`code/<lot>/blocked_*-NN.md`** for the
@@ -284,26 +344,40 @@ whether a recurring kind of escaped question becomes an entry of
 `GRILLE_CADRAGE_PRODUIT_V2.md`.** ⚠️ **Append, never overwrite**: the
 file is the record of every cycle, not of this one.
 
-**Write `code/registre-questions.md`.**
-
-📌 **On a correction cycle** — 🔴 **the Arbitre's files alone**: there
-is no control report.
+**Write `registre-questions.md`, at the feature folder's root** — 🔴
+**one register per feature, outside any `bugfix-NN/`**: ⚠️ **a
+`code/` under a correction cycle is a fresh folder each cycle**, and a
+register written there would record one cycle alone. 📌 **Every cycle
+appends to the same file.**
 
 ### Phase 6 — the product decisions taken while coding
 
 🔴 **A product question settled during the coding went into a sheet** —
 📌 **never into the product file, never into the global.**
 
-🔴 **Gather them from the same two depths as phase 5**: 📌 **every
-`## Decision` that settles what the application does**, as opposed to
-how it is built.
+🔴 **Gather them from the same two depths as phase 5**, in the working
+folder: 📌 **every `## Decision` that settles what the application
+does**, as opposed to how it is built.
 
 ⚠️ **The test is the one the Arbitre uses** — 📌 **a decision on a
 behaviour, a wording, what the user sees.** 🔴 **A technical decision
 is not one.**
 
-**Write `code/decisions-produit.md`** — 📌 **one decision per line, with
-the block it bears on when the file names one.**
+**Write `code/decisions-produit.md`**, in the working folder — 📌 **one
+decision per line, in this shape:**
+
+    B12  <the decision, as the ## Decision wrote it>
+    —  <a decision the file ties to no block>
+
+🔴 **The identifier first, then two spaces, then the decision** —
+⚠️ **when the blocking file names the block**; 📌 **a dash where it
+names none.** 🔴 **Nothing before the identifier**: the Rédacteur greps
+it, and reads it as written.
+
+🔴 **The decision is copied, in the language the `## Decision` was
+written in — French.** 📌 **The Rédacteur translates it at `/fusion`,
+invocation 3, as it translates an answer at invocation 2** — ⚠️ **you
+translate nothing, and reword nothing.**
 
 🔴 **The Rédacteur reads it at `/fusion`**, invocation 3. ⚠️ **Write it
 even empty** — 📌 **its absence would read as *the phase did not run*.**
@@ -334,16 +408,27 @@ carry on.
 
 | | |
 |---|---|
-| `code/rapport-controle-NN.md` | 📌 **Main cycle only** |
-| `code/recette-ordonnee.md` | 🔴 **What the Product Owner checks by hand** |
-| `code/registre-questions.md` | 🔴 **Read by the Product Owner, across cycles** — 📌 **a kind of product question that keeps escaping upstream is a question the framing grid is missing** |
-| `code/decisions-produit.md` | 📌 **Read by the Rédacteur at `/fusion`** |
+| `code/rapport-controle-NN.md` | 📌 **In the feature folder** — 🔴 **the blocks marked `carried` read as found there, with the mark as the reason** |
+| `code/recette-ordonnee.md` | 🔴 **What the Product Owner checks by hand** — in the working folder |
+| `registre-questions.md` | 🔴 **At the feature folder's root, read by the Product Owner across cycles** — 📌 **a kind of product question that keeps escaping upstream is a question the framing grid is missing** |
+| `code/decisions-produit.md` | 📌 **Read by the Rédacteur at `/fusion`** — in the working folder |
+
+**Plus the reservations the verdicts hold**, one line each — 📌
+**the lot, and the `## Findings` line the Relecteur wrote for a `PASS
+with reservation`.** 🔴 **A reservation says *it passes, but it is worth
+looking at*** — ⚠️ **relayed here, it reaches the Product Owner at the
+one moment she reviews the whole feature.** 📌 **None to relay is said
+in one word.**
 
 🔴 **Nothing else is yours**: no reading of those files, no summary of
 what they hold, no decision on what to do next.
 
 📌 **The Product Owner reads them and decides** whether the control
-report becomes a `bug-list.md` for a correction cycle.
+report becomes a `bug-list.md` for a correction cycle. 🔴 **A gap she
+takes from the report keeps its `B<n>` in `bug-list.md`** — 📌 **the
+Diagnostiqueur carries it into `desc-bug.md`, the Cadreur into the lot
+list, and phase 1 of the next control marks the block `carried` from
+there.**
 
 ⚠️ **The manual list is the one to run before deciding** — 📌 **a gap
 the Contrôleur cannot see shows there.**

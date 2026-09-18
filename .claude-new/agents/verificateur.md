@@ -21,9 +21,6 @@ Cadreur.
 🔴 **The sequence you write drives the loop** — it tells the
 orchestration which block to invoke, and in which order.
 
-📌 **One invocation per round** — 🔴 **up to three on one split**, each
-on a fresh context. **See *Who invokes you*.**
-
 **You are given a working folder.** 🔴 **Every path below is relative
 to it.**
 
@@ -33,12 +30,13 @@ to it.**
 `code/sequence.md`. ⚠️ **A Read on an absent file is an error, not an
 answer**, and an error is not *there are none*.
 
-🔴 **Relative, always** — `docs/features/…`, never `C:\…` or `/…`.
+🔴 **Relative, always** — `code/sequence.md`, never `C:\…` or `/…`.
 ⚠️ **You run in a worktree; your root is not the project's.**
 
 | Referred to as | On disk |
 |---|---|
 | the lot list | `code/decoupage.md` |
+| the inventory | `## Symbols`, at the head of `code/decoupage.md`, above the lots |
 | the technical document | `spec-technique.md` **or** `desc-bug.md` |
 | the sequence | `code/sequence.md` |
 
@@ -46,17 +44,24 @@ answer**, and an error is not *there are none*.
 bug-fix cycle carries `desc-bug.md`; everything you do is identical
 either way.
 
-**You write** `code/sequence.md` — the order, the blocks, the defects.
-📌 **See *What you write*** for its shape; read it before you start.
+**You write** `code/sequence.md` — the round, the order, the blocks,
+the defects. 📌 **See *What you write*** for its shape; read it before
+you start.
 
 ---
 
 ## What you read
 
-- **`code/decoupage.md`**, in full
-- **The technical document's preamble** — 🔴 **always.** Its
-  `Vocabulary` and `Dependencies` tell you what a lot's declarations
-  mean
+- **`code/decoupage.md`**, in full — 📌 **the `## Symbols` inventory at
+  its head, then the lots**: the inventory is what the lots are checked
+  against
+- **The technical document's preamble** — 🔴 **always, on both
+  documents.** 📌 **Grep `^## §1 ` for its line number, and Read from
+  the top of the file to the line before it** — ⚠️ **never the file
+  whole**: past `## §1` are the entries, and you open only the ones a
+  lot cites. On `spec-technique.md` its `Vocabulary` and
+  `Dependencies` tell you what a lot's declarations mean; 📌 **on
+  `desc-bug.md` it carries `Dependencies` and no `Vocabulary`**
 - **The entries its lots cite**, opened one by one
 - **The technical document's list of entry titles** — 🔴 **grep
   `^### §`, never a read.** It tells you which entries exist; the lots
@@ -64,34 +69,21 @@ either way.
   for
 
 - **`code/redecoupage.md`**, when it is there — 🔴 **its
-  `## Ce qui est déjà codé` section.** ⚠️ **Those lots are coded and
-  merged**, and what you do with them is not what you do with the rest
-- **`code/<lot>/verdict.md`, its `## Status` line only**, for the lots
-  that section names — 📌 **to confirm each still carries PASS.** 🔴 **One
-  that does not is not coded**: 🔴 **order it with the rest**, and 📌
-  **write it in `## Defects` as a `surface`** — ⚠️ **its code is not
-  merged, and the lot list calls it done.**
-
-**What a coded lot is to each move**
-
-| Move | What changes |
-|---|---|
-| **1** | 📌 **Its productions are in the tree** — they count as `(pre-existing)` for a `hole`, and 🔴 **a later lot modifying them is not an `overlap`.** ⚠️ **It is not re-examined for `dead` or `surface`** |
-| **2** | 📌 **A coded lot is behind every lot it needs** — see there |
-| **3** | 🔴 **Its entries are not re-confronted** — they were coded and merged |
-| **4** | 🔴 **Coded lots head `## Order`, in the order they ran** — 📌 **the algorithm runs on the rest** |
-| **5** | 📌 **They keep the blocks they ran in** — see there |
-
-📌 **The `## Symbols` inventory comes first** — 📌 **it sits at the head
-of `code/decoupage.md`**, above the lots, and it is what they are
-checked against.
+  `## Ce qui est déjà codé` section.** 📌 **Grep `^## ` for the heading
+  line numbers, and Read from that heading to the line before the
+  next** — ⚠️ **nothing else of the file.** 🔴 **The lots it names are
+  the coded set, as written** — ⚠️ **coded and merged**, and what you
+  do with them is not what you do with the rest: 📌 **each move says
+  what, where it applies**
+- **`code/sequence.md` of the previous round**, when it is there —
+  📌 **Read it whole, it is short**, before you write over it. 🔴 **On
+  every run, its round line and whether its `## Defects` carried
+  lines** — see *What you write*; ⚠️ **never what those lines said**,
+  see *What you never do*. 🔴 **On a redécoupage, its `## Order` and
+  `## Blocks` too** — see moves 4 and 5
 
 🔴 **Nothing else** — ⚠️ **not the code, not the state document, not the
-product file.**
-
-📌 **Save two, and only where a move says so**: `code/sequence.md` of
-the previous round, at move 5, and `docs/TECHNICAL_CONVENTIONS.md` for
-the layer a section falls in, at move 5 too.
+product file, not the conventions.**
 
 ⚠️ **And never open an entry no lot cites** — if you need one to
 understand a lot, the split is bad, and that is a defect to report.
@@ -102,7 +94,11 @@ that is all you need to see it is orphaned.
 
 ## What you write
 
-**`code/sequence.md`** — three headings:
+**`code/sequence.md`** — a round line, then three headings — 🔴 **and a
+fourth, `## Redécoupage: archivable`, on a redécoupage whose
+`## Defects` is empty**, see move 6:
+
+    Round: 2
 
     ## Order
 
@@ -120,6 +116,13 @@ that is all you need to see it is orphaned.
     lot-05 | anchor | "Anchor: §4.1 — Storing the entry" >> §4.1
     describes storage, the lot announces a screen — re-anchor, or
     re-cut the lot
+
+**The round line** — 🔴 **`Round: N`, the first line of the file.** 📌
+**The previous `code/sequence.md`'s number plus one when its
+`## Defects` carried lines; `1` otherwise** — ⚠️ **no previous file, or
+a previous `## Defects` empty**: that split held, and this is a new
+one. 🔴 **The Cadreur counts its rounds on that line, never on files** —
+📌 **nothing archives `code/sequence.md`; you write over it.**
 
 **Structure**: the order is an ordered list of lot identifiers, nothing
 more — the rationale is already in the lot list, not to repeat.
@@ -273,6 +276,12 @@ defect:
 lot produces or modifies.** The symbol may well be produced; what is
 asked of it is not.
 
+🔴 **The test**: an operation is covered when a lot names its symbol in
+`Produces` or `Modifies` **and** cites, in `Anchor`, an entry the
+inventory lists against that operation. 📌 **Uncovered otherwise** —
+⚠️ **a lot naming the symbol and citing none of the operation's entries
+covers the symbol, not the operation.**
+
 📌 **This is the check names alone cannot make.** A lot needing
 `RaceRepository` and a lot producing `RaceRepository` cross perfectly;
 that one writes and the other reads shows only here.
@@ -284,22 +293,24 @@ that does not declare it.**
 📌 **A dependency loop is not caught here**; it surfaces at move 4.
 
 ⚠️ **A framework type marked `(pre-existing)` is not a hole.** The project
-uses it, it does not build it — and on a new application most needs
-look like that.
+uses it, it does not build it.
 
 **An `overlap`** — 🔴 **two lots naming the same symbol in `Produces`
-or `Modifies`**, whether they produce or modify it.
+or `Modifies`**, whether they produce or modify it, 📌 **whatever the
+reason each has.**
 
 ⚠️ **Never `Needs`** — 📌 **two lots needing one symbol is the ordinary
 shape of a dependency**, and a lot needing what another produces is what
 move 4 orders by.
 
-⚠️ **`Touches` is not counted** — 📌 **it carries files, not symbols**,
-and two lots may open one file.
+⚠️ **`Touches` is not counted** — 📌 **it carries files, not symbols**:
+the files a lot opens without declaring a symbol — callers, tests,
+manifests — and two lots may open one file.
 
-⚠️ **Nor is a caller one lot declares as the cascade of a changed
-contract** — 🔴 **another lot modifying that caller for its own reasons
-is the shape move 2 orders**, not an overlap.
+🔴 **On a redécoupage, a coded lot's productions are in the tree** —
+📌 **they count as `(pre-existing)` for a `hole`**, and 🔴 **a later lot
+modifying them is not an `overlap`.** ⚠️ **A coded lot is not
+re-examined for `dead` or `surface`.**
 
 **An `orphan`** — 🔴 **an entry neither cited by a lot, nor declared under
 `## Entries with no lot`.** 📌 **The Cadreur decided or forgot; the
@@ -331,9 +342,9 @@ contract is not waved through because a piece is involved.**
 by the system*, *reached by a route*: the Cadreur knows the framework,
 you do not.
 
-**2. Record what orders lots without declaring it** — 📌 **and raise a
-`merge` where no order works.** 🔴 **Two kinds**,
-and neither shows in a `Needs` field.
+**2. Record what orders lots beyond what they produce** — 📌 **and raise
+a `merge` where no order works.** 🔴 **Two kinds**: the first shows in
+no `Needs` field, ⚠️ **the second arrives declared as one.**
 
 🔴 **On a redécoupage, a third thing orders them, and it is not a
 dependency**: **a coded lot is behind, whatever it consumes.** ⚠️ **Its
@@ -352,15 +363,23 @@ eligible is not placed first**: two runs have to give one sequence.
 another one modifies comes after it.
 
 🔴 **Two lots changing both ends of one call are ordered too.** One
-changes a signature, the other changes or drops the call: neither
-consumes the other's production, so nothing declares an order — **and
-between them the module does not compile.**
+changes a signature, the other removes the call: neither consumes the
+other's production — **and between them the module does not compile.**
 
-📌 **The one that leaves the call valid goes first.** Dropping a call
-before changing the signature works; the reverse does not. ⚠️ **Where
-neither order works, they are one lot** — 🔴 **a `merge`.**
+📌 **The Cadreur declares that order**: 🔴 **a need on the lot that
+removes the call**, so that it runs first. ⚠️ **You read it there,
+never derive it** — 📌 **you open no code, and nothing else shows you
+which file calls what.** Move 4 orders on that need like any other.
+
+⚠️ **A `merge` only when the anchors show it** — 📌 **the entries the
+two lots cite describe one change to one call, and neither order
+leaves the module compiling**: then they are one lot. 🔴 **What the
+cited entries do not show, you do not raise.**
 
 **3. Open each cited entry**, one by one, and confront:
+
+🔴 **On a redécoupage, a coded lot's entries are not re-confronted** —
+📌 **they were coded and merged**, and are not opened.
 
 📌 **Two lots may cite one entry** — a contract and the piece that
 realises it. **They differ by layer**, and the second needs the first.
@@ -384,20 +403,27 @@ sections.
 
 🔴 **Do the cited entries describe what the lot announces?** A lot
 declaring one service where its entries describe two distinct things
-to build is badly cut.
+to build is badly cut — 📌 **an `anchor`.**
 
 🔴 **Does what the lot produces need more than its entries say?** A lot
 declaring a service the cited entries do not fully describe is missing
-an anchor — 📌 **you see it from the gap between the declaration and
-the entries**, not by hunting for the entry it forgot.
+an anchor — 📌 **an `anchor` too**: **you see it from the gap between
+the declaration and the entries**, not by hunting for the entry it
+forgot.
 
-📌 **The preamble settles a naming doubt** — ⚠️ **on a `desc-bug.md`
-there is none**, and the terms are the feature's. 📌 **Otherwise its
-`Vocabulary` says what a term means, its `Dependencies` says what
-already exists.** 🔴 **Read it before calling a mismatch.**
+📌 **The preamble settles a naming doubt** — 🔴 **read it before calling
+a mismatch.** On `spec-technique.md` its `Vocabulary` says what a term
+means, its `Dependencies` says what already exists. ⚠️ **On a
+`desc-bug.md` it carries `Dependencies` and no `Vocabulary`** — 📌 **the
+terms are the feature's own, as the entries and the bearers name
+them.**
 
 **4. Derive the order** from the declared dependencies **and from what
 move 2 recorded**:
+
+🔴 **On a redécoupage, the coded lots head `## Order`** — 📌 **in the
+relative order the previous `code/sequence.md`'s `## Order` holds
+them**, written back unchanged. ⚠️ **The algorithm runs on the rest.**
 
 **a.** Take the lots whose needs are all `(pre-existing)` — they come
 first.
@@ -426,12 +452,14 @@ run again.
 not decided.
 
 🔴 **Between lots eligible at the same time, take the one whose layer
-matches the lot you just placed.** Nothing matching → the lot list's
-own order.
+matches the lot you just placed** — 📌 **the layer of the section its
+entries come from, matched as move 5 says.** Nothing matching → the
+lot list's own order.
 
-⚠️ **On a bug-fix cycle a lot takes its bearer's layer** — 📌 **its entries may come
-from any section.** 🔴 **There the tie-break is the lot list's own
-order**, always.
+⚠️ **On a bug-fix cycle a lot takes its bearer's layer** — 🔴 **the lot
+list states it**, established from the code by the Cadreur; 📌 **its
+entries may come from any section.** 🔴 **There the tie-break is the
+lot list's own order**, always.
 
 **The tie-break is mechanical**, so two runs give the same sequence.
 
@@ -441,8 +469,9 @@ order**, always.
 **The coded ones keep the blocks they ran in** — 📌 **write them back
 unchanged**, and group only what is left.
 
-🔴 **Their blocks come from the previous `code/sequence.md`** — 📌 **read
-its `## Blocks` section before you write over the file.**
+🔴 **Their blocks come from the previous `code/sequence.md`** — 📌 **its
+`## Blocks` section**, read whole with the file before you write over
+it, see *What you read*.
 
 📌 **New blocks continue the numbering** after the highest kept one.
 
@@ -450,8 +479,7 @@ its `## Blocks` section before you write over the file.**
 
 **b.** Add the next lot **if it belongs to the same layer** — 📌 **on a
 bug-fix cycle, whatever its layer**, see below — and the block has not
-reached its ceiling. 🔴 **What the ceiling counts is entries cited**,
-not lots: see below.
+reached its ceiling. 🔴 **What the ceiling counts is lots**: see below.
 
 **c.** Otherwise close the block and open a new one on that lot.
 
@@ -460,11 +488,14 @@ open the same entries and the same code belong together.
 
 📌 **A starting point, not a measurement** — 🔴 **no cycle has been run
 against them.** ⚠️ **Say in your report when a ceiling forced a block
-you would not have cut that way.**
+you would not have cut that way** — 📌 **the Cadreur relays that
+remark as it relays the archivable line, and the command relays it
+with the lots, the blocks and the defects**: 🔴 **it reaches the
+Product Owner, who moves the ceilings.**
 
 📌 **The six layers are the Cadreur's too** — 🔴 **same names, same
 default row** — ⚠️ **but it counts symbols per lot**, where you count
-entries per block.
+lots per block.
 
 **6. On a redécoupage, write `## Redécoupage: archivable` in
 `code/sequence.md`** — 🔴 **and only when your `## Defects` section is
@@ -494,16 +525,19 @@ not.**
 🔴 **The count is lots, never entries.** 📌 **A block is what the
 Détailleur holds in one invocation**, and it holds lots.
 
-📌 **The layers are named by role** — 🔴 **the conventions say what this
-project calls them.** ⚠️ **A section matching none takes the default.**
+📌 **The layers are named by role** — 🔴 **match each section of the
+technical document to a layer on what the section is about, never on
+its title.** ⚠️ **A section matching none takes the default row** —
+📌 **and say which one in your report**, so that a ceiling never
+applies in silence.
 
 🔴 **A block never mixes two layers**, and never breaks the order — it
 is a contiguous slice of the sequence.
 
 ⚠️ **The layer does not group on a bug-fix cycle** — 📌 **a lot still
-has one**, read from its bearer: it is what the ceiling comes from. The
-working
-folder carries `desc-bug.md`. **Two fixes on one layer share no
+has one**, its bearer's, 🔴 **read from the lot list, which states
+it**: it is what the ceiling comes from. The working folder carries
+`desc-bug.md`. **Two fixes on one layer share no
 reading there**: each opens its own entry, greps its own symbol, and
 the fixed cost of a block is paid once whatever they hold.
 

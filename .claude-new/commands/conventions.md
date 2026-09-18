@@ -35,7 +35,18 @@ folder, or a `bugfix-NN/` inside it. **A second argument names it.**
 `questions-architecte-*.md` at the root — 🔴 **plus two greps on that
 last one**: `Answer:` lines with nothing after them, and `^### Q`.
 
-⚠️ **Counts, never content** — 📌 **you never open a questions file.**
+**Two things of `blocked_architecte.md`, when the working folder holds
+one, and nothing more of it** — 🔴 **whether its `## Decision` is
+filled, and its `## Invocation` line.** 📌 **The walk below keys on
+both.**
+
+**Whether each request in `architecte/` carries a filled
+`## Verdict`** — 🔴 **a request with no `## Verdict` heading at all
+reads as one with an empty one.**
+
+⚠️ **Counts, never content** — 📌 **you never open a questions file,
+and you read no more of a blocking file or a request than the lines
+named above.**
 
 ⚠️ **Nothing else.** `CLAUDE.md`'s standing reading rules apply.
 
@@ -68,12 +79,13 @@ matches.**
 |---|---|
 | A `blocked_architecte.md` with an empty `## Decision` | 🔴 **Nothing** — relay it and stop |
 | 🔴 **A `blocked_architecte.md` with a filled `## Decision`** | 📌 **The invocation its `## Invocation` line names** — 🔴 **name the file in the prompt** |
-| A request in `architecte/` with an empty `## Verdict` | **Invocation 3 — Requests** |
+| A request in `architecte/` with an empty `## Verdict` — 🔴 **or with no `## Verdict` heading at all** | **Invocation 3 — Requests** |
+| 🔴 **A second argument names a `bugfix-NN`, and no row above matched** | 📌 **Nothing to invoke** — say so: ⚠️ **`/8_code` carries on**. 🔴 **The rows below are the feature folder's**: a `bugfix-NN` carries no technical document of its own to walk |
 | A `questions-architecte-NN.md` at the root with an empty `Answer:` | 🔴 **Nothing** — say which questions wait |
-| A `questions-architecte-NN.md` at the root, **answered** | **Invocation 2 — Integrating** |
+| A `questions-architecte-NN.md` at the root, **answered** | **Invocation 2 — Integrating** — 🔴 **name the file in the prompt** |
 | A `questions-architecte-NN.md` at the root with **no `### Q`** | 🔴 **Nothing** — the derivation asked nothing. 📌 **Say `/7_lots`** |
 | 🔴 **No `docs/TECHNICAL_CONVENTIONS.md`** | **Invocation 1 — Deriving** — 📌 **the first derivation this repository ever had** |
-| **It exists, and no `couverture.md` at the working folder's root** | 🔴 **Invocation 4 — Completing** — ⚠️ **on a feature folder only**: 📌 **a `bugfix-NN` carries no technical document of its own to walk** |
+| **It exists, and no `couverture.md` at the feature folder's root** | 🔴 **Invocation 4 — Completing** |
 | **It exists, and a `couverture.md` is there** | 📌 **Nothing to do** — say `/7_lots` |
 | Nothing of the sort | 📌 **Nothing to do** — say `/7_lots` |
 
@@ -87,8 +99,8 @@ none — 📌 **and a test on it would send every feature but the first
 through invocation 1.**
 
 📌 **`couverture.md` tells something else**: whether this feature has
-already been walked. 🔴 **That is the third row**, and it is what makes
-the command idempotent.
+already been walked. 🔴 **That is the invocation-4 row**, and it is what
+makes the command idempotent.
 
 📌 **An integrated questions file leaves the root** — 🔴 **filed after
 invocation 2**, ⚠️ **otherwise every later run matches its row again and
@@ -107,7 +119,13 @@ and a request is treated in the cycle that raised it.
 
 ## Git, before invoking
 
-🔴 **File away every root `questions-*.md` whose prefix is not
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
+`architecte` before touching it** — 📌 **a file holding questions is
+not yours to file**: ⚠️ **it waits on an answer, or its answers were
+never integrated.** 🔴 **Stop and say which.** 📌 **The architecte's
+own file is the walk's above, not this guard's.**
+
+🔴 **Then file away every root `questions-*.md` whose prefix is not
 `architecte`:**
 
     git mv docs/features/<name>/questions-<other>-NN.md \
@@ -157,8 +175,9 @@ the unnumbered name, the next run stops on it.**
 
 ## How it runs
 
-**What you do**: invoke the agent via `Agent()` with the feature folder
-and which invocation it is — and nothing else.
+**What you do**: invoke the agent via `Agent()` with the working folder
+and which invocation it is — and nothing else beyond what its form
+below carries.
 
 🔴 **Never paraphrase the agent's process in your invocation** — not
 its inputs, its checks, its output format. It reads its own
@@ -171,10 +190,32 @@ Agent(
   subagent_type="architecte",
   model="opus",
   description="conventions <feature>",
-  prompt="Feature folder: docs/features/<name>/. Invocation 1 — Deriving.
+  prompt="Working folder: docs/features/<name>/. Invocation 1 — Deriving.
           Your questions file number: NN."
 )
 ```
+
+🔴 **The prompt takes one of four forms** — 📌 **the walk above says
+which**:
+
+| Invocation | The prompt |
+|---|---|
+| 1 — Deriving | `Working folder: docs/features/<name>/. Invocation 1 — Deriving. Your questions file number: NN.` |
+| 2 — Integrating | `Working folder: docs/features/<name>/. Invocation 2 — Integrating. Answered file: questions-architecte-NN.md. Your questions file number: NN.` |
+| 3 — Requests | `Working folder: <the working folder>. Invocation 3 — Requests. Called by the orchestration.` |
+| 4 — Completing | `Working folder: docs/features/<name>/. Invocation 4 — Completing. Your questions file number: NN.` |
+
+📌 **At invocation 2 the prompt names the answered file** — 🔴 **the
+agent reads that file and no other**: it never lists a folder to find
+it.
+
+📌 **At invocation 3 the working folder is the feature folder, or the
+`bugfix-NN/` inside it the second argument names.** 🔴 **The prompt
+says who called — `Called by the orchestration.`, never inferred**: the
+Architecte behaves differently when the Arbitre calls it.
+
+📌 **A filled `blocked_architecte.md` adds its file name to the form
+its `## Invocation` line names.**
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
 either** — in this environment the Agent tool always runs async and
@@ -222,7 +263,7 @@ Owner would otherwise learn of it from a file listing, at best.**
 | The run | Next |
 |---|---|
 | It raised questions | 📌 **Answer them, then `/conventions`** |
-| It raised a **product question** | 🔴 **The framing grid did not close the product** — ⚠️ **the Product Owner decides**: back into the loop, or corrected by hand |
+| It raised a **product question** | 🔴 **The framing grid did not close the product** — ⚠️ **the Product Owner corrects the product file by hand**: 📌 **the behaviour is built in the next cycle, as a new behaviour** — 🔴 **no upstream turn re-runs** |
 | It raised an **`inconsistency`** | 🔴 **The technical document is wrong** — 📌 **say which entry**: the fix is upstream, in `/6_convertit`, not here |
 | It wrote a blocking file | 📌 **Fill its `## Decision`, then `/conventions`** |
 | It asked nothing, or everything is integrated | 📌 `/7_lots` |

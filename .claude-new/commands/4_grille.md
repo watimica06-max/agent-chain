@@ -38,7 +38,7 @@ or a questions file's content.**
 ## Before anything else
 
 🔴 **Does a blocking file sit in the feature folder, unnumbered?** 📌
-**Five names, one per invocation this command runs** — ⚠️ **the four
+**Six names, one per invocation this command runs** — ⚠️ **the four
 sondeurs run at once, and a shared name would let one overwrite
 another:**
 
@@ -51,24 +51,29 @@ another:**
 | `blocked_existant.md`, **at the feature root** | 🔴 **The second time** — 📌 **not under `cadrage-produit/`** |
 | `blocked_assembleur.md`, at the feature folder's root | The assembleur |
 
+🔴 **Test all six names — any number can stand at once.** ⚠️ **Four
+sondeurs that ran together can leave two, three or four files**, each
+with its own decision.
+
 | | What you do |
 |---|---|
 | None | 📌 Carry on |
-| One, its `## Decision` empty | 🔴 **Stop** — say which one still stands |
-| One, its `## Decision` filled | 📌 **Name it in that agent's prompt, and in no other** — 🔴 **and invoke that reading alone**: see below |
+| Any, its `## Decision` empty | 🔴 **Stop** — say which ones still stand, every one of them |
+| Every one standing has its `## Decision` filled | 📌 **Name each in its own reading's prompt, and in no other** — 🔴 **and invoke those readings alone, together**: see below. ⚠️ **The merge waits for all of them** |
 
-⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
-file.
+⚠️ **Read that one heading in each, nothing else** — 📌 the agent reads
+the file.
 
 🔴 **On a decision you just lifted, only what blocked runs again.** 📌
-**A sondeur's decision → that reading alone.** 📌 **The assembleur's →
-the merge alone**, on the four files still standing: ⚠️ **re-running the
+**A sondeur's decision → that reading alone** — ⚠️ **several sondeurs'
+→ those readings, and no other.** 📌 **The assembleur's → the merge
+alone**, on the four files still standing: ⚠️ **re-running the
 sondeurs would replace the very inputs the decision was written
-against.** 📌 **The other three files are already in
-`cadrage-produit/`** — ⚠️ **nothing touched the product file between
-the two runs**, and recomputing them would cost three opus invocations
-for the same result. 🔴 **Leave them in place, do not file them, and
-merge once the blocked one has written its own.**
+against.** 📌 **The files of the readings that did not block are
+already in `cadrage-produit/`** — ⚠️ **nothing touched the product file
+between the two runs**, and recomputing them would cost up to three
+opus invocations for the same result. 🔴 **Leave them in place, do not
+file them, and merge once every blocked reading has written its own.**
 
 ⚠️ **Unless the markers changed in between** — 📌 **then it is a new
 turn, and all four run.**
@@ -94,10 +99,19 @@ blocks, and that `/3b_nature` has to run first.
 be grouped by judgement, or left out of that reading with nothing
 signalling it.**
 
-🔴 **The latest questions file at the root is answered and integrated.**
-📌 **A `grep '^Answer:$'` on it** — ⚠️ **one hit and you stop**, saying
-which questions wait: the turn that produced them is not closed, and
-probing again would raise the same gaps through five invocations.
+🔴 **The latest questions file at the root is answered.** 📌 **An entry
+whose `Answer:` is empty and that carries no `Défaut:` line** — ⚠️ **one
+and you stop**, saying which questions wait: the turn that produced
+them is not closed, and probing again would raise the same gaps through
+five invocations.
+
+⚠️ **An entry whose `Answer:` is empty **and** that carries a `Défaut:`
+line is answered** — 📌 **silence accepts the proposal**, and that is
+what the line exists for. 🔴 **Test both**: `^Answer:\s*$` with no
+`Défaut:` above it in the same entry.
+
+📌 **Whether it is integrated is the `### Q` guard's test**, under
+*Git, before invoking*.
 
 ---
 
@@ -159,10 +173,20 @@ C question asked once on the feature**, and pass C is the global's.
 them the grid asks him a second time**, and she answers what he has
 already answered.
 
-🔴 **What closes the first time is a `questions-sondeur-NN.md` at the
-root holding no `### Q`** — 📌 **grep it before the two greps below.**
-⚠️ **One exists and is empty → the first time is closed**, and the
-second time runs: see below.
+🔴 **What closes the first time is the highest-numbered
+`questions-sondeur-NN.md` holding no `### Q`** — 📌 **wherever it sits,
+at the root or filed under `questions/sondeur/`**: ⚠️ **glob both
+places and test the highest `NN` alone** — an earlier turn's file holds
+its answered questions, and says nothing about the grid. 🔴 **Test it
+before the two marker greps of *Which blocks the angles probe*.** 📌
+**It is empty → the first time is closed**, and the second time runs:
+see below.
+
+⚠️ **Root or filed, because a sibling command files it** — 📌 **a
+`/3_decoupe` run by hand between the closure and the second time, or
+`/4_grille` itself on the run that blocked in `blocked_existant.md`,
+moves the empty file under `questions/sondeur/`**: 🔴 **a test on the
+root alone would then read a closed grid as a broken one.**
 
 ⚠️ **Never *no marker returned*** — 📌 **markers are stripped by the
 Rédacteur when it integrates a questions file that holds questions.** 🔴
@@ -170,15 +194,29 @@ Rédacteur when it integrates a questions file that holds questions.** 🔴
 test on them would send the grid round for ever on a feature it has
 nothing left to ask about.
 
-📌 **Neither grep returns anything, and no empty file at the root** →
-🔴 **stop and say so**: nothing moved and nothing closed the turn —
-⚠️ **a run produced no questions file at all.**
+📌 **Neither marker grep returns anything, and the highest-numbered
+`questions-sondeur-NN.md` holds a `### Q`** → 🔴 **two cases, told apart
+by `questions-existant-NN.md`, root or `questions/existant/`:**
+
+| | What it is | Next |
+|---|---|---|
+| One exists | 🔴 **The grid is closed** — the second time already ran, and nothing moved since | 📌 **Invoke nothing**, and say `/5_reclasse` |
+| None anywhere | 🔴 **A run produced no questions file at all** — nothing moved and nothing closed the turn | 📌 **Stop and say so**, naming the highest file and where it sits — `/4_grille` again once a marker or an empty file is there |
 
 ---
 
 ## Git, before invoking
 
-🔴 **Before invoking, file every root `questions-*.md`:**
+🔴 **Grep `^### Q` in each root `questions-*.md` before touching it** —
+📌 **a file holding questions is not yours to file**: ⚠️ **it waits on
+an answer, or its answers were never integrated.** 🔴 **Stop and say
+which.** 📌 **The sondeur's own is no exception** — ⚠️ **answered, it
+goes through `/1_lexique` and `/2_structure`**, which integrate it and
+put it away; 🔴 **still at the root, it has not been through them.**
+📌 **The empty one that closed a time holds no `### Q`**, and is filed
+like any other.
+
+🔴 **Then file every root `questions-*.md`:**
 
     git mv docs/features/<name>/questions-<agent>-NN.md \
            docs/features/<name>/questions/<agent>/
@@ -194,8 +232,13 @@ next one written has to be the only one there.**
 ⚠️ **`git mv`, never a read-and-rewrite** — the agents must not open
 those files, and neither should you.
 
-🔴 ⚠️ **Not on a turn that re-ran the merge alone** — 🔴 **those four files
-are what it just read**, and filing them would take them from under it.
+🔴 **Not on a turn about to re-run the merge alone** — 📌 **a turn
+resuming on `blocked_assembleur.md`'s decision**: ⚠️ **every
+`cadrage-produit/` file the previous turn wrote is what the merge is
+about to read**, and filing any of them would take it from under it.
+📌 **Nor on a turn re-running a blocked reading alone** — 🔴 **the
+other readings' files stay where they are**: see *Before anything
+else*.
 
 **Otherwise, the previous turn's six `cadrage-produit/` files:**
 
@@ -254,9 +297,10 @@ block marked, nothing left to probe inside the feature.**
 at the root or in `questions/existant/`** — ⚠️ **one and the second time
 is over**: write nothing, and go to *What you relay*.
 
-🔴 **Which blocks** — 📌 **`grep -B1 '^Global: '` in
-`desc-produit.md`.** ⚠️ **Those alone**: a block attached to nothing
-hits nothing.
+🔴 **Which blocks** — 📌 **`grep -B3 '^Global: '` in
+`desc-produit.md`** — ⚠️ **three lines above each hit is the heading**:
+`Genre:` and `Nature:` sit between. 📌 **Those alone**: a block
+attached to nothing hits nothing.
 
 📌 **Nothing returned** → 🔴 **invoke nothing.** ⚠️ **The feature
 touches nothing that exists** — write `questions-existant-NN.md` empty,
@@ -420,13 +464,22 @@ Agent(
             par-nature.md
             global.md
           Write to docs/features/<name>/cadrage-produit/questions.md.
-          <Plus: blocked_assembleur.md, its decision is filled.>"
+          <Plus: docs/features/<name>/blocked_assembleur.md, its decision is filled.>"
 )
 ```
 
 ---
 
 ## Once it has reported
+
+🔴 **The assembleur reports a missing input** — 📌 **it wrote nothing:
+no `blocked_assembleur.md`, no `questions.md`.** ⚠️ **A missing input is
+not a decision the Product Owner writes** — it is this command's to
+repair.
+
+| | What you do |
+|---|---|
+| Its report names a missing file | 🔴 **Stop** — 📌 **say which file, and to run `/4_grille` again** — ⚠️ nothing below runs |
 
 🔴 **A blocking file you named is filed**, in the folder it sits in:
 
@@ -490,7 +543,7 @@ your own.
 
 | The run | Next |
 |---|---|
-| A **sondeur** wrote a blocking file | 📌 Fill its `## Decision`, then `/4_grille` again — 🔴 **only that reading runs** |
+| A **sondeur** wrote a blocking file — or several did | 📌 Fill each `## Decision`, then `/4_grille` again — 🔴 **only those readings run** |
 | The **assembleur** wrote one | 📌 Fill its `## Decision`, then `/4_grille` again — 🔴 **the merge alone runs**, on the four files still standing |
 | **First time** — its questions file holds questions | 📌 **Answer them, then `/1_lexique`** — 🔴 it settles the vocabulary your answers brought, before the Rédacteur reads them |
 | **First time** — its questions file is empty | 📌 **`/4_grille` again** — 🔴 **the second time runs** |

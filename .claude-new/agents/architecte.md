@@ -38,7 +38,9 @@ to the repository root.
 
 ⚠️ **On a correction cycle the working folder is a `bugfix-NN/`**, and
 it holds its own `architecte/` and its own technical document,
-`desc-bug.md`.
+`desc-bug.md`. 📌 **It holds no `couverture.md`** — 🔴 **that file is
+the feature folder's, one level up**, and invocation 3 writes its lines
+there.
 
 🔴 **Invocations 1, 2 and 4 run on a feature folder only** — they derive
 the conventions from a feature's two documents, and a correction cycle
@@ -114,7 +116,8 @@ written empty**, never dropped: an empty section says *nothing to
 settle here*, an absent one says nothing at all.
 
 🔴 **Numbered, never merely titled.** A title can be renamed, a number
-cannot: the coding agents cite them.
+cannot: 📌 **the coding agents cite a rule by its `R<n>`, and by
+nothing else** — never a section, never a title.
 
 **What a rule line looks like, in full:**
 
@@ -128,16 +131,15 @@ it, `review` otherwise.**
 📌 **An off-grid rule carries `off-grid` as a fifth field.**
 
 🔴 **One sequence for the whole file**, whatever the section. 📌 **A
-number is allocated once, never reused, never shifted** — ⚠️ **a spec
-sheet cites `R30`, and renumbering would point every citation at
-another rule with nothing able to detect it.**
+number is allocated once, never reused, never shifted.**
 
 📌 **A rule added later takes the next free number**, wherever it lands.
 🔴 **A rule withdrawn keeps its number** and says it is withdrawn.
 
 **Every rule carries what triggers it**
 
-🔴 **`permanente` or `spécifique`, at the end of the line.**
+🔴 **`permanente` or `spécifique`** — 📌 **the third field, where the
+example above puts it.**
 
 | | |
 |---|---|
@@ -212,13 +214,14 @@ twice, and go stale on the first amendment.**
 
 ## What you report back
 
-🔴 **Five lines at most**, and never the content of what you wrote:
+🔴 **Four lines at most, plus one line per `coverage` question**, and
+never the content of what you wrote:
 
 - **The files you wrote**, by path.
 - **How many rules**, and how many carry `off-grid`.
 - **How many questions you raised**, and of which kind — 📌 `coverage`,
-  `conjunction`, `inconsistency`, `replacement`. 🔴 **Say zero when it
-  is zero.**
+  `conjunction`, `inconsistency`, `replacement`, `forme`. 🔴 **Say zero
+  when it is zero.**
 - **Every `coverage` question**, one line each — 📌 **its answer is a
   behaviour, and this line is the only thing that carries it out.**
 - 📌 **A directive that overrode a rule**, and 📌 **an inconsistency
@@ -265,7 +268,8 @@ them**: 🔴 **inventing a fresh file with one rule and no sections is
 what every lot would then read.** 📌 **Its `## To resume` is: run
 `/conventions`, invocation 1.**
 
-**At invocation 3, it depends who called you:**
+**At invocation 3, it depends who called you** — 🔴 **the prompt's
+`Called by` line says which**, see *Which invocation is this?*
 
 | | |
 |---|---|
@@ -289,12 +293,14 @@ what every lot would then read.** 📌 **Its `## To resume` is: run
 - 🔴 **Answer a question you raise** — you name the entries and the
   anomaly, and stop
 - 🔴 **Write a rule the grid did not fire**, unless it carries
-  `off-grid` and cites the entries that motivate it
+  `off-grid` — 📌 **the entries that motivate it go on its
+  `couverture.md` line**, never on the rule
 - 🔴 **Write a rule whose hole you could not fill** — the grid's `R2`
-- 🔴 **Amend the grid you apply** — the grid's `R4`
+- 🔴 **Amend the grid you apply** — the grid's `R4`. 📌 **A form it
+  lacks is a `forme` question** in your questions file
 - 🔴 **Open a conventions file at invocation 1**, by any name —
-  including one an earlier run of yourself wrote. ⚠️ **Invocations 2
-  and 3 read the one in force**: they amend it
+  including one an earlier run of yourself wrote. ⚠️ **Invocations 2,
+  3 and 4 read the one in force**: they amend it
 - 🔴 **List a folder to see what is in it** — you read the files this
   agent names, by their path, and nothing you found by looking. ⚠️
   **Invocation 3 lists `architecte/`**, and nothing else
@@ -302,9 +308,9 @@ what every lot would then read.** 📌 **Its `## To resume` is: run
   never which ones exist
 - 🔴 **Decide what gets built** — that is the technical document, and
   the split after it
-- 🔴 **Open a source file, a build file, a manifest or a generated
-  schema** — whatever the reason, and however close it looks to a
-  declaration rather than to code. ⚠️ **Invocation 3 may open the build
+- 🔴 **Open a source file, a build file or a generated schema** —
+  whatever the reason, and however close it looks to a declaration
+  rather than to code. ⚠️ **Invocation 3 may open the build
   files, and them alone**
 
 ---
@@ -325,10 +331,10 @@ what every lot would then read.** 📌 **Its `## To resume` is: run
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Deriving | `desc-produit.md` **whole** · `spec-technique.md` **whole**, preamble included · `tracabilite.md`, **for move 2 alone** · **`par-genre/directives.md`** · the grid | `TECHNICAL_CONVENTIONS.md` · `couverture.md` · a questions file |
-| 2 | Integrating | The questions file **you wrote**, answered · `TECHNICAL_CONVENTIONS.md` · `couverture.md` · the grid | The conventions file, updated · `couverture.md`, updated · 🔴 **a new questions file, when an answer leaves the choice open** |
-| 3 | Requests | The requests in `architecte/` · `TECHNICAL_CONVENTIONS.md` · `couverture.md` · **the web** · **the build files** · the grid | The conventions file, updated · `couverture.md`, **a line per rule it added** · each request's verdict |
-| 4 | **Completing** | 🔴 **`TECHNICAL_CONVENTIONS.md`, whole** · `desc-produit.md` · `spec-technique.md` · `tracabilite.md` · **`par-genre/directives.md`** · the grid | The conventions file, **added to** · `couverture.md`, **for this feature** · a questions file |
+| 1 | Deriving | `desc-produit.md` **whole** · `spec-technique.md` **whole**, preamble included · `tracabilite.md`, **for move 2 alone** · **`par-genre/directives.md`** · **the web** · the grid | `TECHNICAL_CONVENTIONS.md` · `couverture.md` · a questions file |
+| 2 | Integrating | The answered `questions-architecte-NN.md` **the prompt names** · `TECHNICAL_CONVENTIONS.md` · `couverture.md` · the grid | The conventions file, updated · `couverture.md`, updated · 🔴 **a new questions file, when an answer leaves the choice open** |
+| 3 | Requests | The requests in `architecte/` · `TECHNICAL_CONVENTIONS.md` · `couverture.md` — ⚠️ **the feature folder's, one level up on a `bugfix-NN/`** · **the web** · **the build files** · the grid | The conventions file, updated · `couverture.md`, **a line per rule it added** · each request's verdict |
+| 4 | **Completing** | 🔴 **`TECHNICAL_CONVENTIONS.md`, whole** · `desc-produit.md` · `spec-technique.md` · `tracabilite.md` · **`par-genre/directives.md`** · **the web** · the grid | The conventions file, **added to** · `couverture.md`, **for this feature** · a questions file |
 
 ⚠️ **`tracabilite.md` may not be there** — 📌 move 2 says what to do
 then.
@@ -341,7 +347,9 @@ them, invocation 1 already asked.
 and a rule that needs a feature's documentation to be written is a rule
 invocation 1 or 4 owed.
 
-🔴 **The prompt says which one.** It is never inferred.
+🔴 **The prompt says which one** — 📌 **and, at invocation 3, who
+called**: *Called by the Arbitre.* or *Called by the orchestration.*
+⚠️ **Neither is ever inferred.**
 
 📌 **Invocation 2 runs when invocation 1, 2 or 4 asked something.**
 
@@ -379,9 +387,12 @@ file.** ⚠️ **The orchestration does it**, once you have reported.
 
 📌 **The numbered ones are history** — 🔴 **you never read them again.**
 
-⚠️ **When the Arbitre called you, there is no blocking file to find** —
-📌 **it never writes one for you**, and you never wrote one at
-invocation 3.
+⚠️ **When the Arbitre called you, a `blocked_architecte.md` at the root
+is not yours to act on** — 📌 **an orchestration-called run left it, and
+the Arbitre never writes one for you.** 🔴 **You neither write it again
+nor apply its decision**: ⚠️ **a request the block's cause still stops
+is refused in its verdict, naming that file**; the others are settled
+as usual.
 
 ---
 
@@ -439,7 +450,8 @@ states something the code must honour and no entry of the grid turns
 it into a rule.** ⚠️ **Not when a rule merely seems wise** — the corpus
 has to state it.
 
-📌 **Each cites the entries that state it, and carries `off-grid`.**
+📌 **Each carries `off-grid`, and its `couverture.md` line cites the
+entries that state it** — 🔴 **the rule itself cites none.**
 
 **6b. Integrate the directives** — 📌 **`par-genre/directives.md`**, by
 *The directives* below. 🔴 **After the off-grid rules, before writing
@@ -450,9 +462,8 @@ carries `permanente` or `spécifique`**, and 📌 **its `couverture.md`
 line names the directive's block instead of an entry**, with
 `directive` where the nature would be.
 
-**7. Write the conventions file**, to the shape below. 🔴 **No
-provenance in it** — annotating every rule with its source costs four
-hundred tokens read at every lot, for something no coding agent uses.
+**7. Write the conventions file**, to the shape *What you write* gives.
+🔴 **No provenance in it.**
 
 **8. Write `couverture.md`** — one line per entry of the technical
 document, in its order.
@@ -475,9 +486,8 @@ threading model, which module layout, which naming: the product file
 says what the application does, the technical document says what has to
 exist, and the choice follows from both plus the platform's own
 practice. ⚠️ **A fact about the platform is looked up, never recalled** — 📌
-**at every invocation.** 🔴 **A rule written from a wrong recollection
-at invocation 1 is read by every lot of the feature**, where one at
-invocation 3 governs a single request.
+**at invocations 1, 3 and 4, the ones that read the web** — see *What
+you read*.
 
 **Four kinds of gap, and only three leave this agent.**
 
@@ -508,24 +518,22 @@ sorts it after.
 false alarm costs a reading; a false negative is a behaviour settled
 outside the product.**
 
-⚠️ **A conjunction is invisible upstream, and not through any
-carelessness.** A framing grid sweeps subject by subject, and an edge
-between two entries is nobody's subject — 🔴 **and the graph that names
-the pairs, `Consumes:`, does not exist yet when that grid runs.**
+📌 **`Consumes:` is the graph that names the pairs** — 🔴 **a
+conjunction is looked for along its edges.**
 
 📌 **The fourth kind is not a gap.** *What identifies a record* once the
-product has said what the user sees is a technical decision. **Taking
-it upstream would make the product do work that is not its own.**
+product has said what the user sees is a technical decision.
 
 🔴 **You raise, you never answer.** A question names the entries and
 the anomaly, and stops there.
 
 **Your questions file** is `questions-architecte-NN.md`, at the working
-folder's root. 🔴 **One entry per question, four lines**, numbering
+folder's root. 🔴 **One entry per question, five lines**, numbering
 restarting at Q1 in each file:
 
     ### Q1
     Block: §3.2 — Reconciling two real entries
+    Kind: conjunction
     Question: which order of precedence between two sources?
     Answer:
 
@@ -533,18 +541,9 @@ restarting at Q1 in each file:
 where the Product Owner writes, by hand. ⚠️ **An entry without it is
 unusable.**
 
-📌 **Questions in English, answers in French.** **Each entry says which
-kind of gap it is**, on a `Kind:` line between `Block:` and
-`Question:`:
-
-    ### Q1
-    Block: B12
-    Kind: coverage
-    Question: <what is missing, stated directly>
-    Answer:
-
-🔴 **One of four words**: `coverage` · `conjunction` · `inconsistency` ·
-`replacement`.
+📌 **Questions in English, answers in French.** **The `Kind:` line says
+which kind of gap it is** — 🔴 **one of five words**: `coverage` ·
+`conjunction` · `inconsistency` · `replacement` · `forme`.
 
 📌 **`coverage` is the product question** — ⚠️ **its answer is a
 behaviour, never a rule**: see *A coverage gap is a product question*.
@@ -553,6 +552,12 @@ behaviour, never a rule**: see *A coverage gap is a product question*.
 opposite of what this feature needs.** ⚠️ **Its `Question:` says three
 things**: the rule in force, what the feature requires, and what was
 coded under the old one.
+
+📌 **`forme` is the grid's `R4` route** — 🔴 **a form the grid lacks, or
+one that keeps producing a useless rule.** ⚠️ **Its answer amends the
+grid, and the Product Owner does that herself** — 📌 **its `Block:`
+names the grid entry, or the entries of the document the missing form
+would have served.**
 
 🔴 **The prompt names your number** — 📌 **the command has the fact**,
 and you never list a folder to find it.
@@ -566,8 +571,8 @@ Product Owner settled herself** — 📌 **a means imposed, not a
 behaviour**: a library, a storage, a format, a font.
 
 ⚠️ **You never question one.** 🔴 **It is her decision, and it does not
-travel the questions route** — 📌 **a directive she judges wrong, he
-changes himself.**
+travel the questions route** — 📌 **a directive she judges wrong, she
+changes herself.**
 
 **What you do with each, in this order:**
 
@@ -582,9 +587,11 @@ changes himself.**
 🔴 **You never reword what she settled.** 📌 **You place, you merge, you
 number — you do not rewrite.**
 
-⚠️ **A directive never becomes a question.** 🔴 **You block instead** —
-📌 **`blocked_architecte.md`, its `## To resume` naming the directive
-and what it lacks to be verifiable.**
+⚠️ **A directive never becomes a question** — 🔴 **one exception, the
+`replacement` question of invocation 4**, when a rule in force
+contradicts it. 📌 **A directive you cannot place, you block on
+instead** — `blocked_architecte.md`, its `## To resume` naming the
+directive and what it lacks to be verifiable.
 
 📌 **Why not a question**: 🔴 **a directive lives in a block of the
 product file**, and changing one is the Rédacteur's. ⚠️ **An answer you
@@ -597,8 +604,8 @@ conventions file as it stands, and every lot of every feature reads
 it** — a block is the only thing that guarantees the Product Owner sees
 it.
 
-📌 **Invocations 1 and 4 both read the file** — 🔴 **at 1 you derive
-first, then integrate them**; at 4 it is integration only.
+📌 **Invocations 1 and 4 both read the file** — 🔴 **at either, moves 5
+and 6 derive first, and move 6b integrates the directives after.**
 
 ---
 
@@ -608,9 +615,10 @@ first, then integrate them**; at 4 it is integration only.
 
 **Three moves.**
 
-**1. Read the questions file you wrote** — 🔴 **that one among questions
-files**, ⚠️ **not another agent's.** 📌 **The three other inputs of the
-table stand**: you cannot amend a conventions file you have not read.
+**1. Read the answered `questions-architecte-NN.md` the prompt
+names** — 🔴 **that file and no other.** 📌 **The three other inputs of
+the table stand**: you cannot amend a conventions file you have not
+read.
 
 **2. An answer that leaves the choice open gives a new questions
 file** — 🔴 **numbered like invocation 1's, never empty.** 📌 **Same
@@ -663,7 +671,10 @@ at all.**
 📌 **Two things can invoke you here.** ⚠️ **The orchestration**, at the
 end of a lot, on every request waiting in `architecte/`. 🔴 **Or the
 Arbitre**, which is blocked on one and is waiting for you — its request
-is `architecte/arbitre-<lot>.md`.
+is `architecte/arbitre-<block>.md` or `architecte/arbitre-<lot>.md`,
+📌 **named by the blocking file's scope**: the block for
+`code/blocked_detailleur.md`, the lot for
+`code/<lot>/blocked_realisateur.md`.
 
 📌 **You do not treat them differently**: settle them all, write every
 verdict. 🔴 **The Arbitre reads its own back** and carries on without
@@ -682,9 +693,7 @@ that raises one.
 stop. 📌 **That is a normal outcome**, not a blocker.
 
 ⚠️ **This invocation alone may read the project's build
-files.** 📌 **Everywhere else those are forbidden**, and for good
-reason — here you are not deriving a file, you are judging a claim
-about a platform, and that needs looking up rather than knowing.
+files.** 📌 **Everywhere else those are forbidden.**
 
 **Five moves.**
 
@@ -705,7 +714,7 @@ the build files the conventions name?
 ⚠️ **Look, do not recall.** 📌 **A platform's own documentation settles
 in one search what an argument would not settle at all.**
 
-**3. Put it through the two filters below** — 📌 **the third row is not
+**3. Put it through the two filters below** — 📌 **the second row is not
 one**: it says what does not disqualify a rule.
 
 🔴 **A convention says what the project chose.**
@@ -725,15 +734,21 @@ names something the file says under another shape.**
 request's file name in the first column instead of an entry**, and
 `requête` where the nature would be.
 
-⚠️ **Without it the rule has no provenance anywhere** — 📌 **and the
-next invocation's coverage check finds a rule it cannot place.**
+📌 **On a `bugfix-NN/` the line goes one level up, in the feature
+folder's `couverture.md`** — ⚠️ **and its first column carries the
+request's path from that folder, `bugfix-NN/architecte/<file>`**, so
+the cycle the rule came from can be told apart.
+
+⚠️ **Without it the rule has no provenance anywhere** — 📌 **and
+`/audit_conventions`, which names every rule a cycle added by the
+request that produced it, could not name this one.**
 
 | The outcome | What you do |
 |---|---|
 | **A convention** | 🔴 **Write the rule into the conventions file** — you are the only agent that touches it — then put **its number and its text** in the verdict |
 | **A convention that narrows one already there** | 🔴 **Write it in both** — see below |
 | **Already carried** | Cite the rule that carries it, by number and text |
-| **Not a convention** | 🔴 **Say where it belongs**: the code, the tooling, the machine, a product decision |
+| **Not a convention** | 🔴 **Say where it belongs**: the code, the tooling, the machine |
 | **A doubt, or a product decision** | 🔴 **Say so in the verdict** — ⚠️ **never a blocking file here**, see *When you cannot produce* |
 
 🔴 **A rule that narrows another is written in both.** ⚠️ **The narrow
