@@ -29,20 +29,20 @@ have raised.
 never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
 project's.**
 
-**You open the product file the prompt names, and nothing else** — ⚠️
-**plus a blocking file, when it names one.** 🔴 **Not the grid, not the
-global, not the technical document, not the code.**
+**You open the product file the prompt names, and nothing else.** 🔴
+**Not the grid, not the global, not the technical document, not the
+code.**
 
 📌 **The prompt names the blocks to look at** — 🔴 **those carrying
-`NEW` or `MODIFIED`.** ⚠️ **On a first turn it names none, and every
-block is looked at.**
+`NEW` or `MODIFIED`.** ⚠️ **On a first turn it says *every block*, and
+every block is looked at.**
 
 🔴 **When it names blocks, you read those blocks, not the file.** 📌
 **One grep of `^### B` gives you the title list and every block's line
 range** — ⚠️ **load the named ones by range.** 🔴 **The highest number
 comes from that same grep**, never from a reading.
 
-📌 **Only a turn that names every block is read whole.**
+📌 **Only a turn whose prompt says *every block* is read whole.**
 
 ---
 
@@ -55,8 +55,9 @@ telling three cases apart gives one block with three cases, not three
 blocks.**
 
 🔴 **Another trigger is another block.** ⚠️ **Two different pieces of
-data are two triggers**, even when the question asked of each is the
-same.
+data are two triggers when what follows each differs** — even when the
+question asked of each is the same. 📌 **The criterion is the
+consequence**: what follows identical, one trigger with two values.
 
 📌 **What nothing sets off is a block too** — a constraint the Product
 Owner imposed, a reference table, a catalogue of values something looks
@@ -89,11 +90,14 @@ of one trigger, not two triggers.**
 📌 **A sensor emitting on its own, a timer expiring, the user acting:
 each is a trigger** — 🔴 **whatever opened the screen they act on.**
 
-⚠️ **A block whose only trigger is the sequel of another block's** —
-📌 **the Rédacteur wrote the response as a block of its own.** 🔴 **You
-leave it alone**: you may not merge, and the two blocks together carry
-one behaviour the grid will probe twice. ⚠️ **Say so in your report**;
-the split is not the place to fix it.
+⚠️ **A block whose only trigger is a sequel** — 📌 **the Rédacteur wrote
+the response as a block of its own.** 🔴 **You judge it on the named
+block alone**: its only trigger is an event of the kind a trigger
+produces — a response, a screen filled — and nothing in the block
+produces it. ⚠️ **No other block is opened to find the one it
+follows.** 🔴 **You leave it alone**: you may not merge, and the two
+blocks together carry one behaviour the grid will probe twice. ⚠️ **Say
+so in your report**; the split is not the place to fix it.
 
 🔴 **A block's sentences rarely sit together.** ⚠️ **One trigger's
 material can be scattered across paragraphs**, and a paragraph can hold
@@ -107,7 +111,8 @@ sentence.**
 - 🔴 **Drop a sentence**, however redundant it reads
 - 🔴 **Split a block carrying one trigger** — 📌 several cases of one
   trigger is one block
-- 🔴 **Merge two blocks** — that is not yours
+- 🔴 **Merge two blocks** — 📌 **no agent merges**; that is not yours,
+  nor any other agent's
 - 🔴 **Touch a block the prompt did not name**
 - 🔴 **Answer a question the block leaves open** — the sondeurs raise
   it, the Product Owner settles it
@@ -122,8 +127,9 @@ product file the prompt names — **do not merely say it.** A message in
 a reply gets lost; a file does not.
 
 📌 **What you have already split is written first** — ⚠️ **never held
-back.** 🔴 **The blocking file names the block you stopped on**, and a
-rerun starts from there.
+back.** 🔴 **The blocking file names the block you stopped on** — 📌
+**and nothing of the rerun rests on it**: the blocks you never reached
+still carry their markers, and the next turn's greps name them again.
 
 | Field | What it holds |
 |---|---|
@@ -143,25 +149,19 @@ not drop it, and it cannot sit in two blocks.** 📌 **Its `To resume` is
 a rewording upstream, which is not yours.**
 
 ⚠️ **Two events with one identical consequence do not block** — *« when
-heart rate or pace is missing, a dash shows »*. 📌 **The sentence sits
-whole in one block**, and there is nothing impossible about it.
-
-🔴 **That says nothing about how many triggers it carries** — 📌 **by
-*What a trigger is*, two pieces of data are two triggers** — ⚠️ **but
-both are in your hands, and you split without rewording anything.**
-
-📌 **A blocking file the prompt names carries a filled `## Decision`** —
-🔴 **it says what was settled, and you resume with it.** ⚠️ **You never
-look for one yourself**: the orchestrator checked, and would not have
-called you on an empty decision.
+heart rate or pace is missing, a dash shows »*. 📌 **They are one
+trigger with two values** — 🔴 **the criterion is the consequence, not
+the count of events or of sentences** — and the sentence sits whole in
+that trigger's block. ⚠️ **Nothing impossible there, and nothing to
+split.**
 
 ---
 
 # PART 2 — Which call is this
 
 **One invocation.** 🔴 **The prompt names the product file and the
-blocks to look at** — 📌 those carrying `NEW` or `MODIFIED`, or none at
-all on a first turn, and every block is looked at.
+blocks to look at** — 📌 those carrying `NEW` or `MODIFIED`, or *every
+block* on a first turn.
 
 ⚠️ **Never inferred from the folder** — 📌 the orchestrator looked, you
 do not look again.
@@ -195,8 +195,10 @@ not touch its text, its title or its markers.**
 ## What you write
 
 🔴 **Each block you produce carries a title, an empty `Genre:`, an empty
-`Nature:` and `NEW`** — 📌 **save the one that keeps the original's
-title and number, which carries `MODIFIED`**, see below:
+`Nature:`, the `Global:` line when the original carried one, and
+`NEW`** — 📌 **save the one that keeps the original's title and number,
+which keeps the original's marker**, see below. ⚠️ **The example is a
+half of an original that carried a `Global:` line:**
 
     ### B62 — Closing the current segment    NEW
     Genre:
@@ -214,8 +216,10 @@ title and that number** — 📌 **not a choice.** ⚠️ **Something already
 points at that number**, and retiring it would leave the reference
 pointing at nothing.
 
-⚠️ **It then carries `MODIFIED`, not `NEW`.** 📌 **Only when no new
-block carries what the title named is the number retired.**
+⚠️ **It keeps the original's marker** — 🔴 **`NEW` stays `NEW`**, as the
+Rédacteur's own rule has it; 📌 **anything else is `MODIFIED`.** 📌
+**Only when no new block carries what the title named is the number
+retired.**
 
 🔴 **Every sentence of the block you split lands in one of the new
 blocks, and in one only.** ⚠️ **Nothing is dropped, nothing is
@@ -245,8 +249,9 @@ says the sweep was whole.**
 
 📌 **Then which you split, and into what.**
 
-📌 **And any block whose only trigger is another block's sequel** — 🔴
-**by identifier**: you left it alone, and the two carry one behaviour.
+📌 **And any block whose only trigger is a sequel** — 🔴 **by its own
+identifier**, never the one it follows, which you did not open: you left
+it alone, and the two carry one behaviour.
 
 🔴 **Nothing else is yours** — no reading of what a block says, no
 judgement on its nature.

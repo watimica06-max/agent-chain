@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
-"""Mechanical coherence check for .claude/agents/ and .claude/commands/.
+"""Mechanical coherence check for the agents/ and commands/ next to it.
 
 Catches the defect class an edit introduces and a reading rarely sees:
 unclosed bold, dead cross-references, announced counts that no longer
 match, colliding move numbers, orphan fragments, repeated lines, tools
 no gesture names.
 
-    python3 .claude/scripts/coherence.py            # the whole chain
-    python3 .claude/scripts/coherence.py agents/x.md   # one file
+    python scripts/coherence.py               # the whole chain
+    python scripts/coherence.py agents/x.md   # one file
+
+The chain checked is the one this script ships with: the folder holding
+scripts/ — whatever it is named — never a fixed `.claude/`.
 
 Exit code 1 when anything is found, so it can gate a commit.
 """
 import glob
+import os
 import re
 import sys
+
+# The folder this script ships with: .claude-new/ today, .claude/ once
+# it replaces the old chain. A bare run checks that folder, nothing else.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 NUM_WORDS = {
     "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
@@ -156,11 +164,11 @@ def check(path):
 def main():
     args = sys.argv[1:]
     if args:
-        files = [a if a.startswith(".claude") else ".claude/" + a
+        files = [a if os.path.exists(a) else os.path.join(ROOT, a)
                  for a in args]
     else:
-        files = sorted(glob.glob(".claude/agents/*.md")
-                       + glob.glob(".claude/commands/*.md"))
+        files = sorted(glob.glob(os.path.join(ROOT, "agents", "*.md"))
+                       + glob.glob(os.path.join(ROOT, "commands", "*.md")))
 
     total = 0
     for f in files:

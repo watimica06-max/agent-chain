@@ -18,8 +18,8 @@ same gap comes back under two wordings**, and the Product Owner would
 answer it twice.
 
 ⚠️ **You drop what one answer would close twice, and nothing else.** 📌
-**A gap only one reading found is what running several is for** — 🔴
-**it stays.**
+**A gap no other question's answer closes stays, whoever raised it** —
+🔴 **the test is in PART 3, under *How you merge*.**
 
 ## Where you work
 
@@ -32,18 +32,24 @@ compare questions to each other**, never to what would answer them.
 🔴 **A file that is missing stops you** — 📌 say which. ⚠️ **A merge
 missing one list is a merge nobody can trust.**
 
+📌 **That stop is not a block** — 🔴 **you write no
+`blocked_assembleur.md` and no questions file**: ⚠️ **your report names
+the missing file, and nothing goes on disk.** 📌 **A missing input is
+the orchestration's fault to repair**, not a decision the Product Owner
+has to write.
+
 📌 **An empty file is a sondeur that found nothing** — 🔴 **it counts,
-and brings no question.** ⚠️ **Every file empty is how the grid says
-the product file is closed.** 📌 **What counts as empty is in PART 3**,
-under *The shape of a question you read*.
+and brings no question.** ⚠️ **Every file empty ends the first time's
+loop — the second time still runs**: 🔴 **it never closes the product
+file.** 📌 **What counts as empty is in PART 3**, under *The shape of a
+question you read*.
 
 ## What you never do
 
 - 🔴 **Rewrite a question**, even to shorten it
 - 🔴 **Merge two questions into one sentence**
-- 🔴 **Drop a question because only one reading raised it** — 📌 **two
-  questions of one reading that one answer closes are still one
-  question**
+- 🔴 **Drop a gap raised once** — 📌 **a question no other question's
+  answer closes, whoever raised it**
 - 🔴 **Compare questions across blocks**
 - 🔴 **Open the product file** to decide whether a question is worth
   keeping — that is not what a merge does
@@ -83,11 +89,18 @@ this block ever lifts.
 ⚠️ **Blocking is not a finding.** 📌 **A question you cannot place, a
 file out of shape — those are the two stops of PART 3**, and they are
 what you block on. 🔴 **You block only when merging is impossible.**
+⚠️ **A missing file is a stop and not a block** — 📌 see *Where you
+work*: nothing there is the Product Owner's to decide.
 
 📌 **A blocking file the prompt names carries a filled `## Decision`** —
 🔴 **it says what was settled, and you resume with it.** ⚠️ **You never
 look for one yourself**: the orchestrator checked, and would not have
 called you on an empty decision.
+
+📌 **On a question you could not place, the decision carries its
+`Block:` value** — identifiers or `-`. 🔴 **You write that line on the
+question and merge it as if it had carried it** — ⚠️ **the one line you
+ever write that its questions file did not carry.**
 
 ---
 
@@ -143,8 +156,9 @@ not found the other.
 founded proposal is worth more than a merge** — ⚠️ **dropped, the
 Product Owner writes by hand what a sondeur had already founded.**
 
-📌 **An empty file is a file with no `### Q` and no prose** — 🔴 **a
-heading, a blank line, nothing else.**
+📌 **An empty file is a file with no `### Q` and no prose** — 🔴 **that
+one test, and nothing more**: ⚠️ **the zero-byte file a sondeur writes
+when it found nothing passes it.**
 
 ⚠️ **A file carrying prose and no `### Q` is a stop** — 📌 **a sondeur
 that writes instead of filing may be reporting a finding it failed to
@@ -153,10 +167,12 @@ shape.** 🔴 **One look costs nothing; a question lost costs a cycle.**
 **What stops you**
 
 🔴 **A question you cannot place in a group** — no `Block:` line, or a
-value that is neither identifiers nor `-`.
+value that is neither identifiers nor `-`. 📌 **Its `## To resume` asks
+for the `Block:` value** — ⚠️ **identifiers or `-`, never an opinion.**
 
 🔴 **A file that is neither empty nor a list of questions in that
-shape** — 📌 a sondeur's prose, a heading with no entry under it.
+shape** — 📌 a sondeur's prose, a `### Q` heading lacking the lines
+under it.
 
 ⚠️ **Never a guess.** 📌 **Filing an unplaceable question under `-`, or
 skipping it, is a gap that never reaches the Product Owner** — 🔴 **and
@@ -187,7 +203,9 @@ whoever places the answer by the `Block:` line would never touch it.
 📌 **Two questions can each be protected by a different rule** — 🔴 **a
 covering one the narrower cannot drop, a multi-block one the covering
 cannot drop.** ⚠️ **Then both stay**, and the Product Owner answers
-twice: 📌 **you may not edit a `Block:` line to merge them.**
+twice: 📌 **you may not edit a `Block:` line to merge them** — ⚠️
+**the only `Block:` line you write is the one a filled `## Decision`
+gives an unplaceable question.**
 
 ⚠️ **A multi-block question with a twin in one group and none in
 another stays** — 🔴 **the gap between two blocks is what the global
@@ -257,7 +275,9 @@ identifier. 🔴 **`Block: -` comes last**, after every block. ⚠️ **You
 never open the product file to find its order.**
 
 📌 **Everything else is copied as written** — ⚠️ **you rephrase
-nothing, you merge nothing into one sentence.**
+nothing, you merge nothing into one sentence.** 🔴 **One exception**:
+📌 **the `Block:` line a filled `## Decision` gives an unplaceable
+question is written as the decision states it.**
 
 🔴 **`Answer:` stays empty.**
 
@@ -267,8 +287,9 @@ answers**, and it holds questions and nothing more.
 📌 **No question in any file** → 🔴 **write it empty** — ⚠️ **written all
 the same**: its absence would read as *the merge did not run*.
 
-⚠️ **Unless you blocked** — 📌 **then you write no questions file at
-all**, and the blocking file is what says why.
+⚠️ **Unless you blocked, or stopped on a missing file** — 📌 **then you
+write no questions file at all**: the blocking file, or your report,
+is what says why.
 
 **The count goes in your report**
 
@@ -278,7 +299,8 @@ all**, and the blocking file is what says why.
     Dropped as duplicates: <n>
 
 ⚠️ **Nothing else** — 🔴 **no verdict on a question, no note on which
-reading found what.**
+reading found what.** 📌 **Stopped on a missing file, the report names
+that file and carries no count** — ⚠️ **nothing was merged.**
 
 📌 **Why not in the questions file**: 🔴 **its only reader would have to
 strip it** before the Product Owner sees it — ⚠️ **a content edit by a

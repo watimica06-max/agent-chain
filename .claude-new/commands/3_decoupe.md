@@ -35,16 +35,23 @@ Feature folder: `docs/features/$ARGUMENTS/`
 | | What you do |
 |---|---|
 | Absent | 📌 Carry on |
-| Its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands |
-| Its `## Decision` is filled | 📌 **Name it in the prompt** |
+| Its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands, and that its `## Decision` is to fill |
+| Its `## Decision` is filled | 🔴 **Stop** — say `/2_structure` has to run first |
 
-⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
-file.
+⚠️ **Read that one heading, nothing else.** 🔴 **A filled decision is
+`/2_structure`'s alone** — 📌 **the Rédacteur reads the file and applies
+it, and `/2_structure` renames it.** ⚠️ **The decoupeur never sees the
+file** — 🔴 **the prompt never names it.**
 
 🔴 **Grep `Clarification needed` in `desc-produit.md`.**
 
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
 one**, and that `/2_structure` has to run first.
+
+🔴 **Grep `^### Q` in each root `questions-*.md` before touching it** —
+📌 **a file holding questions is not yours to file**: ⚠️ **it waits on
+an answer, or its answers were never integrated.** 🔴 **Stop and say
+which.**
 
 🔴 **File every root `questions-*.md`**, by `git mv`:
 
@@ -67,7 +74,9 @@ is a normal outcome.
 **absent, you stop and name the file**: `/2_structure` has not run.
 
 **Until the grid has run once — no `questions-sondeur-*.md` anywhere:**
-🔴 **every block.** 📌 **Name none in the prompt.**
+🔴 **every block.** 📌 **The prompt says *every block*, in those
+words** — ⚠️ **the agent keys on them**, and a prompt naming no block
+names nothing.
 
 ⚠️ **The markers are still there, whatever earlier turns did** — 📌 **the
 Rédacteur strips them only once a grid turn has consumed them.** 🔴 **So
@@ -132,8 +141,7 @@ Agent(
   model="opus",
   description="Split <name>",
   prompt="The product file: docs/features/<name>/desc-produit.md.
-          Look at these blocks: <B7, B28 — or: every block>.
-          <Plus: blocked_decoupeur.md, its decision is filled.>"
+          Look at these blocks: <B7, B28 — or: every block>."
 )
 ```
 
@@ -148,16 +156,10 @@ notifies on completion. Do not pass it; wait for the notification.
 
 ## Once it has reported
 
-🔴 **A blocking file you named is filed:**
-
-    git mv docs/features/<name>/blocked_decoupeur.md \
-           docs/features/<name>/blocked_decoupeur-NN.md
-
-📌 **`NN`: the highest `blocked_decoupeur-NN.md` in the folder plus
-one — `01` when there is none.**
-
-⚠️ **Anything left at the unnumbered name reads as a block still
-standing**, and the next run stops on it.
+🔴 **A `blocked_decoupeur.md` it wrote stays at the unnumbered name.**
+📌 **You rename nothing** — ⚠️ **it waits for `/2_structure`, which
+applies its decision and renames it**; 🔴 **left there, it stops this
+command until then.**
 
 🔴 **Grep `^### B` in `desc-produit.md`** and count. 📌 **Say how many
 blocks the file held before, and how many it holds now.**
@@ -199,13 +201,18 @@ named.** ⚠️ **They have to match** — 📌 **a short list is a partial
 sweep**, and nothing else can see it: you may not open a block to
 check.
 
-🔴 **A short list: invoke the decoupeur again on the blocks it did not
-reach**, and nothing else. 📌 **Twice at most** — ⚠️ **still short at
-the second, stop and say which blocks were never looked at**: the split
-is incomplete and `/3a_genre` would run on it.
+🔴 **A short list and no blocking file: invoke the decoupeur again on
+the blocks it did not reach**, and nothing else. 📌 **Twice at most** —
+⚠️ **still short at the second, stop and say which blocks were never
+looked at**: the split is incomplete and `/3a_genre` would run on it.
 
-⚠️ **On a turn that named every block**, its list is what tells you it
-reached the end.
+🔴 **A short list and a `blocked_decoupeur.md`: no re-invocation.** 📌
+**The short list is expected** — it stopped on the block the file
+names, and the blocks it never reached still carry their markers for
+the next turn. ⚠️ **Relay the file and stop**, see below.
+
+⚠️ **On a turn whose prompt said *every block***, its list is what tells
+you it reached the end.
 
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
@@ -213,6 +220,7 @@ reached the end.
 | What just happened | Next |
 |---|---|
 | It wrote a blocking file | 🔴 **Fill its `## Decision`, then `/2_structure`** — ⚠️ **it blocks on a sentence carrying two triggers, and rewording is the Rédacteur's.** 📌 **`/3_decoupe` again afterwards** |
+| It reports a block whose only trigger is a sequel | 📌 **Relay its identifier; the next step does not change** — 🔴 **nobody merges**: ⚠️ the two blocks carry one behaviour the grid probes twice, and 📌 **the Product Owner merges by hand when it bothers her** |
 | Otherwise | 📌 `/3a_genre`, whether it split anything or not |
 
 🔴 **Nothing else is yours**: no reading of what a block says.

@@ -24,16 +24,18 @@ feature's.
 ## What you read
 
 **Every `blocked_*-NN.md` of the working folder** — the settled ones,
-numbered. 🔴 **Three places**: `code/**/`, the folder's own root
-*(`blocked_architecte`, `blocked_diagnostiqueur`)*, and
-`investigation/` *(a `/diagnostique` phase 1)*.
+numbered. 🔴 **Four places**: `code/**/`, `cadrage-produit/` *(the
+sondeurs)*, the folder's own root *(`blocked_architecte`,
+`blocked_diagnostiqueur`)*, and `investigation/` *(a `/diagnostique`
+phase 1)*.
 
-⚠️ **A glob on `code/**/` alone misses two families** — 📌 **and the
+⚠️ **A glob on `code/**/` alone misses three families** — 📌 **and the
 audit would report a feature as having blocked on nothing.**
 
-📌 **And `code/**/blocked_*.md` without a number** — one still standing.
-⚠️ **Read it and list it under `### Still open`**: a block waiting for a
-decision is worth reporting, and its own findings wait with it.
+📌 **And every `blocked_*.md` without a number, in the same four
+places** — one still standing. ⚠️ **Read it and list it under
+`### Still open`**: a block waiting for a decision is worth reporting,
+and its own findings wait with it.
 
 🔴 **Never put it in `## Files read`** — it is not finished, and a
 later pass has to read it again once it carries a decision.
@@ -153,7 +155,7 @@ under `## Files read`.
     code/lot-10/blocked_realisateur-02.md
 
     ### Pass 2
-    code/lot-31/blocked_detailleur-01.md
+    code/blocked_detailleur-01.md
 
     ## Pass 2
 

@@ -23,9 +23,11 @@ same scope.
 
 ## What you read
 
-**Only what the routing table tests** — the presence of files, and
-whether a `## Decision` or an `Answer:` field is empty. 🔴 **Never
-their content beyond that.**
+**Only what the routing table tests** — the presence of files, whether
+a `## Decision` or an `Answer:` field is empty, what a filled blocking
+file's `## Invocation` line says — the file numbers *Git, before
+invoking* reads off their names, and the one grep *On `INIT` — the
+copy* names. 🔴 **Never their content beyond that.**
 
 ⚠️ **Nothing else.** `CLAUDE.md`'s standing reading rules apply.
 
@@ -40,34 +42,42 @@ matches.**
 |---|---|---|
 | 1 | `desc-produit.md` absent | 🔴 **Error** — say so and stop |
 | 2 | A `blocked_*.md` with an empty `## Decision` | 🔴 **STOP** — relay it |
-| 3 | A `blocked_*.md` with a filled `## Decision` | 📌 **The agent its name carries**, at the invocation its `## Invocation` line names |
+| 3 | A `blocked_*.md` with a filled `## Decision` | 📌 **The agent its name carries**, at the invocation its `## Invocation` line names — 🔴 **name the file in the prompt** |
 | 4 | `rapport-fusion.md` exists | 🔴 **STOP** — the merge is done |
 | 5 | A root questions file with an empty `Answer:` | 🔴 **STOP** — relay it |
 | 6 | 🔴 **`desc-produit-fusion.md` absent** | **Rédacteur, invocation 3 — Merging** |
 | 7 | 🔴 **`questions-fusionneur-NN.md` holding `### Q`, answered**, and no `plan-fusion.md` | **Fusionneur, invocation 3** |
 | 8 | A `bugfix-*/` folder, and no `questions-fusionneur-*` anywhere | **Fusionneur, invocation 3** |
-| 9 | `questions-fusionneur-NN.md`, answered — 📌 **empty, or its questions resolved** | **Fusionneur, invocation 2** |
+| 9 | `questions-fusionneur-NN.md`, answered or empty, and no `plan-fusion.md` | **Fusionneur, invocation 1** |
 | 10 | `plan-fusion.md` exists | **Fusionneur, invocation 2** |
 | 11 | Otherwise | **Fusionneur, invocation 1** |
+
+🔴 **Row 10 is the only route to invocation 2** — 📌 **it applies the
+plan, and no other invocation writes one.** ⚠️ **A questions file with
+no plan beside it is invocation 3's**: the bug-fix pass has run, the
+compare has not — row 9 sends the run to the compare.
 
 🔴 **The order of these rows is the routing.** ⚠️ **The Rédacteur comes
 before every Fusionneur row**: it writes the source the Fusionneur
 reads, and a Fusionneur invocation above it would run on a file that
 does not exist.
 
-⚠️ **And a `bugfix-*/` folder comes before the row without it** — 📌
-**the two conditions differ by that folder alone**, and the general one
-placed first would shadow the specific: a correction cycle would go to
-invocation 2, which needs a plan no invocation wrote.
+⚠️ **And row 8 comes before every invocation-1 row** — 📌 **a
+correction cycle's decisions are folded before the compare runs**;
+placed after, *Otherwise* would send a feature with `bugfix-*/` folders
+straight to invocation 1, and what the corrections settled would never
+reach the global.
 
 📌 **Row 8 fires once.** The Fusionneur writes a questions file even when
 empty, and its presence is what says the pass has run — the
 `bugfix-*/` folders never go away.
 
-🔴 **An empty one sends the next run to row 9, not back to row 7** — 📌
-**row 7 tests `### Q`**, so a pass that asked nothing does not repeat
-itself. ⚠️ **Without that test, row 7 would fire on its own output**,
-for ever.
+🔴 **An empty one sends the next run to row 9 — invocation 1, the
+compare — not back to row 7**: 📌 **row 7 tests `### Q`**, so a pass
+that asked nothing does not repeat itself. ⚠️ **Without that test, row
+7 would fire on its own output**, for ever. 📌 **And never to
+invocation 2** — the bug-fix pass writes no plan, and invocation 2
+applies one.
 
 ⚠️ **Row 8 covers every `bugfix-NN` at once**, not the last one. **A
 feature with no bug-fix cycle never matches rows 7 or 8.**
@@ -114,6 +124,15 @@ stays at the root, it carries the numbering.
 
 📌 **Create `questions/<agent>/` if it does not exist.**
 
+🔴 **A Fusionneur row fired: compute its questions file number** — 📌
+**the highest `questions-fusionneur-NN.md` at the root and under
+`questions/fusionneur/` together, plus one**; ⚠️ **`01` when there is
+none.** 🔴 **It goes in the prompt, at every one of its invocations** —
+the agent never lists a folder to find it. 📌 **Invocation 2 needs it
+too**: on an ambiguous answer it writes the next questions file, and
+nothing else. ⚠️ **The Rédacteur gets none** — its row writes no
+questions file.
+
 🔴 **Then commit the feature folder**, before creating the worktree:
 
     git add docs/features/<name>/ && git commit -m "chore: answers"
@@ -139,13 +158,32 @@ isolated.
 
 ---
 
+## On `INIT` — the copy
+
+🔴 **Invocation 2 is the one about to run — row 10, or row 3 naming
+it — and `plan-fusion.md` holds `INIT` alone → copy the product file
+over the global, in the worktree, before invoking:**
+
+    cp docs/features/<name>/desc-produit-fusion.md docs/PRODUIT_GLOBAL.md
+
+📌 **One grep tells** — the plan's only non-empty line is the word
+`INIT`. ⚠️ **Any other plan: no copy** — the agent applies it by
+targeted edits.
+
+📌 **The agent has no tool that copies** — ⚠️ **and a whole read
+followed by a whole write truncates in silence.** 🔴 **It strips from
+the copy what belongs to the feature file alone; you make the copy.**
+
+---
+
 ## How it runs
 
 **One phase per run.** 🔴 **Never chain two agents** — each stop hands
 back to the Product Owner, and the next run picks the table up again.
 
-**What you do**: invoke the agent via `Agent()` with the feature folder
-and which invocation it is — and nothing else.
+**What you do**: invoke the agent via `Agent()` with the feature folder,
+which invocation it is — and, for the Fusionneur, its questions file
+number — and nothing else.
 
 🔴 **Never paraphrase the agent's process in your invocation** — not
 its inputs, its checks, its output format. It reads its own
@@ -158,9 +196,17 @@ Agent(
   subagent_type="<agent>",
   model="sonnet",
   description="<phase> <feature>",
-  prompt="Feature folder: docs/features/<name>/. <Which invocation>."
+  prompt="Feature folder: docs/features/<name>/. <Which invocation>.
+          [Questions file number: <NN>.]
+          [Blocking file: <folder>/blocked_<agent>.md, its `## Decision`
+          filled.]"
 )
 ```
+
+📌 **The first bracketed line on every Fusionneur invocation, never on
+the Rédacteur's.** 📌 **The second only when row 3 fired** — 🔴 **the
+agent applies the decision and says so in its report**, see *Git, once
+it has reported*.
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
 either** — in this environment the Agent tool always runs async and

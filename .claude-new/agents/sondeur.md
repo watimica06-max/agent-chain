@@ -45,14 +45,14 @@ project's.**
 | **A blocking file** | 📌 **Only when the prompt names one** |
 | **The global**, `docs/PRODUIT_GLOBAL.md` | 🔴 **Invocation 3 only** — 📌 **the sections your blocks name, never the file whole** |
 
-🔴 **The prompt names two lists of blocks, and they are not read the
-same way:**
+🔴 **The prompt names lists of blocks, and they are not read the same
+way** — 📌 **and which lists it carries depends on the invocation:**
 
-| The list | What you do with it |
-|---|---|
-| **The blocks to probe** | 📌 **Every one carries `Genre: comportement`** — 🔴 **you take each through the grid's questions** |
-| **The transverse blocks** | 🔴 **You never probe them** — 📌 **you hold them beside you**, and a question a transverse rule already answers is a *défaut*, not an obligatory question |
-| **The out-of-scope blocks** | 📌 **At the global invocation only.** 🔴 **You never probe them** — ⚠️ **they are what the Product Owner already excluded**, and a question they answer is not asked |
+| The list | Which invocations | What you do with it |
+|---|---|---|
+| **The blocks to probe** | 📌 **Every one** — at 1 and 2, each carries `Genre: comportement`; at 3, each carries a `Global:` line, and the prompt names the global section beside it | 🔴 **You take each through the grid's questions** |
+| **The transverse blocks** | 📌 **1 and 2** | 🔴 **You never probe them** — 📌 **you hold them beside you**, and a question a transverse rule already answers is a *défaut*, not an obligatory question |
+| **The out-of-scope blocks** | 📌 **2 only** | 🔴 **You never probe them** — ⚠️ **they are what the Product Owner already excluded**, and a question they answer is not asked |
 
 ⚠️ **A block of any other genre is neither** — 📌 **the command does not
 name it**, and it is not yours.
@@ -78,12 +78,14 @@ title, read from there.**
 
 **Two things stop you before you write anything:**
 
-🔴 **1. A read that returned less than the file holds** — 📌 **a
+🔴 **1. A read that returned less than you asked for** — 📌 **a block,
+from its heading to the next; a section of the global, at invocation 3;
+the grid, whole.** ⚠️ **Three observables, and they are the test: a
 truncation the tool signals, a text ending mid-block, a heading with no
-body after it** — ⚠️ **or nothing at all.** 📌 **Say what you asked for
+body after it** — 🔴 **or nothing at all.** 📌 **Say what you asked for
 and what you got.**
 
-⚠️ **A small file that reads whole is not a stop.**
+⚠️ **A short block that reads whole is not a stop.**
 
 🔴 **2. An identifier the prompt listed that the product file does not
 hold** — 📌 **name it.** ⚠️ **The list is the only authority**, and one
@@ -108,19 +110,20 @@ that has changed since.
 
 ## When you cannot produce
 
-🔴 **Write the blocking file the prompt names you** — do not merely say
-it. ⚠️ **A message in a reply gets lost; a file does not.**
+📌 **Your blocking file has one name, known before anything blocks:**
+
+| Invocation | Its name |
+|---|---|
+| **1 and 2** | 🔴 **`<out>/blocked_<your name>.md`** — 📌 **derived from the output path the prompt gives**, `<out>` and the name as in *What you write* — ⚠️ **several of you run at once**, and one shared name would let one blocking file overwrite another |
+| **3** | 🔴 **The path the prompt gives** — 📌 **you run alone**, and the prompt names it |
+
+🔴 **Write that file** — do not merely say it. ⚠️ **A message in a reply
+gets lost; a file does not.**
 
 🔴 **A blocked run writes that file and nothing else** — ⚠️ **no
 questions file, no record**, whatever the invocation owed. 📌 **The
 command tells a blocked reading from a missing one by which file is
 there.**
-
-📌 **At invocations 1 and 2 it is `<out>/blocked_<your name>.md`** —
-⚠️ **several of you run at once**, and one shared name would let one
-blocking file overwrite another.
-
-📌 **At invocation 3 you run alone**, and the prompt names it.
 
 **Its shape** — four headings, the last one left empty:
 
@@ -338,14 +341,19 @@ pass B's** — ⚠️ **a pass A question stands on its block alone.**
 
 ⚠️ **A question they already answer is not asked at all** — 📌 **neither
 obligatory nor *défaut***: 🔴 **she wrote it once, and asking again makes
-him answer what she has already answered.**
+her answer what she has already answered.**
 
 📌 **`C1.2` is the one that fires on them** — ⚠️ **and a scope question
 they do not cover is still asked**, as it always was.
 
-🔴 **A block of the feature that does what one of them excludes is not
-your business** — 📌 **it is a contradiction of the product**, and it
-goes to the Product Owner as an obligatory question naming both.
+🔴 **A block of the feature that does what one of them excludes is a
+contradiction of the product** — 📌 **you raise it, as an obligatory
+question**: ⚠️ **its `Block:` line carries the feature's block alone**,
+and the question's own words name the out-of-scope block it
+contradicts — on the model of invocation 3, which names the global's
+section the same way. 🔴 **Never a *défaut***: the Product Owner
+settles which of the two stands. 📌 **It is the global's** — the one
+invocation that holds the out-of-scope blocks.
 
 ### The transverse rules beside you
 
@@ -429,6 +437,12 @@ crosses.**
 
 📌 **`Block: -` for a pass C question**: it was asked of the feature,
 and nothing in it says where its answer lands.
+
+📌 **One identifier for a contradiction with an out-of-scope block** —
+🔴 **the feature's block that does what the other excludes, never the
+out-of-scope block**, which the question names in its own words. ⚠️
+**The global raises it**, and it is neither a pass A gap nor a
+crossing.
 
 📌 **At invocation 3, one identifier** — 🔴 **the feature's block that
 does the hitting.** ⚠️ **Never a block of the global**, which this chain

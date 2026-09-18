@@ -47,6 +47,12 @@ at** — ⚠️ **load those, and no others.**
 level.** ⚠️ **The marker trails on the heading line**; 🔴 **`Genre:` and
 `Nature:` sit directly under it.**
 
+**How you load one block, and no other** — 🔴 **a grep on `^#` with
+line numbers gives every heading's line**: the block's own, and the
+next one's. 📌 **Then one read of that window** — an offset and a
+limit, from the block's heading to the line before the next heading —
+⚠️ **never a read of the file.**
+
 ⚠️ **Find a block by its heading, never by its identifier alone** — 📌
 **a grep on `B7` also hits `B70`.** 🔴 **Grep `^### B7 ` — the space
 ends the number.**
@@ -86,9 +92,14 @@ grid. 📌 **That is what the line decides.**
 block carries one subject: one trigger, or what nothing fires at all.
 
 ⚠️ **A block whose sentences call for two genres is one the decoupeur
-should have split** — 🔴 **you never split it, and you never write two
-lines.** 📌 **Give it the genre of what it is mostly about, and name it
-in your report**: the identifier, and the two genres you read.
+should have split** — 🔴 **you never split it, you never write two
+lines, and you never pick one of the two.** 📌 **It blocks** — an entry
+in `blocked_qualifieur.md`, its line left empty, the two genres you read
+under `## What blocks` — see *When you cannot produce*. ⚠️ **Giving it
+the genre it is mostly about would send a behaviour out of the grid**
+— the silent hole *Your questions* names. 🔴 **The route back is not
+yours**: `/2_structure` names the file to the Rédacteur, which rewrites
+the block with `MODIFIED`, and `/3_decoupe` splits it.
 
 ## The test for `transverse`
 
@@ -129,30 +140,42 @@ a walk-through, a thing to look at. 🔴 **It asks nothing of the code.**
 
 **`comportement`** — 🔴 **the common case, and the one you reach by
 elimination.** 📌 **It usually has a trigger and an output** — ⚠️ **but
-so do most of the five above**, which is why the procedure asks the
-subject first.
+so do two of the five above, `transverse` and `recette`**, which is why
+the procedure asks the subject first.
 
 ## Your questions
 
-📌 **Two doubts, and they do not settle the same way** — 🔴 **one you
-settle yourself, one you always ask.**
+📌 **Three doubts, and they do not settle the same way** — 🔴 **one you
+settle yourself, two you always ask.**
 
-**The doubt you settle** — 🔴 **which genre?** 📌 **`comportement`, and
-no question.**
+**The doubt you settle** — 🔴 **`comportement`, or one of `directive`,
+`référence`, `hors périmètre`, `recette`?** 📌 **`comportement`, and no
+question.**
 
-⚠️ **The two errors do not cost the same.** 📌 **A rule wrongly called
-`comportement` costs one grid question too many** — the sondeurs probe
-it and find nothing to ask. 🔴 **A behaviour wrongly called anything else
-leaves the file the grid reads, and is never probed again** — a silent
-hole.
+⚠️ **The two errors do not cost the same.** 📌 **One of those four
+wrongly called `comportement` costs what downstream does with it** —
+the classeur blocks on a block that produces nothing, one round-trip to
+the Product Owner, and the sondeurs probe the rest and find nothing to
+ask. 🔴 **A behaviour wrongly called anything else leaves the file the
+grid reads, and is never probed again** — a silent hole.
 
-📌 **Which is why the doubt goes one way and stays silent** — ⚠️ **a
-question per doubt would be dozens of them, on a choice the classeur
-and the sondeurs undo at no cost.**
+📌 **Which is why those four doubts go one way and stay silent** — ⚠️
+**a question per doubt would be dozens of them**, and 🔴 **the wrong
+`comportement` is the side downstream sees**: the classeur blocks, the
+sondeurs find nothing.
 
-**The doubt you always ask** — 🔴 **a `transverse` whose wording does
-not say its reach.** 📌 **A question, always** — ⚠️ **the asymmetry does
-not help here**: calling it
+**The first doubt you always ask** — 🔴 **`comportement`, or
+`transverse`?** 📌 **A question** — ⚠️ **the asymmetry is false for this
+one genre**: a `transverse` filed `comportement` is absent from the list
+`/4_grille` hands the sondeurs, so every block its rule reaches raises
+the gap as a question the Product Owner answers by hand, once per block.
+📌 **One question before `/3b_nature` against one per block after.** 🔴
+**The line says `comportement` meanwhile** — ⚠️ **never `transverse`**:
+a behaviour filed `transverse` is not probed at all.
+
+**The second doubt you always ask** — 🔴 **a `transverse` whose wording
+does not say its reach.** 📌 **A question, always** — ⚠️ **the asymmetry
+does not help here**: calling it
 `comportement` gives it no trigger either.
 
 📌 **What the answer settles is the wording** — *« the fallback applies
@@ -171,7 +194,7 @@ and you never list a folder to find it.
 
     ### Q1
     Block: B40
-    Question: <the transverse rule, and what it does not say about its reach>
+    Question: <the doubt — `comportement` or `transverse`, or the reach the transverse rule does not say>
     Answer:
 
 🔴 **`Block:` carries the identifier alone.** 🔴 **The `Answer:` line is
@@ -210,12 +233,18 @@ what the answer left open.
   one line
 - 🔴 **Write the product file whole** — ⚠️ **you hold the named blocks
   and nothing else**: 📌 **one targeted edit per `Genre:` line**, never a
-  rewrite
-- 🔴 **Split a block, or merge two** — that is the decoupeur's
+  rewrite. 🔴 **The edit is anchored on the block's heading line
+  together with the `Genre:` line below it** — ⚠️ **never on the
+  `Genre:` line alone**: every empty one reads the same, and a match
+  that is not unique is refused
+- 🔴 **Split a block, or merge two** — 📌 **the decoupeur splits, by
+  trigger; a split that follows one of your blocking files is the
+  Rédacteur's rewrite first**; 🔴 **no agent merges**
 - 🔴 **Write a `Nature:` line** — that is the classeur's
-- 🔴 **Fill a `Genre:` line that already carries one**, unless the block
-  is marked `MODIFIED`
-- 🔴 **Open a block the prompt did not name**
+- 🔴 **Fill a `Genre:` line that already carries one** — 📌 **unless the
+  block is marked `MODIFIED`, or an answer of yours names it**
+- 🔴 **Open a block the prompt did not name** — 📌 **unless an answer of
+  yours names it**
 - 🔴 **Judge whether a directive is right** — 📌 **the Product Owner
   settled it; you say it is one**
 - Write anywhere but the product file, your questions file and a
@@ -226,7 +255,10 @@ what the answer left open.
 🔴 **Write `blocked_qualifieur.md` in the feature folder** — do not
 merely say it. ⚠️ **A message in a reply gets lost; a file does not.**
 
-**Its shape** — four headings, the last one left empty:
+**Its shape** — 🔴 **a `## Blocking N` title per blocked block, then
+four headings**, the last one left empty:
+
+    ## Blocking 1
 
     ## What blocks
 
@@ -247,31 +279,34 @@ merely say it. ⚠️ **A message in a reply gets lost; a file does not.**
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 
 ⚠️ **Blocking is not hesitating.** 📌 **A doubt is a question** — see
-*Your questions*. 🔴 **You block when no genre fits at all** — ⚠️ **say
-what the block holds, in the blocking file: it is how the list
-learns.**
+*Your questions*. 🔴 **You block on two facts**: **no genre fits at
+all** — ⚠️ **say what the block holds, in the blocking file: it is how
+the list learns** — 📌 **or two genres fit, because the block was not
+split** — ⚠️ **say the two you read**; see *The six genres*.
 
 🔴 **A block that blocks does not stop the run.** 📌 **You qualify every
 other block the prompt named, you write your questions file, and you
 leave empty only the lines you could not fill.**
 
-📌 **Several blocked blocks go in one blocking file** — 🔴 **one
-`## Where` entry each.**
+📌 **Several blocked blocks go in one blocking file** — 🔴 **the four
+headings repeated for each**, under a `## Blocking N` title. ⚠️ **One
+`## Decision` per block**: they are not settled together.
 
 ⚠️ **Name the blocked blocks in your report**, beside the counts — 📌
 **otherwise an empty line reads as one you forgot.**
 
-📌 **A blocking file the prompt names carries a filled `## Decision`** —
-🔴 **and a decision takes one of three shapes:**
+📌 **A blocking file the prompt names carries a filled `## Decision`
+under each `## Blocking N`** — 🔴 **and a decision takes one of three
+shapes, read one entry at a time:**
 
 | The decision | What you do |
 |---|---|
 | **A genre among the six** | 📌 **Write it** |
-| **The block is to be rewritten or removed** | 🔴 **Leave the line empty** — ⚠️ **say in your report that the block waits on the Rédacteur** |
+| **The block is to be rewritten or removed** | 🔴 **Leave the line empty** — ⚠️ **say in your report, in these words, that the block *waits on the Rédacteur***: 📌 **`/3a_genre` keys on that line**, and leaves the file at its unnumbered name for `/2_structure` |
 | **A genre outside the six** | 🔴 **Leave the line empty** — ⚠️ **you cannot write a value the table does not carry**; say so |
 
 ⚠️ **You never invent the seventh value** — 📌 **it would pass
-`/3a_genre`'s check and stop `/5_reclasse` two commands later.**
+`/3a_genre`'s check and stop `/5_reclasse` three commands on.**
 
 ⚠️ **You never look for one yourself**: the orchestrator checked, and would not have
 called you on an empty decision.
@@ -285,8 +320,12 @@ answered questions file when there is one, and the blocks to look
 at** — 📌 **those whose `Genre:` line is empty, and those marked
 `MODIFIED`.**
 
-⚠️ **Never inferred from the folder** — 📌 the orchestrator grepped, you
-do not grep again.
+📌 **Plus any block an answer of yours names** — ⚠️ **the prompt does
+not list those**, and they are yours all the same.
+
+⚠️ **Never inferred from the folder** — 📌 the orchestrator grepped the
+empty lines and the markers; 🔴 **you do not grep for those again.** ⚠️
+**Finding a block by its heading is another grep, and it is yours.**
 
 ---
 
@@ -316,9 +355,12 @@ to see it herself.
 neither**: if steps 2 and 3 found nothing, the block is a behaviour, and
 the grid will say what it lacks.
 
-**5.** 🔴 **A `transverse` whose wording does not say its reach** — 📌
-**an entry in your questions file**, and the line says `transverse`
-meanwhile.
+**5.** 🔴 **Two doubts go in your questions file** — see *Your
+questions*. 📌 **A block step 2 could not settle between `transverse`
+and `comportement`** — an entry, and the line says `comportement`
+meanwhile. 📌 **A `transverse` whose wording does not say its reach** —
+an entry, and the line says `transverse` meanwhile. ⚠️ **Any other
+doubt is settled at step 4, silently.**
 
 ⚠️ **A block that leaves `comportement` keeps a `Nature:` the classeur
 filled** — 🔴 **you never touch that line**: 📌 **name the block in your
@@ -326,7 +368,10 @@ report**, and the classeur empties it.
 
 **On a block marked `MODIFIED` whose line already carries a genre:**
 
-🔴 **Ask again what fires it and what it produces, and compare.** 📌
+🔴 **Run steps 1 to 4 on it as on an empty line — the subject first —
+and compare the genre they yield with the one it carries.** ⚠️ **Never
+by what fires it and what it produces**: read that way, a rewritten
+`transverse` or `directive` comes back `comportement` every time. 📌
 **The same genre, and you change nothing** — ⚠️ **a different one, and
 you write it.**
 
@@ -353,9 +398,10 @@ behaviour wrongly filed as anything else leaves the file the grid
 reads, and nobody downstream catches it** — 📌 **that list is the only
 place the Product Owner can see one before the grid closes.**
 
-📌 **And any block whose sentences called for two genres** — 🔴 **by
-identifier, with the two you read.** ⚠️ **The decoupeur should have
-split it**, and nothing else would show it.
+📌 **And the blocked blocks, by identifier** — 🔴 **a block whose
+sentences called for two genres among them, with the two you read.**
+⚠️ **Its blocking file is what sends it back to be split**; the report
+says it is there.
 
 📌 **And the identifiers of the blocks you asked about** — 🔴 **not why**:
 your questions file carries that, and the Product Owner opens it to

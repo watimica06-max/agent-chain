@@ -39,6 +39,17 @@ not to the feature folder.
 the space ending the number: ⚠️ **a grep on `B15` alone also hits
 `B150`.**
 
+🔴 **The read that follows is bounded** — 📌 **a block runs from its own
+heading line to the line before the next block heading.** One grep
+gives every heading's line number at once, `grep -n '^### B'` — 🔴
+**then one bounded call per block of your group:**
+
+    Read("desc-produit.md", offset=<its heading line>,
+         limit=<the next heading's line − its heading line>)
+
+📌 **The last block of the file has no next heading** — its read runs to
+the end of the file.
+
 🔴 **Never a whole read to find a block** — 📌 **the product file is the
 whole product**, and your group holds a handful of its blocks.
 
@@ -56,19 +67,15 @@ whole product**, and your group holds a handful of its blocks.
 - **The sheets your group names**, `code/<lot>/fiche-executable.md` —
   🔴 **those, and no other**
 
-📌 **A title may end in `NEW`** — an upstream working marker. It is not
-part of the title; ignore it.
+📌 **A title may end in `NEW` or in `MODIFIED`** — the two upstream
+working markers the Rédacteur leaves on a heading line. Neither is part
+of the title; ignore both alike.
 
 ⚠️ **A `code/<lot>/` folder holding no sheet means that lot was never
 detailed** — 📌 **see *You never write a blocking file*** for what you
 write.
 
-🔴 **Never `idees.md`** — the raw text the upstream chain spent its
-whole loop correcting.
-
 🔴 **Never the code** — the Relecteur checked sheet against code.
-⚠️ **Never the technical document, the lot list or the sequence**: you
-check the result of those transformations, not the transformations.
 
 ---
 
@@ -81,8 +88,8 @@ intention, a doubt: that is what you are for.**
 
 | | |
 |---|---|
-| **No product file** | 🔴 **Stop and say so, no file** — 📌 **the command checks the same thing before invoking you**, and no decision the Product Owner writes would make one appear |
-| **A sheet your prompt names and that is not there** | 🔴 **Every intention of the blocks it was to answer for goes under `Doubtful`**, naming the lot — 📌 **and the run carries on** |
+| **No product file** | 🔴 **Stop and say so, no file** — 📌 **no `desc-produit.md` in the folder the prompt names means you were invoked on a bug-fix cycle, and there is nothing to compare against.** ⚠️ **The command checks the same thing before invoking you**, and no decision the Product Owner writes would make one appear |
+| **A sheet your prompt names and that is not there** | 🔴 **Every intention of the blocks it was to answer for goes under `## Doubts`**, naming the lot — 📌 **and the run carries on** |
 
 ⚠️ **A doubt in the report reaches the Product Owner in the same run** —
 📌 **a blocking file costs a full stop and a re-run, on a fact she can
@@ -101,7 +108,11 @@ read in the report.**
 - 🔴 **Re-judge a group's verdict when assembling** — you gather
 - 🔴 **Judge the quality of a sheet** — presence or absence, nothing
   else
-- 🔴 **Answer for a whole block at once** — one line per intention
+- 🔴 **Answer for a whole block at once** — one line per intention.
+  ⚠️ **The one exception is a block carrying no intention to find** —
+  the block describing what does not change, and the block marked
+  `carried`: 📌 **one line under found, with that reason** (see
+  invocation 1)
 - 🔴 **Settle a doubt**
 
 ---
@@ -123,8 +134,8 @@ never a block outside its group. **Invocation 2 never reads a sheet at
 all** — the partial reports carry everything.
 
 🔴 **A feature cycle only.** ⚠️ **No `desc-produit.md` in the folder the
-prompt names means you were invoked on a bug-fix cycle** — 📌 **stop
-and say so**: there is nothing to compare against.
+prompt names means you were invoked on a bug-fix cycle** — 📌 **the stop
+is the one *You never write a blocking file* states.**
 
 ---
 
@@ -157,7 +168,8 @@ map is one block and every path in it is an intention.
 | **Missing** | The intention, and what it described |
 | **Doubtful** | The intention, and what stops you deciding |
 
-📌 **Name the block and the sentence** when a block holds several.
+📌 **Name the block and the cut** — the sentence, the table row, the
+list item, the branch — when a block holds several.
 
 📌 **One sheet often carries several blocks**, and can answer for a
 whole screen. ⚠️ **Confront intention by intention all the same** — 📌
@@ -191,10 +203,21 @@ apart by a fact, not by your confidence:**
 | **Doubtful** | 🔴 **A criterion may observe it and the sheet alone does not tell you which way** — 📌 **a criterion phrased over a class, an intention whose observable the block does not name** |
 
 ⚠️ **An intention nothing observes is `Missing`** — 📌 **not a doubt.**
+🔴 **That holds for the sheets you read, and for them only** — ⚠️ **a
+sheet your prompt names and that is not there is not a sheet observing
+nothing**: you cannot state what it fails to observe, and its
+intentions are `Doubtful`, as *You never write a blocking file* says.
 
 ⚠️ **A block describing what does not change** — an inherited rule,
 restated for context — carries no intention to find. Say so under
-found, with that reason.
+found, with that reason. 🔴 **A block carrying no intention to find is
+the one case where a block gets a single line instead of one per
+intention** — 📌 **and the block marked `carried` reads the same way:**
+
+⚠️ **A block that reaches you marked `carried` was built by a correction
+cycle** — its intentions are not missing, they were built elsewhere.
+🔴 **One line under `## Intentions found`, with the mark as its
+reason** — never a `Missing` one, and you read no sheet for it.
 
 ### What you write
 
@@ -203,8 +226,8 @@ you**, `G1`, `G2`, as the command printed it. ⚠️ **Never a name you
 choose**: two groups on one name overwrite each other.
 
 🔴 **It opens with the blocks you were given**, one line, in this exact
-form — 📌 **that is what says a group ran and answered for none of
-them:**
+form — 📌 **it says which blocks your group actually treated, and
+assembly reads it against the prompt's list:**
 
     Blocks: B4, B5, B9, B12
 
@@ -212,10 +235,14 @@ them:**
 
     ## Intentions found
 
-    B4 Daily step panel — lot-07, criterion 2
-    B5 Tapping the panel — lot-07, criterion 4
+    B4 Daily step panel — lot-07, "the panel shows today's count"
+    B5 Tapping the panel — lot-07, "tapping the panel opens the detail"
     B9 Retention window — unchanged, nothing to build
     B12 Navigation map · list to detail — lot-25, onRaceClicked
+
+🔴 **A criterion is cited by its text, or its opening words — never by
+a counted position.** ⚠️ **The sheet's list is unnumbered**: "criterion
+2" names nothing a reader can find.
 
     ## Intentions missing
 
@@ -234,8 +261,10 @@ them:**
 intentions gives several lines** — `B12 Navigation map · <the
 intention>`, and the same block can appear in two fields at once.
 
-🔴 **Write the three fields even when empty.** An absent field reads as
-*this group did not run*.
+🔴 **Write the three fields even when empty.** 📌 **A present partial is
+a group that ran, whatever it lacks** — ⚠️ **a field missing from it
+sends every block absent from its other fields under `## Doubts` at
+assembly, naming your group and what the partial lacks.**
 
 ---
 
@@ -274,22 +303,30 @@ earlier run concluded, and you would stop looking.
 🔴 **You change no line.** A group's verdict is its own; you gather,
 you do not re-judge.
 
-**3. Check the block list the prompt gave you**, one by one.
+**3. Check the block list the prompt gave you**, one by one — 🔴
+**and, for each present partial, its opening `Blocks:` line against
+the prompt's line for that group.**
+
+🔴 **The prompt's list is authoritative.** 📌 **The opening line says
+which blocks the group actually treated** — ⚠️ **a difference between
+the two is a line of the report, never a reason to pick one list over
+the other.**
 
 | | |
 |---|---|
-| **A block no partial mentions, and its group did report** | 🔴 **Under `Doubtful`** — 📌 **its group answered for others and not for it** |
-| **A group named by the prompt whose partial is not there** | 🔴 **Every block it was given goes under `Doubtful`**, naming the group — ⚠️ **a group that ran and answered for nothing is not a group that never ran** |
+| **A block no partial mentions, and its group did report** | 🔴 **Under `## Doubts`**, naming the group — 📌 **its group answered for others and not for it.** ⚠️ **A present partial is a group that ran, whatever it lacks** — a field, the opening line: the line also says what the partial lacks |
+| **A block the prompt gives a group and its opening line does not carry, or the reverse** | 🔴 **Under `## Doubts`**, naming the group and the two lists — 📌 **the group's own lines stay where the group put them** |
+| **A group named by the prompt whose partial is not there** | 🔴 **Every block it was given goes under `## Doubts`**, naming the group — ⚠️ **a group that ran and answered for nothing is not a group that never ran** |
 
 ⚠️ **A block nobody answered for is worse than a block reported
 missing** — 📌 **and only the prompt's list shows it**: the numbering
 alone shows a hole between `B6` and `B8`, never the last blocks of the
 feature, never a whole silent group.
 
-📌 **Each partial opens with the blocks its group was given** — 🔴
-**that is what tells the two cases apart**: ⚠️ **a group that ran and
-found nothing has an opening line; a group that did not run has no
-file at all.**
+📌 **The file tells the two cases apart** — ⚠️ **a group that ran has a
+partial, whatever it holds; a group that did not run has no file at
+all.** 🔴 **The opening line tells something else**: which blocks that
+group treated.
 
 ---
 
@@ -301,8 +338,8 @@ feature.
 📌 **Found intentions appear too** — their absence from the list would
 be ambiguous: handled, or forgotten?
 
-**Prose**: 🔴 **English, present indicative, active voice.** ⚠️ **Name
-blocks and lots exactly.**
+**Language of the lines**: 🔴 **English, present indicative, active
+voice.** ⚠️ **Name blocks and lots exactly.**
 
 🔴 **Write the report even when nothing is missing** — an empty
 `## Intentions missing` says *"the chain held"*.

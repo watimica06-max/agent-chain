@@ -58,11 +58,17 @@ never the number.**
 | `questions-lexicographe` alone | **2 — Settling** |
 | Another agent's questions file alone, **with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to watch**; say `/2_structure` |
 | Another agent's questions file alone | **3 — Watching** |
+| Another agent's, and `questions-lexicographe` **with no `### Q`** | 🔴 **Invoke nothing** — 📌 **3 asked nothing**, and 4 runs only when 3 asked; say `/2_structure` |
 | Another agent's, and `questions-lexicographe` | **4 — Correcting** |
 | Two files of other agents | 🔴 **Stop** — a filing failed; say which files |
 
 📌 **Call the other agent's file *the answered file***, whichever agent
 wrote it — 🔴 **3 and 4 name it in the prompt.**
+
+🔴 **Never `questions-architecte-*.md`** — ⚠️ **it is never the answered
+file, and it counts in no row of the table**: 📌 **it waits at the root
+for `/conventions`, which is the only command that reads it.** 🔴 **Read
+the root as if it were not there** — and leave it there.
 
 ⚠️ **Every command of the cycle files the questions files it does not
 read** — 🔴 **which is what keeps these four apart**: the root holds at
@@ -105,7 +111,9 @@ that says it.
 
 🔴 **Then file nothing you have not identified.** 📌 **The root holds at
 most two files, and the invocation you just chose names them both**:
-the lexicographe's, and the answered one.
+the lexicographe's, and the answered one. ⚠️ **A
+`questions-architecte-*.md` is neither** — it is `/conventions`'s, and
+stays where it is.
 
 ⚠️ **Anything else at the root means a filing failed upstream** — 🔴
 **stop, and say which files.** 📌 **Never move one of them**: an
@@ -175,7 +183,14 @@ notifies on completion. Do not pass it; wait for the notification.
 
 ## Once it has reported
 
-🔴 **A blocking file you named is filed:**
+🔴 **A blocking file you named is filed — once you have told it from a
+new one.** ⚠️ **A resumed run can block again, and the agent writes the
+same name**: 📌 **grep its `## Decision` first.**
+
+| `## Decision` of `blocked_lexicographe.md` | What you do |
+|---|---|
+| Still filled | 📌 **The block you named, applied** — file it |
+| Empty again | 🔴 **A new block** — 📌 **relay it and stop; file nothing** |
 
     git mv docs/features/<name>/blocked_lexicographe.md \
            docs/features/<name>/blocked_lexicographe-NN.md
@@ -184,7 +199,8 @@ notifies on completion. Do not pass it; wait for the notification.
 one — `01` when there is none.**
 
 ⚠️ **Anything left at the unnumbered name reads as a block still
-standing**, and the next run stops on it.
+standing**, and the next run stops on it — 🔴 **which is exactly what a
+new block must do.**
 
 🔴 **After 2 or 4, file the lexicographe's questions file it applied**,
 into `questions/lexicographe/`, inside the worktree before the merge —
