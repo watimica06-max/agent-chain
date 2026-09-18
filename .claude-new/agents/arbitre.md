@@ -134,11 +134,15 @@ needed.
 ⚠️ **Never touch `What blocks`, `Where` or `To resume`** — 📌 **they are
 the record of what happened.**
 
-🔴 **One shape for every blocking file, whoever wrote it**: one
-`## Blocking N` per stop, **even when there is only one**, its three
-headings as `###` under it, and 🔴 **one `## Decision` at the end**,
-whatever the count. 📌 **The agents that write one match this shape** —
-⚠️ **you are its single reader, and the one a stray shape breaks.**
+🔴 **One shape for the two blocking files you receive — the
+Détailleur's and the Réalisateur's**: one `## Blocking N` per stop,
+**even when there is only one**, its three headings as `###` under it,
+and 🔴 **one `## Decision` at the end**, whatever the count. 📌 **Those
+two agents match this shape** — ⚠️ **you are its single reader, and the
+one a stray shape breaks.** 📌 **The Concepteur, the Testeur and the
+Relecteur write four `##` headings and no `## Blocking N`** — that
+shape stays theirs, and ⚠️ **a file in it is not yours to settle** —
+see *Which blocks are yours*.
 
 **A decision has three parts:**
 
