@@ -82,6 +82,15 @@ built against it would propose going backwards.
 🔴 **`stale` and `wrong` require a citation. Without one, the verdict is
 `confirmed`.**
 
+🔴 **One case is settled in advance: a finding whose only complaint is
+that `modifications.md` does not record a change.** 📌 **Verdict
+`moot`** — ⚠️ **that index belongs to the refonte, which is closed, and
+it is no longer kept up to date.**
+
+📌 **Say in one line what the unrecorded change is, all the same** — 🔴
+**another section may find that change wrong**, and wave 2 merges the
+two entries.
+
 ⚠️ **This is not a formality.** 📌 **The previous round declared nine
 corrections applied that were not** — 🔴 **a verdict with nothing behind
 it is how a real defect disappears.**
@@ -391,10 +400,16 @@ wave 3** — ⚠️ **anything here was introduced by a correction.**
 
 ---
 
-## 2 — The thirteen BLOCKING, replayed
+## 2 — Replay what spans two files
 
-🔴 **Take each `BLOCKING` of the consolidated table and read it against
-the corrected files.**
+🔴 **Take every `BLOCKING` of the consolidated table, and every `TO FIX`
+whose `Where` names two files.** 📌 **Read each against the corrected
+files.**
+
+⚠️ **Why those and not all of them**: 🔴 **a finding inside one file
+breaks that agent; one that spans two breaks the chain** — 📌 **and a
+correction applied on one side only is the failure this campaign exists
+to prevent.**
 
 | | |
 |---|---|
@@ -418,6 +433,38 @@ repairing a list, a correction applied at one site of three.**
 🔴 **No new findings.** ⚠️ **A defect you meet that no BLOCKING names is
 not yours** — 📌 **note it in one line at the end, and go no further.**
 ```
+
+---
+
+# What this campaign does not prove
+
+⚠️ **Wave 4 closing clean is not « the chain works ».**
+
+**What it establishes:**
+
+✅ **The known BLOCKING findings are gone** · ✅ **every cross-file
+`TO FIX` landed on both sides** · ✅ **the form is clean** · ✅ **the
+corrections broke nothing on the lines they touched.**
+
+**What it does not:**
+
+🔴 **That the single-file `TO FIX` were applied well** — 📌 **nothing
+replays them**, and they are most of the volume.
+
+🔴 **That no new defect was born elsewhere** — 📌 **wave 4 looks around
+the lines wave 3 touched**, not at the whole chain.
+
+🔴 **That the chain runs.** ⚠️ **Nothing executes it**: 📌 **this whole
+campaign is document reading.**
+
+**The measure that follows** — 🔴 **one real cycle on a small feature,
+end to end.** 📌 **A gate that stops, a prompt missing a parameter, a
+loop that never closes: none of those is visible to a reader**, and two
+verification rounds have not found one.
+
+⚠️ **Do not open a third reading round on the strength of this one.** 📌
+**Two rounds found the same volume** — 🔴 **the next gain is in running
+the chain, not in reading it again.**
 
 ---
 

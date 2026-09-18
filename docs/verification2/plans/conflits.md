@@ -492,7 +492,38 @@ What is wrong: every plan makes the Détailleur the owner of `## Files` and drop
 Where: detailleur.md L259-265, L401-402 ↔ cadreur.md L753-754; concepteur.md L57-58, L186-191, L259-261; testeur.md L58-59, L282-284; realisateur.md L189-191, L533-535; relecteur.md L386-388
 Quotations: —
 
-Arbitration:
+Arbitration: **The Concepteur places, and `conception.md` is the record.**
+
+🔴 **`## Files` carries what the Cadreur knows** — the files the lot
+opens that already exist, from `Touches`. ⚠️ **Never a file the lot
+creates**: 📌 **nobody knows its path before the Concepteur places the
+symbol.**
+
+🔴 **The Concepteur names each created file in `conception.md`'s
+`## Declared`**, as it already does for the symbols.
+
+📌 **The three `## Outside the lot` checks test against `## Files` **and**
+`## Declared`** — ⚠️ **a file in either is declared.**
+
+📌 **Why this side**: 🔴 **`a-trancher concepteur renommages F16` gives
+the placement to the Concepteur** — a symbol that depends on nothing
+goes in the module of the lot's other symbols, or the one the
+`architecte/` request names. ⚠️ **Having the Détailleur derive the path
+first would pre-empt a placement the Concepteur may not follow.**
+
+🔴 **`detailleur.md` L401-402 is corrected, not kept.** ⚠️ **It reads
+*« Decide where the code goes — the Réalisateur does, from the
+conventions »*** — 📌 **stale since the refonte added the Concepteur**,
+which is the agent that writes the declarations. 🔴 **It names the
+Concepteur.**
+
+📌 **`concepteur.md` L186-191 is reworded**: the symbol goes where the
+conventions place it, and `## Files` narrows nothing for a created
+symbol.
+
+📌 **Verified**: 🔴 **`cadreur.md` L753-754 — `Needs`, `Produces` and
+`Modifies` carry symbols, never a file** · 🔴 **L756 — `Touches` carries
+the files a lot has to open.**
 
 ### C2 · The half-answered `## Decision` and the hand-back line
 
@@ -502,7 +533,28 @@ What is wrong: the arbitre plan reverses the empty-field rule — a product ques
 Where: arbitre.md L165-167, L178-187, L215-217, L456-462 ↔ 8_code.md L50-51, L167-170; detailleur.md L346, L434-441; realisateur.md L317-318, L503-505; audit_blocages.md L112-115
 Quotations: —
 
-Arbitration:
+Arbitration: **Keep the empty number. The Détailleur and Réalisateur plans win.**
+
+🔴 **`arbitre.md` L165-167 forbids exactly what the arbitre plan
+proposes**: *« never write a placeholder under it — an empty number is
+the signal »*. ⚠️ **`Not settled here.` written under a number is a
+placeholder.**
+
+📌 **The two mechanisms are distinct and both stand**: 🔴 **`Not settled
+here.` is for a block that is not the Arbitre's at all** (L148-152) —
+📌 **an empty number is for one entry of a file that is his.**
+
+🔴 **`/8_code` counts the numbered answers against the `## Blocking N`
+headings.** 📌 **Owner: `8_code`** — it is the one that renames, so it
+is the one that must know whether every entry is answered.
+
+⚠️ **That is a row to create, not one to reassign**: 📌 **L167-170
+carries two rows only — `## Decision` empty, and filled.** 🔴 **A third
+sits between them**: some numbers answered, others not → apply the
+answered ones, stop on the rest, and do not rename.
+
+📌 **The Détailleur's `Not settled here.` row goes** — ⚠️ **it never
+fires on a file the Arbitre owns.**
 
 ### C3 · One blocking-file shape — who owns it
 
@@ -512,7 +564,18 @@ What is wrong: the three plans agree on the outcome — `## Blocking N` with `##
 Where: arbitre.md L129-130, L180 ↔ detailleur.md L292-293; realisateur.md L258-259, L272-288
 Quotations: —
 
-Arbitration:
+Arbitration: **Owner: the Arbitre. Follows: the Détailleur and the Réalisateur.**
+
+🔴 **The shape's owner is its single reader.** 📌 **Many agents write a
+blocking file; one reads them all** — ⚠️ **and it is the one that breaks
+when a shape varies.**
+
+📌 **So `arbitre.md` states the shape once** — `## Blocking N`, `###`
+headings, one `## Decision`, even for a single entry — 🔴 **and the
+writing agents match it.**
+
+🔴 **`realisateur.md` L272-288 is deleted**, `arbitre.md` L129-130 and
+L180 with it.
 
 ### C4 · `## Traps` is not a heading of the state document — who aligns realisateur.md L135-137
 
@@ -522,7 +585,16 @@ What is wrong: both plans align realisateur.md L135-137 on the headings the Arbi
 Where: realisateur.md L133-137 ↔ arbitre.md L391-393
 Quotations: —
 
-Arbitration:
+Arbitration: **Owner: the Arbitre. Follows: the Réalisateur.**
+
+🔴 **`arbitre.md` L391-393 already states the two placements** —
+`## Traps — general` when several subjects meet the trap, the subject's
+own `###` when one owns it. 📌 **That is the form.**
+
+🔴 **`realisateur.md` L135-137 aligns on it.** ⚠️ **Both agents write
+traps into that document**, and both load the
+`technical-state-format` skill — 📌 **the skill defines the file, the
+Arbitre's lines state how the two of them use it.**
 
 ### C5 · The relay of `## Ce qui revient` and `## Ce que j'en fais`
 
@@ -532,7 +604,21 @@ What is wrong: the arbitre plan keeps the relay in `/8_code`, moved after `/7_lo
 Where: 8_code.md L352-354 ↔ cadreur.md L907-909, L923; 7_lots.md L103, L240-253
 Quotations: —
 
-Arbitration:
+Arbitration: **Owner: `/7_lots`. The relay moves there.**
+
+🔴 **`/7_lots` is the command that ran the re-split** — 📌 **it holds
+`code/redecoupage.md` before renaming it**, so it reads the two sections
+at their own path, with no number to guess.
+
+🔴 **Reading them from `code/redecoupage-NN.md` in `/8_code`** — the
+arbitre plan — ⚠️ **means guessing which number the rename produced**,
+one command later.
+
+📌 **On every redécoupage, not only a third return**: 🔴 **the sections
+say what came back and what was done with it** — ⚠️ **that is worth
+reading each time.**
+
+📌 **Follows: the Cadreur** (L923), **`/8_code`** (the relay drops).
 
 ### C6 · "a product decision" in the Architecte's two rows — does arbitre.md L431-432 change
 
@@ -542,7 +628,19 @@ What is wrong: both apply decisions.md on architecte.md L736-737; the arbitre pl
 Where: architecte.md L736-737 ↔ arbitre.md L431-432; audit_conventions.md L124-126
 Quotations: —
 
-Arbitration:
+Arbitration: **Nothing changes in `arbitre.md`. The architecte plan is right.**
+
+🔴 **Verified at `arbitre.md` L429-431**: the verdict table already
+reads the two apart — *« Refused, and it says what would settle it »* →
+settle from that; *« Refused, and nothing else would settle it »* → wait
+for the Product Owner.
+
+📌 **So the only change is `architecte.md` L736**, as `decisions.md`
+`passages-aval F14` says: 🔴 **the *Not a convention* row no longer ends
+on « a product decision »**, which is what made the two rows
+indistinguishable.
+
+📌 **`audit_conventions.md` L126 follows.**
 
 ### C7 · The round count — who writes it, where
 
@@ -552,7 +650,22 @@ What is wrong: the cadreur plan has the Vérificateur write the round number in 
 Where: cadreur.md L822-823 ↔ verificateur.md L96, L444-445, L105; 7_lots.md L101-103
 Quotations: —
 
-Arbitration:
+Arbitration: **Owner: the Vérificateur. It writes the round number in
+`code/sequence.md`.**
+
+🔴 **One line, written by the agent that produces the file, read by the
+one that counts.** 📌 **Previous plus one when the previous
+`## Defects` carried lines, `1` otherwise.**
+
+⚠️ **Why not archiving**: 🔴 **it makes the Cadreur copy a file by Read
+and Write before every call** — 📌 **a file-proliferation cost for a
+number that fits on a line.**
+
+📌 **And the defect it closes is real**: ⚠️ **the Vérificateur
+overwrites `code/sequence.md` each round and nothing archives it**, so a
+count on archived files is always zero.
+
+🔴 **`cadreur.md` L822-823 counts on that line, never on files.**
 
 ### C8 · A re-cut lot and its `verdict.md`
 
@@ -562,7 +675,18 @@ What is wrong: to stop a re-cut lot inheriting its `## Attempts`, the cadreur pl
 Where: 8_code.md L344, L379-382 ↔ relecteur.md L157-158; cadreur.md L884-891
 Quotations: —
 
-Arbitration:
+Arbitration: **Owner: `/8_code`. It deletes `verdict.md` with the stale sheet.**
+
+🔴 **It is the same gesture, in the same place, as the decision already
+taken**: 📌 **`a-trancher relecteur F19` and the git family have
+`/8_code` revert the lot's commits and delete `fiche-executable.md`,
+`conception.md` and `tests.md`.** ⚠️ **`verdict.md` joins that list.**
+
+⚠️ **Why not renumbering the lot**: 🔴 **it retires folders and burns lot
+numbers on every redécoupage** — 📌 **more moving parts for the same
+outcome**, and the number is what the whole downstream keys on.
+
+🔴 **The lot keeps its number.** 📌 **`relecteur.md` L157-158 stands.**
 
 ### C9 · `R<n>` in the sheet's `## Conventions` — who owns the change
 
@@ -572,7 +696,14 @@ What is wrong: the three plans agree the sheet cites rules by `R<n>` and shows `
 Where: detailleur.md L250-254, L652 ↔ architecte.md L131-132, L144-152; relecteur.md L141
 Quotations: —
 
-Arbitration:
+Arbitration: **Owner: the Architecte. Follows: the Détailleur and the Relecteur.**
+
+🔴 **The Architecte numbers the rules** — 📌 **`R<n>` is its key**, and
+whoever owns a key owns its form.
+
+📌 **The Détailleur cites it in the sheet's `## Conventions`, the
+Relecteur reports it.** ⚠️ **Both change their own text to match**, and
+neither decides the shape.
 
 ### C10 · realisateur F08 — the `permanente` grep rests on a line the architecte plan removes
 
@@ -582,7 +713,23 @@ What is wrong: realisateur F08 names the gesture that locates the `permanente` r
 Where: realisateur.md L66-70, L97-98, L551-552, L452-453 ↔ architecte.md L140, L119-128
 Quotations: architecte.md L140 — "🔴 **`permanente` or `spécifique`, at the end of the line.**" · architecte.md L121-122 — "R12 · Every identifier that leaves a module is in English · permanente · mechanical"
 
-Arbitration:
+Arbitration: **The gesture greps the word, never its position. `#30` stands.**
+
+🔴 **Verified on both lines.** `architecte.md` L121-122 shows the rule's
+own example — *« R12 · Every identifier that leaves a module is in
+English · permanente · mechanical »* — ⚠️ **the mark is the third
+field, and `mechanical` ends the line.**
+
+🔴 **So L140's « at the end of the line » is false**, and `#30` removes
+it.
+
+📌 **The Réalisateur's gesture becomes**: `grep 'permanente'` on
+`TECHNICAL_CONVENTIONS.md`, ⚠️ **the word anywhere on the rule line.**
+🔴 **`realisateur.md` L66-70, L97-98, L551-552 and L452-453 are reworded
+to drop the position.**
+
+⚠️ **And the fallback stands**: 📌 **no rule carries the marker → read
+the file whole.**
 
 ### C11 · An attempt that committed nothing — what the fresh Réalisateur is handed
 
@@ -592,7 +739,20 @@ What is wrong: both route the case as a FAIL with a fresh Réalisateur and give 
 Where: 8_code.md L129-132, L138, L149-151 ↔ realisateur.md L519-522
 Quotations: —
 
-Arbitration:
+Arbitration: **The Réalisateur plan. No verdict is written by the orchestration.**
+
+🔴 **A verdict is the Relecteur's file.** ⚠️ **Having `/8_code` write
+one means inventing `## Verified`, `## Findings` and `## Cause` for a
+review that never ran.**
+
+📌 **The FAIL row keys on the absence**: 🔴 **no `## Status`, or no
+verdict named** → a fresh Réalisateur.
+
+📌 **`8_code.md` L131 stands and is not this case**: ⚠️ **it increments
+`## Attempts` on a verdict that already exists**, from an earlier
+attempt. 🔴 **On a first attempt that committed nothing, there is no
+verdict and nothing to increment** — the row's own count is what
+bounds the retry.
 
 ### C12 · realisateur.md L352-355 — is the worktree about to be removed
 
@@ -602,7 +762,28 @@ What is wrong: the realisateur plan corrects L352-355 as a false fact — the re
 Where: realisateur.md L335-338, L352-355 ↔ 8_code.md L357-358, L365-366; 7_lots.md L64, L224
 Quotations: —
 
-Arbitration:
+Arbitration: **Split: L352-355 stands, L336-338 is corrected.**
+
+🔴 **The commandes decision on `chemins-aval F01` closes the loop's
+worktree before `/7_lots`** — 📌 **so L352's reason now holds**, and the
+realisateur plan's F25 reads against a decision taken after it was
+written.
+
+⚠️ **L336-338 is not a false fact, and the realisateur plan overstates
+it.** 📌 **Verified**: 🔴 **`code/redecoupage.md` is written by the
+Arbitre** (`realisateur.md` L343), **and the blocking file comes from an
+earlier run** — **the Réalisateur creates no new file in this one.**
+
+🔴 **The real gap is the one neither plan states**: 📌 **those two files
+stay in the tree after the `git restore`**, and ⚠️ **nothing says who
+commits them** — while L352-355 refuses to leave a dirty tree.
+
+📌 **So L336-338 stands as written**, and 🔴 **the branch gains one
+line**: the two files are not the Réalisateur's to drop, and the
+orchestration commits them with the return to the split.
+
+📌 **Owner: the Réalisateur for that line. `8_code` for the worktree
+close and the commit, already decided.**
 
 ### C13 · renommages F09 — the number the report cannot know, and whether the Relecteur resolves it
 
@@ -612,7 +793,19 @@ What is wrong: both have the report name the blocking file at its unnumbered nam
 Where: realisateur.md L176-178 ↔ 8_code.md L170-171; relecteur.md L184-185
 Quotations: —
 
-Arbitration:
+Arbitration: **The Relecteur plan. Nothing changes on its side.**
+
+🔴 **No reader resolves the number.** 📌 **The Relecteur checks that the
+report's fields hold** — ⚠️ **it never opens a blocking file**, and
+`/9_controle` does not either.
+
+📌 **So the unnumbered name in the report is a record of what the file
+was called when the agent wrote it**, 🔴 **and that is all it has to
+be.**
+
+🔴 **One line in `realisateur.md` L176-178 says so**, so that nobody
+later builds a resolution on it. ⚠️ **The entry number is not added**:
+📌 **it would invite exactly that.**
 
 ### C14 · A criterion whose behaviour the sheet removes — a block, or a `tests.md` field
 
@@ -622,7 +815,23 @@ What is wrong: the testeur plan makes the case a block (`blocked_testeur.md` —
 Where: testeur.md L230-233 ↔ 8_code.md L112-113, L479-488; testeur.md L268-291; realisateur.md L77-78; relecteur.md L333-334
 Quotations: —
 
-Arbitration:
+Arbitration: **The Testeur plan: it is a block.**
+
+🔴 **`a-trancher` already settles the principle** — 📌 **`decisions.md`
+and the Testeur's own D.3**: *« adapt, never delete — if the criterion
+it asserted is gone too, say so: only the Product Owner removes a
+behaviour »*.
+
+⚠️ **A `tests.md` field reaches the Réalisateur and the Relecteur** —
+🔴 **it does not reach the Product Owner**, and a behaviour removed by a
+sheet is a product change nobody validated.
+
+📌 **The block is the route that reaches her.** 🔴 **`testeur.md` L233's
+report line goes.**
+
+⚠️ **The green-by-declaration tests keep their `tests.md` field** —
+📌 **that case is not this one**: a criterion met, not a criterion
+gone.
 
 ### C15 · `blocked_redacteur.md` under `/fusion` — route by name, or an `## Invocation` heading
 
@@ -632,7 +841,19 @@ What is wrong: the fusionneur plan keeps the Rédacteur's four-heading blocking 
 Where: fusion.md L43 ↔ redacteur.md L343-359; fusionneur.md L200-205; 2_structure.md L103-110
 Quotations: —
 
-Arbitration:
+Arbitration: **The Rédacteur plan: an `## Invocation` heading, five headings.**
+
+🔴 **Routing by file name cannot work**: 📌 **the Rédacteur has three
+invocations and one blocking-file name** — ⚠️ **`/2_structure` and
+`/fusion` both look for `blocked_redacteur.md`**, and neither can tell
+which invocation wrote it.
+
+📌 **And the pattern already exists**: 🔴 **verified at
+`fusionneur.md` L200-205** — five headings, `## Invocation` carrying
+*« the one that wrote this file: 1, 2 or 3 »*.
+
+🔴 **Both commands then route correctly**, and `/fusion` row 3 stands as
+written. 📌 **Owner: the Rédacteur.**
 
 ### C16 · classeur.md L181 — "Split a block, or merge two — that is the decoupeur's"
 
@@ -642,7 +863,16 @@ What is wrong: the two plans rewrite the same line for two halves of it — the 
 Where: classeur.md L181, L115 ↔ decoupeur.md L110; qualifieur.md L214
 Quotations: —
 
-Arbitration:
+Arbitration: **Owner: the Classeur. Follows: the Découpeur and the Qualifieur.**
+
+📌 **The two halves are complementary and both are kept** — 🔴 **the
+line is in `classeur.md`, so one owner writes it whole.**
+
+🔴 **What it says after the rewrite**: a split that follows one of the
+classeur's answers is the Rédacteur's · the decoupeur's split is by
+trigger · **and no agent merges** *(a-trancher `decoupeur F17`)*.
+
+📌 **`decoupeur.md` L110 and `qualifieur.md` L214 align on it.**
 
 ### C17 · fichiers.md F07 — the audit does not see `cadrage-produit/blocked_*-NN.md`
 
@@ -652,7 +882,18 @@ What is wrong: the finding is confirmed on the `/4_grille` side (L431-434 file t
 Where: audit_blocages.md L26-29 ↔ 4_grille.md L431-434
 Quotations: audit_blocages.md L27-29 — "🔴 **Three places**: `code/**/`, the folder's own root *(`blocked_architecte`, `blocked_diagnostiqueur`)*, and `investigation/`" · 4_grille.md L433-434 — "git mv docs/features/<name>/cadrage-produit/blocked_par-bloc.md docs/features/<name>/cadrage-produit/blocked_par-bloc-NN.md"
 
-Arbitration:
+Arbitration: **Add `cadrage-produit/` to the audit's places. Owner:
+`audit_blocages`.**
+
+🔴 **Verified on both sides.** `audit_blocages.md` L27-29 names three
+places — `code/**/`, the folder's own root, `investigation/` — ⚠️ **and
+`/4_grille` L433-434 files the sondeurs' blocking files under
+`cadrage-produit/`.**
+
+📌 **Four places, not three.** 🔴 **The same line carries the
+unnumbered glob** *(`#47`)*, so both changes land together.
+
+⚠️ **The count in the sentence changes with it.**
 
 ---
 
