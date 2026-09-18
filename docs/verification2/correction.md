@@ -333,6 +333,22 @@ presence tells you a file you read is about to change.**
 
 ---
 
+## When your `Owner` is a command
+
+⚠️ **The twenty agents run in parallel; the commands run after them, in
+series.** 📌 **So a line naming you as a `Follows` with a command as its
+`Owner` reaches you before its owner has written anything.**
+
+🔴 **Apply the decision exactly as the table words it.** 📌 **Do not
+interpret it, do not complete it, do not choose between two readings**
+— ⚠️ **if the wording looks open, it is the command that closes it, not
+you.**
+
+📌 **If it cannot be applied as written**, 🔴 **refuse it and say why** —
+⚠️ **never a guess that the command will then have to undo.**
+
+---
+
 ## You may refuse
 
 🔴 **If, opening the files, you see the plan rests on a false fact — do
