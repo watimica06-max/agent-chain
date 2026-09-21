@@ -19,8 +19,8 @@ import os
 import re
 import sys
 
-# The folder this script ships with: .claude-new/ today, .claude/ once
-# it replaces the old chain. A bare run checks that folder, nothing else.
+# The folder this script ships with, whatever it is named. A bare run
+# checks that folder, nothing else.
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 NUM_WORDS = {
