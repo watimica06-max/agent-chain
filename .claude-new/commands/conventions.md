@@ -102,9 +102,12 @@ through invocation 1.**
 already been walked. 🔴 **That is the invocation-4 row**, and it is what
 makes the command idempotent.
 
-📌 **An integrated questions file leaves the root** — 🔴 **filed after
-invocation 2**, ⚠️ **otherwise every later run matches its row again and
-integrates the same answers twice.**
+📌 **An integrated questions file leaves the root** — 🔴 **filed right
+after invocation 2, inside the worktree before the merge** — see *Git,
+once it has reported*. ⚠️ **Left at the root, the next run matches its
+row again and integrates the same answers twice**: 📌 **your two greps
+cannot tell an integrated file from an answered one waiting**, so no
+later run can file it in your place.
 
 🔴 **Give the agent its questions file number in the prompt** — 📌 **the
 highest `questions-architecte-NN.md` in the root and in
@@ -134,14 +137,20 @@ own file is the walk's above, not this guard's.**
 ⚠️ **`git mv`, never a read-and-rewrite** — the agent must not open
 those files, and neither should you.
 
-🔴 **And every `questions-architecte-*.md` at the root that is
-integrated, or that holds no `### Q`** — same `git mv`, into
-`questions/architecte/`. 📌 **Invocations 1 and 4 write their questions
-file whether they asked or not** — ⚠️ **left at the root, the empty one
-matches its row at every later run**; filed here, that row matches on
-the run right after the derivation and never again. 📌 **Nothing stays
-at the root to carry the numbering**: ⚠️ **you give the agent its number
-in the prompt**, counting the root and `questions/architecte/` together.
+🔴 **And every `questions-architecte-*.md` at the root that holds no
+`### Q`** — same `git mv`, into `questions/architecte/`. 📌 **Invocations
+1 and 4 write their questions file whether they asked or not** — ⚠️
+**left at the root, the empty one matches its row at every later run**;
+filed here, that row matches on the run right after the derivation and
+never again. 📌 **Nothing stays at the root to carry the numbering**: ⚠️
+**you give the agent its number in the prompt**, counting the root and
+`questions/architecte/` together.
+
+⚠️ **An integrated file is not filed here** — 🔴 **it left the root
+inside the worktree, right after invocation 2**: see *Git, once it has
+reported*. 📌 **Your greps cannot tell it from an answered file
+waiting**, and the walk above would have taken it for invocation 2
+before this step ran.
 
 📌 **Create `questions/<agent>/` if it does not exist.**
 
@@ -233,13 +242,27 @@ the unnumbered name, the next run stops on it.** 📌 **Step 1 carries the
 rename into the commit** — ⚠️ **done after it, the rename stays out of
 the merge and leaves the tree dirty for step 5.**
 
+🔴 **After invocation 2, file the questions file it integrated — the one
+the prompt named — into `questions/architecte/`, inside the worktree
+before the merge:**
+
+    git mv docs/features/<name>/questions-architecte-NN.md \
+           docs/features/<name>/questions/architecte/
+
+📌 **Create `questions/architecte/` if it does not exist.** ⚠️ **Left at
+the root, it would read as answered again, and the next run would take
+it for invocation 2** — 🔴 **your greps cannot tell an integrated file
+from one waiting**, so this run is the only one that knows which it is.
+📌 **A new `questions-architecte-NN.md` it wrote stays at the root** — an
+answer left a hole open, and it waits on the Product Owner.
+
 **Then — 📌 five steps, in this order:**
 
 1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
-   agent has no Bash and commits nothing**, and the rename above is
-   staged, not committed; 📌 **`git merge` takes the branch's commits,
-   not the worktree's files**, and `git worktree remove` refuses a
-   dirty tree
+   agent has no Bash and commits nothing**, and the rename and the
+   filing above are staged, not committed; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
 2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
    cannot issue a git command against the main checkout**: the merge
    below, issued from inside it, is refused

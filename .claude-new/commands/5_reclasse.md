@@ -118,14 +118,13 @@ whole:**
 | `par-genre/transverses.md` | 📌 **The Convertisseur — its invocation 2, alone**: ⚠️ **no nature invocation opens it** |
 | `par-genre/directives.md` | The Architecte |
 | `par-genre/references.md` | The Convertisseur — its Text section |
+| `par-genre/hors-perimetre.md` | The Convertisseur — its preamble |
+| `par-genre/recette.md` | 🔴 **The Product Owner**, handed back by `/9_controle` |
 
 🔴 **The file name is the genre, plural, without accent, a hyphen for a
 space** — 📌 `référence` → `references.md`, `hors périmètre` →
 `hors-perimetre.md`. ⚠️ **You grep the genre as the block writes it,
 accents included** — 🔴 **`^Genre: référence$`**, never the file name.
-
-| `par-genre/hors-perimetre.md` | The Convertisseur — its preamble |
-| `par-genre/recette.md` | 🔴 **The Product Owner**, handed back by `/9_controle` |
 
 🔴 **One grep per genre** — `grep -B1 '^Genre: <genre>$'` — 📌 **and each
 block copied from its `### B` line to the next heading of any level.**

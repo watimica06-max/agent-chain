@@ -24,7 +24,12 @@ same scope.
 no route of this command into the global. 🔴 **If one must happen, the
 Product Owner restores the old global from git by hand first** — 📌
 **the compare expects a global the feature has not reached yet**, and
-would otherwise run against its own previous merge.
+would otherwise run against its own previous merge. 🔴 **And she sets
+aside, by hand as well, `rapport-fusion.md`, `plan-fusion.md` and every
+`questions-fusionneur-*.md`, at the root and under
+`questions/fusionneur/`** — ⚠️ **the global alone restored, row 4 still
+stops on the report, and the plan or a questions file would send the
+run to row 7, 9 or 10 instead of row 8.**
 
 ---
 

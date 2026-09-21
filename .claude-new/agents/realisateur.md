@@ -84,7 +84,8 @@ start.
 - **`code/<lot>/tests.md`** — 🔴 **its `## Red` line**: the tests that
   were red when they were written, ⚠️ **and the ones left green because
   the declaration alone meets the criterion** — 📌 **a test named green
-  there is not one you have to turn green**
+  there is not one you have to turn green** — and **its `## Created`**:
+  the test file the testeur created, which counts as declared
 - **`docs/CURRENT_TECHNICAL_STATE.md`** — 🔴 **two sections only**,
   then greps by symbol — 📌 **move 3 says how each is found** — and you
   write to it at the end
@@ -217,12 +218,15 @@ conventions requests this lot wrote, or a dash** — the file itself
 carries what they say.
 
 🔴 **`## Outside the lot` names every file you wrote in that neither
-the sheet's `## Files` nor `conception.md`'s `## Declared` names, and
-what you did to it — or a dash.** 📌 **A file in either is declared.**
+the sheet's `## Files`, `conception.md`'s `## Declared` nor `tests.md`'s
+`## Created` names, and what you did to it — or a dash.** 📌 **`## Files`
+carries the existing files the lot opens, `## Declared` the files the
+concepteur created, `## Created` the test file the testeur created**: ⚠️
+**a file in any of the three is declared.**
 
 ⚠️ **A decision authorised it, or you could not compile without it** —
-📌 **either way it is in neither list, and nobody else knows you did
-it.**
+📌 **either way it is in none of the three lists, and nobody else knows
+you did it.**
 
 🔴 **A fix left out of this field is a fix nobody can attribute.** ⚠️
 **The next lot meets your change with no idea where it came from**, and
