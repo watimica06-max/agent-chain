@@ -37,72 +37,19 @@ them.**
 📌 **One gap, one identifier** — `G01`, `G02`, in the file's own order.
 **Its full text goes in the prompt**, verbatim.
 
+**`investigation/`, and only to sort the gaps** — a `Glob` on
+`investigation/*.md` tells which gap has its report and which has a
+blocking file. 🔴 **A blocking file is opened for its `## Decision`
+alone**, to tell empty from filled — never for what it says.
+
+**`desc-bug.md`** — 📌 **its existence, nothing more**: a `Glob` before
+phase 2.
+
 ⚠️ **Nothing else.** `CLAUDE.md`'s standing reading rules apply.
 
 ---
 
-## How it runs
-
-**Two phases, in this order.**
-
-🔴 **Skip a gap whose report already exists**, unless its
-`investigation/blocked_<id>.md` carries a filled `## Decision`. **A
-re-run costs a full investigation; an existing report is done.**
-
-📌 **That is how a single failed investigation is re-run**: the Product
-Owner fills its blocking file, you launch this command again, and only
-that one goes.
-
-**Phase 1 — one `Agent()` per remaining gap, all issued together.**
-🔴 **Each call carries one gap and its identifier**, nothing about the
-others.
-
-```
-Agent(
-  subagent_type="diagnostiqueur",
-  model="sonnet",
-  description="investigate G01 <feature>",
-  prompt="Bug-fix folder: docs/features/<name>/bugfix-NN/.
-          Invocation 1 — Investigation.
-          Gap G01: <the gap's text, verbatim>."
-)
-```
-
-⚠️ **Wait for every call to report** before phase 2. 📌 **A call that
-returns a blocking file does not stop the others** — relay it, let the
-rest finish.
-
-⚠️ **Phase 1 issuing nothing is normal** — every report exists and you
-go straight to phase 2.
-
-**Phase 2 — one `Agent()`, once every report exists.**
-
-```
-Agent(
-  subagent_type="diagnostiqueur",
-  model="sonnet",
-  description="assemble <feature>",
-  prompt="Bug-fix folder: docs/features/<name>/bugfix-NN/.
-          Invocation 2 — Assembly."
-)
-```
-
-🔴 **Never paraphrase the agent's process in your invocation** — not
-its inputs, its checks, its output format. It reads its own
-instructions.
-
-❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
-either** — in this environment the Agent tool always runs async and
-notifies on completion. Do not pass it; wait for the notification.
-
-❌ **Never pass `isolation`** — phase 2 reads what phase 1 wrote.
-
-📌 **Phase 1's calls do not collide**: each writes
-`investigation/<id>.md`, its own file and no other.
-
----
-
-## Git, in this mode
+## Git, before invoking
 
 🔴 **Commit the feature folder**, before creating the worktree:
 
@@ -129,11 +76,120 @@ isolated. *(Measured on three
 phases: the agent does the full job, cannot write, and the whole
 invocation is redone.)*
 
-**Then, once phase 2 reports:**
+---
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+## How it runs
+
+**Two phases, in this order.**
+
+🔴 **Sort every gap of `bug-list.md` before issuing anything**, on
+what `investigation/` holds for its identifier — the first row that
+matches decides:
+
+| For `<id>` | Phase 1 |
+|---|---|
+| `investigation/blocked_<id>.md` with a filled `## Decision` | **Issue it**, naming the file in the prompt — the agent applies it, then investigates |
+| `investigation/blocked_<id>.md` with an empty `## Decision` | 🔴 **Skip it, and relay it as standing** — nothing changed since it was written; re-issuing it costs a full investigation that stops at the same place |
+| `investigation/<id>.md` exists | **Skip it** — 🔴 **an existing report is done; a re-run costs a full investigation** |
+| Nothing | **Issue it** |
+
+📌 **That is how a single failed investigation is re-run**: the Product
+Owner fills its blocking file, you launch this command again, and only
+that one goes.
+
+**Phase 1 — one `Agent()` per gap to issue, all issued together.**
+🔴 **Each call carries one gap and its identifier**, nothing about the
+others.
+
+```
+Agent(
+  subagent_type="diagnostiqueur",
+  model="sonnet",
+  description="investigate G01 <feature>",
+  prompt="Bug-fix folder: docs/features/<name>/bugfix-NN/.
+          Invocation 1 — Investigation.
+          Gap G01: <the gap's text, verbatim>.
+          [Blocking file: investigation/blocked_G01.md — its
+          ## Decision is filled.]"
+)
+```
+
+📌 **The bracketed line goes in only on the first row of the table.**
+
+⚠️ **Wait for every call to report** before phase 2. 📌 **A call that
+returns a blocking file does not stop the others** — relay it, let the
+rest finish.
+
+⚠️ **Phase 1 issuing nothing is normal** — every gap has its report,
+or what has none stands blocked.
+
+🔴 **Phase 2 runs only once every report exists.** ⚠️ **A phase-1 block
+withholds it** — a gap whose investigation blocked has no report, and
+invocation 2 would only block in turn, on a file no decision can
+supply a report to. 📌 **Report the blocked identifiers from your own
+phase-1 results** — the calls that returned a blocking file, and the
+gaps skipped as standing — and stop there; see *What you relay*.
+
+🔴 **Before issuing phase 2, `Glob` `desc-bug.md` in the folder.** ⚠️
+**It exists → do not issue phase 2**: 📌 **relay it as done** — what
+it holds is settled, and the agent would only stop on it.
+
+**Phase 2 — one `Agent()`, once every report exists and no
+`desc-bug.md` does.**
+
+```
+Agent(
+  subagent_type="diagnostiqueur",
+  model="sonnet",
+  description="assemble <feature>",
+  prompt="Bug-fix folder: docs/features/<name>/bugfix-NN/.
+          Invocation 2 — Assembly.
+          [Blocking file: blocked_diagnostiqueur.md — its
+          ## Decision is filled.]"
+)
+```
+
+📌 **The bracketed line goes in only when that file is there with a
+filled `## Decision`.**
+
+🔴 **Never paraphrase the agent's process in your invocation** — not
+its inputs, its checks, its output format. It reads its own
+instructions.
+
+❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
+either** — in this environment the Agent tool always runs async and
+notifies on completion. Do not pass it; wait for the notification.
+
+❌ **Never pass `isolation`** — phase 2 reads what phase 1 wrote.
+
+📌 **Phase 1's calls do not collide**: each writes
+`investigation/<id>.md`, its own file and no other.
+
+---
+
+## Git, once it has reported
+
+**Then, once the last call you issued reports** — phase 2's, or
+phase 1's when phase 2 is withheld or not issued — 📌 **five steps, in
+this order:**
+
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**, and the renames of *What
+   you relay* are staged, not committed; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
+
+⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
+**never force it**: 📌 **say what is left there, and stop.** 📌 **What
+is left is something step 1 did not stage** — a fault of this run,
+never of the agent: it was not to commit it. Forcing the removal
+destroys it.
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.
@@ -151,15 +207,31 @@ an unmerged branch is invisible to the next one. ⚠️ **A
 ## What you relay
 
 The agent's own report, and nothing more. 🔴 **Nothing else is yours**:
-no phase chain, no risk level, no `TaskCreate`.
+no phase chain.
 
 **If an agent returns a blocking file**: relay it. 📌 **In phase 1 it
 is `investigation/blocked_<id>.md` and the other calls carry on**;
 in phase 2 it is `blocked_diagnostiqueur.md` and you stop.
 
-⚠️ **A phase-1 block does not cancel phase 2** — invocation 2 counts
-the reports against `bug-list.md` and blocks itself if one is missing.
+**If phase 2 is not issued**: say why. 📌 **`desc-bug.md` exists** —
+relay it as done, and name the next step, `/7_lots`. 📌 **Phase 2
+withheld** — 🔴 **list every identifier standing blocked**, from your
+own phase-1 results: the calls that returned
+`investigation/blocked_<id>.md`, and the gaps skipped as standing.
+**That is what the Product Owner needs to re-run them** — ⚠️ **never
+an identifier taken from an invocation-2 block**: there is none.
 
-🔴 **Say which identifier the missing report belongs to**, taken from
-invocation 2's own block. **That is what the Product Owner needs to
-re-run it.**
+🔴 **A blocking file's `## Decision` filled, run `/diagnostique`
+again** — 📌 **name the file in the agent's prompt**, and 🔴 **rename it
+once the agent reports having applied it** — the same gesture for both
+files:
+
+    git mv investigation/blocked_<id>.md investigation/blocked_<id>-NN.md
+    git mv blocked_diagnostiqueur.md blocked_diagnostiqueur-NN.md
+
+📌 **`NN`: the highest beside it plus one, `01` when there is none** —
+counted per file: among `investigation/blocked_<id>-NN.md` for that
+identifier, among `blocked_diagnostiqueur-NN.md` at the root. ⚠️ **The
+agent has no tool that removes a file.** 🔴 **A filled decision left at
+the unnumbered name re-issues the gap at the next run**, and
+`/audit_blocages` lists it as still open.

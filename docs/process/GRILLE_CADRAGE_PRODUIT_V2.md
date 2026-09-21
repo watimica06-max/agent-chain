@@ -22,10 +22,31 @@ one block**, and a chain never reaches it.
 belongs to none of them.**
 
 🔴 **Every question carries an identifier** — `A1.3`, `A2.presentation.2`,
-`C1.6`. ⚠️ **Whoever answers writes that identifier, exactly** — 📌 it
+`C1.5`. ⚠️ **Whoever answers writes that identifier, exactly** — 📌 it
 is what makes one block's answers comparable to another's.
 
 ⚠️ **A closure belongs to one pass, never both.**
+
+## The two levels of a question
+
+🔴 **A gap this grid finds becomes one of two questions**, and the
+difference is where the answer comes from — never how important it is.
+
+| | |
+|---|---|
+| **Obligatory** | 📌 **Nothing in the corpus answers it.** 🔴 **The Product Owner writes the answer** |
+| **Défaut** | 📌 **A transverse rule, or a pattern the file already follows, answers it.** 🔴 **The proposal is written with what founds it, and silence accepts it** |
+
+🔴 **A *défaut* always carries its ground** — the transverse block
+quoted in its own words, or the blocks that already follow the pattern.
+⚠️ **A proposal with nothing behind it is an obligatory question.**
+
+📌 **Why it exists**: the same absence is settled once, at feature level,
+and asked again of every block. ⚠️ **Without the level, the Product
+Owner writes the same answer fifteen times.**
+
+⚠️ **It does not lower the bar.** 🔴 **The question is asked, written
+down, and answerable** — 📌 **only the writing is spared.**
 
 🔴 **"Block" always means a block of the product file** — the grid's own
 divisions are parts.
@@ -343,26 +364,24 @@ on?**
 construction; a dated value only from its date.
 
 **`C1.2` What is out of scope, though one might think it in?**
+🔴 **The out-of-scope blocks answer this one.** 📌 **What they already
+carry is not asked again** — ⚠️ **the Product Owner wrote it once.**
 
-**`C1.3` For each existing rule the feature touches: kept, changed,
-removed?**
-🔴 **Silence is not removal.** Rule by rule.
-
-**`C1.4` Are the displayed terms the product's or the code's?**
+**`C1.3` Are the displayed terms the product's or the code's?**
 🔴 Internal naming never surfaces on screen.
 
-**`C1.5` Does it collect personal or sensitive data?**
+**`C1.4` Does it collect personal or sensitive data?**
 Health, location, biometrics, identifiers. Consent is a product
 decision, never ticked by default. 🔴 **One answer per kind** — health
 and location are not consented to together.
 
-**`C1.6` What system permissions, and what if they are denied for
+**`C1.5` What system permissions, and what if they are denied for
 good?**
 🔴 Asked at the moment of use, never at launch. 🔴 **One answer per
 permission** — a refused sensor and a refused link do not leave the
 same application behind.
 
-**`C1.7` Does it span parts installed or updated independently of each
+**`C1.6` Does it span parts installed or updated independently of each
 other?**
 🔴 **For each pair: what happens when their versions differ?**
 

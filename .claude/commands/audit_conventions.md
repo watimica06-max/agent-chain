@@ -45,9 +45,10 @@ folder's root, and use it from there.
 📌 **The rules it traces still hold** — the conventions file is shared
 by the whole project, feature cycles and correction cycles alike.
 
-⚠️ **Absent from both** — 🔴 **findings 1, 4 and 6 cannot be made.**
+⚠️ **Absent from both** — 🔴 **findings 1, 4 and 7 cannot be made.**
 **Say so under each of their headings** — *no coverage file* — and make
-the others.
+the others. 📌 **Finding 6 keeps running**: it reads your earlier passes
+and `TECHNICAL_CONVENTIONS.md`, nothing else.
 
 **The technical document** — 🔴 **only the entries `couverture.md`
 names**, one at a time, for finding 4. 📌 **The one those entries live
@@ -55,7 +56,7 @@ in**: `couverture.md` traces to the document it was written against,
 which may be the feature's `spec-technique.md` rather than this cycle's
 `desc-bug.md`.
 
-**`code/decoupage.md`** — 📌 **for finding 6 alone**, its lots'
+**`code/decoupage.md`** — 📌 **for finding 7 alone**, its lots'
 `Anchor` lines.
 
 **`audit-conventions.md`** at the working folder's root, if it is
@@ -88,15 +89,26 @@ from a request, not from the corpus.
 📌 **Name it, and name the request that produced it.** ⚠️ **That is a
 rule nobody read before it started binding every lot.**
 
+🔴 **Name the lot too** — the request file carries it in its name,
+`architecte/detailleur-lot-04.md`. ⚠️ **On a correction cycle the line's
+first column carries the request's path from the feature folder,
+`bugfix-NN/architecte/detailleur-lot-04.md`** — 📌 **the lot is still
+read from the file name, and the `bugfix-NN/` prefix tells which cycle
+the rule came from.** 📌 **That lot was coded under the
+rule as it stood, and the rule written for it governs only what
+follows** — ⚠️ **say so, and leave the Product Owner to decide whether
+it stays that way.**
+
 **2. A rule no lot can follow inside its own scope.** 🔴 **One asking
 for something a lot cannot supply on its own** — whatever that
 something is.
 
-📌 **The test is the scope, not the thing**: a lot produces symbols and
-touches the files its `Modifies` names. ⚠️ **A rule asking for anything
-beyond that — a symbol nobody produces, a declaration outside the code,
-a tool nobody installed — cannot be obeyed**, and the block comes much
-later, at detailing.
+📌 **The test is the scope, not the thing**: a lot produces or changes
+the symbols its `Produces` and `Modifies` name, and opens the files its
+`Touches` names. ⚠️ **A rule asking for anything beyond that — a symbol
+nobody produces, a declaration outside the code, a tool nobody
+installed — cannot be obeyed**, and the block comes much later, at
+detailing.
 
 **3. Two rules of one section asking for different shapes.** 🔴 **Pair
 them by the section of `TECHNICAL_CONVENTIONS.md` they sit in** — that
@@ -117,7 +129,7 @@ another moment, another symbol.
 
 **5. What was refused, and where it belongs.** 📌 **A verdict that
 turns a request down names where the thing goes** — the code, the
-tooling, the machine, a product decision.
+tooling, the machine.
 
 🔴 **Quote that**, and nothing more. ⚠️ **Whether it landed there is not
 yours to say**: you do not read the code.

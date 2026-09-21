@@ -64,7 +64,7 @@ que ce que les agents font. Les deux sont documentés ici.
 
 # LES AGENTS
 
-*Dix agents. Chacun existe parce qu'un agent voisin ne peut pas faire
+*Neuf agents. Chacun existe parce qu'un agent voisin ne peut pas faire
 son travail sans se contredire.*
 
 ---
@@ -274,9 +274,12 @@ pas à côté.
 le plus souvent un sujet neuf** — ⚠️ **elle a été posée de la
 fonctionnalité, et rien en elle ne dit où elle atterrit.**
 
-🔴 **Il marque chaque entrée intégrée** — `[integrated: B7]`, nommant
-tous les blocs où il a écrit. **En dernier**, une fois toutes les passes
-faites : un bloc créé en cours de route doit y figurer.
+📌 **Il ne marque rien dans le fichier de questions.** ⚠️ **Une marque
+`[integrated:]` a existé** — 🔴 **retirée : personne ne la lisait, et
+lui donner un lecteur aurait fait d'une case à remplir une incitation à
+certifier un travail non fait** *(voir ce qu'a mesuré le relevé par
+classe)*. 📌 **Un fichier de questions intégré est rangé aussitôt** :
+sa seule présence à la racine dit qu'il attend.
 
 **La frontière** — avec le Découpeur : 🔴 **il scinde ce qu'une réponse
 lui dit de scinder ; le Découpeur scinde ce qu'un bloc s'est révélé
@@ -872,66 +875,16 @@ périmètre.**
 
 ---
 
-## L'Extracteur
-
-**À quoi il sert** — 🔴 **Reprise d'une application existante sans
-document global.** Il décrit ce que l'application **fait aujourd'hui**,
-en lisant son code.
-
-📌 **Sa sortie est de la documentation produit** : ce qu'un utilisateur
-voit, les règles, les valeurs — jamais comment c'est construit.
-
-**Ce qui le déclenche** — 🔴 **une passe par domaine**, plus une passe
-application en tête et une passe finale de recâblage. **Une seule fois
-dans la vie d'un projet.**
-
-**Ce qu'il lit** — 🔴 **`docs/TECHNICAL_CONVENTIONS.md` en entier** :
-c'est lui qui nomme les dossiers de code, les fichiers de langue et
-l'emplacement de la carte route↔écran. 📌 **Cette carte est ce qui lui
-dit si un écran est atteignable.**
-
-🔴 **Jamais `CURRENT_TECHNICAL_STATE.md`** — il lit le code directement.
-🔴 **Jamais les specs produit existantes** — le global décrit ce qui
-**est**, pas ce qui était prévu.
-
-**Le niveau de détail** — 🔴 **ce qui vient du thème va dans la section
-thème, le reste est décrit.** Une couleur nommée depuis le thème n'est
-pas une décision d'écran ; une valeur en dur en est une.
-
-**Cinq balises greppables**, pour que le Product Owner les récupère par
-script :
-
-| Balise | Sens |
-|---|---|
-| `<<REF:name>>` | Référence vers un domaine pas encore extrait — résolue à la passe finale |
-| `<<ORPHAN>>` | Écran ou service qui n'apparaît dans aucune route ni appel |
-| `<<HARD_STYLE>>` | Valeur de style en dur au lieu du thème |
-| `<<HARD_TEXT>>` | Texte affiché en dur au lieu des fichiers de langue |
-| `<<DOUBT>>` | Ce qu'il n'a pas su interpréter |
-
-📌 **Il ne tranche aucun de ces cas** — il décrit et il balise.
-
-**La frontière** — 🔴 **Il ne corrige pas ce qui lui semble anormal.**
-**Le comportement observé *est* l'état actuel** ; le décrire tel quel
-est exactement ce qu'on veut. 🔴 **Il ne décrit pas ce qui n'est pas
-implémenté.** 🔴 **Il ne nomme ni fichier, ni classe, ni méthode** —
-c'est `CURRENT_TECHNICAL_STATE.md`.
-
-🔴 **Il ajoute son domaine au global, il ne le réécrit jamais** — les
-domaines déjà là ne sont pas les siens.
-
----
-
 ## Qui tourne sur quel modèle
 
 *Porté par la frontmatter de chaque agent.*
 
 | Opus | Sonnet |
 |---|---|
-| lexicographe · decoupeur · sondeur · convertisseur · architecte | redacteur · classeur · assembleur · fusionneur · extracteur |
+| lexicographe · decoupeur · sondeur · convertisseur · architecte | redacteur · classeur · assembleur · fusionneur |
 
-📌 **Cinq portent `effort: high`** — redacteur, convertisseur,
-fusionneur, architecte, extracteur. ⚠️ **Aucune commande ne le passe** —
+📌 **Quatre portent `effort: high`** — redacteur, convertisseur,
+fusionneur, architecte. ⚠️ **Aucune commande ne le passe** —
 le paramètre n'existe pas sur l'appel.
 
 ---
@@ -1000,13 +953,20 @@ personne d'autre ne l'écrira.**
 lève, parce que ça n'appartient à aucun.** 🔴 **Les seules questions
 énumérées de la grille — courtes exprès.**
 
+🔴 **`C1.3` en est sortie** — *« pour chaque règle existante que la
+fonctionnalité touche : conservée, changée, retirée ? »*. ⚠️ **Le
+Sondeur ne pouvait pas y répondre** : il ne lisait que le fichier de la
+fonctionnalité. 📌 **Elle est devenue `E3.1` de `GRILLE_EXISTANT.md`**,
+où le bloc et la section du global sont lus ensemble. **C1.4 à C1.7 se
+renumérotent.**
+
 📌 **Trois questions ajoutées, passées à six critères** — règle
 générale, bornée, qui attrape un défaut observé, sans ambiguïté, sans
 exemple ni justification, en vocabulaire universel : **`A1.9`** (ce
 qu'un bloc interdit ou conditionne hors de sa propre sortie), croisée
 en **`B1.8`** avec ce que les autres déclenchent ou produisent — la
 seule forme de contradiction entre blocs qu'un croisement de colonnes
-peut voir ; **`C1.7`** (deux parties installées ou mises à jour
+peut voir ; **`C1.6`** (deux parties installées ou mises à jour
 séparément, dont les versions diffèrent) ; et, en `external exchange`,
 **un exemple réel** d'un format qu'un autre système décide.
 
@@ -1018,7 +978,7 @@ une réponse à cette question ne rejoignait jamais `lexique.md`.
 ## Deux mécaniques qui traversent la grille
 
 🔴 **Chaque question porte un identifiant** — `A1.3`, `A2.presentation.2`,
-`C1.5`. ⚠️ **Qui répond, dans le relevé, écrit cet identifiant,
+`C1.4`. ⚠️ **Qui répond, dans le relevé, écrit cet identifiant,
 exactement** — 📌 c'est ce qui rend les réponses d'un bloc comparables à
 celles d'un autre. 🔴 **Une question posée au Product Owner n'en porte
 aucun.**
@@ -1046,7 +1006,6 @@ se lisent pareil.**
 | `/fusion_compare` | fusionneur, inv. 1 | `plan-fusion.md` · questions |
 | `/fusion_applique` | fusionneur, inv. 2 | Le global à jour · `rapport-fusion.md` |
 | `/fusion` | fusionneur | Reprise, par table de routage |
-| `/extrait` | extracteur, enchaîné | Le global entier, depuis le code |
 
 📌 **La numérotation suit la chaîne, pas les agents** — elle donne
 l'ordre d'exécution.
@@ -1174,9 +1133,12 @@ section `## Merge` — ⚠️ une note de travail, pas une question.
 📌 **Aucune question du tout → elle écrit le fichier vide. C'est ce qui
 termine la boucle.**
 
-🔴 **Elle crée `cadrage-produit/closed/` dans le worktree avant
-d'invoquer** — ⚠️ un agent dont le dossier cible manque cherche au lieu
-de s'arrêter.
+🔴 **Elle range les six fichiers du tour précédent** — les quatre
+sorties des sondeurs, le relevé et le fichier fusionné — **dans
+`cadrage-produit/closed/`, numérotés, par `git mv`.** 📌 **Même
+mécanisme que `questions/<agent>/`** : l'espace de travail du tour reste
+propre. ⚠️ **Personne ne les relit** — ce sont des archives, et le
+dossier est créé par la commande, pour la commande.
 
 ## `/5_reclasse` — range, sans agent
 
@@ -1262,27 +1224,6 @@ existe — la fusion est faite — sinon l'invocation qui correspond.
 
 🔴 **Une phase par exécution, jamais deux agents enchaînés** — chaque
 arrêt rend la main au Product Owner.
-
-## `/extrait` — décide la séquence, jamais le découpage
-
-📌 **La liste des domaines est une décision produit, jamais dérivée de
-l'arborescence** — 🔴 **sans elle, on n'extrait rien.** ⚠️ Un dossier
-peut porter deux sujets, un sujet s'étaler sur trois dossiers.
-
-**Trois temps** : la passe application, puis les domaines dans l'ordre
-de la liste, puis le recâblage.
-
-🔴 **Séquentiel, jamais parallèle** — 📌 **chaque domaine voit les
-précédents et balise moins.** En parallèle, aucun ne verrait les autres
-et la passe de recâblage deviendrait énorme.
-
-📌 **Un seul worktree pour toutes les passes**, pas un par passe.
-**Entre deux passes, elle grepe le titre du domaine dans le global** —
-🔴 **sans ça, une passe ratée passe inaperçue et son domaine manque
-simplement.**
-
-**Sur échec elle continue** — 📌 les domaines sont indépendants, et elle
-rapporte les domaines ratés à la fin.
 
 ## L'enveloppe git, commune à toutes
 
@@ -1413,11 +1354,11 @@ fasse apparaître un nouveau problème est normal, pas un échec.**
 | `questions-<agent>-NN.md` | L'agent émetteur · **Product Owner** pour les réponses | Son émetteur, le Lexicographe *(inv. 3 et 4)*, le Rédacteur |
 | `spec-technique.md` | `/6_convertit` *(assemblage)* · Convertisseur *(inv. 2 : préambule, renvois, Resources)* | Architecte, **Cadreur** *(aval)* |
 | `tracabilite.md` | Convertisseur *(inv. 2)* | Architecte *(inv. 1)* |
-| `docs/TECHNICAL_CONVENTIONS.md` | **Architecte, seul** | Tous les agents de code, Extracteur |
+| `docs/TECHNICAL_CONVENTIONS.md` | **Architecte, seul** | Tous les agents de code |
 | `couverture.md` | Architecte | Product Owner, une fois |
 | `architecte/<demande>.md` | Les agents d'aval · **Architecte** pour le `## Verdict` | Architecte *(inv. 3)*, leur auteur |
 | `plan-fusion.md` | Fusionneur *(inv. 1)* | Fusionneur *(inv. 2)*, elle seule |
-| `docs/PRODUIT_GLOBAL.md` | Fusionneur · Extracteur | Rédacteur, Fusionneur — 🔴 **par l'index** |
+| `docs/PRODUIT_GLOBAL.md` | Fusionneur | Rédacteur, Fusionneur — 🔴 **par l'index** |
 | `rapport-fusion.md` | Fusionneur *(inv. 2)* | Product Owner |
 | `blocked_<agent>.md` | L'agent · **Product Owner** pour la `## Decision` | L'agent, et l'orchestrateur pour cette seule ligne |
 | `docs/process/GRILLE_*.md` | Product Owner, hors chaîne | Sondeur *(cadrage)* · Convertisseur *(fermeture)* · Architecte *(conventions)* |
@@ -1557,9 +1498,8 @@ hors de la session isolée**, et l'écriture échoue.
 
 ## Les marques greppables
 
-📌 **Deux agents laissent des marques dans leur propre sortie**, pour
-qu'un grep ou un script les récupère : `<<ASSUMED …>>` chez le
-Convertisseur, les cinq balises de l'Extracteur.
+📌 **Le Convertisseur laisse des marques dans sa propre sortie**, pour
+qu'un grep ou un script les récupère : `<<ASSUMED …>>`.
 
 🔴 **Une marque porte l'identifiant de ce qui la lèvera**, pas seulement
 le fait qu'elle existe.
