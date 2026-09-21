@@ -23,11 +23,20 @@ feature's.
 
 ## What you read
 
-**Every `code/**/blocked_*-NN.md`** — the settled ones, numbered.
+**Every `blocked_*-NN.md` of the working folder** — the settled ones,
+numbered. 🔴 **Five places**: `code/**/`, `cadrage-produit/` *(the
+sondeurs)*, `convertisseur/` *(`blocked_<nature>`,
+`blocked_transversal`)*, the folder's own root *(`blocked_architecte`,
+`blocked_diagnostiqueur`)*, and `investigation/` *(a `/diagnostique`
+phase 1)*.
 
-📌 **And `code/**/blocked_*.md` without a number** — one still standing.
-⚠️ **Read it and list it under `### Still open`**: a block waiting for a
-decision is worth reporting, and its own findings wait with it.
+⚠️ **A glob on `code/**/` alone misses four families** — 📌 **and the
+audit would report a feature as having blocked on nothing.**
+
+📌 **And every `blocked_*.md` without a number, in the same five
+places** — one still standing. ⚠️ **Read it and list it under
+`### Still open`**: a block waiting for a decision is worth reporting,
+and its own findings wait with it.
 
 🔴 **Never put it in `## Files read`** — it is not finished, and a
 later pass has to read it again once it carries a decision.
@@ -96,8 +105,9 @@ settles**.
 could give it?
 
 📌 **Each agent owns one thing** — the Cadreur the split, the
-Vérificateur its order, the Détailleur a sheet, the Réalisateur the
-code of one lot, the Relecteur its verdict. 🔴 **A block asking for
+Vérificateur its order, the Détailleur a sheet, the Concepteur its
+declarations, the Testeur its tests, the Réalisateur the code of one
+lot, the Relecteur its verdict. 🔴 **A block asking for
 what an agent before its author owns is one**, whatever it asks for.
 
 ⚠️ **If it asks for nothing its author could not give itself, it is not
@@ -147,7 +157,7 @@ under `## Files read`.
     code/lot-10/blocked_realisateur-02.md
 
     ### Pass 2
-    code/lot-31/blocked_detailleur-01.md
+    code/blocked_detailleur-01.md
 
     ## Pass 2
 

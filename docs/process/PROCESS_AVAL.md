@@ -391,7 +391,8 @@ correction que personne ne peut attribuer.**
 un service, un mécanisme qu'un autre lot pourrait reconstruire, une
 table, une route, une cascade, un piège, un état mort. 🔴 **Ce que son
 lot a rendu faux disparaît** — une entrée n'est jamais *« modifiée par
-lot-03 »*. ⚠️ **Ce document commande le Cadreur.**
+lot-03 »*. 📌 **Ses lecteurs sont le Détailleur, le Réalisateur
+suivant et le Diagnostiqueur.**
 
 **Sa discipline de vérification** — 🔴 **analyse et tests par unité
 cohérente de travail, jamais par édition.** *(41 exécutions sur 149
@@ -576,9 +577,8 @@ peut pas rattacher va sous *douteux*, jamais sous *manquant*.
 décide** s'il devient une liste d'écarts pour un cycle de correction.
 
 ⚠️ **Il n'écrase jamais un rapport antérieur** — 📌 **il en écrit un
-nouveau, numéroté** : c'est ainsi qu'on compare deux états. 🔴 **Il n'en
-ouvre aucun non plus** : ce qu'une exécution antérieure a conclu
-l'arrêterait de chercher.
+nouveau, numéroté.** 🔴 **Il n'en ouvre aucun non plus** : ce qu'une
+exécution antérieure a conclu l'arrêterait de chercher.
 
 ---
 
@@ -975,10 +975,15 @@ ferait signaler une intention comme absente.
 
 ## `/9_controle` — décide le groupement, et ne le décide pas seule
 
-📌 **`/8_code` lance le Contrôleur tout seul une fois le dernier lot
-passé.** 🔴 **Cette commande sert à le relancer** — après que les fiches
-ont changé, après que ses propres règles ont changé, ou pour comparer
-deux états.
+🔴 **`/8_code` ne lance pas le Contrôleur** — elle s'arrête une fois le
+dernier lot passé et annonce cette commande. 📌 **C'est ici, et
+seulement ici, qu'il tourne.**
+
+🔴 **Sur le dossier de la fonctionnalité, jamais sur un `bugfix-NN/`** —
+⚠️ **un cycle de correction n'a ni fichier produit ni traçabilité : il
+n'y a rien à confronter.** 📌 **Et le Contrôleur n'est pas relancé après
+un cycle de correction** : les lots d'un bugfix ne sont dans aucune
+carte, son rapport redirait les mêmes manques.
 
 **Elle construit la carte bloc → lots elle-même**, sans agent : 📌 **la
 traçabilité donne bloc → entrées, les ancres du découpage donnent
@@ -994,7 +999,8 @@ lirait un jeu de fiches incomplet et signalerait une intention comme
 manquante quand elle est seulement pas encore écrite.**
 
 📌 **Un rapport existant n'est pas une raison de s'arrêter** — il en
-écrit un numéroté à côté, et c'est ainsi qu'on compare deux états.
+écrit un numéroté à côté. ⚠️ **C'est une archive, pas une
+comparaison.**
 
 ## `/conventions` — hors de la boucle, lancée à la main
 
@@ -1066,7 +1072,7 @@ ce que les fichiers disent** ; quoi en faire est au Product Owner.
 | `spec-technique.md` · `desc-bug.md` | L'amont · **Diagnostiqueur** *(inv. 2)* | Cadreur *(en entier)*, Vérificateur et Détailleur *(les entrées citées)* |
 | `bug-list.md` | Product Owner, hors ligne | Diagnostiqueur *(inv. 2)*, Fusionneur *(amont)* |
 | `investigation/<id>.md` | Diagnostiqueur *(inv. 1)* | Diagnostiqueur *(inv. 2)* |
-| `code/decoupage.md` | **Cadreur** | Vérificateur, Détailleur, Arbitre, `/9_controle` |
+| `code/decoupage.md` — 📌 **l'inventaire des symboles, puis la liste des lots** | **Cadreur** | Vérificateur *(qui croise l'inventaire contre les lots)*, Détailleur, Arbitre, `/9_controle` |
 | `code/sequence.md` | **Vérificateur** | 🔴 **La commande**, le Détailleur, le Cadreur *(ses défauts)* |
 | `code/<lot>/fiche-executable.md` | **Détailleur** | Réalisateur, Relecteur, Contrôleur |
 | `code/<lot>/compte-rendu.md` | **Réalisateur** | Relecteur · **grepé** par le Détailleur du bloc suivant |
@@ -1101,8 +1107,11 @@ que ce sont des sections et non des entrées.
 📌 **Un piège change une signature** pour le Détailleur, **et la façon
 d'écrire** pour le Réalisateur.
 
-⚠️ **Ce document commande le Cadreur** : c'est contre lui qu'un lot est
-déclaré production ou modification.
+🔴 **Le Cadreur ne le lit pas** — ⚠️ **un lot est déclaré production ou
+modification contre le code, par grep, jamais contre ce document.**
+📌 **C'est le principe de la chaîne** : le code est la vérité, ce
+document est un cache. **Un cache qui aurait dérivé ferait déclarer
+*production* un symbole qui existe.**
 
 ---
 
@@ -1203,14 +1212,19 @@ dossier »*, la seule exception nommée étant un `code/redecoupage.md`.
 *« ne corrige que les lots nommés »*, et **les dix gestes ne sont pas
 rejoués.** ⚠️ **Deux comportements pour un même appel.**
 
-🟡 **Comment `/8_code` invoque le Contrôleur.** Elle écrit *« quand tous
-les lots portent un PASS → `controleur`, puis stop »*, **une invocation,
-sans groupe.** 🔴 **Le Contrôleur exige que le prompt nomme ses blocs et
-ses fiches** — *« ni l'un ni l'autre n'est déduit »* — et son invocation
-1 est une passe par groupe, suivie d'un assemblage. 📌 **La machinerie
-qui construit ces groupes vit dans `/9_controle`** : la carte
-bloc → lots, puis le script de groupement. ⚠️ **`/8_code` n'en porte
-rien.**
+🟡 **Renommer ou supprimer : tranché.** 📌 **Les cinq agents renomment
+désormais**, comme le Cadreur et comme le PROCESS le décrivent —
+📌 **les fichiers numérotés sont l'archive que l'exécution suivante
+lit**, et A5 en fait la source d'un registre.
+
+🟡 **Comment `/8_code` invoque le Contrôleur : tranché.** 📌 **Elle ne
+l'invoque pas.** ⚠️ **Elle se contredisait elle-même** : son en-tête
+disait *« elle n'invoque jamais le Contrôleur — il a besoin de ses
+blocs et de ses fiches, que ni l'un ni l'autre ne se déduit »*, et sa
+section *Where to resume* disait *« va droit au Contrôleur »*. 🔴 **La
+seconde est corrigée** : tous les lots en PASS, la commande s'arrête et
+annonce `/9_controle`. 📌 **La machinerie des groupes vit là, et
+seulement là.**
 
 📌 **Un point vérifié, et il tient** : les modèles annoncés par
 `.claude/CLAUDE.md` — neuf agents en `opus`, dont `arbitre`, `cadreur`,

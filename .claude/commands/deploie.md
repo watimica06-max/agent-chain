@@ -1,6 +1,6 @@
 ---
 description: Install both applications on the physical phone and watch
-allowed-tools: Bash
+allowed-tools: PowerShell
 ---
 
 Deploy both applications to the physical devices. **You install, you
@@ -31,6 +31,9 @@ build fails in ways that read as code defects.
 ---
 
 ## 2. Install
+
+🔴 **Every command below runs through the `PowerShell` tool** — ⚠️
+**never Bash, which rejects each of them.**
 
 🔴 **In PowerShell the variable goes on its own line, before the
 command** — set on the same line it does not reach Gradle.
