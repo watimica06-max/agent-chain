@@ -360,9 +360,9 @@ file says is never empty nor breaks the cause chain.**
 🔴 **Then the sheet's sections — the second head rule.** 📌 **A check
 whose input is missing is never a pass**: ⚠️ **a sheet with no
 `## Signatures`, no `## Acceptance criteria` or no `## Conventions`
-section is a `FAIL structurel`, `Cause: sheet`** — 🔴 **the lot cannot
-demonstrate its contract, and no fresh Réalisateur can fix that.** 📌
-**`/8_code` runs the Détailleur on the block again** — see
+section is a `FAIL structurel`, `## Cause` reading `sheet`** — 🔴 **the
+lot cannot demonstrate its contract, and no fresh Réalisateur can fix
+that.** 📌 **`/8_code` runs the Détailleur on the block again** — see
 `## Cause` under *What you write*. ⚠️ **A section present and carrying
 a dash is not a missing section** — 📌 **`## Conventions` with a dash
 sends point 3 to the `permanente` scope alone.**

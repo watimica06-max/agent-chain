@@ -97,7 +97,10 @@ that is all you need to see it is orphaned.
 
 **`code/sequence.md`** — a round line, then three headings — 🔴 **and a
 fourth, `## Redécoupage: archivable`, on a redécoupage whose
-`## Defects` is empty**, see move 6:
+`## Defects` is empty**, see move 6. 📌 **`/7_lots` consumes that
+line** — ⚠️ **it removes it from `code/sequence.md` once it has archived
+the file on it**, so a later run never finds a stale one; 🔴 **you write
+it afresh only on a new redécoupage whose `## Defects` is empty**:
 
     Round: 2
 

@@ -113,6 +113,10 @@ what the line exists for. 🔴 **Test both**: `^Answer:\s*$` with no
 📌 **Whether it is integrated is the `### Q` guard's test**, under
 *Git, before invoking*.
 
+⚠️ **Never `questions-architecte-*.md`** — 📌 **it is `/conventions`'s,
+which alone reads it**: 🔴 **read the root as if it were not there**,
+as the `### Q` guard and the filing do.
+
 ---
 
 ## Which blocks the angles probe
@@ -124,6 +128,10 @@ trigger, no output, and the grid's questions do not apply to it.
 
 **First turn — no `questions-sondeur-*.md` anywhere:** 🔴 **every
 behaviour block.** 📌 **Name them all.**
+
+⚠️ **The grep returns no block** → 🔴 **do not invoke.** 📌 **Commit
+what the filing moved, if anything, and push** — no worktree. ⚠️ **Say
+the feature carries no behaviour block**, and go to *What you relay*.
 
 **Later turns — two greps in `desc-produit.md`, and the union of what
 they return:**
@@ -139,6 +147,9 @@ marker.
 
 📌 **The hit is the heading** — 🔴 **the identifier is what follows
 `### `, up to the first space after it.**
+
+📌 **A turn reopening the first time probes the same union** — 🔴 **the
+marked blocks alone**: see the closure test below.
 
 ⚠️ **Never the questions file** — 🔴 **a block an answer touched carries
 `MODIFIED`**, and the second grep finds it.
@@ -173,14 +184,28 @@ C question asked once on the feature**, and pass C is the global's.
 them the grid asks him a second time**, and she answers what he has
 already answered.
 
-🔴 **What closes the first time is the highest-numbered
-`questions-sondeur-NN.md` holding no `### Q`** — 📌 **wherever it sits,
-at the root or filed under `questions/sondeur/`**: ⚠️ **glob both
-places and test the highest `NN` alone** — an earlier turn's file holds
-its answered questions, and says nothing about the grid. 🔴 **Test it
-before the two marker greps of *Which blocks the angles probe*.** 📌
-**It is empty → the first time is closed**, and the second time runs:
-see below.
+🔴 **What closes the first time is two things at once: the
+highest-numbered `questions-sondeur-NN.md` holds no `### Q`, and no
+`### B` line of `desc-produit.md` carries a marker** — 📌 **the file
+wherever it sits, at the root or filed under `questions/sondeur/`**:
+⚠️ **glob both places and test the highest `NN` alone** — an earlier
+turn's file holds its answered questions, and says nothing about the
+grid. 🔴 **Test it before the two marker greps of *Which blocks the
+angles probe*.** 📌 **It is empty and the two greps return nothing →
+the first time is closed**, and the second time runs: see below.
+
+⚠️ **It is empty and a grep returns a heading** → 🔴 **the first time
+reopens, on the marked blocks alone** — 📌 **a later integration
+created or changed them**, and they would reach `/5_reclasse`
+unprobed. ⚠️ **The turn that wrote the empty file stripped every
+marker** — *Once it has reported* — so a marker beside it is a block
+that moved since.
+
+📌 **The Rédacteur strips only when the file it integrates comes from
+the grid or the conversion** — ⚠️ **on any other integration,
+`idees.md` included, markers of an earlier turn survive and reopen the
+first time on blocks already probed**: 🔴 **probing twice is the
+accepted side.**
 
 ⚠️ **Root or filed, because a sibling command files it** — 📌 **a
 `/3_decoupe` run by hand between the closure and the second time, or
@@ -188,11 +213,15 @@ see below.
 moves the empty file under `questions/sondeur/`**: 🔴 **a test on the
 root alone would then read a closed grid as a broken one.**
 
-⚠️ **Never *no marker returned*** — 📌 **markers are stripped by the
-Rédacteur when it integrates a questions file that holds questions.** 🔴
-**An empty one is integrated by nobody**, so the markers stay, and a
-test on them would send the grid round for ever on a feature it has
-nothing left to ask about.
+⚠️ **Never *no marker returned* alone** — 📌 **a marker says a block
+moved, not that the grid ran**: 🔴 **the empty file is the evidence a
+turn ran and asked nothing**, and the greps beside it say whether
+anything moved since. ⚠️ **The Rédacteur strips the markers when it
+integrates a questions file that holds questions** — 🔴 **an empty one
+is integrated by nobody**, which is why this command strips them itself
+when it writes one: *Once it has reported*. 📌 **A test on the markers
+alone would send the grid round for ever** on a feature it has nothing
+left to ask about.
 
 📌 **Neither marker grep returns anything, and the highest-numbered
 `questions-sondeur-NN.md` holds a `### Q`** → 🔴 **two cases, told apart
@@ -206,10 +235,10 @@ by where that file sits:**
 ⚠️ **Whether a `questions-existant-NN.md` exists changes nothing here** —
 📌 **the second time's *has it already run* test reads it.**
 
-⚠️ **The empty file the first row writes is the closure `/5_reclasse`
-tests** — 📌 **the same evidence a turn with nothing left to ask would
-have written**: 🔴 **a marker no integration can now set is not what
-closes the first time.**
+⚠️ **The empty file the first row writes, beside headings carrying no
+marker, is the closure `/5_reclasse` tests** — 📌 **the same evidence a
+turn with nothing left to ask leaves**: 🔴 **an empty file, and no
+marker on any `### B` line.**
 
 ---
 
@@ -308,8 +337,9 @@ folder and none of that happens.**
 
 ## The second time — the feature against what is already built
 
-🔴 **It runs once, and only when the first time has closed** — 📌 **no
-block marked, nothing left to probe inside the feature.**
+🔴 **It runs once, and only when the first time has closed** — 📌 **the
+highest `questions-sondeur-NN.md` empty and no block marked, nothing
+left to probe inside the feature.**
 
 🔴 **Has it already run?** 📌 **Glob `questions-existant-NN.md` at the
 root and under `questions/existant/`, and test the highest `NN` alone:**
@@ -541,6 +571,13 @@ exactly where one is dropped or reworded.**
 📌 **No question at all** → 🔴 **write the file empty.** ⚠️ **That is
 what ends the loop.**
 
+🔴 **And strip a trailing `NEW` or `MODIFIED` from every `### B` line of
+`desc-produit.md`** — 📌 **by script, one targeted edit per line, no
+agent**: ⚠️ **the empty file is integrated by nobody**, and a marker
+left standing would read as a block that moved since. 📌 **Inside the
+worktree** — step 1 of *Git, once it has reported* commits it with the
+rest.
+
 ---
 
 ## Git, once it has reported
@@ -549,8 +586,8 @@ what ends the loop.**
 
 1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
    sondeurs and the assembleur have no Bash and commit nothing**, and
-   the rename and the copy of *Once it has reported* are in the tree,
-   not in a commit; 📌 **`git merge` takes the branch's commits, not the
+   the rename, the copy and the strip of *Once it has reported* are in
+   the tree, not in a commit; 📌 **`git merge` takes the branch's commits, not the
    worktree's files**, and `git worktree remove` refuses a dirty tree
 2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
    cannot issue a git command against the main checkout**: the merge

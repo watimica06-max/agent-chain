@@ -408,6 +408,12 @@ decision per line, in this shape:**
 dash where no block is derived.** 🔴 **Nothing before the identifier**:
 the Rédacteur greps it, and reads it as written.
 
+⚠️ **A `## Decision` written on several lines — the Arbitre's three
+parts, one under the other — is written as one line**: 🔴 **its parts
+joined in order on the identifier's line, nothing dropped and nothing
+on a continuation line.** 📌 **The Rédacteur reads one line per
+decision, and a continuation line would open on no identifier.**
+
 ⚠️ **No blocking file names a block** — 🔴 **it names a lot, and you
 derive the block from the lot through the map of phase 1:**
 
@@ -494,10 +500,11 @@ what they hold, no decision on what to do next.
 📌 **The Product Owner reads them and decides** whether the control
 report becomes a `bug-list.md` for a correction cycle. 🔴 **A gap she
 takes from the report keeps its `B<n>` in `bug-list.md`** — 📌 **in
-parentheses, at the end of the gap's first line**, as the
-Diagnostiqueur writes it into `desc-bug.md`:
+parentheses, at the end of the gap's first line, after the `G<n>` each
+gap she writes opens on**, as the Diagnostiqueur writes it into
+`desc-bug.md`:
 
-    Correction factor never computed (B12)
+    G03 Correction factor never computed (B12)
 
 🔴 **That is the form the Diagnostiqueur greps** — ⚠️ **written anywhere
 else on the gap, the identifier is lost**, and the block reads missing

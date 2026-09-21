@@ -105,8 +105,9 @@ settles**.
 could give it?
 
 📌 **Each agent owns one thing** — the Cadreur the split, the
-Vérificateur its order, the Détailleur a sheet, the Réalisateur the
-code of one lot, the Relecteur its verdict. 🔴 **A block asking for
+Vérificateur its order, the Détailleur a sheet, the Concepteur its
+declarations, the Testeur its tests, the Réalisateur the code of one
+lot, the Relecteur its verdict. 🔴 **A block asking for
 what an agent before its author owns is one**, whatever it asks for.
 
 ⚠️ **If it asks for nothing its author could not give itself, it is not

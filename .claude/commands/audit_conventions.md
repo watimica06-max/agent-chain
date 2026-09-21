@@ -148,6 +148,12 @@ entry `couverture.md` traces it to.**
 exists, and the split cut no lot from it. ⚠️ **It costs a read at every
 lot and catches nothing.**
 
+⚠️ **Only when both sides name one same document.** 🔴 **When
+`couverture.md` traces to a document the `Anchor` lines do not cite** —
+the case "What you read" names under the technical document — 📌 **the
+test has no ground: skip the finding and say so under its heading** —
+*coverage and split on different documents*.
+
 📌 **Distinct from finding 2**: there a lot meets the rule and cannot
 obey it; here no lot meets it at all.
 

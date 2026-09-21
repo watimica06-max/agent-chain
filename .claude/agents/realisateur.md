@@ -295,7 +295,10 @@ first thing you cannot do.**
 
 🔴 **A second lack you meet while carrying on is added to the blocking
 file** — ⚠️ **it never replaces the first.** 📌 **One entry each, and the
-Arbitre answers both.**
+Arbitre answers both.** ⚠️ **The same on a run given a filled file**:
+🔴 **a fresh block goes below the existing entries as the next
+`## Blocking N`**, never a rewrite of the file — 📌 **the Arbitre numbers
+its answer under the ones already there.**
 
 ⚠️ **Say in your report what you did write** — 🔴 **a block does not
 mean the lot is untouched**, and the next run has to know.
@@ -350,6 +353,14 @@ returned is an acknowledgement; the answer is in `## Decision`.**
 | Filled, **and `code/redecoupage.md` is there** | 🔴 **The lot goes back to the split** — **drop everything you wrote.** See below |
 | Some numbers answered, others not | 🔴 **Apply the answered ones** — 📌 **stop on the entries they do not cover, as on an empty decision**: see below |
 | Still empty | 📌 **The Arbitre could not settle it and the Product Owner has not either.** See below |
+
+🔴 **Before you carry on, `git status`** — 📌 **a
+`docs/CURRENT_TECHNICAL_STATE.md` it shows modified holds a trap the
+Arbitre wrote**: commit that file alone, now, before move 7 touches it,
+under a message that does not begin with `<lot>: ` — `trap: <what it
+says>`. ⚠️ **The lot's revert list is built from that prefix**, and a
+trap committed outside it survives every revert of the lot. 📌 **The
+file unchanged, the Arbitre wrote no trap** — nothing to commit.
 
 📌 **A blocked run writes its report all the same** — 🔴 **`## Build`
 says the analysis and the tests did not pass**, and the rest says what
@@ -695,7 +706,9 @@ you change your code, and the error does not move.
 **8. Write the report**, `code/<lot>/compte-rendu.md` — 📌 **its six
 fields are above.**
 
-**9. Commit**, staging explicitly what belongs to the lot. 🔴 **The
-message reads `<lot>: <what the commit carries>`** — 📌 **the
-orchestration finds the lot's first commit by `git log` on it.**
+**9. Commit**, staging explicitly what belongs to the lot — ⚠️ **never
+your request in `architecte/`**: 📌 **the command commits those**, so
+a revert of the lot leaves them standing. 🔴 **The message reads
+`<lot>: <what the commit carries>`** — 📌 **the orchestration finds the
+lot's first commit by `git log` on it.**
 

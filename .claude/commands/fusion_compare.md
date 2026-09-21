@@ -17,13 +17,16 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 ## Before anything else
 
-🔴 **Three tests, in this order** — 📌 **stop at the first that fires:**
+🔴 **Six tests, in this order** — 📌 **stop at the first that fires:**
 
 | | |
 |---|---|
 | `desc-produit-fusion.md` absent | 🔴 **Stop** — 📌 **say to run `/fusion` first**: ⚠️ **only its Rédacteur row writes that file**, and the Fusionneur reads it and nothing else |
 | `blocked_fusionneur.md` with an empty `## Decision` | 🔴 **Stop** — 📌 **relay it** |
 | `blocked_fusionneur.md` with a filled `## Decision`, and its `## Invocation` line names 2 or 3 | 🔴 **Stop** — 📌 **it is not this command's**: say `/fusion_applique` for 2, `/fusion` for 3 |
+| `rapport-fusion.md` exists | 🔴 **Stop** — 📌 **the merge is done** |
+| `plan-fusion.md` exists | 🔴 **Stop** — 📌 **say `/fusion_applique`**: ⚠️ **invocation 1 has run, the plan waits for invocation 2** |
+| A `bugfix-*/` folder, and no `questions-fusionneur-*` anywhere | 🔴 **Stop** — 📌 **say `/fusion`**: ⚠️ **the bug-fix pass has not run** — only `/fusion` invokes it, and its questions file, even empty, is what says it has |
 
 🔴 **A `blocked_fusionneur.md` with a filled `## Decision` whose
 `## Invocation` line names 1 → name it in the prompt.** 📌 **The agent
@@ -47,13 +50,17 @@ open `CURRENT_TECHNICAL_STATE.md`.
 
 ## Git, before invoking
 
-🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
-`architecte` before touching it** — 📌 **a file holding questions is
-not yours to file**: ⚠️ **it waits on an answer, or its answers were
-never integrated.** 🔴 **Stop and say which.** 📌 **The architecte's is
-the one exception** — ⚠️ **it is `/conventions`'s, not this chain's**,
-and a `### Q` in it says nothing about the run; 🔴 **read the root as if
-it were not there** — and leave it there, see below.
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is
+neither `architecte` nor `fusionneur` before touching it** — 📌 **a
+file holding questions is not yours to file**: ⚠️ **it waits on an
+answer, or its answers were never integrated.** 🔴 **Stop and say
+which.** 📌 **Two exceptions.** ⚠️ **The architecte's is
+`/conventions`'s, not this chain's**, and a `### Q` in it says nothing
+about the run; 🔴 **read the root as if it were not there** — and leave
+it there, see below. ⚠️ **The Fusionneur's highest stays at the root by
+design** — see below — and 📌 **a `### Q` in it is its normal state, not
+a wait**: whether it waits is `/fusion`'s test, an empty `Answer:`, not
+this command's.
 
 🔴 **Then move every root `questions-*.md` whose prefix is not
 `fusionneur`:**
@@ -146,6 +153,18 @@ and each reads what the previous one wrote.
 
 ## Git, once it has reported
 
+🔴 **The agent reports having applied a decision → rename its blocking
+file**, inside the worktree, before the steps below:
+
+    git mv docs/features/<name>/blocked_fusionneur.md \
+           docs/features/<name>/blocked_fusionneur-NN.md
+
+📌 **`NN`: the highest in that folder plus one, `01` when there is
+none.** ⚠️ **The agent has no tool that removes a file** — 🔴 **left at
+the unnumbered name, the next run stops on it.** 📌 **Step 1 carries the
+rename into the commit** — ⚠️ **done after it, the rename stays out of
+the merge and leaves the tree dirty for step 5.**
+
 **Then, once the agent reports — 📌 five steps, in this order:**
 
 1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
@@ -169,16 +188,6 @@ carry on.
 🔴 **Merge before handing back, always** — a phase whose output sits on
 an unmerged branch is invisible to the next one. ⚠️ **A
 `blocked_*.md` merges too**: the Product Owner has to see it.
-
-🔴 **The agent reports having applied a decision → rename its blocking
-file:**
-
-    git mv docs/features/<name>/blocked_fusionneur.md \
-           docs/features/<name>/blocked_fusionneur-NN.md
-
-📌 **`NN`: the highest in that folder plus one, `01` when there is
-none.** ⚠️ **The agent has no tool that removes a file** — 🔴 **left at
-the unnumbered name, the next run stops on it.**
 
 ---
 

@@ -65,9 +65,6 @@ from it, and the upstream loop has not reached it yet. ⚠️ **Invocation 3
 does not need it**: it judges a request against the conventions and the
 grid.
 
-🔴 **Stop if a root `questions-architecte-*.md` carries an empty
-`Answer:`** — relay it. The agent asked something and it is unanswered.
-
 ---
 
 ## Which invocation
@@ -83,9 +80,9 @@ matches.**
 | 🔴 **A second argument names a `bugfix-NN`, and no row above matched** | 📌 **Nothing to invoke** — say so: ⚠️ **`/8_code` carries on**. 🔴 **The rows below are the feature folder's**: a `bugfix-NN` carries no technical document of its own to walk |
 | A `questions-architecte-NN.md` at the root with an empty `Answer:` | 🔴 **Nothing** — say which questions wait |
 | A `questions-architecte-NN.md` at the root, **answered** | **Invocation 2 — Integrating** — 🔴 **name the file in the prompt** |
-| A `questions-architecte-NN.md` at the root with **no `### Q`** | 🔴 **Nothing** — the derivation asked nothing. 📌 **File it and commit — the filing steps of *Git, before invoking*, no worktree — then say `/7_lots`** |
 | 🔴 **No `docs/TECHNICAL_CONVENTIONS.md`** | **Invocation 1 — Deriving** — 📌 **the first derivation this repository ever had** |
 | **It exists, and no `couverture.md` at the feature folder's root** | 🔴 **Invocation 4 — Completing** |
+| A `questions-architecte-NN.md` at the root with **no `### Q`** | 🔴 **Nothing** — the derivation asked nothing. 📌 **File it and commit — the filing steps of *Git, before invoking*, no worktree — then say `/7_lots`** |
 | **It exists, and a `couverture.md` is there** | 📌 **Nothing to do** — say `/7_lots` |
 | Nothing of the sort | 📌 **Nothing to do** — say `/7_lots` |
 

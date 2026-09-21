@@ -30,12 +30,17 @@ either.
 
 ## What you read
 
-**`bug-list.md`, and only to count and split it.** 🔴 **You read the
+**`bug-list.md`, and only to split it, gap by gap.** 🔴 **You read the
 gaps to hand each one to an agent, never to judge, rewrite or merge
 them.**
 
-📌 **One gap, one identifier** — `G01`, `G02`, in the file's own order.
-**Its full text goes in the prompt**, verbatim.
+📌 **One gap, one identifier** — the `G<n>` each gap opens on, `G01`,
+`G02`. 🔴 **Read from the line, never counted from the gap's
+position** — 📌 **the Product Owner writes it**, as a control-report
+gap already carries its `B<n>` in parentheses at the end of its first
+line. **Its full text goes in the prompt**, verbatim, the `G<n>`
+passed as its identifier. ⚠️ **A gap opening on no `G<n>`** → 🔴 **stop
+before issuing anything, and say which line lacks one.**
 
 **`investigation/`, and only to sort the gaps** — a `Glob` on
 `investigation/*.md` tells which gap has its report and which has a

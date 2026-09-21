@@ -115,6 +115,7 @@ That is a split defect, not a decision to take here.
 | The contradiction | What it means |
 |---|---|
 | A production that already exists, or the reverse | The lot was declared against a stale state document |
+| A production that exists, **and the lot's verdict starts with `PASS`** | 🔴 **Not a contradiction** — 📌 **it is what the lot built**: ⚠️ **the walk greps no PASSed lot** — see *First, walk the whole block* |
 | A production that exists **with an empty body** | 🔴 **Not a contradiction** — 📌 **a concepteur declared it before the block came back from a redécoupage**: ⚠️ **treat it as absent**, the lot still has to build it |
 | A need whose symbol exists but does not carry what the lot asks | The lot needs a modification nobody declared |
 
@@ -351,6 +352,13 @@ the count.
 🔴 **The `## Decision` heading is written empty, and never omitted** —
 📌 **the Arbitre answers each blocking there, numbered.**
 
+⚠️ **The file is already there, its `## Decision` filled** — 🔴 **you
+are the run applying it**, and a fresh stop goes below the existing
+entries as the next `## Blocking N`, before that `## Decision` — 📌
+**never a rewrite of the file**: the Arbitre numbers its answer under
+the existing ones, and a `## Blocking N` with no number is what the
+orchestration reads as a block standing.
+
 📌 **Never block out of caution.** A terse but complete rule is not
 ambiguous.
 
@@ -500,7 +508,9 @@ once.**
 
 🔴 **And, per lot, one grep of the symbol it declares as produced or
 modified** — 📌 **on the code folders the conventions name**, which move
-4 also uses.
+4 also uses. ⚠️ **Not on a lot whose verdict's `## Status` starts with
+`PASS`** — 📌 **its symbol is in the code because it built it**, and the
+table below says its sheet is never touched.
 
 ⚠️ **Three of your six block causes show only in a grep** — 📌 **without
 it the walk meets them after the earlier sheets are written.**

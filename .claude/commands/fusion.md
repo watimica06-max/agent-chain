@@ -38,8 +38,9 @@ run to row 7, 9 or 10 instead of row 8.**
 **Only what the routing table tests** — the presence of files, whether
 a `## Decision` or an `Answer:` field is empty, what a blocking file's
 `## Invocation` line says — the file numbers *Git, before
-invoking* reads off their names, and the one grep *On `INIT` — the
-copy* names. 🔴 **Never their content beyond that.**
+invoking* reads off their names and its one grep of `^### Q`, and the
+one grep *On `INIT` — the copy* names. 🔴 **Never their content beyond
+that.**
 
 ⚠️ **Nothing else.** `CLAUDE.md`'s standing reading rules apply.
 
@@ -137,8 +138,17 @@ Fusionneur must never have to choose its source.**
 
 ## Git, before invoking
 
-🔴 **Before invoking, move every root `questions-*.md` whose prefix is
-not the one the phase you are about to run writes:**
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is
+neither `fusionneur` nor `architecte` before touching it** — 📌 **a
+file holding questions is not yours to file**: ⚠️ **it waits on an
+answer, or its answers were never integrated.** 🔴 **Stop and say
+which.** 📌 **The two exceptions are the two the filing below already
+carries** — ⚠️ **the architecte's is `/conventions`'s, not this
+command's**, and a `### Q` in it says nothing about the run; the
+Fusionneur's own is what the routing table reads, rows 7 and 9.
+
+🔴 **Then move every root `questions-*.md` whose prefix is not the
+one the phase you are about to run writes:**
 
     git mv docs/features/<name>/questions-<other>-NN.md \
            docs/features/<name>/questions/<other>/

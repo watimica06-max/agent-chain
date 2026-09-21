@@ -53,13 +53,18 @@ Feature folder: `docs/features/$ARGUMENTS/`
 ⚠️ **wherever each sits, at the root or filed under
 `questions/sondeur/` and `questions/existant/`**: 🔴 **glob both places
 and test the highest `NN` alone** — 📌 **an earlier turn's file holds
-its answered questions, and says nothing about the grid.**
+its answered questions, and says nothing about the grid.** 🔴 **And no
+`### B` line of `desc-produit.md` carries a trailing `NEW` or
+`MODIFIED`** — 📌 `grep '^### .*NEW'` and `grep '^### .*MODIFIED'`,
+anchored on the heading line — ⚠️ **a marker beside an empty sondeur
+file is a block a later integration created or changed**, and
+`/4_grille` reopens the first time on it.
 
 📌 **Both files, whether or not the feature attaches to the global** —
 ⚠️ **`/4_grille`'s second time writes `questions-existant-NN.md` empty
 when no block carries `Global:`**, so its absence means the second time
-never ran. 🔴 **Either missing, or the highest holding a `### Q`** →
-🔴 **stop**: say to run `/4_grille`.
+never ran. 🔴 **Either missing, the highest holding a `### Q`, or a
+marker on any heading** → 🔴 **stop**: say to run `/4_grille`.
 
 ⚠️ **This command is what closes the upstream** — 📌 **it writes the
 views every later step reads**, and a product file still open would be

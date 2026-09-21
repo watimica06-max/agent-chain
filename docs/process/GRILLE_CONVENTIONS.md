@@ -48,8 +48,9 @@ carries `off-grid`.** ⚠️ **The mark is not distrust** — it is how the
 grid learns which forms it lacks.
 
 **R4 — The Architecte never amends the grid he applies.** A missing
-form, or a form that keeps producing a useless rule, goes back as a
-conventions request in `architecte/`.
+form, or a form that keeps producing a useless rule, is a `Kind: forme`
+question in his questions file — 📌 **its answer amends the grid, and
+the Product Owner does that herself.**
 
 **R5 — A list never permits what it leaves out.** 🔴 **Where a form
 names a class, write the class**, not the members of it you found. ⚠️

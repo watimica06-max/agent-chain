@@ -55,6 +55,8 @@ never wait for her on anything an agent can settle.
 | `/6_convertit` | a feature name | **Cycle, upstream** — the convertisseur once per nature, all at once, then once across the document |
 | `/7_lots` · `/8_code` | a feature name | **Cycle, downstream** — several agents, chained |
 | `/9_controle` · `/conventions` · `/fusion` | a feature name | **Outside the chain** — run by hand |
+| `/audit_blocages` · `/audit_conventions` | a feature folder name | **Outside the chain** — run by hand; no agent, you read and report yourself |
+| `/deploie` | none | **Outside the chain** — run by hand; no agent, installs both applications on the physical phone |
 
 📌 **Each command holds its own rules** — its invocation parameters,
 its git handling and what to relay live in the command file, not here.

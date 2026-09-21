@@ -152,6 +152,12 @@ the lines under its `## <nature>` heading, up to the next `## `. 📌
 | `convertisseur/blocked_<nature>.md` carries a filled `## Decision` | 🔴 **Runs** — ⚠️ **a decision is applied only by the invocation it is named to** |
 | None of the above | 📌 **Kept as it stands** |
 
+📌 **Several *Runs* rows can match one nature** — 🔴 **it runs once,
+and its prompt carries the line of every row that matched**: the
+answered technical file, the `questions-convertisseur-NN.md`, the
+decision. ⚠️ **A line dropped is an answer the invocation never sees**
+— the mark stays, or the decision waits another run.
+
 📌 **A nature that waits is a third state, beside *ran* and *kept*** —
 🔴 **and the document does not stand while one waits.**
 
@@ -172,7 +178,7 @@ what the next run compares against.**
 | | What you do |
 |---|---|
 | `spec-technique.md` exists, opens on `# Preamble`, holds no `<<ASSUMED` and no `[B`, `tracabilite.md` is there, no nature's files were just deleted, no nature is waiting, `convertisseur/technique-transversal.md` is absent or holds an `^Answer:$` line, and `blocked_transversal.md` carries no filled `## Decision` | 🔴 **Nothing to write** — say the document stands, and go to *Once it has run* |
-| Otherwise | 📌 **Skip to the assembly** — the document has to be built again around what stands. ⚠️ **An answered `technique-transversal.md` takes a nature's route**: 🔴 **it forces the assembly and invocation 2, which its prompt names** |
+| Otherwise | 📌 **Skip to the assembly** — the document has to be built again around what stands. ⚠️ **A waiting nature alone lands on the assembly's *No* row** — nothing is built while one waits. ⚠️ **An answered `technique-transversal.md` takes a nature's route**: 🔴 **it forces the assembly and invocation 2, which its prompt names** |
 
 ---
 
@@ -195,9 +201,10 @@ Agent(
 )
 ```
 
-📌 **The `questions-convertisseur-NN.md` line goes only to a nature the
-*part byte-identical, no answered technical file* row sent running** —
-⚠️ **a nature whose part changed reads the answer in its blocks**, and
+📌 **The `questions-convertisseur-NN.md` line goes to every nature the
+*part byte-identical, no answered technical file* row matched** —
+⚠️ **whether or not another row matched it too** — and to no other:
+🔴 **a nature whose part changed reads the answer in its blocks**, and
 the file would tell it nothing the product file does not. 🔴 **You name
 the file; you open none of it** — the agent reads it.
 
@@ -227,10 +234,10 @@ missing one stops the command**
 
 ## The assembly
 
-| Every nature whose part holds blocks has its `convertisseur/<nature>.md` | What you do |
+| Every nature whose part holds blocks has its `convertisseur/<nature>.md`, **and none waits** | What you do |
 |---|---|
 | Yes | 📌 **Assemble** |
-| No | 🔴 **Assemble nothing** — delete `spec-technique.md` if it is there, skip invocation 2, go to *The questions*, and say which nature wrote no section. ⚠️ **It asked something it cannot write a rule without**, and a document missing that rule would be cut as if it were whole |
+| No | 🔴 **Assemble nothing** — delete `spec-technique.md` if it is there, skip invocation 2, go to *The questions*, and say which nature wrote no section, or waits. ⚠️ **It asked something it cannot write a rule without**, and a document missing that rule would be cut as if it were whole. 📌 **A waiting nature takes this row too** — the document does not stand while one waits, see *Which natures run* |
 
 **`spec-technique.md`, at the feature folder's root, replaced whole** —
 the nine sections in order:

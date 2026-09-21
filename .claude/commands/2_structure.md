@@ -45,6 +45,9 @@ Feature folder: `docs/features/$ARGUMENTS/`
   the second grep adds are the run's**
 - **Whether `code/decoupage.md` exists** in the feature folder — 📌 **a
   test, not a read**
+- **A grep of `Clarification needed` in `desc-produit.md`**, when no
+  questions file sits at the root and the product file exists — 📌 **the
+  last row of *How it runs* tests it before naming `/3_decoupe`**
 
 📌 **You pass the agent the file it reads; it does not look for
 itself.** 🔴 **You never read a questions file's entries** — the greps
@@ -147,7 +150,7 @@ Rédacteur has three invocations and one blocking-file name**, and
 | One of the three with **any** `## Decision` empty | 🔴 **Stop** — say the decision is still to write, and which `## Blocking N` waits | — |
 | **One questions file, with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to integrate**; say `/3_decoupe` | — |
 | No questions file, **and no `desc-produit.md`** | **1 — Structuring** | `idees.md` |
-| No questions file, **and a `desc-produit.md`** | 🔴 **Stop** — 📌 **the idea file is transcribed once**; say `/3_decoupe` comes next | — |
+| No questions file, **and a `desc-produit.md`** | 🔴 **Stop** — 📌 **the idea file is transcribed once**. 🔴 **Grep `Clarification needed` in `desc-produit.md` first**: ⚠️ **a hit → say the flag stands with no questions file at the root to lift it** — a filing or an integration went wrong, and the file is the Product Owner's to find — 📌 **never `/3_decoupe`**, which stops on the flag and sends back here; no hit → say `/3_decoupe` comes next | — |
 
 🔴 **First match wins, and the questions file comes before the blocking
 files** — 📌 **an answered file and a blocking file at the root
@@ -159,7 +162,8 @@ questions file beside the answered one, and the next run stops on two.
 the stop on the decision comes at the next run. ⚠️ **The empty
 questions file sits below the blocking-file rows** — 🔴 **a filled
 decision beside a file that asked nothing is taken, not left behind on
-"nothing to integrate".**
+"nothing to integrate"** — 📌 **and the empty file is filed with the
+run**, see *Once it has run*.
 
 🔴 **Invocation 1 runs on a settled vocabulary, never before** — 📌
 **the highest-numbered `questions-lexicographe-NN.md`, at the root or
@@ -314,7 +318,13 @@ decision comes back.**
 `questions/<agent>/`, inside the worktree before the merge — 📌
 **integrated, it waits for nothing**; ⚠️ **left
 at the root beside the Rédacteur's own, the next command could not tell
-which one waits.** 📌 **A `questions-architecte-*.md` at the root
+which one waits.** 🔴 **On the blocking-file row, file the empty
+`questions-<agent>-NN.md` that sat beside the blocking file, by the same
+`git mv` into `questions/<agent>/`** — 📌 **it asked nothing and waits
+for nothing**; ⚠️ **the Rédacteur writes its own file even when it asked
+nothing, and two files at the root stop the next run on a failed
+filing.** 📌 **After the run, the Rédacteur's new file is the only one
+at the root.** 📌 **A `questions-architecte-*.md` at the root
 stays there** — 🔴 **you named it to nothing**, and `/conventions` is
 waiting for it.
 

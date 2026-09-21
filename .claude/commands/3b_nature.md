@@ -218,7 +218,8 @@ is the one that lifts a rewrite.
 🔴 **Every stop below merges first.** ⚠️ **The agent has written its
 lines in the worktree** — 📌 **stopping before the merge loses the whole
 invocation, and a worktree holding unmerged work never self-cleans.**
-🔴 **Merge, push, remove the worktree, and then report the defect.**
+🔴 **The five steps of *Git, once it has reported*, and then report the
+defect.**
 
 🔴 **Grep `-B2 '^Nature:$'` in `desc-produit.md`, and keep the hits
 whose `Genre:` is `comportement`.** 📌 **Zero is what you expect** — ⚠️
@@ -292,7 +293,7 @@ lines** — say them in the agent's terms, or that there are none.
 |---|---|
 | It wrote a blocking file, **naming a nature it could not settle** | 📌 Fill every `## Decision`, then `/3b_nature` again — ⚠️ **or the row below that the decision fits** |
 | It wrote a blocking file **and** a questions file with questions | 🔴 **Answer the questions first, then `/1_lexique`** — 📌 **fill the decision second, once the answers are integrated.** ⚠️ **Both end in the Rédacteur's hands** — at the root together, `/2_structure` takes the answered file and leaves the blocking file for its next run |
-| A `## Decision` names a rewrite | 🔴 **`/2_structure`** — 📌 **it finds the blocking file at its unnumbered name and names it to the Rédacteur, which rewrites the block with `MODIFIED`.** ⚠️ **Then `/1_lexique` if the rewrite brought vocabulary, and the route back** |
+| **Every** `## Decision` names a rewrite | 🔴 **`/2_structure`** — 📌 **it finds the blocking file at its unnumbered name and names it to the Rédacteur, which rewrites the block with `MODIFIED`.** ⚠️ **Then `/3_decoupe`, `/3a_genre`, and back here** — 🔴 **not `/1_lexique`**: the Lexicographe has nothing to watch on a rewrite. ⚠️ **A file mixing nature decisions and rewrites runs `/3b_nature` first** — 📌 **the classeur writes the natures, and the file stays at its unnumbered name for `/2_structure`** (*Once it has reported*) |
 | A `## Decision` names a nature outside the list | 🔴 **Nothing runs** — ⚠️ **the tables have to carry it first**; say so |
 | 🔴 **A block carrying `Genre: comportement` still has an empty `Nature:`, and no blocking file explains it** | 📌 **Say which, and run `/3b_nature` once more** — ⚠️ **once, not until it clears**: 🔴 **a second run that leaves one empty stops there, the blocks named** — a line left empty by neither a block nor a decision is a defect of the run, and a third run would repeat it. 🔴 **Count only those**: a block of any other genre has an empty `Nature:` and must keep it |
 | Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a block producing two things is split before the grid probes it |

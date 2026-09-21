@@ -147,9 +147,10 @@ reach the Product Owner.
 📌 **A blocking file the prompt names carries a filled `## Decision`** —
 🔴 **apply it and carry on.** ⚠️ **You never look for one yourself.**
 
-🔴 **Say in your report that you applied it** — 📌 **the orchestration
-renames the file**: ⚠️ **you have no tool that removes one**, and left
-at its unnumbered name it reads as a block still standing.
+🔴 **Name it under `## Decision applied` of your report** — 📌 **the
+orchestration's rename keys on that field**: ⚠️ **you have no tool that
+removes one**, and left at its unnumbered name it reads as a block
+still standing.
 
 🔴 **A `code/<lot>/tests.md` already there is a run of yours that
 blocked** — 📌 **the filled `## Decision` the prompt names is what
@@ -336,6 +337,10 @@ is merged**, and the worktree is removed at the end of the run.
     <the test file you created because the one your tests belong in
     did not exist — or a dash>
 
+    ## Decision applied
+
+    <the blocking file the prompt named, or a dash>
+
     ## Outside the lot
 
     <every file you wrote that neither `## Files` of the sheet,
@@ -348,6 +353,10 @@ lot`'s** — 🔴 **the Relecteur counts it declared, beside the sheet's
 the lot` keeps its meaning**: a file you touched that none of the three
 names — 📌 **an older test adapted at move 4 in a file the sheet does
 not name, for one.**
+
+🔴 **`## Decision applied` names the blocking file whose `## Decision`
+you applied** — 📌 **a dash or a name, never omitted**: ⚠️ **a dash is
+no application.**
 
 🔴 **`## Red` is what the realisateur and the Relecteur take as
 given** — 📌 **neither runs the tests again before writing**, and ⚠️

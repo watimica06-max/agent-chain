@@ -163,6 +163,12 @@ written without it are never read as filled.**
 lot told to fix a call site will fix every call site it meets** unless
 the decision says where to stop.
 
+⚠️ **A `## Decision` that already holds numbered answers is a file the
+agent ran with** — a fresh lack met while applying them is appended
+below as the next `## Blocking N`, never a rewrite of the file. 🔴
+**Number your answer under the existing ones — the new `N.` matches the
+new `## Blocking N`, and the earlier decisions stay as they are.**
+
 **When a block is not yours** — a Relecteur's or an
 Architecte's — 🔴 **say so in `## Decision`** and stop:
 

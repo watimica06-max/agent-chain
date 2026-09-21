@@ -1,11 +1,11 @@
 # Vérification 4 — plan
 
-Source: `docs/verification4/consolide.md`, 40 entries. Every file a `Where` names was opened at the lines named, on every side, before any decision below — except entry 22, whose two files sit in `docs/process/` and are not opened by this session. Line numbers are the ones read under `.claude-new/` (and `docs-new/process/` for entry 20); where they differ from the consolidated report, the ones read are given.
+Source: `docs/verification4/consolide.md`, 40 entries. Every file a `Where` names was opened at the lines named, on every side, before any decision below — except entry 22, whose two files sit in `docs/process/` and are not opened by this session. Line numbers are the ones read under `.claude-new/` (and `docs-new/process/` for entry 20) before the chain moved — a `Where` naming `.claude-new/` or `docs-new/` is read as `.claude/` or `docs/`; where they differ from the consolidated report, the ones read are given.
 
 Three rules of this plan:
 
 - A `Decision` says what changes and in which file, never the wording. The agent that applies it writes the prose.
-- Entries whose fix turns on intent, scope or what the Product Owner sees carry `Decision: —` and sit in `## To settle` at the end, with what each option costs. Four entries (1, 4, 29, 34) carry a decision on their mechanical part and a residual question in `## To settle`.
+- Entries whose fix turned on intent, scope or what the Product Owner sees carried `Decision: —` and sat in `## To settle` at the end, with what each option costs; four entries (1, 4, 29, 34) carried a decision on their mechanical part and a residual question there. 📌 **All nine items were settled on 2026-09-21** — each entry's `Decision` now carries the settled part, and `## To settle` keeps the options for the record.
 - Decisions of `docs/verification3/plan.md` stand. Where an entry touches one, the entry says how it fits; none reverses one.
 
 Entries marked `Same as` in the consolidated report got one decision each (3, 4, 6, 11, 19, 30, 34). Every entry whose `Where` names two files appeared in one report only — the consolidation opened both sides, and this plan opened them again; that is said once here and holds for all of them. Entry 22 is the one whose sides stay unopened.
@@ -19,7 +19,7 @@ Entries marked `Same as` in the consolidated report got one decision each (3, 4,
 ### 1 · passages F01 — The Concepteur has no rule on the `created` / `modified` mark
 
 Severity: BLOCKING
-Decision: In `concepteur.md`, move 1 (L190-191) reads each symbol's mark beside its signature; a `modified` symbol is edited in place — the existing declaration, found by the grep of L76-78, takes the sheet's signature — and is neither declared beside the old one nor read as a taken name (L78) or a duplicate (L176-179); `## Declared` (L301-304) carries the mark per symbol as the Réalisateur's `## Symbols` does. What becomes of the existing body of a `modified` symbol → `## To settle`, item A.
+Decision: In `concepteur.md`, move 1 (L190-191) reads each symbol's mark beside its signature; a `modified` symbol is edited in place — the existing declaration, found by the grep of L76-78, takes the sheet's signature — and is neither declared beside the old one nor read as a taken name (L78) or a duplicate (L176-179); `## Declared` (L301-304) carries the mark per symbol as the Réalisateur's `## Symbols` does. The body: item A settled, Option 1 — a declaration the lot marks `modified` loses its existing body to the same *not implemented* throw as a new one, and nothing carries the old body forward; one sentence in `concepteur.md` beside L17-18 or L106-107, which say every body throws but not of a body that already exists. The earlier tests of that symbol turn red in its module and the Réalisateur runs « until both pass » (testeur.md L244-245, realisateur.md L665-669), so the earlier behaviour stays a constraint with the earlier test as its specification.
 Where: detailleur.md L267-271 ↔ concepteur.md L190-191, L236-245, L76-78, L176-179 (relecteur.md L370-381, cadreur.md L422-423)
 Cited: detailleur.md L267-268 — "🔴 **Every symbol of `## Signatures` opens with its mark — `created` or `modified`** — 📌 **copied from the lot's `Produces` or `Modifies`**, one mark per symbol." · relecteur.md L381 — "a symbol the sheet marks *modified* that the report declares *created* was written beside the old one, not in its place" · testeur.md L272 — "| **A signature `## Signatures` marks *modified*** | 📌 **Adapt the test to the new signature** — 🔴 **that is the lot doing its work**"
 Owner: concepteur.md
@@ -53,10 +53,10 @@ Note: the heading occurs at 8_code.md L567 and L571 only, across every command a
 ### 4 · fichiers F01 — The `<lot>:` commits and the `sheet`-cause revert disagree on what belongs to the lot
 
 Severity: TO FIX
-Decision: In `8_code.md`: (F01) `code/<lot>/compte-rendu.md` joins the deletion lists at L219-221, L238 and L593-594. (F02) the requests of `architecte/` are the command's to commit, never a lot's — L114-123 and both step-1 enumerations (L608-610, L720-724) name `architecte/` among what the command stages; `concepteur.md` L283-284 drops "the request when you wrote one" from what the Concepteur stages, `realisateur.md` L698 the same for its own request — a request then rides no `<lot>:` commit, and no revert removes it. (F03, the Arbitre's trap) → `## To settle`, item B.
+Decision: In `8_code.md`: (F01) `code/<lot>/compte-rendu.md` joins the deletion lists at L219-221, L238 and L593-594. (F02) the requests of `architecte/` are the command's to commit, never a lot's — L114-123 and both step-1 enumerations (L608-610, L720-724) name `architecte/` among what the command stages; `concepteur.md` L283-284 drops "the request when you wrote one" from what the Concepteur stages, `realisateur.md` L698 the same for its own request — a request then rides no `<lot>:` commit, and no revert removes it. (F03, the Arbitre's trap) item B settled, Option 2 — in `realisateur.md`, at the step where it calls the Arbitre: right after the Arbitre returns and before the Réalisateur resumes its own steps, it commits `CURRENT_TECHNICAL_STATE.md` alone, under a message that does not begin with `<lot>: ` — the revert list is built by the `^<lot>: ` grep of the log (8_code.md L162-174, reused L215-217 and L582-584), so no revert removes the trap. Owner of that part: realisateur.md; follows none — step 9 already puts the file in the lot's diff.
 Where: 8_code.md L215-221, L236-238, L593-594, L608-610, L720-724 ↔ realisateur.md L695-700 ↔ concepteur.md L281-288 ↔ arbitre.md L401 ↔ detailleur.md L668-682 ↔ audit_conventions.md L26-27
 Cited: concepteur.md L281-285 — "**5. Commit.** 🔴 **`git status` first** — 📌 **it says what the worktree holds**, and you stage explicitly what belongs to the lot: the declarations, the files the module needed, `code/<lot>/conception.md` and the request when you wrote one" · realisateur.md L698 — "**9. Commit**, staging explicitly what belongs to the lot." · detailleur.md L681 — "| A hit | An earlier lot of this cycle created it — **reuse it, never redeclare it** |" · arbitre.md L401 — "| **A platform trap nobody could guess before a red test** | 🔴 **`CURRENT_TECHNICAL_STATE.md`** — 📌 **write it there yourself**, and settle the block with it |"
-Owner: 8_code.md
+Owner: 8_code.md (F01, F02) · realisateur.md (F03)
 Follows: concepteur.md L283-284, realisateur.md L698 (their staging lists); 7_lots.md L277-282 (its step 1 commits the Architecte's verdicts on `architecte/` — same enumeration)
 Note: `compte-rendu` occurs nowhere in 8_code.md (grep, verified). Read with entries 17 and 18 (same paragraphs): 17 orders the reverts, 18 enumerates the closing commit — one edit of L608-610 and L720-724 serves 4 and 18. The non-last-lot paragraph L232-242 is verification 3's item C, Option 1, already written — this entry adds a file to its list and changes nothing else of it.
 
@@ -83,11 +83,11 @@ Note: F17's mechanism as consolidated — redacteur.md L275 writes an empty file
 ### 7 · chemins-amont F03 — Once the first time is closed, a block a later answer creates or changes is never probed
 
 Severity: TO FIX
-Decision: —
+Decision: Item C settled, Option 1 — in `4_grille.md`, the turn that closes the first time (the one whose highest `questions-sondeur-NN.md` comes back empty) strips a trailing `NEW` or `MODIFIED` from the `### B` heading lines of `desc-produit.md` — a command editing the product file without an agent, as `/5_reclasse` already does when it copies (5_reclasse.md L182-183). The closure test becomes two-part: the highest sondeur file empty *and* no marker on any heading; a marker found beside an empty sondeur file reopens the first time, on the marked blocks alone. One sentence on the case that stays open: on an integration from `idees.md` or from the existant the Rédacteur does not strip (redacteur.md L598-599, *only when*), so markers of an earlier turn can survive and reopen the first time on blocks already probed — probing twice is the accepted side. No reader of the markers follows: every reader sits before `/4_grille` in the turn, `/5_reclasse` strips them, the Contrôleur ignores them (L70-72), `/6_convertit` compares bytes (L158-161).
 Where: 4_grille.md L176-183, L128-134, L191-195, L311-321 ↔ 2_structure.md L382 ↔ redacteur.md L126-134
 Cited: 2_structure.md L382 — "| Its questions file is empty | 📌 `/3_decoupe` — 🔴 a new block is split, classed and framed before the Convertisseur reads it |" · redacteur.md L132 — "| `sondeur`, `existant` | 🔴 **The grid** — 📌 **strip them all**, then mark what this turn touches |"
 Owner: 4_grille.md
-Follows: 2_structure.md L382 (its promise), 5_reclasse.md L50-62 (the closure it tests)
+Follows: 5_reclasse.md L50-62 (the closure it tests — aligned on the two-part test); every other file that tests closure, swept (3_decoupe.md L84 tests only that the grid ran once — no change). 2_structure.md L382's promise now holds unchanged.
 Note: both sides verified; the defect stands. No reopen rule survives the trap L191-195 name — the markers of the closing turn are stripped by nobody, so "highest sondeur file empty and a marker present" is also the state a closed grid rests in — and every candidate fix either lets a command edit the product file or accepts the hole. Intent → `## To settle`, item C.
 
 ### 8 · chemins-amont F04 — The "latest questions file is answered" gate has no architecte exception
@@ -205,11 +205,11 @@ Note: `TECHNICAL_CONVENTIONS` and `couverture` occur nowhere in 8_code.md (verif
 ### 19 · fichiers F04 — Nothing resets `Round:` after a third-round decision
 
 Severity: QUESTION
-Decision: —
+Decision: Item D settled, Option 1 — in `cadreur.md` L919-926, a round beyond the third that still carries defects blocks again at once, naming the decision that bought it; each filled `blocked_cadreur.md` buys exactly one round. The Vérificateur's `Round:` line goes on counting up.
 Where: cadreur.md L919-926 ↔ verificateur.md L121-126
 Cited: verificateur.md L121-125 — "**The round line** — 🔴 **`Round: N`, the first line of the file.** 📌 **The previous `code/sequence.md`'s number plus one when its `## Defects` carried lines; `1` otherwise** … 🔴 **The Cadreur counts its rounds on that line, never on files**"
 Owner: cadreur.md
-Follows: verificateur.md L121-126
+Follows: — (verificateur.md L121-126 unchanged)
 Note: both sides verified — after a filled third-round decision the next round is `4`, and L919-926 say nothing of a fourth. Whether a decision buys fresh rounds is hers → `## To settle`, item D.
 
 ---
@@ -257,7 +257,7 @@ Follows: —
 ### 24 · fichiers F05 — `releve.md` is archived for nobody
 
 Severity: NOTE
-Decision: —
+Decision: Item E settled, Option 1 — `cadrage-produit/releve.md` stays in `/4_grille`'s archive list. No file changes.
 Where: sondeur.md L225-231 ↔ 4_grille.md L450, L254-260
 Cited: sondeur.md L225-226, L230-231 — "**2. Pass B, from the record alone** — 🔴 **never the blocks again.** … 📌 **The prompt names where the record goes**, beside your questions file."
 Owner: 4_grille.md
@@ -305,7 +305,7 @@ Note: read with entry 10 (same table) — 10 moves row L86 below L88-89, 28 keep
 ### 29 · chemins-amont F12 — Four opus sondeurs on an empty list
 
 Severity: NOTE
-Decision: In `4_grille.md`, the first turn (L125-126) invokes nothing when the `Genre: comportement` grep returns no block, and says so — as `3a_genre.md` L125-128 does on an empty list. What the run writes or says next → `## To settle`, item F (with entry 30).
+Decision: In `4_grille.md`, the first turn (L125-126) invokes nothing when the `Genre: comportement` grep returns no block, and says so — as `3a_genre.md` L125-128 does on an empty list. What the run writes or says next: item F settled, neither option — the stop is at `/7_lots`, not at `/4_grille` (see entry 30, F13); `/4_grille` gets no further rule.
 Where: 4_grille.md L120-126 ↔ sondeur.md L53 · 3a_genre.md L125-128, 3b_nature.md L127-130
 Cited: sondeur.md L53 — "| **The blocks to probe** | 📌 **Every one** — at 1 and 2, each carries `Genre: comportement`" · 3a_genre.md L125-126 — "📌 **Neither grep returns anything, and that highest file holds no `### Q` — or there is none** → 🔴 **do not invoke.**"
 Owner: 4_grille.md
@@ -315,11 +315,11 @@ Note: read with entries 7, 8 and 24 (same owner) — different paragraphs.
 ### 30 · chemins-amont F13 — The *Otherwise → assembly* row runs on nothing, and on a nature that waits
 
 Severity: NOTE
-Decision: —
+Decision: Item F settled. *F13, a feature with no behaviour block — neither option; the stop is at `/7_lots`.* A `transverse` block gives a lot only if it has a code half, and invocation 2 of the Convertisseur is what decides that (convertisseur.md L162-168, L185-187; 9_controle.md L146 downstream) — so no command before `/6_convertit` can tell whether the feature has something to build. `/4_grille` probes only `comportement` (4_grille.md L120-123): no rule. `/5_reclasse` must run — it writes `par-genre/recette.md` (5_reclasse.md L122) and a genre with no block gets an empty file (L135-137): no rule. `/6_convertit` must run — the only place the question is answerable, it writes the `tracabilite.md` `/9_controle` requires, and it already runs on an empty nature (L145): no rule. `/conventions` and `/fusion` are manual: no rule. The one rule, in `7_lots.md`: a `spec-technique.md` carrying zero numbered entries — the command cuts no split, names no next command, and its relay says where the feature's content lives: `par-genre/recette.md` at the feature folder's root and the preamble's `## Cross-cutting rules` in the technical document — then `/fusion`. Accepted cost, said in that row: `/9_controle` does not run, so `code/recette-ordonnee.md` is never written; the recette stays readable in `par-genre/recette.md`. The test is written against the shape `6_convertit.md` actually produces — if the document carries no countable entry marker, nothing is written and the entry is refused. *F18, a nature waiting on a technical answer — Option 1*: in `6_convertit.md`, no assembly while a nature waits — the assembly table (L230-233) treats a waiting nature as its *No* row: nothing assembled, `spec-technique.md` deleted, invocation 2 skipped, the nature named; the *No nature runs* table sends a run that fails L174 on a waiting nature alone to the same outcome. L155-156 and L433-436 already say it — this brings L230-233 into line, not a new rule. The `/conventions` stop on a missing document then holds.
 Where: 6_convertit.md L170-175, L145, L155-156, L230-233, L433-438 ↔ 5_reclasse.md L134-137 ↔ fusionneur.md L83-87
 Cited: 5_reclasse.md L135-137 — "⚠️ **A genre with no block gets an empty file**, never no file: its absence would read as *the split did not run*." · fusionneur.md L83-85 — "🔴 **Read `Genre:` on every block, at invocations 1 and 2, `INIT` included.** 📌 **`comportement`, `transverse`, `recette` and `référence`** enter. ⚠️ **`directive` and `hors périmètre` never do**"
-Owner: 6_convertit.md
-Follows: 5_reclasse.md L134-137, fusionneur.md L83-87
+Owner: 6_convertit.md (F18) · 7_lots.md (F13)
+Follows: — (5_reclasse.md L134-137 and fusionneur.md L83-87 unchanged)
 Note: both defects verified. F18 rests on two sentences of the same file that disagree — L230-233 assemble whenever every nature with blocks has its file, L433-436 assume a waiting nature makes the assembly write nothing — and picking one changes what the Product Owner sees while a nature waits; F13 is what the chain does with a feature that has no behaviour block. Both → `## To settle`, item F.
 
 ### 31 · chemins-amont F14 — The `### Q` guard stops on the Fusionneur's own integrated file
@@ -352,7 +352,7 @@ Follows: —
 ### 34 · chemins-aval F10 — *Where to resume* has no row for a PASSed lot with a filled decision, nor for a revert conflict
 
 Severity: NOTE
-Decision: In `8_code.md`, *Where to resume* (L71-74) opens on a look for an unnumbered `code/<lot>/blocked_*.md` with a filled `## Decision` on a lot already carrying a PASS — that lot runs first, its agent invoked with the file named and its review run again, as L695-700 promise; then the first lot with no PASS. What the Product Owner does on a revert conflict (F12) → `## To settle`, item G.
+Decision: In `8_code.md`, *Where to resume* (L71-74) opens on a look for an unnumbered `code/<lot>/blocked_*.md` with a filled `## Decision` on a lot already carrying a PASS — that lot runs first, its agent invoked with the file named and its review run again, as L695-700 promise; then the first lot with no PASS. On a revert conflict (F12): item G settled, Option 2 — a conflict on a lot's revert takes down every lot after it in the sequence, PASS or not, as the non-last-lot rule (L232-242) already does for a `sheet` cause; L217-218 and L586-587 point at L232-242 and do not restate it. A conflict means a later lot edited the same lines, so it depends on the reverted code; no git surgery is asked of the Product Owner.
 Where: 8_code.md L71-74 ↔ L695-700 · L215-218, L586-587
 Cited: 8_code.md L695-698 — "📌 **A filled `## Decision` is not a stop** — invoke the agent it names on the lot it names, and let it apply the decision. ⚠️ **Even on a lot already carrying a PASS**" · L217-218 — "⚠️ **A conflict stops the command**: `git revert --abort`, say so, and resolve nothing"
 Owner: 8_code.md
@@ -372,7 +372,7 @@ Note: L89-94 remove the previous run's file before the Cadreur runs, so one foun
 ### 36 · chemins-aval F13 — Three empty attempts leave nothing on disk
 
 Severity: NOTE
-Decision: —
+Decision: Item H settled, Option 1 — accept. The count stays in this run alone, as verification 3's entry 23 decided. No file changes.
 Where: 8_code.md L182-196, L251-255 ↔ 8_code.md L257-262, L706-707
 Cited: 8_code.md L191-194 — "🔴 **No verdict yet → write none**: ⚠️ **a verdict is the Relecteur's file**, and inventing `## Verified`, `## Findings` and `## Cause` for a review that never ran is worse than a count held in this run." · L259-261 — "⚠️ **Otherwise a run stopped for any reason restarts the count at zero**, and a lot that cannot pass is retried three times per run for ever."
 Owner: 8_code.md
@@ -410,11 +410,11 @@ Follows: —
 ### 40 · chemins-aval F17 — Gap identifiers are positional
 
 Severity: NOTE
-Decision: —
+Decision: Item I settled, Option 2 — each gap in `bug-list.md` opens on its own `G<n>`, written by the Product Owner, as a control-report gap already carries its `B<n>`; `diagnostique.md` (L37) reads the identifier instead of counting position, and a gap with no identifier stops the command, which says which line lacks one. Follows: whatever describes `bug-list.md`'s shape to the Product Owner — diagnostiqueur.md (L63, L490, L535, L621-623: the order and the `B<n>`), 9_controle.md L495-496 (how a gap she takes from the report enters `bug-list.md`). A description outside `.claude/` and `docs/process/` is named, not changed; `PROCESS_AVAL.md` L894, L1073 are the Product Owner's, out of scope as entry 22.
 Where: diagnostique.md L33-38 ↔ diagnostiqueur.md L79-82, L191-200
 Cited: diagnostiqueur.md L79-82 — "🔴 **You block when producing is impossible** — 📌 **four cases**: a prompt naming no gap · a report set that does not match `bug-list.md` · a report that does not carry what an entry needs · a closure that fails."
 Owner: diagnostique.md
-Follows: diagnostiqueur.md L80-81, L194-198
+Follows: diagnostiqueur.md L63, L80-81, L194-198, L490, L535, L621-623; 9_controle.md L495-496
 Note: verified — `G01`, `G02` are "in the file's own order" (L37) and nothing else names a gap. `bug-list.md` is hers, hand-written; whether she freezes its order or writes identifiers is hers → `## To settle`, item I.
 
 ---
@@ -424,24 +424,24 @@ Note: verified — `G01`, `G02` are "in the file's own order" (L37) and nothing 
 | Owner | Entries | Collision check |
 |---|---|---|
 | 8_code.md | 3 (third-return stop, relay) · 4, 17, 18 (revert paragraphs, closing step 1) · 13 (hand-back table, L279-282, Relecteur prompt) · 14 (move 1) · 15 (4b post-report test) · 34 (resume) · 37 (move 2) · follows 5 (L59-60, L303-305) · 36 to settle | 4 + 18: one edit of L608-610 and L720-724 (`architecte/`, the two docs files). 4 + 17: 17 orders the reverts, 4 changes what they carry — compatible. 13 + 15: the Relecteur's file is out of 4b and in the hand-back table; 15's post-report test applies to it on the *anything else* row only — compatible. 14 + 37: move 1 and move 2, different lines. 34 + verification 3's 46: same section, a look then a read. |
-| 4_grille.md | 8 (L102-106) · 29 (L125-126) · 7, 24 to settle | Different paragraphs; 7 and 24 change nothing until settled. |
-| 6_convertit.md | 9 (nature table, L198-202) · 30 to settle | 30 bears on L170-175 and L230-233, 9 on L143-153 — no overlap. |
-| 7_lots.md | 16 (L115-127) · 35 (L163-172) · follows 3 (L318-323), 18 (L277-282) | Four paragraphs, no overlap. |
+| 4_grille.md | 8 (L102-106) · 29 (L125-126) · 7 (closure L176-183) · 24 (no change) | Different paragraphs. |
+| 6_convertit.md | 9 (nature table, L198-202) · 30 F18 (L230-233, L170-175) | 30 bears on L170-175 and L230-233, 9 on L143-153 — no overlap. |
+| 7_lots.md | 16 (L115-127) · 35 (L163-172) · 30 F13 (one row, zero entries) · follows 3 (L318-323), 18 (L277-282) | Five paragraphs, no overlap. |
 | conventions.md | 10 (row L86 moves below L88-89) · 28 (L68-69 dropped, row L84 stays) | Same table; 28 relies on row L84 sitting below L82-83, which 10 does not move. |
 | fusion_compare.md | 11 (L20-26) · 12 (L149-181) · 31 (L50-56) | Three sections. |
 | 2_structure.md | 2 (invocation-2 filing) · 27 (row L150) | Different rows; the table order of verification 3's 5+6 stays. |
 | 3a_genre.md | 6 (row L284) · verification 3's 56 (same row, its sentence stays) | One edit of the row keeps J's sentence. |
 | 3b_nature.md | 26 (L221) · follows 6 (L295) | Different lines. |
 | concepteur.md | 1 (move 1, `## Declared`) · follows 4 (L283-284) | Different moves. |
-| realisateur.md | follows 4 (L698), 15 (L262) | Different lines. |
+| realisateur.md | 4 F03 (the step that calls the Arbitre) · follows 4 (L698), 15 (L262) | Different lines. |
 | detailleur.md | 33 (walk) · follows 15 (L311) | Different sections. |
 | relecteur.md | 21 (L363) · follows 13 (no change) | — |
 | testeur.md | 5 | — |
 | verificateur.md | follows 16 (L98-100) | — |
-| cadreur.md | follows 3 (block C) · 19 to settle | Different sections. |
+| cadreur.md | follows 3 (block C) · 19 (L919-926) | Different sections. |
 | fusion.md | 32 | — |
 | 9_controle.md | 25 | — |
-| audit_blocages.md 38 · audit_conventions.md 39 · CLAUDE.md 23 · GRILLE_CONVENTIONS.md 20 · diagnostique.md 40 (to settle) | one each | — |
+| audit_blocages.md 38 · audit_conventions.md 39 · CLAUDE.md 23 · GRILLE_CONVENTIONS.md 20 · diagnostique.md 40 · 5_reclasse.md follows 7 · diagnostiqueur.md and 9_controle.md follow 40 | one each | — |
 
 ---
 
@@ -449,13 +449,13 @@ Note: verified — `G01`, `G02` are "in the file's own order" (L37) and nothing 
 
 | # | Severity | Decision | Where | Owner | Follows |
 |---|---|---|---|---|---|
-| 1 | BLOCKING | Move 1 reads the mark; a `modified` symbol is edited in place, never redeclared nor a clash; `## Declared` carries the mark — body: item A | detailleur.md L267-271 ↔ concepteur.md L190, L236-245, L78, L176-179 | concepteur.md | — |
+| 1 | BLOCKING | Move 1 reads the mark; a `modified` symbol is edited in place, never redeclared nor a clash; `## Declared` carries the mark — body: the throw, like a new one (A, Option 1) | detailleur.md L267-271 ↔ concepteur.md L190, L236-245, L78, L176-179 | concepteur.md | — |
 | 2 | BLOCKING | Invocation 2 on a blocking file files the empty questions file beside it | 2_structure.md L146, L160-162, L313-316 ↔ redacteur.md L275 ↔ 1_lexique.md L63 | 2_structure.md | — |
 | 3 | TO FIX | The stop and the relay name the heading and `/7_lots`; 7_lots relays it; block C reads it as her instruction | 8_code.md L552-554, L566-573, L750-759 ↔ 7_lots.md L318-323 ↔ cadreur.md L976-981 | 8_code.md | 7_lots.md, cadreur.md |
-| 4 | TO FIX | `compte-rendu.md` in the three deletion lists; `architecte/` requests are the command's to commit, never a lot's — trap: item B | 8_code.md L215-221, L236-238, L593-594, L608-610, L720-724 ↔ realisateur.md L698 ↔ concepteur.md L281-285 ↔ arbitre.md L401 ↔ detailleur.md L681 | 8_code.md | concepteur.md, realisateur.md, 7_lots.md |
+| 4 | TO FIX | `compte-rendu.md` in the three deletion lists; `architecte/` requests are the command's to commit, never a lot's — trap: the Réalisateur commits the state document alone, unprefixed (B, Option 2) | 8_code.md L215-221, L236-238, L593-594, L608-610, L720-724 ↔ realisateur.md L698 ↔ concepteur.md L281-285 ↔ arbitre.md L401 ↔ detailleur.md L681 | 8_code.md, realisateur.md | concepteur.md, realisateur.md, 7_lots.md |
 | 5 | TO FIX | `tests.md` gains `## Decision applied`; 8_code names the three fields | testeur.md L150-152, L318-343 ↔ 8_code.md L59-60, L303-305 | testeur.md | 8_code.md |
 | 6 | TO FIX | Row L284: `/2_structure` only when every decision is a rewrite, a mixed file runs `/3a_genre` first; the `/1_lexique` leg goes | 3a_genre.md L284, L200-205 · 3b_nature.md L295 ↔ 2_structure.md L300-307, L382 ↔ redacteur.md L577-580, L275 ↔ 1_lexique.md L59 | 3a_genre.md | 3b_nature.md |
-| 7 | TO FIX | — (item C) | 4_grille.md L176-183, L191-195 ↔ 2_structure.md L382 ↔ redacteur.md L132 | 4_grille.md | 2_structure.md, 5_reclasse.md |
+| 7 | TO FIX | The closing turn strips the markers; closure = empty file and no marker; a marker reopens on the marked blocks (C, Option 1) | 4_grille.md L176-183, L191-195 ↔ 2_structure.md L382 ↔ redacteur.md L132 | 4_grille.md | 5_reclasse.md |
 | 8 | TO FIX | The answered-file gate excludes `questions-architecte-*.md` | 4_grille.md L102-106 ↔ L218-228, L235-237 ↔ conventions.md L84 | 4_grille.md | — |
 | 9 | TO FIX | Rows combine: one run, every matching row's prompt line | 6_convertit.md L143-153, L198-202 ↔ convertisseur.md L503-507 | 6_convertit.md | — |
 | 10 | TO FIX | Row L86 moves below the `couverture.md` rows | conventions.md L86, L88-89, L140-147 ↔ 2_structure.md L279-281 | conventions.md | — |
@@ -467,39 +467,38 @@ Note: verified — `G01`, `G02` are "in the file's own order" (L37) and nothing 
 | 16 | TO FIX | The command strips the line after the archive | 7_lots.md L115-127 ↔ verificateur.md L98-100, L501-503 ↔ cadreur.md L1036-1039 | 7_lots.md | verificateur.md |
 | 17 | TO FIX | One revert list across lots, newest first | 8_code.md L579-587, L236-238, L162-180 ↔ testeur.md L287-288 | 8_code.md | — |
 | 18 | TO FIX | Step 1 enumerates the conventions file, `couverture.md`, the state document, `architecte/` | 8_code.md L608-610, L720-724 ↔ architecte.md L4, L337 · arbitre.md L401, L477-478 | 8_code.md | 7_lots.md |
-| 19 | QUESTION | — (item D) | cadreur.md L919-926 ↔ verificateur.md L121-126 | cadreur.md | verificateur.md |
+| 19 | QUESTION | A round beyond the third with defects blocks again; one decision, one round (D, Option 1) | cadreur.md L919-926 ↔ verificateur.md L121-126 | cadreur.md | — |
 | 20 | NOTE | `R4` names the `forme` question route | docs-new/process/GRILLE_CONVENTIONS.md L50-52 ↔ architecte.md L300-301, L564-568 | GRILLE_CONVENTIONS.md | — |
 | 21 | NOTE | L363 spells the cause as the template does | relecteur.md L363 ↔ L160-162, 8_code.md L211 | relecteur.md | — |
 | 22 | NOTE | — (moot, settled; not opened) | PROCESS_AMONT.md L1210 ↔ PROCESS_AVAL.md L1010 | — | — |
 | 23 | NOTE | A row for the three commands | .claude-new/CLAUDE.md L49-57, L62-63 ↔ the three `description:` lines | CLAUDE.md | — |
-| 24 | NOTE | — (item E) | sondeur.md L225-231 ↔ 4_grille.md L450, L254-260 | 4_grille.md | — |
+| 24 | NOTE | `releve.md` stays archived — no change (E, Option 1) | sondeur.md L225-231 ↔ 4_grille.md L450, L254-260 | 4_grille.md | — |
 | 25 | NOTE | A multi-line decision is written as one line, parts joined | 9_controle.md L401-409 ↔ arbitre.md L147-160 ↔ redacteur.md L749-750 | 9_controle.md | — |
 | 26 | NOTE | L221 names the five steps | 3b_nature.md L221 ↔ L251-263 | 3b_nature.md | — |
 | 27 | NOTE | Row L150 greps the flag first and names the state | 2_structure.md L150 ↔ 3_decoupe.md L47-50 | 2_structure.md | — |
 | 28 | NOTE | L68-69 dropped; row L84 is the stop | conventions.md L68-69 ↔ L82-84 | conventions.md | — |
-| 29 | NOTE | Empty behaviour list → invoke nothing, say so — the rest: item F | 4_grille.md L125-126 ↔ sondeur.md L53 | 4_grille.md | — |
-| 30 | NOTE | — (item F) | 6_convertit.md L170-175, L230-233, L433-438 ↔ 5_reclasse.md L134-137 ↔ fusionneur.md L83-87 | 6_convertit.md | 5_reclasse.md, fusionneur.md |
+| 29 | NOTE | Empty behaviour list → invoke nothing, say so — the rest: the stop is `/7_lots`'s (F, see 30) | 4_grille.md L125-126 ↔ sondeur.md L53 | 4_grille.md | — |
+| 30 | NOTE | F13: `/7_lots` stops on a document with zero entries, names where the content lives, then `/fusion` (F, neither option) · F18: no assembly while a nature waits (F, Option 1) | 6_convertit.md L170-175, L230-233, L433-438 ↔ 5_reclasse.md L134-137 ↔ fusionneur.md L83-87 · 7_lots.md | 6_convertit.md, 7_lots.md | — |
 | 31 | NOTE | The guard leaves the Fusionneur's files to row 5's test | fusion_compare.md L50-56, L71-72 ↔ fusion.md L59, L153-154 | fusion_compare.md | — |
 | 32 | NOTE | The `### Q` guard opens the filing | fusion.md L140-154 ↔ 3_decoupe.md L52-58 | fusion.md | — |
 | 33 | NOTE | The walk's grep skips PASSed lots | detailleur.md L501-503 ↔ L115-117, L512 | detailleur.md | — |
-| 34 | NOTE | Resume looks first for a filled decision on a PASSed lot — conflict: item G | 8_code.md L71-74 ↔ L695-700 · L217-218 | 8_code.md | — |
+| 34 | NOTE | Resume looks first for a filled decision on a PASSed lot — conflict: the later lots go down too, as L232-242 (G, Option 2) | 8_code.md L71-74 ↔ L695-700 · L217-218, L586-587 | 8_code.md | — |
 | 35 | NOTE | First-match rule, the Vérificateur row first | 7_lots.md L163-172 ↔ L89-94 | 7_lots.md | — |
-| 36 | NOTE | — (item H) | 8_code.md L182-196, L251-255 ↔ L257-262, L706-707 | 8_code.md | — |
+| 36 | NOTE | Accept — the count stays per run, no change (H, Option 1) | 8_code.md L182-196, L251-255 ↔ L257-262, L706-707 | 8_code.md | — |
 | 37 | NOTE | Move 2 skips the Réalisateur on its report | 8_code.md L136-140 ↔ L182-196 | 8_code.md | — |
 | 38 | NOTE | The list names the Concepteur and the Testeur | audit_blocages.md L107-109 ↔ concepteur.md L14-15 | audit_blocages.md | — |
 | 39 | NOTE | Finding 7 skipped when `couverture.md` traces to another document | audit_conventions.md L144-148 ↔ L53-57 | audit_conventions.md | — |
-| 40 | NOTE | — (item I) | diagnostique.md L37 ↔ diagnostiqueur.md L79-82, L191-200 | diagnostique.md | diagnostiqueur.md |
+| 40 | NOTE | Each gap opens on its `G<n>`, hers; the command reads it, stops on a gap without one (I, Option 2) | diagnostique.md L37 ↔ diagnostiqueur.md L79-82, L191-200 | diagnostique.md | diagnostiqueur.md, 9_controle.md |
 
 ---
 
 ## Counts
 
 - **40 entries**, 40 distinct defects (the `Same as` halves were consolidated already).
-- **Decided: 33** — entries 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 23, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 37, 38, 39. Four of them (1, 4, 29, 34) carry a residual question in `## To settle` (items A, B, F, G).
-- **`## To settle`, Decision empty: 6** — entries 7, 19, 24, 30, 36, 40 (items C, D, E, F, H, I).
+- **Decided: 39** — every entry but 22. The nine `## To settle` items (A-I) were settled by the Product Owner on 2026-09-21 and written into their entries: 1 (A), 4 (B), 7 (C), 19 (D), 24 (E), 29 and 30 (F), 34 (G), 36 (H), 40 (I). Two of them change no file: 24 and 36.
 - **Could not verify: 1** — entry 22 (`docs/process/`, not opened by this session; moot by the *Settled* rule, change nothing).
 
-33 + 6 + 1 = 40. Nine `## To settle` items, A-I.
+39 + 1 = 40. Nine `## To settle` items, A-I, all settled.
 
 **Contradictions with verification 3's decisions: none found.** Entries 2, 3, 4, 8, 9, 10, 13, 14, 17, 34 and 37 touch lines a verification 3 decision wrote; each entry says how it fits, and none reverses one.
 
@@ -507,9 +506,11 @@ Note: verified — `G01`, `G02` are "in the file's own order" (L37) and nothing 
 
 ## To settle
 
-Each item: what is open, the options, what each costs. The `Decision` of the entry it belongs to stays empty (A, B, F, G excepted — their entry carries the mechanical part).
+Each item: what was open, the options, what each costs — kept as written for the record. 📌 **All nine are settled**; the decision stands in the `Decision` of the entry it belongs to, and the line under each heading here names it.
 
 ### A — Entry 1: the body of a `modified` symbol
+
+**Settled: Option 1.**
 
 The Concepteur edits a `modified` declaration in place (the decision). Its body is the question: concepteur.md L17-18 and L106-107 say every body throws *not implemented*, and testeur.md L265 counts on it ("the bodies throw, so anything calling one raises") — applied to a modified symbol, the working body of the previous lot is replaced by a throw until the Réalisateur writes it again.
 
@@ -518,12 +519,16 @@ The Concepteur edits a `modified` declaration in place (the decision). Its body 
 
 ### B — Entry 4, F03: the Arbitre's trap rides the lot's commit
 
+**Settled: Option 2.**
+
 A trap the Arbitre writes into `CURRENT_TECHNICAL_STATE.md` mid-lot (arbitre.md L401) is committed by the Réalisateur's step 9 with the lot's own state entries, in one file, and a `sheet` revert removes both.
 
 - **Option 1 — accept**: the re-coded lot meets the same red test, calls the Arbitre, which writes the trap again. Cost: one Arbitre invocation per such recoding, and a second settling that may differ from the first.
 - **Option 2 — the Réalisateur commits the trap apart**: right after the Arbitre returns, and before its own step 7, the Réalisateur commits the state document alone under a message not prefixed `<lot>:` — outside every revert list. Cost: one rule in realisateur.md (its step 5/6, where it calls the Arbitre) and a commit the Relecteur's diff includes as a file the lot touched.
 
 ### C — Entry 7: reopening the first time after a later integration
+
+**Settled: Option 1.**
 
 Once the highest `questions-sondeur-NN.md` is empty, 4_grille.md L176-183 close the first time and nothing reopens it; a block a second-time or conversion answer creates or changes (marked by the Rédacteur, L132-133) reaches `/5_reclasse` unprobed, against 2_structure.md L382. Any reopen rule keyed on the markers meets L191-195: the closing turn's markers are stripped by nobody, so a closed grid and a reopened one look alike.
 
@@ -533,6 +538,8 @@ Once the highest `questions-sondeur-NN.md` is empty, 4_grille.md L176-183 close 
 
 ### D — Entry 19: rounds after a third-round decision
 
+**Settled: Option 1.**
+
 cadreur.md L919-926 count three rounds on the Vérificateur's `Round:` line; after a filled third-round `blocked_cadreur.md` the next line reads `4`, and nothing says what a round beyond three does.
 
 - **Option 1 — one round per decision**: a round beyond the third still carrying defects blocks again at once, the decision named; each of her answers buys one round. Cost: two sentences in cadreur.md; a decision that needs two corrections costs her two rounds.
@@ -540,12 +547,16 @@ cadreur.md L919-926 count three rounds on the Vérificateur's `Round:` line; aft
 
 ### E — Entry 24: `releve.md` archived for nobody
 
+**Settled: Option 1 — no file changes.**
+
 The global sondeur writes and reads `cadrage-produit/releve.md` inside one invocation (sondeur.md L225-231); 4_grille.md L254-260 archive it with the five other files, and no later reader is named.
 
 - **Option 1 — keep it**: a trace of what pass B crossed, beside the questions it produced. Cost: nothing.
 - **Option 2 — drop it from the archive list**: the file is overwritten each turn and never kept. Cost: one line in 4_grille.md; a pass-B question can no longer be traced to the record that produced it.
 
 ### F — Entries 29 and 30: a feature with no behaviour block, and a nature that waits
+
+**Settled: F13 — neither option, the stop is at `/7_lots` (one row; every command before it runs, none gets a rule); F18 — Option 1.**
 
 Two questions of one kind — what the chain does when there is nothing, or not yet something, to build.
 
@@ -561,12 +572,16 @@ Two questions of one kind — what the chain does when there is nothing, or not 
 
 ### G — Entry 34, F12: a revert conflict
 
+**Settled: Option 2.**
+
 8_code.md L217-218 and L586-587 stop the command on a conflict with nothing changed, and every re-run meets it again. Entry 17's order removes the conflicts the shared files caused; the ones left are real — a later lot edited the same lines.
 
 - **Option 1 — the Product Owner resolves it as an ordinary request**: the stop says which commit and which files conflict, and she asks the orchestrator, outside the command, to revert by hand and commit; the next `/8_code` finds the revert done (the list of move 3 is empty after it). Cost: one sentence; a git operation done outside any command.
 - **Option 2 — the command reverts the later lots too**: a conflict on a lot's revert takes every lot after it in the sequence down, PASS or not, as the non-last-lot rule (L232-242) already does for a `sheet` cause. Cost: lots redone for a conflict; safe, and no hand work.
 
 ### H — Entry 36: three empty attempts across runs
+
+**Settled: Option 1 — no file changes.**
 
 The empty-attempt count lives in this run alone (8_code.md L191-196, L253-255), by a choice verification 3's entry 23 made; a run stopped and restarted repeats the three.
 
@@ -576,6 +591,8 @@ The empty-attempt count lives in this run alone (8_code.md L191-196, L253-255), 
 
 ### I — Entry 40: gap identifiers are positional
 
+**Settled: Option 2.**
+
 `G01`, `G02` follow `bug-list.md`'s order (diagnostique.md L37); a gap she inserts between two runs shifts them, and invocation 2 blocks on a report set that no longer matches. `bug-list.md` is hers, hand-written.
 
 - **Option 1 — a rule on the file**: a gap added once a run has started goes at the end, never between two; diagnostique.md says so, and the command says so when it stops on a mismatch. Cost: one sentence; a rule she has to remember.
@@ -583,4 +600,4 @@ The empty-attempt count lives in this run alone (8_code.md L191-196, L253-255), 
 
 ---
 
-*33 entries decided · 6 with an empty `Decision` (7, 19, 24, 30, 36, 40) · 1 not verified and moot (22) — 40 in all. Nine `## To settle` items, A-I; four of them (A, B, F, G) are residual questions on entries that carry a decision.*
+*39 entries decided · 1 not verified and moot (22) — 40 in all. Nine `## To settle` items, A-I, all settled on 2026-09-21 and written into their entries; 24 and 36 change no file.*

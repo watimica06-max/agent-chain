@@ -51,16 +51,20 @@ a worktree; your root is not the project's.**
 
 ## What a gap looks like
 
-**Free form** — a sentence naming what is wrong, and what it should be:
+**Free form, after the `G<n>` that opens it** — a sentence naming what
+is wrong, and what it should be:
 
-    The correction factor is never computed. It should be, at the end
-    of each kilometre, and its outcome kept on the race.
+    G03 The correction factor is never computed. It should be, at the
+    end of each kilometre, and its outcome kept on the race.
 
 📌 **No fixed vocabulary.** What matters is that it names a behaviour,
 not a file.
 
 ⚠️ **Invocation 1 gets one, in its prompt.** **Invocation 2 reads
-`bug-list.md` whole**, for the order the Product Owner listed them in.
+`bug-list.md` whole**, for the `G<n>` each gap opens on and for the
+order the Product Owner listed them in. 🔴 **The identifier is read
+from the line, never counted from the gap's position** — 📌 **she
+writes it.**
 
 ---
 
@@ -78,8 +82,8 @@ reply gets lost; a file does not.
 or one nothing in the code relates to, gets a `set aside` verdict and
 the cycle carries on. 🔴 **You block when producing is
 impossible** — 📌 **four cases**: a prompt naming no gap · a report set
-that does not match `bug-list.md` · a report that does not carry what
-an entry needs · a closure that fails.
+that does not match `bug-list.md` identifier for identifier · a report
+that does not carry what an entry needs · a closure that fails.
 
 📌 **At invocation 1, a block stops your gap alone.** The others carry
 on, and invocation 2 will see the report missing.
@@ -143,7 +147,7 @@ this block ever lifts.
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
 | 1 | Investigation | **One gap, in the prompt** · `docs/TECHNICAL_CONVENTIONS.md` · the code, by grep — 📌 **plus the body of each caller of the bearer, at move 5** · `docs/CURRENT_TECHNICAL_STATE.md` — 📌 **its `## Traps — general` and `## Dead state` sections only**, as a search aid: 🔴 **grep the two headings, then a bounded read from each to the next `## `** — never the whole file | `investigation/<id>.md` |
-| 2 | Assembly | `investigation/<id>.md` for each identifier of `bug-list.md` · `bug-list.md`, for the order · `docs/process/GRILLE_FERMETURE_TECHNIQUE.md` | `desc-bug.md` |
+| 2 | Assembly | `investigation/<id>.md` for each identifier of `bug-list.md` · `bug-list.md`, for its identifiers and the order · `docs/process/GRILLE_FERMETURE_TECHNIQUE.md` | `desc-bug.md` |
 
 🔴 **The prompt says which one, and invocation 1 says which gap.**
 Neither is inferred.
@@ -185,8 +189,8 @@ moves 1 to 5 as usual. 📌 **A decision naming another gap is not
 yours to apply.**
 
 **How you apply it, at invocation 2** — 🔴 **the decision does not
-replace what is missing.** Re-run the count at the head of the
-assembly: the gaps, then the reports.
+replace what is missing.** Re-run the matching at the head of the
+assembly: the gaps' identifiers, then the reports.
 
 | After applying | What you do |
 |---|---|
@@ -476,26 +480,31 @@ or a dead symbol the state document records on the gap goes in
 
 **Once, when every report exists.**
 
-🔴 **Right after the look for your blocking file, and before any count,
-`Glob` `desc-bug.md`.** ⚠️ **It exists → stop**: 📌 **name the file,
-and say what it holds is settled** — a run of yours got past the
+🔴 **Right after the look for your blocking file, and before any
+matching, `Glob` `desc-bug.md`.** ⚠️ **It exists → stop**: 📌 **name the
+file, and say what it holds is settled** — a run of yours got past the
 closures and wrote it. 🔴 **A stop, not a block** — no blocking file,
-no count, no reading; the orchestration does not issue this invocation
-when the file exists, and relays it as done.
+no matching, no reading; the orchestration does not issue this
+invocation when the file exists, and relays it as done.
 
 🔴 **Read them all** — ⚠️ **never a `blocked_*.md` of that folder**: 📌
 **those are another invocation's, and a gap whose investigation blocked
 has no report at all.**
 
-📌 **Plus `bug-list.md`**, for the order the Product Owner listed them
-in — ⚠️ **and for the `B<n>` a gap carries**, see *What you write*.
+📌 **Plus `bug-list.md`**, for the `G<n>` each gap opens on and for the
+order the Product Owner listed them in — ⚠️ **and for the `B<n>` a gap
+carries**, see *What you write*.
 
-🔴 **One gap in `bug-list.md`, one report** — ⚠️ **a report may hold
+🔴 **One gap in `bug-list.md`, one report** — `investigation/G<n>.md`,
+named by the identifier the gap opens on — ⚠️ **a report may hold
 several `## Bearer` blocks.**
 
-📌 **Count both**: a missing file means an investigation did not run.
-🔴 **Block rather than assemble a partial set** — ⚠️ **a gap silently
-dropped never comes back.**
+📌 **Match them by identifier, never by position**: every `G<n>` of the
+file has its report, and no report names an identifier the file lacks.
+A missing file means an investigation did not run; ⚠️ **a gap opening
+on no `G<n>` is one the set cannot match.** 🔴 **Block rather than
+assemble a partial set** — ⚠️ **a gap silently dropped never comes
+back.**
 
 ⚠️ **You never open the code.** 🔴 **A report that leaves you unable to
 write an entry is a block**, not a reason to go looking.
@@ -620,11 +629,11 @@ several entries** — numbered inside its section — `§4.1`,
 
 🔴 **A gap `bug-list.md` marks with a `B<n>` — the block a control
 report found unbuilt — hands it to every entry it gives.** 📌 **In
-`bug-list.md` the identifier sits in parentheses at the end of the
-gap's first line** — `Correction factor never computed (B12)` — 🔴
-**and that is the form you read it by**: ⚠️ **a `B<n>` written anywhere
-else on the gap is not one.** 📌 **The identifier closes the entry's
-title the same way, in parentheses**:
+`bug-list.md` the `B<n>` sits in parentheses at the end of the gap's
+first line, after the `G<n>` that opens it** — `G03 Correction factor
+never computed (B12)` — 🔴 **and that is the form you read it by**: ⚠️
+**a `B<n>` written anywhere else on the gap is not one.** 📌 **The
+`B<n>` closes the entry's title the same way, in parentheses**:
 
     ### §4.1 Correction factor never computed (B12)
 

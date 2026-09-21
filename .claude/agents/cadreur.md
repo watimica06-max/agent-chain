@@ -923,7 +923,10 @@ one when the previous `## Defects` carried lines, `1` otherwise. ⚠️
 📌 **a cold re-entry has no context, and nothing archives
 `code/sequence.md`** — each round writes over it. ⚠️ **Still carrying
 defects at the third**: write `code/blocked_cadreur.md` naming what
-would not converge, and go out.
+would not converge, and go out. 📌 **A filled `## Decision` buys exactly
+one round** — 🔴 **a round beyond the third still carrying defects
+blocks again at once**, the new block naming the decision that bought
+it. ⚠️ **The `Round:` line goes on counting up, never back to `1`.**
 
 ⚠️ **You do not argue with a defect.** 🔴 **If you judge one wrong, the
 blocking file is the one outcome**: say so there rather than re-cutting
@@ -979,6 +982,9 @@ was not wrong on paper, it turned out wrong against the code.
 
 **Read it in full**, and 🔴 **read every `code/redecoupage-NN.md`
 beside it** — those are the times the split was already sent back.
+🔴 **A `## Décision du Product Owner` section in `code/redecoupage.md`
+is her instruction** — 📌 **written after a third return, and binding on
+the cut you make.**
 
 ### What the coded lots make of your freedom
 
