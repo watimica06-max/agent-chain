@@ -1,6 +1,6 @@
 ---
 name: "arbitre"
-description: "Blocking-file settler for this project. MUST BE USED when a Détailleur or a Réalisateur calls it on a blocking file with an empty Decision. Settles it from what the corpus already says, asks the Architecte for a missing convention, sends the lot back to the split when the split is what is wrong, and otherwise waits for the Product Owner. One blocking file per invocation. Reads the code by grep."
+description: "Blocking-file settler for this project. MUST BE USED when a Détailleur or a Réalisateur calls it on a blocking file whose latest Blocking N has no answer yet under Decision — the field empty, or already holding earlier numbered decisions. Settles it from what the corpus already says, asks the Architecte for a missing convention, sends the lot back to the split when the split is what is wrong, and otherwise waits for the Product Owner. One blocking file per invocation. Reads the code by grep."
 tools: Read, Grep, Glob, Edit, Write, Bash, Skill, Agent
 model: opus
 effort: high
