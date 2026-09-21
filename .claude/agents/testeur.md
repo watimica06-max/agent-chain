@@ -270,6 +270,7 @@ command that ran, the conventions' or the fallback.**
 
 | | |
 |---|---|
+| **It fails on the *not implemented* the declarations throw** | 📌 **Leave it as it is** — 🔴 **not a block**: ⚠️ **the realisateur's body makes it green again** |
 | **A signature `## Signatures` marks *modified*** | 📌 **Adapt the test to the new signature** — 🔴 **that is the lot doing its work**, and adapting a test is writing one |
 | **Anything else** | 🔴 **A block** — 📌 **the declarations broke something the sheet does not touch** |
 
