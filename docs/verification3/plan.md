@@ -115,6 +115,7 @@ Cited: 6_convertit.md L35-38 — "🔴 **`code/decoupage.md` exists → stop.** 
 Owner: 2_structure.md
 Follows: —
 Note: the guard is the mechanical part. How a `NEW` block created after the split reaches the code is a question of intent → `## To settle`, item A.
+Settled (Product Owner, item A — Option 3): `/2_structure` refuse d'intégrer une réponse qui crée un bloc `NEW` une fois le découpage fait ; il le dit, et le Product Owner décide où la réponse va.
 
 ### 12 · fichiers F05 — The audit never sees the Convertisseur's blocks
 
@@ -146,11 +147,11 @@ Follows: —
 ### 15 · chemins-amont F06 — A product answer that changed no block re-asks the same question every run
 
 Severity: TO FIX
-Decision: —
+Decision: Settled (Product Owner, item B — Option 1): le Convertisseur lit son fichier de questions répondu ; propriétaire `6_convertit.md`, suiveur `convertisseur.md`.
 Where: 6_convertit.md L143-144 ↔ convertisseur.md L487-489, L632-634
 Cited: convertisseur.md L632-634 — "🔴 **Open `idees.md`**, or any questions file 📌 **but the answered technical file the prompt names** — a product answer reaches you through the product file, a technical one through that file alone"
-Owner: — (see `## To settle`, item B)
-Follows: —
+Owner: 6_convertit.md
+Follows: convertisseur.md
 Note: both sides verified; the fix turns on where a product answer lands — a principle the Convertisseur states at L633-634 — and two designs respect different halves of the text. `## To settle`, item B.
 
 ### 16 · chemins-amont F07 — A turn whose answers changed no block cannot close the grid
@@ -259,6 +260,7 @@ Cited: 8_code.md L595-598 — "📌 **A filled `## Decision` is not a stop** —
 Owner: 8_code.md
 Follows: —
 Note: F06's sentence is decided. F16's sentence — a `sheet` cause on a lot that is not the last coded, reverting commits later lots built on — has no rule and is a scope question → `## To settle`, item C. Entry 58 is the same defect and takes this decision.
+Settled (Product Owner, item C — Option 1): une cause `sheet` sur un lot qui n'est pas le dernier codé passe par *When the split comes back* ; tous les lots suivants validés sont révoqués et recodés.
 
 ### 27 · chemins-aval F07 — A signature rewritten after a `sheet` cause reaches no later sheet
 
@@ -288,6 +290,7 @@ Cited: detailleur.md L484 — "| A `## Decision` sending the lot back to the spl
 Owner: 8_code.md
 Follows: —
 Note: the Détailleur's wording L548 keys on — the side the consolidated report said no report named — is opened here (detailleur L484-485). What runs after the Product Owner's decision on a third return is nowhere written and is hers → `## To settle`, item D.
+Settled (Product Owner, item D — Option 1): le Product Owner corrige puis relance `/7_lots` ; écrire dans `/8_code` ce qui remet le compteur à zéro.
 
 ### 30 · passages F02 — The second request of a settled file is never answered
 
@@ -332,20 +335,20 @@ Follows: cadreur.md L494, L767-770
 ### 34 · fichiers F08 — Row 8 runs invocation 3 before invocation 1, and `INIT` never fires
 
 Severity: QUESTION
-Decision: —
+Decision: Settled (Product Owner, item E — Option 1, after verification): l'invocation 3 du Fusionneur teste le global d'abord ; sur `# Application` seul, ses fusions vont dans `desc-produit-fusion.md` (que `INIT` copie ensuite sur le global) et non dans le global. Vérifié : la copie du Rédacteur (redacteur.md L699-763) porte `desc-produit.md` et les `decisions-produit.md` seulement ; l'invocation 3 du Fusionneur apporte par construction ce que la copie ne porte pas (fusionneur.md « You carry only what `desc-produit-fusion.md` does not already carry ») — sauter la ligne 8 perdrait cela.
 Where: fusion.md L50, L65-69 ↔ fusionneur.md L355-357, L524-604
 Cited: fusionneur.md L355-357 — "🔴 **A global holding nothing but `# Application` is a first feature.** There is nothing to compare: **the plan is one line, `INIT`**, and no question comes out of it." · L585 — "**3. Merge what you kept**, by the same three levels as invocation 1"
-Owner: — (see `## To settle`, item E)
-Follows: —
+Owner: fusionneur.md
+Follows: fusion.md
 Note: both sides opened here; the finding holds — invocation 3 writes into the global (L585-593), so a first feature with a bug-fix cycle reaches invocation 1 with a global that is no longer `# Application` alone. The fix is a design choice → `## To settle`, item E.
 
 ### 35 · chemins-amont F25 — A `bugfix-NN` coded after the merge never carries its decisions into the global
 
 Severity: QUESTION
-Decision: —
+Decision: Settled (Product Owner, item F — Option 1): une relance de `/fusion` après la fusion n'est pas prévue. Ajouter : si elle doit avoir lieu, le Product Owner restaure d'abord à la main l'ancien global depuis git.
 Where: fusion.md L46 ↔ fusion.md L18-20
 Cited: fusion.md L18-20 — "🔴 **One run per feature, once every bug-fix cycle has been coded.** The global is not revised while a downstream cycle is running on the same scope."
-Owner: — (see `## To settle`, item F)
+Owner: fusion.md
 Follows: —
 Note: L18 states the intent the finding questions; whether a correction cycle after the merge is supported is the Product Owner's → `## To settle`, item F.
 
@@ -362,11 +365,11 @@ Note: both sides opened; the routing part is mechanical, the "carries on" part f
 ### 37 · chemins-aval F19 — Neither side says how `B<n>` is written inside a gap of `bug-list.md`
 
 Severity: QUESTION
-Decision: —
+Decision: Settled (Product Owner, item G): l'identifiant `B<n>` entre parenthèses en fin de première ligne du manque, comme le Diagnostiqueur l'écrit dans `desc-bug.md`. `9_controle.md` L427-431 l'énonce (owner), `diagnostiqueur.md` L616 lit par cette forme (follows).
 Where: 9_controle.md L427-431 ↔ diagnostiqueur.md L616-620
 Cited: diagnostiqueur.md L616-618 — "🔴 **A gap `bug-list.md` marks with a `B<n>` — the block a control report found unbuilt — hands it to every entry it gives**: 📌 **the identifier closes the entry's title, in parentheses**"
-Owner: — (see `## To settle`, item G)
-Follows: —
+Owner: 9_controle.md
+Follows: diagnostiqueur.md
 Note: `bug-list.md` is the Product Owner's hand-written file; the shape she writes `B<n>` in is hers to fix → `## To settle`, item G. Once she has, both files state it: `9_controle.md` L427-431 (writer's side) and `diagnostiqueur.md` L616 (reader's grep).
 
 ---
@@ -431,7 +434,7 @@ Note: read with entry 8 (same owner) — no collision: entry 8 changes the reque
 ### 44 · renommages F11 — Both process documents still name `/cycle`
 
 Severity: NOTE
-Decision: —
+Decision: moot (Product Owner) — `PROCESS_AMONT.md` et `PROCESS_AVAL.md` sont hors périmètre de cette campagne. Change nothing.
 Where: PROCESS_AMONT.md L1210 ↔ PROCESS_AVAL.md L1010
 Cited: — (not opened)
 Owner: —
@@ -526,28 +529,28 @@ Follows: —
 ### 54 · chemins-amont F21 — A `/1_lexique` run by mistake after "4 wrote none" re-watches a corrected file
 
 Severity: NOTE
-Decision: —
+Decision: Settled (Product Owner, item H — Option 1): accept, change nothing.
 Where: 1_lexique.md L60 ↔ 1_lexique.md L263
 Cited: 1_lexique.md L60 — "| Another agent's questions file alone | **3 — Watching** |"
-Owner: — (see `## To settle`, item H)
+Owner: — (no change)
 Follows: —
 
 ### 55 · chemins-amont F22 — "Once, not until it clears" has no record across runs
 
 Severity: NOTE
-Decision: —
+Decision: Settled (Product Owner, item I — Option 1): accept, change nothing.
 Where: 3a_genre.md L258 ↔ 3b_nature.md L268
 Cited: 3b_nature.md L268 — "📌 **Say which, and run `/3b_nature` once more** — ⚠️ **once, not until it clears**: 🔴 **a second run that leaves one empty stops there, the blocks named**"
-Owner: — (see `## To settle`, item I)
+Owner: — (no change)
 Follows: —
 
 ### 56 · chemins-amont F23 — The two-genre route can repeat on the same block
 
 Severity: NOTE
-Decision: —
+Decision: Settled (Product Owner, item J — Option 1): accept — a sentence at `3a_genre.md` L256 says each turn she writes the decision, sees the repetition, and can settle it by splitting the block herself in the decision.
 Where: 3a_genre.md L256 ↔ qualifieur.md L95-102
 Cited: qualifieur.md L100-102 — "🔴 **The route back is not yours**: `/2_structure` names the file to the Rédacteur, which rewrites the block with `MODIFIED`, and `/3_decoupe` splits it."
-Owner: — (see `## To settle`, item J)
+Owner: 3a_genre.md
 Follows: —
 
 ### 57 · chemins-amont F26 — `.claude/commands/cycle.md` is still tracked and named
@@ -652,11 +655,11 @@ Follows: —
 | 8 | TO FIX | Request blocks get an identifier; `## Where` carries it | cadreur.md L196-198, L227-243, L314 ↔ 7_lots.md L167-168, L182-186 | cadreur.md | 7_lots.md, architecte.md |
 | 9 | TO FIX | Invocation 2 exempts `forme` like `inconsistency` and `coverage` | architecte.md L544-560, L634-652 ↔ conventions.md L263-269 | architecte.md | conventions.md |
 | 10 | TO FIX | Step d counts the kept blocks | 9_controle.md L132, L187-189 ↔ convertisseur.md L857-864 | 9_controle.md | — |
-| 11 | TO FIX | No deletion when `code/decoupage.md` exists; say "new cycle" as 6_convertit does — rest To settle A | 2_structure.md L202-210 ↔ 6_convertit.md L35-38 | 2_structure.md | — |
+| 11 | TO FIX | No deletion when `code/decoupage.md` exists; say "new cycle" as 6_convertit does — rest settled A, Option 3 (refuse) | 2_structure.md L202-210 ↔ 6_convertit.md L35-38 | 2_structure.md | — |
 | 12 | TO FIX | `convertisseur/` is the fifth place | audit_blocages.md L26-36 ↔ 6_convertit.md L343-350 | audit_blocages.md | — |
 | 13 | TO FIX | Third trigger: filed qualifieur file with `### Q` → invoke with it | 3a_genre.md L103-112, L154-155 ↔ qualifieur.md L220, L323-324 | 3a_genre.md | — |
 | 14 | TO FIX | Same for the classeur | 3b_nature.md L102-113 ↔ classeur.md L169-175 | 3b_nature.md | — |
-| 15 | TO FIX | — (To settle B) | 6_convertit.md L143-144 ↔ convertisseur.md L487-489, L632-634 | — | — |
+| 15 | TO FIX | Settled B, Option 1: the Convertisseur reads its answered questions file | 6_convertit.md L143-144 ↔ convertisseur.md L487-489, L632-634 | 6_convertit.md | convertisseur.md |
 | 16 | TO FIX | Filed sondeur file with `### Q`, no marker, no existant → write the next sondeur file empty, first time closed | 4_grille.md L176-183, L197-204 ↔ 2_structure.md L249-250 | 4_grille.md | — |
 | 17 | TO FIX | The `### Q` guard excludes `questions-architecte-*.md` | 3a_genre.md L54-59 ↔ conventions.md L122-126 | 3a_genre.md | 3b_nature, 3_decoupe, 4_grille, 5_reclasse, 6_convertit, fusion_compare |
 | 18 | NOTE | Leave `questions-architecte-*.md` at the root | fusion.md L113-117 ↔ conventions.md L85 | fusion.md | fusion_applique.md |
@@ -667,25 +670,25 @@ Follows: —
 | 23 | TO FIX | Empty attempt = no new commit between before and after the Réalisateur | 8_code.md L147-158, L164-167 ↔ concepteur L286, testeur L303, realisateur L695 | 8_code.md | — |
 | 24 | TO FIX | 4b's table excludes `blocked_relecteur.md` | 8_code.md L227-235 ↔ L267-270, L572-581 | 8_code.md | — |
 | 25 | TO FIX | Two filled-tests by shape: numbered headings vs four-heading files | 8_code.md L233-240 ↔ arbitre.md L142-144 | 8_code.md | — |
-| 26 | TO FIX | The revert/diff list is cut after the lot's last `Revert "<lot>: …"` — F16 To settle C | 8_code.md L142-155, L186-189, L486-492 ↔ L595-598 | 8_code.md | — |
+| 26 | TO FIX | The revert/diff list is cut after the lot's last `Revert "<lot>: …"` — F16 settled C, Option 1 | 8_code.md L142-155, L186-189, L486-492 ↔ L595-598 | 8_code.md | — |
 | 27 | TO FIX | Findings rewrite propagates changed signatures to the block's later sheets | detailleur.md L507-519 ↔ relecteur.md L209-211 ↔ 8_code.md L294-305 | detailleur.md | 8_code.md |
 | 28 | settled | L313-315 separates `stop.md` (main checkout) from a blocking file filled in the worktree; arbitre unchanged | 8_code.md L313-315 ↔ arbitre.md L466-499 | 8_code.md | — |
-| 29 | TO FIX | L548 routes through *When the split comes back*; the third-return stop still closes the worktree — "what next" To settle D | 8_code.md L548-549 ↔ L473-480, L510-518 ↔ detailleur.md L484 | 8_code.md | — |
+| 29 | TO FIX | L548 routes through *When the split comes back*; the third-return stop still closes the worktree — "what next" settled D, Option 1 | 8_code.md L548-549 ↔ L473-480, L510-518 ↔ detailleur.md L484 | 8_code.md | — |
 | 30 | TO FIX | Invocation 3 skips blocks, not files | cadreur.md L240-243 ↔ architecte.md L686-690 | architecte.md | — |
 | 31 | TO FIX | A dash raises `inconsistency` only on `comportement` and `référence` blocks | convertisseur.md L862-864 ↔ architecte.md L413-422 | architecte.md | — |
 | 32 | TO FIX | Phase 6 derives the block from the lot through `tracabilite-full.md` | 9_controle.md L366-374 ↔ detailleur.md L326-330, realisateur.md L303-307 | 9_controle.md | — |
 | 33 | TO FIX | `carried` only for "already carried by the code"; three greppable reason forms | cadreur.md L494, L762-774 ↔ 9_controle.md L149-154 | 9_controle.md | cadreur.md |
-| 34 | QUESTION | — (To settle E) | fusion.md L50 ↔ fusionneur.md L355-357, L585 | — | — |
-| 35 | QUESTION | — (To settle F) | fusion.md L46 ↔ L18-20 | — | — |
+| 34 | QUESTION | Settled E, Option 1: invocation 3 writes into the copy on a first feature | fusion.md L50 ↔ fusionneur.md L355-357, L585 | fusionneur.md | fusion.md |
+| 35 | QUESTION | Settled F, Option 1: no re-run; if one must happen the PO restores the old global from git by hand first | fusion.md L46 ↔ L18-20 | fusion.md | — |
 | 36 | QUESTION | Rows 2-3 bear on the two files this command routes; row 3 names the decisions files; the Rédacteur carries on after a block | fusion.md L44-45, L101, L201 ↔ redacteur.md L750-753 | fusion.md | redacteur.md |
-| 37 | QUESTION | — (To settle G) | 9_controle.md L427-431 ↔ diagnostiqueur.md L616-620 | — | — |
+| 37 | QUESTION | Settled G: `B<n>` in parentheses at the end of the gap's first line | 9_controle.md L427-431 ↔ diagnostiqueur.md L616-620 | 9_controle.md | diagnostiqueur.md |
 | 38 | NOTE | Name the part `## Intent and vocabulary` | verificateur.md L62, L415 ↔ convertisseur.md L138 ↔ detailleur.md L68, L607 | verificateur.md | detailleur.md |
 | 39 | NOTE | `# Preamble` in `desc-bug.md` | diagnostiqueur.md L563 ↔ convertisseur.md L144-146 | diagnostiqueur.md | — |
 | 40 | NOTE | Move 7 reads `## Trigger` for a second requirement | diagnostiqueur.md L411-415 ↔ L514-519 | diagnostiqueur.md | — |
 | 41 | NOTE | Drop the placements field | concepteur.md L231-233, L314-317, L338-340 ↔ 8_code.md L57-58 | concepteur.md | — |
 | 42 | NOTE | The Testeur's test file is declared, not outside the lot | testeur.md L86-87, L332-335 ↔ concepteur.md L114-118 ↔ relecteur.md L453-459 | testeur.md | relecteur.md |
 | 43 | NOTE | Drop `## Conventions requests` | cadreur.md L245-248, L848-851 ↔ 7_lots.md L194-195 | cadreur.md | — |
-| 44 | NOTE | — (not verified: `docs/process/` not opened) | PROCESS_AMONT.md L1210 ↔ PROCESS_AVAL.md L1010 | — | — |
+| 44 | NOTE | moot (PO): out of scope, change nothing | PROCESS_AMONT.md L1210 ↔ PROCESS_AVAL.md L1010 | — | — |
 | 45 | NOTE | Name `/7_lots` | arbitre.md L210-211 ↔ 8_code.md L482-484 | arbitre.md | — |
 | 46 | NOTE | Resume stops on `code/blocked_verificateur.md` | 8_code.md L69-81 ↔ verificateur.md L176 ↔ 7_lots.md L172 | 8_code.md | — |
 | 47 | NOTE | Second move is the only reader | 5_reclasse.md L109 ↔ convertisseur.md L53 | 5_reclasse.md | — |
@@ -695,9 +698,9 @@ Follows: —
 | 51 | NOTE | Blocking table reads per file | 6_convertit.md L49-53 ↔ L191-194 | 6_convertit.md | — |
 | 52 | NOTE | First-match rule on the relay table | 6_convertit.md L410-419 ↔ L167-168 | 6_convertit.md | — |
 | 53 | NOTE | L99 names `/3_decoupe` | 1_lexique.md L93-101 ↔ 2_structure.md L135 | 1_lexique.md | — |
-| 54 | NOTE | — (To settle H) | 1_lexique.md L60 ↔ L263 | — | — |
-| 55 | NOTE | — (To settle I) | 3a_genre.md L258 ↔ 3b_nature.md L268 | — | — |
-| 56 | NOTE | — (To settle J) | 3a_genre.md L256 ↔ qualifieur.md L95-102 | — | — |
+| 54 | NOTE | Settled H, Option 1: accept, change nothing | 1_lexique.md L60 ↔ L263 | — | — |
+| 55 | NOTE | Settled I, Option 1: accept, change nothing | 3a_genre.md L258 ↔ 3b_nature.md L268 | — | — |
+| 56 | NOTE | Settled J, Option 1: accept; a sentence at L256 says so | 3a_genre.md L256 ↔ qualifieur.md L95-102 | 3a_genre.md | — |
 | 57 | NOTE | — (moot, settled: change nothing) | .claude/commands/cycle.md ↔ .claude/CLAUDE.md L51 | — | — |
 | 58 | NOTE | Covered by 26 | 8_code.md L141-155 ↔ L502-503 | 8_code.md | — |
 | 59 | NOTE | A mixed line: sheets read, unmatched intentions found with the mark as reason | 9_controle.md L151-152, L171-179 ↔ controleur.md L215-220 | controleur.md | 9_controle.md |
@@ -721,6 +724,9 @@ Follows: —
 ---
 
 ## To settle
+
+**Answered by the Product Owner (2026-09-21)** — each answer is transcribed under the `Decision` of its entry above. In one line each:
+A — Option 3 · B — Option 1 (owner `6_convertit.md`, follows `convertisseur.md`) · C — Option 1 · D — Option 1 · E — Option 1, after verification (see entry 34) · F — Option 1, plus: si une relance doit avoir lieu, le Product Owner restaure d'abord à la main l'ancien global depuis git · G — l'identifiant entre parenthèses en fin de première ligne du manque · H, I, J — Option 1 · entry 44 — moot.
 
 Each item: what is open, the options, what each costs. The `Decision` of the entry it belongs to stays empty (A, C, D excepted — their entry carries the mechanical part).
 
