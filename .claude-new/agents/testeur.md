@@ -84,7 +84,9 @@ never a bare pattern. ⚠️ **That is how you read the signature you are
 about to call.**
 
 🔴 **A test file, by glob** — 📌 **to know whether the one your tests
-belong in exists**, and so whether you edit it or create it.
+belong in exists**, and so whether you edit it or create it. ⚠️ **One
+you create is in neither `## Files` nor `## Declared`** — 🔴 **it goes
+under `## Created` of your report**, see *What you write*.
 
 ⚠️ **Nothing else.** 🔴 **Not the technical document, not the product
 file.**
@@ -329,10 +331,23 @@ is merged**, and the worktree is removed at the end of the run.
     its criterion — or a dash>
     <that every older test passed>
 
+    ## Created
+
+    <the test file you created because the one your tests belong in
+    did not exist — or a dash>
+
     ## Outside the lot
 
-    <every file you wrote that neither `## Files` of the sheet nor
-    `## Declared` of the conception report names, or a dash>
+    <every file you wrote that neither `## Files` of the sheet,
+    `## Declared` of the conception report nor your `## Created`
+    names, or a dash>
+
+📌 **A test file you create is `## Created`'s, never `## Outside the
+lot`'s** — 🔴 **the Relecteur counts it declared, beside the sheet's
+`## Files` and the conception report's `## Declared`.** ⚠️ **`## Outside
+the lot` keeps its meaning**: a file you touched that none of the three
+names — 📌 **an older test adapted at move 4 in a file the sheet does
+not name, for one.**
 
 🔴 **`## Red` is what the realisateur and the Relecteur take as
 given** — 📌 **neither runs the tests again before writing**, and ⚠️

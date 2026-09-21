@@ -96,9 +96,11 @@ and 2**: the vocabulary is settled before the product file exists,
 never after — a term changed then would leave sixty blocks carrying the
 old one.
 
-🔴 **On that stop, say `/2_structure`** — 📌 **the vocabulary is settled
-and the product file is where the work is now.** ⚠️ **A stop that names
-no next step leaves the Product Owner to guess.**
+🔴 **On that stop, say `/3_decoupe`** — 📌 **the vocabulary is settled
+and the idea file is transcribed once**: `/2_structure` stops on the
+same state and names the same step. ⚠️ **A stop that names no next step
+leaves the Product Owner to guess** — 🔴 **and one that names
+`/2_structure` sends her to a command that stops in turn.**
 
 ---
 
@@ -229,11 +231,19 @@ them, not you.**
 
 ## Git, once it has reported
 
-**Then, once it has reported:**
+**Then, once it has reported — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**, and the filings of *Once it
+   has reported* are staged, not committed; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.**
 

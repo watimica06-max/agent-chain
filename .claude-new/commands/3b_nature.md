@@ -50,12 +50,16 @@ is read** — the agent reads the file.
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
 one**, and that `/2_structure` has to run first.
 
-🔴 **Grep `^### Q` in each root `questions-*.md` before touching it** —
-📌 **a file holding questions is not yours to file**: ⚠️ **it waits on
-an answer, or its answers were never integrated.** 🔴 **Stop and say
-which.** 📌 **The classeur's own is no exception** — ⚠️ **answered, it
-goes through `/1_lexique` and `/2_structure`**, which integrate it and
-put it away; 🔴 **still at the root, it has not been through them.**
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
+`architecte` before touching it** — 📌 **a file holding questions is
+not yours to file**: ⚠️ **it waits on an answer, or its answers were
+never integrated.** 🔴 **Stop and say which.** 📌 **The classeur's own
+is no exception** — ⚠️ **answered, it goes through `/1_lexique` and
+`/2_structure`**, which integrate it and put it away; 🔴 **still at the
+root, it has not been through them.** 📌 **The architecte's is the one
+exception** — ⚠️ **it is `/conventions`'s, not this chain's**, and a
+`### Q` in it says nothing about the run; 🔴 **read the root as if it
+were not there** — and leave it there, see below.
 
 📌 **Filed, a file is read by no command again** — ⚠️ **and its answers
 are lost for good** — 🔴 **except under `questions/qualifieur/` and
@@ -99,7 +103,8 @@ writes this turn is the root's, until its answers are integrated.
 
 ## Which blocks it looks at
 
-**Two greps, and the union of what they return:**
+**Two greps, the union of what they return — and a third trigger, which
+names no block:**
 
 | Grep | What it names |
 |---|---|
@@ -108,9 +113,21 @@ writes this turn is the root's, until its answers are integrated.
 | 🔴 **Plus `grep -B1 '^Nature: '` kept to the blocks whose `Genre:` is **not** `comportement`** | 📌 **Name those too** — ⚠️ **they changed genre since the classeur last ran**, and their nature has to be emptied: the genre views `/5_reclasse` builds copy the block as it stands, and a stale nature travels with it |
 | `grep '^### .*MODIFIED'` | The blocks changed last turn, whose nature may have moved with them |
 
-📌 **Neither returns anything** → 🔴 **do not invoke.** 📌 **Commit
-what the filing moved, if anything, and push** — no worktree. ⚠️ **Say
-there is nothing to class**, and go to *What you relay*.
+🔴 **The third trigger is the answered file** — 📌 **the highest
+`questions-classeur-NN.md` under `questions/classeur/` holds a
+`### Q`** → 🔴 **invoke, that file named**, even when the two greps
+returned nothing — 📌 **then no block is listed.** ⚠️ **An answer
+naming a nature alone changes no block** — the Rédacteur leaves the
+text as it was, so no `MODIFIED` marks it and no `Nature:` line is
+empty; 📌 **the agent finds the blocks its answers name, and it is
+there that the nature lands.** 🔴 **What silences the trigger is the
+agent's own next file**, empty — filed, it is the highest, and it holds
+no `### Q`.
+
+📌 **Neither grep returns anything, and that highest file holds no
+`### Q` — or there is none** → 🔴 **do not invoke.** 📌 **Commit what
+the filing moved, if anything, and push** — no worktree. ⚠️ **Say there
+is nothing to class**, and go to *What you relay*.
 
 ⚠️ **A block with a filled nature and no marker was classed on an
 earlier turn**, and nothing about it has moved since.
@@ -150,13 +167,17 @@ Agent(
   model="sonnet",
   description="Class <name>",
   prompt="The product file: docs/features/<name>/desc-produit.md.
-          Look at these blocks: <B7, B62, B63>.
+          <Look at these blocks: B7, B62, B63.>
           Your questions file number: NN.
           <Plus: your answered questions file:
            docs/features/<name>/questions/classeur/questions-classeur-NN.md.>
           <Plus: blocked_classeur.md, every ## Decision is filled.>"
 )
 ```
+
+📌 **The `Look at these blocks` line carries what the two greps
+returned** — 🔴 **and goes when they returned nothing**: the answered
+file alone invoked, and the blocks it names are the agent's to find.
 
 🔴 **Never paraphrase its process** — not the natures, its checks, its
 output. It reads its own instructions.
@@ -227,11 +248,19 @@ wrong one before the grid closes on it.**
 
 ## Git, once it has reported
 
-**Then, once it has reported:**
+**Then, once it has reported — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**, and the rename of *Once it
+   has reported* is staged, not committed; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.**
 
@@ -262,7 +291,7 @@ lines** — say them in the agent's terms, or that there are none.
 | What just happened | Next |
 |---|---|
 | It wrote a blocking file, **naming a nature it could not settle** | 📌 Fill every `## Decision`, then `/3b_nature` again — ⚠️ **or the row below that the decision fits** |
-| It wrote a blocking file **and** a questions file with questions | 🔴 **Answer the questions first, then `/1_lexique`** — 📌 **fill the decision second, once the answers are integrated.** ⚠️ **Both end in the Rédacteur's hands, but never at the root together**: `/2_structure` would take the blocking file and leave the answered file beside the Rédacteur's own, and the next command stops on two |
+| It wrote a blocking file **and** a questions file with questions | 🔴 **Answer the questions first, then `/1_lexique`** — 📌 **fill the decision second, once the answers are integrated.** ⚠️ **Both end in the Rédacteur's hands** — at the root together, `/2_structure` takes the answered file and leaves the blocking file for its next run |
 | A `## Decision` names a rewrite | 🔴 **`/2_structure`** — 📌 **it finds the blocking file at its unnumbered name and names it to the Rédacteur, which rewrites the block with `MODIFIED`.** ⚠️ **Then `/1_lexique` if the rewrite brought vocabulary, and the route back** |
 | A `## Decision` names a nature outside the list | 🔴 **Nothing runs** — ⚠️ **the tables have to carry it first**; say so |
 | 🔴 **A block carrying `Genre: comportement` still has an empty `Nature:`, and no blocking file explains it** | 📌 **Say which, and run `/3b_nature` once more** — ⚠️ **once, not until it clears**: 🔴 **a second run that leaves one empty stops there, the blocks named** — a line left empty by neither a block nor a decision is a defect of the run, and a third run would repeat it. 🔴 **Count only those**: a block of any other genre has an empty `Nature:` and must keep it |

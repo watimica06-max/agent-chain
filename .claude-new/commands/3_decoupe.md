@@ -6,7 +6,8 @@ argument-hint: "<feature folder name>"
 
 Act as the orchestrator, in **upstream mode**.
 
-**This command invokes `decoupeur`, once.**
+**This command invokes `decoupeur`, once** — 📌 **a second time only
+when its list of blocks comes back short**, see *Once it has reported*.
 
 📌 **It runs between `/2_structure` and `/4_grille`, every turn.** 🔴 **A
 block the Rédacteur just wrote or changed may carry two triggers**, and
@@ -48,15 +49,22 @@ file** — 🔴 **the prompt never names it.**
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
 one**, and that `/2_structure` has to run first.
 
-🔴 **Grep `^### Q` in each root `questions-*.md` before touching it** —
-📌 **a file holding questions is not yours to file**: ⚠️ **it waits on
-an answer, or its answers were never integrated.** 🔴 **Stop and say
-which.**
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
+`architecte` before touching it** — 📌 **a file holding questions is
+not yours to file**: ⚠️ **it waits on an answer, or its answers were
+never integrated.** 🔴 **Stop and say which.** 📌 **The architecte's is
+the one exception** — ⚠️ **it is `/conventions`'s, not this chain's**,
+and a `### Q` in it says nothing about the run; 🔴 **read the root as if
+it were not there** — and leave it there, see below.
 
 🔴 **File every root `questions-*.md`**, by `git mv`:
 
     git mv docs/features/<name>/questions-<agent>-NN.md \
            docs/features/<name>/questions/<agent>/
+
+⚠️ **Never `questions-architecte-*.md`** — 🔴 **leave it at the root**:
+📌 **it waits for `/conventions`, which is the only command that reads
+it.**
 
 📌 **This command reads none of them.** 🔴 **A questions file stays at
 the root only while it waits to be answered or integrated** — ⚠️ **the
@@ -161,8 +169,29 @@ notifies on completion. Do not pass it; wait for the notification.
 applies its decision and renames it**; 🔴 **left there, it stops this
 command until then.**
 
-🔴 **Grep `^### B` in `desc-produit.md`** and count. 📌 **Say how many
-blocks the file held before, and how many it holds now.**
+🔴 **Compare the list of blocks it says it looked at against the list
+you named.** ⚠️ **They have to match** — 📌 **a short list is a partial
+sweep**, and nothing else can see it: you may not open a block to
+check. ⚠️ **On a turn whose prompt said *every block***, its list is
+what tells you it reached the end.
+
+🔴 **A short list and no blocking file: invoke the decoupeur again on
+the blocks it did not reach**, and nothing else — 📌 **here, still
+inside the worktree.** ⚠️ **Once *Git, once it has reported* has run,
+the worktree is merged and removed**: a second invocation after it
+would write outside any worktree, where the harness blocks the agent's
+writes — 📌 the whole invocation lost, as *Git, before invoking* says.
+📌 **Twice at most** — ⚠️ **still short at the second, invoke nothing
+more**: 🔴 **say so in *What you relay***.
+
+🔴 **A short list and a `blocked_decoupeur.md`: no re-invocation.** 📌
+**The short list is expected** — it stopped on the block the file
+names, and the blocks it never reached still carry their markers for
+the next turn.
+
+🔴 **Then grep `^### B` in `desc-produit.md`** and count. 📌 **Say how
+many blocks the file held before, and how many it holds now** — ⚠️
+**the count after the last invocation**, not the first.
 
 ⚠️ **Same count means it split nothing** — 📌 **that is a normal
 outcome**, and the cycle carries on to `/3a_genre`.
@@ -174,11 +203,19 @@ what it produced; that is what catches a bad split.**
 
 ## Git, once it has reported
 
-**Then, once it has reported:**
+**Then, once it has reported — the second invocation of *Once it has
+reported* included, when there was one — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.
@@ -196,23 +233,14 @@ too**: the Product Owner has to see it.
 
 📌 **How many blocks before, how many after.**
 
-🔴 **And the list of blocks it says it looked at, against the list you
-named.** ⚠️ **They have to match** — 📌 **a short list is a partial
-sweep**, and nothing else can see it: you may not open a block to
-check.
+🔴 **A list still short after the second invocation: say which blocks
+were never looked at** — ⚠️ **the split is incomplete and `/3a_genre`
+would run on it.** 📌 **No further invocation** — *Once it has reported*
+has already run the two it allows.
 
-🔴 **A short list and no blocking file: invoke the decoupeur again on
-the blocks it did not reach**, and nothing else. 📌 **Twice at most** —
-⚠️ **still short at the second, stop and say which blocks were never
-looked at**: the split is incomplete and `/3a_genre` would run on it.
-
-🔴 **A short list and a `blocked_decoupeur.md`: no re-invocation.** 📌
-**The short list is expected** — it stopped on the block the file
-names, and the blocks it never reached still carry their markers for
-the next turn. ⚠️ **Relay the file and stop**, see below.
-
-⚠️ **On a turn whose prompt said *every block***, its list is what tells
-you it reached the end.
+🔴 **A short list beside a `blocked_decoupeur.md`: relay the file and
+stop**, see below — 📌 **the blocks it never reached wait for the next
+turn**, their markers still on them.
 
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**

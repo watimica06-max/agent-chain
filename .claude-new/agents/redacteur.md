@@ -357,7 +357,8 @@ merely say it.
 ⚠️ **Blocking is not flagging.** A gap, a contradiction, a question:
 that goes in the questions file and the cycle carries on. 🔴 **You block
 only when producing is impossible** — a missing input, a file you were
-told to read that is not there, a false premise that voids the work.
+told to read that is not there, a false premise that voids the work —
+📌 **and, at invocation 3, a decision you cannot place or cannot read.**
 
 **Its shape** — five headings, the last one left empty:
 
@@ -385,6 +386,13 @@ told to read that is not there, a false premise that voids the work.
 three invocations and one blocking-file name**: `/2_structure` reads
 it to hand a 1 or a 2 back to you, `/fusion` a 3. ⚠️ **Without it,
 neither command can tell which invocation wrote it.**
+
+📌 **Invocations 1 and 2 block once and stop.** 🔴 **Invocation 3
+blocks a decision and carries on** — see *INVOCATION 3 — Merging* —
+📌 **one `## Blocking N` title per decision you could not place, the
+four headings after `## Invocation` repeated under each**, ⚠️
+**`## Invocation` written once, above the first**, and 🔴 **one
+`## Decision` per entry**: they are not settled together.
 
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 It is where the Product Owner answers, by hand, and it is the only way
@@ -711,7 +719,8 @@ only route the product has at all.**
 
 **You read** `desc-produit-fusion.md`, and **every decisions file the
 prompt names** — 🔴 **in the order it names them**: the feature's own,
-then `bugfix-01`'s, then `bugfix-02`'s.
+then `bugfix-01`'s, then `bugfix-02`'s. 📌 **And a blocking file, when
+the prompt names one** — see move 2.
 
 **You edit `desc-produit-fusion.md` in place** — 📌 **the command's
 copy of the product file, with those decisions folded in.**
@@ -751,6 +760,19 @@ Structuring*.
 `blocked_redacteur.md`**, its `## Invocation` line saying 3. ⚠️ **Never
 a flag in the copy** — the Fusionneur would carry it into the global —
 📌 **and never a questions file**: this invocation writes none.
+
+🔴 **It does not stop the fold.** 📌 **You carry on with every other
+decision**, and file each one you could not place as you meet it — one
+`## Blocking N` per decision, all in that one file, see *When you
+cannot produce*. ⚠️ **Move 3 runs all the same**: the copy is complete
+but for what the file names.
+
+📌 **The re-invocation is this same invocation, the blocking file
+named in the prompt, its `## Decision` filled under every
+`## Blocking N`.** 🔴 **You fold those decisions alone** — ⚠️ **the
+others are in the copy already**, and folding them again doubles them.
+📌 **The decisions files the prompt names are where you read each
+one's text**; its `## Decision` says where it lands, or how to read it.
 
 **3. Strip every marker** — 🔴 **no `NEW`, no `MODIFIED` in the file you
 write.** ⚠️ **Nothing probes it**: it is read once, by the Fusionneur.

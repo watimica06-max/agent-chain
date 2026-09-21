@@ -65,8 +65,9 @@ block. 📌 **Its shape is below**; read it before you start.
   `## Symbols` inventory**, which says what a symbol you consume
   carries and which entries ask it
 - **The technical document's preamble** — 🔴 **always**, whatever your
-  block. Its `Vocabulary` names the terms your signatures must use;
-  its `Dependencies` lists what already exists, so you grep those first
+  block. Its `## Intent and vocabulary` names the terms your signatures
+  must use; its `## Dependencies` lists what already exists, so you grep
+  those first
 - **The spec entries their lots cite** — 📌 **those, not the whole
   document.** The Cadreur read it all; you read a few. ⚠️ **Plus any
   entry one of them points at** for what a trigger it names reaches —
@@ -509,14 +510,23 @@ it the walk meets them after the earlier sheets are written.**
 | | What you do |
 |---|---|
 | **A sheet, and its verdict's `## Status` starts with `PASS`** | 🔴 **Never touched** — a reservation after the word changes nothing |
-| **A sheet, and no `PASS`** | 📌 **You skip it** — ⚠️ **the lot after it may be about to consume its signature**, and rewriting it mid-block would change what that lot was written against |
+| **A sheet, and no `PASS`** | 📌 **You skip it** — ⚠️ **the lot after it may be about to consume its signature**, and rewriting it mid-block would change what that lot was written against. 🔴 **One exception**: the lines a findings rewrite changed the signature of — see below |
 | **No sheet** | 📌 **You write it** |
 
-📌 **A prompt carrying a verdict's `## Findings`** names a lot whose
-sheet the review found false — ⚠️ **the orchestration has deleted that
-sheet**, so the lot falls under *No sheet* and you write it again in
-this ordinary mode, 🔴 **the findings saying what the last one got
-wrong.** 📌 **A parameter, not a mode**: no `Mode:` line comes with it.
+📌 **A prompt carrying a verdict's `## Findings` names the lot whose
+sheet the review found false** — 🔴 **you take the lot from the prompt,
+never as the one you find without a sheet**: ⚠️ **the orchestration has
+deleted that sheet**, and you write it again in this ordinary mode, 🔴
+**the findings saying what the last one got wrong.** 📌 **A parameter,
+not a mode**: no `Mode:` line comes with it.
+
+🔴 **That sheet written, grep the block's later sheets for every symbol
+whose signature changed** — 📌 **the `fiche-executable.md` of the lots
+after it in the sequence, none of them coded** — and ⚠️ **rewrite the
+lines that carry it, as divergence mode does**: the same symbol, the
+same signature in each. 🔴 **The findings rewrite carries its own
+propagation** — 📌 **the orchestration runs no divergence call after
+it**, and a signature that did not change touches no later sheet.
 
 **Several stops in one walk**
 
@@ -604,7 +614,7 @@ means the signature takes a range, not a date.
 see *Deriving a signature from a rule*.
 
 📌 **The naming conventions apply here**, nowhere else, and 🔴 **the
-preamble's `Vocabulary` fixes the terms.**
+preamble's `## Intent and vocabulary` fixes the terms.**
 
 ⚠️ **A `desc-bug.md` has none** — 📌 **the terms are the feature's,
 already in the code.** 🔴 **A signature never renames what the feature
@@ -734,12 +744,13 @@ file.**
 | **The walk** | ⚠️ **No** — 📌 **the coded lot's code is the ground for the signature**, not the entries |
 | **Moves 1 and 2** | 🔴 **Yes, on the named lots, before anything else** — 📌 **the entries stay the ground for the criteria**, and the traps still change a signature |
 | **Moves 3 to 9** | 🔴 **On the named lots only** |
-| **One read the normal run never does** | 📌 **The block's other uncoded sheets** — ⚠️ **a symbol two sheets share is rewritten the same way in both** |
+| **One read the normal run does only after a findings rewrite** | 📌 **The block's other uncoded sheets** — ⚠️ **a symbol two sheets share is rewritten the same way in both** |
 
 🔴 **Rewrite only those sheets**, against the signature the code
 actually carries — grep it. ⚠️ **Leave the coded lots alone**: their
 sheets describe what was built.
 
-🔴 **`Edit` serves here and nowhere else** — 📌 **the sheets the prompt
-names are rewritten in place**, a shared symbol's line the same way in
-each. ⚠️ **Every other production of yours is a Write.**
+🔴 **`Edit` serves here, and in the propagation a findings rewrite
+carries — nowhere else** — 📌 **the sheets the prompt names are
+rewritten in place**, a shared symbol's line the same way in each. ⚠️
+**Every other production of yours is a Write.**

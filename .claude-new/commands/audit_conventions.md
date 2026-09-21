@@ -103,11 +103,12 @@ it stays that way.**
 for something a lot cannot supply on its own** — whatever that
 something is.
 
-📌 **The test is the scope, not the thing**: a lot produces symbols and
-touches the files its `Modifies` names. ⚠️ **A rule asking for anything
-beyond that — a symbol nobody produces, a declaration outside the code,
-a tool nobody installed — cannot be obeyed**, and the block comes much
-later, at detailing.
+📌 **The test is the scope, not the thing**: a lot produces or changes
+the symbols its `Produces` and `Modifies` name, and opens the files its
+`Touches` names. ⚠️ **A rule asking for anything beyond that — a symbol
+nobody produces, a declaration outside the code, a tool nobody
+installed — cannot be obeyed**, and the block comes much later, at
+detailing.
 
 **3. Two rules of one section asking for different shapes.** 🔴 **Pair
 them by the section of `TECHNICAL_CONVENTIONS.md` they sit in** — that

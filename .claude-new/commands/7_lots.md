@@ -164,8 +164,8 @@ most, which it counts.**
 |---|---|
 | `code/sequence.md` whose `## Defects` **carries no line** | 🔴 **The split holds.** See *the pending requests*, then stop and report |
 | `code/sequence.md` whose `## Defects` **carries lines**, and no blocking file | 🔴 **Stop** — 📌 **relay the defects**: the three rounds did not clear them |
-| `code/blocked_cadreur.md` **and** the request its `## Where` names, in `architecte/cadreur.md`, with an **empty** `## Verdict` | 📌 **The conventions fall short**: invoke `architecte`, invocation 3, then invoke `cadreur` again |
-| The request its `## Where` names with a **filled** `## Verdict`, and the Cadreur has not yet reported on it | 📌 **The Architecte has answered** — 🔴 **invoke `cadreur`**: the verdict is what lifts its block |
+| `code/blocked_cadreur.md` **and** the `# Request N` its `## Where` names, in `architecte/cadreur.md`, with an **empty** `## Verdict` | 📌 **The conventions fall short**: invoke `architecte`, invocation 3, then invoke `cadreur` again |
+| The `# Request N` its `## Where` names with a **filled** `## Verdict`, and the Cadreur has not yet reported on it | 📌 **The Architecte has answered** — 🔴 **invoke `cadreur`**: the verdict is what lifts its block |
 | The Cadreur reports **block standing** — `code/blocked_cadreur.md`, last `## Decision` empty, nothing lifting it | 🔴 **Stop.** Relay it — the Product Owner fills `## Decision`, and the Cadreur reads it on its next run |
 | The Cadreur reports **verdict refused** | 🔴 **Stop.** 📌 **Relay the request and its verdict** — ⚠️ **never invoke `cadreur` again on it**: nothing it can cut changes, and the Product Owner decides |
 | The Cadreur reports **decision applied**, and the file's last `## Decision` is filled — or reports **verdict applied** | 🔴 **Rename the file** — 📌 **the agent has no tool that removes one:**<br>`git mv code/blocked_cadreur.md code/blocked_cadreur-NN.md`<br>📌 **`NN`: the highest in the folder plus one, `01` when there is none.** ⚠️ **Anything left at the unnumbered name reads as a block still standing** |
@@ -181,9 +181,14 @@ as a block standing.
 
 🔴 **The two conventions rows key on one request, never on the whole
 of `architecte/cadreur.md`** — 📌 **the file holds every request this
-split raised, one heading block each**, and a mixed file — one verdict
-filled, another empty — is read block by block: ⚠️ **the block the
-blocking file's `## Where` names is the one that counts.**
+split raised, one `# Request N` heading each**, and a mixed file — one
+verdict filled, another empty — is read block by block: ⚠️ **the
+`# Request N` the blocking file's `## Where` names — as
+`architecte/cadreur.md — Request N` — is the one that counts.** 🔴
+**Read the number from `## Where`, then the block under that heading**
+— 📌 **a `## Where` naming the file alone points at every request it
+holds**, and you cannot tell which verdict lifts it: neither
+conventions row matches, and the file is a block standing.
 
 📌 **A `blocked_cadreur.md` at the third round** names what would not
 converge. ⚠️ **That is not a failure of the command** — 🔴 the split
@@ -266,11 +271,27 @@ would compete with them.
 
 ## Git, once it has reported
 
-**Then, once the split holds:**
+**Then, once the Cadreur — or the Architecte, when *the pending
+requests* ran it — has reported — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agents have no Bash and commit nothing**, and the renames of *How it
+   runs* — `code/redecoupage-NN.md`, `code/blocked_cadreur-NN.md`, the
+   `git rm` of `code/blocked_verificateur.md` — are staged, not
+   committed; 📌 **`git merge` takes the branch's commits, not the
+   worktree's files**, and `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
+
+⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
+**never force it**: 📌 **say what is left there, and stop.** 📌 **What
+is left is something step 1 did not stage** — a fault of this run,
+never of an agent: none of them was to commit it. Forcing the removal
+destroys it.
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.

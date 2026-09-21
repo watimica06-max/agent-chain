@@ -83,7 +83,7 @@ matches.**
 | 🔴 **A second argument names a `bugfix-NN`, and no row above matched** | 📌 **Nothing to invoke** — say so: ⚠️ **`/8_code` carries on**. 🔴 **The rows below are the feature folder's**: a `bugfix-NN` carries no technical document of its own to walk |
 | A `questions-architecte-NN.md` at the root with an empty `Answer:` | 🔴 **Nothing** — say which questions wait |
 | A `questions-architecte-NN.md` at the root, **answered** | **Invocation 2 — Integrating** — 🔴 **name the file in the prompt** |
-| A `questions-architecte-NN.md` at the root with **no `### Q`** | 🔴 **Nothing** — the derivation asked nothing. 📌 **Say `/7_lots`** |
+| A `questions-architecte-NN.md` at the root with **no `### Q`** | 🔴 **Nothing** — the derivation asked nothing. 📌 **File it and commit — the filing steps of *Git, before invoking*, no worktree — then say `/7_lots`** |
 | 🔴 **No `docs/TECHNICAL_CONVENTIONS.md`** | **Invocation 1 — Deriving** — 📌 **the first derivation this repository ever had** |
 | **It exists, and no `couverture.md` at the feature folder's root** | 🔴 **Invocation 4 — Completing** |
 | **It exists, and a `couverture.md` is there** | 📌 **Nothing to do** — say `/7_lots` |
@@ -134,10 +134,14 @@ own file is the walk's above, not this guard's.**
 ⚠️ **`git mv`, never a read-and-rewrite** — the agent must not open
 those files, and neither should you.
 
-🔴 **And every integrated `questions-architecte-*.md`** — 📌 **nothing
-stays at the root to carry the numbering**: ⚠️ **you give the agent its
-number in the prompt**, counting the root and `questions/architecte/`
-together.
+🔴 **And every `questions-architecte-*.md` at the root that is
+integrated, or that holds no `### Q`** — same `git mv`, into
+`questions/architecte/`. 📌 **Invocations 1 and 4 write their questions
+file whether they asked or not** — ⚠️ **left at the root, the empty one
+matches its row at every later run**; filed here, that row matches on
+the run right after the derivation and never again. 📌 **Nothing stays
+at the root to carry the numbering**: ⚠️ **you give the agent its number
+in the prompt**, counting the root and `questions/architecte/` together.
 
 📌 **Create `questions/<agent>/` if it does not exist.**
 
@@ -161,15 +165,6 @@ answers are invisible inside it, and the agent works on a stale file.
 📌 **Enter the worktree before invoking the agent**, not after it
 fails — the harness blocks a subagent's writes until the session is
 isolated.
-
-🔴 **The agent reports having applied a decision → rename its blocking
-file:**
-
-    git mv <folder>/blocked_architecte.md <folder>/blocked_architecte-NN.md
-
-📌 **`NN`: the highest in that folder plus one, `01` when there is
-none.** ⚠️ **The agent has no tool that removes a file** — 🔴 **left at
-the unnumbered name, the next run stops on it.**
 
 ---
 
@@ -227,16 +222,31 @@ notifies on completion. Do not pass it; wait for the notification.
 
 ## Git, once it has reported
 
-**Then, once the agent reports:**
+🔴 **The agent reports having applied a decision → rename its blocking
+file, inside the worktree, before the steps below:**
+
+    git mv <folder>/blocked_architecte.md <folder>/blocked_architecte-NN.md
+
+📌 **`NN`: the highest in that folder plus one, `01` when there is
+none.** ⚠️ **The agent has no tool that removes a file** — 🔴 **left at
+the unnumbered name, the next run stops on it.** 📌 **Step 1 carries the
+rename into the commit** — ⚠️ **done after it, the rename stays out of
+the merge and leaves the tree dirty for step 5.**
+
+**Then — 📌 five steps, in this order:**
 
 1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
-   agent has no Bash and commits nothing**; 📌 **`git merge` takes the
-   branch's commits, not the worktree's files**, and
-   `git worktree remove` refuses a dirty tree
-2. `git merge --no-ff -m "Merge <branch>" <branch>` from the main
+   agent has no Bash and commits nothing**, and the rename above is
+   staged, not committed; 📌 **`git merge` takes the branch's commits,
+   not the worktree's files**, and `git worktree remove` refuses a
+   dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff -m "Merge <branch>" <branch>` from the main
    checkout root
-3. `git push`
-4. `git worktree remove <path>`
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.**
 
@@ -265,6 +275,7 @@ Owner would otherwise learn of it from a file listing, at best.**
 | It raised questions | 📌 **Answer them, then `/conventions`** |
 | It raised a **product question** | 🔴 **The framing grid did not close the product** — ⚠️ **the Product Owner corrects the product file by hand**: 📌 **the behaviour is built in the next cycle, as a new behaviour** — 🔴 **no upstream turn re-runs** |
 | It raised an **`inconsistency`** | 🔴 **The technical document is wrong** — 📌 **say which entry**: the fix is upstream, in `/6_convertit`, not here |
+| It raised a **`forme`** question | 🔴 **The framing grid lacks a form, or one keeps producing a useless rule** — ⚠️ **the Product Owner amends the grid herself**, the grid's `R4`: 📌 **no rule is written for it**, `couverture.md` says what became of it |
 | It wrote a blocking file | 📌 **Fill its `## Decision`, then `/conventions`** |
 | It asked nothing, or everything is integrated | 📌 `/7_lots` |
 

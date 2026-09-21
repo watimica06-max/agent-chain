@@ -296,7 +296,7 @@ this block ever lifts.
 |---|---|---|---|
 | 1 | Compare and question | The final product file · the global | The merge plan · the next questions file |
 | 2 | Apply | The merge plan · **the questions file you wrote**, answered · the global | The updated global · the merge report — **or** the next questions file alone, on an ambiguous answer |
-| 3 | Bug-fix decisions | Every `bugfix-*/desc-bug.md` of the feature · `desc-produit-fusion.md` · **your answered questions file** at the root, when there is one · the global | The updated global · the next questions file |
+| 3 | Bug-fix decisions | Every `bugfix-*/desc-bug.md` of the feature · `desc-produit-fusion.md` · **your answered questions file** at the root, when there is one · the global | The updated global — **or the updated `desc-produit-fusion.md`, on a first feature** · the next questions file |
 
 🔴 **Grep the global's `^#` index, never read it whole** — 📌 **it is
 the whole product**, and you need a handful of sections.
@@ -354,7 +354,9 @@ alone.**
 
 🔴 **A global holding nothing but `# Application` is a first feature.**
 There is nothing to compare: **the plan is one line, `INIT`**, and no
-question comes out of it.
+question comes out of it. 📌 **Invocation 3 left it so** — what the
+corrections settled went into `desc-produit-fusion.md`, and the copy
+carries it over — see *Where invocation 3 writes*.
 
 📌 **Everything below applies to a global that already describes
 something.**
@@ -533,6 +535,25 @@ longer behaves that way.
 `desc-produit-fusion.md` · **your answered questions file** at the
 root, when there is one · the global.
 
+### Where invocation 3 writes
+
+🔴 **Test the global first, before reading a single `desc-bug.md`.**
+📌 **It holds more than `# Application` → you write into the global.**
+⚠️ **It holds nothing but `# Application` → you write into
+`desc-produit-fusion.md`, and never into the global.** 🔴 **That is a
+first feature**: invocation 1 tests the global for that one heading, and
+a line of yours in it would make `INIT` never fire — the feature would
+then be compared sentence by sentence against a near-empty global. 📌
+**`INIT` copies the product file over the global**, and what you merged
+into it crosses with the rest.
+
+🔴 **Every "the global" below reads `desc-produit-fusion.md` on a first
+feature** — the three levels, the title check, the fourth move alike.
+📌 **A block you place in it carries no `Genre:` line** — it is neither
+`directive` nor `hors périmètre`, and enters at `INIT` as such.
+
+---
+
 🔴 **`desc-bug.md`, never `bug-list.md`.** 📌 **A gap the diagnosis set
 aside produced no code** — carrying it into the global would describe a
 behaviour the application does not have; it stays in `desc-bug.md` with
@@ -599,6 +620,7 @@ the other. ⚠️ **An answer that settles none of what was asked is
 ambiguous** — it goes into the next questions file, restated with what
 left it open, never interpreted.
 
-**Output**: the global, updated · the next questions file — 🔴 **written
-even when empty.** 📌 **Empty, it says nothing was asked — or, after the
+**Output**: the global, updated — or `desc-produit-fusion.md`, on a
+first feature — · the next questions file — 🔴 **written even when
+empty.** 📌 **Empty, it says nothing was asked — or, after the
 fourth move, that every answer was applied.**

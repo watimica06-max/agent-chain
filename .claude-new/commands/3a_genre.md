@@ -51,12 +51,16 @@ is read** — the agent reads the file.
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
 one**, and that `/2_structure` has to run first.
 
-🔴 **Grep `^### Q` in each root `questions-*.md` before touching it** —
-📌 **a file holding questions is not yours to file**: ⚠️ **it waits on
-an answer, or its answers were never integrated.** 🔴 **Stop and say
-which.** 📌 **The qualifieur's own is no exception** — ⚠️ **answered, it
-goes through `/1_lexique` and `/2_structure`**, which integrate it and
-put it away; 🔴 **still at the root, it has not been through them.**
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
+`architecte` before touching it** — 📌 **a file holding questions is
+not yours to file**: ⚠️ **it waits on an answer, or its answers were
+never integrated.** 🔴 **Stop and say which.** 📌 **The qualifieur's own
+is no exception** — ⚠️ **answered, it goes through `/1_lexique` and
+`/2_structure`**, which integrate it and put it away; 🔴 **still at the
+root, it has not been through them.** 📌 **The architecte's is the one
+exception** — ⚠️ **it is `/conventions`'s, not this chain's**, and a
+`### Q` in it says nothing about the run; 🔴 **read the root as if it
+were not there** — and leave it there, see below.
 
 📌 **Filed, a file is read by no command again** — ⚠️ **and its answers
 are lost for good** — 🔴 **except under `questions/qualifieur/` and
@@ -100,16 +104,28 @@ writes this turn is the root's, until its answers are integrated.
 
 ## Which blocks it looks at
 
-**Two greps, and the union of what they return:**
+**Two greps, the union of what they return — and a third trigger, which
+names no block:**
 
 | Grep | What it names |
 |---|---|
 | `grep -B1 '^Genre:$'` | 🔴 **The blocks whose genre is empty** — the line above each hit carries the block |
 | `grep '^### .*MODIFIED'` | The blocks changed last turn, whose genre may have moved with them |
 
-📌 **Neither returns anything** → 🔴 **do not invoke.** 📌 **Commit
-what the filing moved, if anything, and push** — no worktree. ⚠️ **Say
-there is nothing to qualify**, and go to *What you relay*.
+🔴 **The third trigger is the answered file** — 📌 **the highest
+`questions-qualifieur-NN.md` under `questions/qualifieur/` holds a
+`### Q`** → 🔴 **invoke, that file named**, even when the two greps
+returned nothing — 📌 **then no block is listed.** ⚠️ **An answer
+naming a genre alone changes no block** — the Rédacteur leaves the text
+as it was, so no `MODIFIED` marks it and no `Genre:` line is empty; 📌
+**the agent finds the blocks its answers name, and it is there that the
+genre lands.** 🔴 **What silences the trigger is the agent's own next
+file**, empty — filed, it is the highest, and it holds no `### Q`.
+
+📌 **Neither grep returns anything, and that highest file holds no
+`### Q` — or there is none** → 🔴 **do not invoke.** 📌 **Commit what
+the filing moved, if anything, and push** — no worktree. ⚠️ **Say there
+is nothing to qualify**, and go to *What you relay*.
 
 ⚠️ **A block with a filled genre and no marker was qualified on an
 earlier turn**, and nothing about it has moved since.
@@ -149,13 +165,17 @@ Agent(
   model="sonnet",
   description="Qualify <name>",
   prompt="The product file: docs/features/<name>/desc-produit.md.
-          Look at these blocks: <B7, B62, B63>.
+          <Look at these blocks: B7, B62, B63.>
           Your questions file number: NN.
           <Plus: your answered questions file:
            docs/features/<name>/questions/qualifieur/questions-qualifieur-NN.md.>
           <Plus: blocked_qualifieur.md, every ## Decision is filled.>"
 )
 ```
+
+📌 **The `Look at these blocks` line carries what the two greps
+returned** — 🔴 **and goes when they returned nothing**: the answered
+file alone invoked, and the blocks it names are the agent's to find.
 
 🔴 **Never paraphrase its process** — not the genres, its checks, its
 output. It reads its own instructions.
@@ -196,8 +216,8 @@ is the one that lifts a rewrite.
 🔴 **Every stop below merges first.** ⚠️ **The agent has written
 its lines in the worktree** — 📌 **stopping before the merge loses the
 whole invocation, and a worktree holding unmerged work never
-self-cleans.** 🔴 **Merge, push, remove the worktree, and then report
-the defect.**
+self-cleans.** 🔴 **The five steps of *Git, once it has reported*, and
+then report the defect.**
 
 🔴 **Grep `-c '^Genre:$'` in `desc-produit.md`.** 📌 **Zero is what you
 expect** — ⚠️ **anything else means a block was left unqualified**, and
@@ -222,11 +242,19 @@ place the Product Owner can see one before the grid closes.**
 
 ## Git, once it has reported
 
-**Then, once it has reported:**
+**Then, once it has reported — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**, and the rename of *Once it
+   has reported* is staged, not committed; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.**
 
@@ -252,8 +280,8 @@ questions — 🔴 **and the per-block list, as the agent reports it.**
 | What just happened | Next |
 |---|---|
 | It wrote a blocking file — **a genre it could not settle, or two it read in one block** | 📌 Fill every `## Decision`, then `/3a_genre` again — ⚠️ **or the row below that the decision fits** |
-| It wrote a blocking file **and** a questions file with questions | 🔴 **Fill every decision first, then answer, then `/1_lexique`** — 📌 both end in the Rédacteur's hands |
-| A `## Decision` names a rewrite | 🔴 **`/2_structure`** — 📌 **it names the blocking file to the Rédacteur, which rewrites the block with `MODIFIED`.** ⚠️ **Then `/1_lexique` if the rewrite brought vocabulary, `/3_decoupe`, and back here** — 📌 **a block that called for two genres takes this route: the split is the decoupeur's, on the rewritten block** |
+| It wrote a blocking file **and** a questions file with questions | 🔴 **Answer the questions first, then `/1_lexique`** — 📌 **fill the decision second, once the answers are integrated.** ⚠️ **Both end in the Rédacteur's hands** — at the root together, `/2_structure` takes the answered file and leaves the blocking file for its next run |
+| A `## Decision` names a rewrite | 🔴 **`/2_structure`** — 📌 **it names the blocking file to the Rédacteur, which rewrites the block with `MODIFIED`.** ⚠️ **Then `/1_lexique` if the rewrite brought vocabulary, `/3_decoupe`, and back here** — 📌 **a block that called for two genres takes this route: the split is the decoupeur's, on the rewritten block.** ⚠️ **A rewrite that still holds two genres blocks again, on the same block** — 🔴 **each turn is a decision she writes, so the repetition is hers to see**: 📌 **a decision that says how to split the block settles it**, the Rédacteur splits what a decision tells it to |
 | A `## Decision` names a genre outside the list | 🔴 **Nothing runs** — ⚠️ **the tables have to carry it first**; say so |
 | 🔴 **The `^Genre:$` count is non-zero and no blocking file explains it** | 📌 **Say which blocks, and run `/3a_genre` once more** — ⚠️ **once, not until it clears**: 🔴 **a second run that leaves one empty stops there, the blocks named** — a line left empty by neither a block nor a decision is a defect of the run, and a third run would repeat it |
 | Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a genre in doubt is settled before the classeur gives a nature |

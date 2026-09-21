@@ -195,7 +195,8 @@ blocking file alone stops the run.
 
     ## Where
 
-    <the lot, section or file>
+    <the lot, section or file — on a conventions request,
+    `architecte/cadreur.md — Request N`>
 
     ## To resume
 
@@ -208,7 +209,10 @@ blocking file alone stops the run.
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 📌 **It is where the Product Owner answers, by hand.** ⚠️ **One block
 lifts otherwise**: 🔴 **a conventions request answered by the
-Architecte's `## Verdict`** — see the dispatch table.
+Architecte's `## Verdict`** — see the dispatch table. 📌 **Its
+`## Where` names the request by the `# Request N` heading that opens
+it** — ⚠️ **a `## Where` naming the file alone points at every request
+the file holds**, and the command cannot tell which verdict lifts it.
 
 📌 **Never block out of caution.**
 
@@ -224,11 +228,18 @@ declaration that requires something the project does not carry.
 the folder if it is not there** — you are often the first to write in
 it:
 
+    # Request 1
+
     ## What I need
     ## Why the lot cannot proceed
     ## Where I met it
     ## What I think it is        add · update · remove
     ## Verdict                   🔴 left empty
+
+🔴 **Every request opens on a `# Request N` heading** — 📌 **`1` for the
+first in the file, the next free number for each one after**, ⚠️
+**never one already used**: the blocking file's `## Where` and the
+Architecte's verdict both point at that number.
 
 🔴 **You describe what you lack, never the rule itself.** ⚠️ **You do
 not know whether it is a convention** — the Architecte does, and it is
@@ -237,15 +248,16 @@ his to settle.
 🔴 **Whether you also block is settled in *When you cannot produce*** —
 📌 **by what you can still cut**, never by a judgement on the request.
 
-🔴 **Two needs in one run go in one file**, one block of headings each.
-📌 **A file already there whose `## Verdict` is filled is answered** —
-⚠️ **you never reopen it**: write the new need under a fresh heading
-block, below.
+🔴 **Two needs in one run go in one file**, one block of headings each,
+🔴 **each under its own `# Request N`.** 📌 **A file already there whose
+`## Verdict` is filled is answered** — ⚠️ **you never reopen it**: write
+the new need under a fresh `# Request N`, below.
 
-🔴 **Either way, name it in `code/decoupage.md`** — see
-`## Conventions requests` under *What you write*. ⚠️ **Without it a
-request written on the fast path is invisible**: nothing else you
-produce mentions it.
+📌 **You name it nowhere else** — 🔴 **the command finds every request
+by globbing `architecte/`**, and a blocking file reaches its own by the
+`# Request N` its `## Where` carries. ⚠️ **A request written alone, with
+no blocking file beside it, is found the same way** — 📌 **nothing in
+`code/decoupage.md` has to point at it.**
 
 ---
 
@@ -311,7 +323,7 @@ which block of part 3 you run**, and you run that one only.
 
 | What you find | Which block |
 |---|---|
-| `code/blocked_cadreur.md` whose last `## Decision` is **empty**, **and the request its `## Where` names carries a filled `## Verdict`** in `architecte/cadreur.md` | 📌 **The verdict is what lifts it** — 🔴 **read it, apply it, and dispatch again on what remains** — see *D — A decision to apply* |
+| `code/blocked_cadreur.md` whose last `## Decision` is **empty**, **and the `# Request N` its `## Where` names carries a filled `## Verdict`** in `architecte/cadreur.md` | 📌 **The verdict is what lifts it** — 🔴 **read it, apply it, and dispatch again on what remains** — see *D — A decision to apply* |
 | `code/blocked_cadreur.md` whose last `## Decision` is **empty** | 🔴 **Stop** — say the blocking file still stands |
 | `code/blocked_cadreur.md` whose last `## Decision` is **filled** | **D**, then dispatch again on what remains |
 | `code/redecoupage.md` | **C** — 🔴 the coded lots are closed |
@@ -326,10 +338,10 @@ runs.
 
 🔴 **The first row keys on one request, never on the whole of
 `architecte/cadreur.md`** — 📌 **the file holds every request this split
-raised, one heading block each**, and a request answered in an earlier
+raised, one `# Request N` each**, and a request answered in an earlier
 run lifts nothing now. ⚠️ **A file holding one filled and one empty
-`## Verdict` is read block by block**: the block `## Where` names is
-the one that counts.
+`## Verdict` is read block by block**: the `# Request N` that `## Where`
+names is the one that counts.
 
 📌 **A redécoupage and defects at once** — 🔴 **`code/redecoupage.md`
 wins**: it comes from the code, and the defects were raised against a
@@ -491,7 +503,7 @@ it** — 🔴 **the gap is what has to be built.**
 |---|---|
 | It exists, and does not carry what is asked | The gap, against that symbol |
 | It does not exist | The whole of it |
-| It exists and already carries it | 🔴 **The entry goes in `## Entries with no lot`**, with that reason — 📌 **already carried by the code**. ⚠️ **Otherwise the Contrôleur reads it as a gap** |
+| It exists and already carries it | 🔴 **The entry goes in `## Entries with no lot`**, its line opening on `already carried by the code` — 📌 **the first of the three forms move 10 fixes**. ⚠️ **Any other opening, and the Contrôleur reads it as a gap** |
 
 📌 **Write it into `code/decoupage.md`, before the lots** — see *What
 you write*.
@@ -760,14 +772,26 @@ with its title:
 anchor** — the Détailleur would never open it.
 
 🔴 **An entry no lot cites is declared with no lot**, at the end of the
-list:
+list — 📌 **one line per entry, and the reason opens the line after the
+dash, in one of three forms**:
 
     ## Entries with no lot
 
-    §8.1 — carried by §4.1 and §5.2, nothing of its own to build
+    §4.7 — already carried by the code
+    §8.1 — carried by §4.1 and §5.2
+    §2.9 — nothing to build
 
-📌 **An entry attributing a rule to another, or setting a boundary,
-builds nothing.** ⚠️ **Its reason fits on one line.**
+| The reason opens on | When you write it |
+|---|---|
+| `already carried by the code` | 🔴 **Move 3 found the symbol already carrying what the entry asks** — ⚠️ **the only form `/9_controle` reads as built** |
+| `carried by §…` | 📌 **Other entries build it** — name each one; the lots citing them are its lots |
+| `nothing to build` | 📌 **An entry attributing a rule to another, or setting a boundary** — it builds nothing |
+
+🔴 **`/9_controle` reads the opening words alone** — 📌 **your prose,
+when there is any, follows a comma**: `§8.1 — carried by §4.1 and §5.2,
+nothing of its own to build`. ⚠️ **Never a fourth form**, and never
+the first on an entry the code does not already carry — 🔴 **that hides
+a gap.**
 
 🔴 **Every entry is either cited or declared here.** One that is
 neither is an omission, not a decision — **and nothing downstream can
@@ -808,8 +832,7 @@ a bug-fix cycle changes*:
       keeps the correction factor on the race      §2.3
 
 **Then five fields per lot, one lot after another** — and, at the end,
-`## Entries with no lot`, then `## Conventions requests` when you wrote
-one:
+`## Entries with no lot`:
 
     ## lot-01
 
@@ -845,10 +868,9 @@ move 6's table names.**
     ## lot-02
     ...
 
-🔴 **`## Conventions requests` names each file you wrote in
-`architecte/`**, one per line with what it asks for. ⚠️ **Omit the
-section when you wrote none** — unlike `## Entries with no lot`, an
-absent request is not ambiguous.
+📌 **No section for the conventions requests** — 🔴 **`architecte/` is
+where they are found**, by glob, and nothing in the lot list repeats
+them.
 
 🔴 **Lot numbers start at 1 in each feature** — no continuity with
 another feature, no continuity with the old task files.
@@ -1045,11 +1067,12 @@ you raised in this run sits below it, as *When you cannot produce*
 says, and keeps the file at its unnumbered name.
 
 **A conventions block lifts differently.** 🔴 **Its `## Where` names a
-request, and the Architecte answered in that request's `## Verdict`** —
-📌 **read it there, not in your own `## Decision`, which stays empty.**
-⚠️ **That request only**: `architecte/cadreur.md` holds every request
-this split raised, one heading block each, and the others' verdicts —
-filled in an earlier run, or still empty — lift nothing here.
+`# Request N`, and the Architecte answered in that request's
+`## Verdict`** — 📌 **read it there, not in your own `## Decision`,
+which stays empty.** ⚠️ **That request only**: `architecte/cadreur.md`
+holds every request this split raised, one `# Request N` each, and the
+others' verdicts — filled in an earlier run, or still empty — lift
+nothing here.
 
 | The verdict | What you do |
 |---|---|

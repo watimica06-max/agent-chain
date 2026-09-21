@@ -43,29 +43,36 @@ run**: its six files are what the invocations read beside their blocks.
 **2b.** 🔴 **`desc-par-nature.md` absent → stop.** Say `/5_reclasse` has
 to run first.
 
-**3. The blocking files** — `convertisseur/blocked_<nature>.md` and
-`convertisseur/blocked_transversal.md`, unnumbered:
+**3. The blocking files** — every unnumbered
+`convertisseur/blocked_<nature>.md` and `convertisseur/blocked_transversal.md`,
+📌 **read file by file** — ⚠️ **several can stand at once**, one per
+nature that blocked in the same run:
 
 | | What you do |
 |---|---|
 | None | 📌 Carry on |
-| One, its `## Decision` empty | 🔴 **Stop** — say which one still stands |
-| One, its `## Decision` filled | 📌 **Name it in that invocation's prompt** |
+| Any whose `## Decision` is empty | 🔴 **Stop** — say which ones still stand, ⚠️ **all of them**, never the first found |
+| Every one whose `## Decision` is filled | 📌 **Name each in its own nature's prompt** — `blocked_transversal.md` in invocation 2's |
 
-⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
-file.
+⚠️ **Read that one heading in each, nothing else** — 📌 the agent reads
+the file.
 
 ---
 
 ## Git, before invoking
 
-🔴 **Grep `^### Q` in each root `questions-*.md` before touching it** —
-📌 **a file holding questions is not yours to file**: ⚠️ **it waits on
-an answer, or its answers were never integrated.** 🔴 **Stop and say
-which.**
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
+`architecte` before touching it** — 📌 **a file holding questions is
+not yours to file**: ⚠️ **it waits on an answer, or its answers were
+never integrated.** 🔴 **Stop and say which.** 📌 **The architecte's is
+the one exception** — ⚠️ **it is `/conventions`'s, not this chain's**,
+and a `### Q` in it says nothing about the run; 🔴 **read the root as
+if it were not there** — and leave it there, see below.
 
 📌 **Filed, it is read by no command again** — ⚠️ **and its answers are
-lost for good.**
+lost for good** — 🔴 **except under `questions/convertisseur/`**, whose
+highest file this command names to a nature in its prompt, see *Which
+natures run*: ⚠️ **the agent reads it, never you.**
 
 🔴 **Then move every root `questions-*.md`:**
 
@@ -141,7 +148,7 @@ the lines under its `## <nature>` heading, up to the next `## `. 📌
 | `convertisseur/<nature>.md` holds `<<ASSUMED`, **and its part changed** | 🔴 **Runs** — ⚠️ **a mark is lifted only by writing its section again** |
 | 🔴 **Its `convertisseur/technique-<nature>.md` is answered** — it holds a `### Q` and no `^Answer:$` line, by grep | 🔴 **Runs** — 📌 **whatever its blocks did**: ⚠️ **a technical answer changes no block**, and without this row it would wait for ever. 📌 **Name the file in its prompt**. |
 | Either of the two, **its part byte-identical, and its `technique-<nature>.md` holds an `^Answer:$` line** | 📌 **Waits** — 🔴 **it does not run.** ⚠️ **It would read the same blocks, meet the same gap and ask the same question**: one opus invocation for a known result |
-| Either of the two, **its part byte-identical, and no `technique-<nature>.md` holding an `^Answer:$` line** | 🔴 **Runs** — 📌 **the product question it waits on is answered, and the answer changed no block**: ⚠️ **the rerun is what lifts the mark, its part unchanged** — one opus invocation, and the agent rewrites the section with the answer in hand |
+| Either of the two, **its part byte-identical, and no `technique-<nature>.md` holding an `^Answer:$` line** | 🔴 **Runs** — 📌 **the product question it waits on is answered, and the answer changed no block**: ⚠️ **the rerun is what lifts the mark, its part unchanged** — one opus invocation. 🔴 **Name in its prompt the highest `questions-convertisseur-NN.md` under `questions/convertisseur/`** — ⚠️ **the block does not carry the answer, that file does**: 📌 **without it the agent meets the same gap and marks again**, run after run |
 | `convertisseur/blocked_<nature>.md` carries a filled `## Decision` | 🔴 **Runs** — ⚠️ **a decision is applied only by the invocation it is named to** |
 | None of the above | 📌 **Kept as it stands** |
 
@@ -182,22 +189,30 @@ Agent(
   prompt="Feature folder: docs/features/<name>/.
           Invocation 1 — Nature: <nature>.
           <Plus: convertisseur/technique-<nature>.md, its question is answered.>
+          <Plus: questions/convertisseur/questions-convertisseur-NN.md, its
+           answers changed no block — the mark's answer is there.>
           <Plus: convertisseur/blocked_<nature>.md, its decision is filled.>"
 )
 ```
+
+📌 **The `questions-convertisseur-NN.md` line goes only to a nature the
+*part byte-identical, no answered technical file* row sent running** —
+⚠️ **a nature whose part changed reads the answer in its blocks**, and
+the file would tell it nothing the product file does not. 🔴 **You name
+the file; you open none of it** — the agent reads it.
 
 🔴 **Wait for all of them.**
 
 🔴 **First, grep for a new unnumbered `convertisseur/blocked_*.md`.**
 📌 **One is enough**: that nature is **blocked**, not missing, and not a
-nature that could write no rule. ⚠️ **Report it as blocked**, and go to
-*Once it has run* — 🔴 **never *go no further***.
+nature that could write no rule. ⚠️ **Report every one found as
+blocked**, and go to *Once it has run* — 🔴 **never *go no further***.
 
 🔴 **Every stop from here on merges first.** ⚠️ **Seven natures have
 written their sections in the worktree** — 📌 **stopping before the
 merge loses them all**, the blocking file included, and the Product
-Owner sees nothing. 🔴 **Merge, push, remove the worktree, then
-report.**
+Owner sees nothing. 🔴 **The five steps of *Git, once it has
+reported* — commit, leave, merge, push, remove — then report.**
 
 🔴 **Then check each wrote `convertisseur/questions-<nature>.md`**, and
 — 🔴 **when it wrote its section** — `convertisseur/<nature>-notes.md`:
@@ -340,8 +355,8 @@ what ends the loop.**
 
 ## Once it has run
 
-🔴 **A blocking file you named is filed** — `blocked_transversal.md`
-the same way:
+🔴 **Every blocking file you named is filed**, each on its own —
+`blocked_transversal.md` the same way:
 
     git mv docs/features/<name>/convertisseur/blocked_<nature>.md \
            docs/features/<name>/convertisseur/blocked_<nature>-NN.md
@@ -377,11 +392,19 @@ run.
 
 ## Git, once it has reported
 
-**Then, once it has reported:**
+**Then, once it has reported — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**, and the filings of *Once it
+   has run* are staged, not committed; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.
@@ -407,6 +430,13 @@ grep.
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
 
+🔴 **The first row that matches is the one you relay** — ⚠️ **a run can
+match two**: 📌 **a waiting nature makes the assembly write nothing and
+*The questions* write an empty file**, and the run then matches the
+waiting row and the last one. **The waiting row sits above; it wins.**
+⚠️ **The *Invocation 2's No* row is the one exception** — it adds to the
+row that matched above it, and never fires alone.
+
 | The run | Next |
 |---|---|
 | An invocation wrote a blocking file, **and nothing else asked** | 📌 Fill its `## Decision`, then `/6_convertit` again |
@@ -415,7 +445,7 @@ grep.
 | **Technical questions only** | 🔴 **Answer them, then `/6_convertit`** — 📌 **the short loop**: a technical answer changes no block, so nothing upstream has to run again |
 | **Product questions, alone or with technical ones** | 📌 **Answer them, then `/1_lexique`** — 🔴 **the long loop.** ⚠️ **Answer the technical ones too**: the agent integrates both when its turn comes round |
 | **A nature is waiting** on an unanswered technical question | 🔴 **Answer it, then `/6_convertit`** — 📌 **the document does not stand while one waits** |
-| **Invocation 2's *No*** — `tracabilite.md` missing beside a question | 🔴 **The row its question's kind takes, above** — 📌 **and say the document does not stand without its preamble**: ⚠️ **never the row below** |
+| **Invocation 2's *No*** — `tracabilite.md` missing beside a question | 🔴 **The row its question's kind takes, above, already fired** — 📌 **add that the document does not stand without its preamble**: ⚠️ **never the row below** |
 | Wrote an empty questions file, or found the document standing — ⚠️ **never a document without `# Preamble` or without `tracabilite.md`** | 📌 `/conventions`, then `/7_lots` — 🔴 the Cadreur reads the conventions in full. 📌 The merge, `/fusion_compare`, branches off here whenever you choose |
 
 ⚠️ **The short loop is an exception to the standing rule that every

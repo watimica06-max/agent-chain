@@ -228,9 +228,10 @@ it depends on most** — a module exists whether or not its file does.
 other symbols land in; when the lot has none, the module your request
 names** — 🔴 **say under `## Where I met it` which one you chose.**
 
-📌 **Name both in your report** — 🔴 **the placement and the request,
-under `## Placements not settled by the conventions`.** ⚠️ **The testeur
-and the realisateur read `## Declared` to find the symbol meanwhile.**
+📌 **The request is the only place the placement is written** — 🔴
+**`## Declared` names the file, as for any other symbol.** ⚠️ **The
+testeur and the realisateur read `## Declared` to find the symbol
+meanwhile.**
 
 **3. Write the declarations, each body throwing *not implemented*.**
 
@@ -311,11 +312,6 @@ file list is the diff from the earliest.
 
     <the blocking file the prompt named, or a dash>
 
-    ## Placements not settled by the conventions
-
-    <one line per symbol: the module it was placed in, and the request
-    that carries it — or a dash>
-
     ## Outside the lot
 
     <every file you wrote in that neither `## Files` nor `## Declared`
@@ -335,9 +331,8 @@ you applied** — 📌 **it is what the orchestration's rename keys on, and
 what tells the Relecteur a signature that differs from the sheet was
 decided**, ⚠️ **not drifted.**
 
-⚠️ **`## Decision applied`, `## Placements not settled by the
-conventions` and `## Outside the lot` are a dash or a list** — 🔴
-**never omitted.**
+⚠️ **`## Decision applied` and `## Outside the lot` are a dash or a
+list** — 🔴 **never omitted.**
 
 📌 **Nothing else in the report** — no judgement on the sheet, no
 summary of what the lot will do.

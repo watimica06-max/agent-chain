@@ -141,11 +141,19 @@ and each reads what the previous one wrote.
 
 ## Git, once it has reported
 
-**Then, once the agent reports:**
+**Then, once it has reported — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**, and the copy *On `INIT`*
+   makes is committed by nobody else; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.
@@ -177,6 +185,10 @@ written**: move every root `questions-*.md` to `questions/<its agent>/`:
 
     git mv docs/features/<name>/questions-<agent>-NN.md \
            docs/features/<name>/questions/<agent>/
+
+⚠️ **Never `questions-architecte-*.md`** — 🔴 **leave it at the root**:
+📌 **it waits for `/conventions`, which is the only command that reads
+it.**
 
 ⚠️ **`git mv`, never a read-and-rewrite.** 📌 **Create the folder if it
 does not exist**, and commit the moves.

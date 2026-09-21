@@ -451,14 +451,15 @@ demonstrated nothing, and a targeted fix would demonstrate nothing
 either.
 
 🔴 **`## Outside the lot` names every file the lot touched that neither
-its sheet's `## Files` nor `conception.md`'s `## Declared` names, or a
-dash** — 📌 **`## Files` carries the existing files the lot opens,
-`## Declared` the files the Concepteur created**: ⚠️ **a file in either
-is declared.** 🔴 **Check the three `## Outside the lot` fields together
-against the file list the prompt names** — 📌 **`conception.md`,
-`tests.md` and the report each declare their own**, and the diff starts
-at the concepteur's commit: a file changed and named in none of the
-five places is a change nobody can attribute.
+its sheet's `## Files`, `conception.md`'s `## Declared` nor `tests.md`'s
+`## Created` names, or a dash** — 📌 **`## Files` carries the existing
+files the lot opens, `## Declared` the files the Concepteur created,
+`## Created` the test file the Testeur created**: ⚠️ **a file in any of
+the three is declared.** 🔴 **Check the three `## Outside the lot`
+fields together against the file list the prompt names** — 📌
+**`conception.md`, `tests.md` and the report each declare their own**,
+and the diff starts at the concepteur's commit: a file changed and
+named in none of the six places is a change nobody can attribute.
 
 📌 **You do not judge whether the lot was right to touch it** — a
 decision may have authorised it, or it could not compile otherwise.

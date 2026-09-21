@@ -47,16 +47,23 @@ open `CURRENT_TECHNICAL_STATE.md`.
 
 ## Git, before invoking
 
-🔴 **Grep `^### Q` in each root `questions-*.md` before touching it** —
-📌 **a file holding questions is not yours to file**: ⚠️ **it waits on
-an answer, or its answers were never integrated.** 🔴 **Stop and say
-which.**
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
+`architecte` before touching it** — 📌 **a file holding questions is
+not yours to file**: ⚠️ **it waits on an answer, or its answers were
+never integrated.** 🔴 **Stop and say which.** 📌 **The architecte's is
+the one exception** — ⚠️ **it is `/conventions`'s, not this chain's**,
+and a `### Q` in it says nothing about the run; 🔴 **read the root as if
+it were not there** — and leave it there, see below.
 
 🔴 **Then move every root `questions-*.md` whose prefix is not
 `fusionneur`:**
 
     git mv docs/features/<name>/questions-<other>-NN.md \
            docs/features/<name>/questions/<other>/
+
+⚠️ **Never `questions-architecte-*.md`** — 🔴 **leave it at the root**:
+📌 **it waits for `/conventions`, which is the only command that reads
+it.**
 
 ⚠️ **`git mv`, never a read-and-rewrite** — the agent must not open
 those files, and neither should you.
@@ -139,11 +146,18 @@ and each reads what the previous one wrote.
 
 ## Git, once it has reported
 
-**Then, once the agent reports:**
+**Then, once the agent reports — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.

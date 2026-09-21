@@ -51,8 +51,10 @@ the split's root, and `blocked_architecte.md` at the working folder's
 root** — 📌 **the Détailleur blocks on a block, not on a lot; the
 Architecte on a missing input.** 📌 **Its `## Blocking N` headings and
 the numbered answers under `## Decision`** — empty, some, or one per
-heading — **and the `## Invocation` line of the Architecte's**, nothing
-more of it.
+heading — ⚠️ **or, on a file with no such heading, whether
+`## Decision` holds anything** — **and the `## Invocation` line of the
+Architecte's**, nothing more of it. 📌 **The two shapes are told apart
+under 4b.**
 
 **`code/<lot>/conception.md`** — 🔴 **its `## Decision applied` field
 alone**: it is where the Concepteur says it applied a decision.
@@ -80,6 +82,13 @@ file.
 ⚠️ **If `## Defects` is not empty**, stop: the split was never
 corrected. Run `/7_lots` first.
 
+⚠️ **If `code/blocked_verificateur.md` is there**, stop the same way:
+📌 **the Vérificateur writes it when an input it needs is missing**,
+and the split it could not check is not one to code against. 🔴 **It
+carries no `## Decision`** — nothing in it is the Product Owner's to
+fill; `/7_lots` retires it and runs the step before it again. Run
+`/7_lots` first.
+
 ---
 
 ## Git, before invoking
@@ -105,7 +114,13 @@ invoking anything.
 ⚠️ **The `concepteur`, the `testeur` and the `realisateur` commit
 inside it, lot by lot** — 📌 **each its own work, with a message
 reading `<lot>: <what the commit carries>`.** That is theirs; you do
-not commit for them.
+not commit for them. 🔴 **Everything else the run leaves in the
+worktree is yours to commit** — 📌 **the sheets, the verdicts, every
+blocking file, the renames of 4b**: the Détailleur and the Relecteur
+have no Bash, and the three that commit stage their own work only. ⚠️
+**You do it when the run ends** — see *Git, once it has reported* —
+**and before `/7_lots` at a split-back**, see *When the split comes
+back*; never lot by lot.
 
 ---
 
@@ -148,23 +163,37 @@ its check on `## Outside the lot` rests on that list.
 committing agents write `<lot>: <what the commit carries>` as their
 message**, so:
 
-    git log --reverse --format=%H --grep="^<lot>: "
+    git log -1 --format=%H --grep='^Revert "<lot>: '
+    git log --reverse --format=%H --grep="^<lot>: " <that sha>..HEAD
+
+🔴 **The first command finds the lot's most recent revert** — 📌 **a
+`sheet` cause or a redécoupage reverted an earlier coding of the lot**,
+and those reverted commits still match the second grep. ⚠️ **The list
+is the lot's commits after that revert, none of the reverted ones** —
+📌 **no revert found → the whole history**, `<that sha>..HEAD` left
+out.
 
 ⚠️ **The first line is the lot's first commit** — a blocked run's when
 one came before, the concepteur's otherwise. 📌 **The same list is what
-the revert of *When the split comes back* and of move 4 works on.**
+the revert of *When the split comes back* and of move 4 works on** —
+⚠️ **cut the same way**: a revert reverts one coding, never the
+commits an earlier revert already undid.
 
-📌 **An empty list means the realisateur committed nothing** — 🔴 **that
-counts as a failed attempt, and the Relecteur is not invoked.** ⚠️
-**Increment `## Attempts` yourself then, on a verdict that already
-exists** — from an earlier attempt of this lot: 📌 **nobody else
-writes on that verdict**, and the count would stall. 🔴 **No verdict
-yet → write none**: ⚠️ **a verdict is the Relecteur's file**, and
-inventing `## Verified`, `## Findings` and `## Cause` for a review
-that never ran is worse than a count held in this run. 📌 **Count the
-empty attempt in this run**, and invoke the fresh `realisateur` with
-no `Verdict:` line — 🔴 **it takes the lot from move 1, as a first
-run.**
+🔴 **The list is never empty on a lot that reached this move** — 📌
+**the concepteur's and the testeur's commits fill it** — ⚠️ **so it
+cannot tell you whether the Réalisateur committed.** 🔴 **`git
+rev-parse HEAD` before invoking the Réalisateur, and again once it has
+reported**: 📌 **the same sha is the empty attempt** — the Réalisateur
+committed nothing. 🔴 **That counts as a failed attempt, and the
+Relecteur is not invoked.** ⚠️ **Increment `## Attempts` yourself
+then, on a verdict that already exists** — from an earlier attempt of
+this lot: 📌 **nobody else writes on that verdict**, and the count
+would stall. 🔴 **No verdict yet → write none**: ⚠️ **a verdict is the
+Relecteur's file**, and inventing `## Verified`, `## Findings` and
+`## Cause` for a review that never ran is worse than a count held in
+this run. 📌 **Count the empty attempt in this run**, and invoke the
+fresh `realisateur` with no `Verdict:` line — 🔴 **it takes the lot
+from move 1, as a first run.**
 
 📌 **If `code/<lot>/reprise_realisateur.md` is there**, 🔴 **name it in
 the Réalisateur's prompt**: a run before it got part of the lot done
@@ -184,20 +213,33 @@ Réalisateur** — 📌 **the fault is upstream, in the sheet.** What you do,
 in this order:
 
 1. 🔴 **Revert the lot's commits** — 📌 **the `git log` list of move 3,
-   newest first**, `git revert --no-edit <sha>` on each. ⚠️ **A
-   conflict stops the command**: `git revert --abort`, say so, and
-   resolve nothing
+   cut after the lot's last revert, newest first**, `git revert
+   --no-edit <sha>` on each. ⚠️ **A conflict stops the command**: `git
+   revert --abort`, say so, and resolve nothing
 2. 🔴 **Delete `code/<lot>/fiche-executable.md`, `conception.md` and
    `tests.md`** — ⚠️ **the verdict stays**: its `## Attempts` is the
    count
 3. 🔴 **`detailleur` on the block, in its ordinary mode** — 📌 **the lot
    has no sheet now, so it writes it again** — ⚠️ **with the verdict's
    `## Findings` in the prompt**, a `Findings:` line carrying them
-   copied. 📌 **A parameter, not a mode**: no `Mode:` line with it
+   copied, **and the lot named**. 📌 **A parameter, not a mode**: no
+   `Mode:` line with it
 4. **Then move 2 on the lot**, as on a lot never coded
 
 📌 **It counts as an attempt** — 🔴 **the Relecteur already
 incremented `## Attempts` on that verdict**, and the cap below applies.
+
+⚠️ **A `sheet` cause on a lot that is not the last coded** — 📌 **a lot
+already carrying a PASS, re-run on a filled `## Decision`, see *Where
+you stop and hand back*** — 🔴 **takes every lot after it in the
+sequence down with it**: ⚠️ **their code was built on the signature the
+sheet got wrong.** 📌 **Revert their commits and delete their files
+too, PASS or not, as *When the split comes back* does for the lots
+with no PASS** — `fiche-executable.md`, `conception.md`, `tests.md`
+and `verdict.md` each. 🔴 **No `/7_lots`**: the split stands. Step 3
+writes the lot's sheet again; move 1 writes the later lots' when their
+turn comes, and the loop resumes at the first lot with no PASS — this
+one.
 
 🔴 **`## Attempts` reaching 3 stops the lot** — 📌 **three codings, the
 first included.** ⚠️ **Relay the last verdict and stop**: the lot is
@@ -231,13 +273,27 @@ stops on the Product Owner.**
 | | |
 |---|---|
 | **Its `## Decision` is empty** | 🔴 **Stop** — ⚠️ **invoking again re-raises the same block** |
-| **Some numbers answered, others not** — 📌 **fewer numbered answers under `## Decision` than `## Blocking N` headings** | 🔴 **Stop, and do not rename** — ⚠️ **the agent applied the answered ones before it stopped**, and the rest wait on the Product Owner as on an empty `## Decision`. 📌 **A rename would bury the numbers still open** |
-| **Filled** — 📌 **one answer per `## Blocking N`** | 📌 **Name it in the agent's prompt**, and 🔴 **rename it once the agent reports having applied it**:<br>📌 **At the path it sits at** — `code/<lot>/` for the four agents of the loop, `code/` for the detailleur, the working folder's root for the architecte.<br>`git mv code/<lot>/blocked_<agent>.md code/<lot>/blocked_<agent>-NN.md`<br>📌 **`NN`: the highest in that folder plus one, `01` when there is none** |
+| **Some numbers answered, others not** — 📌 **fewer numbered answers under `## Decision` than `## Blocking N` headings**, on the numbered shape alone | 🔴 **Stop, and do not rename** — ⚠️ **the agent applied the answered ones before it stopped**, and the rest wait on the Product Owner as on an empty `## Decision`. 📌 **A rename would bury the numbers still open** |
+| **Filled** — 📌 **by the test of its shape, below** | 📌 **Name it in the agent's prompt**, and 🔴 **rename it once the agent reports having applied it**:<br>📌 **At the path it sits at** — `code/<lot>/` for the three agents of move 2 and for the Relecteur's, when *Where you stop and hand back* sends you here; `code/` for the detailleur, the working folder's root for the architecte.<br>`git mv code/<lot>/blocked_<agent>.md code/<lot>/blocked_<agent>-NN.md`<br>📌 **`NN`: the highest in that folder plus one, `01` when there is none** |
 
-🔴 **Count the numbered answers against the `## Blocking N` headings** —
-📌 **a grep of `^## Blocking ` and of the numbered lines under
-`## Decision`**: ⚠️ **a file is filled when every heading has its
-number**, never when the field merely holds text.
+🔴 **`code/<lot>/blocked_relecteur.md` is not in this table** — 📌 **its
+`## Decision` is empty by shape**, nobody fills it, and the first row
+would stop on a file the act retires. ⚠️ **The table under *Where you
+stop and hand back* is what handles it.**
+
+🔴 **Filled is read by shape, and two shapes reach you:**
+
+- 📌 **A file with `## Blocking N` headings** — the Détailleur's and the
+  Réalisateur's, the two the Arbitre settles — 🔴 **is filled when
+  every heading has its number**: ⚠️ **a grep of `^## Blocking ` and
+  of the numbered lines under `## Decision`**, never the field merely
+  holding text. 📌 **An entry still waiting has no number written at
+  all** — that is the Arbitre's signal, and the second row reads it
+- 📌 **A file with no `## Blocking N` heading** — the Concepteur's and
+  the Testeur's four `##` headings, the Architecte's with its
+  `## Invocation` line — 🔴 **is filled when `## Decision` holds
+  anything**: ⚠️ **one block, one answer, nothing to count.** 📌 **Grep
+  `-A2 '^## Decision$'`** — nothing under the heading is empty
 
 🔴 **The rename is yours, never the agent's** — 📌 **none of the six has
 a tool that removes a file.** ⚠️ **Left at the
@@ -292,17 +348,30 @@ sheet**: 📌 **the propagation silently does not happen.**
 retried**: the retry may revert the very signature you propagated.
 
 📌 **The ordinary-mode prompt after a `sheet` FAIL** — see move 4 —
-carries the verdict's findings and no `Mode:` line:
+carries the verdict's findings, the lot they bear on, and no `Mode:`
+line:
 
 ```
 Agent(
   subagent_type="detailleur", model="opus",
   description="Detail <block>, <feature>",
   prompt="Working folder: <the working folder>. Your block: <block>.
+          Your lot: <lot>.
           Findings: <the ## Findings of code/<lot>/verdict.md, copied>.
           <Plus: code/blocked_detailleur.md, its decision is filled.>"
 )
 ```
+
+🔴 **The `Your lot:` line names the lot whose sheet you deleted** — 📌
+**the Détailleur takes it from the prompt, never as the one it finds
+without a sheet**: ⚠️ **a block half-detailed holds other lots with no
+sheet**, and the findings would land on the wrong one.
+
+📌 **That rewrite carries its own propagation** — 🔴 **the Détailleur
+greps the block's later sheets for every symbol whose signature
+changed, and rewrites them as its divergence mode does.** ⚠️ **You run
+no divergence call after it**: move 5 is for a final verdict's
+`## Symbol divergences`, and a `sheet` FAIL has none.
 
 📌 **You read five fields of a verdict** — 🔴 **`## Status`,
 `## Attempts`, `## Cause`, `## Causes so far` and
@@ -310,9 +379,17 @@ Agent(
 into the Détailleur's prompt on a `sheet` cause**: 📌 **what it says is
 the fresh Réalisateur's or the Détailleur's to judge, not yours.**
 
-**6. Look for `stop.md` at the feature folder's root** — 🔴 **from the
-main checkout, never from a worktree**: a worktree holds a copy frozen
-at its creation and would never see a file created after it.
+**6. Look for `stop.md` at the feature folder's root** — 🔴 **in the
+main checkout, never in the worktree**: 📌 **the Product Owner creates
+it there, after the worktree was cut**, and a file created in the main
+checkout never reaches a worktree cut before it.
+
+⚠️ **The opposite holds for a `## Decision` she fills while a run is
+live** — 📌 **she opens the worktree and answers there**, where the
+Arbitre's poll reads the blocking file; 🔴 **a decision written in the
+main checkout reaches no agent running in the worktree.** 📌 **Two
+files, two places**: `stop.md` in the main checkout, a blocking file
+where the agent that wrote it runs.
 
 📌 **Present → stop here**, whatever lots remain. **The lot just
 finished is merged and pushed; nothing is lost.** ⚠️ **Say how many
@@ -479,6 +556,22 @@ problem the split can solve**, and the Product Owner decides.
 📌 **Across runs, not within one** — 🔴 **the archived files are the
 count**, and a run stopped and resumed does not start it over.
 
+🔴 **Stopping there, you still do everything below but `/7_lots` and
+the fresh worktree** — 📌 **the reverts, the deletions, and the five
+git steps that close the worktree**: ⚠️ **`code/redecoupage.md` and the
+blocking file reach `HEAD` tracked**, where she reads them, and the
+tree she runs `/7_lots` on is the one it expects. 🔴 **A stop that
+leaves them in an unmerged branch hands her nothing.**
+
+📌 **What resets the count is hers** — 🔴 **she writes her decision
+into `code/redecoupage.md` under a `## Décision du Product Owner`
+heading, then runs `/7_lots` by hand**, which archives the file with
+that heading inside. ⚠️ **Count only the archived files numbered above
+the highest one carrying that heading** — 📌 **a grep of
+`^## Décision du Product Owner` across `code/redecoupage-*.md`** — plus
+the one now at `code/redecoupage.md`. 🔴 **None carries it → every
+archived file counts.**
+
 📌 **What came back and what was done with it is `/7_lots`'s to
 relay** — 🔴 **it reads `code/redecoupage.md` before renaming it**; you
 relay nothing of it.
@@ -487,7 +580,9 @@ relay nothing of it.
 sent back, and every other lot of the sequence whose `verdict.md` is
 absent or whose `## Status` does not start with `PASS`**: their code
 was written against the old split. ⚠️ **The `git log` list of move 3
-per lot, newest first**, `git revert --no-edit <sha>` on each. 🔴 **A
+per lot, cut after that lot's last revert, newest first**, `git revert
+--no-edit <sha>` on each — 📌 **a lot already reverted by an earlier
+run gives an empty list, and nothing is reverted twice.** 🔴 **A
 conflict stops the command**: `git revert --abort`, say so, and resolve
 nothing — the Product Owner decides.
 
@@ -507,15 +602,16 @@ sheet does not rewrite it**, and would detail against a lot that
 changed shape. 📌 **Move 2 runs the concepteur and the testeur again the
 same way**: their reports gone, they are not skipped.
 
-🔴 **Then close your worktree, before running `/7_lots`** — 📌 **in
-this order:**
+🔴 **Then close your worktree, before running `/7_lots`** — 📌 **the
+five steps of *Git, once it has reported*, in this order:**
 
 1. `git add` and `git commit`, inside the worktree — 🔴 **everything
    the lots coded this run, the reverts, the deletions,
    `code/redecoupage.md` and the blocking file**
-2. `git merge --no-ff <branch>` from the main checkout root
-3. `git push`
-4. `git worktree remove <path>`
+2. **Leave the worktree** — the merge is refused from inside it
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 ⚠️ **`/7_lots` creates its worktree from `HEAD`** — 📌 **and yours was
 a branch of its own**: unmerged, none of this run's lots are in the
@@ -545,9 +641,13 @@ relay what it said. **There is no split to code against.**
 
 ## Where you stop and hand back
 
-📌 **A Détailleur reporting that its block waits on the split** — 🔴
-**`code/redecoupage.md` still there → run `/7_lots`**; ⚠️ **gone → the
-blocking file was never closed**: say which file, and stop.
+📌 **A Détailleur reporting that its block waits on the split, or a
+Réalisateur that its lot does** — 🔴 **`code/redecoupage.md` still
+there → *When the split comes back*, from its count**: ⚠️ **a run
+stopped before `/7_lots` ran resumes there, never at `/7_lots`
+straight** — the count is what a third return stops on, and the
+reverts already made give an empty list. ⚠️ **Gone → the blocking file
+was never closed**: say which file, and stop.
 
 🔴 **A `blocked_*.md` whose `## Decision` is still empty**, wherever it
 sits — 📌 **three places:**
@@ -595,7 +695,9 @@ may change with the decision.
 📌 **A filled `## Decision` is not a stop** — invoke the agent it names
 on the lot it names, and let it apply the decision. ⚠️ **Even on a lot
 already carrying a PASS**: a block left unsettled on an earlier run is
-answered whenever the Product Owner fills it.
+answered whenever the Product Owner fills it. 🔴 **Its review then
+runs again, and a `## Cause` of `sheet` on it takes the later lots
+down** — see move 4.
 
 🔴 **What the Contrôleur reports never comes back this way** — 📌 **a
 missing intention goes into a `bug-list.md` and a correction cycle**,
@@ -613,16 +715,26 @@ fix that passes: carry on.
 
 ## Git, once it has reported
 
-**When the run ends:**
+**When the run ends — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   Détailleur and the Relecteur have no Bash and commit nothing, and
+   the three that commit stage their own work only**: the sheets, the
+   verdicts, every blocking file and the renames of 4b are still
+   uncommitted. 📌 **`git merge` takes the branch's commits, not the
+   worktree's files**, and `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
-⚠️ **A worktree with uncommitted files refuses a plain remove** — 🔴
-**never force it**: 📌 **say what is left there, and stop.** ⚠️ **An
-agent handed back leaving work uncommitted is a fault of that agent**,
-and forcing the removal destroys it.
+⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
+**never force it**: 📌 **say what is left there, and stop.** 📌 **What
+is left is something step 1 did not stage** — a fault of this run,
+never of an agent: none of them was to commit it. Forcing the removal
+destroys it.
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.

@@ -77,9 +77,13 @@ says `comportement`. ⚠️ **One hit and you stop**: say which, and that
 📌 **A block of any other genre carries an empty `Nature:`, and that is
 right** — 🔴 **only a behaviour has one.**
 
-🔴 **Grep `^### Q` in each before touching it** — 📌 **a file holding
-questions is not yours to file**: ⚠️ **it waits on an answer, or its
-answers were never integrated.** 🔴 **Stop and say which.**
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
+`architecte` before touching it** — 📌 **a file holding questions is
+not yours to file**: ⚠️ **it waits on an answer, or its answers were
+never integrated.** 🔴 **Stop and say which.** 📌 **The architecte's is
+the one exception** — ⚠️ **it is `/conventions`'s, not this chain's**,
+and a `### Q` in it says nothing about the run; 🔴 **read the root as if
+it were not there** — and leave it there, see below.
 
 📌 **Filed, it is read by no command again** — ⚠️ **and its answers are
 lost for good.**
@@ -88,6 +92,10 @@ lost for good.**
 
     git mv docs/features/<name>/questions-<agent>-NN.md \
            docs/features/<name>/questions/<agent>/
+
+⚠️ **Never `questions-architecte-*.md`** — 🔴 **leave it at the root**:
+📌 **it waits for `/conventions`, which is the only command that reads
+it.**
 
 📌 **This command reads none of them.** 🔴 **A questions file stays at
 the root only while it waits to be answered or integrated** — ⚠️ **the
@@ -106,7 +114,7 @@ whole:**
 
 | File | Who reads it |
 |---|---|
-| `par-genre/comportements.md` | 🔴 **This command's second move**, then the Convertisseur |
+| `par-genre/comportements.md` | 🔴 **This command's second move, and nothing else** — ⚠️ **the Convertisseur reads `convertisseur/<nature>-input.md`**, which `/6_convertit` copies from `desc-par-nature.md` |
 | `par-genre/transverses.md` | 📌 **The Convertisseur — its invocation 2, alone**: ⚠️ **no nature invocation opens it** |
 | `par-genre/directives.md` | The Architecte |
 | `par-genre/references.md` | The Convertisseur — its Text section |

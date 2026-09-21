@@ -224,8 +224,9 @@ never the content of what you wrote:
   when it is zero.**
 - **Every `coverage` question**, one line each — 📌 **its answer is a
   behaviour, and this line is the only thing that carries it out.**
-- 📌 **A directive that overrode a rule**, and 📌 **an inconsistency
-  answer that has to be fixed upstream** — ⚠️ **when there were any.**
+- 📌 **A directive that overrode a rule**, 📌 **an inconsistency answer
+  that has to be fixed upstream**, and 📌 **a `forme` answer, which
+  amends the grid and not the file** — ⚠️ **when there were any.**
 
 ⚠️ **A question you raised and did not report is a question nobody
 reads.** 📌 **The Product Owner does not go looking through the folder.**
@@ -414,12 +415,19 @@ matching by hand.**
 
 | | |
 |---|---|
-| **A block whose traceability line is a dash** | 📌 **It produced no entry** — ⚠️ **the technical document does not carry it** |
+| **A block whose traceability line is a dash, and whose `Genre:` is `comportement` or `référence`** | 📌 **It produced no entry** — ⚠️ **the technical document does not carry what the product asked for** |
 | **An entry no traceability line names** | 📌 **It came from no block** — ⚠️ **the document carries something the product did not ask for** |
 
 🔴 **Both are `inconsistency`** — 📌 **the answer corrects the technical
 document, not the conventions file.** ⚠️ **The work carries on**; the
 file is not finished while one stands.
+
+🔴 **A dash on a block of any other genre raises nothing** — 📌 **a
+`directive`, a `hors périmètre`, a `recette` or a `transverse` block
+gives no entry by design**, and the Convertisseur writes the dash on
+purpose: ⚠️ **it says someone looked and found none.** 📌 **The genre is
+the block's `Genre:` line in `desc-produit.md`**, which invocations 1
+and 4 read whole — 🔴 **never inferred from the block's title.**
 
 📌 **No `tracabilite.md`** — match on titles, and say in the questions
 file that you did.
@@ -495,7 +503,7 @@ you read*.
 |---|---|
 | **Coverage** — a behaviour question the corpus answers nowhere | 🔴 **Raise it, and mark it a product question** — see below |
 | **Conjunction** — the question arises between two entries, each complete on its own | 🔴 **Raise it.** No grid could have seen it |
-| **Inconsistency** — the corpus contradicts itself: a block whose traceability line is a dash, two numbers that disagree | 🔴 **Raise it, and say the answer lands in the technical document**, not here |
+| **Inconsistency** — the corpus contradicts itself: a behaviour or reference block whose traceability line is a dash, two numbers that disagree | 🔴 **Raise it, and say the answer lands in the technical document**, not here |
 | **Precision** — the behaviour is settled, at a coarser grain than the code needs | 📌 **Settle it yourself** and write it down |
 
 ### A coverage gap is a product question
@@ -660,6 +668,19 @@ product file herself.**
 report**: the question, and that its answer is a behaviour. ⚠️ **That
 line is the only thing that carries it out of this file.**
 
+⚠️ **An answer to a `forme` question is not a rule either** — 📌 **it
+amends the grid**, and the Product Owner makes that amendment herself —
+the grid's `R4`. 🔴 **You write nothing in the conventions file for it,
+and nothing in the grid.**
+
+📌 **Its `couverture.md` line records what became of it** — 🔴 **what its
+`Block:` named, and either `grille amendée` or `question ouverte`.** ⚠️
+**Without it, nothing on disk says the form was asked for**, and the
+next invocation raises it again.
+
+🔴 **And you name it in your report**: the question, and that its answer
+is a grid amendment the Product Owner makes herself.
+
 ---
 
 ## INVOCATION 3 — Requests
@@ -683,11 +704,18 @@ you.
 **Read** `architecte/` in the working folder — 🔴 **glob it, that
 folder alone** — plus the grid and the conventions in force.
 
-🔴 **Open only the requests whose `## Verdict` is empty** — 📌 **grep the
-folder for a filled one and skip those files.** ⚠️ **A settled request
-is history**: 🔴 **its verdict is written, its rule is in the
-conventions**, and re-reading it costs the whole folder at every lot
-that raises one.
+🔴 **Open every file of the folder, and settle every request block whose
+`## Verdict` is empty** — 📌 **a file may hold several requests, one
+block of headings each**: `architecte/cadreur.md` stacks every request
+the split raised, ⚠️ **each opening on a `# Request N` heading**, and
+its second request sits below a first one already answered. 🔴 **You
+skip blocks, never files** — 📌 **a file is skipped whole only when every
+block it holds carries a filled `## Verdict`**, and ⚠️ **a block with no
+`## Verdict` heading at all is an empty one** — see move 1.
+
+⚠️ **A settled block is history**: 🔴 **its verdict is written, its rule
+is in the conventions**, and you never reopen it — 📌 **the empty one
+below it is the request.**
 
 ⚠️ **No folder, or no request with an empty `## Verdict`** — say so and
 stop. 📌 **That is a normal outcome**, not a blocker.
@@ -701,10 +729,16 @@ files.** 📌 **Everywhere else those are forbidden.**
 one rule** — they become a single change. 🔴 **The order you treat them
 in is yours.**
 
-📌 **You treat the requests whose `## Verdict` is empty**, and those
-alone. **A filled one is done.** ⚠️ **A request with no `## Verdict`
-heading at all counts as empty** — 🔴 **you add the heading and write
-under it**: a request with no verdict reads as one nobody looked at.
+📌 **You treat the request blocks whose `## Verdict` is empty**, and
+those alone. **A filled one is done.** ⚠️ **A request with no
+`## Verdict` heading at all counts as empty** — 🔴 **you add the heading
+and write under it**: a request with no verdict reads as one nobody
+looked at.
+
+🔴 **The verdict goes under the block it answers** — 📌 **in a stacked
+file, under the `# Request N` that opens that block**, never at the
+file's end: ⚠️ **the blocking file's `## Where` names that `N`**, and the
+Cadreur reads the verdict there.
 
 **2. Look it up.** 🔴 **Three questions, in this order**: does the
 platform impose it? does a tool the project could name already check
@@ -732,7 +766,9 @@ names something the file says under another shape.**
 
 🔴 **A rule you add here gets its `couverture.md` line too** — 📌 **the
 request's file name in the first column instead of an entry**, and
-`requête` where the nature would be.
+`requête` where the nature would be. ⚠️ **In a stacked file the name
+alone points at every request it holds** — 🔴 **add the block's
+`# Request N`**: `architecte/cadreur.md — Request 2`.
 
 📌 **On a `bugfix-NN/` the line goes one level up, in the feature
 folder's `couverture.md`** — ⚠️ **and its first column carries the

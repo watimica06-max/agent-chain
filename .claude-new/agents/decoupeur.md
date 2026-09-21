@@ -131,12 +131,28 @@ back.** 🔴 **The blocking file names the block you stopped on** — 📌
 **and nothing of the rerun rests on it**: the blocks you never reached
 still carry their markers, and the next turn's greps name them again.
 
-| Field | What it holds |
-|---|---|
-| What blocks | The fact, not your reading of it |
-| Where | The block |
-| To resume | A decision, a correction upstream |
-| Decision | 🔴 **Written empty** — the Product Owner answers by hand |
+**Its shape** — four headings, the last one left empty:
+
+    ## What blocks
+
+    <the fact, not your reading of it — in one sentence>
+
+    ## Where
+
+    <the block>
+
+    ## To resume
+
+    <a decision, a correction upstream>
+
+    ## Decision
+
+    <left empty — the Product Owner writes here>
+
+🔴 **The `## Decision` heading is written empty, and never omitted.**
+📌 **It is where the Product Owner answers, by hand** — ⚠️ **and what
+`/3_decoupe` and `/2_structure` grep**: 🔴 **a field in a table, they
+would not find.**
 
 ⚠️ **Blocking is not signalling.** 🔴 **Block only when splitting is
 impossible** — 📌 **which is one case, and you can see it in the block

@@ -19,13 +19,20 @@ Feature folder: `docs/features/$ARGUMENTS/`
 The global is not revised while a downstream cycle is running on the
 same scope.
 
+📌 **A run after the merge is not planned** — ⚠️ **row 4 stops on
+`rapport-fusion.md` for good**, and a `bugfix-NN` coded afterwards has
+no route of this command into the global. 🔴 **If one must happen, the
+Product Owner restores the old global from git by hand first** — 📌
+**the compare expects a global the feature has not reached yet**, and
+would otherwise run against its own previous merge.
+
 ---
 
 ## What you read
 
 **Only what the routing table tests** — the presence of files, whether
-a `## Decision` or an `Answer:` field is empty, what a filled blocking
-file's `## Invocation` line says — the file numbers *Git, before
+a `## Decision` or an `Answer:` field is empty, what a blocking file's
+`## Invocation` line says — the file numbers *Git, before
 invoking* reads off their names, and the one grep *On `INIT` — the
 copy* names. 🔴 **Never their content beyond that.**
 
@@ -41,16 +48,24 @@ matches.**
 | # | Test | What you do |
 |---|---|---|
 | 1 | `desc-produit.md` absent | 🔴 **Error** — say so and stop |
-| 2 | A `blocked_*.md` with an empty `## Decision` | 🔴 **STOP** — relay it |
-| 3 | A `blocked_*.md` with a filled `## Decision` | 📌 **The agent its name carries**, at the invocation its `## Invocation` line names — 🔴 **name the file in the prompt** |
+| 2 | 🔴 **`blocked_redacteur.md` whose `## Invocation` says 3, or `blocked_fusionneur.md`**, with an empty `## Decision` | 🔴 **STOP** — relay it |
+| 3 | One of those two, with a filled `## Decision` | 📌 **The agent its name carries**, at the invocation its `## Invocation` line names — 🔴 **name the file in the prompt**; 📌 **the Rédacteur's names the decisions files too**, as row 6 does |
 | 4 | `rapport-fusion.md` exists | 🔴 **STOP** — the merge is done |
-| 5 | A root questions file with an empty `Answer:` | 🔴 **STOP** — relay it |
+| 5 | A root questions file with an empty `Answer:` — 📌 **`questions-architecte-*.md` excepted** | 🔴 **STOP** — relay it |
 | 6 | 🔴 **`desc-produit-fusion.md` absent** | **Rédacteur, invocation 3 — Merging** |
 | 7 | 🔴 **`questions-fusionneur-NN.md` holding `### Q`, answered**, and no `plan-fusion.md` | **Fusionneur, invocation 3** |
 | 8 | A `bugfix-*/` folder, and no `questions-fusionneur-*` anywhere | **Fusionneur, invocation 3** |
 | 9 | `questions-fusionneur-NN.md`, answered or empty, and no `plan-fusion.md` | **Fusionneur, invocation 1** |
 | 10 | `plan-fusion.md` exists | **Fusionneur, invocation 2** |
 | 11 | Otherwise | **Fusionneur, invocation 1** |
+
+🔴 **Rows 2 and 3 bear on the two blocking files this command can
+route, and on no other.** ⚠️ **Any other `blocked_*.md` at the root
+stops the walk, the command it belongs to named** — 📌 **a
+`blocked_redacteur.md` whose `## Invocation` says 1 or 2 is
+`/2_structure`'s**, the structuring blocked, not the merge; another
+agent's is its own command's. 🔴 **An upstream block is never settled
+from here.**
 
 🔴 **Row 10 is the only route to invocation 2** — 📌 **it applies the
 plan, and no other invocation writes one.** ⚠️ **A questions file with
@@ -82,6 +97,12 @@ applies one.
 ⚠️ **Row 8 covers every `bugfix-NN` at once**, not the last one. **A
 feature with no bug-fix cycle never matches rows 7 or 8.**
 
+📌 **On a first feature — a global holding nothing but `# Application`
+— invocation 3 writes into `desc-produit-fusion.md`, never into the
+global.** ⚠️ **The agent tests the global itself**; the routing does
+not change. 🔴 **A line of its own in the global would make `INIT`
+never fire** — the copy *On `INIT`* makes carries over what it merged.
+
 🔴 **Row 6 fired: copy the product file, then invoke.** 📌 **In that
 order** — ⚠️ **the row tests the copy's absence**, so copying first
 would make it never fire:
@@ -101,7 +122,8 @@ would otherwise reach neither the product file nor the global.**
 📌 **Name it every `code/decisions-produit.md` that `/9_controle`
 produced, in cycle order** — 🔴 **the feature's own first, then `bugfix-01`, then
 `bugfix-02`.** ⚠️ **A later cycle that revised an earlier decision wins,
-and that is what the order is for.**
+and that is what the order is for.** 📌 **Row 3 naming the Rédacteur
+gives the same list, in the same order.**
 
 📌 **No decisions file at all → it writes a faithful copy** — 🔴 **the
 Fusionneur must never have to choose its source.**
@@ -115,6 +137,10 @@ not the one the phase you are about to run writes:**
 
     git mv docs/features/<name>/questions-<other>-NN.md \
            docs/features/<name>/questions/<other>/
+
+⚠️ **Never `questions-architecte-*.md`** — 🔴 **leave it at the root**:
+📌 **it waits for `/conventions`, which is the only command that reads
+it.**
 
 ⚠️ **`git mv`, never a read-and-rewrite** — the agent must not open
 those files, and neither should you.
@@ -182,8 +208,8 @@ the copy what belongs to the feature file alone; you make the copy.**
 back to the Product Owner, and the next run picks the table up again.
 
 **What you do**: invoke the agent via `Agent()` with the feature folder,
-which invocation it is — and, for the Fusionneur, its questions file
-number — and nothing else.
+which invocation it is — for the Fusionneur, its questions file
+number; for the Rédacteur, its decisions files — and nothing else.
 
 🔴 **Never paraphrase the agent's process in your invocation** — not
 its inputs, its checks, its output format. It reads its own
@@ -198,15 +224,18 @@ Agent(
   description="<phase> <feature>",
   prompt="Feature folder: docs/features/<name>/. <Which invocation>.
           [Questions file number: <NN>.]
+          [Decisions files, in cycle order: <path>, <path>.]
           [Blocking file: <folder>/blocked_<agent>.md, its `## Decision`
           filled.]"
 )
 ```
 
 📌 **The first bracketed line on every Fusionneur invocation, never on
-the Rédacteur's.** 📌 **The second only when row 3 fired** — 🔴 **the
-agent applies the decision and says so in its report**, see *Git, once
-it has reported*.
+the Rédacteur's.** 📌 **The second on every Rédacteur invocation, never
+on the Fusionneur's** — ⚠️ **left out when no decisions file exists**,
+see row 6. 📌 **The third only when row 3 fired** — 🔴 **the agent
+applies the decision and says so in its report**, see *Git, once it
+has reported*.
 
 ❌ No `effort` parameter. ⚠️ **`run_in_background` may not exist
 either** — in this environment the Agent tool always runs async and
@@ -219,11 +248,28 @@ reads what the previous one wrote.
 
 ## Git, once it has reported
 
-**Then, once the agent reports:**
+🔴 **The agent reports having applied a decision → rename its blocking
+file**, inside the worktree, before the steps below:
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+    git mv <folder>/blocked_<agent>.md <folder>/blocked_<agent>-NN.md
+
+📌 **`NN`: the highest in that folder plus one, `01` when there is
+none.** ⚠️ **The agent has no tool that removes a file** — 🔴 **left at
+the unnumbered name, the next run stops on it.**
+
+**Then, once it has reported — 📌 five steps, in this order:**
+
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**, and the copy *On `INIT`*
+   makes and the rename above are committed by nobody else; 📌 **`git
+   merge` takes the branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.
@@ -237,15 +283,6 @@ an unmerged branch is invisible to the next one. ⚠️ **A `blocked_*.md`
 merges too**: the Product Owner has to see it.
 
 ---
-
-🔴 **The agent reports having applied a decision → rename its blocking
-file:**
-
-    git mv <folder>/blocked_<agent>.md <folder>/blocked_<agent>-NN.md
-
-📌 **`NN`: the highest in that folder plus one, `01` when there is
-none.** ⚠️ **The agent has no tool that removes a file** — 🔴 **left at
-the unnumbered name, the next run stops on it.**
 
 ## What you relay
 

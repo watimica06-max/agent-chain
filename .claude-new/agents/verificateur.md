@@ -59,9 +59,10 @@ you start.
   documents.** 📌 **Grep `^## §1 ` for its line number, and Read from
   the top of the file to the line before it** — ⚠️ **never the file
   whole**: past `## §1` are the entries, and you open only the ones a
-  lot cites. On `spec-technique.md` its `Vocabulary` and
-  `Dependencies` tell you what a lot's declarations mean; 📌 **on
-  `desc-bug.md` it carries `Dependencies` and no `Vocabulary`**
+  lot cites. On `spec-technique.md` its `## Intent and vocabulary`
+  and `## Dependencies` tell you what a lot's declarations mean; 📌
+  **on `desc-bug.md` it carries a `Dependencies:` line and no
+  vocabulary**
 - **The entries its lots cite**, opened one by one
 - **The technical document's list of entry titles** — 🔴 **grep
   `^### §`, never a read.** It tells you which entries exist; the lots
@@ -412,11 +413,11 @@ the declaration and the entries**, not by hunting for the entry it
 forgot.
 
 📌 **The preamble settles a naming doubt** — 🔴 **read it before calling
-a mismatch.** On `spec-technique.md` its `Vocabulary` says what a term
-means, its `Dependencies` says what already exists. ⚠️ **On a
-`desc-bug.md` it carries `Dependencies` and no `Vocabulary`** — 📌 **the
-terms are the feature's own, as the entries and the bearers name
-them.**
+a mismatch.** On `spec-technique.md` its `## Intent and vocabulary`
+says what a term means, its `## Dependencies` says what already exists.
+⚠️ **On a `desc-bug.md` it carries a `Dependencies:` line and no
+vocabulary** — 📌 **the terms are the feature's own, as the entries and
+the bearers name them.**
 
 **4. Derive the order** from the declared dependencies **and from what
 move 2 recorded**:

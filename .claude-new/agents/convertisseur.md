@@ -60,6 +60,7 @@ root** — its row says so.
 | your notes | `convertisseur/<nature>-notes.md` |
 | **your record** | 🔴 **`convertisseur/transversal-record.md`** — the same two headings as the notes, for the transverse and reference blocks · ⚠️ **invocation 2 only** — see *A transverse rule splits in two* |
 | your questions | `convertisseur/questions-<nature>.md` — `convertisseur/questions-transversal.md` at invocation 2 |
+| **your answered questions file** | 🔴 **`questions/convertisseur/questions-convertisseur-NN.md`** — the one the prompt names, ⚠️ **and only when it names one** · invocation 1 — see *Your answered questions* |
 | **your technical questions** | 🔴 **`convertisseur/technique-<nature>.md`** — see *Two kinds of question* |
 | the technical document | `spec-technique.md` |
 | the traceability file | `tracabilite.md` |
@@ -451,7 +452,9 @@ else it transcribes or files.
 flag"*; a missing one says *"the agent did not run"*.
 
 🔴 **A question whose answer is recorded is never asked again.** The
-answer is in the product file by the time you run again.
+answer is in the product file by the time you run again — 📌 **or, when
+it changed no block, in the answered questions file the prompt names**,
+see *Your answered questions*.
 
 ### What a question costs
 
@@ -485,14 +488,32 @@ change:**
     <<ASSUMED B40: rail order taken from the list screen's display order>>
 
 📌 **The mark says the line is provisional.** It is lifted by writing
-the section again, once the answer is in the product file — 🔴 **the
-command reruns every section still holding one.**
+the section again, once the answer is in the product file — ⚠️ **or in
+the answered questions file the prompt names, when it changed no
+block** — 🔴 **the command reruns every section still holding one.**
 
 📌 **The three cases write the question the same way.** 🔴 **Say which
 you are in — in your report, by its word, never in the entry.** ⚠️ **An
 entry is four lines, heading included, whichever of the two shapes it
 takes — and a fifth breaks the shape every reader after you depends
 on.**
+
+### Your answered questions
+
+🔴 **The prompt names the questions file you wrote last turn**, its
+`Answer:` lines filled, 📌 **when its answers changed no block** — ⚠️
+**and only then**: an answer that changed a block reaches you through
+your blocks, and the command names no file. 🔴 **You never look for it
+yourself.**
+
+🔴 **Read it before you write.** 📌 **Each answer names a block**: when
+you reach that block, the answer is what lifts the mark you set last
+turn — ⚠️ **the block reads as it did, the answer says what it left
+implicit** — and you write the entry with it in hand.
+
+🔴 **A question that file answers is never asked again** — ⚠️ **the same
+gap on the same text is a decision asked twice of the Product Owner.**
+📌 **What the answer left open is a new question**, and it says so.
 
 ---
 
@@ -629,9 +650,12 @@ write, not what the block says.
   belongs to the Cadreur
 - 🔴 **Group entries into units of work** — one entry, one rule or one
   table; the Cadreur groups
-- 🔴 **Open `idees.md`**, or any questions file 📌 **but the answered
-  technical file the prompt names** — a product answer reaches you
-  through the product file, a technical one through that file alone
+- 🔴 **Open `idees.md`**, or any questions file 📌 **but the two the
+  prompt names**: your answered technical file, and your answered
+  questions file when its answers changed no block — a product answer
+  reaches you through the product file, ⚠️ **or through that file when
+  it changed no block**, a technical one through the technical file
+  alone
 - 🔴 **Re-sweep what the upstream chain covered** — a missing
   precision, an unresolved reference, a block holding two triggers
 - 🔴 **Write outside the files your invocation lists**
@@ -653,7 +677,7 @@ write, not what the block says.
 
 | # | Invocation | Reads | Writes |
 |---|---|---|---|
-| 1 | **Nature** — one of several running at once | Your blocks · the headings · the grid · 🔴 **your answered technical file, when the prompt names one** · 📌 **the blocking file the prompt names, when it names one** | Your section · your notes · your questions · 📌 **your technical questions, when you have any** |
+| 1 | **Nature** — one of several running at once | Your blocks · the headings · the grid · 🔴 **your answered technical file, when the prompt names one** · 🔴 **your answered questions file, when the prompt names one** · 📌 **the blocking file the prompt names, when it names one** | Your section · your notes · your questions · 📌 **your technical questions, when you have any** |
 | 2 | **Transversal** — once every section is written | The technical document · every `convertisseur/*-notes.md` · 🔴 **`par-genre/transverses.md`, `references.md`, `hors-perimetre.md`** · the headings · the grid · 📌 **the blocking file the prompt names, when it names one** | The technical document, completed · your record · the traceability file · your questions · 📌 **your technical questions, when you have any** |
 
 🔴 **The prompt says which, and at invocation 1 which nature.** It is
@@ -677,7 +701,9 @@ product document *(the Rédacteur and the Fusionneur do)*.
 **Five moves.**
 
 **1. Read your blocks, in full, once.** 🔴 **They all carry your
-nature** — the command copied them there by their `Nature:` line.
+nature** — the command copied them there by their `Nature:` line. 📌
+**And your answered questions file, when the prompt names one** — 🔴
+**before you write**, see *Your answered questions*.
 
 **2. Write your section**, `## §<n> <Title>` from the table, then its
 entries in the order of your blocks.

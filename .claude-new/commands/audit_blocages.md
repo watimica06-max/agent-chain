@@ -24,15 +24,16 @@ feature's.
 ## What you read
 
 **Every `blocked_*-NN.md` of the working folder** — the settled ones,
-numbered. 🔴 **Four places**: `code/**/`, `cadrage-produit/` *(the
-sondeurs)*, the folder's own root *(`blocked_architecte`,
+numbered. 🔴 **Five places**: `code/**/`, `cadrage-produit/` *(the
+sondeurs)*, `convertisseur/` *(`blocked_<nature>`,
+`blocked_transversal`)*, the folder's own root *(`blocked_architecte`,
 `blocked_diagnostiqueur`)*, and `investigation/` *(a `/diagnostique`
 phase 1)*.
 
-⚠️ **A glob on `code/**/` alone misses three families** — 📌 **and the
+⚠️ **A glob on `code/**/` alone misses four families** — 📌 **and the
 audit would report a feature as having blocked on nothing.**
 
-📌 **And every `blocked_*.md` without a number, in the same four
+📌 **And every `blocked_*.md` without a number, in the same five
 places** — one still standing. ⚠️ **Read it and list it under
 `### Still open`**: a block waiting for a decision is worth reporting,
 and its own findings wait with it.

@@ -196,25 +196,36 @@ nothing left to ask about.
 
 📌 **Neither marker grep returns anything, and the highest-numbered
 `questions-sondeur-NN.md` holds a `### Q`** → 🔴 **two cases, told apart
-by `questions-existant-NN.md`, root or `questions/existant/`:**
+by where that file sits:**
 
-| | What it is | Next |
+| The sondeur's file | What it is | Next |
 |---|---|---|
-| One exists | 🔴 **The grid is closed** — the second time already ran, and nothing moved since | 📌 **Invoke nothing**, and say `/5_reclasse` |
-| None anywhere | 🔴 **A run produced no questions file at all** — nothing moved and nothing closed the turn | 📌 **Stop and say so**, naming the highest file and where it sits — `/4_grille` again once a marker or an empty file is there |
+| Filed under `questions/sondeur/` | 🔴 **The first time is closed** — its answers went through `/1_lexique` and `/2_structure`, which integrated them, filed the file, and changed no block | 📌 **Write the next `questions-sondeur-NN.md` empty at the root, without an agent** — ⚠️ `NN`: that file's, plus one; *Git, before invoking* files it with the rest. 🔴 **Then the second time**: see below — its own test says whether it runs, writes an empty file of its own, or has nothing left to say |
+| At the root | 🔴 **Its answers were never integrated** — the `### Q` guard's case, under *Git, before invoking* | 📌 **Stop and say so**, naming the file — `/1_lexique` and `/2_structure` have to run first |
+
+⚠️ **Whether a `questions-existant-NN.md` exists changes nothing here** —
+📌 **the second time's *has it already run* test reads it.**
+
+⚠️ **The empty file the first row writes is the closure `/5_reclasse`
+tests** — 📌 **the same evidence a turn with nothing left to ask would
+have written**: 🔴 **a marker no integration can now set is not what
+closes the first time.**
 
 ---
 
 ## Git, before invoking
 
-🔴 **Grep `^### Q` in each root `questions-*.md` before touching it** —
-📌 **a file holding questions is not yours to file**: ⚠️ **it waits on
-an answer, or its answers were never integrated.** 🔴 **Stop and say
-which.** 📌 **The sondeur's own is no exception** — ⚠️ **answered, it
-goes through `/1_lexique` and `/2_structure`**, which integrate it and
-put it away; 🔴 **still at the root, it has not been through them.**
-📌 **The empty one that closed a time holds no `### Q`**, and is filed
-like any other.
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
+`architecte` before touching it** — 📌 **a file holding questions is
+not yours to file**: ⚠️ **it waits on an answer, or its answers were
+never integrated.** 🔴 **Stop and say which.** 📌 **The sondeur's own
+is no exception** — ⚠️ **answered, it goes through `/1_lexique` and
+`/2_structure`**, which integrate it and put it away; 🔴 **still at the
+root, it has not been through them.** 📌 **The architecte's is the one
+exception** — ⚠️ **it is `/conventions`'s, not this chain's**, and a
+`### Q` in it says nothing about the run; 🔴 **read the root as if it
+were not there** — and leave it there, see below. 📌 **The empty one
+that closed a time holds no `### Q`**, and is filed like any other.
 
 🔴 **Then file every root `questions-*.md`:**
 
@@ -263,6 +274,13 @@ checkout.)*
 
 📌 **Nothing to commit is a normal outcome** — carry on.
 
+🔴 **On a second-time turn, no worktree yet** — 📌 **go to *The second
+time* first**: ⚠️ **its two tests, *has it already run* and the
+`Global:` grep, decide whether any agent runs at all**, and a run that
+invokes nothing creates no worktree. 📌 **It comes back here, to the
+three steps below, only once a sondeur is to be invoked.** 🔴 **A
+first-time turn goes straight on.**
+
 🔴 **Then create a worktree from local `HEAD`, and register it:**
 
     git worktree add .claude/worktrees/<name> HEAD
@@ -293,9 +311,21 @@ folder and none of that happens.**
 🔴 **It runs once, and only when the first time has closed** — 📌 **no
 block marked, nothing left to probe inside the feature.**
 
-🔴 **Has it already run?** 📌 **A `questions-existant-NN.md` anywhere,
-at the root or in `questions/existant/`** — ⚠️ **one and the second time
-is over**: write nothing, and go to *What you relay*.
+🔴 **Has it already run?** 📌 **Glob `questions-existant-NN.md` at the
+root and under `questions/existant/`, and test the highest `NN` alone:**
+
+| The highest | What it is | Next |
+|---|---|---|
+| None anywhere | The second time never ran | 📌 **Carry on below** |
+| Empty | 🔴 **The second time is over** — it said its last word | 📌 **Write nothing**, and go to *What you relay* |
+| Holds a `### Q`, filed under `questions/existant/` | 🔴 **Its answers went through `/1_lexique` and `/2_structure`, which filed it** — ⚠️ **the second time ran once, and runs no agent again** | 📌 **Write the next `questions-existant-NN.md` empty, without an agent** — as *Nothing returned* does below: commit and push without a worktree, and go to *What you relay* |
+
+📌 **A highest one at the root is the `### Q` guard's**, under *Git,
+before invoking* — ⚠️ **it stopped this run before it got here.**
+
+⚠️ **`/5_reclasse` tests the highest of each name for a `### Q`** — 📌
+**a filed file holding questions closes nothing**: 🔴 **without the empty
+one it would send back to a second time that says it is over.**
 
 🔴 **Which blocks** — 📌 **`grep -B3 '^Global: '` in
 `desc-produit.md`** — ⚠️ **three lines above each hit is the heading**:
@@ -305,6 +335,11 @@ attached to nothing hits nothing.
 📌 **Nothing returned** → 🔴 **invoke nothing.** ⚠️ **The feature
 touches nothing that exists** — write `questions-existant-NN.md` empty,
 commit and push without a worktree, and relay.
+
+📌 **Something returned** → 🔴 **now the worktree**: the steps that
+close *Git, before invoking*, from *create a worktree from local `HEAD`*
+on — then the invocation below. ⚠️ **The grep ran first**, so a
+worktree exists only when an agent is about to write into it.
 
 🔴 **One invocation, not four** — 📌 **there is one corpus to cross, and
 three reading orders would read the global three times.**
@@ -510,11 +545,19 @@ what ends the loop.**
 
 ## Git, once it has reported
 
-**Then, once every agent has reported:**
+**Then, once every agent has reported — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   sondeurs and the assembleur have no Bash and commit nothing**, and
+   the rename and the copy of *Once it has reported* are in the tree,
+   not in a commit; 📌 **`git merge` takes the branch's commits, not the
+   worktree's files**, and `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.
@@ -545,7 +588,7 @@ your own.
 | **First time** — its questions file holds questions | 📌 **Answer them, then `/1_lexique`** — 🔴 it settles the vocabulary your answers brought, before the Rédacteur reads them |
 | **First time** — its questions file is empty | 📌 **`/4_grille` again** — 🔴 **the second time runs** |
 | **Second time** — `questions-existant-NN.md` holds questions | 📌 **Answer them, then `/1_lexique`** — ⚠️ **an arbitration becomes a block, like any other answer** |
-| **Second time** — it is empty, or had already run | 📌 `/5_reclasse` — 🔴 the product file is closed |
+| **Second time** — its file is empty, written by the sondeur or by this command, or the second time had already said its last word | 📌 `/5_reclasse` — 🔴 the product file is closed |
 
 🔴 **Nothing else is yours**: no reading of what the questions say.
 

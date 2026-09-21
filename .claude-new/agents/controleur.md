@@ -111,8 +111,10 @@ read in the report.**
 - 🔴 **Answer for a whole block at once** — one line per intention.
   ⚠️ **The one exception is a block carrying no intention to find** —
   the block describing what does not change, and the block marked
-  `carried`: 📌 **one line under found, with that reason** (see
-  invocation 1)
+  `carried` that none of your sheets carries an intention of: 📌 **one
+  line under found, with that reason** (see invocation 1). ⚠️ **A
+  marked block a sheet of yours carries in part is one line per
+  intention, like any other**
 - 🔴 **Settle a doubt**
 
 ---
@@ -212,12 +214,22 @@ intentions are `Doubtful`, as *You never write a blocking file* says.
 restated for context — carries no intention to find. Say so under
 found, with that reason. 🔴 **A block carrying no intention to find is
 the one case where a block gets a single line instead of one per
-intention** — 📌 **and the block marked `carried` reads the same way:**
+intention** — 📌 **and a block marked `carried` that none of your
+sheets carries an intention of reads the same way.**
 
-⚠️ **A block that reaches you marked `carried` was built by a correction
-cycle** — its intentions are not missing, they were built elsewhere.
-🔴 **One line under `## Intentions found`, with the mark as its
-reason** — never a `Missing` one, and you read no sheet for it.
+⚠️ **A block that reaches you marked `carried`** — `B53 (carried)` in
+the prompt's `Blocks:` line — **had intentions built by a correction
+cycle**, and none of the feature's sheets shows those. 🔴 **The mark is
+set on the block, and the block can hold intentions your lots built
+beside the ones the correction built** — 📌 **so confront it against
+your sheets like any other, intention by intention:**
+
+| | |
+|---|---|
+| **A sheet carries the intention** | 🔴 **Found, with that sheet** — as for any block |
+| **No sheet carries it** | 🔴 **Found, with the mark as its reason** — ⚠️ **never `Missing`**: it was built elsewhere |
+| **A criterion may carry it** | 📌 **A doubt stays a doubt** — the mark answers for what nothing observes, not for what you cannot tell |
+| **No sheet of yours carries any intention of the block** | 🔴 **One line under `## Intentions found`, with the mark as its reason** — the block has no lot of the feature, or none in your group |
 
 ### What you write
 
@@ -227,9 +239,10 @@ choose**: two groups on one name overwrite each other.
 
 🔴 **It opens with the blocks you were given**, one line, in this exact
 form — 📌 **it says which blocks your group actually treated, and
-assembly reads it against the prompt's list:**
+assembly reads it against the prompt's list.** ⚠️ **Identifiers alone,
+no `(carried)` here** — the mark is not a block:
 
-    Blocks: B4, B5, B9, B12
+    Blocks: B4, B5, B9, B12, B53, B61
 
 **Then three fields, covering your blocks and no others:**
 
@@ -239,6 +252,9 @@ assembly reads it against the prompt's list:**
     B5 Tapping the panel — lot-07, "tapping the panel opens the detail"
     B9 Retention window — unchanged, nothing to build
     B12 Navigation map · list to detail — lot-25, onRaceClicked
+    B53 Correction factor · shown on the race — lot-29, "the factor reads on the race card"
+    B53 Correction factor · kept across a restart — carried, built by a correction cycle
+    B61 Weekly recap — carried, built by a correction cycle
 
 🔴 **A criterion is cited by its text, or its opening words — never by
 a counted position.** ⚠️ **The sheet's list is unnumbered**: "criterion

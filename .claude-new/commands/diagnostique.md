@@ -170,11 +170,26 @@ notifies on completion. Do not pass it; wait for the notification.
 ## Git, once it has reported
 
 **Then, once the last call you issued reports** — phase 2's, or
-phase 1's when phase 2 is withheld or not issued:
+phase 1's when phase 2 is withheld or not issued — 📌 **five steps, in
+this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**, and the renames of *What
+   you relay* are staged, not committed; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
+
+⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
+**never force it**: 📌 **say what is left there, and stop.** 📌 **What
+is left is something step 1 did not stage** — a fault of this run,
+never of the agent: it was not to commit it. Forcing the removal
+destroys it.
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.

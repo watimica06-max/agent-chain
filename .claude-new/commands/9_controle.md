@@ -36,10 +36,11 @@ phase that reads or writes them says so.
 
 ## What you read
 
-📌 **At phase 1**: `tracabilite.md`, the `Anchor:` lines of
-`code/decoupage.md` and, for each `bugfix-NN/` of the feature folder,
-the `Anchor:` lines of its own `code/decoupage.md` **by grep** — 🔴
-**never any of those files whole.**
+📌 **At phase 1**: `tracabilite.md`, the `Genre: comportement` lines of
+`desc-produit.md`, the `Anchor:` lines and the `## Entries with no lot`
+section of `code/decoupage.md` and, for each `bugfix-NN/` of the
+feature folder, the `Anchor:` lines of its own `code/decoupage.md`
+**by grep** — 🔴 **never any of those files whole.**
 
 **Then only whether `desc-produit.md` is there**, and whether every lot
 of `code/sequence.md` — the sequences *When it runs* names — carries a
@@ -127,31 +128,51 @@ was empty.
 
 ### Phase 1 — build the block-to-lot map
 
-🔴 **Two greps and a crossing**, no agent.
+🔴 **Greps and a crossing**, no agent.
 
-🔴 **Keep the blocks carrying `Genre: comportement` alone** — 📌 **the
-other four genres produce no lot by construction**, and each is taken
-up elsewhere:
+🔴 **Keep the blocks carrying `Genre: comportement`, plus every other
+block whose `tracabilite.md` line carries at least one entry.** 📌 **The
+genre comes from `desc-produit.md`, by grep** —
+`grep -B1 '^Genre: comportement$'`, the block heading one line above
+each hit, as `/3a_genre` reads the empty ones. ⚠️ **The other five
+genres produce no lot by construction**, and each is taken up
+elsewhere — 🔴 **save the block that gave an entry**, which its
+`tracabilite.md` line keeps whatever its genre:
 
 | Genre | Where it is taken up |
 |---|---|
 | `recette` | 📌 **Phase 4** — `par-genre/recette.md` feeds `code/recette-ordonnee.md` |
 | `directive` | 📌 **The Architecte** turned it into a conventions rule |
+| `transverse` | 📌 **Its constraint half, the preamble's `## Cross-cutting rules`** — ⚠️ **its code half is an entry**, and a transverse block that gave one is kept through that entry's lot, like a behaviour |
 | `référence` | 📌 **The Convertisseur**, §9 Text of the technical document |
 | `hors périmètre` | ⚠️ **Set aside by the Product Owner, explicitly** |
 
-⚠️ **Say how many blocks you kept, how many each genre set aside, and
-how many are marked `carried`** — 🔴 **so none of them reads as
-dropped.**
+⚠️ **Say how many blocks you kept — the behaviours, and the blocks of
+another genre an entry kept — how many each genre set aside, and how
+many are marked `carried`** — 🔴 **so none of them reads as dropped.**
 
 **a.** `tracabilite.md` gives block → entries.
 
 **b.** The `Anchor:` fields of `code/decoupage.md` give entry → lots.
 
-🔴 **Plus its `## Entries with no lot` section** — 📌 **an entry the code
-already carries**: ⚠️ **mark those entries `carried`**, never as a block
-with no lot. 🔴 **Without it the Contrôleur reports their intentions
-missing**, and they were built before this feature ran.
+🔴 **Plus its `## Entries with no lot` section** — 📌 **one line per
+entry, and the reason opens the line after the dash, in one of three
+forms the Cadreur fixes**; ⚠️ **each is read differently:**
+
+    §4.7 — already carried by the code
+    §8.1 — carried by §4.1 and §5.2
+    §2.9 — nothing to build
+
+| The reason opens on | What the entry gets |
+|---|---|
+| `already carried by the code` | 🔴 **The mark `carried`** — 📌 **built before this feature ran**; without it the Contrôleur reports its intentions missing |
+| `carried by §…` | 🔴 **The lots of the entries it names** — ⚠️ **follow each `§` through the `Anchor:` lines**, no mark |
+| `nothing to build` | 🔴 **No lot and no mark** — 📌 **an attribution or a boundary**: its block answers through its other entries, or gets the dash |
+
+⚠️ **Only the first form marks** — 🔴 **an entry with no lot is not an
+entry already built**, and marking the other two would hide a gap.
+📌 **Anything after the form, past a comma, is the Cadreur's prose** —
+you read the opening words alone.
 
 **b'.** 🔴 **The blocks a correction cycle built** — 📌 **grep `(B<n>)`
 in the `Anchor:` lines of every `bugfix-NN/code/decoupage.md` under the
@@ -168,15 +189,23 @@ shows it. 📌 **A gap the Product Owner raised from use carries no
 **c.** Cross them into `tracabilite-full.md`, at the feature folder's
 root.
 
-🔴 **One line per block, in block order** — its identifier, then the
-lots that build its entries, deduplicated; 📌 **then the word
-`carried` when b' marked the block**, after the lots or after the dash:
+🔴 **One line per kept block, in block order** — its identifier, then
+the lots that build its entries, deduplicated; 📌 **then the word
+`carried` when b marked one of its entries or b' marked the block**,
+after the lots or after the dash:
 
     B1   lot-01
     B43  lot-21, lot-30, lot-33
     B59  —
     B60  lot-12  carried
     B61  —  carried
+
+🔴 **A line carrying both lots and the mark is a block built in two
+places** — 📌 **the Contrôleur reads the lots' sheets like any other
+block's, and an intention no sheet carries is found with the mark as
+its reason.** ⚠️ **A line with the mark and no lot is one found line**,
+and no sheet is read for it. 📌 **The mark is set on the block, never
+on an intention** — the Contrôleur tells the two apart, not you.
 
 📌 **Two spaces at least after the identifier**; nothing else on the
 line, no title, no prose, no header. **That is the format the script
@@ -185,16 +214,18 @@ and ignores the mark**: the lots stay on the line so the grouping and
 the check in **d** still see them.
 
 **d.** 🔴 **Check the crossing before going on** — 📌 **count the blocks
-of `tracabilite.md` and the lines of `tracabilite-full.md`**: ⚠️ **they
-match, or a block was lost in the join.**
+the filter above kept and the lines of `tracabilite-full.md`**: ⚠️
+**they match, or a block was lost in the join.** 🔴 **Never every block
+of `tracabilite.md`** — it lists the set-aside ones too, with a dash,
+and that count can never match.
 
 🔴 **And grep every lot of `code/decoupage.md` in it** — 📌 **a lot
 appearing in no line built no entry any block names**, which is either
 a split defect or a crossing defect. ⚠️ **Say which lots, and stop.**
 
-🔴 **Every block appears.** A block whose entries no lot cites gets a
-dash — it still needs an answer, and the group carrying it reads no
-sheet for it.
+🔴 **Every kept block appears.** A block whose entries no lot cites
+gets a dash — it still needs an answer, and the group carrying it reads
+no sheet for it.
 
 ### Phase 2 — group the blocks
 
@@ -244,9 +275,13 @@ product file and the sheets it confronts are there.**
 
 🔴 **A block marked `carried` in `tracabilite-full.md` carries
 `(carried)` after its identifier in `Blocks:`** — 📌 **that is how the
-mark reaches the agent**, which writes one found line for it and reads
-no sheet for it. ⚠️ **Its lots stay in `Sheets:`** when another block
-of the group cites them; otherwise leave them out.
+mark reaches the agent**, which confronts the block against the sheets
+like any other and finds, with the mark as the reason, the intentions
+no sheet carries. ⚠️ **Its lots go in `Sheets:` like any other
+block's** — 🔴 **a marked line with lots is a block built in two
+places**, and dropping its sheets would read every intention as
+carried. 📌 **A marked line with the dash brings no sheet**, and the
+agent writes one found line for it.
 
 🔴 **Empty `code/controle/` before issuing the groups** — 📌 **the
 partials of an earlier run would otherwise still be there.**
@@ -369,10 +404,25 @@ decision per line, in this shape:**
     B12  <the decision, as the ## Decision wrote it>
     —  <a decision the file ties to no block>
 
-🔴 **The identifier first, then two spaces, then the decision** —
-⚠️ **when the blocking file names the block**; 📌 **a dash where it
-names none.** 🔴 **Nothing before the identifier**: the Rédacteur greps
-it, and reads it as written.
+🔴 **The identifier first, then two spaces, then the decision** — 📌 **a
+dash where no block is derived.** 🔴 **Nothing before the identifier**:
+the Rédacteur greps it, and reads it as written.
+
+⚠️ **No blocking file names a block** — 🔴 **it names a lot, and you
+derive the block from the lot through the map of phase 1:**
+
+| The blocking file | Where its lot is |
+|---|---|
+| The Détailleur's, `code/blocked_detailleur-NN.md` | 📌 **The `## Blocking N — lot-NN` heading** the decision answers — one lot per blocking, so one line per numbered answer |
+| The four agents of the loop, `code/<lot>/blocked_*-NN.md` | 📌 **The `code/<lot>/` folder it sits in** |
+
+🔴 **Then the lot in `tracabilite-full.md`** — 📌 **one line carries
+it → that block's identifier; several lines, or none → the dash.**
+⚠️ **On a correction cycle the lot is a `bugfix-NN/` lot**, absent from
+that file: 🔴 **its block is the `(B<n>)` its `Anchor:` lines carry**,
+the one b' grepped — one identifier → that block; several, or none →
+the dash. 📌 **The Cadreur's, `code/blocked_cadreur-NN.md`, precedes
+every lot** — its decisions take the dash.
 
 🔴 **The decision is copied, in the language the `## Decision` was
 written in — French.** 📌 **The Rédacteur translates it at `/fusion`,
@@ -386,12 +436,27 @@ even empty** — 📌 **its absence would read as *the phase did not run*.**
 
 ## Git, once it has reported
 
-**Then, once the agent reports:**
+**Then, once phase 6 has written its file — 📌 five steps, in this
+order:**
 
-1. `git merge --no-ff -m "Merge <branch>" <branch>` from the main
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**, and the four files phases
+   1, 4, 5 and 6 wrote by hand are uncommitted too; 📌 **`git merge`
+   takes the branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff -m "Merge <branch>" <branch>` from the main
    checkout root
-2. `git push`
-3. `git worktree remove <path>`
+4. `git push`
+5. `git worktree remove <path>`
+
+⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
+**never force it**: 📌 **say what is left there, and stop.** 📌 **What
+is left is something step 1 did not stage** — a fault of this run,
+never of the agent: it was not to commit it. Forcing the removal
+destroys it.
 
 🔴 **The push is part of the merge, not an afterthought.** A report
 that sits only on the local machine is lost with it.
@@ -399,6 +464,9 @@ that sits only on the local machine is lost with it.
 ⚠️ **A push that fails — diverged remote, no network — is reported, not
 retried and not worked around.** The merge holds locally; say so and
 carry on.
+
+🔴 **Merge before handing back, always** — an unmerged branch is
+invisible to whoever reads next.
 
 ---
 
@@ -408,7 +476,7 @@ carry on.
 
 | | |
 |---|---|
-| `code/rapport-controle-NN.md` | 📌 **In the feature folder** — 🔴 **the blocks marked `carried` read as found there, with the mark as the reason** |
+| `code/rapport-controle-NN.md` | 📌 **In the feature folder** — 🔴 **the intentions of a block marked `carried` that no sheet carries read as found there, with the mark as the reason** |
 | `code/recette-ordonnee.md` | 🔴 **What the Product Owner checks by hand** — in the working folder |
 | `registre-questions.md` | 🔴 **At the feature folder's root, read by the Product Owner across cycles** — 📌 **a kind of product question that keeps escaping upstream is a question the framing grid is missing** |
 | `code/decisions-produit.md` | 📌 **Read by the Rédacteur at `/fusion`** — in the working folder |
@@ -425,10 +493,19 @@ what they hold, no decision on what to do next.
 
 📌 **The Product Owner reads them and decides** whether the control
 report becomes a `bug-list.md` for a correction cycle. 🔴 **A gap she
-takes from the report keeps its `B<n>` in `bug-list.md`** — 📌 **the
-Diagnostiqueur carries it into `desc-bug.md`, the Cadreur into the lot
-list, and phase 1 of the next control marks the block `carried` from
-there.**
+takes from the report keeps its `B<n>` in `bug-list.md`** — 📌 **in
+parentheses, at the end of the gap's first line**, as the
+Diagnostiqueur writes it into `desc-bug.md`:
+
+    Correction factor never computed (B12)
+
+🔴 **That is the form the Diagnostiqueur greps** — ⚠️ **written anywhere
+else on the gap, the identifier is lost**, and the block reads missing
+at the next control. 📌 **The Diagnostiqueur carries it into
+`desc-bug.md`, the Cadreur into the lot list, and phase 1 of the next
+control marks the block `carried` from there.** ⚠️ **Say so when you
+relay the report** — one sentence, so the form reaches her with the
+file.
 
 ⚠️ **The manual list is the one to run before deciding** — 📌 **a gap
 the Contrôleur cannot see shows there.**

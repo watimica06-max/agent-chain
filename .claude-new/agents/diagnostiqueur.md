@@ -465,7 +465,8 @@ that nothing matched, or where outside the repository you think it
 lives.
 
 📌 **`## Today` and `## Expected` are what invocation 2 turns into an
-entry.** **Write them full** — it will not reopen the code. 📌 **A trap
+entry** — 🔴 **and `## Trigger`, when it carries a requirement.**
+**Write them full** — it will not reopen the code. 📌 **A trap
 or a dead symbol the state document records on the gap goes in
 `## Today` too**, named as such.
 
@@ -512,14 +513,18 @@ returns a wrong value is a `calculation` gap. ⚠️ **A missing text key
 is no nature's** — it goes under §9 Text.
 
 **7. Write one entry per `## Bearer` block of the report**, from its
-`## Today` and `## Expected`.
+`## Today` and `## Expected` — 📌 **and from its `## Trigger`, when
+that is where the requirement sits.**
 
 🔴 **Every second requirement a report's `## Expected` carries goes into
 the entry** — a missing observer, an unreachable value, a signature
-that has to change. 📌 **They are what the bearer's change cannot stand
-without** — part of what has to be built — and the Cadreur would
-otherwise cut a lot that cannot be built. ⚠️ **What stands on its own
-is a `## Bearer` block of the report, and an entry of its own here.**
+that has to change — ⚠️ **and so does the one its `## Trigger` carries
+when the trigger itself is the requirement**: a trigger ending in
+`nothing observes it` is something the fix has to build. 📌 **They are
+what the bearer's change cannot stand without** — part of what has to
+be built — and the Cadreur would otherwise cut a lot that cannot be
+built. ⚠️ **What stands on its own is a `## Bearer` block of the
+report, and an entry of its own here.**
 
 **Prose**: present indicative, active voice, one sentence one rule, in
 English. 🔴 **Two sentences, usually** — what the code does today, and
@@ -560,7 +565,7 @@ document's sections**: 📌 **nine of them — the eight natures, then
 📌 **You reach this line only if the file did not exist at the head of
 the invocation** — an existing one stopped you there.
 
-    ## Preamble
+    # Preamble
 
     Intent: correcting the gaps reported on <feature>.
     Out of scope: everything not listed below.
@@ -614,8 +619,12 @@ several entries** — numbered inside its section — `§4.1`,
 `§4.1`, and that citation has to hold.
 
 🔴 **A gap `bug-list.md` marks with a `B<n>` — the block a control
-report found unbuilt — hands it to every entry it gives**: 📌 **the
-identifier closes the entry's title, in parentheses**:
+report found unbuilt — hands it to every entry it gives.** 📌 **In
+`bug-list.md` the identifier sits in parentheses at the end of the
+gap's first line** — `Correction factor never computed (B12)` — 🔴
+**and that is the form you read it by**: ⚠️ **a `B<n>` written anywhere
+else on the gap is not one.** 📌 **The identifier closes the entry's
+title the same way, in parentheses**:
 
     ### §4.1 Correction factor never computed (B12)
 

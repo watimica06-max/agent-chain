@@ -144,17 +144,20 @@ Relecteur write four `##` headings and no `## Blocking N`** — that
 shape stays theirs, and ⚠️ **a file in it is not yours to settle** —
 see *Which blocks are yours*.
 
-**A decision has three parts:**
+**A decision has three parts, under the entry's number** — 🔴 **one
+`N.` per `## Blocking N`, a single entry included**: 📌 **the caller
+and `/8_code` read a decision by its number**, and ⚠️ **the three parts
+written without it are never read as filled.**
 
     ## Decision
 
-    <what the agent does — one instruction, in the imperative>
+    1. <what the agent does — one instruction, in the imperative>
 
-    <what it rests on — the rule, or where the same problem is
-    solved elsewhere>
+       <what it rests on — the rule, or where the same problem is
+       solved elsewhere>
 
-    <what it does not extend to, when the instruction could be read
-    wider than it is>
+       <what it does not extend to, when the instruction could be read
+       wider than it is>
 
 📌 **The third part is what keeps a decision from spreading.** ⚠️ **A
 lot told to fix a call site will fix every call site it meets** unless
@@ -175,12 +178,13 @@ Architecte's — 🔴 **say so in `## Decision`** and stop:
 **the Détailleur files everything one walk found, at once, and the
 Réalisateur adds each lack it meets while carrying on.**
 
-⚠️ **You answer each of them**, numbered, under the single
-`## Decision` — 🔴 **one number per `## Blocking N`.**
+⚠️ **You answer each of them under the single `## Decision`, in the
+shape above** — 🔴 **each answer under its own heading's number.**
 
-⚠️ **A number with no answer is an entry still waiting** — 📌 **that is
-how a product question holds up one entry and not the file.** 🔴 **Never
-write a placeholder under it**: an empty number is the signal.
+⚠️ **An entry whose number is not written is an entry still waiting** —
+📌 **that is how a product question holds up one entry and not the
+file.** 🔴 **Never write its number alone, nor a placeholder under it**:
+the absent number is the signal.
 
 📌 **Read them all before answering any** — ⚠️ **an entry often says
 what it depends on**, and settling the second changes what the first
@@ -208,7 +212,7 @@ you waited, and what the Product Owner has to settle.
 🔴 **English for the prose**, like every file the agents read. 📌 **A
 file's headings follow the contract that names them** — ⚠️
 **`code/redecoupage.md` keeps its French headings**: the Cadreur
-appends under them, and `/8_code` relays them by those names.
+appends under them, and `/7_lots` relays them by those names.
 
 📌 **Present indicative, active voice.** One instruction, one
 sentence.
@@ -230,8 +234,8 @@ that led you there is not the agent's business.
 - 🔴 **Change a lot's scope beyond what the block needs** — the split
   is the Cadreur's
 - 🔴 **Answer from memory** — a fact about the code is grepped
-- 🔴 **Leave a number unanswered**, except after waiting out the
-  Product Owner on that entry
+- 🔴 **Leave an entry without its number**, except after waiting out
+  the Product Owner on that entry
 - 🔴 **Ask the Architecte twice in one invocation** — 📌 **one request,
   gathering every entry that needs a rule**
 - 🔴 **Write a rule into `TECHNICAL_CONVENTIONS.md`** — 📌 **that is the
@@ -465,10 +469,10 @@ the Architecte under another wording.**
 
 ## When you wait for the Product Owner
 
-🔴 **Write every number you settled into `## Decision` first** — 📌
-**the wait bears on the handed-back numbers only**, and changes nothing
-already written. 🔴 **Leave those numbers unanswered and poll the
-blocking file.**
+🔴 **Write every entry you settled into `## Decision` first, under its
+number** — 📌 **the wait bears on the handed-back entries only**, and
+changes nothing already written. 🔴 **Write nothing for those entries,
+not even their numbers, and poll the blocking file.**
 
 📌 **`sleep` between two reads** — ⚠️ **that is the only command your
 `Bash` runs**: 🔴 **nothing else at all**, not a search, not a listing,
@@ -483,17 +487,18 @@ loop and the table below would mean nothing.**
 ⚠️ **This wait is bounded, unlike an agent's** — 📌 **a person may not
 be at the keyboard.**
 
-🔴 **Her answer appears under a number: apply it and carry on with
-your turn.** 📌 **On a product question, her line is the decision** —
-leave it as she wrote it, and report the entry settled by her. 🔴 **On
-a *rule in force that is now wrong*, write the `architecte/` request
-with her answer in `## What I need` and call the Architecte** — see
-*When a rule would settle it*.
+🔴 **Her answer appears under the entry's number, which she writes:
+apply it and carry on with your turn.** 📌 **On a product question, her
+line is the decision** — leave it as she wrote it, and report the entry
+settled by her. 🔴 **On a *rule in force that is now wrong*, write the
+`architecte/` request with her answer in `## What I need` and call the
+Architecte** — see *When a rule would settle it*.
 
-🔴 **Nothing at 20 minutes: stop, leaving those numbers unanswered.** 📌
-**The missing number is the signal** — the agent that called you reads
-it and stops in turn, and the Product Owner answers in one file.
+🔴 **Nothing at 20 minutes: stop, those entries' numbers still
+unwritten.** 📌 **The missing number is the signal** — the agent that
+called you reads it and stops in turn, and the Product Owner answers in
+one file.
 
 ⚠️ **Say in your report that you waited and got nothing** — 🔴 **do not
-write anything under those numbers**, not even a note. **A missing
-number is what the caller tests on.**
+write those numbers, nor anything under them**, not even a note. **A
+missing number is what the caller tests on.**

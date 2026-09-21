@@ -24,9 +24,13 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 - **An `ls` of the feature folder's root** — before the run, and again
   after
-- **A grep of `^### Q` in the lexicographe's questions file** — 📌 **the
-  highest-numbered `questions-lexicographe-NN.md`, at the root or under
-  `questions/lexicographe/`**
+- **A grep of `^### Q` in a `questions-lexicographe-NN.md` at the
+  root**, when there is one — 📌 **the file the guard of *How it runs*
+  bears on, and the one it files**
+- **A grep of `^### Q` in the highest-numbered
+  `questions-lexicographe-NN.md`, at the root or under
+  `questions/lexicographe/`** — 📌 **invocation 1's settled-vocabulary
+  test, and nothing else reads it**
 - **Two headings of `blocked_redacteur.md`**, when there is one —
   `## Invocation` and `## Decision`, 📌 **those alone**
 - **Every `## Decision` heading of a `blocked_decoupeur.md`,
@@ -36,7 +40,11 @@ Feature folder: `docs/features/$ARGUMENTS/`
   to integrate — 📌 **an entry carrying a `Défaut:` is answered by
   silence**
 - **A grep of `^### Q`** in the questions file the agent wrote
-- **A grep of `^### .*NEW`** in `desc-produit.md`, after the run
+- **A grep of `^### .*NEW` and of `^### .*MODIFIED`** in
+  `desc-produit.md`, before the run and again after — 📌 **the titles
+  the second grep adds are the run's**
+- **Whether `code/decoupage.md` exists** in the feature folder — 📌 **a
+  test, not a read**
 
 📌 **You pass the agent the file it reads; it does not look for
 itself.** 🔴 **You never read a questions file's entries** — the greps
@@ -83,11 +91,15 @@ invocation is redone.)*
 
 ## How it runs
 
-**First, the lexicographe's questions file.** 🔴 **Grep it for `^### Q`
-before touching it** — ⚠️ **one hit and you stop, answered or not**:
-📌 **its entries were never applied.** `/1_lexique` files the file it
-applied, so one still at the root holding entries has not been through
-it. Say `/1_lexique` comes next.
+**First, a lexicographe's questions file at the root.** 🔴 **Grep it
+for `^### Q` before touching it** — ⚠️ **one hit and you stop, answered
+or not**: 📌 **its entries were never applied.** `/1_lexique` files the
+file it applied, so one still at the root holding entries has not been
+through it. Say `/1_lexique` comes next. ⚠️ **The root alone** — 📌 **a
+file already under `questions/lexicographe/` holds the entries
+`/1_lexique` applied**, and a guard reading it there would stop on a
+settled vocabulary after its invocation 4 wrote none. 📌 **None at the
+root → nothing to guard**, carry on.
 
 📌 **No `### Q` → file it**, 🔴 **the choice of invocation below reads
 the root after it:**
@@ -129,13 +141,25 @@ Rédacteur has three invocations and one blocking-file name**, and
 
 | At the root | Invocation | What you name |
 |---|---|---|
-| No questions file, **and no `desc-produit.md`** | **1 — Structuring** | `idees.md` |
+| **One questions file, holding `### Q`** — any prefix | **2 — Integrating** | 🔴 **That one** |
+| **More than one questions file** | 🔴 **Stop** — a filing failed; say which files | — |
 | 🔴 **A `blocked_decoupeur.md`, `blocked_qualifieur.md` or `blocked_classeur.md`, every `## Decision` filled** | **2 — Integrating** | 🔴 **That file** — 📌 **all three block on something only a rewrite of the block settles**, and rewriting is yours |
 | One of the three with **any** `## Decision` empty | 🔴 **Stop** — say the decision is still to write, and which `## Blocking N` waits | — |
+| **One questions file, with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to integrate**; say `/3_decoupe` | — |
+| No questions file, **and no `desc-produit.md`** | **1 — Structuring** | `idees.md` |
 | No questions file, **and a `desc-produit.md`** | 🔴 **Stop** — 📌 **the idea file is transcribed once**; say `/3_decoupe` comes next | — |
-| One, **with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to integrate**; say `/3_decoupe` | — |
-| One, any prefix | **2 — Integrating** | 🔴 **That one** |
-| More than one | 🔴 **Stop** — a filing failed; say which files | — |
+
+🔴 **First match wins, and the questions file comes before the blocking
+files** — 📌 **an answered file and a blocking file at the root
+together: the answers go in and the file is filed; the blocking file
+waits for the next run**, which finds it alone. ⚠️ **The other way round
+dead-ends**: the Rédacteur applying the decision writes its own
+questions file beside the answered one, and the next run stops on two.
+📌 **A blocking file with an empty `## Decision` waits the same way** —
+the stop on the decision comes at the next run. ⚠️ **The empty
+questions file sits below the blocking-file rows** — 🔴 **a filled
+decision beside a file that asked nothing is taken, not left behind on
+"nothing to integrate".**
 
 🔴 **Invocation 1 runs on a settled vocabulary, never before** — 📌
 **the highest-numbered `questions-lexicographe-NN.md`, at the root or
@@ -194,22 +218,58 @@ other.**
 
 ### Once it has run
 
-🔴 **Any stop from here on merges first.** ⚠️ **The agent has written in
-the worktree** — 📌 **stopping before the merge loses the whole
-invocation**, and a worktree holding unmerged work never self-cleans.
-🔴 **Merge, push, remove the worktree, and then report.**
+🔴 **Any stop from here on merges first** — ⚠️ **one exception, the
+refusal below, which merges nothing by design.** ⚠️ **The agent has
+written in the worktree** — 📌 **stopping before the merge loses the
+whole invocation**, and a worktree holding unmerged work never
+self-cleans. 🔴 **The five steps of *Git, once it has reported*, and
+then report.**
 
-🔴 **Did the run create a `NEW` block?** 📌 **Grep `'^### .*NEW'` in
-`desc-produit.md`** — ⚠️ **anchored on the title line: a bare `NEW`
-matches prose inside a block**, and would name one carrying no marker
-at all — 🔴 **and only then:**
+🔴 **Did the run create a `NEW` block, or change one?** 📌 **Grep
+`'^### .*NEW'` and `'^### .*MODIFIED'` in `desc-produit.md`, and
+compare with the same greps before the run** — ⚠️ **anchored on the
+title line: a bare `NEW` matches prose inside a block**, and would name
+one carrying no marker at all; ⚠️ **compared, because a marker can stand
+since an earlier run**: the Rédacteur strips them only when the file it
+integrates comes from the grid or the conversion. 📌 **The titles the
+second grep adds are the run's.**
+
+🔴 **Then, does `code/decoupage.md` exist?** ⚠️ **The split is cut, and
+a lot cites entries by number** — 📌 **the technical document is not
+rebuilt behind it**, and `/6_convertit` stops on it.
+
+| `code/decoupage.md` | The run | What you do |
+|---|---|---|
+| **Exists** | **created a `NEW` block** | 🔴 **Refuse the integration** — below |
+| **Exists** | **changed blocks, created none** | 📌 **Delete nothing.** 🔴 **Say that a change to the product now belongs to a new cycle** — the sentence `/6_convertit` says when it stops |
+| Absent | **created a `NEW` block** | 🔴 **Delete all four** — below |
+| Absent | **changed blocks, created none** | 🔴 **Delete `couverture.md` alone** — below |
+| Either | neither | 📌 **Nothing to delete**, a normal outcome |
+
+🔴 **The refusal**: 📌 **a `NEW` block after the split reaches no lot** —
+the lots cite entries by number, and the document is not rewritten
+under them. ⚠️ **Commit nothing, merge nothing** — leave the worktree,
+then:
+
+    git worktree remove --force .claude/worktrees/<name>
+
+📌 **The feature folder is as the run found it** — the answered file, or
+the blocking file, at the root, unfiled; `desc-produit.md` without the
+block. 🔴 **Say which block the answer created, and that the file is the
+Product Owner's to place** — ⚠️ **a change to the product now belongs to
+a new cycle, and where the answer goes is hers to decide**; 📌 **left
+where it is, the next run takes it again and refuses again.** 🔴 **Stop
+there** — nothing below runs.
+
+🔴 **The deletions**, when `code/decoupage.md` is absent:
 
     rm -rf docs/features/<name>/par-genre/ \
            docs/features/<name>/desc-par-nature.md \
            docs/features/<name>/spec-technique.md \
            docs/features/<name>/couverture.md
 
-📌 **Nothing there → nothing to delete**, a normal outcome.
+📌 **On `MODIFIED` alone, the last line only.** 📌 **Nothing there →
+nothing to delete**, a normal outcome.
 
 ⚠️ **Why**: all four are derived from the product file — 📌 **the
 fourth through the technical document it walks.** 🔴 **A block created
@@ -218,7 +278,11 @@ it** — the split and the coding then run on a technical document
 missing a block, and the gap surfaces at the controleur. 🔴 **And a
 `couverture.md` left behind says the feature was walked** — ⚠️
 `/conventions` then finds nothing to do, instead of walking the rebuilt
-document at its invocation 4.
+document at its invocation 4. 📌 **A block changed is a section
+re-converted, and a re-converted section is a rebuilt document** — 🔴
+**the `couverture.md` reason holds for it**; the three others stay on
+`NEW` alone, `/5_reclasse` replacing its files whole and `/6_convertit`
+re-converting a changed nature.
 
 🔴 **Say which files you deleted**, or that none needed it.
 
@@ -272,11 +336,19 @@ and each reads what the previous one wrote.
 
 ## Git, once it has reported
 
-**Then, once the agent reports:**
+**Then, once the agent reports — 📌 five steps, in this order:**
 
-1. `git merge --no-ff <branch>` from the main checkout root
-2. `git push`
-3. `git worktree remove <path>`
+1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
+   agent has no Bash and commits nothing**, and the filings of *Once it
+   has run* are staged, not committed; 📌 **`git merge` takes the
+   branch's commits, not the worktree's files**, and
+   `git worktree remove` refuses a dirty tree
+2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
+   cannot issue a git command against the main checkout**: the merge
+   below, issued from inside it, is refused
+3. `git merge --no-ff <branch>` from the main checkout root
+4. `git push`
+5. `git worktree remove <path>`
 
 🔴 **The push is part of the merge, not an afterthought.** A phase that
 sits only on the local machine is lost with it.
@@ -287,7 +359,9 @@ carry on.
 
 🔴 **Merge before handing back, always** — a phase whose output sits on
 an unmerged branch is invisible to the next one. ⚠️ **A
-`blocked_*.md` merges too**: the Product Owner has to see it.
+`blocked_*.md` merges too**: the Product Owner has to see it. 📌 **The
+one run that merges nothing is the refusal of *Once it has run*** — it
+has nothing to hand on, and its worktree is already gone.
 
 ---
 
@@ -302,9 +376,14 @@ The agent's own report.
 
 | What just happened | Next |
 |---|---|
+| The integration was refused — a `NEW` block after the split | 🔴 **Nothing runs** — 📌 **the file at the root is the Product Owner's to place**; say which block the answer created |
 | It wrote a blocking file | 📌 Fill its `## Decision`, then `/2_structure` again |
 | Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a flag stands until answered, and nothing downstream runs meanwhile |
 | Its questions file is empty | 📌 `/3_decoupe` — 🔴 a new block is split, classed and framed before the Convertisseur reads it |
+
+📌 **A blocking file waited at the root while the answers went in** —
+🔴 **say so, whichever row matched**: `/2_structure` takes it once the
+root holds no answered file.
 
 🔴 **Nothing else is yours**: no phase chain.
 
