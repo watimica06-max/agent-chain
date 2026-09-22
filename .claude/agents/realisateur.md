@@ -602,6 +602,7 @@ code/<lot>/verdict.md` line** — ⚠️ **no such line, no FAIL to resume.**
 | **FAIL mineur** | 🔴 **Fix every point `## Findings` names**, re-run the static analysis and the tests, **correct the state entries the failed attempt left**, **amend the report** — 📌 **read it, never rewrite it from the code.** 🔴 **Do not revisit the rest of the lot** — ⚠️ **but the run ends as any other**: moves 6 to 9. |
 | **FAIL structurel** | Take the lot back from move 1 — 🔴 **including the technical state**: grep your lot's symbols there and remove what the failed attempt wrote, before you write your own |
 | **`## Cause` reading `sheet`**, whatever the status | 🔴 **Stop** — 📌 **the sheet is being rewritten, and that FAIL never reaches you**: the orchestration should not have invoked you on it |
+| **`## Cause` reading `understanding` or `reasoning`** | 📌 **Nothing beyond the status row** — 🔴 **the cause is the orchestration's**: it read it before invoking you, to tell a sheet fault from a coding one and to choose the model you run on. ⚠️ **`## Status` says where you resume, `## Findings` what you fix** — the word under `## Cause` changes neither |
 | **No `## Status`, or no verdict named** | 📌 **The previous attempt committed nothing** — 🔴 **take the lot from move 1**, as a first run |
 
 ⚠️ **You do not argue with a verdict.** 🔴 **If you judge it wrong,

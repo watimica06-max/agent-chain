@@ -505,8 +505,8 @@ chaîne écrit `python` partout depuis la phase 7. Même point que pour
   seule · raison : il attrape un gras cassé ou une ligne perdue pendant
   que l'édition est encore en tête ; une correction sur cinq laissait
   quelque chose derrière elle (`docs/verification2/correction.md`
-  lignes 379-381 ; `coherence.py` lignes 4-7) · éprouvée — les
-  campagnes 2, 3 et 4 l'ont lancé.
+  lignes 379-381 ; `coherence.py` lignes 4-7 ; les campagnes 2, 3 et 4
+  l'ont lancé) · éprouvée.
 - Le dossier vérifié est celui qui porte `scripts/`, quel que soit son
   nom · écarté : `.claude/` en dur · raison : la chaîne a vécu sous
   `.claude-new/` pendant les campagnes (lignes 12-13, 22-24) · éprouvée.

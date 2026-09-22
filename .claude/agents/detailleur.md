@@ -488,7 +488,7 @@ block.
 | It holds | What you do |
 |---|---|
 | Nothing, or no such file | Carry on normally |
-| A `## Decision` still empty | 🔴 **Stop, and say the orchestration should not have invoked you** — ⚠️ **a standing block is its stop**, and calling the Arbitre again re-raises what it could not settle |
+| A `## Decision` still empty, or with a `## Blocking N` whose number is not written under it | 🔴 **Stop, and say the orchestration should not have invoked you** — ⚠️ **a standing block is its stop**, 📌 **and a heading with no number is one still standing** — see *When you cannot produce*; calling the Arbitre again re-raises what it could not settle |
 | A `## Decision` filled | 📌 **Apply it, and say in your report that you did** — 🔴 **the orchestration renames the file.** ⚠️ **In divergence mode, only when it bears on a lot the prompt names** — see *When a verdict sends the block back* |
 | A `## Decision` sending the lot back to the split, **and `code/redecoupage.md` is still there** | 🔴 **Stop.** The split has not been redone — say the block is waiting on it |
 | The same, **and `code/redecoupage.md` is gone** | 📌 **The split was redone** — 🔴 **detail the block, and say in your report that the decision was applied** |

@@ -955,8 +955,30 @@ sequence without defects and report that the split holds.
 
 🔴 **Fix only what the first field names.** ⚠️ **It is a lot number, or
 an entry number** — 📌 **an `orphan` attaches to an entry and to no
-lot**, and cutting a lot for it is the fix. A hole, a false anchor, a badly cut
-lot: correct those, leave the rest untouched.
+lot**, and cutting a lot for it is the fix. 🔴 **Every lot the defects
+do not name stays as it is.**
+
+📌 **The third field says what is expected**, after the `>>` — 🔴 **read
+it before the table below**: what stands before it is the contested
+line, copied verbatim, and you search for it in `code/decoupage.md`.
+
+**The second field is one of eleven words, and each has its fix** —
+📌 **none is new**: every row is a rule of the moves, applied to the lot
+or entry the defect names.
+
+| The type | What you correct |
+|---|---|
+| `surface` | An operation the inventory lists that no lot covers — 🔴 **the lot naming the symbol cites, in `Anchor`, the entry the inventory lists against that operation**; no lot names the symbol → the modification, or the lot, that move 5 gives it |
+| `hole` | A need no lot produces — 🔴 **cut a lot for it, or mark it `(pre-existing)`** when the code already carries it |
+| `overlap` | Two lots naming one symbol in `Produces` or `Modifies`, or citing one entry outside the contract-and-piece case — 🔴 **one lot carries it and the other needs it**, or the two are one — see *What makes a lot* |
+| `orphan` | An entry no lot cites — 🔴 **cut a lot for it, or declare it under `## Entries with no lot`**, in one of the three forms of move 10 |
+| `dead` | A production no lot needs, whose `Produces` names no caller — 🔴 **name what calls it**: a need on the lot holding the moment that triggers it, or what outside the split reaches it, in `Produces` — moves 6 and 9 |
+| `cascade` | A modified contract whose lot declares no caller and no fulfiller — 🔴 **every file in the symbol's hit list goes in `Touches`**, and a need on the lot that removes a call — move 6 |
+| `anchor` | A lot whose entries do not describe what it announces, that cites an entry the document does not hold, or that cites none — 🔴 **re-anchor, or re-cut the lot** — move 10 |
+| `section` | A lot citing a bare section, or entries from two — 🔴 **one lot per section**, each citing numbered entries — see *What makes a lot*. ⚠️ **On a `spec-technique.md` only**: on a `desc-bug.md` the unit is the bearer |
+| `bearer` | Two lots naming one bearer — 🔴 **they are one lot**, whatever sections their entries come from — see *What a bug-fix cycle changes*. ⚠️ **On a `desc-bug.md` only** |
+| `cycle` | Lots needing each other — 🔴 **re-cut the lots it names so that the symbols it names run one way**, in the direction the entries' `Consumes:` lines give — move 5. ⚠️ **That round's `## Order` and `## Blocks` are empty**, and nothing there is yours to read |
+| `merge` | Two lots changing both ends of one call, and no order leaves the module compiling — 🔴 **fold them into one lot**: a signature and its call sites go in one lot — move 6 |
 
 📌 **A defect you judge wrong** — see *Then call the Vérificateur, and
 wait*: the blocking file, never a re-cut against it.

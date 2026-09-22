@@ -227,6 +227,12 @@ and wrote what it left. ⚠️ **Without it, it starts the lot again.**
 `relecteur` again on the same lot** — 📌 **one retry is one fix and one
 review.** ⚠️ **The new verdict replaces the old**, at the same path.
 
+📌 **`FAIL mineur` and `FAIL structurel` are one FAIL here** — 🔴 **the
+form is the Réalisateur's, which reads it to fix the findings or to
+take the lot back from its move 1**; ⚠️ **you match the `PASS` prefix,
+as every reader does, and branch on `## Cause` alone** — `sheet` below,
+`reasoning` for the model.
+
 🔴 **The retry prompt names the verdict** — 📌 **a `Verdict:
 code/<lot>/verdict.md` line**, see the form under *The three agents of
 a lot*. ⚠️ **Without that line the agent takes the lot as a first
@@ -297,6 +303,11 @@ attempt** — no verdict exists yet to carry it.
 🔴 **the third realisateur is passed `opus`.** ⚠️ **A reasoning failure
 retried on the same model is the retry that fails three times and
 stops on the Product Owner.**
+
+📌 **A `## Cause` of `understanding` is the plain retry at the head of
+this move, on `sonnet`** — 🔴 **a sheet misread is a coding fault, not
+a sheet fault, and only `reasoning` counts toward `opus`**: ⚠️ **neither
+the revert above nor the model change.**
 
 **4b.** 🔴 **Before invoking anything on a lot, look for a
 `blocked_*.md` in `code/<lot>/`, `code/blocked_detailleur.md`, and

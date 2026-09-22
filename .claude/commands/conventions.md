@@ -293,6 +293,7 @@ Owner would otherwise learn of it from a file listing, at best.**
 | The run | Next |
 |---|---|
 | It raised questions | 📌 **Answer them, then `/conventions`** |
+| It raised a **`conjunction`** question | 📌 **The ordinary case** — 🔴 **the question arose between two entries, each complete on its own, and no grid could have seen the pair**: ⚠️ **answer it, then `/conventions`** — 📌 **the answer becomes a rule, and `couverture.md` carries its line** |
 | It raised a **product question** | 🔴 **The framing grid did not close the product** — ⚠️ **the Product Owner corrects the product file by hand**: 📌 **the behaviour is built in the next cycle, as a new behaviour** — 🔴 **no upstream turn re-runs** |
 | It raised an **`inconsistency`** | 🔴 **The technical document is wrong** — 📌 **say which entry**: the fix is upstream, in `/6_convertit`, not here |
 | It raised a **`forme`** question | 🔴 **The framing grid lacks a form, or one keeps producing a useless rule** — ⚠️ **the Product Owner amends the grid herself**, the grid's `R4`: 📌 **no rule is written for it**, `couverture.md` says what became of it |

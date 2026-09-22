@@ -735,8 +735,8 @@ Les valeurs — le test dépend de la forme du fichier :
 - remplie, forme à quatre ou cinq titres — n'importe quoi sous le titre : la commande nomme le fichier au prompt ; un bloc, une réponse, rien à compter
 - vide sous chaque `## Blocking N`, forme 3 — chaque `## Decision` testé un par un ; un seul vide arrête (`/2_structure`, `/3a_genre`, `/3b_nature`) ; une décision peut nommer un genre ou une nature (écrit par l'agent), une réécriture ou un retrait (la ligne reste vide, le bloc *waits on the Rédacteur*, le fichier reste au nom non numéroté pour `/2_structure`), une valeur hors table (ligne vide, rien ne tourne)
 - numérotée complète, forme 4 — chaque `## Blocking N` a sa ligne `N.` sous l'unique `## Decision` (grep `^## Blocking ` contre les lignes numérotées) : remplie
-- numérotée partielle, forme 4 — moins de numéros que de titres : l'agent a appliqué les répondus et s'est arrêté sur les autres ; la commande s'arrête sans renommer ; le numéro absent est le signal, jamais un numéro vide ni une note
-- `Not settled here. <whose it is, and why>` — l'Arbitre sur un blocage qui n'est pas le sien (Relecteur, Architecte, Cadreur avec requête) ; le Réalisateur s'arrête et relaie la ligne. Divergence : le detailleur et `/8_code` n'énumèrent pas cette valeur (elle tombe pour eux sous « pas de numéro » ou « tient quelque chose »)
+- numérotée partielle, forme 4 — moins de numéros que de titres : l'agent a appliqué les répondus et s'est arrêté sur les autres ; la commande s'arrête sans renommer ; le numéro absent est le signal, jamais un numéro vide ni une note ; le detailleur l'énumère à la reprise — un `## Blocking N` sans numéro dessous est un blocage encore debout, il s'arrête (`detailleur.md` L491)
+- `Not settled here. <whose it is, and why>` — l'Arbitre sur un blocage qui n'est pas le sien (Relecteur, Architecte, Cadreur avec requête) ; le Réalisateur s'arrête et relaie la ligne. Pas une divergence : la valeur n'atteint ni le Détailleur ni `/8_code` — l'Arbitre ne l'émet que sur un bloc dont `Written by` n'est ni detailleur ni realisateur (`arbitre.md` L172-177, L275-281) ; le fichier du Détailleur est le sien, et aucun des cinq fichiers que 4b lit ne peut la porter, `/8_code` n'invoquant jamais l'Arbitre (`8_code.md` L726)
 - une décision qui renvoie le lot au découpage — testée par la présence de `code/redecoupage.md`, jamais par les mots de la décision (realisateur, detailleur, `/8_code`)
 - le `## Verdict` d'une requête, forme 1 empilée du Cadreur — `## Decision` reste vide ; rempli sur le `# Request N` que `## Where` nomme, il lève le blocage (cadreur, `/7_lots`) ; refusé, le blocage tient et le Product Owner décide
 - absent — forme 5 du Vérificateur : rien n'est à trancher
@@ -785,23 +785,23 @@ Les valeurs :
 - `FAIL mineur` — tout le reste, quel que soit le nombre de constats ; une correction ciblée par un Réalisateur neuf, une re-revue entière
 - `FAIL structurel` — le module du lot rouge ou ses tests non lancés (première règle de tête), une section manquante de la fiche (`Cause` `sheet`), ou un symbole promis absent ou divergent sans décision (point 1) ; le lot est repris du mouvement 1
 
-Tout lecteur apparie le préfixe `PASS`. Divergence : le realisateur n'énumère que `FAIL mineur` et `FAIL structurel` ; `/8_code` distingue `PASS` et `FAIL` sans nommer les deux FAIL.
+Tout lecteur apparie le préfixe `PASS`. Divergence : aucune — `PASS` et `PASS with reservation` n'atteignent pas le realisateur : il n'est invoqué sur un verdict que sur FAIL (`8_code.md` L226, L547-549), et une reprise sur décision remplie passe le fichier de blocage, jamais `Verdict:` (`8_code.md` L74-78, L538-543) ; `/8_code` dit que `FAIL mineur` et `FAIL structurel` sont un seul FAIL pour elle, la forme étant celle du Réalisateur, et branche sur `## Cause` seul (`8_code.md` L230-234).
 
 ### Les trois causes d'un FAIL — d'où vient la faute
 
 Écrit par: relecteur (`## Cause`, la catégorie seule ; `## Causes so far`, toutes, dans l'ordre)
-Lu par: `/8_code` (`sheet` → revert et Détailleur ; `reasoning` deux fois → `opus`) ; realisateur (`sheet` → arrêt) ; relecteur suivant (copie)
+Lu par: `/8_code` (`sheet` → revert et Détailleur ; `reasoning` deux fois → `opus` ; `understanding` → la reprise ordinaire, sur `sonnet`) ; realisateur (`sheet` → arrêt ; `understanding` ou `reasoning` → rien au-delà de la ligne du statut) ; relecteur suivant (copie)
 Les valeurs :
 - `understanding` — la fiche lue de travers ; aussi la cause d'une revue arrêtée sur un build rouge
 - `reasoning` — la fiche bien lue, le raisonnement qui en part manqué ; la seule qui justifie `opus`, au seuil de deux occurrences dans `## Causes so far`
 - `sheet` — la faute est en amont, dans la fiche ; `## Findings` dit ce que la fiche manque ; `/8_code` revert les commits du lot, supprime quatre fichiers, relance le Détailleur en mode ordinaire avec `Findings:` et `Your lot:` — jamais un Réalisateur ; cela compte comme une tentative ; sur un lot qui n'est pas le dernier codé, tous les lots suivants tombent avec lui
 
-Divergence : le realisateur n'énumère que `sheet` ; `/8_code` n'énumère que `sheet` et `reasoning`, jamais `understanding` (`8_code.md`, aucune occurrence du mot) — elle tombe pour lui sous le FAIL ordinaire, un Réalisateur neuf sans changement de modèle.
+Divergence : aucune — le realisateur énumère les trois : `understanding` ou `reasoning`, rien au-delà de la ligne du statut, la cause est à l'orchestration (`realisateur.md` L605) ; `/8_code` énumère les trois : `understanding` est la reprise ordinaire sur `sonnet`, ni le revert ni le changement de modèle (`8_code.md` L307-310).
 
 ### Les onze types de défaut — ce que le Vérificateur constate
 
 Écrit par: verificateur (deuxième champ de chaque ligne de `## Defects`)
-Lu par: cadreur (corrige ce que le premier champ nomme, un lot ou une entrée) ; `/7_lots`, `/8_code` (`## Defects` vide ou non, jamais les types)
+Lu par: cadreur (les onze, une table type → correction, appliquée au lot ou à l'entrée que le premier champ nomme) ; `/7_lots`, `/8_code` (`## Defects` vide ou non, jamais les types)
 Les valeurs :
 - `surface` — une opération de l'inventaire qu'aucun lot ne produit ni ne modifie
 - `hole` — un besoin qu'aucun lot ne produit et que le Cadreur n'a pas marqué `(pre-existing)`
@@ -815,7 +815,7 @@ Les valeurs :
 - `cycle` — des lots qui ont besoin l'un de l'autre ; `## Order` et `## Blocks` restent vides pour la partie non codée
 - `merge` — deux lots qui n'en font qu'un, sur les seules ancres
 
-Divergence : le cadreur n'énumère que `orphan`, `hole`, `anchor` et « a badly cut lot » ; il corrige ce que le premier champ nomme, sans lire le type.
+Divergence : aucune — le cadreur énumère les onze, une ligne par type avec sa correction (`cadreur.md` L965-981, *The defects it reports* ; `section` sur `spec-technique.md` seul, `bearer` sur `desc-bug.md` seul).
 
 ### Les cinq Kind: — la sorte d'une question de l'Architecte
 
@@ -828,7 +828,7 @@ Les valeurs :
 - `replacement` — invocation 4 : une règle en vigueur dit le contraire de ce que la feature exige, et des lots codés suivent l'ancienne
 - `forme` — la grille manque une forme, ou une forme produit une règle inutile ; sa réponse amende la grille, par le Product Owner, `couverture.md` note `grille amendée` ou `question ouverte`
 
-Divergence : `/conventions` n'énumère que trois issues nommées — « a product question » (`coverage`), `inconsistency`, `forme` — les autres tombant sous « It raised questions ».
+Divergence : `/conventions` énumère quatre issues nommées — « a product question » (`coverage`), `conjunction` (`conventions.md` L296), `inconsistency`, `forme` ; `replacement` — atteignable à l'invocation 4 — tombe sous « It raised questions » : `/conventions` le relaie sous la ligne générique ; à trancher par le Product Owner.
 
 ### Les trois formes de « Entries with no lot » — pourquoi une entrée n'a pas de lot
 
