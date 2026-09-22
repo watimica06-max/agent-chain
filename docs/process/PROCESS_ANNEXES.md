@@ -29,7 +29,7 @@ candidat ; les trente derniers messages de commit (`git log --oneline
 
 | Candidat | Ce qu'il lit | Ce qu'il écrit ou imprime | Qui l'appelle dans la chaîne | Sa sortie façonne-t-elle un document ou un rapport que la chaîne garde ? | Verdict |
 |---|---|---|---|---|---|
-| `.claude/scripts/grouper.py` | `tracabilite-full.md` (un bloc par ligne, `ID  label  lot-01, lot-02`) | Sur la sortie standard : les groupes `G<n>`, une ligne chacun, sous `=== budget … ===` | `/9_controle`, phase 2, ligne 232 : `python3 .claude/scripts/grouper.py docs/features/<name>/tracabilite-full.md --auto` | Oui — ligne 238 : « Take the grouping it prints, unchanged » ; les lignes `G<n>` deviennent `Group:`, `Blocks:` et `Sheets:` de chaque invocation du Contrôleur (lignes 260-266), donc `code/controle/<group>.md` puis `code/rapport-controle.md` | **hors annexe — appartient à `PROCESS_AVAL.md`** §/9_controle |
+| `.claude/scripts/grouper.py` | `tracabilite-full.md` | Sur la sortie standard : les groupes `G<n>` | `/9_controle`, phase 2 | Oui — l'argument, → `MECANISMES §Périmètre d'audit` | **hors annexe — appartient à `PROCESS_AVAL.md`** §/9_controle |
 | `.claude/commands/deploie.md` | `adb devices -l` (ligne 13) ; rien dans le dépôt | Rien dans le dépôt ; un rapport en message, une ligne par appareil (lignes 61-62) ; deux installations sur deux appareils par `gradlew installDebug` | Personne — `CLAUDE.md` ligne 59 le range « outside the chain, run by hand » ; aucune commande ni aucun agent ne le nomme | Non — il n'écrit aucun fichier, il installe ce que le dépôt contient | **annexe** |
 | `.claude/commands/audit_blocages.md` | Les `blocked_*-NN.md` et `blocked_*.md` de cinq lieux du dossier de travail (lignes 26-39) ; `audit-blocages.md` de ses passes antérieures (ligne 44) | `audit-blocages.md` à la racine du dossier de travail, en ajout (ligne 140) | Personne — ligne 9-10 : « No command calls it » ; `/diagnostique` ligne 242 le cite pour dire qu'un fichier non renommé y sera listé « still open », ce n'est pas un appel | Non — voir l'argument ci-dessous | **annexe** |
 | `.claude/commands/audit_conventions.md` | `architecte/*.md`, `docs/TECHNICAL_CONVENTIONS.md` entier, `couverture.md`, les entrées du document technique que `couverture.md` nomme, les lignes `Anchor` de `code/decoupage.md`, ses passes antérieures (lignes 26-63) | `audit-conventions.md` à la racine du dossier de travail, en ajout (ligne 164) | Personne — lignes 9-10 ; `/9_controle` ligne 15 le cite comme exemple de dérivation des dossiers, `architecte.md` ligne 779 le cite pour justifier la ligne de `couverture.md` ; ni l'un ni l'autre n'est un appel | Non — voir l'argument ci-dessous | **annexe** |
@@ -66,25 +66,20 @@ contiennent — la recherche n'en trouve aucun.
 
 ### grouper.py — hors annexe
 
-`/9_controle` l'appelle en phase 2, `.claude/commands/9_controle.md`
-ligne 232, et prend son regroupement tel qu'imprimé (ligne 238, « Take
-the grouping it prints, unchanged. Never regroup by hand, never override
-the budget — the split has to be reproducible from the same input ») ;
-chaque ligne `G<n>` devient une invocation du Contrôleur (lignes
-260-266 : `Group:`, `Blocks:`, `Sheets:`), dont la sortie est
-`code/controle/<group>.md` puis, à l'assemblage, `code/rapport-controle.md`.
-Sa sortie façonne donc un rapport que la chaîne garde : il n'est pas une
-annexe. `PROCESS_AVAL.md` §/9_controle le décrit — l'entrée qu'il parse,
-`--auto`, les poids, ce qui survit à son impression et ce qui n'y
-survit pas (la marque `carried`, ligne 243). Rien de cela n'est repris
-ici.
+Le verdict est dans la table ci-dessus ; l'argument — la commande, la
+ligne, ce que sa sortie façonne — est tenu une fois, → `MECANISMES
+§Périmètre d'audit` ; ce qu'il fait est décrit dans `PROCESS_AVAL.md`
+§/9_controle. Rien de cela n'est repris ici.
 
 Un seul fait le concerne dans ce document, parce qu'il touche aussi
-`coherence.py` : la graphie `python3`. `9_controle.md` ligne 232 et la
-docstring de `grouper.py` ligne 34 écrivent `python3` ; sur cet hôte
-Windows, c'est `python` qui répond (`docs/verification/chemins-aval.md`
-lignes 591-592 : « `python3` on this Windows host is usually `python`; a
-question, not a finding »). La graphie n'a jamais été tranchée.
+`coherence.py` : la graphie de l'interpréteur. Jusqu'au 2026-09-22,
+`9_controle.md` ligne 232 et la docstring de `grouper.py` ligne 34
+écrivaient `python3` ; sur cet hôte Windows, `python3 --version` ne
+répond pas (l'alias `WindowsApps` renvoie au Store) et c'est `python`
+qui répond (`docs/verification/chemins-aval.md` lignes 591-592). Les
+deux graphies ont été passées à `python` en phase 7 — le shebang de
+`grouper.py` (ligne 1, `#!/usr/bin/env python3`) est resté, il ne sert
+pas sur cet hôte.
 
 ---
 
@@ -499,9 +494,10 @@ introduced by a correction »). Il n'entre dans aucun hook, aucun
 commit, aucune commande de cycle.
 
 **La graphie.** La docstring écrit `python` (lignes 9-10) ; les prompts
-de campagne écrivent `python3` (`docs/verification2/correction.md`
+de campagne écrivaient `python3` (`docs/verification2/correction.md`
 lignes 379 et 412, cette dernière avec des antislashs Windows) ; sur
-cet hôte c'est `python` qui répond. Même point ouvert que pour
+cet hôte `python3` ne répond pas et c'est `python` qui répond — la
+chaîne écrit `python` partout depuis la phase 7. Même point que pour
 `grouper.py`.
 
 **Décisions**
@@ -588,8 +584,8 @@ ce qu'elle a mesuré.
 **Verdict.** Annexe : aucun agent ne le lit, aucune règle n'en dérive,
 et le remettre une entrée est un geste du Product Owner sur
 `GRILLE_CONVENTIONS.md` — c'est alors la grille qui change, pas ce
-fichier, et ce changement-là relève de `PROCESS_AMONT.md` §architecte,
-qui dit comment la grille est lue.
+fichier, et ce changement-là relève de `PROCESS_AMONT.md`
+§architecte — ce qui vaut pour ses quatre invocations, qui dit comment la grille est lue.
 
 **Décisions**
 - Garder le texte entier des entrées retirées · écarté : une liste
@@ -612,7 +608,7 @@ Scripts décrits : `.claude/scripts/coherence.py`.
 Fichiers décrits : `docs/process/GRILLE_CONVENTIONS_RETIREES.md`.
 
 Candidats renvoyés ailleurs, avec leur destination :
-- `.claude/scripts/grouper.py` → `PROCESS_AVAL.md` §/9_controle — appelé
+- `.claude/scripts/grouper.py` → `PROCESS_AVAL.md` §/9_controle — confronter le fichier produit à toutes les fiches — appelé
   à `.claude/commands/9_controle.md` ligne 232, ses groupes imprimés
   forment les invocations du Contrôleur.
 

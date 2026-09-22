@@ -11,7 +11,7 @@
 | Document | Ce qu'il tient |
 |---|---|
 | `PROCESS_MECANISMES.md` | Ce document. Le fichier de blocage, le fichier de questions, `stop.md`, la forme d'un relais, le renommage `-NN` et l'archivage, l'invocation d'un agent et son frontmatter, les sections Git et worktree, les protocoles de lecture, la disposition du dossier de feature, les ensembles de valeurs fermés. Il énonce aussi, une fois pour les cinq, le périmètre d'audit. |
-| `PROCESS_ENTREES.md` | Les quatre entrées de la chaîne — `idees.md`, `/socle`, `/extrait`, `/diagnostique` — ce que chacune garantit à ce qui suit, et ce qu'elle laisse manquant. |
+| `PROCESS_ENTREES.md` | Les trois entrées de la chaîne — `idees.md`, `/socle`, `/diagnostique` — ce que chacune garantit à ce qui suit, et ce qu'elle laisse manquant. Une quatrième, `/extrait`, n'existe pas : ni commande, ni agent, absente de `CLAUDE.md` — la carte ne la nomme pas comme entrée, parce qu'une carte qui nomme une commande que personne ne peut lancer trompe son lecteur ; mais le fait qu'elle a été retirée, et comment le global naît à sa place (`INIT` du Fusionneur sur la première feature fusionnée), est ce que la section enregistre → `PROCESS_ENTREES.md` §/extrait. |
 | `PROCESS_AMONT.md` | De l'idée à `spec-technique.md` : `/1_lexique` à `/6_convertit`, plus `/conventions` et la fusion (`/fusion`, `/fusion_compare`, `/fusion_applique`). Les agents lexicographe, redacteur, decoupeur, qualifieur, classeur, sondeur, assembleur, convertisseur, fusionneur, architecte. |
 | `PROCESS_AVAL.md` | De `spec-technique.md` au code fusionné : `/7_lots`, `/8_code`, `/9_controle`. Les agents cadreur, verificateur, detailleur, arbitre, concepteur, testeur, realisateur, relecteur, controleur. |
 | `PROCESS_ANNEXES.md` | Hors périmètre d'audit : ce qui ne change aucun artefact que la chaîne produit. |
@@ -29,9 +29,9 @@
 
 Quatre documents sont audités : `PROCESS_MECANISMES.md`, `PROCESS_ENTREES.md`, `PROCESS_AMONT.md`, `PROCESS_AVAL.md`. Un seul ne l'est pas : `PROCESS_ANNEXES.md`.
 
-Le critère est unique : une annexe change aucun artefact que la chaîne produit. Ce qui y figure est vérifié au fichier, jamais supposé — `/deploie` (installe sur le téléphone, écrit rien dans le dépôt), `/audit_blocages` et `/audit_conventions` (lisent et rapportent dans `audit-blocages.md` et `audit-conventions.md`, que rien dans la chaîne ne relit), `.claude/scripts/coherence.py`, `docs/process/GRILLE_CONVENTIONS_RETIREES.md`. `.claude/scripts/grouper.py` est le cas à trancher au fichier : `/9_controle` l'appelle en phase 2 et prend son regroupement tel qu'imprimé pour former les prompts du Contrôleur — sa sortie façonne `code/controle/<group>.md` et le rapport ; si ce trait est confirmé au fichier, il n'est pas une annexe et appartient à `PROCESS_AVAL.md`, qui dit alors la commande et la ligne.
+Le critère est unique : une annexe change aucun artefact que la chaîne produit. Ce qui y figure est vérifié au fichier, jamais supposé — `/deploie` (installe sur le téléphone, écrit rien dans le dépôt), `/audit_blocages` et `/audit_conventions` (lisent et rapportent dans `audit-blocages.md` et `audit-conventions.md`, que rien dans la chaîne ne relit), `.claude/scripts/coherence.py`, `docs/process/GRILLE_CONVENTIONS_RETIREES.md`. `.claude/scripts/grouper.py` n'est pas une annexe, et voici l'argument, tenu ici seul : `/9_controle` l'appelle en phase 2 (`.claude/commands/9_controle.md`, ligne 232 : `python .claude/scripts/grouper.py docs/features/<name>/tracabilite-full.md --auto`) et prend son regroupement tel qu'imprimé (ligne 238 : « Take the grouping it prints, unchanged. Never regroup by hand, never override the budget ») ; chaque ligne `G<n>` qu'il imprime devient les lignes `Group:`, `Blocks:` et `Sheets:` d'une invocation du Contrôleur (lignes 267-269), dont la sortie est `code/controle/<group>.md` puis, à l'assemblage, `code/rapport-controle.md`. Sa sortie façonne donc un rapport que la chaîne garde ; il appartient à `PROCESS_AVAL.md` §/9_controle — confronter le fichier produit à toutes les fiches, qui décrit ce qu'il fait — son entrée, sa sortie, ce que la commande en prend sans y toucher — et ne redit pas cet argument.
 
-Ce périmètre est énoncé ici et nulle part ailleurs dans les cinq documents.
+Ce périmètre, et cet argument, sont énoncés ici et nulle part ailleurs dans les cinq documents : les autres documents y renvoient par `→ MECANISMES §Périmètre d'audit`.
 
 ## Comment lire une entrée
 
@@ -577,7 +577,7 @@ Coût et écarté : une section par nature, écrite à part et assemblée par sc
 
 Utilisé par: convertisseur (scripteur) ; `/6_convertit`, architecte, `/9_controle` (lecteurs).
 
-À la racine de la feature, écrit par l'invocation 2 du Convertisseur : une ligne par bloc du fichier produit, dans son ordre — l'identifiant, le titre, puis ses entrées ou un tiret — deux espaces au moins entre colonnes, rien d'autre, pas d'en-tête ; tout bloc y figure, ceux sans entrée compris. `/6_convertit` compare sa première colonne aux identifiants des titres de `desc-produit.md` (un manquant ou un en trop est une faute du run) et teste sa présence comme preuve que le document tient ; l'Architecte (invocation 1, mouvement 2) y lit la correspondance bloc → entrées et lève `inconsistency` sur un tiret d'un bloc `comportement` ou `référence` seulement ; `/9_controle` (phase 1) en tire bloc → entrées pour `tracabilite-full.md`, qui reprend la forme — identifiant, deux espaces, `lot-NN` séparés par des virgules ou un tiret, puis le mot `carried` — et que `grouper.py` parse.
+À la racine de la feature, écrit par l'invocation 2 du Convertisseur : une ligne par bloc du fichier produit, dans son ordre — l'identifiant, le titre, puis ses entrées ou un tiret — deux espaces au moins entre colonnes, rien d'autre, pas d'en-tête ; tout bloc y figure, ceux sans entrée compris. `/6_convertit` compare sa première colonne aux identifiants des titres de `desc-produit.md` (un manquant ou un en trop est une faute du run) et teste sa présence comme preuve que le document tient ; l'Architecte (invocations 1 et 4, mouvement 2 — l'invocation 4 rejoue les mouvements 2 à 10 de la 1) y lit la correspondance bloc → entrées et lève `inconsistency` sur un tiret d'un bloc `comportement` ou `référence` seulement ; `/9_controle` (phase 1) en tire bloc → entrées pour `tracabilite-full.md`, qui reprend la forme — identifiant, deux espaces, `lot-NN` séparés par des virgules ou un tiret, puis le mot `carried` — et que `grouper.py` parse.
 
 Coût et écarté : un tiret plutôt qu'une ligne absente · écarté : ne lister que les blocs à entrées · raison : un tiret dit que quelqu'un a regardé ; une ligne absente ne dit rien (`convertisseur.md`, mouvement 5) · inconnu. Le tiret non questionné hors `comportement` et `référence` · écarté : questionner tout tiret · raison : chaque dérivation demandait au Product Owner des blocs qui n'ont produit aucune entrée à dessein (`docs/verification3/plan.md` entrée 31) · inconnu.
 
@@ -796,7 +796,7 @@ Les valeurs :
 - `reasoning` — la fiche bien lue, le raisonnement qui en part manqué ; la seule qui justifie `opus`, au seuil de deux occurrences dans `## Causes so far`
 - `sheet` — la faute est en amont, dans la fiche ; `## Findings` dit ce que la fiche manque ; `/8_code` revert les commits du lot, supprime quatre fichiers, relance le Détailleur en mode ordinaire avec `Findings:` et `Your lot:` — jamais un Réalisateur ; cela compte comme une tentative ; sur un lot qui n'est pas le dernier codé, tous les lots suivants tombent avec lui
 
-Divergence : le realisateur n'énumère que `sheet`.
+Divergence : le realisateur n'énumère que `sheet` ; `/8_code` n'énumère que `sheet` et `reasoning`, jamais `understanding` (`8_code.md`, aucune occurrence du mot) — elle tombe pour lui sous le FAIL ordinaire, un Réalisateur neuf sans changement de modèle.
 
 ### Les onze types de défaut — ce que le Vérificateur constate
 
@@ -900,40 +900,50 @@ Les valeurs :
 - manquante (`## Intentions missing`) — aucune signature ni critère des fiches du groupe ne l'observe ; un fait, pas un doute ; jamais sur un bloc marqué `carried`
 - douteuse (`## Doubts`) — un critère peut l'observer sans que la fiche dise lequel ; une fiche nommée absente ; à l'assemblage, un bloc que nul partiel ne mentionne, un écart entre la ligne `Blocks:` d'un partiel et celle du prompt, un groupe sans partiel
 
+### Rouge / vert par la déclaration seule — l'état d'un test neuf
+
+Écrit par: testeur (sous `## Red` de `code/<lot>/tests.md` — la commande qui a tourné, puis une ligne par test neuf rouge, puis une ligne par test laissé vert ou un tiret, puis que chaque test ancien passe ; mouvement 4)
+Lu par: realisateur (un test nommé vert n'est pas à rendre vert ; `## Red` est ce qu'il prend pour acquis sans relancer les tests) ; relecteur (point 2 : un test nommé vert par déclaration est le test de son critère ; il ne lance aucun test)
+Les valeurs — chaque test neuf est l'un ou l'autre, jamais un troisième :
+- rouge — le test échoue contre le corps qui jette *not implemented* ; le test : il appelle un corps, et tout ce qui appelle un corps lève ; un test neuf qui passe en appelant un corps est réécrit, il n'affirme rien
+- vert par la déclaration seule — le test affirme une déclaration seule (la présence d'un champ, l'arité d'un constructeur, les membres d'une enum) et le critère est tenu par la déclaration ; le test : il passe sans appeler un corps ; laissé vert, jamais affaibli pour le rendre rouge, et nommé sous `## Red` — un vert non nommé se lit comme un test qui n'affirme rien
+
+Un test ancien n'entre pas dans cet ensemble : il passe, ou il échoue sur le *not implemented* et le Réalisateur le rend vert, ou il est adapté à une signature `modified`. Divergence : aucune — les deux lecteurs lisent les deux états (`realisateur.md`, *What you read* ; `relecteur.md`, point 2).
+
 ---
 
 ## Renvoyés aux documents de parcours
 
 Un seul utilisateur : décrit dans le document de l'agent ou de la commande qui le porte, pas ici.
 
-- `missing` · `wrong` · `set aside` — le verdict d'une investigation ; le diagnostiqueur seul (invocation 1 écrit, invocation 2 lit) → `PROCESS_ENTREES.md` §diagnostiqueur
-- `## Verdict` · `## Bearer` · `## Trigger` (finissant par `observed`, `nothing observes it` ou `none — …`) · `## Today` · `## Expected` · `## Searched` — les six titres d'un rapport `investigation/<id>.md` → `PROCESS_ENTREES.md` §diagnostiqueur
-- `blocking` · `assumed` · `misplaced` — les trois mots du rapport du Convertisseur ; aucune commande ne les lit → `PROCESS_AMONT.md` §convertisseur
-- `mechanical` · `review` · `off-grid` — les quatrième et cinquième champs d'une règle ; l'architecte seul → `PROCESS_AMONT.md` §architecte
-- `corrigé` · `question ouverte` · `grille amendée` · `requête` · `directive` · `no rule` — les mentions de `couverture.md` ; l'architecte seul les écrit et les relit → `PROCESS_AMONT.md` §architecte
-- V1 à V10, C1 à C12, `R2`, `R3`, `R4` — les lectures et entrées de `GRILLE_CONVENTIONS.md` ; l'architecte seul → `PROCESS_AMONT.md` §architecte
-- Pass A, B, C et `C1.2` — les passes de `GRILLE_CADRAGE_PRODUIT_V2.md` ; le sondeur seul → `PROCESS_AMONT.md` §sondeur
-- Les fermetures de `GRILLE_FERMETURE_TECHNIQUE.md` par nature et à travers les sections ; le convertisseur (le diagnostiqueur en lit trois nommées, pas les mêmes) → `PROCESS_AMONT.md` §convertisseur, `PROCESS_ENTREES.md` §diagnostiqueur
-- `## Tranché` déplacement des termes, les trois balayages, les quatre lectures d'une paire, `remplace :`, `dans ce sens seulement` — le lexicographe seul → `PROCESS_AMONT.md` §lexicographe
-- La table des préfixes qui retirent les marqueurs (`sondeur`, `existant`, `convertisseur` contre `qualifieur`, `classeur`, `redacteur`) — le redacteur seul → `PROCESS_AMONT.md` §redacteur
-- Le test pour `transverse` et l'asymétrie des deux doutes — le qualifieur seul → `PROCESS_AMONT.md` §qualifieur
-- Les frontières entre natures et les trois doutes — le classeur seul → `PROCESS_AMONT.md` §classeur
-- Le critère du déclencheur et de la suite — le decoupeur seul → `PROCESS_AMONT.md` §decoupeur
-- Le test de fusion « répondre à l'une répond à l'autre », la question couvrante gardée — l'assembleur seul → `PROCESS_AMONT.md` §assembleur
-- Le test de réversibilité (ce que le Convertisseur tranche, ce qu'il demande), la scission d'une règle transverse, les neuf sections — le convertisseur seul → `PROCESS_AMONT.md` §convertisseur
+- `missing` · `wrong` · `set aside` — le verdict d'une investigation ; le diagnostiqueur seul (invocation 1 écrit, invocation 2 lit) → `PROCESS_ENTREES.md` §diagnostiqueur, invocation 1 — Investigation : confirmer un manque contre le code, §diagnostiqueur, invocation 2 — Assembly : assembler les rapports en `desc-bug.md`
+- `## Verdict` · `## Bearer` · `## Trigger` (finissant par `observed`, `nothing observes it` ou `none — …`) · `## Today` · `## Expected` · `## Searched` — les six titres d'un rapport `investigation/<id>.md` → `PROCESS_ENTREES.md` §diagnostiqueur, invocation 1 — Investigation : confirmer un manque contre le code
+- `blocking` · `assumed` · `misplaced` — les trois mots du rapport du Convertisseur ; aucune commande ne les lit → `PROCESS_AMONT.md` §convertisseur, invocation 1 — Nature : écrire la section d'une nature, §convertisseur, invocation 2 — Transversal : le préambule, §9 Text, les références, la traçabilité
+- `mechanical` · `review` · `off-grid` — les quatrième et cinquième champs d'une règle ; l'architecte seul → `PROCESS_AMONT.md` §architecte — ce qui vaut pour ses quatre invocations
+- `corrigé` · `question ouverte` · `grille amendée` · `requête` · `directive` · `no rule` — les mentions de `couverture.md` ; l'architecte seul les écrit et seul les énumère en les relisant (invocations 2, 3, 4) ; `/audit_conventions` lit aussi `couverture.md`, ligne par ligne, pour l'entrée que chaque règle trace (constats 1, 4 et 7 — une règle tracée à aucune entrée vient d'une requête), sans jamais lire ces mots comme des valeurs (`audit_conventions.md`, *What you read*, *couverture.md*) → `PROCESS_AMONT.md` §architecte — ce qui vaut pour ses quatre invocations ; `PROCESS_ANNEXES.md` §/audit_conventions — lire ce que les conventions ont gagné pendant un cycle et rapporter ce que cela coûte
+- V1 à V10, C1 à C12, `R2`, `R3`, `R4` — les lectures et entrées de `GRILLE_CONVENTIONS.md` ; l'architecte seul → `PROCESS_AMONT.md` §architecte — ce qui vaut pour ses quatre invocations
+- Pass A, B, C et `C1.2` — les passes de `GRILLE_CADRAGE_PRODUIT_V2.md` ; le sondeur seul → `PROCESS_AMONT.md` §sondeur, invocation 1 — Angle : la passe A de la grille de cadrage, trois à la fois, un ordre de lecture chacun, §sondeur, invocation 2 — Global : le relevé de chaque comportement, puis les passes B et C
+- Les fermetures de `GRILLE_FERMETURE_TECHNIQUE.md` par nature et à travers les sections ; le convertisseur (le diagnostiqueur en lit trois nommées, pas les mêmes) → `PROCESS_AMONT.md` §convertisseur, invocation 1 — Nature : écrire la section d'une nature, §convertisseur, invocation 2 — Transversal : le préambule, §9 Text, les références, la traçabilité ; `PROCESS_ENTREES.md` §diagnostiqueur, invocation 2 — Assembly : assembler les rapports en `desc-bug.md`
+- `## Tranché` déplacement des termes, les trois balayages, les quatre lectures d'une paire, `remplace :`, `dans ce sens seulement` — le lexicographe seul → `PROCESS_AMONT.md` §lexicographe, invocation 1 — Sweeping : balayer les termes de l'idée et lever les paires, §lexicographe, invocation 2 — Settling : appliquer les réponses à l'idée et régler le lexique, §lexicographe, invocation 3 — Watching : balayer les réponses d'un autre agent, §lexicographe, invocation 4 — Correcting : appliquer ses propres réponses au fichier répondu
+- La table des préfixes qui retirent les marqueurs (`sondeur`, `existant`, `convertisseur` contre `qualifieur`, `classeur`, `redacteur`) — le redacteur seul → `PROCESS_AMONT.md` §redacteur, invocation 2 — Integrating : intégrer un fichier répondu ou une décision de réécriture
+- Le test pour `transverse` et l'asymétrie des deux doutes — le qualifieur seul → `PROCESS_AMONT.md` §qualifieur — écrire la ligne `Genre:` de chaque bloc nommé
+- Les frontières entre natures et les trois doutes — le classeur seul → `PROCESS_AMONT.md` §classeur — écrire la ligne `Nature:` de chaque comportement nommé
+- Le critère du déclencheur et de la suite — le decoupeur seul → `PROCESS_AMONT.md` §decoupeur — scinder les blocs qui portent plus d'un déclencheur
+- Le test de fusion « répondre à l'une répond à l'autre », la question couvrante gardée — l'assembleur seul → `PROCESS_AMONT.md` §assembleur — fusionner les quatre fichiers de questions en un
+- Le test de réversibilité (ce que le Convertisseur tranche, ce qu'il demande), la scission d'une règle transverse, les neuf sections — le convertisseur seul → `PROCESS_AMONT.md` §convertisseur, invocation 1 — Nature : écrire la section d'une nature, §convertisseur, invocation 2 — Transversal : le préambule, §9 Text, les références, la traçabilité
 - La table de `/6_convertit` sur quelles natures tournent (huit lignes, plusieurs pouvant s'appliquer, `cmp`/`diff -q`) → `PROCESS_AMONT.md` §/6_convertit
-- La table de routage à onze lignes de `/fusion`, les trois niveaux de localisation, la liste de retrait (`Genre:`, `Global:`, `Nature:` vide, le numéro), le rapport de fusion à quatre champs → `PROCESS_AMONT.md` §/fusion, §fusionneur
+- La table de routage à onze lignes de `/fusion`, les trois niveaux de localisation, la liste de retrait (`Genre:`, `Global:`, `Nature:` vide, le numéro), le rapport de fusion à quatre champs → `PROCESS_AMONT.md` §/fusion, §fusionneur, invocation 1 — Compare and question : le plan de fusion, §fusionneur, invocation 2 — Apply : appliquer le plan et écrire le rapport
 - La table à onze lignes de `/conventions` → `PROCESS_AMONT.md` §/conventions
-- Les dix mouvements du Cadreur, les cinq déclarations d'un symbole, les pièces et les écouteurs, les blocs A/B/C/D → `PROCESS_AVAL.md` §cadreur
-- Les six mouvements du Vérificateur, l'algorithme d'ordre et le départage mécanique → `PROCESS_AVAL.md` §verificateur
-- La marche du bloc, les neuf mouvements, le mode divergence, la dérivation d'une signature et les trois propriétés d'un critère → `PROCESS_AVAL.md` §detailleur
-- Le test unique de l'Arbitre, les trois mouvements, les quatre destinations d'une règle manquante, le sondage du Product Owner (toutes les 2 minutes de 0 à 10, toutes les 5 de 10 à 20, arrêt à 20) → `PROCESS_AVAL.md` §arbitre
-- Les cinq points de la checklist et ses deux règles de tête → `PROCESS_AVAL.md` §relecteur
-- Les six mouvements du Testeur, le test laissé vert par la déclaration seule, `code/recette.md` → `PROCESS_AVAL.md` §testeur
-- Les cinq mouvements du Concepteur et le corps `not implemented` → `PROCESS_AVAL.md` §concepteur
-- Les neuf mouvements du Réalisateur, la reprise après FAIL, deux échecs identiques de suite → `PROCESS_AVAL.md` §realisateur
-- Les mouvements 1 à 7 de `/8_code`, le compte de trois tentatives (`## Attempts`), la tentative vide, le retour au découpage à trois → `PROCESS_AVAL.md` §/8_code
-- Les six phases de `/9_controle`, `grouper.py`, le tri par état de `recette-ordonnee.md`, la forme de `decisions-produit.md` (identifiant, deux espaces, une ligne par décision) → `PROCESS_AVAL.md` §/9_controle
+- Les dix mouvements du Cadreur, les cinq déclarations d'un symbole, les pièces et les écouteurs, les blocs A/B/C/D → `PROCESS_AVAL.md` §cadreur — couper le document technique en lots livrables, puis tenir la boucle avec le Vérificateur
+- Les six mouvements du Vérificateur, l'algorithme d'ordre et le départage mécanique → `PROCESS_AVAL.md` §verificateur — vérifier qu'un découpage tient et produire la séquence
+- La marche du bloc, les neuf mouvements, le mode divergence, la dérivation d'une signature et les trois propriétés d'un critère → `PROCESS_AVAL.md` §detailleur, mode ordinaire — écrire les fiches exécutables d'un bloc, §detailleur, mode divergence — réécrire les fiches qu'une divergence a rendues fausses
+- Le test unique de l'Arbitre, les trois mouvements, les quatre destinations d'une règle manquante, le sondage du Product Owner (toutes les 2 minutes de 0 à 10, toutes les 5 de 10 à 20, arrêt à 20) → `PROCESS_AVAL.md` §arbitre — remplir le `## Decision` d'un fichier de blocage du Détailleur ou du Réalisateur
+- Les cinq points de la checklist et ses deux règles de tête → `PROCESS_AVAL.md` §relecteur — juger un lot contre sa fiche et écrire le verdict
+- Les six mouvements du Testeur, le test laissé vert par la déclaration seule, `code/recette.md` → `PROCESS_AVAL.md` §testeur — écrire un test par critère, avant les corps, et vérifier qu'il est rouge
+- Les cinq mouvements du Concepteur et le corps `not implemented` → `PROCESS_AVAL.md` §concepteur — déclarer les signatures de la fiche, corps `not implemented`, et compiler
+- Les neuf mouvements du Réalisateur, la reprise après FAIL, deux échecs identiques de suite → `PROCESS_AVAL.md` §realisateur — première passe sur un lot : remplir les corps jusqu'à ce que les tests passent, §realisateur, reprise après FAIL — corriger ce que le verdict nomme
+- Les mouvements 1 à 7 de `/8_code`, le compte de trois tentatives (`## Attempts`), la tentative vide, le retour au découpage à trois → `PROCESS_AVAL.md` §/8_code — coder les lots en attente d'un découpage, un par un
+- Les six phases de `/9_controle`, `grouper.py`, le tri par état de `recette-ordonnee.md`, la forme de `decisions-produit.md` (identifiant, deux espaces, une ligne par décision) → `PROCESS_AVAL.md` §/9_controle — confronter le fichier produit à toutes les fiches
 - Les cinq lieux et les cinq trouvailles de `/audit_blocages`, les sept trouvailles de `/audit_conventions`, les modèles `SM_S928B` et `SM_L705F` de `/deploie` → `PROCESS_ANNEXES.md`
 - `docs/PRODUIT_GLOBAL.md` à `# Application`, `docs/CURRENT_TECHNICAL_STATE.md` à `# Technical state` — ce que `/socle` crée → `PROCESS_ENTREES.md` §/socle
 
@@ -953,6 +963,7 @@ Un seul utilisateur : décrit dans le document de l'agent ou de la commande qui 
 | `questions-fusionneur-NN.md` répondu | `/fusion` (lignes 7, 9), `/fusion_applique` ; le Fusionneur relit ses propres fichiers | `Answer:` vide → arrêt ; `### Q` n'arrête pas `/fusion_compare` | `PROCESS_AMONT.md` |
 | `stop.md` créé dans le dépôt principal (→ `### stop.md`) | `/8_code`, mouvement 6, fin de lot | Présence dans le dépôt principal, jamais dans le worktree | `PROCESS_AVAL.md` |
 | Les lignes `.gitignore` de `stop.md` et `stop1.md` | `/socle` les ajoute si absentes | Jamais commités | `PROCESS_ENTREES.md` |
+| Le commit `chore: scaffolding for the chain` de `/socle` — en place dans le dépôt principal, sans worktree, poussé (→ `### Commit sans worktree`) | Le `HEAD` local depuis lequel chaque commande qui invoque crée son worktree (→ `### Git, avant l'invocation`, pas 2) | `git worktree add .claude/worktrees/<name> HEAD`, jamais une base choisie par l'outillage ; un push qui échoue est rapporté, ni retenté ni contourné, et le commit tient localement | `PROCESS_ENTREES.md` |
 | Le `model` du frontmatter (→ `### Frontmatter d'un agent`) | Le `model=` de chaque `Agent()` | Concorde avec le frontmatter ; l'exception `opus` du troisième realisateur | tous |
 | `Bash` absent du frontmatter | Le pas 1 des cinq pas Git : la commande commite ce que l'agent a écrit | `git status` avant le `remove` ; jamais de force | tous |
 | Un worktree créé depuis `HEAD` par la commande (→ `### Git, avant l'invocation`) | Chaque agent écrit en chemins relatifs, dans ce worktree | Un chemin absolu échoue | tous |
@@ -963,7 +974,7 @@ Un seul utilisateur : décrit dans le document de l'agent ou de la commande qui 
 | `## Redécoupage: archivable` dans `code/sequence.md` | `/7_lots` renomme `code/redecoupage.md` et retire la ligne | La ligne lue au fichier, pas au rapport | `PROCESS_AVAL.md` |
 | `desc-produit.md` fermé, sans marqueur, `questions-sondeur-NN.md` et `questions-existant-NN.md` vides (→ `### Marqueurs NEW et MODIFIED`) | `/5_reclasse` écrit `par-genre/` et `desc-par-nature.md` | Les greps `^### .*NEW`, `^### .*MODIFIED`, `^### Q` sur les deux plus hauts | `PROCESS_AMONT.md` |
 | `spec-technique.md` avec `# Preamble`, sans `<<ASSUMED` ni `[B`, `tracabilite.md` à côté (→ `### Fichiers de la conversion`, `### Marques <<ASSUMED et [B`) | `/conventions` (l'Architecte dérive) puis `/7_lots` (le Cadreur greppe et coupe) | Le grep du Cadreur au mouvement 1 ; `^### §` par `/7_lots` — zéro entrée arrête sans découpage | `PROCESS_AMONT.md` → `PROCESS_AVAL.md` |
-| `tracabilite.md` (→ `### tracabilite.md`) | L'Architecte (invocation 1, mouvement 2) ; `/9_controle` (phase 1) | Première colonne contre les titres de `desc-produit.md` ; un tiret ne lève `inconsistency` que sur `comportement` et `référence` | `PROCESS_AMONT.md`, `PROCESS_AVAL.md` |
+| `tracabilite.md` (→ `### tracabilite.md`) | L'Architecte (invocations 1 et 4, mouvement 2) ; `/9_controle` (phase 1) | Première colonne contre les titres de `desc-produit.md` ; un tiret ne lève `inconsistency` que sur `comportement` et `référence` | `PROCESS_AMONT.md`, `PROCESS_AVAL.md` |
 | `code/decisions-produit.md` par cycle (→ `### Identifiants`, `B<n>`) | Le Rédacteur, invocation 3, nommé par `/fusion` dans l'ordre des cycles | Une décision par ligne, l'identifiant d'abord ou un tiret, en français | `PROCESS_AVAL.md` → `PROCESS_AMONT.md` |
 | `(B<n>)` en fin de première ligne d'un manque de `bug-list.md` | Le Diagnostiqueur le copie dans le titre d'entrée, le Cadreur dans l'`Anchor:`, `/9_controle` marque `carried` (→ `### Marque carried`) | La forme exacte, entre parenthèses, en fin de première ligne | `PROCESS_ENTREES.md` → `PROCESS_AVAL.md` |
 | `docs/CURRENT_TECHNICAL_STATE.md` créé par `/socle` (→ `### Lecture de l'état technique`) | Le Réalisateur et l'Arbitre y écrivent, le Détailleur, le Réalisateur et le Diagnostiqueur y lisent deux sections puis des greps | La compétence `technical-state-format` chargée avant d'écrire | `PROCESS_ENTREES.md`, `PROCESS_AVAL.md` |
@@ -1067,3 +1078,4 @@ Ensembles fermés tenus ici, un par ligne :
 - Plafonds par couche — ce qu'un lot et un bloc peuvent porter
 - Ordres de lecture des sondeurs — ce qui distingue les trois angles
 - Found / Missing / Doubtful — le sort d'une intention
+- Rouge / vert par la déclaration seule — l'état d'un test neuf

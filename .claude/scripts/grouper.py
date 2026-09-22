@@ -31,7 +31,7 @@ Method
 
 Usage
 -----
-    python3 grouper.py <file> [--groups N] [--balance blocks|fiches]
+    python grouper.py <file> [--groups N] [--balance blocks|fiches]
 
 Input format: one block per line, "ID  label  lot-01, lot-02"
 Any line without a lot reference is ignored. Blocks with no lot are kept

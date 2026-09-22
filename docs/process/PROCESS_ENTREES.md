@@ -30,10 +30,14 @@ exercée, `non éprouvée` pour toute décision de
 Un fait de disque, vérifié le jour de cette rédaction et rapporté parce
 qu'il est auditable : `.claude/commands/` tient vingt fichiers et aucun
 `extrait.md` ; `.claude/agents/` tient vingt fichiers et aucun
-`extracteur.md` ; `.gitignore` du projet ne porte aucune ligne
-`stop.md` ; `docs/PRODUIT_GLOBAL.md`, `docs/CURRENT_TECHNICAL_STATE.md`
-et `docs/TECHNICAL_CONVENTIONS.md` existent ; `docs/features/` n'existe
-pas ; `.claude/skills/technical-state-format/SKILL.md` existe.
+`extracteur.md` ; `.gitignore` du projet porte, lignes 18-19, les deux
+lignes `docs/features/*/stop.md` et `docs/features/*/stop1.md` ;
+`docs/PRODUIT_GLOBAL.md` (une ligne, `# Application`),
+`docs/CURRENT_TECHNICAL_STATE.md` (2 305 lignes, dont `## Traps —
+general` et `## Dead state`) et `docs/TECHNICAL_CONVENTIONS.md` existent ;
+`docs/features/` existe et tient deux dossiers de feature,
+`premiere-app/` et `premiere-app-2/` ;
+`.claude/skills/technical-state-format/SKILL.md` existe.
 
 ---
 
@@ -237,9 +241,14 @@ n'invoque personne.
   même titre seul pour savoir où écrire.
 - Au Détailleur, au Réalisateur, au Diagnostiqueur : un état technique
   présent, dont les deux sections ouvertes `## Traps — general` et
-  `## Dead state` n'existent pas encore — un grep du titre ne rend
-  rien, la lecture bornée ne lit rien ; au Réalisateur et à l'Arbitre,
-  un fichier où écrire sous la compétence `technical-state-format`.
+  `## Dead state` n'existent pas encore au sortir de `/socle` — le
+  fichier n'a que `# Technical state`, un grep du titre ne rend rien,
+  la lecture bornée ne lit rien ; elles apparaissent quand le
+  Réalisateur ou l'Arbitre y écrit, sous la compétence
+  `technical-state-format` qui fixe ces deux titres (sur ce projet,
+  après les lots codés, le fichier a 2 305 lignes et les porte, lignes
+  1985 et 2297) ; au Réalisateur et à l'Arbitre, un fichier où écrire
+  sous cette compétence.
 - À `/8_code` : deux lignes de `.gitignore` qui gardent `stop.md` et
   `stop1.md` hors de tout commit — la commande les cherche dans le
   dépôt principal, jamais dans le worktree (→ MECANISMES §stop.md).
@@ -249,7 +258,7 @@ n'invoque personne.
 **Ce qu'elle laisse manquant**
 
 - `docs/TECHNICAL_CONVENTIONS.md` — l'Architecte, invocation 1, à
-  `/conventions` (`PROCESS_AMONT.md` §architecte, §/conventions).
+  `/conventions` (`PROCESS_AMONT.md` §architecte, invocation 1 — Deriving : la première dérivation du dépôt, §/conventions).
 - `docs/features/<name>/` et `idees.md` — le Product Owner, entrée 1.
 - Les quatre grilles de `docs/process/` — `GRILLE_CADRAGE_PRODUIT_V2.md`
   (Sondeur 1, 2), `GRILLE_EXISTANT.md` (Sondeur 3),
@@ -269,9 +278,10 @@ n'invoque personne.
 - Le seul arrêt teste le global : un `docs/CURRENT_TECHNICAL_STATE.md`
   déjà présent sans global n'arrête rien, et le fichier de commande ne
   dit pas s'il est réécrit ou laissé.
-- Sur ce projet, `.gitignore` ne porte pas les deux lignes alors que les
-  trois fichiers existent : la commande dans sa forme actuelle n'y a
-  pas tourné, ou pas entière.
+- Sur ce projet, rien de ce que `/socle` crée ne manque au disque :
+  `.gitignore` porte les deux lignes (18-19), les trois fichiers
+  existent, et `docs/features/` tient déjà deux dossiers de feature —
+  la vérification ne dit rien de plus sur le run qui les a posés.
 
 **Décisions**
 
@@ -315,8 +325,9 @@ refonte.** `Get-ChildItem .claude/commands` rend vingt fichiers, aucun
 commandes, et le registre des agents de `→ MECANISMES §Frontmatter
 d'un agent` ne porte aucun extracteur. Le brief de cette refonte la
 nomme comme troisième entrée ; la carte des cinq documents de
-`PROCESS_MECANISMES.md` la reprend. Ce document dit ce qu'il y a, et
-ne l'invente pas.
+`PROCESS_MECANISMES.md` ne la compte pas parmi les entrées et renvoie
+à cette section pour ce qu'elle enregistre. Ce document dit ce qu'il y
+a, et ne l'invente pas.
 
 Prend: aucun.
 Rend: aucun.
@@ -363,26 +374,25 @@ rend une seule mécanique, qui n'est pas une extraction :
   prend et qu'autre chose tient déjà, ce que le bloc dit et que la
   section dit autrement, ce que la feature retire sans le dire, le test
   de clôture. Ses questions ne sont pas copiées ici.
-- Qui la lit aujourd'hui : le **Sondeur, invocation 3 — Existant**,
-  invoqué par `/4_grille` au second temps, seul, après que les deux
-  premières invocations ont fermé la feature ; le prompt porte `The
-  grid: docs/process/GRILLE_EXISTANT.md.`, `Invocation 3 — Existant.`,
-  les blocs à ligne `Global:` avec la section que chacun nomme, `Write
-  to docs/features/<name>/questions-existant-NN.md.`, et son fichier
-  de blocage `blocked_existant.md` à la racine de la feature (→
-  MECANISMES §Emplacement des fichiers de blocage, §Numéros
-  d'invocation). Il lit le global par les seules sections que les
-  lignes `Global:` nomment, une section une fois (→ MECANISMES
-  §Lecture du global par l'index), n'écrit jamais de ligne `Défaut:`,
-  et écrit son fichier même vide — ce qui termine le second temps.
-  Description entière : `PROCESS_AMONT.md` §sondeur, invocation 3, et
-  §/4_grille.
+- Qui la lit aujourd'hui : le Sondeur, invocation 3 — l'entrée courte
+  ci-dessous, et rien de plus ici.
 - Ce qui en découle ailleurs : `/5_reclasse` teste le plus haut
   `questions-existant-NN.md` sans `### Q` avant de reclasser ; le
   Rédacteur retire tous les marqueurs quand le fichier intégré a pour
   préfixe `existant` (→ MECANISMES §Marqueurs NEW et MODIFIED) ; le
   préfixe `existant` est un préfixe de grille, pas un agent
   (`redacteur.md` L136).
+
+### sondeur, invocation 3 — ce que l'entrée `/extrait` en retient
+
+Ce qui change : rien dans l'invocation — `/4_grille` l'invoque au
+second temps, `PROCESS_AMONT.md` la décrit. Ce que cette entrée en
+retient : la lecture de `GRILLE_EXISTANT.md` est la seule mécanique
+de la chaîne sur l'existant — elle ferme une feature contre le global
+déjà écrit, section nommée par section nommée, jamais contre le code ;
+elle ne remplace pas l'extraction supprimée, et un comportement que le
+code porte sans qu'aucune feature l'ait décrit lui reste invisible.
+Description complète : `PROCESS_AMONT.md` §sondeur, invocation 3 — Existant : la feature contre ce qui est déjà bâti
 
 Rien de cela ne prend une feature déjà codée pour en écrire le fichier
 produit ou le global : l'entrée par extraction n'a, dans cette chaîne,
@@ -1088,9 +1098,9 @@ blocage.
 |---|---|---|---|
 | `docs/features/<name>/idees.md`, écrit à la main, en français, textes affichés entre guillemets | `/1_lexique`, invocation 1 puis 2 — le Lexicographe le lit entier, y remplace les termes retirés, ajoute ou retire des guillemets | Le Lexicographe bloque sur *no idea file* ou fichier vide ; la commande ne l'ouvre jamais ; le fichier atteint le worktree par `chore: answers` | `PROCESS_AMONT.md` |
 | `idees.md` au vocabulaire réglé, `lexique.md` à côté, le plus haut `questions-lexicographe-NN.md` sans `### Q` | `/2_structure`, invocation 1 — le Rédacteur transcrit en `desc-produit.md`, une fois | `^### Q` sur le plus haut fichier du lexicographe, à la racine ou sous `questions/lexicographe/` ; aucun `desc-produit.md` ; le Rédacteur bloque sur deux sujets sans lien | `PROCESS_AMONT.md` |
-| `docs/features/`, vide, créé par `/socle` — hors commit, git ne suit pas un dossier vide | Le Product Owner y crée `<name>/` ; chaque commande dérive `docs/features/<name>/` de son argument | Rien — aucune commande ne teste l'existence du dossier de feature | `PROCESS_AMONT.md`, `PROCESS_AVAL.md` |
+| `docs/features/`, créé par `/socle` — vide au moment où `/socle` le pose, et hors commit, git ne suit pas un dossier vide ; sur ce projet il tient aujourd'hui `premiere-app/` et `premiere-app-2/` | Le Product Owner y crée `<name>/` ; chaque commande amont et aval dérive `docs/features/<name>/` de son argument (→ MECANISMES §Disposition du dossier de feature) | Rien — aucune commande ne teste l'existence du dossier de feature ; sur un `<name>` sans dossier, `/1_lexique` invoque et le Lexicographe bloque sur *no idea file* | `PROCESS_AMONT.md`, `PROCESS_AVAL.md` |
 | `docs/PRODUIT_GLOBAL.md` à `# Application` (→ MECANISMES §Lecture du global par l'index) | Le Rédacteur (index `^#`), le Sondeur invocation 3 (sections nommées), le Fusionneur (invocations 1 et 3) | Le Fusionneur teste le seul titre : rien d'autre → `INIT`, et l'invocation 3 écrit dans `desc-produit-fusion.md` | `PROCESS_AMONT.md` |
-| `docs/CURRENT_TECHNICAL_STATE.md` à `# Technical state` (→ MECANISMES §Lecture de l'état technique) | Le Réalisateur et l'Arbitre y écrivent ; le Détailleur, le Réalisateur, le Diagnostiqueur (invocation 1, ce document) y lisent `## Traps — general` et `## Dead state` par grep puis lecture bornée | Un grep de titre qui ne rend rien lit rien ; la compétence `technical-state-format` chargée avant d'écrire | `PROCESS_AVAL.md`, `PROCESS_MECANISMES.md` |
+| `docs/CURRENT_TECHNICAL_STATE.md` à `# Technical state` — l'état du fichier au sortir de `/socle`, avant tout lot (→ MECANISMES §Lecture de l'état technique) | Le Réalisateur et l'Arbitre y écrivent ; le Détailleur, le Réalisateur, le Diagnostiqueur (invocation 1, ce document) y lisent `## Traps — general` et `## Dead state` par grep puis lecture bornée | Tant qu'aucun lot n'a écrit, un grep de titre qui ne rend rien lit rien ; les deux titres existent une fois qu'un lot a écrit (`PROCESS_AVAL.md`, même ligne) ; la compétence `technical-state-format` chargée avant d'écrire | `PROCESS_AVAL.md`, `PROCESS_MECANISMES.md` |
 | Les lignes `.gitignore` `docs/features/*/stop.md` et `docs/features/*/stop1.md` (→ MECANISMES §stop.md) | `/8_code`, mouvement 6, cherche `stop.md` dans le dépôt principal | Ajoutées si absentes ; ni l'un ni l'autre jamais commité ; aucun des deux présent n'est une erreur | `PROCESS_AVAL.md`, `PROCESS_MECANISMES.md` |
 | `docs/TECHNICAL_CONVENTIONS.md` non créé par `/socle`, dit dans son rapport | `/conventions`, l'Architecte invocation 1 l'écrit depuis les deux documents de la feature | L'Architecte à l'invocation 1 ne lit aucun fichier au nom de *convention* ; tout l'aval le lit ensuite | `PROCESS_AMONT.md` → `PROCESS_AVAL.md` |
 | `code/rapport-controle.md` de `/9_controle`, phase 5 — `## Intentions missing`, `## Doubts` relayés | Le Product Owner écrit `bugfix-NN/bug-list.md` à la main : un manque par `G<n>`, `(B<n>)` en fin de première ligne pour un manque pris du rapport | `/diagnostique` lit `G<n>` sur la ligne et s'arrête sur un manque sans ; le Diagnostiqueur (2) lit `(B<n>)` par cette forme seule | `PROCESS_AVAL.md` → ce document |
@@ -1164,15 +1174,16 @@ Traverse: lexicographe (1, 2), le Product Owner ; `/1_lexique`,
 
 Agents décrits en entier : diagnostiqueur (invocation 1 — Investigation
 ; invocation 2 — Assembly).
-Agents portés en entrée courte : aucun — `/socle` n'invoque personne,
-`/diagnostique` n'invoque que le Diagnostiqueur, et aucun autre
-document ne l'invoque.
+Agents portés en entrée courte : sondeur, invocation 3 — sous la forme
+`### sondeur, invocation 3 — ce que l'entrée /extrait en retient`,
+parce qu'aucune commande de ce document ne l'invoque ; `/socle`
+n'invoque personne, `/diagnostique` n'invoque que le Diagnostiqueur,
+et aucun autre document ne l'invoque.
 Commandes décrites : `/socle` ; `/diagnostique` ; `/extrait` (absente
 de la chaîne, décrite comme telle).
 Entrée décrite hors commande : `idees.md`.
 Agents nommés ici et décrits ailleurs, sans entrée courte parce
 qu'aucune commande de ce document ne les invoque : lexicographe,
-redacteur (`PROCESS_AMONT.md`) ; sondeur, invocation 3
-(`PROCESS_AMONT.md` §sondeur, §/4_grille) ; cadreur, verificateur,
+redacteur (`PROCESS_AMONT.md`) ; cadreur, verificateur,
 detailleur, arbitre, fusionneur invocation 3 (`PROCESS_AVAL.md`,
 `PROCESS_AMONT.md`).

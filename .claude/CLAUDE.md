@@ -183,8 +183,9 @@ disk forever.
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — `PROCESS_AMONT.md`,
-  `PROCESS_AVAL.md`, `MODELE_CIBLE_V3.md` and their like are the
+- 🔴 **Open anything in `docs/process/`** — `PROCESS_MECANISMES.md`,
+  `PROCESS_ENTREES.md`, `PROCESS_AMONT.md`, `PROCESS_AVAL.md`,
+  `PROCESS_ANNEXES.md` and the grids beside them are the
   Product Owner's own documents. They describe why the agents are
   built as they are, including rules that were considered and dropped.
   **Reading one puts discarded reasoning into your context.**

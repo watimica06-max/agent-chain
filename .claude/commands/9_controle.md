@@ -229,7 +229,7 @@ no sheet for it.
 
 ### Phase 2 — group the blocks
 
-    python3 .claude/scripts/grouper.py docs/features/<name>/tracabilite-full.md --auto
+    python .claude/scripts/grouper.py docs/features/<name>/tracabilite-full.md --auto
 
 📌 **The script sweeps every budget and picks one**, weighing the
 context of a pass against the number of passes. **It prints the groups
