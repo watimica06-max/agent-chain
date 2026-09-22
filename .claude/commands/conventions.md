@@ -297,6 +297,7 @@ Owner would otherwise learn of it from a file listing, at best.**
 | It raised a **product question** | 🔴 **The framing grid did not close the product** — ⚠️ **the Product Owner corrects the product file by hand**: 📌 **the behaviour is built in the next cycle, as a new behaviour** — 🔴 **no upstream turn re-runs** |
 | It raised an **`inconsistency`** | 🔴 **The technical document is wrong** — 📌 **say which entry**: the fix is upstream, in `/6_convertit`, not here |
 | It raised a **`forme`** question | 🔴 **The framing grid lacks a form, or one keeps producing a useless rule** — ⚠️ **the Product Owner amends the grid herself**, the grid's `R4`: 📌 **no rule is written for it**, `couverture.md` says what became of it |
+| It raised a **`replacement`** question | 🔴 **A rule in force says the opposite of what this feature needs, and lots already coded follow it** — 📌 **replacing a rule in force is the Product Owner's**: ⚠️ **answer it — change the rule, or conform to it — then `/conventions`**. 🔴 **The lots the question names as coded under the old rule are hers to re-enter through `/diagnostique`**, a `bug-list.md` in a `bugfix-NN/` — ⚠️ **the chain has no other way back into coded lots** |
 | It wrote a blocking file | 📌 **Fill its `## Decision`, then `/conventions`** |
 | It asked nothing, or everything is integrated | 📌 `/7_lots` |
 

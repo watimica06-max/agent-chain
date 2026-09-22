@@ -225,8 +225,9 @@ never the content of what you wrote:
 - **Every `coverage` question**, one line each — 📌 **its answer is a
   behaviour, and this line is the only thing that carries it out.**
 - 📌 **A directive that overrode a rule**, 📌 **an inconsistency answer
-  that has to be fixed upstream**, and 📌 **a `forme` answer, which
-  amends the grid and not the file** — ⚠️ **when there were any.**
+  that has to be fixed upstream**, 📌 **a `forme` answer, which
+  amends the grid and not the file**, and 📌 **a `replacement` answer,
+  which way it went** — ⚠️ **when there were any.**
 
 ⚠️ **A question you raised and did not report is a question nobody
 reads.** 📌 **The Product Owner does not go looking through the folder.**
@@ -559,7 +560,11 @@ behaviour, never a rule**: see *A coverage gap is a product question*.
 📌 **`replacement` is invocation 4's** — 🔴 **a rule in force says the
 opposite of what this feature needs.** ⚠️ **Its `Question:` says three
 things**: the rule in force, what the feature requires, and what was
-coded under the old one.
+coded under the old one — 🔴 **and it asks the choice, in those terms:
+change the rule, or conform to it.** 📌 **The lots you found coded under
+the old rule are named in that same question** — ⚠️ **the Product Owner
+re-enters them through `/diagnostique` if she changes the rule**, and
+nothing else carries their names out.
 
 📌 **`forme` is the grid's `R4` route** — 🔴 **a form the grid lacks, or
 one that keeps producing a useless rule.** ⚠️ **Its answer amends the
@@ -680,6 +685,27 @@ next invocation raises it again.
 
 🔴 **And you name it in your report**: the question, and that its answer
 is a grid amendment the Product Owner makes herself.
+
+⚠️ **An answer to a `replacement` question is never a new rule** — 📌
+**it settles the rule in force, one way or the other.** 🔴 **You never
+write a rule at the next free number for it**: the old one would stay
+in force beside it, and the file would hold two rules that contradict.
+
+📌 **She changes the rule** — 🔴 **you change the rule in force, in
+place**: its number kept, its new form written — the gesture of
+invocation 3's *R30 changed*. ⚠️ **Its `couverture.md` line records
+it** — 🔴 **the entry, and the changed rule's number**, as any rule
+that covers an entry.
+
+📌 **She keeps the rule** — 🔴 **you write nothing in the conventions
+file for it**: ⚠️ **what is wrong is the technical document**, as for
+an `inconsistency`. **Its `couverture.md` line records what became of
+it** — 🔴 **the entry, and either `corrigé` or `question ouverte`.**
+
+🔴 **And you say in your report which it was** — ⚠️ **on *keep*, what
+has to be fixed upstream; on *change*, the lots the question named,
+which follow the old form until the Product Owner re-enters them
+through `/diagnostique`.**
 
 ---
 
@@ -869,7 +895,10 @@ output**: they are settled requests, from real lots.
 ⚠️ **Why replacing is not yours**: 🔴 **every lot already coded follows
 the old rule**, the sheets name it, and new code would follow the new
 one. 📌 **Say the three things in your question** — the rule in force,
-what the feature requires, and what was coded under the old one.
+what the feature requires, and what was coded under the old one — 🔴
+**and ask the choice: change the rule, or conform to it.** ⚠️ **Name the
+lots coded under the old rule in the question itself**: her answer is
+what sends them back through `/diagnostique`.
 
 **`couverture.md`** — 🔴 **for this feature alone.** 📌 **It proves your
 walk reached every entry of *this* feature's technical document**, and

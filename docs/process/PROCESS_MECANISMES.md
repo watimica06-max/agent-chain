@@ -825,10 +825,10 @@ Les valeurs :
 - `coverage` — une question de comportement que le corpus ne répond nulle part ; une question produit ; sa réponse n'est jamais une règle, le Product Owner corrige le fichier produit à la main
 - `conjunction` — la question naît entre deux entrées complètes, le long d'une arête de `Consumes:` ; sa réponse devient une règle
 - `inconsistency` — le corpus se contredit (un tiret de traçabilité sur un `comportement` ou une `référence`, une entrée que nulle ligne ne nomme, deux nombres) ; sa réponse corrige le document technique, `couverture.md` note `corrigé` ou `question ouverte`
-- `replacement` — invocation 4 : une règle en vigueur dit le contraire de ce que la feature exige, et des lots codés suivent l'ancienne
+- `replacement` — invocation 4 : une règle en vigueur dit le contraire de ce que la feature exige, et des lots codés suivent l'ancienne ; la question demande le choix — changer la règle, ou s'y conformer — et nomme les lots codés sous l'ancienne ; sa réponse n'est jamais une règle nouvelle : la règle en vigueur est changée en place (numéro gardé) et sa ligne de `couverture.md` porte son numéro, ou rien n'est écrit et `couverture.md` note `corrigé` ou `question ouverte` comme pour une `inconsistency` ; les lots nommés reviennent par `/diagnostique`
 - `forme` — la grille manque une forme, ou une forme produit une règle inutile ; sa réponse amende la grille, par le Product Owner, `couverture.md` note `grille amendée` ou `question ouverte`
 
-Divergence : `/conventions` énumère quatre issues nommées — « a product question » (`coverage`), `conjunction` (`conventions.md` L296), `inconsistency`, `forme` ; `replacement` — atteignable à l'invocation 4 — tombe sous « It raised questions » : `/conventions` le relaie sous la ligne générique ; à trancher par le Product Owner.
+Divergence : aucune — l'architecte route les cinq à l'invocation 2 (`architecte.md` L653-708 : `inconsistency` L653-662, `coverage` L664-674, `forme` L676-687, `replacement` L689-708 ; la question posée avec son choix, L560-567 et L897-901) ; `/conventions` énumère cinq issues nommées — « a product question » (`coverage`), `conjunction` (`conventions.md` L296), `inconsistency` (L298), `forme` (L299), `replacement` (L300).
 
 ### Les trois formes de « Entries with no lot » — pourquoi une entrée n'a pas de lot
 
