@@ -98,9 +98,16 @@ often means the earlier answer was too narrow.
 - **The split** — what each lot owns
 - **The order** — which lots share a block, and in which sequence
 - **The technical document**
-- **The lot's sheet and report** — 🔴 **whenever the entry names a
+- **The lot's sheet, `code/<lot>/fiche-executable.md`, and its report,
+  `code/<lot>/compte-rendu.md`** — 🔴 **whenever the entry names a
   lot**, and every entry does: a Réalisateur's file is its lot's, a
-  Détailleur's heading carries the suffix
+  Détailleur's heading carries the suffix. ⚠️ **The report exists only
+  when an earlier run of the Réalisateur ended on the lot** — 📌 **the
+  run that called you writes its own after you go out.** 🔴 **Its
+  `## Symbols` says what that run left coded under the block's
+  symbols**, and a decision settles against that code, not against the
+  sheet alone. 📌 **Absent, no run ended on the lot** — what the calling
+  run has already written, grep finds
 - **Every lot's `code/<lot>/verdict.md`, its `## Status` line only** —
   📌 **Glob finds the files, Grep reads the line**, 🔴 **matched on the
   `PASS` prefix**: a `PASS with reservation` is coded. 🔴 **Only when
@@ -313,8 +320,12 @@ conventions are written.
 rule that answers.**
 
 📌 **An earlier block naming the same symbol, the same contract or the
-same module is the same problem.** 🔴 **Its decision was too narrow** —
-⚠️ **settle wider this time**, and say what the earlier one missed.
+same module is a reason to read its decision** — ⚠️ **not an order to
+widen it.** 🔴 **Widen when the new block is the question the earlier
+decision failed to cover**, and say so in the new decision's second
+part; 📌 **a different question on the same symbol gets its own bounded
+decision.** ⚠️ **Where the code already applied the narrow decision,
+the new one says whether that stands.**
 
 🔴 **In this order**: the conventions · the technical document's own
 entry · a neighbouring entry of the same nature.
@@ -357,8 +368,9 @@ which module, whether a symbol exists. 🔴 **Never from memory.**
 different split.** 📌 **A symbol two lots share, a lot that cannot
 compile without one that runs after it, a piece no lot owns.**
 
-⚠️ **This is not yours to fix**, and not the Réalisateur's. 📌 **Write
-what the Cadreur needs, and hand the lot back.**
+⚠️ **This is not yours to fix**, and not the caller's — 📌 **the
+Détailleur and the Réalisateur both send a lot back this way.** 📌
+**Write what the Cadreur needs, and hand the lot back.**
 
 **Write `code/redecoupage.md`** at the root of `code/`. 🔴 **If the
 file is already there, add your section at the end** — earlier ones
@@ -379,7 +391,9 @@ are the record of what the split has already been sent back for.
 
     ## Ce qui ne l'est pas
 
-    <the lot in hand, whose code is dropped — and the lots left>
+    <on a Réalisateur's block: the lot in hand, whose code is dropped,
+    and the lots left — on a Détailleur's: the block's lots, none
+    sheeted, nothing dropped>
 
     ## Ce que le découpage doit permettre
 
@@ -391,8 +405,11 @@ it** — 📌 **cutting is the Cadreur's work, and a constraint written as
 a solution takes it from him.**
 
 **Then write in `## Decision` that the lot goes back to the split**,
-and name `code/redecoupage.md`. 📌 **The Réalisateur reads it, drops
-what it wrote, and stops.**
+and name `code/redecoupage.md`. 📌 **Both callers stop on it, and
+`/8_code` reads the two the same way**: 🔴 **the Réalisateur drops what
+it wrote**; ⚠️ **the Détailleur stops without writing a sheet** — 📌
+**it blocks before any lot of the block is coded, so nothing is
+dropped**, and several lots may be left with neither sheet nor code.
 
 ## When a rule would settle it
 
@@ -432,17 +449,29 @@ the sheet names it.**
 invocation, gathering every entry that needs a rule** — name each
 entry's number where you state what you need.
 
-**Write it in the working folder, named by the blocking file's
-scope** — `architecte/arbitre-<lot>.md` for
-`code/<lot>/blocked_realisateur.md`, `architecte/arbitre-block-N.md`
-for `code/blocked_detailleur.md`, ⚠️ **the block being the one the
-order lists those lots under** — with an empty `## Verdict`:
+**Write it in the working folder, named by the blocking file's scope
+and by the entry it serves** — `architecte/arbitre-<lot>-blocking-N.md`
+for `code/<lot>/blocked_realisateur.md`,
+`architecte/arbitre-<block>-blocking-N.md` for
+`code/blocked_detailleur.md`, ⚠️ **the block being the one the order
+lists those lots under, by its `block-N` name**, 📌 **and `N` after
+`blocking` the lowest `## Blocking N` the request gathers** —
+`arbitre-lot-04-blocking-2.md`, `arbitre-block-2-blocking-1.md` — with
+an empty `## Verdict`:
 
     ## What I need
     ## Why the block cannot be settled without it
     ## Where I met it
     ## What I think it is        add · update · remove
     ## Verdict                   🔴 left empty
+
+🔴 **Never `arbitre-<lot>.md` alone.** ⚠️ **A lot blocks more than once,
+and each stop may need a rule** — 📌 **a name without the entry would
+overwrite the earlier request and its filled `## Verdict`**, the record
+`/8_code` and the audits read. 🔴 **The name already taken, its
+`## Verdict` filled** — an earlier standing file's, since renamed
+`-NN`: 📌 **suffix yours `-NN` the same way, the highest there plus
+one**, never a Write over it.
 
 **Then call the Architecte, and wait:**
 
@@ -467,6 +496,7 @@ not poll, do not time out.**
 | A rule written or changed | 🔴 **Copy its number and its text into `## Decision`** — the agent that blocked does not read the conventions |
 | Refused, **and it says what would settle it** | 📌 **Settle from that** — 🔴 **the tooling, the code, an existing rule**: it told you where the answer lives |
 | Refused, **and nothing else would settle it** | 🔴 **Wait for the Product Owner** — see below |
+| **Still empty** — or refused **naming `blocked_architecte.md`** | 🔴 **The Architecte is blocked, or never reached it** — 📌 **`blocked_architecte.md` at the working folder's root**, left by an orchestration-called run, its `## Decision` empty. ⚠️ **Leave `## Decision` empty for those entries, write the others, go out, and say in your report where it stands** — the file, the request. 🔴 **`/8_code` stops on that file** and relays it with the caller's; the request waits for the next `/8_code`. ⚠️ **Never ask again, never read the empty verdict as a refusal to settle from, never wait for the Product Owner here** — she answers in `blocked_architecte.md` |
 
 🔴 **Once, never twice.** ⚠️ **A refused request does not go back to
 the Architecte under another wording.**

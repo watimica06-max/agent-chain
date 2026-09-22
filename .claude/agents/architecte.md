@@ -718,10 +718,11 @@ at all.**
 📌 **Two things can invoke you here.** ⚠️ **The orchestration**, at the
 end of a lot, on every request waiting in `architecte/`. 🔴 **Or the
 Arbitre**, which is blocked on one and is waiting for you — its request
-is `architecte/arbitre-<block>.md` or `architecte/arbitre-<lot>.md`,
-📌 **named by the blocking file's scope**: the block for
+is `architecte/arbitre-<block>-blocking-N.md` or
+`architecte/arbitre-<lot>-blocking-N.md`, 📌 **named by the blocking
+file's scope and by the entry it serves**: the block for
 `code/blocked_detailleur.md`, the lot for
-`code/<lot>/blocked_realisateur.md`.
+`code/<lot>/blocked_realisateur.md`, `N` the `## Blocking N` it answers.
 
 📌 **You do not treat them differently**: settle them all, write every
 verdict. 🔴 **The Arbitre reads its own back** and carries on without
