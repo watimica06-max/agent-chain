@@ -11,7 +11,7 @@ decisions in, the Fusionneur over the bug-fix lists, then its two merge
 invocations.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -53,11 +53,11 @@ matches.**
 
 | # | Test | What you do |
 |---|---|---|
-| 1 | `desc-produit.md` absent | 🔴 **Error** — say so and stop |
-| 2 | 🔴 **`blocked_redacteur.md` whose `## Invocation` says 3, or `blocked_fusionneur.md`**, with an empty `## Decision` | 🔴 **STOP** — relay it |
+| 1 | `desc-produit.md` absent | 🔴 **Error** — say so and stop — `Next: stop desc-produit.md missing` |
+| 2 | 🔴 **`blocked_redacteur.md` whose `## Invocation` says 3, or `blocked_fusionneur.md`**, with an empty `## Decision` | 🔴 **STOP** — relay it — `Next: answer blocking, then run /fusion <name>` |
 | 3 | One of those two, with a filled `## Decision` | 📌 **The agent its name carries**, at the invocation its `## Invocation` line names — 🔴 **name the file in the prompt**; 📌 **the Rédacteur's names the decisions files too**, as row 6 does |
-| 4 | `rapport-fusion.md` exists | 🔴 **STOP** — the merge is done |
-| 5 | A root questions file with an empty `Answer:` — 📌 **`questions-architecte-*.md` excepted** | 🔴 **STOP** — relay it |
+| 4 | `rapport-fusion.md` exists | 🔴 **STOP** — the merge is done — `Next: done` |
+| 5 | A root questions file with an empty `Answer:` — 📌 **`questions-architecte-*.md` excepted** | 🔴 **STOP** — relay it — `Next: answer questions, then run /fusion <name>` |
 | 6 | 🔴 **`desc-produit-fusion.md` absent** | **Rédacteur, invocation 3 — Merging** |
 | 7 | 🔴 **`questions-fusionneur-NN.md` holding `### Q`, answered**, and no `plan-fusion.md` | **Fusionneur, invocation 3** |
 | 8 | A `bugfix-*/` folder, and no `questions-fusionneur-*` anywhere | **Fusionneur, invocation 3** |
@@ -70,8 +70,8 @@ route, and on no other.** ⚠️ **Any other `blocked_*.md` at the root
 stops the walk, the command it belongs to named** — 📌 **a
 `blocked_redacteur.md` whose `## Invocation` says 1 or 2 is
 `/2_structure`'s**, the structuring blocked, not the merge; another
-agent's is its own command's. 🔴 **An upstream block is never settled
-from here.**
+agent's is its own command's — `Next: run /<that command> <name>`. 🔴
+**An upstream block is never settled from here.**
 
 🔴 **Row 10 is the only route to invocation 2** — 📌 **it applies the
 plan, and no other invocation writes one.** ⚠️ **A questions file with
@@ -142,7 +142,7 @@ Fusionneur must never have to choose its source.**
 neither `fusionneur` nor `architecte` before touching it** — 📌 **a
 file holding questions is not yours to file**: ⚠️ **it waits on an
 answer, or its answers were never integrated.** 🔴 **Stop and say
-which.** 📌 **The two exceptions are the two the filing below already
+which** — `Next: stop <file> waits on an answer or an integration`. 📌 **The two exceptions are the two the filing below already
 carries** — ⚠️ **the architecte's is `/conventions`'s, not this
 command's**, and a `### Q` in it says nothing about the run; the
 Fusionneur's own is what the routing table reads, rows 7 and 9.
@@ -303,3 +303,15 @@ merges too**: the Product Owner has to see it.
 
 The agent's own report, and **which row of the table fired**. 🔴
 **Nothing else is yours**: no phase chain.
+
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+📌 **A phase that ran** — *the next run picks the table up again*,
+*How it runs*:
+
+| The phase left | `Next:` |
+|---|---|
+| A `blocked_*.md` | `Next: answer blocking, then run /fusion <name>` |
+| A questions file holding a `### Q` | `Next: answer questions, then run /fusion <name>` |
+| `rapport-fusion.md` | `Next: done` |
+| Anything else | `Next: run /fusion <name>` |

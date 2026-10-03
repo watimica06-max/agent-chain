@@ -9,7 +9,7 @@ Act as the orchestrator, in **upstream mode**.
 **This command invokes `fusionneur`, invocation 1 — Compare and question.**
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -21,12 +21,12 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 | | |
 |---|---|
-| `desc-produit-fusion.md` absent | 🔴 **Stop** — 📌 **say to run `/fusion` first**: ⚠️ **only its Rédacteur row writes that file**, and the Fusionneur reads it and nothing else |
-| `blocked_fusionneur.md` with an empty `## Decision` | 🔴 **Stop** — 📌 **relay it** |
-| `blocked_fusionneur.md` with a filled `## Decision`, and its `## Invocation` line names 2 or 3 | 🔴 **Stop** — 📌 **it is not this command's**: say `/fusion_applique` for 2, `/fusion` for 3 |
-| `rapport-fusion.md` exists | 🔴 **Stop** — 📌 **the merge is done** |
-| `plan-fusion.md` exists | 🔴 **Stop** — 📌 **say `/fusion_applique`**: ⚠️ **invocation 1 has run, the plan waits for invocation 2** |
-| A `bugfix-*/` folder, and no `questions-fusionneur-*` anywhere | 🔴 **Stop** — 📌 **say `/fusion`**: ⚠️ **the bug-fix pass has not run** — only `/fusion` invokes it, and its questions file, even empty, is what says it has |
+| `desc-produit-fusion.md` absent | 🔴 **Stop** — 📌 **say to run `/fusion` first**: ⚠️ **only its Rédacteur row writes that file**, and the Fusionneur reads it and nothing else — `Next: run /fusion <name>` |
+| `blocked_fusionneur.md` with an empty `## Decision` | 🔴 **Stop** — 📌 **relay it** — `Next: answer blocking, then run /fusion_compare <name>` |
+| `blocked_fusionneur.md` with a filled `## Decision`, and its `## Invocation` line names 2 or 3 | 🔴 **Stop** — 📌 **it is not this command's**: say `/fusion_applique` for 2, `/fusion` for 3 — `Next: run /fusion_applique <name>` for 2, `Next: run /fusion <name>` for 3 |
+| `rapport-fusion.md` exists | 🔴 **Stop** — 📌 **the merge is done** — `Next: done` |
+| `plan-fusion.md` exists | 🔴 **Stop** — 📌 **say `/fusion_applique`**: ⚠️ **invocation 1 has run, the plan waits for invocation 2** — `Next: run /fusion_applique <name>` |
+| A `bugfix-*/` folder, and no `questions-fusionneur-*` anywhere | 🔴 **Stop** — 📌 **say `/fusion`**: ⚠️ **the bug-fix pass has not run** — only `/fusion` invokes it, and its questions file, even empty, is what says it has — `Next: run /fusion <name>` |
 
 🔴 **A `blocked_fusionneur.md` with a filled `## Decision` whose
 `## Invocation` line names 1 → name it in the prompt.** 📌 **The agent
@@ -54,7 +54,7 @@ open `CURRENT_TECHNICAL_STATE.md`.
 neither `architecte` nor `fusionneur` before touching it** — 📌 **a
 file holding questions is not yours to file**: ⚠️ **it waits on an
 answer, or its answers were never integrated.** 🔴 **Stop and say
-which.** 📌 **Two exceptions.** ⚠️ **The architecte's is
+which** — `Next: stop <file> waits on an answer or an integration`. 📌 **Two exceptions.** ⚠️ **The architecte's is
 `/conventions`'s, not this chain's**, and a `### Q` in it says nothing
 about the run; 🔴 **read the root as if it were not there** — and leave
 it there, see below. ⚠️ **The Fusionneur's highest stays at the root by
@@ -199,10 +199,13 @@ no phase chain.
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
 
-| What just happened | Next |
-|---|---|
-| It wrote `blocked_fusionneur.md` | 📌 Fill its `## Decision`, then `/fusion_compare` again |
-| Its questions file holds a `### Q` | 📌 Answer them, then `/fusion_applique` |
-| Its questions file is empty | 📌 `/fusion_applique` at once |
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+
+| What just happened | Next | `Next:` |
+|---|---|---|
+| It wrote `blocked_fusionneur.md` | 📌 Fill its `## Decision`, then `/fusion_compare` again | `Next: answer blocking, then run /fusion_compare <name>` |
+| Its questions file holds a `### Q` | 📌 Answer them, then `/fusion_applique` | `Next: answer questions, then run /fusion_applique <name>` |
+| Its questions file is empty | 📌 `/fusion_applique` at once | `Next: run /fusion_applique <name>` |
 
 **If it returns a `blocked_*.md`**: relay it and stop.

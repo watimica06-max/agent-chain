@@ -108,13 +108,25 @@ advances once per invocation, never per question.
 
 ### The shape of every entry
 
-🔴 **One entry per question, four lines, no exception.** Numbering
-restarts at Q1 in each file:
+🔴 **One entry per question, four lines, no exception** — 📌 **plus
+the `Options:` block, and only it.** Numbering restarts at Q1 in each
+file:
 
     ### Q1
     Block: B7
     Question: what happens to an entry whose duration is zero?
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Answer:
+
+📌 **`Options:` holds the answers that need no new words**, in French,
+two to six, none opening on a number and a dot: for a `PENDING`
+sentence, the rule still holds (`KEEP`) and the rule no longer holds
+(`DELETE`); for a title line, the title still covers the section. 🔴
+**A `REPLACE` or a new title is never an option** — its new wording is
+the free-text answer, and an option alone would be ambiguous, see
+*INVOCATION 2*. ⚠️ **An open question has none.**
 
 🔴 **The `Answer:` line is written empty, and it is never omitted** —
 it is where the Product Owner writes, by hand. **An entry without it is
@@ -249,6 +261,9 @@ told to read that is not there, a false premise that voids the work.
     ## To resume
 
     <the decision or fix needed>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
 
     ## Decision
 
@@ -257,6 +272,10 @@ told to read that is not there, a false premise that voids the work.
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 It is where the Product Owner answers, by hand, and it is the only way
 this block ever lifts.
+
+📌 **`Options:` closes `## To resume`, never as a heading of its own** —
+in French, two to six, none opening on a number and a dot. ⚠️ **A fix
+that is a missing input has none.**
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 

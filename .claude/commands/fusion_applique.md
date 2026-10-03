@@ -9,7 +9,7 @@ Act as the orchestrator, in **upstream mode**.
 **This command invokes `fusionneur`, invocation 2 — Apply.**
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -21,11 +21,11 @@ Feature folder: `docs/features/$ARGUMENTS/`
 
 | | |
 |---|---|
-| `rapport-fusion.md` exists | 🔴 **Stop** — 📌 **the merge is done** |
-| `plan-fusion.md` absent | 🔴 **Stop** — 📌 **invocation 1 has not run**: say to use `/fusion_compare` |
-| `blocked_fusionneur.md` with an empty `## Decision` | 🔴 **Stop** — 📌 **relay it** |
-| `blocked_fusionneur.md` with a filled `## Decision`, and its `## Invocation` line names 1 or 3 | 🔴 **Stop** — 📌 **it is not this command's**: say `/fusion_compare` for 1, `/fusion` for 3 |
-| A root `questions-fusionneur-*.md` with an empty `Answer:` | 🔴 **Stop** — 📌 **relay which questions wait** |
+| `rapport-fusion.md` exists | 🔴 **Stop** — 📌 **the merge is done** — `Next: done` |
+| `plan-fusion.md` absent | 🔴 **Stop** — 📌 **invocation 1 has not run**: say to use `/fusion_compare` — `Next: run /fusion_compare <name>` |
+| `blocked_fusionneur.md` with an empty `## Decision` | 🔴 **Stop** — 📌 **relay it** — `Next: answer blocking, then run /fusion_applique <name>` |
+| `blocked_fusionneur.md` with a filled `## Decision`, and its `## Invocation` line names 1 or 3 | 🔴 **Stop** — 📌 **it is not this command's**: say `/fusion_compare` for 1, `/fusion` for 3 — `Next: run /fusion_compare <name>` for 1, `Next: run /fusion <name>` for 3 |
+| A root `questions-fusionneur-*.md` with an empty `Answer:` | 🔴 **Stop** — 📌 **relay which questions wait** — `Next: answer questions, then run /fusion_applique <name>` |
 
 🔴 **A `blocked_fusionneur.md` with a filled `## Decision` whose
 `## Invocation` line names 2 → name it in the prompt.** 📌 **The agent
@@ -207,7 +207,13 @@ next run's tests find it.
 The agent's own report, and nothing more. 🔴 **Nothing else is yours**:
 no phase chain.
 
-**If it returns a `blocked_*.md`**: relay it and stop.
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+📌 **`rapport-fusion.md` written** — `Next: done`.
+
+**If it returns a `blocked_*.md`**: relay it and stop —
+`Next: answer blocking, then run /fusion_applique <name>`.
 
 **If its questions file holds a `### Q`**: relay it and stop — 📌
-**answered, `/fusion_applique` again.**
+**answered, `/fusion_applique` again** — `Next: answer questions, then
+run /fusion_applique <name>`.

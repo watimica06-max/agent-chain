@@ -14,7 +14,7 @@ the sections whose blocks changed, or that still carry an `<<ASSUMED`
 mark**, and keeps the others as they stand.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -35,13 +35,15 @@ never read a block, an entry or a question for what it says.**
 **1.** 🔴 **`code/decoupage.md` exists → stop.** ⚠️ **The split is cut,
 and a lot cites entries by number** — 📌 **writing a section again would
 renumber it under the lot.** Say that a change to the product now
-belongs to a new cycle.
+belongs to a new cycle — `Next: stop split already cut: a change to the
+product belongs to a new cycle`.
 
 **2.** 🔴 **`par-genre/` absent → stop.** 📌 **Say `/5_reclasse` has to
 run**: its six files are what the invocations read beside their blocks.
+`Next: run /5_reclasse <name>`
 
 **2b.** 🔴 **`desc-par-nature.md` absent → stop.** Say `/5_reclasse` has
-to run first.
+to run first — `Next: run /5_reclasse <name>`.
 
 **3. The blocking files** — every unnumbered
 `convertisseur/blocked_<nature>.md` and `convertisseur/blocked_transversal.md`,
@@ -51,7 +53,7 @@ nature that blocked in the same run:
 | | What you do |
 |---|---|
 | None | 📌 Carry on |
-| Any whose `## Decision` is empty | 🔴 **Stop** — say which ones still stand, ⚠️ **all of them**, never the first found |
+| Any whose `## Decision` is empty | 🔴 **Stop** — say which ones still stand, ⚠️ **all of them**, never the first found — `Next: answer blocking, then run /6_convertit <name>` |
 | Every one whose `## Decision` is filled | 📌 **Name each in its own nature's prompt** — `blocked_transversal.md` in invocation 2's |
 
 ⚠️ **Read that one heading in each, nothing else** — 📌 the agent reads
@@ -64,7 +66,8 @@ the file.
 🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
 `architecte` before touching it** — 📌 **a file holding questions is
 not yours to file**: ⚠️ **it waits on an answer, or its answers were
-never integrated.** 🔴 **Stop and say which.** 📌 **The architecte's is
+never integrated.** 🔴 **Stop and say which** — `Next: stop <file> waits
+on an answer or an integration`. 📌 **The architecte's is
 the one exception** — ⚠️ **it is `/conventions`'s, not this chain's**,
 and a `### Q` in it says nothing about the run; 🔴 **read the root as
 if it were not there** — and leave it there, see below.
@@ -146,9 +149,9 @@ the lines under its `## <nature>` heading, up to the next `## `. 📌
 | Its part differs from `convertisseur/<nature>-input.md`, or that file is absent | 🔴 **Runs** |
 | `convertisseur/<nature>.md` is absent, **and its part changed** | 🔴 **Runs** — its last run wrote no section |
 | `convertisseur/<nature>.md` holds `<<ASSUMED`, **and its part changed** | 🔴 **Runs** — ⚠️ **a mark is lifted only by writing its section again** |
-| 🔴 **Its `convertisseur/technique-<nature>.md` is answered** — it holds a `### Q` and no `^Answer:$` line, by grep | 🔴 **Runs** — 📌 **whatever its blocks did**: ⚠️ **a technical answer changes no block**, and without this row it would wait for ever. 📌 **Name the file in its prompt**. |
-| Either of the two, **its part byte-identical, and its `technique-<nature>.md` holds an `^Answer:$` line** | 📌 **Waits** — 🔴 **it does not run.** ⚠️ **It would read the same blocks, meet the same gap and ask the same question**: one opus invocation for a known result |
-| Either of the two, **its part byte-identical, and no `technique-<nature>.md` holding an `^Answer:$` line** | 🔴 **Runs** — 📌 **the product question it waits on is answered, and the answer changed no block**: ⚠️ **the rerun is what lifts the mark, its part unchanged** — one opus invocation. 🔴 **Name in its prompt the highest `questions-convertisseur-NN.md` under `questions/convertisseur/`** — ⚠️ **the block does not carry the answer, that file does**: 📌 **without it the agent meets the same gap and marks again**, run after run |
+| 🔴 **Its `convertisseur/technique-<nature>.md` is answered** — it holds a `### Q` and no `^Answer:\s*$` line, by grep | 🔴 **Runs** — 📌 **whatever its blocks did**: ⚠️ **a technical answer changes no block**, and without this row it would wait for ever. 📌 **Name the file in its prompt**. |
+| Either of the two, **its part byte-identical, and its `technique-<nature>.md` holds an `^Answer:\s*$` line** | 📌 **Waits** — 🔴 **it does not run.** ⚠️ **It would read the same blocks, meet the same gap and ask the same question**: one opus invocation for a known result |
+| Either of the two, **its part byte-identical, and no `technique-<nature>.md` holding an `^Answer:\s*$` line** | 🔴 **Runs** — 📌 **the product question it waits on is answered, and the answer changed no block**: ⚠️ **the rerun is what lifts the mark, its part unchanged** — one opus invocation. 🔴 **Name in its prompt the highest `questions-convertisseur-NN.md` under `questions/convertisseur/`** — ⚠️ **the block does not carry the answer, that file does**: 📌 **without it the agent meets the same gap and marks again**, run after run |
 | `convertisseur/blocked_<nature>.md` carries a filled `## Decision` | 🔴 **Runs** — ⚠️ **a decision is applied only by the invocation it is named to** |
 | None of the above | 📌 **Kept as it stands** |
 
@@ -177,7 +180,7 @@ what the next run compares against.**
 
 | | What you do |
 |---|---|
-| `spec-technique.md` exists, opens on `# Preamble`, holds no `<<ASSUMED` and no `[B`, `tracabilite.md` is there, no nature's files were just deleted, no nature is waiting, `convertisseur/technique-transversal.md` is absent or holds an `^Answer:$` line, and `blocked_transversal.md` carries no filled `## Decision` | 🔴 **Nothing to write** — say the document stands, and go to *Once it has run* |
+| `spec-technique.md` exists, opens on `# Preamble`, holds no `<<ASSUMED` and no `[B`, `tracabilite.md` is there, no nature's files were just deleted, no nature is waiting, `convertisseur/technique-transversal.md` is absent or holds an `^Answer:\s*$` line, and `blocked_transversal.md` carries no filled `## Decision` | 🔴 **Nothing to write** — say the document stands, and go to *Once it has run* |
 | Otherwise | 📌 **Skip to the assembly** — the document has to be built again around what stands. ⚠️ **A waiting nature alone lands on the assembly's *No* row** — nothing is built while one waits. ⚠️ **An answered `technique-transversal.md` takes a nature's route**: 🔴 **it forces the assembly and invocation 2, which its prompt names** |
 
 ---
@@ -229,6 +232,7 @@ reported* — commit, leave, merge, push, remove — then report.**
 nature had a technical question** — ⚠️ **its absence is not a defect.** ⚠️ **A
 missing one stops the command**
 — say which nature and which file. 📌 **Merge first**, as above.
+`Next: stop <nature>: <file> missing`
 
 ---
 
@@ -284,7 +288,8 @@ that is the only case you touch.
 run** — 📌 **the script reports it, never skips it**: ⚠️ **a
 line-oriented replacement leaves it unresolved or half-replaced**, in a
 document the Cadreur cuts. 🔴 **Say which section holds it, and stop,
-merging first** — never hand it to invocation 2.
+merging first** — never hand it to invocation 2. `Next: stop broken
+reference in <section>`
 
 ---
 
@@ -315,24 +320,27 @@ Agent(
 |---|---|---|
 | There | — | 📌 The document is complete — carry on |
 | Missing | Holds a `### Q` — or `technique-transversal.md` does | 📌 **Invocation 2's *No*** — ⚠️ **it asked something it cannot write the preamble without**, and wrote neither. 🔴 **Not a fault**: go to *The questions*, and say the document does not stand |
-| Missing | Empty, and no `technique-transversal.md` holding one | 🔴 **A fault of the run** — say so, and stop, merging first |
+| Missing | Empty, and no `technique-transversal.md` holding one | 🔴 **A fault of the run** — say so, and stop, merging first — `Next: stop fault of the run: tracabilite.md missing` |
 
 📌 **An `<<ASSUMED` mark left beside an answered technical file is a
 nature that did not apply its answer** — ⚠️ **say which, and run it
 again, from *The nature invocations* on.** 🔴 **Once, never twice** — 📌
 **a mark still there after that rerun is a fault of the run**, reported
-like a missing file. 📌 **A mark beside an unanswered file is normal**:
+like a missing file — `Next: stop fault of the run: <<ASSUMED left in
+<nature>`. 📌 **A mark beside an unanswered file is normal**:
 the question is waiting.
 
 🔴 **Grep `[B` in `spec-technique.md`.** 📌 **What remains beside a
 questions file that holds questions is one of them.** ⚠️ **What remains
 beside an empty questions file is a reference the run missed** — 🔴 **a
 fault, never a *document stands***: say so, and run invocation 2 once
-more. 📌 **Once, never twice.**
+more. 📌 **Once, never twice** — still there, `Next: stop fault of the
+run: [B left in spec-technique.md`.
 
 🔴 **And compare the block identifiers of `desc-produit.md`'s headings
 with the first column of `tracabilite.md`.** ⚠️ **One missing, one
-extra** — 📌 **a fault of the run, reported like a missing file.** 🔴
+extra** — 📌 **a fault of the run, reported like a missing file** —
+`Next: stop fault of the run: tracabilite.md does not match the blocks`. 🔴
 **It is the one file that says which block produced nothing**, and a
 line dropped there is invisible everywhere else.
 
@@ -390,7 +398,7 @@ opus invocation for a known result.
 applied nothing**: 🔴 **its answered file stays at its name**, and the
 *Runs* row fires on it again, as it must.
 
-🔴 **Grep `^Answer:$` in it first.** 📌 **One hit is a new question the
+🔴 **Grep `^Answer:\s*$` in it first.** 📌 **One hit is a new question the
 invocation wrote over the answered one** — ⚠️ **leave it at its name**:
 it waits, and the answered file it replaced was consumed by that same
 run.
@@ -444,16 +452,19 @@ waiting row and the last one. **The waiting row sits above; it wins.**
 ⚠️ **The *Invocation 2's No* row is the one exception** — it adds to the
 row that matched above it, and never fires alone.
 
-| The run | Next |
-|---|---|
-| An invocation wrote a blocking file, **and nothing else asked** | 📌 Fill its `## Decision`, then `/6_convertit` again |
-| **A blocking file and technical questions only** | 🔴 **Answer them, fill the decision, then `/6_convertit`** — 📌 the short loop, the decision applied on the same rerun |
-| **A blocking file and product questions**, with or without technical ones | 🔴 **Fill the decision first, answer the questions, then `/1_lexique`** — 📌 **the long loop, whatever else waits**: ⚠️ **a product answer goes through the Rédacteur and the grid, and `/6_convertit` applies the decision when its turn comes round** |
-| **Technical questions only** | 🔴 **Answer them, then `/6_convertit`** — 📌 **the short loop**: a technical answer changes no block, so nothing upstream has to run again |
-| **Product questions, alone or with technical ones** | 📌 **Answer them, then `/1_lexique`** — 🔴 **the long loop.** ⚠️ **Answer the technical ones too**: the agent integrates both when its turn comes round |
-| **A nature is waiting** on an unanswered technical question | 🔴 **Answer it, then `/6_convertit`** — 📌 **the document does not stand while one waits** |
-| **Invocation 2's *No*** — `tracabilite.md` missing beside a question | 🔴 **The row its question's kind takes, above, already fired** — 📌 **add that the document does not stand without its preamble**: ⚠️ **never the row below** |
-| Wrote an empty questions file, or found the document standing — ⚠️ **never a document without `# Preamble` or without `tracabilite.md`** | 📌 `/conventions`, then `/7_lots` — 🔴 the Cadreur reads the conventions in full. 📌 The merge, `/fusion_compare`, branches off here whenever you choose |
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+
+| The run | Next | `Next:` |
+|---|---|---|
+| An invocation wrote a blocking file, **and nothing else asked** | 📌 Fill its `## Decision`, then `/6_convertit` again | `Next: answer blocking, then run /6_convertit <name>` |
+| **A blocking file and technical questions only** | 🔴 **Answer them, fill the decision, then `/6_convertit`** — 📌 the short loop, the decision applied on the same rerun | `Next: answer questions and blocking, then run /6_convertit <name>` |
+| **A blocking file and product questions**, with or without technical ones | 🔴 **Fill the decision first, answer the questions, then `/1_lexique`** — 📌 **the long loop, whatever else waits**: ⚠️ **a product answer goes through the Rédacteur and the grid, and `/6_convertit` applies the decision when its turn comes round** | `Next: answer questions and blocking, then run /1_lexique <name>` |
+| **Technical questions only** | 🔴 **Answer them, then `/6_convertit`** — 📌 **the short loop**: a technical answer changes no block, so nothing upstream has to run again | `Next: answer questions, then run /6_convertit <name>` |
+| **Product questions, alone or with technical ones** | 📌 **Answer them, then `/1_lexique`** — 🔴 **the long loop.** ⚠️ **Answer the technical ones too**: the agent integrates both when its turn comes round | `Next: answer questions, then run /1_lexique <name>` |
+| **A nature is waiting** on an unanswered technical question | 🔴 **Answer it, then `/6_convertit`** — 📌 **the document does not stand while one waits** | `Next: answer questions, then run /6_convertit <name>` |
+| **Invocation 2's *No*** — `tracabilite.md` missing beside a question | 🔴 **The row its question's kind takes, above, already fired** — 📌 **add that the document does not stand without its preamble**: ⚠️ **never the row below** | — the row above prints it |
+| Wrote an empty questions file, or found the document standing — ⚠️ **never a document without `# Preamble` or without `tracabilite.md`** | 📌 `/conventions`, then `/7_lots` — 🔴 the Cadreur reads the conventions in full. 📌 The merge, `/fusion_compare`, branches off here whenever you choose | `Next: run /conventions <name>` |
 
 ⚠️ **The short loop is an exception to the standing rule that every
 answer goes back through `/1_lexique`** — 📌 **a technical answer brings

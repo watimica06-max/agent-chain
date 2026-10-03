@@ -138,6 +138,9 @@ there.**
     ## To resume
 
     <the decision or fix needed>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
 
     ## Decision
 
@@ -146,6 +149,10 @@ there.**
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 It is where the Product Owner answers, by hand, and it is the only way
 this block ever lifts.
+
+📌 **`Options:` closes `## To resume`, never under a heading of its
+own** — two to six proposals, in French, none opening on a number and
+a dot. ⚠️ **Optional**: a block whose fix is a missing input has none.
 
 ⚠️ **Blocking is not raising a question.** 📌 **A gap goes in your
 questions file and the cycle carries on.** 🔴 **You block only when
@@ -275,6 +282,9 @@ things are true at once and cannot both stay.** 🔴 **You never propose
 which one wins** — ⚠️ **no *défaut* at this invocation**: what the
 corpus holds is precisely what is in conflict.
 
+📌 **The two sides of the arbitration are its options**, in French — 🔴
+**and still no `Défaut:`.**
+
 📌 **Say which section of the global the question stands against**, in
 the question's own words.
 
@@ -384,10 +394,18 @@ a divergence, it is an exception.
     ### Q1
     Block: B7
     Question: <what is missing, stated directly>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Answer:
 
 🔴 **Four lines per question, `Answer:` written empty** — it is where
-the Product Owner answers, by hand.
+the Product Owner answers, by hand. 📌 **The `Options:` block is the
+only addition the count allows**, between `Question:` and `Answer:`.
+
+📌 **`Options:` — two to six proposals, in French**: 🔴 **an option
+chosen becomes the answer word for word.** ⚠️ **None opens on a number
+and a dot.** 📌 **Optional** — an open question has none.
 
 ### A *défaut*
 
@@ -396,8 +414,13 @@ the Product Owner answers, by hand.
     ### Q2
     Block: B12
     Question: <what is missing, stated directly>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Défaut: <the answer you propose> — <the block and the words that found it>
     Answer:
+
+🔴 **The text of `Défaut:` before ` — ` repeats one option verbatim.**
 
 📌 **`Défaut:` names where the answer comes from** — 🔴 **the transverse
 block, quoted in its own words.** ⚠️ **Never a proposal with nothing
@@ -454,6 +477,10 @@ does not address by identifier.
 suggested answer, never the grid identifier that raised it. 📌 **The
 identifier belongs to the record**, not to a question put to the
 Product Owner.
+
+📌 **Proposals go in `Options:`, never in the `Question:` line** — ⚠️
+**no option is marked as preferred**: 🔴 **only a `Défaut:` names one**,
+on a transverse rule.
 
 📌 **One gap, one question.** ⚠️ **Two gaps in one entry cannot be
 answered separately**, and a merge cannot tell them apart.

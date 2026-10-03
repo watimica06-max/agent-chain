@@ -189,18 +189,24 @@ fallback »*. ⚠️ **The behaviour does not change; its reach is said.**
 root. 🔴 **The prompt names your number** — 📌 **the command has the fact**,
 and you never list a folder to find it.
 
-🔴 **One entry per question, four lines, no exception**, numbered from
-`Q1`:
+🔴 **One entry per question, four lines, no exception** — 📌 **save an
+`Options:` block between `Question:` and `Answer:`, the only addition**
+—, numbered from `Q1`:
 
     ### Q1
     Block: B40
     Question: <the doubt — `comportement` or `transverse`, or the reach the transverse rule does not say>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Answer:
 
 🔴 **`Block:` carries the identifier alone.** 🔴 **The `Answer:` line is
 written empty** — the Product Owner answers there, by hand. 📌
-**Questions in English, answers in French.** 🔴 **Never suggest the
-answer.**
+**Questions in English, answers in French.** 🔴 **List the genres in
+doubt as options, never mark one as preferred** — 📌 **two to six, in
+French**: an option chosen becomes the answer word for word. ⚠️ **None
+opens on a number and a dot.** 📌 **An open question has none.**
 
 🔴 **Write the file even when empty** — ⚠️ **an empty one says the chain
 can move on; a missing one says you did not run.**
@@ -271,12 +277,20 @@ four headings**, the last one left empty:
     ## To resume
 
     <the decision or fix needed>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
 
     ## Decision
 
     <left empty — the Product Owner writes here>
 
 🔴 **The `## Decision` heading is written empty, and never omitted.**
+
+📌 **The `Options:` list follows the same rules as a question's** — two
+to six, in French, none opening on a number and a dot; ⚠️ **never a
+heading of its own.** 📌 **They are the decision's shapes** — a genre
+among the six, or the block rewritten or removed.
 
 ⚠️ **Blocking is not hesitating.** 📌 **A doubt is a question** — see
 *Your questions*. 🔴 **You block on two facts**: **no genre fits at

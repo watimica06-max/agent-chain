@@ -10,7 +10,8 @@ Act as the orchestrator, in **downstream mode**.
 once more to assemble.**
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant. ⚠️ **A name,
+for it and stop — never guess which feature is meant —
+`Next: stop argument missing`. ⚠️ **A name,
 never a path** — 📌 **you derive the folders from it**, as `/7_lots`,
 `/8_code` and `/audit_conventions` do.
 
@@ -72,10 +73,11 @@ file, and its sheets are never confronted**: 🔴 **the blocks it built
 reach the Contrôleur marked `carried`, through the map of phase 1.**
 
 🔴 **`desc-produit.md` absent from the feature folder** — 📌 **say so
-and stop**: there is nothing to confront the sheets with.
+and stop**: there is nothing to confront the sheets with —
+`Next: stop desc-produit.md missing`.
 
 🔴 **Stop if a lot of a sequence has no `verdict.md` whose `## Status`
-opens on `PASS`** — name it. 📌 **Two sequences when the working folder
+opens on `PASS`** — name it: `Next: stop <lot> not PASS`. 📌 **Two sequences when the working folder
 is a `bugfix-NN/`**: ⚠️ **the feature folder's, whose sheets phases 1
 to 3 confront, and the working folder's, whose lots phases 4 to 6
 read.**
@@ -119,7 +121,8 @@ isolated.
 **Six phases.**
 
 🔴 **`tracabilite.md` absent from the feature folder** — 📌 **phase 1
-reads it**: say so and stop, the conversion did not finish.
+reads it**: say so and stop, the conversion did not finish —
+`Next: stop tracabilite.md missing`.
 
 📌 **`code/recette.md` absent from the working folder** — ⚠️ **normal,
 not a stop**: no lot had a criterion beyond a test. 🔴 **Phase 4 then
@@ -221,7 +224,8 @@ and that count can never match.
 
 🔴 **And grep every lot of `code/decoupage.md` in it** — 📌 **a lot
 appearing in no line built no entry any block names**, which is either
-a split defect or a crossing defect. ⚠️ **Say which lots, and stop.**
+a split defect or a crossing defect. ⚠️ **Say which lots, and stop** —
+`Next: stop <lots> in no line of the map`.
 
 🔴 **Every kept block appears.** A block whose entries no lot cites
 gets a dash — it still needs an answer, and the group carrying it reads
@@ -459,7 +463,8 @@ order:**
 5. `git worktree remove <path>`
 
 ⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
-**never force it**: 📌 **say what is left there, and stop.** 📌 **What
+**never force it**: 📌 **say what is left there, and stop** —
+`Next: stop worktree dirty: <files>`. 📌 **What
 is left is something step 1 did not stage** — a fault of this run,
 never of the agent: it was not to commit it. Forcing the removal
 destroys it.
@@ -496,6 +501,11 @@ in one word.**
 
 🔴 **Nothing else is yours**: no reading of those files, no summary of
 what they hold, no decision on what to do next.
+
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included. 📌
+**This one, on a run that wrote its four files**: `Next: manual lire le
+rapport de contrôle et la recette, décider d'une bug-list`.
 
 📌 **The Product Owner reads them and decides** whether the control
 report becomes a `bug-list.md` for a correction cycle. 🔴 **A gap she

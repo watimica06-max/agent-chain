@@ -201,9 +201,18 @@ and is not a block.
 
     <the decision or fix needed>
 
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
+
     ## Decision
 
     <left empty — the Product Owner writes here>
+
+📌 **`Options:` holds two to six proposals, in French, none opening on
+a number and a dot** — a chosen one becomes the Product Owner's
+decision word for word; ⚠️ a block whose fix is a missing input has
+none.
 
 ---
 

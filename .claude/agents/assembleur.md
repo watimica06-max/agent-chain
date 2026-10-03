@@ -78,6 +78,10 @@ ran and found nothing to keep**, which is not what happened.
 
     <the decision or fix needed>
 
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
+
     ## Decision
 
     <left empty — the Product Owner writes here>
@@ -85,6 +89,11 @@ ran and found nothing to keep**, which is not what happened.
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 It is where the Product Owner answers, by hand, and it is the only way
 this block ever lifts.
+
+📌 **`Options:` ends the body of `## To resume`** — ⚠️ **a list, never a
+heading.** 🔴 **Two to six proposals, in French**, none opening on a
+number and a dot. 📌 **Optional** — ⚠️ **a block whose fix is a missing
+input has none.**
 
 ⚠️ **Blocking is not a finding.** 📌 **A question you cannot place, a
 file out of shape — those are the two stops of PART 3**, and they are
@@ -145,6 +154,21 @@ feature**, not of a block.
 **You copy it as you copy the rest** — 🔴 **you never write one, never
 remove one, never judge one.**
 
+🔴 **A question may also carry an `Options:` block**, between
+`Question:` and `Défaut:` — or `Answer:` when there is no `Défaut:`:
+
+    ### Q3
+    Block: B14
+    Question: <what is missing, stated directly>
+    Options:
+    - <a proposal, in French>
+    - <another>
+    Défaut: <one option, repeated verbatim> — <what founds it>
+    Answer:
+
+📌 **It is part of the shape** — ⚠️ **you copy it as you copy the
+rest**: 🔴 **you never write one, never remove one, never judge one.**
+
 **When two questions merge and one carries a `Défaut:`**
 
 🔴 **The kept question keeps its own `Défaut:` line, or has none.** 📌
@@ -155,6 +179,10 @@ not found the other.
 🔴 **So a `Défaut:` on the one you would drop keeps both.** 📌 **A
 founded proposal is worth more than a merge** — ⚠️ **dropped, the
 Product Owner writes by hand what a sondeur had already founded.**
+
+🔴 **`Options:` travels with its question the same way** — 📌 **the
+kept question keeps its own `Options:` block, or has none.** ⚠️ **Never
+moved or merged between questions.**
 
 📌 **An empty file is a file with no `### Q` and no prose** — 🔴 **that
 one test, and nothing more**: ⚠️ **the zero-byte file a sondeur writes
@@ -263,11 +291,14 @@ in the feature folder.
     ### Q2
     Block: B12
     Question: <copied, word for word>
+    Options:
+    - <copied, word for word>
+    - <the next, copied likewise>
     Défaut: <copied, word for word>
     Answer:
 
 📌 **The `Défaut:` line travels with its question**, copied like the
-rest.
+rest — 📌 **and so does the `Options:` block**, word for word.
 
 🔴 **Numbering restarts at `Q1`**, in the order of the `Block:` lines —
 📌 **identifier order**, and for a multi-block question its first

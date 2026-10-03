@@ -145,6 +145,10 @@ still carry their markers, and the next turn's greps name them again.
 
     <a decision, a correction upstream>
 
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
+
     ## Decision
 
     <left empty — the Product Owner writes here>
@@ -153,6 +157,11 @@ still carry their markers, and the next turn's greps name them again.
 📌 **It is where the Product Owner answers, by hand** — ⚠️ **and what
 `/3_decoupe` and `/2_structure` grep**: 🔴 **a field in a table, they
 would not find.**
+
+📌 **`Options:` closes `## To resume`, never a heading of its own** —
+🔴 **two to six, in French**: a chosen one becomes the Product Owner's
+decision word for word. ⚠️ **None opens on a number and a dot** (`1.`,
+`2.`). 📌 **Optional** — a block whose fix is a missing input has none.
 
 ⚠️ **Blocking is not signalling.** 🔴 **Block only when splitting is
 impossible** — 📌 **which is one case, and you can see it in the block

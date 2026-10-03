@@ -202,9 +202,20 @@ blocking file alone stops the run.
 
     <the decision or fix needed>
 
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
+
     ## Decision
 
     <left empty — the Product Owner writes here>
+
+📌 **`Options:` closes `## To resume`** — 🔴 **two to six proposals, in
+French**: a chosen one becomes the Product Owner's decision word for
+word. ⚠️ **None opens on a number and a dot** (`1.`, `2.`). 📌 **A block
+whose fix is a missing input carries none**, nor does a conventions
+block — the Architecte's verdict lifts it. 🔴 **Each block appended
+below a filled `## Decision` carries its own.**
 
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 📌 **It is where the Product Owner answers, by hand.** ⚠️ **One block

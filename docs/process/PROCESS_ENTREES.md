@@ -217,7 +217,10 @@ ce qu'il reste au Product Owner à fournir.
    `/conventions` et non à la main ; la compétence
    `technical-state-format`, chargée par le Réalisateur et l'Arbitre
    avant d'écrire dans l'état technique. Ni l'un ni l'autre ne bloque
-   l'amont — seulement `/7_lots` et la suite.
+   l'amont — seulement `/7_lots` et la suite. Le rapport finit sur
+   `Next: manual écrire docs/features/<name>/idees.md, then run
+   /1_lexique <name>` ; l'arrêt de l'étape 1 sur `Next: stop
+   docs/PRODUIT_GLOBAL.md already exists` (→ MECANISMES §Ligne Next:).
 8. Commit seul, `chore: scaffolding for the chain`, et push.
 
 **Git** — → MECANISMES §Commit sans worktree : aucun agent, aucun
@@ -528,7 +531,11 @@ rapport de l'agent relayé, et *What to run next* : `/7_lots`.
     existe → fait, `/7_lots` ; phase 2 retenue → la liste de chaque
     identifiant debout, depuis les résultats de la phase 1, jamais un
     identifiant tiré d'un blocage d'invocation 2 — il n'y en a pas. Un
-    `## Decision` rempli → `/diagnostique` de nouveau.
+    `## Decision` rempli → `/diagnostique` de nouveau. Le relais finit
+    sur la ligne `Next:` de son issue, arrêts compris — `Next: run
+    /7_lots <name>` quand la phase 2 a écrit `desc-bug.md`, `Next:
+    answer blocking, then run /diagnostique <name>` sur un fichier de
+    blocage (→ MECANISMES §Ligne Next:).
 
 **Git** — `chore: answers` avant le worktree ; worktree depuis `HEAD`
 local ; renommages dans le worktree avant les cinq pas ; cinq pas ; le
@@ -792,10 +799,12 @@ d'un autre : rien — il ne voit aucune autre investigation, et ne pointe
 jamais vers une autre entrée. Le rapport de fin dit la décision
 appliquée, s'il y en a une (→ MECANISMES §Forme d'un relais).
 **Bloque** — `investigation/blocked_<id>.md`, forme 1 : `## What
-blocks`, `## Where`, `## To resume`, `## Decision` vide ; le Product
-Owner répond à la main ; un blocage arrête ce manque seul, les autres
-continuent, et l'invocation 2 verra le rapport manquant. Jamais par
-prudence : le doute se signale dans le rapport.
+blocks`, `## Where`, `## To resume` — qui peut finir sur une liste
+`Options:`, aucune quand la correction est une entrée manquante —,
+`## Decision` vide ; le Product Owner répond à la main ; un blocage
+arrête ce manque seul, les autres continuent, et l'invocation 2 verra
+le rapport manquant. Jamais par prudence : le doute se signale dans le
+rapport.
 
 **Décisions**
 

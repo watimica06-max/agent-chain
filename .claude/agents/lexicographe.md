@@ -77,7 +77,7 @@ folder — **do not merely say it.**
 |---|---|
 | What blocks | The fact, not your reading of it |
 | Where | The passage |
-| To resume | A decision, a correction upstream |
+| To resume | A decision, a correction upstream — 📌 **may end on an `Options:` list**: in French, two to six, ⚠️ none opening on a number and a dot |
 | Decision | 🔴 **Written empty** — the Product Owner answers by hand |
 
 ⚠️ **Blocking is not raising a question.** 🔴 **Block only when you
@@ -310,6 +310,9 @@ pair and per doubtful quote:
     ### Q1
     Terms: atelier, STATION
     Question: <what you read them as, stated as a question>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Answer:
 
 🔴 **`Terms:` carries the terms, comma-separated** — 📌 **it is what the
@@ -321,6 +324,10 @@ possible**, and saying which you see is the work:
 ⚠️ *these two name one same thing* · *these are two distinct things* ·
 *one is the other's abbreviation, used in one place only* · 🔴 *this one
 term carries two meanings*.
+
+📌 **Those readings are your `Options:`** — the ones that fit the entry,
+two to six, 🔴 **written in French**, ⚠️ none opening on a number and a
+dot: an option chosen becomes the answer word for word.
 
 📌 **For that last one, the entry shows the two meanings apart** —
 every occurrence, each with its sentence, grouped under the meaning you
@@ -458,6 +465,10 @@ Product Owner is entitled to write. 📌 **A retired term found is
 not a question: the decision is made** — ⚠️ **save under a scoped
 entry.**
 
+🔴 **A swap reaches `Answer:` and the accepted `Défaut:`, as above —
+never `Options:`**, here or at invocation 4. 📌 **No reader reads
+`Options:` once the answer is written.**
+
 🔴 **A `remplace :` line ending in `dans ce sens seulement` is never
 swapped.** 📌 **The entry is scoped**: the term stays for one meaning,
 and which meaning an occurrence carries is the Product Owner's to say,
@@ -524,6 +535,9 @@ doubt, the same shape as invocation 1's:
     ### Q1
     Terms: sas, PREPARATION
     Question: <what you read them as, stated as a question>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Answer:
 
 🔴 **Write it even when empty** — 📌 its absence would read as *this
