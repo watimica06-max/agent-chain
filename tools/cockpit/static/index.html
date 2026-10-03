@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cockpit de la chaîne</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --bg: #f4f3ef; --card: #ffffff; --ink: #1f2328; --soft: #5c6470; --line: #dedbd3;
+  --accent: #2f6b8f; --accent-ink: #ffffff; --accent-soft: #e4eef4;
+  --next: #c77d1a; --next-soft: #fbf0de; --ok: #2e7d4f; --ok-soft: #e3f2e8;
+  --err: #b3392f; --err-soft: #fbe7e4; --warn: #8a6d1a; --warn-soft: #fbf4dc;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1d20; --card: #24272b; --ink: #e8e6e1; --soft: #a3a9b1; --line: #3a3e44;
+    --accent: #6aa7cc; --accent-ink: #0f1a22; --accent-soft: #23343f;
+    --next: #e0a24a; --next-soft: #3a2f1e; --ok: #6cc28f; --ok-soft: #1f3327;
+    --err: #ec8a80; --err-soft: #3d2422; --warn: #e3c56b; --warn-soft: #3a3320;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 17px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; }
+header { display: flex; align-items: center; gap: 16px; padding: 12px 24px;
+  background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+header h1 { font-size: 19px; margin: 0; font-weight: 650; }
+header .pair { color: var(--soft); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+header .pair b { color: var(--ink); }
+main { padding: 20px 24px 60px; max-width: 1600px; margin: 0 auto; }
+h2 { font-size: 20px; margin: 0 0 12px; }
+h3 { font-size: 17px; margin: 0 0 8px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; }
+.zone + .zone { margin-top: 20px; }
+.cols { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; margin-top: 20px; align-items: start; }
+@media (max-width: 1100px) { .cols { grid-template-columns: 1fr; } }
+button { font: inherit; min-height: 44px; padding: 8px 18px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+button.next { background: var(--next); color: #fff; border-color: var(--next); font-weight: 650; }
+button.danger { color: var(--err); border-color: var(--err); }
+button.link { border: none; background: none; color: var(--accent); padding: 4px 0; min-height: 0; text-decoration: underline; }
+input[type=text], textarea { font: inherit; width: 100%; padding: 9px 12px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+textarea { min-height: 70px; resize: vertical; }
+input[type=text]:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.muted { color: var(--soft); }
+.small { font-size: 14px; }
+.mono { font-family: var(--mono); font-size: 14px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.grow { flex: 1; min-width: 200px; }
+.hidden { display: none !important; }
+.badge { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 99px;
+  background: var(--accent-soft); color: var(--accent); font-weight: 600; vertical-align: middle; }
+.badge.next { background: var(--next-soft); color: var(--next); }
+.badge.warn { background: var(--warn-soft); color: var(--warn); }
+.badge.err { background: var(--err-soft); color: var(--err); }
+.notice { border-radius: 8px; padding: 10px 14px; margin: 10px 0; }
+.notice.err { background: var(--err-soft); color: var(--err); }
+.notice.warn { background: var(--warn-soft); color: var(--warn); }
+.notice.ok { background: var(--ok-soft); color: var(--ok); }
+pre.text { white-space: pre-wrap; word-wrap: break-word; font: inherit; margin: 0; }
+
+/* Écran de démarrage */
+#start { max-width: 880px; margin: 0 auto; display: grid; gap: 20px; }
+.folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; margin-top: 10px; }
+.folders button { text-align: left; }
+.folders button.sel { border: 2px solid var(--accent); background: var(--accent-soft); }
+.recent button { display: block; width: 100%; text-align: left; margin-top: 8px; }
+
+/* Prochaine étape */
+#next-text { font-size: 22px; font-weight: 600; margin: 4px 0 12px; }
+#next-zone.k-run { border-left: 6px solid var(--next); }
+#next-zone.k-answer { border-left: 6px solid var(--accent); }
+.cmds { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 8px; margin-top: 14px; }
+.cmd { display: flex; gap: 8px; align-items: center; padding: 6px; border-radius: 9px; border: 1px solid transparent; }
+.cmd button { flex: none; min-width: 150px; text-align: left; font-family: var(--mono); font-size: 15px; white-space: nowrap; }
+.cmd input { flex: 1; min-width: 90px; font-family: var(--mono); font-size: 15px; }
+.cmd.hl { border-color: var(--next); background: var(--next-soft); }
+details summary { cursor: pointer; color: var(--accent); margin-top: 10px; }
+details pre { max-height: 360px; overflow: auto; background: var(--bg); padding: 12px; border-radius: 8px; }
+
+/* À répondre */
+.entry { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin-top: 12px; background: var(--card); }
+.entry.saved { border-color: var(--ok); }
+.entry.failed { border-color: var(--err); }
+.entry .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 6px; }
+.entry .ctx { color: var(--soft); font-size: 15px; }
+.entry .q { margin: 6px 0 10px; }
+.entry .lbl { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); margin-top: 8px; }
+.opts { display: grid; gap: 6px; margin: 8px 0; }
+.opt { display: flex; gap: 10px; align-items: flex-start; padding: 9px 12px; border: 1px solid var(--line);
+  border-radius: 8px; cursor: pointer; }
+.opt:hover { border-color: var(--accent); }
+.opt input { margin-top: 5px; width: 18px; height: 18px; flex: none; }
+.opt.chosen { border-color: var(--accent); background: var(--accent-soft); }
+.opt.later.chosen { border-color: var(--line); background: none; }
+.result { margin-top: 8px; font-size: 15px; }
+.file-head { margin-top: 18px; font-family: var(--mono); font-size: 14px; color: var(--soft); }
+#save-bar { position: sticky; bottom: 0; background: var(--card); padding: 12px 0 4px; margin-top: 16px;
+  border-top: 1px solid var(--line); display: flex; gap: 12px; align-items: center; }
+
+/* Run */
+#perm-list .perm { border: 2px solid var(--next); background: var(--next-soft); border-radius: var(--radius); padding: 12px 14px; margin: 10px 0; }
+#perm-list pre { max-height: 220px; overflow: auto; background: var(--card); padding: 8px; border-radius: 6px; font-family: var(--mono); font-size: 13px; white-space: pre-wrap; }
+@media (min-width: 1101px) { #run-zone { position: sticky; top: 84px; } }
+#stream { height: min(520px, calc(100vh - 380px)); min-height: 200px; overflow: auto; background: var(--bg); border-radius: 8px; padding: 10px 12px; margin-top: 12px;
+  font-size: 15px; border: 1px solid var(--line); }
+#stream .ev { margin: 0 0 8px; }
+#stream .who { font-weight: 650; color: var(--accent); margin-right: 6px; }
+#stream .tool { color: var(--soft); font-family: var(--mono); font-size: 13px; margin: 0 0 4px; }
+#stream .sys { color: var(--next); font-size: 14px; margin: 6px 0; }
+#agents .badge { margin-right: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Cockpit de la chaîne</h1>
+  <div class="pair" id="pair-label"></div>
+  <button id="perm-alert" class="next hidden">Autorisation demandée</button>
+  <button id="btn-change" class="hidden">Changer de dossier</button>
+</header>
+
+<main>
+  <!-- ======================= Écran de démarrage ======================= -->
+  <section id="start" class="hidden">
+    <div id="start-error" class="notice err hidden"></div>
+    <div class="card">
+      <h2>Dossier de l'application</h2>
+      <p class="muted small">Le dossier qui contient <span class="mono">.claude/</span> et <span class="mono">docs/features/</span>.</p>
+      <div class="row">
+        <input type="text" id="app-path" class="grow" placeholder="C:\Dev\hyrox_tracker">
+        <button id="btn-browse">Parcourir…</button>
+        <button id="btn-app" class="primary">Valider</button>
+      </div>
+      <p class="muted small">Si la fenêtre de choix ne s'ouvre pas, collez le chemin dans le champ.</p>
+    </div>
+    <div class="card" id="work-card">
+      <h2>Dossier de travail</h2>
+      <p class="muted small">Une feature de <span class="mono">docs/features/</span>, ou l'un de ses <span class="mono">bugfix-NN/</span>.</p>
+      <div class="folders" id="work-list"><span class="muted">Choisissez d'abord le dossier de l'application.</span></div>
+      <div class="row" style="margin-top:14px"><button id="btn-open" class="primary" disabled>Ouvrir</button></div>
+    </div>
+    <div class="card recent" id="recent-card">
+      <h2>Récents</h2>
+      <div id="recent-list" class="muted">Aucun.</div>
+    </div>
+  </section>
+
+  <!-- ========================= Écran principal ========================= -->
+  <section id="main" class="hidden">
+    <!-- Zone 1 -->
+    <div class="card zone" id="next-zone">
+      <h2>Prochaine étape</h2>
+      <div id="next-text">—</div>
+      <div id="next-detail" class="row"></div>
+      <div id="next-meta" class="muted small"></div>
+      <details id="relay-box" class="hidden"><summary>Relais complet</summary><pre class="text" id="relay"></pre></details>
+      <div id="cmds-box">
+        <div class="lbl muted small" style="margin-top:16px">Toutes les commandes</div>
+        <div class="cmds" id="cmds"></div>
+      </div>
+    </div>
+
+    <div class="cols">
+      <!-- Zone 2 -->
+      <div class="card zone" id="answer-zone">
+        <div class="row"><h2 class="grow" style="margin:0">À répondre</h2>
+          <span id="answer-count" class="muted"></span>
+          <button id="btn-reload">Recharger</button></div>
+        <div id="save-summary"></div>
+        <div id="form-errors"></div>
+        <div id="form"></div>
+        <div id="save-bar">
+          <button id="btn-save" class="primary">Enregistrer</button>
+          <span id="save-hint" class="muted small"></span>
+        </div>
+      </div>
+
+      <!-- Zone 3 -->
+      <div class="card zone" id="run-zone">
+        <h2>Run en cours</h2>
+        <div id="run-status" class="muted">Aucune commande en cours.</div>
+        <div id="agents" style="margin-top:6px"></div>
+        <div id="stop-file" class="notice warn hidden"></div>
+        <div class="row" style="margin-top:10px">
+          <button id="btn-stop-now" class="danger" disabled>Arrêter maintenant</button>
+          <button id="btn-stop-next" class="hidden" disabled>Arrêter au prochain lot</button>
+        </div>
+        <div id="perm-list"></div>
+        <div id="stream"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v;
+    else if (k === "text") n.textContent = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v !== undefined && v !== null && v !== false) n.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kids.flat()) if (c !== null && c !== undefined) n.append(c);
+  return n;
+};
+
+async function api(path, data) {
+  const opts = data === undefined ? {} : {
+    method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(data)};
+  const r = await fetch(path, opts);
+  let body = {};
+  try { body = await r.json(); } catch (e) { /* not json */ }
+  if (!r.ok) throw new Error(body.error || `erreur ${r.status}`);
+  return body;
+}
+
+// Drafts survive a re-render and a reload: long sessions, one person.
+const drafts = {};
+function loadDrafts() { try { Object.assign(drafts, JSON.parse(localStorage.getItem("cockpit-drafts") || "{}")); } catch (e) {} }
+function storeDrafts() { try { localStorage.setItem("cockpit-drafts", JSON.stringify(drafts)); } catch (e) {} }
+
+let S = {};          // /api/state
+let F = null;        // /api/forms
+let seen = 0;        // last event seq
+let es = null;
+
+// ============================================================ démarrage
+let chosenApp = null, chosenWork = null;
+
+function showStart(err) {
+  $("start").classList.remove("hidden");
+  $("main").classList.add("hidden");
+  $("btn-change").classList.add("hidden");
+  $("pair-label").textContent = "";
+  $("start-error").classList.toggle("hidden", !err);
+  $("start-error").textContent = err || "";
+  if (S.app_folder && !$("app-path").value) $("app-path").value = S.app_folder;
+  if (S.working_folders) { chosenApp = S.app_folder; renderWorkList(S.working_folders); }
+  const rl = $("recent-list"); rl.replaceChildren();
+  if (!S.recent || !S.recent.length) rl.append("Aucun.");
+  for (const p of S.recent || []) {
+    rl.append(el("button", {onclick: () => openPair(p.app, p.work)},
+      el("b", {text: p.work}), el("span", {class: "muted small", text: "  —  " + p.app})));
+  }
+}
+
+function renderWorkList(list) {
+  const box = $("work-list"); box.replaceChildren();
+  if (!list.length) box.append(el("span", {class: "muted", text: "Aucun dossier sous docs/features/."}));
+  for (const w of list) {
+    const b = el("button", {text: w, class: w === chosenWork ? "sel" : "",
+      onclick: () => { chosenWork = w; renderWorkList(list); $("btn-open").disabled = false; },
+      ondblclick: () => openPair(chosenApp, w)});
+    box.append(b);
+  }
+  $("btn-open").disabled = !chosenWork;
+}
+
+async function validateApp() {
+  try {
+    const r = await api("/api/app-folder", {path: $("app-path").value});
+    chosenApp = r.path; $("app-path").value = r.path; chosenWork = null;
+    renderWorkList(r.working_folders);
+    $("start-error").classList.add("hidden");
+  } catch (e) { $("start-error").textContent = e.message; $("start-error").classList.remove("hidden"); }
+}
+
+$("btn-browse").onclick = async () => {
+  const b = $("btn-browse"); b.disabled = true; b.textContent = "Fenêtre ouverte…";
+  try {
+    const r = await api("/api/pick-folder", {initial: $("app-path").value});
+    if (r.path) { $("app-path").value = r.path; await validateApp(); }
+  } catch (e) { $("start-error").textContent = e.message; $("start-error").classList.remove("hidden"); }
+  finally { b.disabled = false; b.textContent = "Parcourir…"; }
+};
+$("btn-app").onclick = validateApp;
+$("app-path").addEventListener("keydown", (e) => { if (e.key === "Enter") validateApp(); });
+$("btn-open").onclick = () => openPair(chosenApp, chosenWork);
+$("btn-change").onclick = async () => { await api("/api/close", {}); await refreshState(); };
+
+async function openPair(app, work) {
+  try { await api("/api/open", {app, work}); await refreshState(); }
+  catch (e) { showStart(e.message); }
+}
+
+// ======================================================= état général
+async function refreshState() {
+  S = await api("/api/state");
+  if (!S.open) { closeEvents(); showStart(S.load_error); return; }
+  $("start").classList.add("hidden");
+  $("main").classList.remove("hidden");
+  $("btn-change").classList.remove("hidden");
+  $("pair-label").replaceChildren(el("b", {text: S.working_folder}),
+    el("span", {text: "  —  " + S.app_folder}));
+  renderNext(); renderRun();
+  openEvents();
+  await refreshForms();
+}
+
+// ==================================================== prochaine étape
+function currentNext() {
+  if (S.run && S.run.status !== "ended") return null;
+  return S.last ? S.last.next : null;
+}
+
+function renderNext() {
+  const zone = $("next-zone"), n = currentNext();
+  const running = S.run && S.run.status !== "ended";
+  zone.className = "card zone" + (n ? " k-" + n.kind : "");
+  const detail = $("next-detail"); detail.replaceChildren();
+  let hlCmd = null, hlArgs = "";
+  if (running) {
+    $("next-text").textContent = "Une commande tourne : " + S.run.prompt;
+  } else if (!S.last) {
+    $("next-text").textContent = "Aucun relais encore pour ce dossier.";
+    detail.append(el("span", {class: "muted", text: "Choisissez la commande à lancer : le cockpit ne devine jamais."}));
+  } else {
+    $("next-text").textContent = n.french;
+    if (n.kind === "run") {
+      hlCmd = n.command; hlArgs = n.args;
+      detail.append(el("button", {class: "next", text: `Lancer /${n.command} ${n.args}`.trim(),
+        onclick: () => runCommand(n.command, n.args, true)}));
+    } else if (n.kind === "answer") {
+      detail.append(el("button", {class: "primary", text: "Aller au formulaire",
+        onclick: () => $("answer-zone").scrollIntoView({behavior: "smooth"})}));
+      if (n.command) {
+        hlCmd = n.command; hlArgs = n.args;
+        detail.append(el("span", {class: "muted", text: `Ensuite : /${n.command} ${n.args}`}));
+      }
+    } else if (n.kind === "unknown") {
+      $("relay-box").open = true;
+    }
+  }
+  const meta = $("next-meta");
+  meta.textContent = S.last ? `Dernier relais : ${S.last.command} — ${S.last.outcome || ""} — ${S.last.at || ""}` : "";
+  $("relay-box").classList.toggle("hidden", !S.last || running);
+  $("relay").textContent = S.last ? (S.last.relay || "(relais vide)") : "";
+
+  $("cmds-box").classList.toggle("hidden", !!running);
+  const box = $("cmds"); box.replaceChildren();
+  for (const c of S.commands || []) {
+    const hl = c.name === hlCmd;
+    const key = "arg:" + S.working_folder + ":" + c.name;
+    const input = el("input", {type: "text", value: hl ? hlArgs : (c.argument_hint ? S.feature : ""),
+      placeholder: c.argument_hint || "sans argument", "aria-label": "argument de /" + c.name});
+    const btn = el("button", {class: hl ? "next" : "", text: "/" + c.name, title: c.description,
+      disabled: running || undefined, onclick: () => runCommand(c.name, input.value, hl)});
+    box.append(el("div", {class: "cmd" + (hl ? " hl" : "")}, btn, input));
+  }
+}
+
+async function runCommand(name, args, named) {
+  if (S.run && S.run.status !== "ended") return;
+  // One click for the command Next: names; a confirmation for any other.
+  if (!named && !confirm(`Lancer /${name} ${args || ""} ? Ce n'est pas l'étape que le dernier relais a nommée.`)) return;
+  try { await api("/api/run", {command: name, args: args || ""}); $("stream").replaceChildren(); await refreshState(); }
+  catch (e) { alert(e.message); }
+}
+
+// ========================================================= formulaire
+async function refreshForms() {
+  try { F = await api("/api/forms"); }
+  catch (e) { $("form").replaceChildren(el("div", {class: "notice err", text: e.message})); return; }
+  renderForms();
+}
+$("btn-reload").onclick = () => { $("save-summary").replaceChildren(); refreshForms(); };
+
+function draftOf(id, def) {
+  if (!drafts[id]) drafts[id] = {kind: def ? "default" : "none", option: def || null, text: ""};
+  return drafts[id];
+}
+
+function choiceBlock(id, options, def, freeLabel) {
+  const d = draftOf(id, def);
+  const wrap = el("div", {class: "opts"});
+  const name = "c-" + id;
+  const mk = (kind, option, label, extra) => {
+    const checked = d.kind === kind && (kind !== "option" && kind !== "default" || d.option === option);
+    const input = el("input", {type: "radio", name, checked: checked || undefined});
+    const row = el("label", {class: "opt" + (checked ? " chosen" : "")}, input,
+      el("span", {}, label, extra || null));
+    if (kind === "none") row.classList.add("later");
+    input.addEventListener("change", () => {
+      d.kind = kind; d.option = option; storeDrafts();
+      for (const o of wrap.querySelectorAll(".opt")) o.classList.remove("chosen");
+      row.classList.add("chosen"); hint();
+    });
+    return row;
+  };
+  wrap.append(mk("none", null, el("span", {class: "muted", text: "Plus tard — ne rien écrire maintenant"})));
+  for (const o of options) {
+    if (def !== null && def !== undefined && o === def) {
+      wrap.append(mk("default", o, o, el("span", {class: "badge next", text: " défaut "})));
+    } else wrap.append(mk("option", o, o));
+  }
+  if (def && !options.includes(def)) wrap.append(mk("default", def, def, el("span", {class: "badge next", text: " défaut "})));
+  wrap.append(mk("free", null, freeLabel || "Réponse libre (texte ci-dessous)"));
+  const ta = el("textarea", {placeholder: "Remarque ajoutée à l'option choisie, ou réponse libre"});
+  ta.value = d.text || "";
+  ta.addEventListener("input", () => { d.text = ta.value; storeDrafts(); hint(); });
+  return [wrap, ta];
+}
+
+function entryCard(id, cls, head, body, choice, result) {
+  const card = el("div", {class: "entry " + (cls || ""), id: "e-" + id}, el("div", {class: "head"}, head), body, choice);
+  if (result) card.append(result);
+  return card;
+}
+
+function renderForms() {
+  const form = $("form"); form.replaceChildren();
+  const errs = $("form-errors"); errs.replaceChildren();
+  for (const e of F.errors) {
+    errs.append(el("div", {class: "notice " + (e.level === "warning" ? "warn" : "err")},
+      el("b", {class: "mono", text: e.rel}), " — ", e.message));
+  }
+  const nq = F.questions.length, nb = F.blocking.length + (F.redecoupage ? 1 : 0);
+  $("answer-count").textContent = `${nq} question${nq > 1 ? "s" : ""} · ${nb} blocage${nb > 1 ? "s" : ""}`;
+  if (!nq && !nb) form.append(el("p", {class: "muted", text: "Rien n'attend de réponse dans ce dossier."}));
+
+  if (F.blocking.length || F.redecoupage) form.append(el("h3", {text: "Blocages"}));
+  if (F.redecoupage) {
+    const r = F.redecoupage;
+    const d = draftOf(r.id, null); if (d.kind === "none" && d.text) d.kind = "free";
+    const ta = el("textarea", {placeholder: "Votre décision, en français"}); ta.value = d.text || "";
+    ta.addEventListener("input", () => { d.text = ta.value; d.kind = ta.value.trim() ? "free" : "none"; storeDrafts(); hint(); });
+    form.append(entryCard(r.id, "", [el("span", {class: "badge err", text: `Redécoupage n° ${r.count}`}),
+        el("span", {class: "mono small", text: r.rel})],
+      [el("div", {class: "lbl", text: "Ce qui revient"}), el("pre", {class: "text", text: r.ce_qui_revient || "—"}),
+       el("div", {class: "lbl", text: "Ce que j'en fais"}), el("pre", {class: "text", text: r.ce_que_jen_fais || "—"}),
+       el("div", {class: "lbl", text: "Décision du Product Owner"})], [ta]));
+  }
+  for (const b of F.blocking) {
+    const tags = [el("span", {class: "badge", text: b.agent}), el("span", {class: "mono small", text: b.rel})];
+    if (b.number !== null) tags.push(el("span", {class: "badge", text: "Blocking " + b.number}));
+    if (b.lot) tags.push(el("span", {class: "badge", text: b.lot}));
+    if (b.worktree) tags.push(el("span", {class: "badge warn", text: "worktree en cours"}));
+    form.append(entryCard(b.id, "", tags, [
+      el("div", {class: "lbl", text: "Ce qui bloque"}), el("pre", {class: "text", text: b.what_blocks || "—"}),
+      b.where ? el("div", {class: "lbl", text: "Où"}) : null, b.where ? el("pre", {class: "text", text: b.where}) : null,
+      el("div", {class: "lbl", text: "Pour reprendre"}), el("pre", {class: "text", text: b.to_resume || "—"}),
+    ], choiceBlock(b.id, b.options, null, "Décision libre (texte ci-dessous)")));
+  }
+
+  let file = null;
+  for (const q of F.questions) {
+    if (q.rel !== file) {
+      file = q.rel;
+      if (file && form.querySelector("h3.q-title") === null) form.append(el("h3", {class: "q-title", text: "Questions"}));
+      form.append(el("div", {class: "file-head", text: file}));
+    }
+    const head = [el("b", {text: "Q" + q.number}), el("span", {class: "ctx", text: q.context.join(" · ")})];
+    if (q.default !== null) head.push(el("span", {class: "badge next", text: "défaut proposé"}));
+    const body = [el("pre", {class: "text q", text: q.question})];
+    if (q.default_source) body.push(el("div", {class: "muted small", text: "Source du défaut : " + q.default_source}));
+    if (q.answer) body.push(el("div", {class: "notice warn small", text: "Texte déjà présent sous Answer:, hors de la ligne — il sera remplacé : " + q.answer}));
+    form.append(entryCard(q.id, "", head, body, choiceBlock(q.id, q.options, q.default)));
+  }
+  hint();
+}
+
+function collectItems() {
+  const items = [];
+  const all = [...F.questions, ...F.blocking, ...(F.redecoupage ? [F.redecoupage] : [])];
+  for (const e of all) {
+    const d = drafts[e.id];
+    if (!d || d.kind === "none") continue;
+    items.push({id: e.id, fingerprint: e.fingerprint, kind: d.kind, option: d.option, text: d.text || ""});
+  }
+  return items;
+}
+
+function hint() {
+  if (!F) return;
+  const items = collectItems();
+  const n = items.filter((i) => !(i.kind === "default" && !i.text.trim())).length;
+  $("save-hint").textContent = n ? `${n} réponse${n > 1 ? "s" : ""} à écrire` : "Aucune réponse à écrire pour l'instant.";
+}
+
+$("btn-save").onclick = async () => {
+  const items = collectItems();
+  const btn = $("btn-save"); btn.disabled = true;
+  try {
+    const r = await api("/api/save", {items});
+    const sum = $("save-summary"); sum.replaceChildren();
+    let ok = 0, ko = 0, same = 0;
+    for (const res of r.results) {
+      if (res.status === "saved") { ok++; delete drafts[res.id]; }
+      else if (res.status === "unchanged") { same++; }
+      else if (res.status === "error") ko++;
+    }
+    storeDrafts();
+    await refreshForms();
+    if (ok) sum.append(el("div", {class: "notice ok", text: `${ok} enregistrée${ok > 1 ? "s" : ""} et relue${ok > 1 ? "s" : ""} comme répondue${ok > 1 ? "s" : ""}.`}));
+    if (same) sum.append(el("div", {class: "notice ok", text: `${same} défaut${same > 1 ? "s" : ""} gardé${same > 1 ? "s" : ""} : Answer: reste vide, la chaîne le lit comme accepté.`}));
+    for (const res of r.results) {
+      const card = $("e-" + res.id);
+      if (res.status === "error") {
+        if (card) { card.classList.add("failed"); card.append(el("div", {class: "result notice err", text: "Non enregistré : " + res.message})); }
+        else sum.append(el("div", {class: "notice err", text: `${res.id} — non enregistré : ${res.message}`}));
+      } else if (res.status === "unchanged" && card) {
+        card.append(el("div", {class: "result muted", text: "Défaut gardé — rien d'écrit."}));
+      }
+    }
+    if (!r.results.length) sum.append(el("div", {class: "notice warn", text: "Rien à enregistrer : aucune réponse choisie."}));
+    $("answer-zone").scrollIntoView({behavior: "smooth"});
+  } catch (e) { alert(e.message); }
+  finally { btn.disabled = false; }
+};
+
+// ================================================================ run
+function renderRun() {
+  const run = S.run, running = run && run.status !== "ended";
+  $("run-status").textContent = !run ? "Aucune commande lancée depuis l'ouverture du serveur."
+    : running ? `${run.prompt} — en cours depuis ${run.started_at.slice(11)}`
+    : `${run.prompt} — ${run.outcome}${run.error ? " : " + run.error : ""}`;
+  $("btn-stop-now").disabled = !running;
+  $("btn-stop-next").classList.toggle("hidden", !(run && run.stop_next_lot));
+  $("btn-stop-next").disabled = !running;
+  renderAgents(running ? run.agents : []);
+  const sf = $("stop-file");
+  sf.classList.toggle("hidden", !S.stop_file);
+  sf.replaceChildren();
+  if (S.stop_file) sf.append("stop.md est présent : /8_code s'arrêtera après le lot en cours. ",
+    el("button", {class: "link", text: "Retirer stop.md (le renommer stop1.md)", onclick: disarm}));
+  const pl = $("perm-list"); pl.replaceChildren();
+  if (running) for (const p of run.permissions) addPermission(p);
+  permAlert();
+}
+
+function renderAgents(list) {
+  const a = $("agents"); a.replaceChildren();
+  if (list && list.length) a.append(el("span", {class: "muted small", text: "Agent : "}), ...list.map((n) => el("span", {class: "badge", text: n})));
+}
+
+function addPermission(p) {
+  if ($("perm-" + p.id)) return;
+  const card = el("div", {class: "perm", id: "perm-" + p.id},
+    el("div", {}, el("b", {text: p.title || ("Autoriser " + p.tool + " ?")})),
+    el("div", {class: "muted small", text: `Outil : ${p.tool} · demandé par : ${p.agent}`}),
+    el("pre", {text: p.input}),
+    el("div", {class: "row"},
+      el("button", {class: "primary", text: "Autoriser", onclick: () => answerPerm(p.id, true)}),
+      el("button", {class: "danger", text: "Refuser", onclick: () => answerPerm(p.id, false)})));
+  $("perm-list").append(card);
+  card.scrollIntoView({behavior: "smooth", block: "center"});
+  permAlert();
+}
+
+function permAlert() {
+  const n = $("perm-list").children.length;
+  const a = $("perm-alert");
+  a.classList.toggle("hidden", !n);
+  a.textContent = n > 1 ? `${n} autorisations demandées` : "Autorisation demandée";
+}
+$("perm-alert").onclick = () => { const c = $("perm-list").firstElementChild; if (c) c.scrollIntoView({behavior: "smooth", block: "center"}); };
+
+async function answerPerm(id, allow) {
+  try { await api("/api/permission", {id, allow}); }
+  catch (e) { alert(e.message); }
+  const c = $("perm-" + id); if (c) c.remove();
+  permAlert();
+}
+
+$("btn-stop-now").onclick = async () => {
+  if (!confirm("Arrêter la commande maintenant ? Le tour en cours s'arrête inachevé.")) return;
+  try { await api("/api/stop-now", {}); } catch (e) { alert(e.message); }
+};
+$("btn-stop-next").onclick = async () => {
+  try { await api("/api/stop-next-lot", {}); await refreshState(); } catch (e) { alert(e.message); }
+};
+async function disarm() { try { await api("/api/disarm-stop", {}); await refreshState(); } catch (e) { alert(e.message); } }
+
+function streamAppend(node) {
+  const s = $("stream");
+  const atBottom = s.scrollHeight - s.scrollTop - s.clientHeight < 60;
+  s.append(node);
+  while (s.childNodes.length > 3000) s.removeChild(s.firstChild);
+  if (atBottom) s.scrollTop = s.scrollHeight;
+}
+
+function onEvent(ev) {
+  if (ev.seq <= seen) return;
+  seen = ev.seq;
+  const d = ev.data;
+  switch (ev.type) {
+    case "run_started": streamAppend(el("div", {class: "sys", text: `▶ ${d.prompt}`})); break;
+    case "text": streamAppend(el("div", {class: "ev"}, el("span", {class: "who", text: d.agent}), el("pre", {class: "text", text: d.text}))); break;
+    case "tool": streamAppend(el("div", {class: "tool", text: `${d.agent} · ${d.tool}  ${d.summary || ""}`})); break;
+    case "agent_started":
+      streamAppend(el("div", {class: "sys", text: `→ ${d.agent}${d.description ? " — " + d.description : ""}`}));
+      if (S.run) { S.run.agents = [...(S.run.agents || []), d.agent]; renderAgents(S.run.agents); } break;
+    case "agent_ended":
+      streamAppend(el("div", {class: "sys", text: `← ${d.agent} a rendu la main`}));
+      if (S.run) { const i = S.run.agents.indexOf(d.agent); if (i >= 0) S.run.agents.splice(i, 1); renderAgents(S.run.agents); } break;
+    case "permission": addPermission(d); break;
+    case "permission_resolved": { const c = $("perm-" + d.id); if (c) c.remove(); permAlert(); break; }
+    case "stopping": streamAppend(el("div", {class: "sys", text: d.how === "maintenant" ? "■ Arrêt demandé" : "■ Arrêt au prochain lot demandé (stop.md écrit)"})); break;
+    case "error": streamAppend(el("div", {class: "sys", text: "⚠ " + d.message})); break;
+    case "status": break;
+    case "run_ended":
+      streamAppend(el("div", {class: "sys", text: `■ Fin : ${d.outcome}${d.error ? " — " + d.error : ""}`}));
+      refreshState(); break;
+  }
+}
+
+function openEvents() {
+  if (es) return;
+  es = new EventSource("/api/events");
+  es.onmessage = (m) => { try { onEvent(JSON.parse(m.data)); } catch (e) { console.error(e); } };
+}
+function closeEvents() { if (es) { es.close(); es = null; } }
+
+window.addEventListener("focus", () => { if (S.open && !(S.run && S.run.status !== "ended")) refreshForms(); });
+
+loadDrafts();
+refreshState().catch((e) => showStart(e.message));
+</script>
+</body>
+</html>
