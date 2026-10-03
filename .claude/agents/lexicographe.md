@@ -336,6 +336,9 @@ read it in, so that the answer can name which side it settles:
     ### Q2
     Terms: session
     Question: <the two meanings you read, each with its sentence>
+    Options:
+    - <keeping the grouping as you read it, one full sentence, in French>
+    - <moving occurrences from one meaning to the other, named in a remark, one full sentence, in French>
     Answer:
 
 🔴 **Every occurrence, grouped under the meaning you read it in** — 📌

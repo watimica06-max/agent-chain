@@ -293,7 +293,8 @@ what every lot would then read.** 📌 **Its `## To resume` is: run
 - 🔴 **Invoke another agent** — nothing downstream of you is yours to
   call
 - 🔴 **Answer a question you raise** — you name the entries and the
-  anomaly, and stop
+  anomaly, and stop; its `Options:` are proposals, never an answer,
+  none marked preferred
 - 🔴 **Write a rule the grid did not fire**, unless it carries
   `off-grid` — 📌 **the entries that motivate it go on its
   `couverture.md` line**, never on the rule
