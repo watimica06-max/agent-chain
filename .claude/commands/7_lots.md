@@ -11,7 +11,7 @@ itself**, corrects what it reports, and calls it again — ⚠️ **three
 rounds at most, which it counts.**
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -77,7 +77,8 @@ it.** 📌 **No hit — every section holds `*(empty)*`** → ⚠️ **the featu
 has nothing to build**: 🔴 **cut no split, create no worktree, invoke
 nothing, name no next command.** 📌 **Say where its content lives** —
 `par-genre/recette.md` at the feature folder's root, and the preamble's
-`## Cross-cutting rules` in the technical document — **then `/fusion`.**
+`## Cross-cutting rules` in the technical document — **then `/fusion`** —
+`Next: run /fusion <name>`.
 ⚠️ **Accepted cost: `/9_controle` does not run, so
 `code/recette-ordonnee.md` is never written** — the recette stays
 readable in `par-genre/recette.md`; ordering it against zero lots means
@@ -183,13 +184,13 @@ when it blocks**, and the previous one still stands with its empty
 
 | What you find | What you do |
 |---|---|
-| `code/blocked_verificateur.md` | 🔴 **Stop.** 📌 **Relay which file was missing** — ⚠️ **it carries no `## Decision`**: nothing in it is the Product Owner's to settle, and the step before it has to run again |
-| `code/sequence.md` whose `## Defects` **carries no line** | 🔴 **The split holds.** See *the pending requests*, then stop and report |
-| `code/sequence.md` whose `## Defects` **carries lines**, and no blocking file | 🔴 **Stop** — 📌 **relay the defects**: the three rounds did not clear them |
+| `code/blocked_verificateur.md` | 🔴 **Stop.** 📌 **Relay which file was missing** — ⚠️ **it carries no `## Decision`**: nothing in it is the Product Owner's to settle, and the step before it has to run again — `Next: stop input missing: <file> — the step before it has to run again` |
+| `code/sequence.md` whose `## Defects` **carries no line** | 🔴 **The split holds.** See *the pending requests*, then stop and report — `Next: run /8_code <name>` |
+| `code/sequence.md` whose `## Defects` **carries lines**, and no blocking file | 🔴 **Stop** — 📌 **relay the defects**: the three rounds did not clear them — `Next: stop defects remain after three rounds` |
 | `code/blocked_cadreur.md` **and** the `# Request N` its `## Where` names, in `architecte/cadreur.md`, with an **empty** `## Verdict` | 📌 **The conventions fall short**: invoke `architecte`, invocation 3, then invoke `cadreur` again |
 | The `# Request N` its `## Where` names with a **filled** `## Verdict`, and the Cadreur has not yet reported on it | 📌 **The Architecte has answered** — 🔴 **invoke `cadreur`**: the verdict is what lifts its block |
-| The Cadreur reports **block standing** — `code/blocked_cadreur.md`, last `## Decision` empty, nothing lifting it | 🔴 **Stop.** Relay it — the Product Owner fills `## Decision`, and the Cadreur reads it on its next run |
-| The Cadreur reports **verdict refused** | 🔴 **Stop.** 📌 **Relay the request and its verdict** — ⚠️ **never invoke `cadreur` again on it**: nothing it can cut changes, and the Product Owner decides |
+| The Cadreur reports **block standing** — `code/blocked_cadreur.md`, last `## Decision` empty, nothing lifting it | 🔴 **Stop.** Relay it — the Product Owner fills `## Decision`, and the Cadreur reads it on its next run — `Next: answer blocking, then run /7_lots <name>` |
+| The Cadreur reports **verdict refused** | 🔴 **Stop.** 📌 **Relay the request and its verdict** — ⚠️ **never invoke `cadreur` again on it**: nothing it can cut changes, and the Product Owner decides — `Next: stop verdict refused: <request>` |
 | The Cadreur reports **decision applied**, and the file's last `## Decision` is filled — or reports **verdict applied** | 🔴 **Rename the file** — 📌 **the agent has no tool that removes one:**<br>`git mv code/blocked_cadreur.md code/blocked_cadreur-NN.md`<br>📌 **`NN`: the highest in the folder plus one, `01` when there is none.** ⚠️ **Anything left at the unnumbered name reads as a block still standing** |
 
 🔴 **The Cadreur's report states the outcome on the blocking file in
@@ -226,7 +227,7 @@ adds the heading and writes under it.
 
 🔴 **One invocation, whatever their number.** ⚠️ **Then stop** — the
 conventions changed after the split was cut, and `/8_code` runs against
-both.
+both: `Next: run /8_code <name>`.
 
 ```
 Agent(
@@ -245,7 +246,7 @@ calls it.
 working folder's root — **stop.** 🔴 **It blocks on a missing input,
 the conventions file first of all** — ⚠️ **not on the request**: a
 doubt or a product matter goes in the verdict. 📌 **Say to run
-`/conventions`.**
+`/conventions`** — `Next: run /conventions <name>`.
 
 ⚠️ **You never invoke the Arbitre here.** 📌 **What the Cadreur and the
 Vérificateur block on is mechanical** — a missing document, an
@@ -314,7 +315,8 @@ requests* ran it — has reported — 📌 five steps, in this order:**
 5. `git worktree remove <path>`
 
 ⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
-**never force it**: 📌 **say what is left there, and stop.** 📌 **What
+**never force it**: 📌 **say what is left there, and stop** —
+`Next: stop worktree dirty: <files>`. 📌 **What
 is left is something step 1 did not stage** — a fault of this run,
 never of an agent: none of them was to commit it. Forcing the removal
 destroys it.
@@ -341,6 +343,9 @@ reaches the Product Owner, who moves the ceilings. 🔴 **Nothing else is
 yours** — no judgement on the split itself, and no reading of git
 history to explain what a run found.
 
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+
 **On every redécoupage**: 🔴 **the `## Ce qui revient` and `## Ce que
 j'en fais` of `code/redecoupage.md`**, read from the file before you
 rename it — 📌 **the Cadreur wrote them there at the end of its run**,
@@ -349,11 +354,14 @@ and the Product Owner sees the pattern without opening the file.
 solve**, and she decides — 📌 **her decision goes into
 `code/redecoupage.md` under `## Décision du Product Owner`, then
 `/7_lots` by hand**: 🔴 **the Cadreur's block C reads it as her
-instruction**, and `/8_code` counts the returns from that heading.
+instruction**, and `/8_code` counts the returns from that heading —
+`Next: manual écrire sa décision sous ## Décision du Product Owner dans
+code/redecoupage.md, then run /7_lots <name>`.
 
 **If an agent returns a `blocked_*.md`**: 🔴 **relay it and stop**,
 naming the file. 📌 **The Product Owner fills `## Decision`**, and the
-Cadreur reads it on its next run.
+Cadreur reads it on its next run — `Next: answer blocking, then run
+/7_lots <name>`.
 
 ⚠️ **Except a `blocked_cadreur.md` whose `## Where` names a request
 with an empty `## Verdict`** — 📌 that one goes to the Architecte, and

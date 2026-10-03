@@ -24,7 +24,8 @@ list.**
 every time wireless debugging restarts** — 🔴 **read it again every
 run, never from memory or from an earlier report.**
 
-**A device missing** — 🔴 **stop and say which one.** ⚠️ **Do not
+**A device missing** — 🔴 **stop and say which one** — `Next: stop
+<device> missing`. ⚠️ **Do not
 install the other one alone**: a phone updated against an old watch
 build fails in ways that read as code defects.
 
@@ -63,3 +64,7 @@ or not.
 
 🔴 **Name any error, do not correct it.** ⚠️ **A failed install is a
 result** — the report says what failed and stops there.
+
+🔴 **The report ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **`Next: done`**: what the Product Owner tests on the devices is
+hers.

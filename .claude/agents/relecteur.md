@@ -288,6 +288,10 @@ the report, `conception.md`, `tests.md`.
 
     <the decision or fix needed>
 
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
+
     ## Decision
 
     <left empty — the Product Owner writes here>
@@ -296,6 +300,12 @@ the report, `conception.md`, `tests.md`.
 It is where the Product Owner answers, by hand, when the block is
 relayed to her — ⚠️ **a block `/8_code` acts on is lifted by the act,
 and the heading stays empty.**
+
+📌 **`Options:` is optional** — two to six, in French, since a chosen
+one becomes her decision word for word, and none opening on a number
+and a dot (`1.`, `2.`). ⚠️ **A block naming the report, the sheet,
+`conception.md` or `tests.md` missing carries none** — the act answers
+it.
 
 📌 **Never block out of caution.**
 

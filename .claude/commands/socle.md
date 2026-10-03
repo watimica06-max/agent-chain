@@ -35,7 +35,7 @@ before its next step.** 🔴 **`stop1.md` is the same file disarmed** — 📌
 
 🔴 **Stop if `docs/PRODUIT_GLOBAL.md` already exists.** This command is
 for a new application, and overwriting the global would lose every
-domain in it.
+domain in it. `Next: stop docs/PRODUIT_GLOBAL.md already exists`
 
 **Then report what the Product Owner still has to provide before the
 chain runs end to end:**
@@ -46,6 +46,9 @@ chain runs end to end:**
   Arbitre load before writing to `CURRENT_TECHNICAL_STATE.md`
 
 📌 **Neither blocks the upstream chain** — only `/7_lots` onward.
+
+🔴 **The report ends on its `Next:` line**, in `CLAUDE.md`'s grammar:
+`Next: manual écrire docs/features/<name>/idees.md, then run /1_lexique <name>`.
 
 Then commit alone: `chore: scaffolding for the chain`, and push.
 

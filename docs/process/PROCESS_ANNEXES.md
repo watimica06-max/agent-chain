@@ -102,7 +102,10 @@ workflow.
 Prend : rien — pas d'`argument-hint` (frontmatter, lignes 1-4) ; le
 dépôt tel qu'il est sur le disque.
 Rend : un rapport en message, une ligne par appareil — le module,
-l'identifiant, build passé ou non (lignes 61-62). Rien dans le dépôt.
+l'identifiant, build passé ou non (lignes 61-62) ; en dernière ligne
+`Next: done`, ou `Next: stop <device> missing` sur un appareil absent
+(`deploie.md`, *1. Find the devices* et *3. Report* — ajoutés après le
+`HEAD` de référence ; → `MECANISMES §Ligne Next:`). Rien dans le dépôt.
 
 **Étapes**
 1. `adb devices -l` ; identifier chaque appareil par son modèle, jamais
@@ -174,7 +177,11 @@ dossier de travail en est dérivé, → `MECANISMES §Dossier de travail`
 (lignes 15-18) — une correction s'audite à part de la feature. Tout
 chemin est relatif au dossier de travail (ligne 20).
 Rend : `audit-blocages.md` à la racine du dossier de travail, en ajout
-(ligne 140).
+(ligne 140) ; un relais qui finit toujours sur `Next: done` — l'audit
+ne change rien et n'appelle aucune commande —, ou `Next: stop argument
+missing` sans argument (`audit_blocages.md`, l'en-tête et la fin de
+*What you write* — ajoutés après le `HEAD` de référence ; →
+`MECANISMES §Ligne Next:`).
 
 **Étapes**
 1. Lire `audit-blocages.md` s'il existe : ses `## Files read`, une
@@ -299,7 +306,11 @@ dossier de travail en est dérivé, → `MECANISMES §Dossier de travail`
 racine du dépôt, les autres au dossier de travail (lignes 19-20, →
 `MECANISMES §Chemins relatifs`).
 Rend : `audit-conventions.md` à la racine du dossier de travail, en
-ajout (ligne 164).
+ajout (ligne 164) ; un relais qui finit toujours sur `Next: done` —
+l'audit ne change rien et n'appelle aucune commande —, ou `Next: stop
+argument missing` sans argument (`audit_conventions.md`, l'en-tête et
+la fin de *What you write* — ajoutés après le `HEAD` de référence ; →
+`MECANISMES §Ligne Next:`).
 
 **Étapes**
 1. Lire `audit-conventions.md` s'il existe : ses `## Requests read`

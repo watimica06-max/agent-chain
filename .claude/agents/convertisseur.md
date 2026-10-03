@@ -382,13 +382,19 @@ document.**
 
 ### The shape of a technical question
 
-🔴 **Four lines, heading included, as a product question — `Entries:`
-in place of `Block:`**, 📌 **because it does not land in a block:**
+🔴 **Four lines, heading included, plus the `Options:` block when there
+is one, as a product question — `Entries:` in place of `Block:`**, 📌 **because it
+does not land in a block:**
 
     ### Q1
     Entries: §3.2, [B12: recorded start time]
     Question: <the choice, and what each side would cost>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Answer:
+
+📌 **The sides of the choice are the options** — one each.
 
 📌 **`Entries:` names the entries the answer will change** — ⚠️ **or the
 nature, when no entry exists yet.** 🔴 **It obeys *A reference to another
@@ -426,13 +432,20 @@ it** — you never number a questions file.
 
 ### The shape of every entry
 
-🔴 **One entry per question, four lines, no exception.** Numbering
-restarts at Q1 in your file:
+🔴 **One entry per question, four lines, no exception — the
+`Options:` block aside.** Numbering restarts at Q1 in your file:
 
     ### Q1
     Block: B7
     Question: what happens to an entry whose duration is zero?
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Answer:
+
+📌 **`Options:` is optional** — an open question has none. 🔴 **Two to
+six, in French** — ⚠️ **an option chosen becomes the answer word for
+word** — **none opening on a number and a dot.**
 
 🔴 **`Block:` names the blocks the answer will change** — at invocation
 2, the blocks behind the entries concerned. 📌 **The Rédacteur
@@ -495,8 +508,8 @@ block** — 🔴 **the command reruns every section still holding one.**
 📌 **The three cases write the question the same way.** 🔴 **Say which
 you are in — in your report, by its word, never in the entry.** ⚠️ **An
 entry is four lines, heading included, whichever of the two shapes it
-takes — and a fifth breaks the shape every reader after you depends
-on.**
+takes — the `Options:` block is the one addition allowed, and any other
+line breaks the shape every reader after you depends on.**
 
 ### Your answered questions
 
@@ -612,6 +625,10 @@ told to read that is not there, a false premise that voids the work.
 
     <the decision or fix needed>
 
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
+
     ## Decision
 
     <left empty — the Product Owner writes here>
@@ -619,6 +636,9 @@ told to read that is not there, a false premise that voids the work.
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 It is where the Product Owner answers, by hand, and it is the only way
 this block ever lifts.
+
+📌 **`Options:` closes `## To resume`, never a heading of its own** —
+same rules as in a questions file; ⚠️ **a missing input has none.**
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 

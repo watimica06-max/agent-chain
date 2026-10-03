@@ -10,7 +10,7 @@ Act as the orchestrator. **You do this yourself — no agent.**
 calls it**, and it changes nothing: it reads and it reports.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop.
+for it and stop. `Next: stop argument missing`
 
 🔴 **The working folder is the highest `bugfix-NN/` in it, if there is
 one; the feature folder itself otherwise.** 📌 **One audit per working
@@ -210,6 +210,10 @@ whatever the finding was read from.
 ⚠️ **No recommendation, no correction.** 🔴 **You never edit
 `TECHNICAL_CONVENTIONS.md`** — that is the Architecte's, and only
 through a request.
+
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **here always `Next: done`**: the audit changes nothing and calls no
+command.
 
 ---
 

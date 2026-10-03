@@ -14,7 +14,7 @@ block without a genre would be given a nature it does not have, and
 probed for what it does not do.**
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -36,7 +36,7 @@ Feature folder: `docs/features/$ARGUMENTS/`
 | | What you do |
 |---|---|
 | Absent | 📌 Carry on |
-| **Any** `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands, and which `## Blocking N` waits |
+| **Any** `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands, and which `## Blocking N` waits — `Next: answer blocking, then run /3a_genre <name>` |
 | **Every** `## Decision` is filled | 📌 **Name it in the prompt** |
 
 ⚠️ **One file, several entries** — 📌 **a `## Blocking N` per blocked
@@ -49,12 +49,14 @@ is read** — the agent reads the file.
 🔴 **Grep `Clarification needed` in `desc-produit.md`.**
 
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
-one**, and that `/2_structure` has to run first.
+one**, and that `/2_structure` has to run first — `Next: run /2_structure
+<name>`.
 
 🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
 `architecte` before touching it** — 📌 **a file holding questions is
 not yours to file**: ⚠️ **it waits on an answer, or its answers were
-never integrated.** 🔴 **Stop and say which.** 📌 **The qualifieur's own
+never integrated.** 🔴 **Stop and say which** — `Next: stop <file> waits
+on an answer or an integration`. 📌 **The qualifieur's own
 is no exception** — ⚠️ **answered, it goes through `/1_lexique` and
 `/2_structure`**, which integrate it and put it away; 🔴 **still at the
 root, it has not been through them.** 📌 **The architecte's is the one
@@ -227,7 +229,8 @@ you say which.
 the per-block list it reports**, one line per block, the genre it gave.
 
 🔴 **Check `questions-qualifieur-NN.md` was written** — ⚠️ **a missing one is a
-defect of the run**: the agent writes one every time.
+defect of the run**: the agent writes one every time. `Next: stop
+questions-qualifieur-NN.md missing`
 
 🔴 **Grep `^### Q` in it** and say how many questions it holds.
 
@@ -277,14 +280,17 @@ questions — 🔴 **and the per-block list, as the agent reports it.**
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
 
-| What just happened | Next |
-|---|---|
-| It wrote a blocking file — **a genre it could not settle, or two it read in one block** | 📌 Fill every `## Decision`, then `/3a_genre` again — ⚠️ **or the row below that the decision fits** |
-| It wrote a blocking file **and** a questions file with questions | 🔴 **Answer the questions first, then `/1_lexique`** — 📌 **fill the decision second, once the answers are integrated.** ⚠️ **Both end in the Rédacteur's hands** — at the root together, `/2_structure` takes the answered file and leaves the blocking file for its next run |
-| **Every** `## Decision` names a rewrite | 🔴 **`/2_structure`** — 📌 **it names the blocking file to the Rédacteur, which rewrites the block with `MODIFIED`.** ⚠️ **Then `/3_decoupe`, and back here** — 🔴 **not `/1_lexique`**: the Lexicographe has nothing to watch on a rewrite. ⚠️ **A file mixing genre decisions and rewrites runs `/3a_genre` first** — 📌 **the qualifieur writes the genres, and the file stays at its unnumbered name for `/2_structure`** (*Once it has reported*). 📌 **A block that called for two genres takes this route: the split is the decoupeur's, on the rewritten block.** ⚠️ **A rewrite that still holds two genres blocks again, on the same block** — 🔴 **each turn is a decision she writes, so the repetition is hers to see**: 📌 **a decision that says how to split the block settles it**, the Rédacteur splits what a decision tells it to |
-| A `## Decision` names a genre outside the list | 🔴 **Nothing runs** — ⚠️ **the tables have to carry it first**; say so |
-| 🔴 **The `^Genre:$` count is non-zero and no blocking file explains it** | 📌 **Say which blocks, and run `/3a_genre` once more** — ⚠️ **once, not until it clears**: 🔴 **a second run that leaves one empty stops there, the blocks named** — a line left empty by neither a block nor a decision is a defect of the run, and a third run would repeat it |
-| Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a genre in doubt is settled before the classeur gives a nature |
-| Its questions file is empty, or there was nothing to qualify | 📌 `/3b_nature` |
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+
+| What just happened | Next | `Next:` |
+|---|---|---|
+| It wrote a blocking file — **a genre it could not settle, or two it read in one block** | 📌 Fill every `## Decision`, then `/3a_genre` again — ⚠️ **or the row below that the decision fits** | `Next: answer blocking, then run /3a_genre <name>` |
+| It wrote a blocking file **and** a questions file with questions | 🔴 **Answer the questions first, then `/1_lexique`** — 📌 **fill the decision second, once the answers are integrated.** ⚠️ **Both end in the Rédacteur's hands** — at the root together, `/2_structure` takes the answered file and leaves the blocking file for its next run | `Next: answer questions, then run /1_lexique <name>` |
+| **Every** `## Decision` names a rewrite | 🔴 **`/2_structure`** — 📌 **it names the blocking file to the Rédacteur, which rewrites the block with `MODIFIED`.** ⚠️ **Then `/3_decoupe`, and back here** — 🔴 **not `/1_lexique`**: the Lexicographe has nothing to watch on a rewrite. ⚠️ **A file mixing genre decisions and rewrites runs `/3a_genre` first** — 📌 **the qualifieur writes the genres, and the file stays at its unnumbered name for `/2_structure`** (*Once it has reported*). 📌 **A block that called for two genres takes this route: the split is the decoupeur's, on the rewritten block.** ⚠️ **A rewrite that still holds two genres blocks again, on the same block** — 🔴 **each turn is a decision she writes, so the repetition is hers to see**: 📌 **a decision that says how to split the block settles it**, the Rédacteur splits what a decision tells it to | `Next: run /2_structure <name>` |
+| A `## Decision` names a genre outside the list | 🔴 **Nothing runs** — ⚠️ **the tables have to carry it first**; say so | `Next: stop genre outside the six: <block>` |
+| 🔴 **The `^Genre:$` count is non-zero and no blocking file explains it** | 📌 **Say which blocks, and run `/3a_genre` once more** — ⚠️ **once, not until it clears**: 🔴 **a second run that leaves one empty stops there, the blocks named** — a line left empty by neither a block nor a decision is a defect of the run, and a third run would repeat it | First run: `Next: run /3a_genre <name>` · second: `Next: stop <blocks> left unqualified` |
+| Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a genre in doubt is settled before the classeur gives a nature | `Next: answer questions, then run /1_lexique <name>` |
+| Its questions file is empty, or there was nothing to qualify | 📌 `/3b_nature` | `Next: run /3b_nature <name>` |
 
 **If it returns `blocked_qualifieur.md`**: relay it and stop.

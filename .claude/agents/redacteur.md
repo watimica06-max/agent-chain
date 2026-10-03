@@ -281,13 +281,21 @@ raises none, and `/fusion` would route on a file that means nothing
 there. 📌 **What invocation 3 cannot place goes into
 `blocked_redacteur.md`** — see *INVOCATION 3 — Merging*.
 
-🔴 **One entry per question, four lines, no exception.** 📌 **Numbering
-restarts at Q1 in each file.**
+🔴 **One entry per question, four lines, no exception** — 📌 **except the
+optional `Options:` block between `Question:` and `Answer:`, and only
+it.** 📌 **Numbering restarts at Q1 in each file.**
 
     ### Q1
     Block: B7
     Question: what happens to an entry whose duration is zero?
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Answer:
+
+📌 **`Options:` holds two to six proposals, in French** — ⚠️ **one
+chosen becomes the answer word for word.** 🔴 **None opens on a number
+and a dot.** 📌 **An open question has none.**
 
 🔴 **The `Answer:` line is written empty, and never omitted** — it is
 where the Product Owner writes, by hand. **An entry without it is
@@ -377,10 +385,17 @@ told to read that is not there, a false premise that voids the work —
     ## To resume
 
     <the decision or fix needed>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
 
     ## Decision
 
     <left empty — the Product Owner writes here>
+
+📌 **`Options:` closes `## To resume`** — two to six proposals, in
+French, 🔴 **none opening on a number and a dot**, ⚠️ **never a heading
+of its own.** 📌 **A block whose fix is a missing input has none.**
 
 🔴 **The `## Invocation` line is what routes the file** — 📌 **you have
 three invocations and one blocking-file name**: `/2_structure` reads
@@ -392,7 +407,8 @@ blocks a decision and carries on** — see *INVOCATION 3 — Merging* —
 📌 **one `## Blocking N` title per decision you could not place, the
 four headings after `## Invocation` repeated under each**, ⚠️
 **`## Invocation` written once, above the first**, and 🔴 **one
-`## Decision` per entry**: they are not settled together.
+`## Decision` per entry**: they are not settled together. 📌 **`Options:`
+too is per entry**, at the end of each `## To resume`.
 
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 It is where the Product Owner answers, by hand, and it is the only way
@@ -586,7 +602,8 @@ again on its next run.
 📌 **Then the four passes below do not apply** — 🔴 **there is no answer
 to place, no subject to look for.**
 
-**The Product Owner filled the `Answer:` fields by hand, in French.**
+**The Product Owner filled the `Answer:` fields by hand or through the
+form, in French.**
 🔴 **You decide nothing** — you transcribe, translate and file.
 
 **How you load the product file**
@@ -616,7 +633,8 @@ tell from it whether that block already covers the subject.
 
 🔴 **An entry carrying a `Défaut:` line, between `Question:` and
 `Answer:`, holds its own answer and what founds it.** 📌 **Five lines,
-not four** — ⚠️ **the sondeur writes it; you read it.** 📌 **No `Answer:`
+not four, plus the `Options:` block when there is one** — ⚠️ **the
+sondeur writes it; you read it.** 📌 **No `Answer:`
 written means the Product Owner
 accepted it** — ⚠️ **you integrate the proposed answer as if he had
 written it.** 🔴 **An `Answer:` written overrides it**, and is

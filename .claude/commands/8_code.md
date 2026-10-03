@@ -14,7 +14,7 @@ his sheets named in the prompt**, and the grouping that names them
 lives in `/9_controle`.
 
 **The first argument is mandatory**: the feature folder name. Without
-it, ask for it and stop.
+it, ask for it and stop. `Next: stop argument missing`
 
 **The second is optional**: how many lots to code. 🔴 **One by
 default.**
@@ -83,20 +83,21 @@ every reader matches it** — `PASS with reservation` is a PASS. A read,
 not a scan — the sequence holds the order.
 
 📌 **No such lot** — every one carries a PASS — 🔴 **there is nothing
-left to run: stop, and say `/9_controle` comes next.** ⚠️ **That is the
+left to run: stop, and say `/9_controle` comes next** —
+`Next: run /9_controle <name>`. ⚠️ **That is the
 normal shape of a run restarted after a stop on the last lot.**
 🔴 **You never invoke the Contrôleur yourself** — see the head of this
 file.
 
 ⚠️ **If `## Defects` is not empty**, stop: the split was never
-corrected. Run `/7_lots` first.
+corrected. Run `/7_lots` first — `Next: run /7_lots <name>`.
 
 ⚠️ **If `code/blocked_verificateur.md` is there**, stop the same way:
 📌 **the Vérificateur writes it when an input it needs is missing**,
 and the split it could not check is not one to code against. 🔴 **It
 carries no `## Decision`** — nothing in it is the Product Owner's to
 fill; `/7_lots` retires it and runs the step before it again. Run
-`/7_lots` first.
+`/7_lots` first — `Next: run /7_lots <name>`.
 
 ---
 
@@ -281,7 +282,7 @@ and no git surgery is asked of the Product Owner.
 
 🔴 **`## Attempts` reaching 3 stops the lot** — 📌 **three codings, the
 first included.** ⚠️ **Relay the last verdict and stop**: the lot is
-the Product Owner's.
+the Product Owner's — `Next: stop <lot> failed three times`.
 
 📌 **No `## Attempts` line in a verdict** — 🔴 **read it as 1** and say
 so: a verdict written without it is a defect of the Relecteur.
@@ -315,8 +316,8 @@ the revert above nor the model change.**
 
 | | |
 |---|---|
-| **Its `## Decision` is empty** | 🔴 **Stop** — ⚠️ **invoking again re-raises the same block** |
-| **Some numbers answered, others not** — 📌 **fewer numbered answers under `## Decision` than `## Blocking N` headings**, on the numbered shape alone | 🔴 **Stop, and do not rename** — ⚠️ **the agent applied the answered ones before it stopped**, and the rest wait on the Product Owner as on an empty `## Decision`. 📌 **A rename would bury the numbers still open** |
+| **Its `## Decision` is empty** | 🔴 **Stop** — ⚠️ **invoking again re-raises the same block** — `Next: answer blocking, then run /8_code <name>` |
+| **Some numbers answered, others not** — 📌 **fewer numbered answers under `## Decision` than `## Blocking N` headings**, on the numbered shape alone | 🔴 **Stop, and do not rename** — ⚠️ **the agent applied the answered ones before it stopped**, and the rest wait on the Product Owner as on an empty `## Decision`. 📌 **A rename would bury the numbers still open** — `Next: answer blocking, then run /8_code <name>` |
 | **Filled** — 📌 **by the test of its shape, below** | 📌 **Name it in the agent's prompt**, and 🔴 **rename it once the agent reports having applied it and the file still reads filled** — ⚠️ **the test of its shape run a second time, after the report**, see below:<br>📌 **At the path it sits at** — `code/<lot>/` for the three agents of move 2 and for the Relecteur's, when *Where you stop and hand back* sends you here; `code/` for the detailleur, the working folder's root for the architecte.<br>`git mv code/<lot>/blocked_<agent>.md code/<lot>/blocked_<agent>-NN.md`<br>📌 **`NN`: the highest in that folder plus one, `01` when there is none** |
 
 🔴 **`code/<lot>/blocked_relecteur.md` is not in this table** — 📌 **the
@@ -364,7 +365,8 @@ rename on that report**: the next ordinary run applies the rest.
 runs here** — 📌 **its `## Invocation` line naming 3, name the file in
 the move-7 prompt**, and rename it at the root once the Architecte
 reports having applied it. ⚠️ **Naming another invocation, it is
-`/conventions`'s**: stop, and say to run it.
+`/conventions`'s**: stop, and say to run it — `Next: run /conventions
+<name>`.
 
 📌 **`code/<lot>/reprise_realisateur.md` is renamed the same way**,
 🔴 **once the run it was named to has reported** — ⚠️ **the Réalisateur
@@ -506,7 +508,8 @@ this command does not hold**, and `/9_controle` builds it.
 
 📌 **Say that `/9_controle <feature>` is what comes next** — 🔴 **run by
 hand, on both cycles**, ⚠️ **with the feature name, never a path**: it
-derives the working folder from it as this command does.
+derives the working folder from it as this command does —
+`Next: run /9_controle <name>`.
 
 ⚠️ **On a bug-fix cycle `/9_controle` reads two folders** — 📌 **phases
 1 to 3 run on the feature folder**, whose product file the Contrôleur
@@ -517,7 +520,7 @@ list, the register, and the product decisions the Rédacteur needs at
 
 ⚠️ **Every lot of the sequence, not every lot of this run.** 📌 **`N`
 lots coded with two still pending is not a finished sequence** — say
-how many remain.
+how many remain, and `Next: run /8_code <name>`.
 
 ⚠️ **The count is on lots reviewed PASS**, not on invocations: the
 Détailleur runs when a new block starts, without entering the count.
@@ -697,7 +700,8 @@ verdicts are still there, and they are still behind.
 none.
 
 ⚠️ **If `/7_lots` stops on a defect or a block**, 🔴 **stop too** —
-relay what it said. **There is no split to code against.**
+relay what it said, its `Next:` line included — it is this run's last
+line. **There is no split to code against.**
 
 ---
 
@@ -709,7 +713,8 @@ there → *When the split comes back*, from its count**: ⚠️ **a run
 stopped before `/7_lots` ran resumes there, never at `/7_lots`
 straight** — the count is what a third return stops on, and the
 reverts already made give an empty list. ⚠️ **Gone → the blocking file
-was never closed**: say which file, and stop.
+was never closed**: say which file, and stop — `Next: stop <file> never
+closed`.
 
 🔴 **A `blocked_*.md` whose `## Decision` is still empty**, wherever it
 sits — 📌 **three places:**
@@ -735,8 +740,8 @@ something is missing, not something to settle.
 |---|---|
 | **The report** | 🔴 **A fresh `realisateur`** — 📌 **counted as an attempt** |
 | **The sheet** | 🔴 **`detailleur` on the block** |
-| **`conception.md` or `tests.md`** | 📌 **Relay it and stop** — ⚠️ **move 2 runs the concepteur or the testeur when the file is absent**, so a review reached without it is a fault of the run, not a block to act on. 🔴 **The next run's move 2 writes the file** — that is the act: rename the blocking file once it is there, before invoking the Relecteur |
-| **Anything else** | 📌 **Relay it and stop** — 🔴 **the Product Owner fills `## Decision`**. ⚠️ **The next run names the filled file in the Relecteur's prompt**, its `Plus:` line, and renames it once the Relecteur reports having applied it |
+| **`conception.md` or `tests.md`** | 📌 **Relay it and stop** — ⚠️ **move 2 runs the concepteur or the testeur when the file is absent**, so a review reached without it is a fault of the run, not a block to act on. 🔴 **The next run's move 2 writes the file** — that is the act: rename the blocking file once it is there, before invoking the Relecteur — `Next: run /8_code <name>` |
+| **Anything else** | 📌 **Relay it and stop** — 🔴 **the Product Owner fills `## Decision`**. ⚠️ **The next run names the filled file in the Relecteur's prompt**, its `Plus:` line, and renames it once the Relecteur reports having applied it — `Next: answer blocking, then run /8_code <name>` |
 
 🔴 **On every row, retiring the blocking file is yours** — 📌 **on the
 two act rows once that agent has reported, the act is the answer and
@@ -801,7 +806,8 @@ fix that passes: carry on.
 5. `git worktree remove <path>`
 
 ⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
-**never force it**: 📌 **say what is left there, and stop.** 📌 **What
+**never force it**: 📌 **say what is left there, and stop** —
+`Next: stop worktree dirty: <files>`. 📌 **What
 is left is something step 1 did not stage** — a fault of this run,
 never of an agent: none of them was to commit it. Forcing the removal
 destroys it.
@@ -822,13 +828,18 @@ carry on.
 **Which lots passed, and where the run stopped.** 🔴 **Nothing else is
 yours** — no judgement on the code, no re-reading of a verdict.
 
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+
 **If you stopped on `stop.md`**: say so, and how many lots of the block
 remain. 🔴 **Re-running `/8_code` picks up where you left off** — the
-lots already carrying a PASS are not redone.
+lots already carrying a PASS are not redone. `Next: run /8_code <name>`
 
-**If an agent returns a `blocked_*.md`**: relay it and stop.
+**If an agent returns a `blocked_*.md`**: relay it and stop —
+`Next: answer blocking, then run /8_code <name>`.
 
 **If you stopped on a third return**: say so, and where her decision
 goes — 🔴 **`code/redecoupage.md`, under a `## Décision du Product
 Owner` heading, then `/7_lots` by hand**, see *When the split comes
-back*.
+back*. `Next: manual écrire sa décision sous ## Décision du Product
+Owner dans code/redecoupage.md, then run /7_lots <name>`

@@ -106,6 +106,10 @@ settled**; see the head of invocation 2.
 
     <the decision or fix needed>
 
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
+
     ## Decision
 
     <left empty — the Product Owner writes here>
@@ -113,6 +117,11 @@ settled**; see the head of invocation 2.
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 It is where the Product Owner answers, by hand, and it is the only way
 this block ever lifts.
+
+📌 **`Options:` closes `## To resume`** — two to six, in French, 🔴
+**none opening on a number and a dot**: a chosen one becomes the
+Product Owner's decision word for word. ⚠️ **A block whose fix is a
+missing input has none.**
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 

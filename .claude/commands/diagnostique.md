@@ -15,14 +15,14 @@ Convertisseur, no Fusionneur**: the product already says what is
 expected, and a correction adds nothing to it.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
 🔴 **The working folder is the highest `bugfix-NN/` in it.** The
 Product Owner created it and wrote `bug-list.md` inside. **No such
 folder, or no `bug-list.md`** → say so and stop; you never create
-either.
+either. `Next: stop no bugfix-NN/bug-list.md`
 
 📌 **Every path below is relative to that folder.**
 
@@ -40,7 +40,8 @@ position** — 📌 **the Product Owner writes it**, as a control-report
 gap already carries its `B<n>` in parentheses at the end of its first
 line. **Its full text goes in the prompt**, verbatim, the `G<n>`
 passed as its identifier. ⚠️ **A gap opening on no `G<n>`** → 🔴 **stop
-before issuing anything, and say which line lacks one.**
+before issuing anything, and say which line lacks one** —
+`Next: stop gap without a G<n>: <line>`.
 
 **`investigation/`, and only to sort the gaps** — a `Glob` on
 `investigation/*.md` tells which gap has its report and which has a
@@ -191,7 +192,8 @@ this order:**
 5. `git worktree remove <path>`
 
 ⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
-**never force it**: 📌 **say what is left there, and stop.** 📌 **What
+**never force it**: 📌 **say what is left there, and stop** —
+`Next: stop worktree dirty: <files>`. 📌 **What
 is left is something step 1 did not stage** — a fault of this run,
 never of the agent: it was not to commit it. Forcing the removal
 destroys it.
@@ -214,17 +216,24 @@ an unmerged branch is invisible to the next one. ⚠️ **A
 The agent's own report, and nothing more. 🔴 **Nothing else is yours**:
 no phase chain.
 
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+📌 **Phase 2 wrote `desc-bug.md`** — `Next: run /7_lots <name>`.
+
 **If an agent returns a blocking file**: relay it. 📌 **In phase 1 it
 is `investigation/blocked_<id>.md` and the other calls carry on**;
-in phase 2 it is `blocked_diagnostiqueur.md` and you stop.
+in phase 2 it is `blocked_diagnostiqueur.md` and you stop —
+`Next: answer blocking, then run /diagnostique <name>`.
 
 **If phase 2 is not issued**: say why. 📌 **`desc-bug.md` exists** —
-relay it as done, and name the next step, `/7_lots`. 📌 **Phase 2
+relay it as done, and name the next step, `/7_lots` — `Next: run /7_lots
+<name>`. 📌 **Phase 2
 withheld** — 🔴 **list every identifier standing blocked**, from your
 own phase-1 results: the calls that returned
 `investigation/blocked_<id>.md`, and the gaps skipped as standing.
 **That is what the Product Owner needs to re-run them** — ⚠️ **never
 an identifier taken from an invocation-2 block**: there is none.
+`Next: answer blocking, then run /diagnostique <name>`
 
 🔴 **A blocking file's `## Decision` filled, run `/diagnostique`
 again** — 📌 **name the file in the agent's prompt**, and 🔴 **rename it

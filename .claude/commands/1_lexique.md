@@ -16,7 +16,7 @@ starts.
 the conversion** — 🔴 **before `/2_structure` integrates it.**
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -38,7 +38,7 @@ questions file's content.**
 | | What you do |
 |---|---|
 | Absent | 📌 Carry on |
-| Its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands |
+| Its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands — `Next: answer blocking, then run /1_lexique <name>` |
 | Its `## Decision` is filled | 📌 **Name it in the prompt** |
 
 ⚠️ **Read that one heading, nothing else** — 📌 the agent reads the
@@ -54,13 +54,13 @@ never the number.**
 | At the root | Invocation |
 |---|---|
 | No questions file | **1 — Sweeping** |
-| `questions-lexicographe` alone, **with no `### Q`** | 🔴 **Invoke nothing** — the loop ended. 📌 **Say so, and say `/2_structure`** |
+| `questions-lexicographe` alone, **with no `### Q`** | 🔴 **Invoke nothing** — the loop ended. 📌 **Say so, and say `/2_structure`** — `Next: run /2_structure <name>` |
 | `questions-lexicographe` alone | **2 — Settling** |
-| Another agent's questions file alone, **with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to watch**; say `/2_structure` |
+| Another agent's questions file alone, **with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to watch**; say `/2_structure` — `Next: run /2_structure <name>` |
 | Another agent's questions file alone | **3 — Watching** |
-| Another agent's, and `questions-lexicographe` **with no `### Q`** | 🔴 **Invoke nothing** — 📌 **3 asked nothing**, and 4 runs only when 3 asked; say `/2_structure` |
+| Another agent's, and `questions-lexicographe` **with no `### Q`** | 🔴 **Invoke nothing** — 📌 **3 asked nothing**, and 4 runs only when 3 asked; say `/2_structure` — `Next: run /2_structure <name>` |
 | Another agent's, and `questions-lexicographe` | **4 — Correcting** |
-| Two files of other agents | 🔴 **Stop** — a filing failed; say which files |
+| Two files of other agents | 🔴 **Stop** — a filing failed; say which files — `Next: stop filing failed: <files>` |
 
 📌 **Call the other agent's file *the answered file***, whichever agent
 wrote it — 🔴 **3 and 4 name it in the prompt.**
@@ -75,7 +75,7 @@ read** — 🔴 **which is what keeps these four apart**: the root holds at
 most the file waiting on you, and yours.
 
 **A file with an empty `Answer:` and no `Défaut:` line** → 🔴 **stop**,
-and say which questions are waiting.
+and say which questions are waiting. `Next: answer questions, then run /1_lexique <name>`
 
 ⚠️ **An entry whose `Answer:` is empty **and** that carries a `Défaut:`
 line is answered** — 📌 **silence accepts the proposal**, and that is
@@ -101,6 +101,7 @@ and the idea file is transcribed once**: `/2_structure` stops on the
 same state and names the same step. ⚠️ **A stop that names no next step
 leaves the Product Owner to guess** — 🔴 **and one that names
 `/2_structure` sends her to a command that stops in turn.**
+`Next: run /3_decoupe <name>`
 
 ---
 
@@ -118,7 +119,7 @@ the lexicographe's, and the answered one. ⚠️ **A
 stays where it is.
 
 ⚠️ **Anything else at the root means a filing failed upstream** — 🔴
-**stop, and say which files.** 📌 **Never move one of them**: an
+**stop, and say which files** — `Next: stop filing failed: <files>`. 📌 **Never move one of them**: an
 answered questions file put away in `questions/<agent>/` is read by no
 command again, and the Product Owner's answers are lost.
 
@@ -222,7 +223,7 @@ counted.
 **After 2 or 4** — 📌 **say whether it wrote a new one**, and how many
 entries it holds.
 
-⚠️ **A missing file stops the command** — say which.
+⚠️ **A missing file stops the command** — say which. `Next: stop <file> missing`
 
 🔴 **Never read what a question says.** 📌 **The Product Owner answers
 them, not you.**
@@ -260,17 +261,20 @@ too**: the Product Owner has to see it.
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
 
-| What just happened | Next |
-|---|---|
-| It wrote a blocking file | 📌 Fill its `## Decision`, then `/1_lexique` again |
-| 1 asked something | 📌 Answer them, then `/1_lexique` again |
-| 1 asked nothing | 📌 `/2_structure` — 🔴 the vocabulary is settled |
-| 2 wrote a new questions file | 📌 Answer it, then `/1_lexique` again |
-| 2 wrote none | 📌 `/1_lexique` again — 🔴 a settled term can uncover a pair |
-| 3 asked something | 📌 **Answer it, then `/1_lexique` again** |
-| 3 asked nothing | 📌 `/2_structure` — 🔴 **3 has already replaced what the lexicon retires**, and nothing waits |
-| 4 wrote a new questions file | 📌 Answer it, then `/1_lexique` again |
-| 4 wrote none | 📌 `/2_structure` — 🔴 the answers are settled |
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+
+| What just happened | Next | `Next:` |
+|---|---|---|
+| It wrote a blocking file | 📌 Fill its `## Decision`, then `/1_lexique` again | `Next: answer blocking, then run /1_lexique <name>` |
+| 1 asked something | 📌 Answer them, then `/1_lexique` again | `Next: answer questions, then run /1_lexique <name>` |
+| 1 asked nothing | 📌 `/2_structure` — 🔴 the vocabulary is settled | `Next: run /2_structure <name>` |
+| 2 wrote a new questions file | 📌 Answer it, then `/1_lexique` again | `Next: answer questions, then run /1_lexique <name>` |
+| 2 wrote none | 📌 `/1_lexique` again — 🔴 a settled term can uncover a pair | `Next: run /1_lexique <name>` |
+| 3 asked something | 📌 **Answer it, then `/1_lexique` again** | `Next: answer questions, then run /1_lexique <name>` |
+| 3 asked nothing | 📌 `/2_structure` — 🔴 **3 has already replaced what the lexicon retires**, and nothing waits | `Next: run /2_structure <name>` |
+| 4 wrote a new questions file | 📌 Answer it, then `/1_lexique` again | `Next: answer questions, then run /1_lexique <name>` |
+| 4 wrote none | 📌 `/2_structure` — 🔴 the answers are settled | `Next: run /2_structure <name>` |
 
 🔴 **Nothing else is yours**: no reading of what a term means.
 

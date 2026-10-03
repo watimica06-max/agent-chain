@@ -13,7 +13,7 @@ agent writes `questions-architecte-NN.md`; answering and re-running
 turns each answer into a rule.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/<first argument>/` — 🔴 **the first
 argument only**; ⚠️ **`$ARGUMENTS` holds both when a second names a
@@ -60,7 +60,8 @@ conventions in full; they have to exist when it does.
 ⚠️ **Run by hand** — 🔴 **no command chains it**: 📌 **it sits between
 `/6_convertit` and `/7_lots`**, and the Product Owner runs it there.
 
-🔴 **Stop if `spec-technique.md` is absent** — say so. The agent derives
+🔴 **Stop if `spec-technique.md` is absent** — say so: `Next: stop
+spec-technique.md missing`. The agent derives
 from it, and the upstream loop has not reached it yet. ⚠️ **Invocation 3
 does not need it**: it judges a request against the conventions and the
 grid.
@@ -74,17 +75,17 @@ matches.**
 
 | The folder holds | What you invoke |
 |---|---|
-| A `blocked_architecte.md` with an empty `## Decision` | 🔴 **Nothing** — relay it and stop |
+| A `blocked_architecte.md` with an empty `## Decision` | 🔴 **Nothing** — relay it and stop — `Next: answer blocking, then run /conventions <name>` |
 | 🔴 **A `blocked_architecte.md` with a filled `## Decision`** | 📌 **The invocation its `## Invocation` line names** — 🔴 **name the file in the prompt** |
 | A request in `architecte/` with an empty `## Verdict` — 🔴 **or with no `## Verdict` heading at all** | **Invocation 3 — Requests** |
-| 🔴 **A second argument names a `bugfix-NN`, and no row above matched** | 📌 **Nothing to invoke** — say so: ⚠️ **`/8_code` carries on**. 🔴 **The rows below are the feature folder's**: a `bugfix-NN` carries no technical document of its own to walk |
-| A `questions-architecte-NN.md` at the root with an empty `Answer:` | 🔴 **Nothing** — say which questions wait |
+| 🔴 **A second argument names a `bugfix-NN`, and no row above matched** | 📌 **Nothing to invoke** — say so: ⚠️ **`/8_code` carries on**. 🔴 **The rows below are the feature folder's**: a `bugfix-NN` carries no technical document of its own to walk — `Next: run /8_code <name>` |
+| A `questions-architecte-NN.md` at the root with an empty `Answer:` | 🔴 **Nothing** — say which questions wait — `Next: answer questions, then run /conventions <name>` |
 | A `questions-architecte-NN.md` at the root, **answered** | **Invocation 2 — Integrating** — 🔴 **name the file in the prompt** |
 | 🔴 **No `docs/TECHNICAL_CONVENTIONS.md`** | **Invocation 1 — Deriving** — 📌 **the first derivation this repository ever had** |
 | **It exists, and no `couverture.md` at the feature folder's root** | 🔴 **Invocation 4 — Completing** |
-| A `questions-architecte-NN.md` at the root with **no `### Q`** | 🔴 **Nothing** — the derivation asked nothing. 📌 **File it and commit — the filing steps of *Git, before invoking*, no worktree — then say `/7_lots`** |
-| **It exists, and a `couverture.md` is there** | 📌 **Nothing to do** — say `/7_lots` |
-| Nothing of the sort | 📌 **Nothing to do** — say `/7_lots` |
+| A `questions-architecte-NN.md` at the root with **no `### Q`** | 🔴 **Nothing** — the derivation asked nothing. 📌 **File it and commit — the filing steps of *Git, before invoking*, no worktree — then say `/7_lots`** — `Next: run /7_lots <name>` |
+| **It exists, and a `couverture.md` is there** | 📌 **Nothing to do** — say `/7_lots` — `Next: run /7_lots <name>` |
+| Nothing of the sort | 📌 **Nothing to do** — say `/7_lots` — `Next: run /7_lots <name>` |
 
 🔴 **The last rows are what stops a silent rewrite.** ⚠️ **Invocation 1
 opens no existing conventions file and writes it afresh** — 📌 **every
@@ -122,7 +123,8 @@ and a request is treated in the cycle that raised it.
 🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
 `architecte` before touching it** — 📌 **a file holding questions is
 not yours to file**: ⚠️ **it waits on an answer, or its answers were
-never integrated.** 🔴 **Stop and say which.** 📌 **The architecte's
+never integrated.** 🔴 **Stop and say which** — `Next: stop <file> waits
+on an answer or an integration`. 📌 **The architecte's
 own file is the walk's above, not this guard's.**
 
 🔴 **Then file away every root `questions-*.md` whose prefix is not
@@ -290,16 +292,19 @@ Owner would otherwise learn of it from a file listing, at best.**
 
 **What to run next** — 📌 **indications for the Product Owner.**
 
-| The run | Next |
-|---|---|
-| It raised questions | 📌 **Answer them, then `/conventions`** |
-| It raised a **`conjunction`** question | 📌 **The ordinary case** — 🔴 **the question arose between two entries, each complete on its own, and no grid could have seen the pair**: ⚠️ **answer it, then `/conventions`** — 📌 **the answer becomes a rule, and `couverture.md` carries its line** |
-| It raised a **product question** | 🔴 **The framing grid did not close the product** — ⚠️ **the Product Owner corrects the product file by hand**: 📌 **the behaviour is built in the next cycle, as a new behaviour** — 🔴 **no upstream turn re-runs** |
-| It raised an **`inconsistency`** | 🔴 **The technical document is wrong** — 📌 **say which entry**: the fix is upstream, in `/6_convertit`, not here |
-| It raised a **`forme`** question | 🔴 **The framing grid lacks a form, or one keeps producing a useless rule** — ⚠️ **the Product Owner amends the grid herself**, the grid's `R4`: 📌 **no rule is written for it**, `couverture.md` says what became of it |
-| It raised a **`replacement`** question | 🔴 **A rule in force says the opposite of what this feature needs, and lots already coded follow it** — 📌 **replacing a rule in force is the Product Owner's**: ⚠️ **answer it — change the rule, or conform to it — then `/conventions`**. 🔴 **The lots the question names as coded under the old rule are hers to re-enter through `/diagnostique`**, a `bug-list.md` in a `bugfix-NN/` — ⚠️ **the chain has no other way back into coded lots** |
-| It wrote a blocking file | 📌 **Fill its `## Decision`, then `/conventions`** |
-| It asked nothing, or everything is integrated | 📌 `/7_lots` |
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+
+| The run | Next | `Next:` |
+|---|---|---|
+| It raised questions | 📌 **Answer them, then `/conventions`** | `Next: answer questions, then run /conventions <name>` |
+| It raised a **`conjunction`** question | 📌 **The ordinary case** — 🔴 **the question arose between two entries, each complete on its own, and no grid could have seen the pair**: ⚠️ **answer it, then `/conventions`** — 📌 **the answer becomes a rule, and `couverture.md` carries its line** | `Next: answer questions, then run /conventions <name>` |
+| It raised a **product question** | 🔴 **The framing grid did not close the product** — ⚠️ **the Product Owner corrects the product file by hand**: 📌 **the behaviour is built in the next cycle, as a new behaviour** — 🔴 **no upstream turn re-runs** | `Next: manual corriger le fichier produit à la main — le comportement sera construit au cycle suivant` |
+| It raised an **`inconsistency`** | 🔴 **The technical document is wrong** — 📌 **say which entry**: the fix is upstream, in `/6_convertit`, not here | `Next: run /6_convertit <name>` |
+| It raised a **`forme`** question | 🔴 **The framing grid lacks a form, or one keeps producing a useless rule** — ⚠️ **the Product Owner amends the grid herself**, the grid's `R4`: 📌 **no rule is written for it**, `couverture.md` says what became of it | `Next: manual amender la grille (R4)` |
+| It raised a **`replacement`** question | 🔴 **A rule in force says the opposite of what this feature needs, and lots already coded follow it** — 📌 **replacing a rule in force is the Product Owner's**: ⚠️ **answer it — change the rule, or conform to it — then `/conventions`**. 🔴 **The lots the question names as coded under the old rule are hers to re-enter through `/diagnostique`**, a `bug-list.md` in a `bugfix-NN/` — ⚠️ **the chain has no other way back into coded lots** | `Next: answer questions, then run /conventions <name>` |
+| It wrote a blocking file | 📌 **Fill its `## Decision`, then `/conventions`** | `Next: answer blocking, then run /conventions <name>` |
+| It asked nothing, or everything is integrated | 📌 `/7_lots` | `Next: run /7_lots <name>` |
 
 🔴 **Then list every file the run left in the feature folder**, one line
 each, path and size:
@@ -313,3 +318,6 @@ you without opening it.
 
 🔴 **A run that wrote a question and did not say so is a run whose
 question is lost.** **The Product Owner does not go looking.**
+
+🔴 **The `Next:` line of the table comes after that listing** — ⚠️ **it
+is the relay's last line, nothing after it.**

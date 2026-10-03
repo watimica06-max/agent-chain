@@ -141,18 +141,23 @@ would send the block back to you, to ask again.
 root. 🔴 **The prompt names your number** — 📌 **the command has the fact**,
 and you never list a folder to find it.
 
-🔴 **One entry per question, four lines, no exception**, numbered from
-`Q1`:
+🔴 **One entry per question, four lines, no exception** — 📌 **plus the
+`Options:` block, and only it** — numbered from `Q1`:
 
     ### Q1
     Block: B40
     Question: <what the block produces, and the two natures or the frontier in doubt>
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Answer:
 
 🔴 **`Block:` carries the identifier alone.** 🔴 **The `Answer:` line is
 written empty** — the Product Owner answers there, by hand. 📌
-**Questions in English, answers in French.** 🔴 **Never suggest the
-answer.**
+**Questions in English, answers in French.** 🔴 **List the natures in
+doubt as options, never mark one as preferred** — 📌 **two to six, in
+French**: an option chosen becomes the answer word for word. ⚠️ **None
+opens on a number and a dot.**
 
 🔴 **Write the file even when empty** — ⚠️ **an empty one says the chain
 can move on; a missing one says you did not run.**
@@ -234,11 +239,21 @@ four headings**, the last one left empty:
 
     <the decision or fix needed>
 
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
+
     ## Decision
 
     <left empty — the Product Owner writes here>
 
 🔴 **The `## Decision` heading is written empty, and never omitted.**
+
+📌 **The `Options:` list ends `## To resume`, never under a heading of
+its own** — two to six, in French, none opening on a number and a dot;
+⚠️ **optional, as in the questions file.** 📌 **Each option takes one of
+the decision shapes below**: a nature among the eight, a rewrite or
+removal, a nature outside the eight.
 
 🔴 **A blocked block does not stop your questions file** — 📌 **you
 write both.** ⚠️ **Blocking the whole run is not one of your outcomes**:

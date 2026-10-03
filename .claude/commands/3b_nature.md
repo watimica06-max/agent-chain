@@ -13,7 +13,7 @@ grid asks a block the questions of its nature** — ⚠️ **a block without
 one would be asked none.**
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -35,7 +35,7 @@ Feature folder: `docs/features/$ARGUMENTS/`
 | | What you do |
 |---|---|
 | Absent | 📌 Carry on |
-| **Any** `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands, and which `## Blocking N` waits |
+| **Any** `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands, and which `## Blocking N` waits — `Next: answer blocking, then run /3b_nature <name>` |
 | **Every** `## Decision` is filled | 📌 **Name it in the prompt** |
 
 ⚠️ **One file, several entries** — 📌 **a `## Blocking N` per blocked
@@ -48,12 +48,14 @@ is read** — the agent reads the file.
 🔴 **Grep `Clarification needed` in `desc-produit.md`.**
 
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
-one**, and that `/2_structure` has to run first.
+one**, and that `/2_structure` has to run first — `Next: run /2_structure
+<name>`.
 
 🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
 `architecte` before touching it** — 📌 **a file holding questions is
 not yours to file**: ⚠️ **it waits on an answer, or its answers were
-never integrated.** 🔴 **Stop and say which.** 📌 **The classeur's own
+never integrated.** 🔴 **Stop and say which** — `Next: stop <file> waits
+on an answer or an integration`. 📌 **The classeur's own
 is no exception** — ⚠️ **answered, it goes through `/1_lexique` and
 `/2_structure`**, which integrate it and put it away; 🔴 **still at the
 root, it has not been through them.** 📌 **The architecte's is the one
@@ -233,7 +235,8 @@ every run.**
 📌 **Relay which blocks changed nature**, if it says any did.
 
 🔴 **Check `questions-classeur-NN.md` was written** — ⚠️ **a missing one is a
-defect of the run**: the agent writes one every time.
+defect of the run**: the agent writes one every time. `Next: stop
+questions-classeur-NN.md missing`
 
 🔴 **Grep `^### Q` in it** and say how many questions it holds.
 
@@ -289,14 +292,17 @@ lines** — say them in the agent's terms, or that there are none.
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
 
-| What just happened | Next |
-|---|---|
-| It wrote a blocking file, **naming a nature it could not settle** | 📌 Fill every `## Decision`, then `/3b_nature` again — ⚠️ **or the row below that the decision fits** |
-| It wrote a blocking file **and** a questions file with questions | 🔴 **Answer the questions first, then `/1_lexique`** — 📌 **fill the decision second, once the answers are integrated.** ⚠️ **Both end in the Rédacteur's hands** — at the root together, `/2_structure` takes the answered file and leaves the blocking file for its next run |
-| **Every** `## Decision` names a rewrite | 🔴 **`/2_structure`** — 📌 **it finds the blocking file at its unnumbered name and names it to the Rédacteur, which rewrites the block with `MODIFIED`.** ⚠️ **Then `/3_decoupe`, `/3a_genre`, and back here** — 🔴 **not `/1_lexique`**: the Lexicographe has nothing to watch on a rewrite. ⚠️ **A file mixing nature decisions and rewrites runs `/3b_nature` first** — 📌 **the classeur writes the natures, and the file stays at its unnumbered name for `/2_structure`** (*Once it has reported*) |
-| A `## Decision` names a nature outside the list | 🔴 **Nothing runs** — ⚠️ **the tables have to carry it first**; say so |
-| 🔴 **A block carrying `Genre: comportement` still has an empty `Nature:`, and no blocking file explains it** | 📌 **Say which, and run `/3b_nature` once more** — ⚠️ **once, not until it clears**: 🔴 **a second run that leaves one empty stops there, the blocks named** — a line left empty by neither a block nor a decision is a defect of the run, and a third run would repeat it. 🔴 **Count only those**: a block of any other genre has an empty `Nature:` and must keep it |
-| Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a block producing two things is split before the grid probes it |
-| Its questions file is empty, or there was nothing to class | 📌 `/4_grille` |
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+
+| What just happened | Next | `Next:` |
+|---|---|---|
+| It wrote a blocking file, **naming a nature it could not settle** | 📌 Fill every `## Decision`, then `/3b_nature` again — ⚠️ **or the row below that the decision fits** | `Next: answer blocking, then run /3b_nature <name>` |
+| It wrote a blocking file **and** a questions file with questions | 🔴 **Answer the questions first, then `/1_lexique`** — 📌 **fill the decision second, once the answers are integrated.** ⚠️ **Both end in the Rédacteur's hands** — at the root together, `/2_structure` takes the answered file and leaves the blocking file for its next run | `Next: answer questions, then run /1_lexique <name>` |
+| **Every** `## Decision` names a rewrite | 🔴 **`/2_structure`** — 📌 **it finds the blocking file at its unnumbered name and names it to the Rédacteur, which rewrites the block with `MODIFIED`.** ⚠️ **Then `/3_decoupe`, `/3a_genre`, and back here** — 🔴 **not `/1_lexique`**: the Lexicographe has nothing to watch on a rewrite. ⚠️ **A file mixing nature decisions and rewrites runs `/3b_nature` first** — 📌 **the classeur writes the natures, and the file stays at its unnumbered name for `/2_structure`** (*Once it has reported*) | `Next: run /2_structure <name>` |
+| A `## Decision` names a nature outside the list | 🔴 **Nothing runs** — ⚠️ **the tables have to carry it first**; say so | `Next: stop nature outside the eight: <block>` |
+| 🔴 **A block carrying `Genre: comportement` still has an empty `Nature:`, and no blocking file explains it** | 📌 **Say which, and run `/3b_nature` once more** — ⚠️ **once, not until it clears**: 🔴 **a second run that leaves one empty stops there, the blocks named** — a line left empty by neither a block nor a decision is a defect of the run, and a third run would repeat it. 🔴 **Count only those**: a block of any other genre has an empty `Nature:` and must keep it | First run: `Next: run /3b_nature <name>` · second: `Next: stop <blocks> left unclassed` |
+| Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a block producing two things is split before the grid probes it | `Next: answer questions, then run /1_lexique <name>` |
+| Its questions file is empty, or there was nothing to class | 📌 `/4_grille` | `Next: run /4_grille <name>` |
 
 **If it returns `blocked_classeur.md`**: relay it and stop.

@@ -312,6 +312,9 @@ only one, and 🔴 **one `## Decision` at the end**, whatever the count.
     ### What blocks
     ### Where
     ### To resume
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
 
     ## Decision
 
@@ -319,6 +322,11 @@ only one, and 🔴 **one `## Decision` at the end**, whatever the count.
 
 📌 **`### What blocks` is the fact, in one sentence; `### Where` the
 lot, section or file; `### To resume` the decision or fix needed.**
+📌 **`### To resume` may end on an `Options:` list** — two to six, in
+French, since a chosen option becomes the Product Owner's decision word
+for word; ⚠️ **none for a missing input.** 🔴 **No option opens on a
+number and a dot** (`1.`) — the answers under `## Decision` are counted
+by their `N.` lines.
 
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 It is where the Arbitre answers — and the Product Owner, by hand, when

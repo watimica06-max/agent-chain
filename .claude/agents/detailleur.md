@@ -345,9 +345,18 @@ the count.
 
     <the decision or fix needed>
 
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
+
     ## Decision
 
     <left empty — one numbered answer per blocking>
+
+📌 **`Options:` closes `### To resume`, never under a heading of its
+own** — 🔴 **two to six, in French**: a chosen one becomes the Product
+Owner's decision word for word. ⚠️ **None opens on a number and a dot**
+— it would be counted as an answer. A missing input carries none.
 
 🔴 **The `## Decision` heading is written empty, and never omitted** —
 📌 **the Arbitre answers each blocking there, numbered.**
@@ -559,6 +568,8 @@ end of the walk and file everything you found.**
     ## Decision
 
     <left empty — one numbered answer per blocking>
+
+📌 **Each `### To resume` may end on its `Options:`**, as above.
 
 📌 **Each entry carries its own lack and its own question** — ⚠️ **and,
 when you see it, what it depends on**: *« this one only has a meaning

@@ -157,9 +157,17 @@ for the resumed run.
 
     <the decision or fix needed>
 
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
+
     ## Decision
 
     <left empty — the Product Owner writes here>
+
+📌 **`Options:` closes `## To resume`** — two to six, in French, none
+opening on a number and a dot: ⚠️ **a chosen one becomes the Product
+Owner's decision word for word.** None when the fix is a missing input.
 
 🔴 **You block on a signature that cannot be written** — 📌 **a type the
 language does not have, a name it refuses, a return the platform cannot

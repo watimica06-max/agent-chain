@@ -12,7 +12,7 @@ Act as the orchestrator, in **upstream mode**.
 `idees.md`; with one, it integrates the answers instead.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -102,7 +102,8 @@ through it. Say `/1_lexique` comes next. ⚠️ **The root alone** — 📌 **a
 file already under `questions/lexicographe/` holds the entries
 `/1_lexique` applied**, and a guard reading it there would stop on a
 settled vocabulary after its invocation 4 wrote none. 📌 **None at the
-root → nothing to guard**, carry on.
+root → nothing to guard**, carry on. 🔴 **The stop prints `Next: run
+/1_lexique <name>`.**
 
 📌 **No `### Q` → file it**, 🔴 **the choice of invocation below reads
 the root after it:**
@@ -131,8 +132,8 @@ sit in the feature folder?**
 | | What you do |
 |---|---|
 | Absent | 📌 Carry on |
-| Its `## Invocation` says **3** | 🔴 **Stop** — 📌 **it is `/fusion`'s**: the merge blocked, not the structuring; say so |
-| It says 1 or 2, and its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands |
+| Its `## Invocation` says **3** | 🔴 **Stop** — 📌 **it is `/fusion`'s**: the merge blocked, not the structuring; say so — `Next: run /fusion <name>` |
+| It says 1 or 2, and its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands — `Next: answer blocking, then run /2_structure <name>` |
 | It says 1 or 2, and its `## Decision` is filled | 📌 **Name it in the prompt**, beside the file to read |
 
 ⚠️ **Read those two headings, nothing else** — 📌 the agent reads the
@@ -145,12 +146,12 @@ Rédacteur has three invocations and one blocking-file name**, and
 | At the root | Invocation | What you name |
 |---|---|---|
 | **One questions file, holding `### Q`** — any prefix | **2 — Integrating** | 🔴 **That one** |
-| **More than one questions file** | 🔴 **Stop** — a filing failed; say which files | — |
+| **More than one questions file** | 🔴 **Stop** — a filing failed; say which files — `Next: stop filing failed: <files>` | — |
 | 🔴 **A `blocked_decoupeur.md`, `blocked_qualifieur.md` or `blocked_classeur.md`, every `## Decision` filled** | **2 — Integrating** | 🔴 **That file** — 📌 **all three block on something only a rewrite of the block settles**, and rewriting is yours |
-| One of the three with **any** `## Decision` empty | 🔴 **Stop** — say the decision is still to write, and which `## Blocking N` waits | — |
-| **One questions file, with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to integrate**; say `/3_decoupe` | — |
+| One of the three with **any** `## Decision` empty | 🔴 **Stop** — say the decision is still to write, and which `## Blocking N` waits — `Next: answer blocking, then run /2_structure <name>` | — |
+| **One questions file, with no `### Q`** | 🔴 **Invoke nothing** — 📌 **nothing to integrate**; say `/3_decoupe` — `Next: run /3_decoupe <name>` | — |
 | No questions file, **and no `desc-produit.md`** | **1 — Structuring** | `idees.md` |
-| No questions file, **and a `desc-produit.md`** | 🔴 **Stop** — 📌 **the idea file is transcribed once**. 🔴 **Grep `Clarification needed` in `desc-produit.md` first**: ⚠️ **a hit → say the flag stands with no questions file at the root to lift it** — a filing or an integration went wrong, and the file is the Product Owner's to find — 📌 **never `/3_decoupe`**, which stops on the flag and sends back here; no hit → say `/3_decoupe` comes next | — |
+| No questions file, **and a `desc-produit.md`** | 🔴 **Stop** — 📌 **the idea file is transcribed once**. 🔴 **Grep `Clarification needed` in `desc-produit.md` first**: ⚠️ **a hit → say the flag stands with no questions file at the root to lift it** — a filing or an integration went wrong, and the file is the Product Owner's to find — 📌 **never `/3_decoupe`**, which stops on the flag and sends back here — `Next: manual trouver pourquoi un « Clarification needed » reste sans fichier de questions pour le lever`; no hit → say `/3_decoupe` comes next — `Next: run /3_decoupe <name>` | — |
 
 🔴 **First match wins, and the questions file comes before the blocking
 files** — 📌 **an answered file and a blocking file at the root
@@ -168,7 +169,8 @@ run**, see *Once it has run*.
 🔴 **Invocation 1 runs on a settled vocabulary, never before** — 📌
 **the highest-numbered `questions-lexicographe-NN.md`, at the root or
 under `questions/lexicographe/`, holds no `### Q`.** ⚠️ **None
-anywhere, or entries in it → stop**, and say `/1_lexique` comes next.
+anywhere, or entries in it → stop**, and say `/1_lexique` comes next —
+`Next: run /1_lexique <name>`.
 🔴 **The loop closes on one evidence only** — a run that asked nothing
 wrote an empty file, and it is the highest one. 📌 **A term changed
 once sixty blocks carry it is sixty edits.**
@@ -197,7 +199,8 @@ waits at the root for `/conventions`, which is the only command that
 reads it.**
 
 🔴 **If it carries an empty `Answer:` with no `Défaut:` line** — 📌
-**stop**, and say which questions are waiting.
+**stop**, and say which questions are waiting — `Next: answer questions,
+then run /1_lexique <name>`.
 
 ⚠️ **An entry whose `Answer:` is empty **and** that carries a `Défaut:`
 line is answered** — 📌 **silence accepts the proposal**, and that is
@@ -263,7 +266,8 @@ block. 🔴 **Say which block the answer created, and that the file is the
 Product Owner's to place** — ⚠️ **a change to the product now belongs to
 a new cycle, and where the answer goes is hers to decide**; 📌 **left
 where it is, the next run takes it again and refuses again.** 🔴 **Stop
-there** — nothing below runs.
+there** — nothing below runs. `Next: manual placer la réponse qui a créé
+<block> — un changement du produit appartient à un nouveau cycle`
 
 🔴 **The deletions**, when `code/decoupage.md` is absent:
 
@@ -329,7 +333,8 @@ stays there** — 🔴 **you named it to nothing**, and `/conventions` is
 waiting for it.
 
 🔴 **Check `questions-redacteur-NN.md` was written** — ⚠️ **a missing one
-stops the command**: the agent says it writes one every time.
+stops the command**: the agent says it writes one every time. `Next: stop
+questions-redacteur-NN.md missing`
 
 🔴 **Never paraphrase the agent's process in your invocation** — not
 its inputs, its checks, its output format. It reads its own
@@ -382,14 +387,17 @@ The agent's own report.
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
 
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+
 🔴 **First match wins:**
 
-| What just happened | Next |
-|---|---|
-| The integration was refused — a `NEW` block after the split | 🔴 **Nothing runs** — 📌 **the file at the root is the Product Owner's to place**; say which block the answer created |
-| It wrote a blocking file | 📌 Fill its `## Decision`, then `/2_structure` again |
-| Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a flag stands until answered, and nothing downstream runs meanwhile |
-| Its questions file is empty | 📌 `/3_decoupe` — 🔴 a new block is split, classed and framed before the Convertisseur reads it |
+| What just happened | Next | `Next:` |
+|---|---|---|
+| The integration was refused — a `NEW` block after the split | 🔴 **Nothing runs** — 📌 **the file at the root is the Product Owner's to place**; say which block the answer created | the refusal's, above |
+| It wrote a blocking file | 📌 Fill its `## Decision`, then `/2_structure` again | `Next: answer blocking, then run /2_structure <name>` |
+| Its questions file holds questions | 🔴 **Answer them, then `/1_lexique`** — a flag stands until answered, and nothing downstream runs meanwhile | `Next: answer questions, then run /1_lexique <name>` |
+| Its questions file is empty | 📌 `/3_decoupe` — 🔴 a new block is split, classed and framed before the Convertisseur reads it | `Next: run /3_decoupe <name>` |
 
 📌 **A blocking file waited at the root while the answers went in** —
 🔴 **say so, whichever row matched**: `/2_structure` takes it once the

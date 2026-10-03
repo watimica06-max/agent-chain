@@ -27,7 +27,7 @@ are views** — ⚠️ **a block filed under the wrong genre is never lost**,
 and the next run puts it right.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -64,7 +64,8 @@ file is a block a later integration created or changed**, and
 ⚠️ **`/4_grille`'s second time writes `questions-existant-NN.md` empty
 when no block carries `Global:`**, so its absence means the second time
 never ran. 🔴 **Either missing, the highest holding a `### Q`, or a
-marker on any heading** → 🔴 **stop**: say to run `/4_grille`.
+marker on any heading** → 🔴 **stop**: say to run `/4_grille` —
+`Next: run /4_grille <name>`.
 
 ⚠️ **This command is what closes the upstream** — 📌 **it writes the
 views every later step reads**, and a product file still open would be
@@ -72,12 +73,12 @@ split on a state about to change.
 
 🔴 **Grep `-c '^Genre:$'` in `desc-produit.md`** — it must return zero.
 ⚠️ **Anything else means a block was left unqualified**: 📌 say which,
-say `/3a_genre` has to run, and stop.
+say `/3a_genre` has to run, and stop — `Next: run /3a_genre <name>`.
 
 🔴 **Then every block carrying `Genre: comportement` has a filled
 `Nature:`** — 📌 `grep -B1 '^Nature:$'`, keeping the ones whose `Genre:`
 says `comportement`. ⚠️ **One hit and you stop**: say which, and that
-`/3b_nature` has to run.
+`/3b_nature` has to run — `Next: run /3b_nature <name>`.
 
 📌 **A block of any other genre carries an empty `Nature:`, and that is
 right** — 🔴 **only a behaviour has one.**
@@ -85,7 +86,8 @@ right** — 🔴 **only a behaviour has one.**
 🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
 `architecte` before touching it** — 📌 **a file holding questions is
 not yours to file**: ⚠️ **it waits on an answer, or its answers were
-never integrated.** 🔴 **Stop and say which.** 📌 **The architecte's is
+never integrated.** 🔴 **Stop and say which** — `Next: stop <file> waits
+on an answer or an integration`. 📌 **The architecte's is
 the one exception** — ⚠️ **it is `/conventions`'s, not this chain's**,
 and a `### Q` in it says nothing about the run; 🔴 **read the root as if
 it were not there** — and leave it there, see below.
@@ -142,11 +144,12 @@ genre with no block gets an empty file**, never no file: its absence
 would read as *the split did not run*.
 
 ⚠️ **A `Genre:` value that is not one of the six** — 📌 say which block,
-and stop without writing.
+and stop without writing — `Next: stop <block> carries an unknown genre`.
 
 **Then count** `^### B` across the six files and in `desc-produit.md`.
 🔴 **The two counts match** — ⚠️ **a difference means a block carries no
-genre, or was copied twice**; say so, and stop without committing.
+genre, or was copied twice**; say so, and stop without committing —
+`Next: stop genre split lost or doubled a block`.
 
 ---
 
@@ -190,12 +193,13 @@ turn**, and `/6_convertit` compares these blocks against the last ones
 it translated — 📌 **a marker coming or going would read as a change.**
 
 ⚠️ **A `Nature:` value that is not one of the eight** — say which
-block, and stop without writing.
+block, and stop without writing — `Next: stop <block> carries an unknown
+nature`.
 
 **Then count** `^### B` in `desc-par-nature.md` and in
 `par-genre/comportements.md`. 🔴 **The two counts match** — ⚠️ **a
 difference means a block was lost or doubled**; say so, and stop
-without committing.
+without committing — `Next: stop nature sort lost or doubled a block`.
 
 ---
 
@@ -220,6 +224,9 @@ under each nature.**
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
 
-📌 `/6_convertit`.
+📌 `/6_convertit` — `Next: run /6_convertit <name>`.
+
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
 
 🔴 **Nothing else is yours**: no phase chain.

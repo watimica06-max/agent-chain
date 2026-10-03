@@ -19,7 +19,7 @@ output** — ⚠️ **not what they agree on.**
 `/5_reclasse`.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -58,7 +58,7 @@ with its own decision.
 | | What you do |
 |---|---|
 | None | 📌 Carry on |
-| Any, its `## Decision` empty | 🔴 **Stop** — say which ones still stand, every one of them |
+| Any, its `## Decision` empty | 🔴 **Stop** — say which ones still stand, every one of them — `Next: answer blocking, then run /4_grille <name>` |
 | Every one standing has its `## Decision` filled | 📌 **Name each in its own reading's prompt, and in no other** — 🔴 **and invoke those readings alone, together**: see below. ⚠️ **The merge waits for all of them** |
 
 ⚠️ **Read that one heading in each, nothing else** — 📌 the agent reads
@@ -81,7 +81,8 @@ turn, and all four run.**
 🔴 **Grep `Clarification needed` in `desc-produit.md`.**
 
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
-one**, and that `/2_structure` has to run first.
+one**, and that `/2_structure` has to run first — `Next: run /2_structure
+<name>`.
 
 🔴 **A flagged block was transcribed on a reading nobody confirmed** —
 📌 **probing it would close a text that is about to change.**
@@ -93,7 +94,8 @@ one**, and that `/2_structure` has to run first.
 🔴 **Every block carrying `Genre: comportement` has a filled
 `Nature:`** — 📌 `grep -B1 '^Nature:$'`, then keep the ones whose
 `Genre:` says `comportement`. ⚠️ **One hit and you stop** — say which
-blocks, and that `/3b_nature` has to run first.
+blocks, and that `/3b_nature` has to run first — `Next: run /3b_nature
+<name>`.
 
 📌 **The third angle reads by nature** — 🔴 **a block without one would
 be grouped by judgement, or left out of that reading with nothing
@@ -103,7 +105,7 @@ signalling it.**
 whose `Answer:` is empty and that carries no `Défaut:` line** — ⚠️ **one
 and you stop**, saying which questions wait: the turn that produced
 them is not closed, and probing again would raise the same gaps through
-five invocations.
+five invocations. `Next: answer questions, then run /1_lexique <name>`
 
 ⚠️ **An entry whose `Answer:` is empty **and** that carries a `Défaut:`
 line is answered** — 📌 **silence accepts the proposal**, and that is
@@ -132,6 +134,10 @@ behaviour block.** 📌 **Name them all.**
 ⚠️ **The grep returns no block** → 🔴 **do not invoke.** 📌 **Commit
 what the filing moved, if anything, and push** — no worktree. ⚠️ **Say
 the feature carries no behaviour block**, and go to *What you relay*.
+🔴 **No row there fits: print `Next: stop no behaviour block — nothing
+for the grid to probe`.** ⚠️ **Never `/5_reclasse`**: no
+`questions-sondeur-NN.md` was written and every block still carries
+`NEW`, so its grid-closed test sends the run straight back here.
 
 **Later turns — two greps in `desc-produit.md`, and the union of what
 they return:**
@@ -230,7 +236,7 @@ by where that file sits:**
 | The sondeur's file | What it is | Next |
 |---|---|---|
 | Filed under `questions/sondeur/` | 🔴 **The first time is closed** — its answers went through `/1_lexique` and `/2_structure`, which integrated them, filed the file, and changed no block | 📌 **Write the next `questions-sondeur-NN.md` empty at the root, without an agent** — ⚠️ `NN`: that file's, plus one; *Git, before invoking* files it with the rest. 🔴 **Then the second time**: see below — its own test says whether it runs, writes an empty file of its own, or has nothing left to say |
-| At the root | 🔴 **Its answers were never integrated** — the `### Q` guard's case, under *Git, before invoking* | 📌 **Stop and say so**, naming the file — `/1_lexique` and `/2_structure` have to run first |
+| At the root | 🔴 **Its answers were never integrated** — the `### Q` guard's case, under *Git, before invoking* | 📌 **Stop and say so**, naming the file — `/1_lexique` and `/2_structure` have to run first — `Next: run /1_lexique <name>` |
 
 ⚠️ **Whether a `questions-existant-NN.md` exists changes nothing here** —
 📌 **the second time's *has it already run* test reads it.**
@@ -247,7 +253,8 @@ marker on any `### B` line.**
 🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
 `architecte` before touching it** — 📌 **a file holding questions is
 not yours to file**: ⚠️ **it waits on an answer, or its answers were
-never integrated.** 🔴 **Stop and say which.** 📌 **The sondeur's own
+never integrated.** 🔴 **Stop and say which** — `Next: stop <file> waits
+on an answer or an integration`. 📌 **The sondeur's own
 is no exception** — ⚠️ **answered, it goes through `/1_lexique` and
 `/2_structure`**, which integrate it and put it away; 🔴 **still at the
 root, it has not been through them.** 📌 **The architecte's is the one
@@ -395,7 +402,8 @@ Agent(
 📌 **`NN`: the highest `questions-existant-NN.md` in
 `questions/existant/`, plus one** — ⚠️ **`01` when there is none.**
 
-🔴 **It wrote `blocked_existant.md`** — 📌 **relay it and stop.** ⚠️
+🔴 **It wrote `blocked_existant.md`** — 📌 **relay it and stop** —
+`Next: answer blocking, then run /4_grille <name>`. ⚠️
 **Its decision filled, `/4_grille` runs the second time again**, naming
 the file in the prompt; 🔴 **rename it `blocked_existant-NN.md` once the
 agent reports having applied it.**
@@ -500,7 +508,8 @@ write different ones**, and none reads what another wrote.
 🔴 **First, does any `cadrage-produit/blocked_*.md`, or
 `blocked_existant.md` at the feature root, sit at its
 unnumbered name?** 📌 **One is enough** — ⚠️ **no merge this turn, and
-no questions file at the root.** 🔴 **Relay it and stop.**
+no questions file at the root.** 🔴 **Relay it and stop** —
+`Next: answer blocking, then run /4_grille <name>`.
 
 ⚠️ **A sondeur that blocked writes no questions file** — 📌 **so the
 existence check below would fire on it**, and report as missing a
@@ -514,7 +523,7 @@ merge missing one reading is a merge nobody can trust.**
 | | What you do |
 |---|---|
 | Its blocking file sits beside it | 🔴 **Relay it and stop** — 📌 **a decision awaits the Product Owner**, and the reading will resume from it |
-| No blocking file either | 🔴 **Stop** — 📌 **say which reading produced nothing, and to run `/4_grille` again** |
+| No blocking file either | 🔴 **Stop** — 📌 **say which reading produced nothing, and to run `/4_grille` again** — `Next: run /4_grille <name>` |
 
 ```
 Agent(
@@ -541,7 +550,7 @@ repair.
 
 | | What you do |
 |---|---|
-| Its report names a missing file | 🔴 **Stop** — 📌 **say which file, and to run `/4_grille` again** — ⚠️ nothing below runs |
+| Its report names a missing file | 🔴 **Stop** — 📌 **say which file, and to run `/4_grille` again** — ⚠️ nothing below runs — `Next: run /4_grille <name>` |
 
 🔴 **A blocking file you named is filed**, in the folder it sits in:
 
@@ -618,14 +627,17 @@ your own.
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
 
-| The run | Next |
-|---|---|
-| A **sondeur** wrote a blocking file — or several did | 📌 Fill each `## Decision`, then `/4_grille` again — 🔴 **only those readings run** |
-| The **assembleur** wrote one | 📌 Fill its `## Decision`, then `/4_grille` again — 🔴 **the merge alone runs**, on the four files still standing |
-| **First time** — its questions file holds questions | 📌 **Answer them, then `/1_lexique`** — 🔴 it settles the vocabulary your answers brought, before the Rédacteur reads them |
-| **First time** — its questions file is empty | 📌 **`/4_grille` again** — 🔴 **the second time runs** |
-| **Second time** — `questions-existant-NN.md` holds questions | 📌 **Answer them, then `/1_lexique`** — ⚠️ **an arbitration becomes a block, like any other answer** |
-| **Second time** — its file is empty, written by the sondeur or by this command, or the second time had already said its last word | 📌 `/5_reclasse` — 🔴 the product file is closed |
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included.
+
+| The run | Next | `Next:` |
+|---|---|---|
+| A **sondeur** wrote a blocking file — or several did | 📌 Fill each `## Decision`, then `/4_grille` again — 🔴 **only those readings run** | `Next: answer blocking, then run /4_grille <name>` |
+| The **assembleur** wrote one | 📌 Fill its `## Decision`, then `/4_grille` again — 🔴 **the merge alone runs**, on the four files still standing | `Next: answer blocking, then run /4_grille <name>` |
+| **First time** — its questions file holds questions | 📌 **Answer them, then `/1_lexique`** — 🔴 it settles the vocabulary your answers brought, before the Rédacteur reads them | `Next: answer questions, then run /1_lexique <name>` |
+| **First time** — its questions file is empty | 📌 **`/4_grille` again** — 🔴 **the second time runs** | `Next: run /4_grille <name>` |
+| **Second time** — `questions-existant-NN.md` holds questions | 📌 **Answer them, then `/1_lexique`** — ⚠️ **an arbitration becomes a block, like any other answer** | `Next: answer questions, then run /1_lexique <name>` |
+| **Second time** — its file is empty, written by the sondeur or by this command, or the second time had already said its last word | 📌 `/5_reclasse` — 🔴 the product file is closed | `Next: run /5_reclasse <name>` |
 
 🔴 **Nothing else is yours**: no reading of what the questions say.
 

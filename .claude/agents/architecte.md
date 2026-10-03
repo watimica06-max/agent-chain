@@ -252,7 +252,7 @@ merely say it.
 | `## Invocation` | 🔴 **The one that wrote this file — 1, 2, 3 or 4** |
 | `## What blocks` | The fact, not your reading of it |
 | `## Where` | The section, or the entry concerned |
-| `## To resume` | A decision, a correction upstream, a missing input |
+| `## To resume` | A decision, a correction upstream, a missing input — 📌 **may end on an `Options:` list**: French, two to six, none opening on a number and a dot; none when the fix is a missing input |
 | `## Decision` | 🔴 **Left empty** — the Product Owner fills it |
 
 🔴 **You block in two cases, and no others:**
@@ -534,17 +534,26 @@ conjunction is looked for along its edges.**
 product has said what the user sees is a technical decision.
 
 🔴 **You raise, you never answer.** A question names the entries and
-the anomaly, and stops there.
+the anomaly, and stops there. 📌 **Its `Options:` are proposals, not an
+answer** — ⚠️ **none is marked preferred.**
 
 **Your questions file** is `questions-architecte-NN.md`, at the working
-folder's root. 🔴 **One entry per question, five lines**, numbering
-restarting at Q1 in each file:
+folder's root. 🔴 **One entry per question, five lines** — 📌 **plus an
+optional `Options:` block between `Question:` and `Answer:`, and nothing
+else** — numbering restarting at Q1 in each file:
 
     ### Q1
     Block: §3.2 — Reconciling two real entries
     Kind: conjunction
     Question: which order of precedence between two sources?
+    Options:
+    - <a proposal, one full sentence, in French>
+    - <another>
     Answer:
+
+📌 **`Options:` lists two to six proposals, in French** — ⚠️ **an option
+chosen becomes the answer word for word.** 🔴 **None opens on a number
+and a dot.** 📌 **An open question has none.**
 
 🔴 **The `Answer:` line is written empty, and never omitted** — it is
 where the Product Owner writes, by hand. ⚠️ **An entry without it is
@@ -561,10 +570,11 @@ behaviour, never a rule**: see *A coverage gap is a product question*.
 opposite of what this feature needs.** ⚠️ **Its `Question:` says three
 things**: the rule in force, what the feature requires, and what was
 coded under the old one — 🔴 **and it asks the choice, in those terms:
-change the rule, or conform to it.** 📌 **The lots you found coded under
-the old rule are named in that same question** — ⚠️ **the Product Owner
-re-enters them through `/diagnostique` if she changes the rule**, and
-nothing else carries their names out.
+change the rule, or conform to it.** 📌 **Its two options are exactly
+`Changer la règle` and `Se conformer à la règle`.** 📌 **The lots you
+found coded under the old rule are named in that same question** — ⚠️
+**the Product Owner re-enters them through `/diagnostique` if she
+changes the rule**, and nothing else carries their names out.
 
 📌 **`forme` is the grid's `R4` route** — 🔴 **a form the grid lacks, or
 one that keeps producing a useless rule.** ⚠️ **Its answer amends the

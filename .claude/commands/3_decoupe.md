@@ -14,7 +14,7 @@ block the Rédacteur just wrote or changed may carry two triggers**, and
 the sondeurs would probe it as one.
 
 **The argument is mandatory**: the feature folder name. Without it, ask
-for it and stop — never guess which feature is meant.
+for it and stop — never guess which feature is meant. `Next: stop argument missing`
 
 Feature folder: `docs/features/$ARGUMENTS/`
 
@@ -36,8 +36,8 @@ Feature folder: `docs/features/$ARGUMENTS/`
 | | What you do |
 |---|---|
 | Absent | 📌 Carry on |
-| Its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands, and that its `## Decision` is to fill |
-| Its `## Decision` is filled | 🔴 **Stop** — say `/2_structure` has to run first |
+| Its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands, and that its `## Decision` is to fill — `Next: answer blocking, then run /2_structure <name>` |
+| Its `## Decision` is filled | 🔴 **Stop** — say `/2_structure` has to run first — `Next: run /2_structure <name>` |
 
 ⚠️ **Read that one heading, nothing else.** 🔴 **A filled decision is
 `/2_structure`'s alone** — 📌 **the Rédacteur reads the file and applies
@@ -47,12 +47,14 @@ file** — 🔴 **the prompt never names it.**
 🔴 **Grep `Clarification needed` in `desc-produit.md`.**
 
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
-one**, and that `/2_structure` has to run first.
+one**, and that `/2_structure` has to run first — `Next: run /2_structure
+<name>`.
 
 🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
 `architecte` before touching it** — 📌 **a file holding questions is
 not yours to file**: ⚠️ **it waits on an answer, or its answers were
-never integrated.** 🔴 **Stop and say which.** 📌 **The architecte's is
+never integrated.** 🔴 **Stop and say which** — `Next: stop <file> waits
+on an answer or an integration`. 📌 **The architecte's is
 the one exception** — ⚠️ **it is `/conventions`'s, not this chain's**,
 and a `### Q` in it says nothing about the run; 🔴 **read the root as if
 it were not there** — and leave it there, see below.
@@ -79,7 +81,8 @@ is a normal outcome.
 ## Which blocks it looks at
 
 🔴 **First, `desc-produit.md` has to be there.** 📌 **One glob** — ⚠️
-**absent, you stop and name the file**: `/2_structure` has not run.
+**absent, you stop and name the file**: `/2_structure` has not run —
+`Next: run /2_structure <name>`.
 
 **Until the grid has run once — no `questions-sondeur-*.md` anywhere:**
 🔴 **every block.** 📌 **The prompt says *every block*, in those
@@ -236,7 +239,8 @@ too**: the Product Owner has to see it.
 🔴 **A list still short after the second invocation: say which blocks
 were never looked at** — ⚠️ **the split is incomplete and `/3a_genre`
 would run on it.** 📌 **No further invocation** — *Once it has reported*
-has already run the two it allows.
+has already run the two it allows. `Next: stop split incomplete: <blocks>
+never looked at`
 
 🔴 **A short list beside a `blocked_decoupeur.md`: relay the file and
 stop**, see below — 📌 **the blocks it never reached wait for the next
@@ -245,11 +249,15 @@ turn**, their markers still on them.
 **What to run next** — 📌 **indications for the Product Owner.**
 ⚠️ **You relay them; you run nothing after this command.**
 
-| What just happened | Next |
-|---|---|
-| It wrote a blocking file | 🔴 **Fill its `## Decision`, then `/2_structure`** — ⚠️ **it blocks on a sentence carrying two triggers, and rewording is the Rédacteur's.** 📌 **`/3_decoupe` again afterwards** |
-| It reports a block whose only trigger is a sequel | 📌 **Relay its identifier; the next step does not change** — 🔴 **nobody merges**: ⚠️ the two blocks carry one behaviour the grid probes twice, and 📌 **the Product Owner merges by hand when it bothers her** |
-| Otherwise | 📌 `/3a_genre`, whether it split anything or not |
+🔴 **The relay ends on its `Next:` line**, in `CLAUDE.md`'s grammar —
+📌 **every ending of this command names its own**, stops included. ⚠️
+**Nothing to split** takes the *Otherwise* row.
+
+| What just happened | Next | `Next:` |
+|---|---|---|
+| It wrote a blocking file | 🔴 **Fill its `## Decision`, then `/2_structure`** — ⚠️ **it blocks on a sentence carrying two triggers, and rewording is the Rédacteur's.** 📌 **`/3_decoupe` again afterwards** | `Next: answer blocking, then run /2_structure <name>` |
+| It reports a block whose only trigger is a sequel | 📌 **Relay its identifier; the next step does not change** — 🔴 **nobody merges**: ⚠️ the two blocks carry one behaviour the grid probes twice, and 📌 **the Product Owner merges by hand when it bothers her** | `Next: run /3a_genre <name>` |
+| Otherwise | 📌 `/3a_genre`, whether it split anything or not | `Next: run /3a_genre <name>` |
 
 🔴 **Nothing else is yours**: no reading of what a block says.
 
