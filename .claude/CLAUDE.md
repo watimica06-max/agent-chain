@@ -154,6 +154,27 @@ restarted.**
 
 ---
 
+## The `Next:` line
+
+🔴 **Every relay ends on one line, and one only, in this grammar** — 📌
+**stops included**: a stop is a relay too.
+
+    Next: run /<command> <arguments>
+    Next: answer <questions | blocking | questions and blocking>[, then run /<command> <arguments>]
+    Next: manual <what the Product Owner does>[, then run /<command> <arguments>]
+    Next: stop <reason>
+    Next: done
+
+📌 **It is the last line of the relay** — ⚠️ **nothing after it.** The
+cockpit application reads that line, and that line alone, to highlight
+the next command.
+
+🔴 **A command that does not know the next step prints `Next: stop
+<reason>`** — ⚠️ **never a guess.** 📌 **Each command gives its values**,
+ending by ending; this section gives the grammar, and nothing else.
+
+---
+
 ## Worktrees
 
 🔴 **Never pass `isolation` as a parameter** — it branches each call
