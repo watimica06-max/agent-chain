@@ -1,9 +1,14 @@
-# Chain cockpit — technical design, version 1
+# Chain cockpit — technical design, version 1.1
 
 A local application that lets the Product Owner run the agent chain
 without editing files by hand. Version 1 covers the two things that cost
 her the most time: **answering questions and blocking files**, and
 **knowing which command comes next**.
+
+*1.1 — corrected after `docs/app/analyse-v1.md`: the default is accepted
+by leaving `Answer:` empty (§8.1); five blocking-file shapes, not two
+(§8.2); a fourth place the Product Owner writes (§2, §8.3); `stop.md`
+is read by `/8_code` only (§7); `Next:` carries a second step (§9).*
 
 ---
 
@@ -19,8 +24,7 @@ her the most time: **answering questions and blocking files**, and
   same shape.
 - A "next step" panel: the command the chain asks for, highlighted, one
   click to run it.
-- A live view of the running command, a permission card, two stop
-  buttons.
+- A live view of the running command, a permission card, stop buttons.
 
 **Not in version 1**
 
@@ -38,15 +42,19 @@ her the most time: **answering questions and blocking files**, and
    If the application breaks, every command still runs from Claude Code
    and nothing is lost.
 2. **The application never decides the next step.** The command decides
-   it and says so on its last line (§9). The application only reads that
+   it and prints it on its last line (§9). The application reads that
    line and highlights the matching button.
 3. **The application writes only where the Product Owner writes today**:
-   `Answer:` fields, `## Decision` sections, `stop.md`. Everything else
-   is read-only.
+   - `Answer:` fields;
+   - `## Decision` sections;
+   - `## Décision du Product Owner` in `code/redecoupage.md`;
+   - `stop.md`.
+
+   Everything else is read-only.
 4. **Write back to the file you read.** A blocking file read from a live
    worktree is answered in that worktree; one read from the main
-   checkout is answered there. The only exception is `stop.md`, which
-   always goes in the main checkout (`PROCESS_MECANISMES.md` §stop.md).
+   checkout is answered there. The exception is `stop.md`, which always
+   goes in the main checkout.
 
 ---
 
@@ -116,100 +124,145 @@ Browser page  ⇄  local Python server  ⇄  Claude Agent SDK (Python)  ⇄  Cla
 
 ## 7. Stopping
 
-Two buttons, two meanings:
-
-- **"Stop at the next step"** writes `stop.md` in the main checkout. The
-  command stops before its next step, as it does today.
-- **"Stop now"** calls `interrupt()` on the SDK client. The current turn
-  ends unfinished.
+- **"Stop now"**, on every run, calls `interrupt()` on the SDK client.
+  The current turn ends unfinished.
+- **"Stop at the next lot"**, on `/8_code` only, writes `stop.md` in the
+  main checkout. 📌 `/8_code` is the only command that reads it
+  (`cmd/8_code.md:435-456`); on any other run the button is not shown.
 
 ---
 
 ## 8. File contracts
 
 The forms depend on files a machine can parse. Version 1 adds **one
-thing** to the files agents write, and changes nothing about how they
-read the Product Owner's answers.
+thing** to the files agents write — an `Options:` list — and changes
+nothing about how the chain reads the Product Owner's answers.
 
-### 8.1 Questions files — `questions-<agent>-NN.md`
+### 8.1 Questions files
 
-Target shape of one entry:
+**Where they are.**
+- `questions-<agent>-NN.md` at the working folder's root.
+- 📌 `convertisseur/technique-<nature>.md` and
+  `convertisseur/technique-transversal.md`: technical questions,
+  answered **in place**, never moved to the root.
+
+**Shape of one entry.**
 
 ```
 ### Q<n>
-<Key>: <value>              ← kept as today (Block:, Terms:, Entries:, Kind:)
-Question: <text>
+<Key>: <value>              ← as today (Block:, Terms:, Entries:, Kind:)
+Question: <text, in English, may run over several lines>
 Options:
-- <first proposal, full text>
-- <second proposal, full text>
-Défaut: <the exact text of one option>       ← optional, as today
+- <first proposal, a full sentence, in French>
+- <second proposal, a full sentence, in French>
+Défaut: <the exact text of one option> — <its source>      ← optional, as today
 Answer:
 ```
 
 - **`Options:` is the only addition.** It is optional: an open question
-  has none. It holds two to six proposals, each a full sentence that
-  makes sense on its own.
-- **`Défaut:`, when present, repeats one option's text verbatim**, so
-  the form can pre-select it.
-- **What the application writes in `Answer:`**:
-  - a chosen option → its **full text**, never its position, so every
-    reader keeps reading plain French as it does today;
-  - an option plus a remark → `<option text> — <remark>`;
-  - free text → the text as typed;
-  - a pre-selected default the Product Owner leaves as is → the default's
-    text, written explicitly.
+  has none. It holds two to six proposals.
+- **Options are written in French**, because an option chosen becomes
+  the answer word for word, and answers are in French by the chain's
+  rule. The question stays in English.
+- **No option opens on a number and a dot** (`1.`, `2.`): see §8.2,
+  shape 4.
+- **`Défaut:` keeps its present form.** Its text before ` — ` repeats
+  one option verbatim; what follows ` — ` is its source, unchanged.
 
-### 8.2 Blocking files — `blocked_<agent>.md`
+**What the application writes in `Answer:`.**
 
-- **Two families, as the file is today**:
-  - one block per file, with a single `## Decision`;
-  - numbered entries (`## Blocking N`), with one decision per entry.
-- **Addition**: an `Options:` list in each block or entry, in the same
-  shape as §8.1. Where it sits is settled by the analysis.
-- **Only what waits on the Product Owner is shown.** For the files the
-  Arbitre answers first, the application reuses the commands' own test
-  (`/8_code` step 4b: empty, partial, filled) and shows only the entries
-  left to her.
-- The Vérificateur's file carries no `## Decision` and is never shown as
-  a form.
+| The Product Owner… | `Answer:` |
+|---|---|
+| keeps the pre-selected default, with no remark | 🔴 **left empty** — the chain already reads an empty `Answer:` under a `Défaut:` as the default accepted, and the default keeps its source |
+| chooses an option | the option's full text |
+| chooses an option and adds a remark | `<option text> — <remark>` |
+| writes free text | the text as typed |
 
-### 8.3 Answers are tested the way the commands test them
+- 🔴 **The text always starts on the `Answer:` line**, after one space.
+  Further lines may follow: 141 real answers run over several lines. A
+  text that starts on the next line reads as empty to `^Answer:\s*$`.
+
+**What the parser accepts.** Real files carry prose before the first
+`### Q`, a `Question:` running over several lines, `Answer:` with no
+space after the colon, and older shapes with a title on the `Block:`
+line. The parser accepts all of them, and treats a file it cannot read
+as an error shown to the Product Owner, never as a file with no
+questions.
+
+### 8.2 Blocking files
+
+**Five shapes**, from `docs/app/analyse-v1.md` §B:
+
+| Shape | Writers | Her decision goes |
+|---|---|---|
+| 1. One block | 11 agents | under the single `## Decision`, on the line after one blank line |
+| 2. One block plus `## Invocation` | redacteur, architecte, fusionneur | same as shape 1; `## Invocation` is routing, never shown |
+| 3. Numbered, one `## Decision` per `## Blocking N` | qualifieur, classeur, redacteur inv. 3 | under **each** entry's `## Decision`, after one blank line |
+| 4. Numbered, one `## Decision` for all, answered `N. <text>` | detailleur, realisateur | under the single `## Decision`, one line `N. <text>` per entry left to her |
+| 5. One block appended several times | cadreur | under the **last** `## Decision` of the file |
+
+- **`Options:` sits at the end of the body of `To resume`**
+  (`## To resume`, or `### To resume` in shape 4), never under a new
+  heading.
+- **Shape 4 counts numbered lines.** The application writes exactly one
+  `N. <text>` line per answered entry, and never lets a remark start
+  with a number and a dot.
+
+**What is shown as waiting on her.** The application reuses the
+commands' own tests, unchanged:
+- shapes 1-3: `grep -A2 '^## Decision$'` — nothing under the heading;
+- shape 4: an entry whose number is absent under `## Decision`
+  (`cmd/8_code.md:319-340`). The Arbitre answers these first; only what
+  it leaves is hers;
+- shape 5: the last `## Decision`, empty — **unless** the block waits on
+  an Architecte verdict (`cmd/7_lots.md:189-190`), which is not hers;
+- the relecteur's file: only its « anything else » case
+  (`cmd/8_code.md:739`);
+- the vérificateur's file: never shown — it has no `## Decision`.
+
+**During a live run.** Only shape 4 is answered in a worktree, while the
+Arbitre polls it, 20 minutes at most. Every other blocking file is back
+in the main checkout before the command hands back.
+
+### 8.3 `code/redecoupage.md`
+
+After a third redécoupage, the Product Owner writes under
+`## Décision du Product Owner` (`cmd/8_code.md:606-611`,
+`cmd/7_lots.md:348-352`). Free text only.
+
+### 8.4 Answers are tested the way the commands test them
 
 Before saving, the application checks that what it wrote passes the
-command's own test (for example `^Answer:\s*$` no longer matches). A
-form that saves but leaves the file "unanswered" for the command is a
-bug.
+command's own test — for example `^Answer:\s*$` no longer matches, or
+the decision sits on the line `-A2` reads. A form that saves but leaves
+the file "unanswered" for the command is a bug.
 
 ---
 
 ## 9. The next step — `Next:`
 
-**Every command ends its relay with exactly one line in this grammar:**
+**Every command ends every relay — including every stop — with exactly
+one line in this grammar, as its last line:**
 
 ```
 Next: run /<command> <arguments>
-Next: answer questions
-Next: answer blocking
-Next: manual <what the Product Owner does, in a few words>
+Next: answer <questions | blocking | questions and blocking>[, then run /<command> <arguments>]
+Next: manual <what the Product Owner does>[, then run /<command> <arguments>]
 Next: stop <reason>
 Next: done
 ```
 
-- `run` → the page highlights the button of that command, with its
-  arguments filled in.
-- `answer` → the page highlights the matching form.
-- `manual` → the page shows the instruction; for example a test on the
-  emulator, or a manual command such as `/conventions` or `/fusion`.
-- `stop` and `done` → the page shows the reason.
+- `run` → the page highlights that command's button, arguments filled.
+- `answer` → the page opens the matching form, and shows the command
+  that follows once she has answered.
+- `manual` → the page shows the instruction, and the command that
+  follows if there is one.
+- `stop` → the page shows the reason and offers no button. 📌 A stop
+  is what the chain prints when it does not know the next step; the
+  application never fills that gap.
+- `done` → the page says the cycle step is complete.
 - **No `Next:` line** → the page says the next step is unknown and shows
-  the full relay. The application never guesses.
+  the full relay.
 
----
-
-## 10. Open points settled by the analysis
-
-- The exact list of agents and commands that write questions files and
-  blocking files, and the change each needs.
-- Where `Options:` sits in each blocking-file family.
-- Whether any reader of `Answer:` needs more than one line.
-- The `Next:` value for every way each command can end.
+The grammar is defined once, in `.claude/CLAUDE.md`. Each command gives
+its values.
