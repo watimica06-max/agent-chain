@@ -12,6 +12,7 @@
   --ok: #2e7d4f; --ok-soft: #e3f2e8;
   --err: #b3392f; --err-soft: #fbe7e4;          /* red: only what blocks a run */
   --warn: #8a6d1a; --warn-soft: #fbf4dc;
+  --idle: #6b7280; --idle-soft: #eeeeec;
   --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
   --radius: 10px; --side: 224px;
 }
@@ -21,6 +22,7 @@
     --accent: #6aa7cc; --accent-ink: #0f1a22; --accent-soft: #23343f;
     --ok: #6cc28f; --ok-soft: #1f3327;
     --err: #ec8a80; --err-soft: #3d2422; --warn: #e3c56b; --warn-soft: #3a3320;
+    --idle: #a3a9b1; --idle-soft: #2c2f33;
   }
 }
 * { box-sizing: border-box; }
@@ -36,6 +38,7 @@ button:hover:not(:disabled) { border-color: var(--accent); }
 button:disabled { opacity: .5; cursor: not-allowed; }
 button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
 button.big { min-height: 52px; padding: 12px 28px; font-size: 18px; }
+button.small { min-height: 36px; padding: 4px 14px; font-size: 15px; }
 button.danger { color: var(--err); border-color: var(--err); }
 button.allow { background: var(--ok); color: #fff; border-color: var(--ok); font-weight: 600; }
 button.link { border: none; background: none; color: var(--accent); padding: 4px 0; min-height: 0; text-decoration: underline; }
@@ -56,6 +59,7 @@ input[type=text]:focus, textarea:focus { outline: 2px solid var(--accent); outli
   background: var(--accent-soft); color: var(--accent); font-weight: 600; vertical-align: middle; }
 .badge.warn { background: var(--warn-soft); color: var(--warn); }
 .badge.err { background: var(--err-soft); color: var(--err); }
+.badge.plain { background: var(--idle-soft); color: var(--soft); }
 .notice { border-radius: 8px; padding: 10px 14px; margin: 10px 0; }
 .notice.err { background: var(--warn-soft); color: var(--warn); }
 .notice.warn { background: var(--warn-soft); color: var(--warn); }
@@ -71,6 +75,7 @@ pre.text { white-space: pre-wrap; word-wrap: break-word; font: inherit; margin: 
 button.chip:hover { border-color: var(--accent); }
 .chip b { font-weight: 650; }
 .chip.running { border-color: var(--accent); background: var(--accent-soft); }
+#tb-where { border-radius: 99px; min-height: 0; padding: 5px 16px; font-weight: 600; border-color: var(--accent); color: var(--accent); }
 #perm-badge { background: var(--err); border-color: var(--err); color: #fff; font-weight: 650; border-radius: 99px; min-height: 0; padding: 5px 14px; }
 #perm-banner { border-top: 1px solid var(--err); background: var(--err-soft); padding: 10px 20px 12px;
   max-height: 46vh; overflow: auto; }
@@ -89,6 +94,7 @@ button.chip:hover { border-color: var(--accent); }
 #side .spacer { flex: 1; }
 .count { margin-left: auto; background: var(--accent); color: var(--accent-ink); font-size: 13px; font-weight: 650;
   border-radius: 99px; padding: 0 9px; min-width: 24px; text-align: center; }
+.count.plain { background: var(--idle-soft); color: var(--soft); }
 .dot { margin-left: auto; width: 11px; height: 11px; border-radius: 50%; background: var(--accent);
   animation: pulse 1.6s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: .35; } }
@@ -108,6 +114,7 @@ button.chip:hover { border-color: var(--accent); }
 /* ------------------------------------------------------ dashboard */
 #next-card { padding: 28px 32px; border-left: 6px solid var(--accent); }
 #next-card .label { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--soft); margin-bottom: 6px; }
+#next-source { margin-left: 8px; text-transform: none; letter-spacing: 0; }
 #next-text { font-size: 26px; font-weight: 600; line-height: 1.3; margin-bottom: 18px; }
 #next-meta { margin-top: 14px; }
 .counters { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
@@ -126,11 +133,16 @@ button.chip:hover { border-color: var(--accent); }
 .runs td.log { font-family: var(--mono); font-size: 12px; color: var(--soft); word-break: break-all; }
 details summary { cursor: pointer; color: var(--accent); margin-top: 10px; }
 details pre { max-height: 360px; overflow: auto; background: var(--bg); padding: 12px; border-radius: 8px; }
+.whybox { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 10px; font-size: 15px; }
+.whybox .rule { font-family: var(--mono); font-size: 13px; font-weight: 650; color: var(--accent); margin-right: 6px; }
+.whybox .cite { font-family: var(--mono); font-size: 12px; color: var(--soft); }
+.whybox .files { font-family: var(--mono); font-size: 13px; color: var(--soft); }
+.whybox > div + div { margin-top: 8px; }
 
 /* ------------------------------------------------------ à répondre */
 #answer-top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
 #progress { font-size: 20px; font-weight: 650; }
-.filters { display: flex; gap: 8px; margin: 10px 0 4px; }
+.filters { display: flex; gap: 8px; margin: 10px 0 4px; flex-wrap: wrap; align-items: center; }
 .filters button { min-height: 38px; padding: 4px 16px; border-radius: 99px; }
 .filters button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 650; }
 .grp { margin-top: 20px; }
@@ -158,11 +170,53 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
 .sumline { margin: 4px 0; font-size: 15px; }
 .sumline.ok { color: var(--ok); } .sumline.err { color: var(--warn); font-weight: 600; }
 
+/* ------------------------------------------------------------ flow */
+.flow-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.flow-head h2 { margin: 0; }
+.legend { display: flex; gap: 6px; flex-wrap: wrap; }
+.flow { list-style: none; margin: 0; padding: 0; position: relative; }
+.flow::before { content: ""; position: absolute; left: 21px; top: 22px; bottom: 22px; width: 2px; background: var(--line); }
+.step { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: start;
+  padding: 8px 12px 8px 0; border-radius: var(--radius); border: 1px solid transparent; }
+.step + .step { margin-top: 4px; }
+.step .num { position: relative; z-index: 1; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 700; font-size: 15px; background: var(--idle-soft); color: var(--idle); border: 2px solid var(--idle-soft); }
+.step .sname { font-weight: 650; font-size: 17px; }
+.step .scmd { font-family: var(--mono); font-size: 13px; color: var(--soft); }
+.step .line1 { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; min-height: 26px; }
+.step .acts { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; padding-top: 2px; }
+.step .acts button { min-height: 36px; padding: 4px 14px; font-size: 15px; }
+.step .extra { font-size: 14px; color: var(--soft); margin-top: 2px; }
+.stc { display: inline-block; font-size: 13px; padding: 1px 10px; border-radius: 99px; font-weight: 650; }
+.st-faite .num { background: var(--ok); color: #fff; border-color: var(--ok); }
+.stc.st-faite { background: var(--ok-soft); color: var(--ok); }
+.st-attend .num { background: var(--warn-soft); color: var(--warn); border-color: var(--warn); }
+.stc.st-attend { background: var(--warn-soft); color: var(--warn); }
+.st-encours .num { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); animation: pulse 1.6s ease-in-out infinite; }
+.stc.st-encours { background: var(--accent-soft); color: var(--accent); }
+.st-bloquee .num { background: var(--err-soft); color: var(--err); border-color: var(--err); }
+.stc.st-bloquee { background: var(--err-soft); color: var(--err); }
+.st-afaire .num { background: var(--card); color: var(--soft); border-color: var(--line); }
+.stc.st-afaire { background: var(--idle-soft); color: var(--soft); }
+.st-inconnu .num { background: var(--card); color: var(--soft); border: 2px dashed var(--soft); }
+.stc.st-inconnu { background: none; color: var(--soft); border: 1px dashed var(--soft); }
+.step.is-next { border-color: var(--accent); background: var(--accent-soft); padding-top: 14px; padding-bottom: 14px; }
+.step.is-next .sname { font-size: 20px; }
+.next-tag { font-size: 13px; font-weight: 650; color: var(--accent); background: var(--card); border: 1px solid var(--accent);
+  border-radius: 99px; padding: 1px 10px; }
+.step .slot:empty { display: none; }
+.step .slot { margin-top: 10px; }
+.step .whybox { margin-top: 8px; }
+.flow-note { margin-top: 12px; }
+.corr-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 16px; }
+.corr-list button.sel { border: 2px solid var(--accent); background: var(--accent-soft); font-weight: 650; }
+
 /* -------------------------------------------------------------- run */
-#run-head .title { font-size: 20px; font-weight: 600; }
+#run-panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); padding: 14px 16px; }
+#run-head .title { font-size: 17px; font-weight: 600; }
 #agents .badge { margin-right: 6px; }
-#stream { height: min(560px, calc(100vh - 360px)); min-height: 220px; overflow: auto; background: var(--card); border-radius: var(--radius);
-  padding: 12px 16px; margin-top: 16px; font-size: 15px; border: 1px solid var(--line); }
+#stream { height: min(420px, calc(100vh - 380px)); min-height: 200px; overflow: auto; background: var(--bg); border-radius: 8px;
+  padding: 10px 14px; margin-top: 12px; font-size: 15px; border: 1px solid var(--line); }
 #stream .ev { margin: 0 0 8px; }
 #stream .who { font-weight: 650; color: var(--accent); margin-right: 6px; }
 #stream .tool { color: var(--soft); font-family: var(--mono); font-size: 13px; margin: 0 0 4px; }
@@ -192,6 +246,7 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
     <button id="tb-folder" class="chip hidden" title="Dossiers"></button>
     <button id="tb-mode" class="chip hidden" title="Mode de permission"></button>
     <span id="tb-run" class="chip hidden"></span>
+    <button id="tb-where" class="hidden" title="Relire le dossier et revérifier la dernière ligne Next:">Où on en est ?</button>
     <span class="grow"></span>
     <button id="perm-badge" class="hidden">Autorisation demandée</button>
   </div>
@@ -202,7 +257,8 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
   <nav id="side" aria-label="Menu">
     <a href="#dashboard" id="nav-dashboard">Tableau de bord</a>
     <a href="#answer" id="nav-answer">À répondre <span id="nav-answer-count" class="count hidden"></span></a>
-    <a href="#run" id="nav-run">Run <span id="nav-run-dot" class="dot hidden" title="Une commande tourne"></span></a>
+    <a href="#chaine" id="nav-chaine">Chaîne <span id="nav-run-dot" class="dot hidden" title="Une commande tourne"></span></a>
+    <a href="#correction" id="nav-correction">Correction <span id="nav-corr-count" class="count hidden"></span></a>
     <span class="spacer"></span>
     <a href="#settings" id="nav-settings">Paramètres</a>
   </nav>
@@ -222,8 +278,8 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
         <p class="muted small">Si la fenêtre de choix ne s'ouvre pas, collez le chemin dans le champ.</p>
       </div>
       <div class="card" id="work-card">
-        <h2>Dossier de travail</h2>
-        <p class="muted small">Une feature de <span class="mono">docs/features/</span>, ou l'un de ses <span class="mono">bugfix-NN/</span>.</p>
+        <h2>Feature</h2>
+        <p class="muted small">Une feature de <span class="mono">docs/features/</span>. Ses corrections <span class="mono">bugfix-NN/</span> sont sous « Correction ».</p>
         <div class="folders" id="work-list"><span class="muted">Choisissez d'abord le dossier de l'application.</span></div>
         <div class="row" style="margin-top:14px"><button id="btn-open" class="primary" disabled>Ouvrir</button></div>
       </div>
@@ -236,10 +292,13 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
     <!-- ========================= Tableau de bord ========================= -->
     <section id="scr-dashboard" class="screen hidden">
       <div class="card" id="next-card">
-        <div class="label">Prochaine étape</div>
+        <div class="label">Prochaine étape <span id="next-source" class="badge hidden"></span></div>
+        <div id="next-message" class="notice warn hidden"></div>
         <div id="next-text">—</div>
         <div id="next-detail" class="row"></div>
         <div id="next-meta" class="muted small"></div>
+        <div class="row" style="margin-top:6px"><button id="next-why-btn" class="link">Pourquoi ?</button></div>
+        <div id="next-why" class="hidden"></div>
         <details id="relay-box" class="hidden"><summary>Relais complet</summary><pre class="text" id="relay"></pre></details>
       </div>
       <div class="counters">
@@ -274,20 +333,30 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
       </div>
     </section>
 
-    <!-- ================================ Run ================================ -->
-    <section id="scr-run" class="screen hidden">
-      <div class="card" id="run-head">
-        <div class="title" id="run-status">Aucune commande lancée depuis l'ouverture du serveur.</div>
-        <div id="agents" style="margin-top:8px"></div>
-        <div id="idle-box" class="notice warn hidden"></div>
-        <div class="row" style="margin-top:12px">
-          <button id="btn-stop-now" class="danger" disabled>Arrêter maintenant</button>
-          <button id="btn-stop-next" class="hidden" disabled>Arrêter au prochain lot</button>
-        </div>
-        <div id="stop-file" class="notice warn hidden"></div>
+    <!-- ============================== Chaîne ============================== -->
+    <section id="scr-chaine" class="screen hidden">
+      <div class="flow-head">
+        <h2>Chaîne</h2>
+        <span class="muted" id="chaine-feature"></span>
+        <span class="grow"></span>
+        <span class="legend" id="chaine-legend"></span>
       </div>
-      <div id="stream" aria-label="Flux de la commande"></div>
-      <div class="card" id="run-end" style="margin-top:20px"></div>
+      <div id="chaine-alerts"></div>
+      <ol class="flow" id="flow-main" aria-label="La chaîne principale"></ol>
+      <div id="run-fallback" class="flow-note"></div>
+    </section>
+
+    <!-- ============================ Correction ============================ -->
+    <section id="scr-correction" class="screen hidden">
+      <div class="flow-head">
+        <h2>Correction</h2>
+        <span class="grow"></span>
+        <button id="btn-new-bugfix" class="primary">Nouvelle correction</button>
+      </div>
+      <div id="corr-list" class="corr-list"></div>
+      <div id="corr-note" class="muted small"></div>
+      <ol class="flow" id="flow-corr" aria-label="La chaîne de correction"></ol>
+      <div class="card" id="buglist-card" style="margin-top:20px"></div>
     </section>
 
     <!-- ============================ Paramètres ============================ -->
@@ -311,7 +380,7 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
       </div>
       <div class="card sec" id="sec-commands">
         <h2>Commandes</h2>
-        <p class="muted small">La sortie de secours : le chemin normal est le bouton du tableau de bord. Une commande que le dernier relais n'a pas nommée demande confirmation.</p>
+        <p class="muted small">La sortie de secours : le chemin normal est la chaîne. Une commande que le dernier relais n'a pas nommée demande confirmation.</p>
         <div id="set-commands"></div>
       </div>
       <div class="card sec" id="sec-maint">
@@ -319,6 +388,24 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
         <div id="set-maint"></div>
       </div>
     </section>
+  </div>
+</div>
+
+<!-- The live run: moved under the step it belongs to. -->
+<div id="run-home" class="hidden">
+  <div id="run-panel">
+    <div id="run-head">
+      <div class="title" id="run-status">Aucune commande lancée depuis l'ouverture du serveur.</div>
+      <div id="agents" style="margin-top:6px"></div>
+      <div id="idle-box" class="notice warn hidden"></div>
+      <div class="row" style="margin-top:10px">
+        <button id="btn-stop-now" class="danger small" disabled>Arrêter maintenant</button>
+        <button id="btn-stop-next" class="small hidden" disabled>Arrêter au prochain lot</button>
+      </div>
+      <div id="stop-file" class="notice warn hidden"></div>
+    </div>
+    <div id="stream" aria-label="Flux de la commande"></div>
+    <div id="run-end" style="margin-top:12px"></div>
   </div>
 </div>
 
@@ -358,13 +445,22 @@ let F = null;        // /api/forms
 let seen = 0;        // last event seq
 let es = null;
 let answerFilter = "all";     // all | questions | blocking
+let stepFilter = null;        // {step, chain, name} — « À répondre » filtered on one step
 let savedCount = 0;           // entries saved since the page opened
 let diagBusy = false;
+let corrSel = null;           // the bugfix-NN shown under « Correction »
+const whyOpen = new Set();    // « Pourquoi ? » left open across re-renders
+let opened = false;           // the first state of this page is a scan trigger (« ouverture »)
 
 const running = () => !!(S.run && S.run.status !== "ended");
+// The run panel moves under its step; kept by reference, parked while a flow re-renders.
+const RUN_PANEL = $("run-panel");
+function parkRun() { $("run-home").append(RUN_PANEL); }
+const STATE_CLASS = {"faite": "st-faite", "t'attend": "st-attend", "en cours": "st-encours",
+                     "bloquée": "st-bloquee", "à faire": "st-afaire", "inconnu": "st-inconnu"};
 
 // ================================================================ routes
-const SCREENS = ["dashboard", "answer", "run", "settings"];
+const SCREENS = ["dashboard", "answer", "chaine", "correction", "settings"];
 function currentRoute() {
   const h = (location.hash || "").replace("#", "");
   return SCREENS.includes(h) ? h : "dashboard";
@@ -374,16 +470,17 @@ function go(name, section) {
   if (section) setTimeout(() => { const s = $(section); if (s) s.scrollIntoView({behavior: "smooth", block: "start"}); }, 30);
 }
 function route() {
-  const opened = !!S.open;
-  $("shell").classList.toggle("nofolder", !opened);
-  $("start").classList.toggle("hidden", opened);
+  const isOpen = !!S.open;
+  $("shell").classList.toggle("nofolder", !isOpen);
+  $("start").classList.toggle("hidden", isOpen);
   const r = currentRoute();
-  for (const s of SCREENS) $("scr-" + s).classList.toggle("hidden", !opened || s !== r);
+  for (const s of SCREENS) $("scr-" + s).classList.toggle("hidden", !isOpen || s !== r);
   for (const s of SCREENS) {
     const a = $("nav-" + s);
-    if (s === r && opened) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    if (s === r && isOpen) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   }
-  if (opened && r === "answer") hint();
+  if (isOpen && r === "answer") hint();
+  if (isOpen && (r === "chaine" || r === "correction")) placeRun();
 }
 window.addEventListener("hashchange", route);
 
@@ -407,7 +504,7 @@ function showStart(err) {
 
 function renderWorkList(list) {
   const box = $("work-list"); box.replaceChildren();
-  if (!list.length) box.append(el("span", {class: "muted", text: "Aucun dossier sous docs/features/."}));
+  if (!list.length) box.append(el("span", {class: "muted", text: "Aucune feature sous docs/features/."}));
   for (const w of list) {
     box.append(el("button", {text: w, class: w === chosenWork ? "sel" : "",
       onclick: () => { chosenWork = w; renderWorkList(list); $("btn-open").disabled = false; },
@@ -439,13 +536,22 @@ $("btn-open").onclick = () => openPair(chosenApp, chosenWork);
 
 async function changeFolder() { await api("/api/close", {}); savedCount = 0; await refreshState(); }
 async function openPair(app, work) {
-  try { await api("/api/open", {app, work}); savedCount = 0; location.hash = "#dashboard"; await refreshState(); }
+  try { await api("/api/open", {app, work}); savedCount = 0; corrSel = null; stepFilter = null; opened = false;
+        location.hash = "#dashboard"; await refreshState(); }
   catch (e) { showStart(e.message); }
 }
 
 // ======================================================= état général
-async function refreshState() {
-  S = await api("/api/state");
+// The first state of the page, the button and a save of answers are scan
+// triggers: the server re-checks the stored Next: against the files (§2.3).
+async function refreshState(reason) {
+  if (!opened || reason) {
+    const probe = await api("/api/state");
+    if (probe.open) { S = await api("/api/check", {reason: reason || "ouverture"}); opened = true; }
+    else S = probe;
+  } else {
+    S = await api("/api/state");
+  }
   if (!S.open) { closeEvents(); showStart(S.load_error); return; }
   openEvents();
   route();
@@ -454,72 +560,152 @@ async function refreshState() {
 }
 
 function renderAll() {
-  renderChrome(); renderDashboard(); renderRun(); renderSettings();
+  renderChrome(); renderDashboard(); renderChaine(); renderCorrection(); renderRun(); renderSettings();
+  placeRun();
 }
 
 // ---------------------------------------------------------- top bar
 function renderChrome() {
-  const open = !!S.open;
-  $("tb-folder").classList.toggle("hidden", !open);
-  $("tb-mode").classList.toggle("hidden", !open);
-  $("tb-run").classList.toggle("hidden", !open);
-  if (!open) return;
-  $("tb-folder").replaceChildren(el("b", {text: S.working_folder}),
+  const isOpen = !!S.open;
+  for (const id of ["tb-folder", "tb-mode", "tb-run", "tb-where"]) $(id).classList.toggle("hidden", !isOpen);
+  if (!isOpen) return;
+  $("tb-folder").replaceChildren(el("b", {text: S.feature || S.working_folder}),
     el("span", {class: "muted", text: " · " + baseName(S.app_folder)}));
   $("tb-mode").replaceChildren("Mode : ", el("b", {text: S.mode === "manuel" ? "Manuel" : "Auto"}));
   const tb = $("tb-run");
   tb.classList.toggle("running", running());
   tb.textContent = running() ? `${S.run.prompt} — depuis ${S.run.started_at.slice(11, 16)}` : "Au repos";
   $("nav-run-dot").classList.toggle("hidden", !running());
+  const nc = (S.bugfixes || []).length;
+  $("nav-corr-count").textContent = nc; $("nav-corr-count").classList.toggle("hidden", !nc);
+  $("nav-corr-count").classList.add("plain");
 }
 function baseName(p) { return (p || "").split(/[\\/]/).filter(Boolean).pop() || ""; }
 $("tb-folder").onclick = () => go("settings", "sec-folders");
 $("tb-mode").onclick = () => go("settings", "sec-mode");
 $("perm-badge").onclick = () => { $("perm-banner").scrollTop = 0; };
+$("tb-where").onclick = async () => {
+  const b = $("tb-where"); b.disabled = true;
+  try { await refreshState("bouton"); } catch (e) { alert(e.message); }
+  finally { b.disabled = false; }
+};
+
+// ------------------------------------------------------------ steps
+function chainSteps(chain) {
+  if (!S.scan) return [];
+  if (chain === "main") return S.scan.main;
+  const c = S.scan.corrections.find((x) => x.name === chain);
+  return c ? c.steps : [];
+}
+function findStep(chain, id) { return chainSteps(chain).find((s) => s.id === id) || null; }
+function chainProposal(chain) {
+  if (!S.scan) return null;
+  if (chain === "main") return S.scan.main_proposal;
+  const c = S.scan.corrections.find((x) => x.name === chain);
+  return c ? c.proposal : null;
+}
+function stepName(id) {
+  const s = (S.scan && [...S.scan.main, ...S.scan.corrections.flatMap((c) => c.steps)].find((x) => x.id === id));
+  return s ? s.name : id;
+}
+
+// « Pourquoi ? » — the rule of scan_rules.md and the files that gave a state.
+function whyBox(step, extra) {
+  const box = el("div", {class: "whybox"});
+  for (const x of extra || []) box.append(x);
+  if (!step) return box;
+  box.append(el("div", {}, el("b", {text: `« ${step.name} » — ${step.state}`})));
+  for (const w of step.why || []) {
+    box.append(el("div", {},
+      el("span", {class: "rule", text: w.rule}), w.text,
+      w.files && w.files.length ? el("div", {class: "files", text: "Fichiers : " + w.files.join(" · ")}) : null,
+      w.cite ? el("div", {class: "cite", text: "Règle (scan_rules.md) : " + w.cite}) : null));
+  }
+  if (step.confirm) box.append(el("div", {class: "small"}, el("span", {class: "rule", text: "§1.2"}),
+    `/${step.command} demande toujours confirmation : ${step.confirm}.`));
+  return box;
+}
 
 // ---------------------------------------------------------- dashboard
-function currentNext() {
-  if (running()) return null;
-  return S.last ? S.last.next : null;
-}
 const openCount = () => F ? F.questions.length + F.blocking.length + (F.redecoupage ? 1 : 0) : 0;
+function openCountFor(step, chain) {
+  if (!F) return 0;
+  const all = [...F.questions, ...F.blocking, ...(F.redecoupage ? [F.redecoupage] : [])];
+  return all.filter((e) => e.step === step && (!chain || e.chain === chain)).length;
+}
 
 function renderDashboard() {
-  const n = currentNext();
+  const d = S.decision;
   const detail = $("next-detail"); detail.replaceChildren();
-  const card = $("next-card");
   $("relay-box").classList.add("hidden");
   $("relay-box").open = false;
-  if (running()) {
-    $("next-text").textContent = "Une commande tourne : " + S.run.prompt;
-    detail.append(el("button", {class: "primary big", text: "Voir le run", onclick: () => go("run")}));
-  } else if (!S.last || !n) {
-    $("next-text").textContent = "Aucune étape connue. Choisis une commande";
-    detail.append(el("button", {class: "link", text: "Voir la liste des commandes", onclick: () => go("settings", "sec-commands")}));
+  const src = $("next-source");
+  src.classList.toggle("hidden", !d || !d.label);
+  src.className = "badge" + (d && d.source === "dossier" ? " plain" : "") + (d && d.label ? "" : " hidden");
+  src.textContent = d && d.label ? d.label : "";
+  $("next-message").classList.toggle("hidden", !(d && d.message));
+  $("next-message").textContent = d && d.message ? d.message : "";
+  if (!d) { $("next-text").textContent = "—"; return; }
+  const n = d.next || {kind: "unknown"};
+  $("next-text").textContent = n.french || "—";
+  if (d.note) detail.append(el("div", {class: "muted small", style: "width:100%", text: d.note}));
+  if (d.source === "run") {
+    detail.append(el("button", {class: "primary big", text: "Voir la chaîne", onclick: () => goStep(d.chain, d.step)}));
   } else if (n.kind === "run") {
-    $("next-text").textContent = n.french;
-    detail.append(el("button", {class: "primary big", text: `Lancer /${n.command} ${n.args}`.trim(),
-      onclick: () => runCommand(n.command, n.args, true)}));
+    detail.append(el("button", {class: "primary big", text: `Lancer /${n.command} ${n.args || ""}`.trim(),
+      onclick: () => launchNext(d)}));
   } else if (n.kind === "answer") {
-    $("next-text").textContent = n.french;
-    detail.append(el("button", {class: "primary big", text: `Répondre (${openCount()})`, onclick: () => go("answer")}));
-    if (n.command) detail.append(el("span", {class: "muted", text: `Ensuite : /${n.command} ${n.args}`}));
+    // The folder's proposal is one step's answers; a chain's Next: names
+    // questions, blocking or both — which may belong to several steps.
+    const byStep = d.source === "dossier" && d.step;
+    const kind = n.what === "questions" ? "questions" : n.what === "blocking" ? "blocking" : "all";
+    const k = byStep ? openCountFor(d.step, d.chain) : kindCount(kind);
+    detail.append(el("button", {class: "primary big", text: `Répondre (${k})`,
+      onclick: () => byStep ? openAnswers(d.step, d.chain) : openAnswersOfKind(kind)}));
+    if (n.command) detail.append(el("span", {class: "muted", text: `Ensuite : /${n.command} ${n.args || ""}`}));
+  } else if (n.kind === "manual") {
+    if (d.step === "diagnostique" && d.chain && d.chain !== "main") {
+      detail.append(el("button", {class: "primary big", text: "Écrire la bug-list", onclick: () => { corrSel = d.chain; bug.name = null; renderCorrection(); go("correction"); }}));
+    }
+    if (d.step === "test" || (d.proposal && d.proposal.step === "test" && !n.command)) {
+      detail.append(el("button", {class: "primary big", text: "Déployer", onclick: () => launchStep(findStep("main", "test"), "main")}));
+      if (S.recette) detail.append(el("span", {class: "muted", text: `À tester : ${S.recette.rel} (${S.recette.count} points)`}));
+    }
+    if (n.command) detail.append(el("span", {class: "muted", text: `Ensuite : /${n.command} ${n.args || ""}`}));
   } else if (n.kind === "unknown") {
     $("next-text").textContent = "Le dernier relais ne finit pas par une ligne Next:.";
     $("relay-box").classList.remove("hidden"); $("relay-box").open = true;
     if (S.run && S.run.can_continue) detail.append(el("button", {class: "primary big", text: "Continuer la session", onclick: continueSession}));
-  } else {                     // manual, stop, done: the text, no button
-    $("next-text").textContent = n.french;
-  }
-  $("next-meta").textContent = S.last ? `Dernier relais : ${S.last.command} — ${S.last.outcome || ""} — ${(S.last.at || "").replace("T", " ")}` : "";
-  if (S.last && !running() && n && n.kind !== "unknown") $("relay-box").classList.remove("hidden");
+  }                            // stop, done, a blocked or unknown step: the text, no button (§9)
+  $("next-meta").textContent = S.last ? `Dernier relais : ${S.last.command} — ${S.last.outcome || ""} — ${(S.last.at || "").replace("T", " ")}` : "Aucun relais mémorisé pour cette feature.";
+  if (S.last && !running() && n.kind !== "unknown") $("relay-box").classList.remove("hidden");
   $("relay").textContent = S.last ? (S.last.relay || "(relais vide)") : "";
+
+  // « Pourquoi ? » on the card: where the step comes from, and its state's rule.
+  const wb = $("next-why");
+  const lines = [];
+  if (d.source === "chaine") {
+    const raw = (S.last && S.last.next && S.last.next.raw) || "";
+    lines.push(el("div", {}, el("span", {class: "rule", text: "§2"}),
+      d.fresh ? `Le run ${S.last ? S.last.command : ""} vient de finir : sa ligne est prise telle quelle, sans vérification.`
+              : "La dernière ligne Next: a été vérifiée contre les fichiers : rien ne la contredit.",
+      raw ? el("div", {class: "files", text: raw}) : null));
+  } else if (d.source === "dossier") {
+    lines.push(el("div", {}, el("span", {class: "rule", text: "§1.4"}),
+      "La première étape de la chaîne qui n'est pas faite" + (d.chain && d.chain !== "main" ? ` (correction ${d.chain})` : "") + "."));
+  }
+  if (d.dropped) lines.push(el("div", {}, el("span", {class: "rule", text: d.dropped.rule}),
+    "Ligne écartée : " + d.dropped.reason + ".",
+    d.dropped.logged_to ? el("div", {class: "files", text: "Écrit au journal : " + d.dropped.logged_to}) : null));
+  wb.replaceChildren(whyBox(d.step ? findStep(d.chain || "main", d.step) : null, lines));
+  wb.classList.toggle("hidden", !whyOpen.has("card"));
+  $("next-why-btn").onclick = () => { whyOpen.has("card") ? whyOpen.delete("card") : whyOpen.add("card"); wb.classList.toggle("hidden"); };
 
   const nq = F ? F.questions.length : 0, nb = F ? F.blocking.length + (F.redecoupage ? 1 : 0) : 0;
   $("cnt-q").textContent = nq; $("cnt-q").classList.toggle("zero", !nq);
   $("cnt-b").textContent = nb; $("cnt-b").classList.toggle("zero", !nb);
-  $("cnt-questions").onclick = () => { answerFilter = "questions"; renderForms(); };
-  $("cnt-blocking").onclick = () => { answerFilter = "blocking"; renderForms(); };
+  $("cnt-questions").onclick = () => { answerFilter = "questions"; stepFilter = null; renderForms(); };
+  $("cnt-blocking").onclick = () => { answerFilter = "blocking"; stepFilter = null; renderForms(); };
 
   renderAlerts();
   renderHistory();
@@ -528,11 +714,12 @@ function renderDashboard() {
 function renderAlerts() {
   const box = $("alerts"); box.replaceChildren();
   const add = (cls, ...kids) => box.append(el("div", {class: "alert " + cls}, ...kids));
+  for (const a of (S.scan && S.scan.alerts) || []) if (a.rule === "G-WT") add("", a.text);
   for (const w of S.worktrees || []) add("", `Un worktree est resté après un run : `, el("span", {class: "mono", text: w}));
   if (S.stop_file) add("", "stop.md est présent : /8_code s'arrêtera après le lot en cours. ",
     el("button", {class: "link", text: "Retirer stop.md", onclick: disarm}));
   for (const e of (F && F.errors) || []) add("",
-    "Fichier illisible : ", el("b", {class: "mono", text: e.rel}), " — " + e.message);
+    e.level === "warning" ? "À vérifier : " : "Fichier illisible : ", el("b", {class: "mono", text: e.rel}), " — " + e.message);
   const d = S.diagnostic;
   if (!d) add("", "Le diagnostic n'a jamais été lancé. ",
     el("button", {class: "link", text: "Le lancer", onclick: () => go("settings", "sec-diag")}));
@@ -558,17 +745,178 @@ function renderHistory() {
     el("thead", {}, el("tr", {}, el("th", {text: "Commande"}), el("th", {text: "Fin"}), el("th", {text: "Next"}), el("th", {text: "Journal"}))), tb));
 }
 
-async function runCommand(name, args, named) {
+// ------------------------------------------------------------ launch
+// One click for the step the chain named or the folder proposes; a
+// confirmation for any other, and always for the commands §1.2 flagged.
+function isNamed(step, chain) {
+  const d = S.decision;
+  if (d && d.source !== "run" && d.next && d.next.command === step.command && (d.chain || "main") === chain) return true;
+  const p = chainProposal(chain);
+  return !!(p && p.step === step.id && p.proposable);
+}
+function argsFor(step, chain) {
+  const d = S.decision;
+  if (d && d.next && d.next.command === step.command && (d.chain || "main") === chain && d.next.args) return d.next.args;
+  return step.command === "deploie" ? "" : S.feature;
+}
+async function launchStep(step, chain) {
+  if (!step || running()) return;
+  const cmd = step.command, args = argsFor(step, chain);
+  const reasons = [];
+  if (!isNamed(step, chain)) reasons.push("Ce n'est ni l'étape que la chaîne a nommée, ni celle que le dossier propose.");
+  if (step.confirm) reasons.push(`/${cmd} demande toujours confirmation : ${step.confirm}.`);
+  if (step.note && chain === "main") reasons.push(step.note);
+  if (step.state === "faite") reasons.push(`L'étape est faite d'après le dossier.`);
+  if (reasons.length && !confirm(`Lancer /${cmd} ${args} ?\n\n` + reasons.join("\n"))) return;
+  await runCommand(cmd, args, chain, step.id);
+}
+function launchNext(d) {
+  const st = findStep(d.chain || "main", d.step) || {id: d.step, command: d.next.command, name: d.next.command, confirm: null, state: ""};
+  launchStep(st, d.chain || "main");
+}
+
+async function runCommand(name, args, chain, stepId) {
   if (running()) return;
-  // One click for the command Next: names; a confirmation for any other.
-  if (!named && !confirm(`Lancer /${name} ${args || ""} ? Ce n'est pas l'étape que le dernier relais a nommée.`)) return;
   try {
     await api("/api/run", {command: name, args: args || ""});
     $("stream").replaceChildren();
-    location.hash = "#run";
     await refreshState();
+    goStep(chain || (S.run_place && S.run_place.chain) || "main", stepId || (S.run_place && S.run_place.step));
   } catch (e) { alert(e.message); }
 }
+
+function goStep(chain, step) {
+  if (chain && chain !== "main") { corrSel = chain; renderCorrection(); go("correction"); }
+  else go("chaine");
+  setTimeout(() => { placeRun(); const s = $(`step-${chain || "main"}-${step}`); if (s) s.scrollIntoView({block: "center"}); }, 40);
+}
+
+function kindCount(kind) {
+  if (!F) return 0;
+  const nq = F.questions.length, nb = F.blocking.length + (F.redecoupage ? 1 : 0);
+  return kind === "questions" ? nq : kind === "blocking" ? nb : nq + nb;
+}
+function openAnswersOfKind(kind) { stepFilter = null; answerFilter = kind; renderForms(); go("answer"); }
+function openAnswers(step, chain) {
+  stepFilter = step ? {step, chain: chain || null, name: stepName(step)} : null;
+  answerFilter = "all";
+  renderForms();
+  go("answer");
+}
+
+// -------------------------------------------------------------- flows
+function renderFlow(box, steps, chain, launchable, offNote) {
+  if (box.contains(RUN_PANEL)) parkRun();
+  box.replaceChildren();
+  const d = S.decision || {};
+  const hlChain = d.chain || "main";
+  // The step that stands out: the run going, the chain's Next:, else the folder's proposal.
+  let hl = null;
+  if (d.source === "run") hl = d.step;
+  else if (d.next && ["run", "answer"].includes(d.next.kind)) hl = d.step;
+  else if (d.next && (d.next.kind === "manual" || d.next.kind === "done")) hl = d.proposal && d.proposal.chain === chain ? d.proposal.step : null;
+  steps.forEach((s, i) => {
+    const isNext = hl && hlChain === chain && s.id === hl;
+    const cls = "step " + (STATE_CLASS[s.state] || "st-inconnu") + (isNext ? " is-next" : "");
+    const acts = el("div", {class: "acts"});
+    const waiting = openCountFor(s.id, chain === "main" ? "main" : chain);
+    if (s.state === "t'attend" || waiting) acts.append(el("button", {class: s.state === "t'attend" ? "primary" : "",
+      text: `Répondre (${waiting})`, onclick: () => openAnswers(s.id, chain)}));
+    if (s.command && s.id !== "test") acts.append(el("button", {class: isNext && d.next && d.next.kind === "run" ? "primary" : "",
+      text: "Lancer", disabled: !launchable || running() || undefined, title: launchable ? `/${s.command}` : offNote,
+      onclick: () => launchStep(s, chain)}));
+    if (s.id === "test") acts.append(el("button", {class: isNext ? "primary" : "", text: "Déployer",
+      disabled: running() || undefined, title: "/deploie", onclick: () => launchStep(s, chain)}));
+    const key = `${chain}:${s.id}`;
+    const wb = whyBox(s);
+    wb.classList.toggle("hidden", !whyOpen.has(key));
+    acts.append(el("button", {class: "link", text: "Pourquoi ?", onclick: () => {
+      whyOpen.has(key) ? whyOpen.delete(key) : whyOpen.add(key); wb.classList.toggle("hidden"); }}));
+    const line1 = el("div", {class: "line1"}, el("span", {class: "sname", text: s.name}),
+      el("span", {class: "stc " + (STATE_CLASS[s.state] || "st-inconnu"), text: s.state}));
+    if (s.lots) line1.append(el("span", {class: "badge plain", text: `${s.lots.pass} / ${s.lots.total} en PASS`}));
+    if (isNext && d.source !== "run") line1.append(el("span", {class: "next-tag", text: `Prochaine étape · ${d.label || ""}`}));
+    const cmdText = s.id === "test" ? "/deploie, puis à la main" : `/${s.command} ${s.command === "deploie" ? "" : S.feature}`;
+    const main = el("div", {}, line1, el("div", {class: "scmd", text: cmdText + (s.note && chain === "main" ? " — " + s.note : "")}));
+    if (s.id === "test") main.append(el("div", {class: "extra", text: S.recette
+      ? `À tester : ${S.recette.rel} — ${S.recette.count} points${S.recette.first.length ? " : " + S.recette.first[0] : ""}`
+      : "code/recette-ordonnee.md n'existe pas encore : /9_controle l'écrit."}));
+    main.append(wb, el("div", {class: "slot", id: `slot-${chain}-${s.id}`}));
+    box.append(el("li", {class: cls, id: `step-${chain}-${s.id}`, "data-state": s.state},
+      el("div", {class: "num", text: String(i + 1)}), main, acts));
+  });
+}
+
+function renderChaine() {
+  if (!S.scan) return;
+  $("chaine-feature").textContent = S.feature;
+  const lg = $("chaine-legend"); lg.replaceChildren();
+  for (const k of Object.keys(STATE_CLASS)) lg.append(el("span", {class: "stc " + STATE_CLASS[k], text: k}));
+  const al = $("chaine-alerts"); al.replaceChildren();
+  for (const a of S.scan.alerts || []) al.append(el("div", {class: "alert", text: a.text}));
+  if ((S.bugfixes || []).length) al.append(el("div", {class: "notice warn small",
+    text: `Une correction est ouverte (${S.bugfixes[S.bugfixes.length - 1]}) : /7_lots, /8_code et /9_controle agissent sur elle. Sa chaîne est sous « Correction ».`}));
+  renderFlow($("flow-main"), S.scan.main, "main", true);
+}
+
+// ---------------------------------------------------------- correction
+function renderCorrection() {
+  if (!S.scan) return;
+  const list = $("corr-list"); list.replaceChildren();
+  const corr = S.scan.corrections;           // newest first
+  if (!corrSel || !corr.find((c) => c.name === corrSel)) corrSel = corr.length ? corr[0].name : null;
+  for (const c of corr) list.append(el("button", {class: c.name === corrSel ? "sel" : "", text: c.name + (c.highest ? " · en cours" : ""),
+    onclick: () => { corrSel = c.name; renderCorrection(); placeRun(); loadBuglist(); }}));
+  $("btn-new-bugfix").disabled = running();
+  const c = corr.find((x) => x.name === corrSel);
+  $("corr-note").textContent = !c ? "Aucune correction. « Nouvelle correction » crée bugfix-01/ et son bug-list.md, rien d'autre."
+    : c.highest ? `Les commandes prennent la feature (${S.feature}) et agissent sur ${c.name}, la correction la plus haute.`
+    : `Lecture seule : les commandes agissent sur la correction la plus haute (7_lots.md:18-19), pas sur ${c.name}.`;
+  if (!c) { $("flow-corr").replaceChildren(); $("buglist-card").classList.add("hidden"); return; }
+  renderFlow($("flow-corr"), c.steps, c.name, c.highest, "Seule la correction la plus haute se lance.");
+  $("buglist-card").classList.remove("hidden");
+  if (!bug.name || bug.name !== corrSel) loadBuglist();
+}
+
+const bug = {name: null, text: "", editable: false, dirty: false};
+async function loadBuglist() {
+  if (!corrSel) return;
+  try { const r = await api("/api/bugfix/buglist?name=" + encodeURIComponent(corrSel));
+        Object.assign(bug, {name: r.name, text: r.text, editable: r.editable, dirty: false}); }
+  catch (e) { Object.assign(bug, {name: corrSel, text: "", editable: false}); }
+  renderBuglist();
+}
+function renderBuglist() {
+  const box = $("buglist-card"); box.replaceChildren();
+  box.append(el("h2", {text: `${bug.name}/bug-list.md`}));
+  if (!bug.editable) {
+    box.append(el("p", {class: "muted small", text: "desc-bug.md existe : le diagnostic a lu cette bug-list. Elle n'est plus modifiée ici."}),
+      el("pre", {class: "text small", style: "max-height:260px;overflow:auto", text: bug.text || "(vide)"}));
+    return;
+  }
+  const ta = el("textarea", {id: "buglist-text", style: "min-height:220px", "aria-label": "bug-list.md",
+    placeholder: "G01 Ce qui ne va pas (B12)\n\nUn écart par paragraphe, chacun ouvert par son G<n> ; le B<n> d'un écart pris au rapport de contrôle entre parenthèses à la fin de sa première ligne."});
+  ta.value = bug.text;
+  ta.addEventListener("input", () => { bug.text = ta.value; bug.dirty = true; $("buglist-hint").textContent = "Non enregistré."; });
+  box.append(el("p", {class: "muted small", text: "Chaque écart s'ouvre sur son G<n> (diagnostique.md:42-44). Seul ce fichier est écrit."}), ta,
+    el("div", {class: "row", style: "margin-top:10px"},
+      el("button", {class: "primary", text: "Enregistrer bug-list.md", onclick: saveBuglist}),
+      el("span", {id: "buglist-hint", class: "muted small", text: ""})));
+}
+async function saveBuglist() {
+  try { await api("/api/bugfix/buglist", {name: bug.name, text: $("buglist-text").value}); bug.dirty = false;
+        $("buglist-hint").textContent = "Enregistré."; await refreshState(); }
+  catch (e) { alert(e.message); }
+}
+$("btn-new-bugfix").onclick = async () => {
+  const hb = (S.bugfixes || []).slice(-1)[0];
+  const open = hb && S.scan.corrections[0] && S.scan.corrections[0].steps.some((s) => s.state !== "faite");
+  if (!confirm(`Créer une nouvelle correction ?\n\nLe cockpit crée le dossier suivant et son bug-list.md vide, rien d'autre.` +
+               (open ? `\n\n${hb} n'est pas finie : les commandes agiront sur la nouvelle.` : ""))) return;
+  try { const r = await api("/api/bugfix/new", {}); corrSel = r.name; bug.name = null; await refreshState();
+        go("correction"); await loadBuglist(); setTimeout(() => { const t = $("buglist-text"); if (t) t.focus(); }, 60); }
+  catch (e) { alert(e.message); }
+};
 
 // ========================================================= À répondre
 async function refreshForms() {
@@ -576,6 +924,7 @@ async function refreshForms() {
   catch (e) { $("form").replaceChildren(el("div", {class: "notice err", text: e.message})); return; }
   renderForms();
   renderDashboard();
+  renderChaine(); renderCorrection(); placeRun();
 }
 $("btn-reload").onclick = () => { $("save-summary").replaceChildren(); refreshForms(); };
 
@@ -619,13 +968,20 @@ function entryCard(id, head, body, choice) {
   return el("div", {class: "entry", id: "e-" + id}, el("div", {class: "head"}, head), body, choice);
 }
 
+const inStep = (e) => !stepFilter || (e.step === stepFilter.step && (!stepFilter.chain || e.chain === stepFilter.chain));
+function stepBadge(e) { return e.step ? el("span", {class: "badge plain", text: stepName(e.step) + (e.chain && e.chain !== "main" ? " · " + e.chain : "")}) : null; }
+
 function renderFilters() {
   const box = $("filters"); box.replaceChildren();
-  const nq = F ? F.questions.length : 0, nb = F ? F.blocking.length + (F.redecoupage ? 1 : 0) : 0;
+  const qs = F ? F.questions.filter(inStep) : [], bs = F ? F.blocking.filter(inStep) : [];
+  const red = F && F.redecoupage && inStep(F.redecoupage) ? 1 : 0;
+  const nq = qs.length, nb = bs.length + red;
   for (const [k, label] of [["all", `Tout (${nq + nb})`], ["questions", `Questions (${nq})`], ["blocking", `Blocages (${nb})`]]) {
     box.append(el("button", {class: answerFilter === k ? "on" : "", text: label,
       onclick: () => { answerFilter = k; renderForms(); }}));
   }
+  if (stepFilter) box.append(el("span", {class: "badge", id: "step-filter"}, `Étape : ${stepFilter.name}${stepFilter.chain && stepFilter.chain !== "main" ? " · " + stepFilter.chain : ""} `,
+    el("button", {class: "link", text: "✕ tout montrer", onclick: () => { stepFilter = null; renderForms(); }})));
 }
 
 function group(rel, count, entries) {
@@ -642,29 +998,32 @@ function renderForms() {
       el("b", {class: "mono", text: e.rel}), " — ", e.message));
   }
   renderFilters();
-  const nq = F.questions.length, nb = F.blocking.length + (F.redecoupage ? 1 : 0);
+  const nAll = F.questions.length + F.blocking.length + (F.redecoupage ? 1 : 0);
   const cnt = $("nav-answer-count");
-  cnt.textContent = nq + nb; cnt.classList.toggle("hidden", !(nq + nb));
-  if (!nq && !nb) form.append(el("p", {class: "muted", text: "Rien n'attend de réponse dans ce dossier."}));
+  cnt.textContent = nAll; cnt.classList.toggle("hidden", !nAll);
+  const qs = F.questions.filter(inStep), bs = F.blocking.filter(inStep);
+  const red = F.redecoupage && inStep(F.redecoupage) ? F.redecoupage : null;
+  if (!qs.length && !bs.length && !red) form.append(el("p", {class: "muted", text: stepFilter ? "Rien n'attend de réponse pour cette étape." : "Rien n'attend de réponse dans cette feature."}));
 
   if (answerFilter !== "questions") {
     const blocks = new Map();             // rel -> cards
     const put = (rel, card) => { if (!blocks.has(rel)) blocks.set(rel, []); blocks.get(rel).push(card); };
-    if (F.redecoupage) {
-      const r = F.redecoupage;
+    if (red) {
+      const r = red;
       const d = draftOf(r.id, null); if (d.kind === "none" && d.text) d.kind = "free";
       const ta = el("textarea", {placeholder: "Votre décision, en français", "aria-label": "Décision du Product Owner"}); ta.value = d.text || "";
       ta.addEventListener("input", () => { d.text = ta.value; d.kind = ta.value.trim() ? "free" : "none"; storeDrafts(); hint(); });
-      put(r.rel, entryCard(r.id, [el("span", {class: "badge warn", text: `Redécoupage n° ${r.count}`})],
+      put(r.rel, entryCard(r.id, [el("span", {class: "badge warn", text: `Redécoupage n° ${r.count}`}), stepBadge(r)],
         [el("div", {class: "lbl", text: "Ce qui revient"}), el("pre", {class: "text", text: r.ce_qui_revient || "—"}),
          el("div", {class: "lbl", text: "Ce que j'en fais"}), el("pre", {class: "text", text: r.ce_que_jen_fais || "—"}),
          el("div", {class: "lbl", text: "Décision du Product Owner"})], [ta]));
     }
-    for (const b of F.blocking) {
+    for (const b of bs) {
       const tags = [el("span", {class: "badge", text: b.agent})];
       if (b.number !== null) tags.push(el("span", {class: "badge", text: "Blocking " + b.number}));
       if (b.lot) tags.push(el("span", {class: "badge", text: b.lot}));
       if (b.worktree) tags.push(el("span", {class: "badge warn", text: "worktree en cours"}));
+      tags.push(stepBadge(b));
       put(b.rel, entryCard(b.id, tags, [
         el("div", {class: "lbl", text: "Ce qui bloque"}), el("pre", {class: "text", text: b.what_blocks || "—"}),
         b.where ? el("div", {class: "lbl", text: "Où"}) : null, b.where ? el("pre", {class: "text", text: b.where}) : null,
@@ -675,8 +1034,8 @@ function renderForms() {
   }
   if (answerFilter !== "blocking") {
     const files = new Map();
-    for (const q of F.questions) {
-      const head = [el("b", {text: "Q" + q.number}), el("span", {class: "ctx", text: q.context.join(" · ")})];
+    for (const q of qs) {
+      const head = [el("b", {text: "Q" + q.number}), el("span", {class: "ctx", text: q.context.join(" · ")}), stepBadge(q)];
       const body = [el("pre", {class: "text q", text: q.question})];
       if (q.default_source) body.push(el("div", {class: "muted small", text: "Source du défaut : " + q.default_source}));
       if (q.answer) body.push(el("div", {class: "notice warn small", text: "Texte déjà présent sous Answer:, hors de la ligne — il sera remplacé : " + q.answer}));
@@ -732,7 +1091,8 @@ $("btn-save").onclick = async () => {
     }
     savedCount += ok;
     storeDrafts();
-    await refreshForms();
+    // A save of answers is a scan trigger: the stored Next: is checked again (§2.3).
+    await refreshState("enregistrement");
     for (const res of r.results) {
       const l = labels[res.id] || res.id;
       if (res.status === "saved") sum.append(el("div", {class: "sumline ok", text: `✓ ${l} — enregistrée et relue comme répondue.`}));
@@ -749,6 +1109,22 @@ $("btn-save").onclick = async () => {
 };
 
 // ================================================================ run
+// The live run sits under its step, in « Chaîne » or in « Correction ».
+function placeRun() {
+  const panel = RUN_PANEL;
+  const run = S.run;
+  if (!run) { parkRun(); return; }
+  const p = S.run_place;
+  let slot = p ? $(`slot-${p.chain}-${p.step}`) : null;
+  if (!slot) {
+    // Under « Chaîne » when its step is in no flow shown (a tool, an older correction).
+    slot = $("run-fallback");
+    if (!slot.querySelector("h3")) slot.prepend(el("h3", {text: "Dernier run"}));
+  }
+  if (slot.id !== "run-fallback") { const h = $("run-fallback").querySelector("h3"); if (h) h.remove(); }
+  if (panel.parentNode !== slot) slot.append(panel);
+}
+
 function renderRun() {
   const run = S.run;
   $("run-status").textContent = !run ? "Aucune commande lancée depuis l'ouverture du serveur."
@@ -777,14 +1153,14 @@ function renderRunEnd() {
   if (!run || running()) return;
   const n = run.next || {kind: "unknown"};
   b.append(el("div", {class: "label muted small", text: "Fin du run"}),
-    el("div", {style: "font-size:20px;font-weight:600;margin:4px 0 10px", text: n.kind === "unknown" ? "Aucune ligne Next: dans le relais." : n.french}));
+    el("div", {style: "font-size:18px;font-weight:600;margin:4px 0 8px", text: n.kind === "unknown" ? "Aucune ligne Next: dans le relais." : n.french}));
   if (run.log_path) b.append(el("div", {class: "muted small", text: "Journal brut : " + run.log_path}));
   const wts = run.worktrees_left || [];
   if (wts.length) b.append(el("div", {class: "notice warn"}, el("div", {text: `Worktree${wts.length > 1 ? "s" : ""} resté${wts.length > 1 ? "s" : ""} en place :`}),
     ...wts.map((p) => el("div", {class: "small mono", text: p}))));
   if (run.can_continue) b.append(el("pre", {class: "text", text: run.relay || "(relais vide)"}),
     el("div", {class: "row", style: "margin-top:12px"}, el("button", {class: "primary", text: "Continuer la session", onclick: continueSession})));
-  b.append(el("div", {class: "row", style: "margin-top:12px"}, el("button", {class: run.can_continue ? "" : "primary", text: "Retour au tableau de bord", onclick: () => go("dashboard")})));
+  b.append(el("div", {class: "row", style: "margin-top:10px"}, el("button", {class: run.can_continue ? "small" : "primary small", text: "Retour au tableau de bord", onclick: () => go("dashboard")})));
 }
 
 function renderIdle(idle) {
@@ -799,7 +1175,8 @@ function renderIdle(idle) {
 
 async function continueWait() { try { await api("/api/continue-wait", {}); await refreshState(); } catch (e) { alert(e.message); } }
 async function continueSession() {
-  try { const r = await api("/api/continue-session", {}); S.run = r.run; location.hash = "#run"; await refreshState(); }
+  try { const r = await api("/api/continue-session", {}); S.run = r.run; await refreshState();
+        goStep((S.run_place && S.run_place.chain) || "main", S.run_place && S.run_place.step); }
   catch (e) { alert(e.message); }
 }
 async function stopNow() { try { await api("/api/stop-now", {}); } catch (e) { alert(e.message); } }
@@ -882,6 +1259,7 @@ function onEvent(ev) {
     case "status": break;
     case "run_ended":
       streamAppend(el("div", {class: "sys", text: `■ Fin : ${d.outcome}${d.error ? " — " + d.error : ""}${d.log_path ? " — journal : " + d.log_path : ""}`}));
+      // After every run the scan runs; the run's own Next: is trusted as printed (§2.2).
       refreshState(); break;
   }
 }
@@ -897,11 +1275,15 @@ function closeEvents() { if (es) { es.close(); es = null; } }
 const GROUP_ORDER = ["Amont", "Aval", "Correction", "Fusion", "Outils"];
 
 function renderSettings() {
-  // Dossiers
+  // Dossiers: the application folder, and the feature.
   const f = $("set-folders"); f.replaceChildren(
     el("div", {}, el("span", {class: "muted", text: "Application : "}), el("span", {class: "mono", text: S.app_folder || "—"})),
-    el("div", {style: "margin-top:4px"}, el("span", {class: "muted", text: "Dossier de travail : "}), el("span", {class: "mono", text: S.working_folder || "—"})),
-    el("div", {class: "row", style: "margin-top:12px"}, el("button", {text: "Changer", onclick: changeFolder})));
+    el("div", {style: "margin-top:4px"}, el("span", {class: "muted", text: "Feature : "}), el("b", {class: "mono", text: S.feature || "—"})));
+  const fl = el("div", {class: "folders", id: "feature-list"});
+  for (const w of S.working_folders || []) fl.append(el("button", {text: w, class: w === S.feature ? "sel" : "",
+    onclick: () => { if (w !== S.feature) openPair(S.app_folder, w); }}));
+  f.append(el("div", {class: "muted small", style: "margin-top:12px", text: "Changer de feature :"}), fl,
+    el("div", {class: "row", style: "margin-top:12px"}, el("button", {text: "Changer d'application", onclick: changeFolder})));
   const rc = $("set-recent"); rc.replaceChildren();
   if (!(S.recent || []).length) rc.append(el("span", {class: "muted", text: "Aucune."}));
   for (const p of S.recent || []) rc.append(el("button", {onclick: () => openPair(p.app, p.work)},
@@ -921,22 +1303,22 @@ function renderSettings() {
   }
   $("mode-note").textContent = "Le mode choisi vaut pour le prochain run ; un run en cours garde le sien. Même en Auto, une demande renvoyée vers toi devient un bandeau.";
 
-  // Diagnostic
   renderDiag();
 
-  // Commandes
+  // Commandes — the escape hatch, unchanged.
   const cm = $("set-commands"); cm.replaceChildren();
-  const nextCmd = (currentNext() || {}).command;
+  const d = S.decision || {};
+  const nextCmd = d.source !== "run" && d.next ? d.next.command : null;
   for (const g of GROUP_ORDER) {
     const list = (S.commands || []).filter((c) => (c.group || "Outils") === g);
     if (!list.length) continue;
     const box = el("div", {class: "cmds"});
     for (const c of list) {
       const hl = c.name === nextCmd;
-      const input = el("input", {type: "text", value: c.argument_hint ? S.feature : "",
+      const input = el("input", {type: "text", value: c.argument_hint ? (hl && d.next.args ? d.next.args : S.feature) : "",
         placeholder: c.argument_hint || "sans argument", "aria-label": "argument de /" + c.name});
       const btn = el("button", {text: "/" + c.name, title: c.description, disabled: running() || undefined,
-        onclick: () => runCommand(c.name, input.value, hl)});
+        onclick: () => runRaw(c.name, input.value, hl)});
       box.append(el("div", {class: "cmd" + (hl ? " hl" : "")}, btn, input));
     }
     cm.append(el("div", {class: "cmd-group"}, el("h3", {text: g}), box));
@@ -950,6 +1332,18 @@ function renderSettings() {
   if (!wts.length) mt.append(el("div", {class: "muted", text: "Aucun."}));
   for (const w of wts) mt.append(el("div", {class: "mono", text: w}));
   mt.append(el("h3", {style: "margin-top:16px", text: "Dossier des journaux bruts"}), el("div", {class: "mono", text: S.logs_dir || "—"}));
+  mt.append(el("div", {class: "muted small", style: "margin-top:6px", text: `Scan du dossier : ${S.scan ? S.scan.took_ms : "—"} ms.`}));
+}
+
+async function runRaw(name, args, named) {
+  if (running()) return;
+  if (!named && !confirm(`Lancer /${name} ${args || ""} ? Ce n'est pas l'étape que le dernier relais a nommée.`)) return;
+  try {
+    await api("/api/run", {command: name, args: args || ""});
+    $("stream").replaceChildren();
+    await refreshState();
+    goStep((S.run_place && S.run_place.chain) || "main", S.run_place && S.run_place.step);
+  } catch (e) { alert(e.message); }
 }
 
 function renderDiag() {

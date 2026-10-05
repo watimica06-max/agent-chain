@@ -17,13 +17,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import blocking   # noqa: E402
+import decide as decide_mod  # noqa: E402
 import diagnostic  # noqa: E402
+import gitref     # noqa: E402
 import questions  # noqa: E402
 import runner as runner_mod  # noqa: E402
+import scan as scan_mod  # noqa: E402
+import textfile   # noqa: E402
 import writer     # noqa: E402
 from state import State  # noqa: E402
 
 HOST = "127.0.0.1"
+STATE_KEY = web.AppKey("state", State)
 DEFAULT_PORT = 8765
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
 # `.claude/CLAUDE.md`'s table: upstream cycle, downstream cycle, bug-fix entry,
@@ -56,17 +61,22 @@ def check_app_folder(app):
 
 
 def working_folders(app):
+    """The features of `docs/features/`. Since 1.3 a feature's `bugfix-NN/`
+    are not picked here: they live under « Correction »."""
     base = features_dir(app)
-    out = []
-    for name in sorted(os.listdir(base)):
-        p = os.path.join(base, name)
-        if not os.path.isdir(p) or name.startswith("."):
-            continue
-        out.append(name)
-        for sub in sorted(os.listdir(p), key=_natural):
-            if BUGFIX.match(sub) and os.path.isdir(os.path.join(p, sub)):
-                out.append(f"{name}/{sub}")
-    return out
+    return [name for name in sorted(os.listdir(base))
+            if os.path.isdir(os.path.join(base, name)) and not name.startswith(".")]
+
+
+def bugfixes(app, feature):
+    """The feature's `bugfix-NN/`, oldest first."""
+    p = work_dir(app, feature)
+    try:
+        names = os.listdir(p)
+    except OSError:
+        return []
+    return sorted((n for n in names if BUGFIX.match(n) and os.path.isdir(os.path.join(p, n))),
+                  key=_natural)
 
 
 def _natural(s):
@@ -113,24 +123,87 @@ def list_commands(app):
 
 # --------------------------------------------------------------- forms
 
+def _prefix(entries, prefix):
+    """Entries read in a `bugfix-NN/` carry their path from the feature
+    folder, so that one form holds both without two ids alike."""
+    if prefix:
+        for e in entries:
+            old = e.rel
+            e.rel = prefix + old
+            if hasattr(e, "id"):
+                e.id = e.id.replace(old, e.rel, 1)
+    return entries
+
+
+def form_folders(app, feature):
+    """Where the form reads: the feature folder, and the highest
+    `bugfix-NN/` — the one the commands act on (cmd/7_lots.md:19-21). The
+    redécoupage is the last folder's alone, the working folder."""
+    bf = bugfixes(app, feature)
+    out = [("", work_dir(app, feature))]
+    if bf:
+        out.append((bf[-1] + "/", os.path.join(work_dir(app, feature), bf[-1])))
+    return out
+
+
 def collect_forms(app, work, rn):
-    wd = work_dir(app, work)
-    qs, qerr = questions.scan(wd)
-    wts = []
-    for wt in rn.live_worktrees(app):
-        wt_work = os.path.join(wt, "docs", "features", *work.split("/"))
-        if os.path.isdir(wt_work):
-            wts.append((wt, wt_work))
-    bs, notices, redec = blocking.scan(wd, wts)
-    return qs, qerr, bs, notices, redec, [wt for wt, _ in wts]
+    feature = feature_of(work)
+    qs, qerr, bs, notices, wts_used = [], [], [], [], []
+    redec = None
+    folders = form_folders(app, feature)
+    live = rn.live_worktrees(app)
+    for prefix, wd in folders:
+        q, qe = questions.scan(wd)
+        qs += _prefix(q, prefix)
+        qerr += _prefix(qe, prefix)
+        wts = []
+        for wt in live:
+            wt_work = os.path.join(wt, "docs", "features", feature, *([prefix.rstrip("/")] if prefix else []))
+            if os.path.isdir(wt_work):
+                wts.append((wt, wt_work))
+        b, n, r = blocking.scan(wd, wts)
+        bs += _prefix(b, prefix)
+        notices += _prefix(n, prefix)
+        wts_used += [wt for wt, _ in wts]
+        if (prefix, wd) == folders[-1] and r:
+            redec = _prefix([r], prefix)[0]
+    return qs, qerr, bs, notices, redec, sorted(set(wts_used))
+
+
+def _owner(rel, kind, path):
+    head, _, inner = rel.partition("/")
+    inner = inner if scan_mod.BUGFIX.match(head) else rel
+    try:
+        lines = textfile.load(path).lines if kind == "blocking" else []
+    except textfile.UnreadableFile:
+        lines = []
+    return scan_mod.owner(inner, kind, lines)[0]
+
+
+def _chain(rel):
+    head = rel.split("/")[0]
+    return head if scan_mod.BUGFIX.match(head) else "main"
 
 
 def forms_payload(app, work, rn):
     qs, qerr, bs, notices, redec, wts = collect_forms(app, work, rn)
+    out_q, out_b = [], []
+    for e in qs:
+        d = e.to_dict()
+        d.update(step=_owner(e.rel, e.kind, e.file), chain=_chain(e.rel))
+        out_q.append(d)
+    for e in bs:
+        d = e.to_dict()
+        d.update(step=_owner(e.rel, "blocking", e.file), chain=_chain(e.rel))
+        out_b.append(d)
+    red = None
+    if redec:
+        red = redec.to_dict()
+        red.update(step="7_lots", chain=_chain(redec.rel))
     return {
-        "questions": [q.to_dict() for q in qs],
-        "blocking": [b.to_dict() for b in bs],
-        "redecoupage": redec.to_dict() if redec else None,
+        "questions": out_q,
+        "blocking": out_b,
+        "redecoupage": red,
         "errors": [e.to_dict() for e in qerr] + [n.to_dict() for n in notices],
         "worktrees": wts,
     }
@@ -161,8 +234,81 @@ def save_items(app, work, rn, items):
         elif isinstance(entry, blocking.BlockingEntry):
             results.append(writer.write_blocking(entry, choice))
         else:
-            results.append(writer.write_redecoupage(entry, choice, work_dir(app, work)))
+            results.append(writer.write_redecoupage(entry, choice, form_folders(app, feature_of(work))[-1][1]))
     return [r.to_dict() for r in results]
+
+
+# ------------------------------------------------------------- the scan
+
+def where(state: State, rn, app, feature, reason=None):
+    """The scan and §2's decision. `reason` names a scan trigger — the
+    button, the opening, a save of answers: it ends the moment a run's
+    `Next:` is trusted without a check. A dropped `Next:` is written to
+    the run's log, once."""
+    run = rn.current(app)
+    snap = run.snapshot() if run and run.id else None
+    sc = scan_mod.run_scan(app, feature, snap)
+    if reason:
+        state.clear_fresh(app, feature)
+    stored = state.relay(app, feature)
+    dec = decide_mod.decide(sc, feature, run=snap, stored=stored,
+                            fresh=state.is_fresh(app, feature), head_now=gitref.head(app))
+    if dec.get("dropped"):
+        log_dropped(state, rn, stored, dec, reason)
+    return sc, dec
+
+
+def log_dropped(state, rn, stored, dec, reason):
+    d = dec["dropped"]
+    if not state.first_log((stored.get("at"), stored.get("command"), d["rule"])):
+        return
+    path = stored.get("log_path") or os.path.join(rn.log_dir, "next-ecarte.jsonl")
+    line = {"at": datetime.now().isoformat(timespec="milliseconds"), "type": "NextDropped",
+            "message": {**d, "trigger": reason or "rafraîchissement"}}
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(line, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
+    d["logged_to"] = path
+
+
+def new_bugfix(app, feature):
+    """The next `bugfix-NN/` and its empty `bug-list.md` — the only two
+    things this writes (§3.3)."""
+    bf = bugfixes(app, feature)
+    n = int(bf[-1].split("-")[1]) + 1 if bf else 1
+    name = f"bugfix-{n:02d}"
+    path = os.path.join(work_dir(app, feature), name)
+    os.makedirs(path)
+    with open(os.path.join(path, "bug-list.md"), "x", encoding="utf-8"):
+        pass
+    return name
+
+
+def run_place(sc, run):
+    if not run or not run.id:
+        return None
+    chain, step = decide_mod.chain_of(sc, run.command)
+    return {"chain": chain, "step": step} if step else None
+
+
+def recette(app, feature):
+    """What to test by hand: `code/recette-ordonnee.md` of the working
+    folder, when /9_controle wrote it (cmd/9_controle.md:362)."""
+    bf = bugfixes(app, feature)
+    base = os.path.join(work_dir(app, feature), *([bf[-1]] if bf else []))
+    p = os.path.join(base, "code", "recette-ordonnee.md")
+    if not os.path.isfile(p):
+        return None
+    try:
+        lines = textfile.load(p).lines
+    except textfile.UnreadableFile:
+        return None
+    rel = os.path.relpath(p, work_dir(app, feature)).replace(os.sep, "/")
+    items = [l.strip() for l in lines if l.strip() and not l.startswith("#")]
+    return {"rel": rel, "count": len(items), "first": items[:3]}
 
 
 # -------------------------------------------------------------- the app
@@ -200,7 +346,8 @@ def make_on_end(state: State):
     """What the server remembers of a run when it ends: the relay with its
     `Next:`, and one line of history."""
     def on_end(run):
-        state.set_relay(run.repo, run.work, run.prompt, run.relay, run.next, run.outcome)
+        state.set_relay(run.repo, run.work, run.prompt, run.relay, run.next, run.outcome,
+                        head=gitref.head(run.repo), log_path=run.log_path)
         state.add_history(run.repo, run.work, {
             "command": run.prompt, "outcome": run.outcome, "next": run.next,
             "log_path": run.log_path, "at": datetime.now().isoformat(timespec="seconds")})
@@ -224,6 +371,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return await handler(request)
 
     app = web.Application(middlewares=[guard])
+    app[STATE_KEY] = state
 
     def pair():
         a, w = state.app_folder, state.working_folder
@@ -250,7 +398,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.FileResponse(os.path.join(HERE, "static", "index.html"),
                                 headers={"Cache-Control": "no-store"})
 
-    async def get_state(request):
+    def state_payload(reason=None):
         a, w = pair()
         out = {"app_folder": state.app_folder, "working_folder": state.working_folder,
                "recent": state.recent(), "load_error": state.load_error,
@@ -261,6 +409,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if a:
             run = rn.current(a)
             feature = feature_of(w)
+            sc, dec = where(state, rn, a, feature, reason)
             out.update({
                 "feature": feature,
                 "commands": list_commands(a),
@@ -270,8 +419,24 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                 "history": state.history(a, w),
                 # Worktrees other than the main checkout, once nothing runs.
                 "worktrees": [] if rn.is_running(a) else runner_mod.list_worktrees(a),
+                "scan": sc,
+                "decision": dec,
+                # Where the run going, or the last one, sits in the flows.
+                "run_place": run_place(sc, run),
+                "bugfixes": bugfixes(a, feature),
+                "recette": recette(a, feature),
             })
-        return web.json_response(out)
+        return out
+
+    async def get_state(request):
+        return web.json_response(state_payload())
+
+    async def check(request):
+        """« Où on en est ? » — and the opening of the page: the stored
+        `Next:` is checked against the files whatever just happened."""
+        data = await body(request)
+        need_pair()
+        return web.json_response(state_payload(data.get("reason") or "bouton"))
 
     async def pick_folder(request):
         data = await body(request)
@@ -316,7 +481,54 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         data = await body(request)
         items = data.get("items") or []
         results = save_items(a, w, rn, items)
+        # A save of answers is a scan trigger (§2.3).
+        state.clear_fresh(a, feature_of(w))
         return web.json_response({"results": results})
+
+    async def bugfix_new(request):
+        a, w = need_pair()
+        if rn.is_running(a):
+            return web.json_response({"error": "une commande tourne : pas de nouvelle correction maintenant"}, status=409)
+        try:
+            name = new_bugfix(a, feature_of(w))
+        except OSError as e:
+            return web.json_response({"error": f"dossier non créé : {e}"}, status=500)
+        return web.json_response({"name": name})
+
+    def buglist_path(a, w, name):
+        if not BUGFIX.match(name or "") or name not in bugfixes(a, feature_of(w)):
+            raise web.HTTPBadRequest(text=json.dumps({"error": "correction inconnue"}),
+                                     content_type="application/json")
+        return os.path.join(work_dir(a, feature_of(w)), name, "bug-list.md")
+
+    async def buglist_get(request):
+        a, w = need_pair()
+        name = request.query.get("name", "")
+        p = buglist_path(a, w, name)
+        try:
+            text = textfile.load(p).text() if os.path.exists(p) else ""
+        except textfile.UnreadableFile as e:
+            return web.json_response({"error": str(e)}, status=500)
+        editable = not os.path.exists(os.path.join(os.path.dirname(p), "desc-bug.md"))
+        return web.json_response({"name": name, "text": text, "editable": editable})
+
+    async def buglist_put(request):
+        """Writes `bug-list.md`, and nothing else, while the diagnostic has
+        not read it yet (no `desc-bug.md`)."""
+        a, w = need_pair()
+        data = await body(request)
+        p = buglist_path(a, w, data.get("name", ""))
+        if os.path.exists(os.path.join(os.path.dirname(p), "desc-bug.md")):
+            return web.json_response({"error": "desc-bug.md existe : le diagnostic a déjà lu cette bug-list"}, status=409)
+        text = data.get("text") or ""
+        try:
+            old = textfile.load(p) if os.path.exists(p) else None
+            nl = old.newline if old else "\n"
+            body_text = nl.join(text.replace("\r\n", "\n").split("\n")).rstrip() + (nl if text.strip() else "")
+            textfile.write_bytes(p, body_text.encode("utf-8"))
+        except (OSError, textfile.UnreadableFile) as e:
+            return web.json_response({"error": f"bug-list.md non écrit : {e}"}, status=500)
+        return web.json_response({"ok": True})
 
     async def run(request):
         a, w = need_pair()
@@ -427,6 +639,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r = app.router
     r.add_get("/", index)
     r.add_get("/api/state", get_state)
+    r.add_post("/api/check", check)
+    r.add_post("/api/bugfix/new", bugfix_new)
+    r.add_get("/api/bugfix/buglist", buglist_get)
+    r.add_post("/api/bugfix/buglist", buglist_put)
     r.add_post("/api/pick-folder", pick_folder)
     r.add_post("/api/app-folder", app_folder)
     r.add_post("/api/open", open_pair)

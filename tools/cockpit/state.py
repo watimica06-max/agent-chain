@@ -1,6 +1,10 @@
-"""`config.json` — the two folders, the recent pairs, and the last relay
-with its `Next:` per working folder, so that reopening shows where things
-stood. Local paths: the file is git-ignored."""
+"""`config.json` — the application folder and the feature, the recent
+pairs, and the last relay with its `Next:` and the `HEAD` it left, per
+feature, so that reopening shows where things stood. Local paths: the file
+is git-ignored.
+
+Since 1.3 the working folder is the feature alone: its `bugfix-NN/` live
+under « Correction ». A 1.2 value `feature/bugfix-NN` reads as `feature`."""
 import json
 import os
 import threading
@@ -24,6 +28,10 @@ class State:
         self.data = {"app_folder": None, "working_folder": None, "recent": [], "relays": {},
                      "mode": "auto", "diagnostic": None, "history": []}
         self.load_error = None
+        # Relays of a run that has just ended, trusted without a check until
+        # the next scan trigger (§2.2). In memory only: a restart is an opening.
+        self._fresh = set()
+        self._logged = set()
         if os.path.exists(path):
             try:
                 with open(path, encoding="utf-8") as f:
@@ -46,7 +54,8 @@ class State:
 
     @property
     def working_folder(self):
-        return self.data.get("working_folder")
+        w = self.data.get("working_folder")
+        return w.split("/")[0] if w else w
 
     def open_pair(self, app: str, work: str):
         with self._lock:
@@ -64,7 +73,8 @@ class State:
             self._save()
 
     def set_relay(self, app: str, work: str, command: str, relay: str, nxt: dict,
-                  outcome: str = "terminé"):
+                  outcome: str = "terminé", head: str | None = None, log_path: str = "",
+                  fresh: bool = True):
         with self._lock:
             self.data.setdefault("relays", {})[_key(app, work)] = {
                 "command": command,
@@ -72,8 +82,28 @@ class State:
                 "next": nxt,
                 "outcome": outcome,
                 "at": datetime.now().isoformat(timespec="seconds"),
+                "head": head,
+                "log_path": log_path,
             }
+            if fresh:
+                self._fresh.add(_key(app, work))
+            else:
+                self._fresh.discard(_key(app, work))
             self._save()
+
+    def is_fresh(self, app: str, work: str) -> bool:
+        return _key(app, work) in self._fresh
+
+    def clear_fresh(self, app: str, work: str):
+        self._fresh.discard(_key(app, work))
+
+    def first_log(self, token) -> bool:
+        """True the first time `token` is seen: a dropped `Next:` is logged
+        once, not on every refresh of the page."""
+        if token in self._logged:
+            return False
+        self._logged.add(token)
+        return True
 
     def relay(self, app: str, work: str):
         return self.data.get("relays", {}).get(_key(app, work))
@@ -112,4 +142,10 @@ class State:
                 for h in self.data.get("history", []) if h.get("key") == k][:n]
 
     def recent(self):
-        return list(self.data.get("recent", []))
+        out, seen = [], set()
+        for r in self.data.get("recent", []):
+            pair = (r.get("app"), (r.get("work") or "").split("/")[0])
+            if pair[1] and pair not in seen:
+                seen.add(pair)
+                out.append({"app": pair[0], "work": pair[1]})
+        return out

@@ -160,7 +160,7 @@ def test_session_state_idle_ends_the_run(tmp_path, monkeypatch):
 
 
 def test_idle_ceiling_asks_then_continue_or_stop(tmp_path, monkeypatch):
-    monkeypatch.setattr(runner_mod, "IDLE_CEILING", 0.15)
+    monkeypatch.setattr(runner_mod, "IDLE_CEILING", 0.4)
 
     async def go():
         clients = []
@@ -173,7 +173,10 @@ def test_idle_ceiling_asks_then_continue_or_stop(tmp_path, monkeypatch):
         first = await next_event(q, "idle_wait")
         snap = run.snapshot()["idle"]
         rn.continue_waiting(repo)
-        await settle()
+        # A few loop turns, not wall time: the next ceiling must not be reached
+        # before the check, however slow the machine (cockpit 1.3: was flaky).
+        for _ in range(5):
+            await asyncio.sleep(0)
         assert run.status == "running" and run.idle is None
         second = await next_event(q, "idle_wait")        # the wait starts over
         await rn.stop_now(repo)

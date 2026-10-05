@@ -20,7 +20,9 @@ class FakeServer:
         self.app_root = tmp_path / "app"
         self.feat = build_app_folder(self.app_root)
         # One command per group of the settings screen, beside those the folder helper writes.
-        for name in ("7_lots", "diagnostique", "fusion_compare"):
+        # Every command of the two chains (1.3), beside those the folder helper writes.
+        for name in ("3_decoupe", "3a_genre", "3b_nature", "4_grille", "5_reclasse", "6_convertit",
+                     "conventions", "7_lots", "9_controle", "fusion", "diagnostique", "fusion_compare"):
             (self.app_root / ".claude" / "commands" / f"{name}.md").write_text(
                 f'---\ndescription: run {name}\nargument-hint: "<f>"\n---\nbody\n', encoding="utf-8")
         self.state = State(str(tmp_path / "config.json"))

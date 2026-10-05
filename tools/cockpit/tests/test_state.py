@@ -10,12 +10,20 @@ def test_pairs_relays_and_reopen(tmp_path):
     s.open_pair("C:/Dev/app", "f")
     s.open_pair("C:/Dev/app", "f/bugfix-02")
     s.open_pair("C:/Dev/app", "f")
-    s.set_relay("C:/Dev/app", "f", "/1_lexique f", "…\nNext: done", {"kind": "done"})
+    s.set_relay("C:/Dev/app", "f", "/1_lexique f", "...\nNext: done", {"kind": "done"},
+                head="abc123", log_path="logs/x.jsonl")
+    assert s.is_fresh("C:/Dev/app", "f")                 # just ended: trusted (§2.2)
+    s.clear_fresh("C:/Dev/app", "f")
+    assert not s.is_fresh("C:/Dev/app", "f")
     again = State(path)
     assert again.app_folder == "C:/Dev/app" and again.working_folder == "f"
-    assert [r["work"] for r in again.recent()] == ["f", "f/bugfix-02"]
-    assert again.relay("C:/Dev/app", "f")["next"] == {"kind": "done"}
-    assert again.relay("C:/Dev/app", "f/bugfix-02") is None
+    # 1.3: a working folder is a feature; a 1.2 « f/bugfix-02 » reads as « f ».
+    assert [r["work"] for r in again.recent()] == ["f"]
+    relay = again.relay("C:/Dev/app", "f")
+    assert relay["next"] == {"kind": "done"} and relay["head"] == "abc123" and relay["log_path"] == "logs/x.jsonl"
+    assert not again.is_fresh("C:/Dev/app", "f")          # a restart is an opening: checked
+    again.data["working_folder"] = "f/bugfix-02"
+    assert again.working_folder == "f"
 
 
 def test_broken_config_is_reported_not_fatal(tmp_path):
