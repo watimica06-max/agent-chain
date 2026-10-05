@@ -74,8 +74,9 @@ Browser page  ⇄  local Python server  ⇄  Claude Agent SDK (Python)  ⇄  Cla
   stop a run; reopening it shows the current state.
 - **One run at a time per repository.** Commands create worktrees and
   commit; two concurrent runs would collide. The server holds a lock.
-- **The application lives in its own folder**, outside any project
-  repository, because it serves several projects.
+- **The application lives in `tools/cockpit/` of the chain's own
+  repository**, versioned with the chain it drives and with no setup;
+  pointed at another project's folder, it serves that project too.
 - **Windows host.** The server is started with `python`, never
   `python3`: `python3` resolves to the Microsoft Store alias on this
   machine.
