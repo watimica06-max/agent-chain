@@ -24,3 +24,10 @@ def place(tmp_path):
         shutil.copyfile(fixture_path(*src.split("/")), target)
         return str(target)
     return _place
+
+
+@pytest.fixture(autouse=True)
+def _logs_in_tmp(tmp_path_factory, monkeypatch):
+    """The raw run logs of a test never land in tools/cockpit/logs/."""
+    import runner
+    monkeypatch.setattr(runner, "LOG_DIR", str(tmp_path_factory.mktemp("logs")))

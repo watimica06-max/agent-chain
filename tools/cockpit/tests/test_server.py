@@ -41,7 +41,7 @@ def with_client(tmp_path, body, picker=None, script=script_until_interrupted):
     feat = build_app_folder(app_root)
     state = State(str(tmp_path / "config.json"))
 
-    def factory(cwd, can_use_tool):
+    def factory(cwd, can_use_tool, **kw):
         return FakeClient(script, can_use_tool)
 
     rn = runner_mod.Runner(client_factory=factory,
@@ -182,6 +182,30 @@ def test_run_lock_stop_and_events(tmp_path):
         assert s["last"]["command"] == "/8_code f" and s["last"]["next"]["kind"] == "unknown"
         r = await post(c, "/api/disarm-stop", {})
         assert r.status == 200 and os.path.exists(feat / "stop1.md")
+    with_client(tmp_path, body)
+
+
+def test_continue_routes(tmp_path):
+    async def body(c, app_root, feat, rn):
+        await open_pair(c, app_root)
+        r = await post(c, "/api/continue-wait", {})
+        assert r.status == 409                       # nothing waits on a decision
+        r = await post(c, "/api/continue-session", {})
+        assert r.status == 409                       # no ended run yet
+        ev = await c.get("/api/events")
+        await post(c, "/api/run", {"command": "1_lexique", "args": "f"})
+        await read_events(ev, {"text"})
+        await post(c, "/api/stop-now", {})
+        await read_events(ev, {"run_ended"})
+        s = (await (await c.get("/api/state")).json())["run"]
+        assert s["can_continue"] and s["session_id"] == "s" and s["log_path"]
+        r = await post(c, "/api/continue-session", {})
+        assert r.status == 200, await r.text()
+        assert (await r.json())["run"]["continued"] is True
+        await read_events(ev, {"text"})
+        await post(c, "/api/stop-now", {})
+        await read_events(ev, {"run_ended"})
+        ev.close()
     with_client(tmp_path, body)
 
 

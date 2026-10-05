@@ -312,6 +312,24 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory):
             return web.json_response({"error": str(e)}, status=409)
         return web.json_response({"ok": True})
 
+    async def continue_wait(request):
+        a, _ = need_pair()
+        try:
+            rn.continue_waiting(a)
+        except runner_mod.NotRunning as e:
+            return web.json_response({"error": str(e)}, status=409)
+        return web.json_response({"ok": True})
+
+    async def continue_session(request):
+        a, _ = need_pair()
+        try:
+            r = await rn.continue_session(a)
+        except runner_mod.NotRunning as e:
+            return web.json_response({"error": str(e)}, status=409)
+        except runner_mod.Busy as e:
+            return web.json_response({"error": str(e)}, status=409)
+        return web.json_response({"run": r.snapshot()})
+
     async def stop_next(request):
         a, _ = need_pair()
         try:
@@ -373,6 +391,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory):
     r.add_post("/api/save", save)
     r.add_post("/api/run", run)
     r.add_post("/api/stop-now", stop_now)
+    r.add_post("/api/continue-wait", continue_wait)
+    r.add_post("/api/continue-session", continue_session)
     r.add_post("/api/stop-next-lot", stop_next)
     r.add_post("/api/disarm-stop", disarm)
     r.add_post("/api/permission", permission)
