@@ -75,9 +75,10 @@ async def script_quick(c):
 def make_runner(script, ended=None):
     made = []
 
-    def factory(cwd, can_use_tool):
+    def factory(cwd, can_use_tool, **kw):
         c = FakeClient(script, can_use_tool)
         c.cwd = cwd
+        c.kw = kw
         made.append(c)
         return c
 
@@ -230,7 +231,9 @@ def test_options_load_project_settings_never_bare(tmp_path):
     assert opts.cwd == str(tmp_path)
     assert opts.setting_sources is None          # all sources: commands, agents, CLAUDE.md
     assert opts.can_use_tool is cb
-    assert opts.permission_mode is None
+    # The mode is explicit, never the CLI's default: « auto » unless told otherwise.
+    assert opts.permission_mode == "auto"
+    assert runner_mod.build_options(str(tmp_path), cb, mode="manuel").permission_mode == "default"
     assert "bare" not in " ".join(f"{k} {v}" for k, v in (opts.extra_args or {}).items())
 
 

@@ -53,19 +53,26 @@ def repo_key(path: str) -> str:
     return os.path.normcase(os.path.realpath(path))
 
 
-def build_options(cwd: str, can_use_tool, resume: str | None = None):
+# The cockpit's two modes, as the SDK's `permission_mode` names them. The
+# mode is passed explicitly on every run, never left to the CLI's default.
+PERMISSION_MODES = {"auto": "auto", "manuel": "default"}
+
+
+def build_options(cwd: str, can_use_tool, resume: str | None = None, mode: str = "auto"):
     """The SDK options. `setting_sources` is left unset (all sources, the
     CLI default) and nothing asks for bare mode. The session-state frames are
     asked for: `idle` is how the CLI says no agent is live and no wake-up turn
-    is owed."""
+    is owed. In auto mode a request still reaches `can_use_tool` when the
+    classifier sends it back to a prompt: it becomes a card, as in manual."""
     from claude_agent_sdk import ClaudeAgentOptions
     return ClaudeAgentOptions(cwd=cwd, can_use_tool=can_use_tool, resume=resume,
+                              permission_mode=PERMISSION_MODES[mode],
                               env={"CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS": "1"})
 
 
-def sdk_client_factory(cwd: str, can_use_tool, resume: str | None = None):
+def sdk_client_factory(cwd: str, can_use_tool, resume: str | None = None, mode: str = "auto"):
     from claude_agent_sdk import ClaudeSDKClient
-    return ClaudeSDKClient(options=build_options(cwd, can_use_tool, resume))
+    return ClaudeSDKClient(options=build_options(cwd, can_use_tool, resume, mode))
 
 
 @dataclass
@@ -115,6 +122,7 @@ class Run:
     resume: str | None = None         # session id to continue
     session_id: str = ""
     log_path: str = ""
+    mode: str = "auto"
     worktrees_left: list = field(default_factory=list)
     tasks: dict = field(default_factory=dict)        # task_id -> tool_use_id
     background: set = field(default_factory=set)     # tool_use_ids started in the background
@@ -142,7 +150,7 @@ class Run:
             "permissions": [p.to_dict() for p in self.permissions.values()],
             "relay": self.relay, "next": self.next,
             "stop_next_lot": self.command == STOP_COMMAND,
-            "continued": bool(self.resume), "session_id": self.session_id,
+            "continued": bool(self.resume), "mode": self.mode, "session_id": self.session_id,
             "log_path": self.log_path, "worktrees_left": list(self.worktrees_left),
             "idle": self.idle,
             "can_continue": (self.status == "ended" and bool(self.session_id)
@@ -151,9 +159,11 @@ class Run:
 
 
 class Runner:
-    def __init__(self, client_factory=sdk_client_factory, on_end=None, log_dir=None):
+    def __init__(self, client_factory=sdk_client_factory, on_end=None, log_dir=None,
+                 mode_getter=lambda: "auto"):
         self.client_factory = client_factory
         self.on_end = on_end
+        self.mode_getter = mode_getter
         self.log_dir = log_dir or LOG_DIR
         self.runs: dict[str, Run] = {}
         self._seq = itertools.count(1)
@@ -180,6 +190,7 @@ class Runner:
                   started_at=datetime.now().isoformat(timespec="seconds"),
                   resume=resume)
         run.message = message or run.prompt
+        run.mode = self.mode_getter() if self.mode_getter() in PERMISSION_MODES else "auto"
         old = self.runs.get(key)
         if old:
             run.subscribers = old.subscribers
@@ -195,7 +206,7 @@ class Runner:
         try:
             self._open_log(run)
             kwargs = {"resume": run.resume} if run.resume else {}
-            client = self.client_factory(run.repo, can_use_tool, **kwargs)
+            client = self.client_factory(run.repo, can_use_tool, mode=run.mode, **kwargs)
             run.client = client
             async with client:
                 run.status = "running"

@@ -9,6 +9,7 @@ import os
 import re
 import sys
 import webbrowser
+from datetime import datetime
 
 from aiohttp import web
 
@@ -16,6 +17,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import blocking   # noqa: E402
+import diagnostic  # noqa: E402
 import questions  # noqa: E402
 import runner as runner_mod  # noqa: E402
 import writer     # noqa: E402
@@ -23,6 +25,16 @@ from state import State  # noqa: E402
 
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
+GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
+# `.claude/CLAUDE.md`'s table: upstream cycle, downstream cycle, bug-fix entry,
+# merge, and what is run by hand outside the chain. A command not listed is a tool.
+COMMAND_GROUP = {
+    **dict.fromkeys(["1_lexique", "2_structure", "3_decoupe", "3a_genre", "3b_nature",
+                     "4_grille", "5_reclasse", "6_convertit"], "Amont"),
+    **dict.fromkeys(["7_lots", "8_code"], "Aval"),
+    "diagnostique": "Correction",
+    **dict.fromkeys(["fusion", "fusion_compare", "fusion_applique"], "Fusion"),
+}
 BUGFIX = re.compile(r"^bugfix-\d+$")
 FRONTMATTER = re.compile(r"^---\s*\n(.*?)\n---", re.S)
 
@@ -93,7 +105,8 @@ def list_commands(app):
                         hint = line.split(":", 1)[1].strip().strip('"')
         except OSError:
             pass
-        out.append({"name": name[:-3], "description": desc, "argument_hint": hint})
+        out.append({"name": name[:-3], "description": desc, "argument_hint": hint,
+                    "group": COMMAND_GROUP.get(name[:-3], "Outils")})
     out.sort(key=lambda c: (0 if c["name"][0].isdigit() else 1, _natural(c["name"])))
     return out
 
@@ -183,7 +196,19 @@ def _host_name(hostport):
         return None
 
 
-def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory):
+def make_on_end(state: State):
+    """What the server remembers of a run when it ends: the relay with its
+    `Next:`, and one line of history."""
+    def on_end(run):
+        state.set_relay(run.repo, run.work, run.prompt, run.relay, run.next, run.outcome)
+        state.add_history(run.repo, run.work, {
+            "command": run.prompt, "outcome": run.outcome, "next": run.next,
+            "log_path": run.log_path, "at": datetime.now().isoformat(timespec="seconds")})
+    return on_end
+
+
+def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
+             diag_runner=diagnostic.run_diagnostic):
     @web.middleware
     async def guard(request, handler):
         # Only this machine's browser, on this page: a foreign site cannot
@@ -229,7 +254,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory):
         a, w = pair()
         out = {"app_folder": state.app_folder, "working_folder": state.working_folder,
                "recent": state.recent(), "load_error": state.load_error,
-               "open": bool(a)}
+               "open": bool(a), "mode": state.mode, "diagnostic": state.diagnostic(),
+               "logs_dir": rn.log_dir, "groups": GROUPS}
         if state.app_folder and not check_app_folder(state.app_folder):
             out["working_folders"] = working_folders(state.app_folder)
         if a:
@@ -241,6 +267,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory):
                 "last": state.relay(a, w),
                 "run": run.snapshot() if run and run.id else None,
                 "stop_file": os.path.exists(rn.stop_file(a, feature)),
+                "history": state.history(a, w),
+                # Worktrees other than the main checkout, once nothing runs.
+                "worktrees": [] if rn.is_running(a) else runner_mod.list_worktrees(a),
             })
         return web.json_response(out)
 
@@ -311,6 +340,21 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory):
         except runner_mod.NotRunning as e:
             return web.json_response({"error": str(e)}, status=409)
         return web.json_response({"ok": True})
+
+    async def set_mode(request):
+        data = await body(request)
+        try:
+            state.set_mode(data.get("mode"))
+        except ValueError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        return web.json_response({"mode": state.mode})
+
+    async def run_diagnostic(request):
+        a, _ = need_pair()
+        loop = asyncio.get_running_loop()
+        result = await loop.run_in_executor(None, diag_runner, a)
+        state.set_diagnostic(result)
+        return web.json_response(result)
 
     async def continue_wait(request):
         a, _ = need_pair()
@@ -391,6 +435,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory):
     r.add_post("/api/save", save)
     r.add_post("/api/run", run)
     r.add_post("/api/stop-now", stop_now)
+    r.add_post("/api/mode", set_mode)
+    r.add_post("/api/diagnostic", run_diagnostic)
     r.add_post("/api/continue-wait", continue_wait)
     r.add_post("/api/continue-session", continue_session)
     r.add_post("/api/stop-next-lot", stop_next)
@@ -413,10 +459,7 @@ def main(argv=None):
 
     state = State(args.config) if args.config else State()
 
-    def on_end(run):
-        state.set_relay(run.repo, run.work, run.prompt, run.relay, run.next, run.outcome)
-
-    rn = runner_mod.Runner(on_end=on_end)
+    rn = runner_mod.Runner(on_end=make_on_end(state), mode_getter=lambda: state.mode)
     app = make_app(state, rn)
     url = f"http://{HOST}:{args.port}/"
 

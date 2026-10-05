@@ -45,7 +45,7 @@ def with_client(tmp_path, body, picker=None, script=script_until_interrupted):
         return FakeClient(script, can_use_tool)
 
     rn = runner_mod.Runner(client_factory=factory,
-                           on_end=lambda r: state.set_relay(r.repo, r.work, r.prompt, r.relay, r.next, r.outcome))
+                           on_end=server.make_on_end(state), mode_getter=lambda: state.mode)
     app = server.make_app(state, rn, picker=picker or (lambda initial: str(app_root)))
 
     async def go():
