@@ -33,6 +33,9 @@ class FakeClient:
     def receive_response(self):
         return self.script(self)
 
+    def receive_messages(self):
+        return self.script(self)
+
     async def interrupt(self):
         self.interrupted.set()
 
