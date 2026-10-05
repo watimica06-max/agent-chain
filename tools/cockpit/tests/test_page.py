@@ -1,4 +1,4 @@
-"""Cockpit 1.2 — the page in a headless browser (Microsoft Edge through
+"""Cockpit 1.2-1.3 — the page in a headless browser (Microsoft Edge through
 Playwright), served by the real cockpit server over a fake application
 folder and a fake SDK client. Skipped when Playwright or Edge is missing.
 No chain command runs."""
@@ -14,7 +14,7 @@ from test_mode_diagnostic import ALL_GOOD, fake_exec  # noqa: E402
 from test_runner import script_until_interrupted  # noqa: E402
 
 SCREENS = [("Tableau de bord", "scr-dashboard"), ("À répondre", "scr-answer"),
-           ("Run", "scr-run"), ("Paramètres", "scr-settings")]
+           ("Chaîne", "scr-chaine"), ("Correction", "scr-correction"), ("Paramètres", "scr-settings")]
 
 
 @pytest.fixture(scope="module")
@@ -77,9 +77,9 @@ def test_each_screen_loads_without_js_error(tmp_path, page):
             go(page, name)
             page.wait_for_selector(f"#{scr}", state="visible")
             assert page.locator("#main section:visible").evaluate_all("els => els.map(e => e.id)") == [scr]
-        # Four entries, « Paramètres » last in the menu, the count on « À répondre ».
-        assert page.locator("#side a").all_inner_texts()[0] == "Tableau de bord"
-        assert page.locator("#side a").last.inner_text() == "Paramètres"
+        # Five entries, « Paramètres » last in the menu, the count on « À répondre ».
+        names = [t.split("\n")[0].strip() for t in page.locator("#side a").all_inner_texts()]
+        assert names == ["Tableau de bord", "À répondre", "Chaîne", "Correction", "Paramètres"]
         assert page.locator("#nav-answer-count").inner_text() == "7"
         assert " ".join(page.locator("#tb-mode").inner_text().split()) == "Mode : Auto"
         assert page.locator("#tb-run").inner_text() == "Au repos"
@@ -165,8 +165,10 @@ def test_answer_screen_groups_options_and_marks_the_default(tmp_path, page):
 
 
 NEXT_FORMS = [
-    ("Fini.\nNext: run /7_lots f", "run", "Lancer /7_lots f"),
-    ("Fini.\nNext: answer questions, then run /4_grille f", "answer", "Répondre (7)"),
+    # Opening the page checks the stored line (§2.3): in « f », 1_lexique waits on
+    # answers, so a run of any later step would be dropped — /1_lexique holds.
+    ("Fini.\nNext: run /1_lexique f", "run", "Lancer /1_lexique f"),
+    ("Fini.\nNext: answer questions, then run /4_grille f", "answer", "Répondre (4)"),
     ("Fini.\nNext: manual installer l'application sur le téléphone", "manual", None),
     ("Fini.\nNext: stop le split n'est pas cohérent", "stop", None),
     ("Fini.\nNext: done", "done", None),
@@ -188,26 +190,34 @@ def test_dashboard_button_for_each_next_form(tmp_path, page, relay, kind, button
             assert buttons == []                          # the text, no button
         else:
             assert buttons == [button]                    # one primary button
+        assert page.locator("#next-source").inner_text() == "dit par la chaîne"
         if kind == "answer":
             assert "Ensuite : /4_grille f" in card.inner_text()
-            card.get_by_role("button", name="Répondre (7)").click()
+            card.get_by_role("button", name="Répondre (4)").click()
             page.wait_for_selector("#scr-answer", state="visible")
+            assert page.locator(".entry").count() == 4                     # the questions the line names
         if kind == "run":
-            card.get_by_role("button", name="Lancer /7_lots f").click()   # named by the relay: no confirmation
-            page.wait_for_selector("#scr-run", state="visible")           # launching switches to Run
+            card.get_by_role("button", name="Lancer /1_lexique f").click()  # named by the relay: no confirmation
+            page.wait_for_selector("#scr-chaine", state="visible")           # launching shows the chain…
             page.wait_for_selector("#perm-banner .perm")
+            page.wait_for_selector("#slot-main-1_lexique #run-panel")       # …the run under its step
+            assert s.clients[0].prompts == ["/1_lexique f"]
             stop_run(s)
         assert no_real_errors(page) == []
 
 
-def test_dashboard_with_no_relay_guesses_nothing(tmp_path, page):
+def test_dashboard_with_no_relay_shows_the_folders_proposal(tmp_path, page):
+    # 1.3: no stored Next: → the scan's proposal, labelled. « f » holds an
+    # empty bugfix-01/: the highest correction, its bug-list still to write.
     with FakeServer(tmp_path) as s:
         page.goto(s.url)
-        page.wait_for_selector("#next-text")
-        assert "Aucune étape connue. Choisis une commande" in page.locator("#next-text").inner_text()
-        assert page.locator("#next-detail button").all_inner_texts() == ["Voir la liste des commandes"]
-        page.get_by_role("button", name="Voir la liste des commandes").click()
-        page.wait_for_selector("#scr-settings", state="visible")
+        page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
+        assert page.locator("#next-source").inner_text() == "déduite du dossier"
+        assert page.locator("#next-text").inner_text() == (
+            "À faire à la main : écrire bugfix-01/bug-list.md, puis lancer /diagnostique f.")
+        page.get_by_role("button", name="Écrire la bug-list").click()
+        page.wait_for_selector("#scr-correction", state="visible")
+        page.wait_for_selector("#buglist-text")
         assert no_real_errors(page) == []
 
 

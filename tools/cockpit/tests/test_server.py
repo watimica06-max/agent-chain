@@ -85,14 +85,19 @@ def test_start_screen_then_open(tmp_path):
         r = await post(c, "/api/pick-folder", {})
         assert (await r.json())["path"] == str(app_root)
         r = await post(c, "/api/app-folder", {"path": str(app_root)})
-        assert (await r.json())["working_folders"] == ["f", "f/bugfix-01"]
+        # 1.3: the features alone; their bugfix-NN/ live under « Correction ».
+        assert (await r.json())["working_folders"] == ["f"]
         r = await post(c, "/api/app-folder", {"path": str(feat)})
         assert r.status == 400
-        await open_pair(c, app_root, "f/bugfix-01")
+        r = await post(c, "/api/open", {"app": str(app_root), "work": "f/bugfix-01"})
+        assert r.status == 400
+        await open_pair(c, app_root, "f")
         s = await (await c.get("/api/state")).json()
         assert s["open"] and s["feature"] == "f" and s["last"] is None and s["run"] is None
         assert [x["name"] for x in s["commands"]] == ["1_lexique", "2_structure", "8_code", "10_x", "deploie"]
-        assert s["recent"][0] == {"app": str(app_root), "work": "f/bugfix-01"}
+        assert s["recent"][0] == {"app": str(app_root), "work": "f"}
+        assert s["bugfixes"] == ["bugfix-01"] and s["scan"]["main"][0]["id"] == "1_lexique"
+        assert s["decision"]["label"] == "déduite du dossier"
     with_client(tmp_path, body)
 
 

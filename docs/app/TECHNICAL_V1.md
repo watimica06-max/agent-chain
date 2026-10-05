@@ -1,9 +1,13 @@
-# Chain cockpit — technical design, version 1.2
+# Chain cockpit — technical design, version 1.3
 
 A local application that lets the Product Owner run the agent chain
 without editing files by hand. Version 1 covers the two things that cost
 her the most time: **answering questions and blocking files**, and
 **knowing which command comes next**.
+
+*1.3 — where the feature stands: a scan of the files (§10), the stored
+`Next:` checked against them (§2.2, §11); « Chaîne » and « Correction »
+as flows (§12); the working folder is the feature alone (§4).*
 
 *1.2 — the permission mode (§6); the page rebuilt around four screens
 and an environment diagnostic.*
@@ -44,14 +48,32 @@ is read by `/8_code` only (§7); `Next:` carries a second step (§9).*
    depend on it.** Agents and commands keep reading and writing files.
    If the application breaks, every command still runs from Claude Code
    and nothing is lost.
-2. **The application never decides the next step.** The command decides
-   it and prints it on its last line (§9). The application reads that
-   line and highlights the matching button.
+2. **The next step** — the command prints it on its last line (§9); the
+   application never decides it, with one fallback (1.3):
+   1. **The files are the ground truth.** A stored `Next:` is a statement
+      the chain made at one moment; a run that crashed, a bug of the
+      cockpit, or an answer saved since can make it wrong.
+   2. **The chain's `Next:` is trusted right after its run, and checked
+      against the files at every other moment** (§11). A stored `Next:`
+      the files contradict is dropped, and the page says so.
+   3. **The scan's proposal is always labelled « déduite du dossier ».**
+   4. **A wrong deduction costs little**, because every command tests its
+      own preconditions before it acts and stops with its own `Next:`.
+      `tools/cockpit/scan_rules.md` §2 checks that this is true before it
+      is relied on.
+
+   *Checked in 1.3: it is not true of `/2_structure`, `/3_decoupe`,
+   `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/fusion` and
+   `/diagnostique` — each files, copies, commits or branches before one
+   of its tests. The page asks for confirmation before launching them,
+   even when the step is the one proposed.*
 3. **The application writes only where the Product Owner writes today**:
    - `Answer:` fields;
    - `## Decision` sections;
    - `## Décision du Product Owner` in `code/redecoupage.md`;
-   - `stop.md`.
+   - `stop.md`;
+   - *(1.3)* a new `bugfix-NN/` and its `bug-list.md`, which she used to
+     create by hand (§12).
 
    Everything else is read-only.
 4. **Write back to the file you read.** A blocking file read from a live
@@ -91,9 +113,10 @@ Browser page  ⇄  local Python server  ⇄  Claude Agent SDK (Python)  ⇄  Cla
 - At first launch, two buttons open the native Windows folder picker,
   run by the server:
   - **the application folder**, for example `C:\Dev\hyrox_tracker`;
-  - **the working folder**: a feature folder under `docs/features/`, or
-    one of its `bugfix-NN/` folders, picked from a list the server
-    builds.
+  - **the feature**, picked from `docs/features/`. *(1.3: its
+    `bugfix-NN/` are no longer picked here — they live under
+    « Correction », §12. A 1.2 value `feature/bugfix-NN` reads as the
+    feature.)*
 - Both are saved in `config.json` in the application's own folder, with
   a short list of recent pairs.
 - On relaunch, the last pair opens directly. A "change" button returns
@@ -274,8 +297,82 @@ Next: done
   is what the chain prints when it does not know the next step; the
   application never fills that gap.
 - `done` → the page says the cycle step is complete.
-- **No `Next:` line** → the page says the next step is unknown and shows
-  the full relay.
+- **No `Next:` line** → right after the run, the page says so, shows the
+  full relay and offers « Continuer la session »; at any later moment the
+  scan's proposal takes its place, labelled (§11).
 
 The grammar is defined once, in `.claude/CLAUDE.md`. Each command gives
 its values.
+
+---
+
+## 10. Where the feature stands — the scan (1.3)
+
+`tools/cockpit/scan.py` reads the feature folder and its `bugfix-NN/` —
+**files only**: no Claude call, no git command (`HEAD` is read from
+`.git/`), no write; about 40 ms on `premiere-app`. Every step of the main
+chain and of each correction chain gets one state — **faite**,
+**t'attend**, **en cours**, **bloquée**, **à faire**, or **inconnu** when
+no rule places it. Each rule is a test of the command itself, with its
+lines: **`tools/cockpit/scan_rules.md` is the table to check the scan
+against**, and a test fails when a cited line no longer says what its
+rule reads.
+
+- **An open question or blocking entry belongs to the step named after
+  it in « `answer …, then run X` »** — X is « t'attend ».
+- **The proposed step** is the first one, in chain order, not « faite »;
+  it is proposed when it is « t'attend » or « à faire », never past a
+  « bloquée » or « inconnu » one. While the highest `bugfix-NN/` has a
+  step not done, the proposal is the correction's: the commands act on
+  it.
+- `/8_code` also reports its lots, « n / N en PASS », from the verdicts
+  the way `/8_code` reads them.
+
+## 11. The next step, decided in this order (1.3)
+
+1. **A run is going** → that run.
+2. **A run has just ended** → its `Next:`, as it printed it — the only
+   moment a `Next:` is trusted without a check.
+3. **At every other moment** — « Où on en est ? », the page opening, a
+   save of answers — the scan runs and checks the stored `Next:`:
+   - it holds → shown, « dit par la chaîne »;
+   - `answer …, then run X` with nothing left to answer → X, same label;
+   - **the files contradict it** → dropped; the scan's proposal takes its
+     place, « déduite du dossier », and the page says « Le dernier relais
+     disait <X> ; les fichiers disent <Y>. »
+4. **No stored `Next:`** → the scan's proposal, labelled.
+
+A stored `Next: run X` is contradicted when a step before X is
+« t'attend », when X is « faite » or « bloquée », or when `HEAD` moved
+since the relay — `HEAD` is stored with each relay, so a move is not a
+cockpit run's. A `manual`, `stop` or `done` line is contradicted by a
+`HEAD` move only. **Every dropped `Next:` is written once to the log of
+the run that printed it** (`"type": "NextDropped"`, with the reason and
+the trigger).
+
+## 12. The screens (1.3)
+
+Tableau de bord · À répondre · **Chaîne** · **Correction** · Paramètres,
+and « Où on en est ? » in the top bar.
+
+- **Tableau de bord** — « Prochaine étape » follows §11 and says where it
+  comes from; « Pourquoi ? » shows the step's rule, its files and lines.
+- **Chaîne** — replaces « Run »: the main chain as a flow, one step per
+  command, its state as a colour and a word. The next step stands out;
+  one click launches it with the feature, or with the `Next:` line's own
+  arguments. A step that is neither the chain's `Next:` nor the scan's
+  proposal asks for confirmation, and so does every command
+  `scan_rules.md` §2 flags. A step « t'attend » opens « À répondre »
+  filtered on it; the running step shows the live run under it; the test
+  step carries « Déployer » (`/deploie`) and what to test from
+  `code/recette-ordonnee.md`.
+- **Correction** — the feature's `bugfix-NN/`, newest first, each as the
+  correction flow. Only the highest launches. « Nouvelle correction »
+  creates the next `bugfix-NN/` and its empty `bug-list.md` — those two
+  things only — and opens it for writing; `bug-list.md` is the one file
+  written there, and only until `desc-bug.md` exists.
+- **Paramètres** — the application folder and the feature; « Commandes »
+  stays the escape hatch.
+
+The page writes nothing beyond §2.3's places — the last of them, `bugfix-NN/bug-list.md`, new in 1.3.
+
