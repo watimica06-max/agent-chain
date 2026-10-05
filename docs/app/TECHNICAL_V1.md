@@ -1,9 +1,12 @@
-# Chain cockpit — technical design, version 1.1
+# Chain cockpit — technical design, version 1.2
 
 A local application that lets the Product Owner run the agent chain
 without editing files by hand. Version 1 covers the two things that cost
 her the most time: **answering questions and blocking files**, and
 **knowing which command comes next**.
+
+*1.2 — the permission mode (§6); the page rebuilt around four screens
+and an environment diagnostic.*
 
 *1.1 — corrected after `docs/app/analyse-v1.md`: the default is accepted
 by leaving `Answer:` empty (§8.1); five blocking-file shapes, not two
@@ -118,10 +121,19 @@ Browser page  ⇄  local Python server  ⇄  Claude Agent SDK (Python)  ⇄  Cla
 
 ## 6. Permissions
 
-- Every permission request reaches the `can_use_tool` callback. The
-  server turns it into a card in the page (tool, input, Allow, Deny) and
-  waits for the click.
-- The run waits with it. No permission is granted by default.
+- **Two modes, « Auto » and « Manuel », default Auto.** The mode is set
+  in Settings, shown in the top bar and remembered in `config.json`. It
+  is passed explicitly on every run, as `ClaudeAgentOptions.permission_mode`
+  (`auto`, or `default` for Manuel) — never left to the CLI's default —
+  and a change applies from the next run. In Auto, Claude Code's
+  classifier approves or blocks the tool calls itself; a request it sends
+  back to a prompt still reaches the `can_use_tool` callback, so **auto
+  mode falls back to a card**, as Manuel does for every request the
+  settings rules do not allow.
+- Every permission request that reaches the `can_use_tool` callback is
+  turned by the server into a card (tool, input, Allow, Deny), shown as a
+  banner at the top of every screen, and the run waits on the click.
+- No permission is granted by default.
 
 ## 7. Stopping
 

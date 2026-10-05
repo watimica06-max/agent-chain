@@ -9,6 +9,8 @@ from datetime import datetime
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PATH = os.path.join(HERE, "config.json")
 MAX_RECENT = 8
+MAX_HISTORY = 30
+MODES = ("auto", "manuel")
 
 
 def _key(app: str, work: str) -> str:
@@ -19,7 +21,8 @@ class State:
     def __init__(self, path: str = DEFAULT_PATH):
         self.path = path
         self._lock = threading.Lock()
-        self.data = {"app_folder": None, "working_folder": None, "recent": [], "relays": {}}
+        self.data = {"app_folder": None, "working_folder": None, "recent": [], "relays": {},
+                     "mode": "auto", "diagnostic": None, "history": []}
         self.load_error = None
         if os.path.exists(path):
             try:
@@ -74,6 +77,39 @@ class State:
 
     def relay(self, app: str, work: str):
         return self.data.get("relays", {}).get(_key(app, work))
+
+    @property
+    def mode(self):
+        """The permission mode of the next run: « auto » unless set otherwise."""
+        m = self.data.get("mode")
+        return m if m in MODES else "auto"
+
+    def set_mode(self, mode: str):
+        if mode not in MODES:
+            raise ValueError(f"mode inconnu : {mode}")
+        with self._lock:
+            self.data["mode"] = mode
+            self._save()
+
+    def diagnostic(self):
+        return self.data.get("diagnostic")
+
+    def set_diagnostic(self, result: dict):
+        with self._lock:
+            self.data["diagnostic"] = result
+            self._save()
+
+    def add_history(self, app: str, work: str, entry: dict):
+        with self._lock:
+            hist = self.data.setdefault("history", [])
+            hist.insert(0, {"key": _key(app, work), **entry})
+            del hist[MAX_HISTORY:]
+            self._save()
+
+    def history(self, app: str, work: str, n: int = 5):
+        k = _key(app, work)
+        return [{a: b for a, b in h.items() if a != "key"}
+                for h in self.data.get("history", []) if h.get("key") == k][:n]
 
     def recent(self):
         return list(self.data.get("recent", []))

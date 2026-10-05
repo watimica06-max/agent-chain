@@ -9,197 +9,318 @@
 :root {
   --bg: #f4f3ef; --card: #ffffff; --ink: #1f2328; --soft: #5c6470; --line: #dedbd3;
   --accent: #2f6b8f; --accent-ink: #ffffff; --accent-soft: #e4eef4;
-  --next: #c77d1a; --next-soft: #fbf0de; --ok: #2e7d4f; --ok-soft: #e3f2e8;
-  --err: #b3392f; --err-soft: #fbe7e4; --warn: #8a6d1a; --warn-soft: #fbf4dc;
+  --ok: #2e7d4f; --ok-soft: #e3f2e8;
+  --err: #b3392f; --err-soft: #fbe7e4;          /* red: only what blocks a run */
+  --warn: #8a6d1a; --warn-soft: #fbf4dc;
   --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
-  --radius: 10px;
+  --radius: 10px; --side: 224px;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #1b1d20; --card: #24272b; --ink: #e8e6e1; --soft: #a3a9b1; --line: #3a3e44;
     --accent: #6aa7cc; --accent-ink: #0f1a22; --accent-soft: #23343f;
-    --next: #e0a24a; --next-soft: #3a2f1e; --ok: #6cc28f; --ok-soft: #1f3327;
+    --ok: #6cc28f; --ok-soft: #1f3327;
     --err: #ec8a80; --err-soft: #3d2422; --warn: #e3c56b; --warn-soft: #3a3320;
   }
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink);
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); display: flex; flex-direction: column;
   font: 17px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; }
-header { display: flex; align-items: center; gap: 16px; padding: 12px 24px;
-  background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
-header h1 { font-size: 19px; margin: 0; font-weight: 650; }
-header .pair { color: var(--soft); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-header .pair b { color: var(--ink); }
-main { padding: 20px 24px 60px; max-width: 1600px; margin: 0 auto; }
-h2 { font-size: 20px; margin: 0 0 12px; }
-h3 { font-size: 17px; margin: 0 0 8px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; }
-.zone + .zone { margin-top: 20px; }
-.cols { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; margin-top: 20px; align-items: start; }
-@media (max-width: 1100px) { .cols { grid-template-columns: 1fr; } }
+h1, h2, h3 { margin: 0; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; margin-bottom: 8px; }
 button { font: inherit; min-height: 44px; padding: 8px 18px; border-radius: 8px; cursor: pointer;
   border: 1px solid var(--line); background: var(--card); color: var(--ink); }
 button:hover:not(:disabled) { border-color: var(--accent); }
 button:disabled { opacity: .5; cursor: not-allowed; }
 button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
-button.next { background: var(--next); color: #fff; border-color: var(--next); font-weight: 650; }
+button.big { min-height: 52px; padding: 12px 28px; font-size: 18px; }
 button.danger { color: var(--err); border-color: var(--err); }
+button.allow { background: var(--ok); color: #fff; border-color: var(--ok); font-weight: 600; }
 button.link { border: none; background: none; color: var(--accent); padding: 4px 0; min-height: 0; text-decoration: underline; }
+a { color: var(--accent); }
 input[type=text], textarea { font: inherit; width: 100%; padding: 9px 12px; border-radius: 8px;
   border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
-textarea { min-height: 70px; resize: vertical; }
+textarea { min-height: 72px; resize: vertical; }
 input[type=text]:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 .muted { color: var(--soft); }
 .small { font-size: 14px; }
 .mono { font-family: var(--mono); font-size: 14px; }
 .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.grow { flex: 1; min-width: 200px; }
+.grow { flex: 1; min-width: 0; }
 .hidden { display: none !important; }
-.badge { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 99px;
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 24px; }
+.card + .card { margin-top: 20px; }
+.badge { display: inline-block; font-size: 13px; padding: 1px 9px; border-radius: 99px;
   background: var(--accent-soft); color: var(--accent); font-weight: 600; vertical-align: middle; }
-.badge.next { background: var(--next-soft); color: var(--next); }
 .badge.warn { background: var(--warn-soft); color: var(--warn); }
 .badge.err { background: var(--err-soft); color: var(--err); }
 .notice { border-radius: 8px; padding: 10px 14px; margin: 10px 0; }
-.notice.err { background: var(--err-soft); color: var(--err); }
+.notice.err { background: var(--warn-soft); color: var(--warn); }
 .notice.warn { background: var(--warn-soft); color: var(--warn); }
 .notice.ok { background: var(--ok-soft); color: var(--ok); }
 pre.text { white-space: pre-wrap; word-wrap: break-word; font: inherit; margin: 0; }
 
-/* Écran de démarrage */
-#start { max-width: 880px; margin: 0 auto; display: grid; gap: 20px; }
+/* ------------------------------------------------------------ frame */
+#chrome { flex: none; z-index: 30; background: var(--card); border-bottom: 1px solid var(--line); }
+#topbar { display: flex; align-items: center; gap: 12px; padding: 8px 20px; min-height: 56px; }
+#topbar h1 { font-size: 18px; font-weight: 650; margin-right: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 99px; min-height: 0;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); font-size: 15px; }
+button.chip:hover { border-color: var(--accent); }
+.chip b { font-weight: 650; }
+.chip.running { border-color: var(--accent); background: var(--accent-soft); }
+#perm-badge { background: var(--err); border-color: var(--err); color: #fff; font-weight: 650; border-radius: 99px; min-height: 0; padding: 5px 14px; }
+#perm-banner { border-top: 1px solid var(--err); background: var(--err-soft); padding: 10px 20px 12px;
+  max-height: 46vh; overflow: auto; }
+.perm { background: var(--card); border: 2px solid var(--err); border-radius: var(--radius); padding: 10px 14px; margin-top: 8px; }
+.perm:first-child { margin-top: 0; }
+.perm pre { max-height: 110px; overflow: auto; background: var(--bg); padding: 8px; border-radius: 6px;
+  font-family: var(--mono); font-size: 13px; white-space: pre-wrap; margin: 6px 0 8px; }
+.perm .title { font-weight: 650; color: var(--err); }
+#shell { flex: 1; min-height: 0; display: grid; grid-template-columns: var(--side) minmax(0, 1fr); }
+#side { border-right: 1px solid var(--line); background: var(--card); padding: 16px 12px; display: flex;
+  flex-direction: column; gap: 4px; overflow: auto; }
+#side a { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-radius: 8px; color: var(--ink);
+  text-decoration: none; font-weight: 500; min-height: 48px; }
+#side a:hover { background: var(--bg); }
+#side a[aria-current=page] { background: var(--accent-soft); color: var(--accent); font-weight: 650; }
+#side .spacer { flex: 1; }
+.count { margin-left: auto; background: var(--accent); color: var(--accent-ink); font-size: 13px; font-weight: 650;
+  border-radius: 99px; padding: 0 9px; min-width: 24px; text-align: center; }
+.dot { margin-left: auto; width: 11px; height: 11px; border-radius: 50%; background: var(--accent);
+  animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+#main { overflow: auto; position: relative; }
+.screen { padding: 28px 32px 48px; max-width: 1180px; margin: 0 auto; }
+#shell.nofolder { grid-template-columns: 1fr; }
+#shell.nofolder #side { display: none; }
+
+/* ---------------------------------------------------------- start */
+#start { max-width: 880px; margin: 0 auto; padding: 28px 24px; display: grid; gap: 20px; }
+#start .card + .card { margin-top: 0; }
 .folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; margin-top: 10px; }
 .folders button { text-align: left; }
 .folders button.sel { border: 2px solid var(--accent); background: var(--accent-soft); }
 .recent button { display: block; width: 100%; text-align: left; margin-top: 8px; }
 
-/* Prochaine étape */
-#next-text { font-size: 22px; font-weight: 600; margin: 4px 0 12px; }
-#next-zone.k-run { border-left: 6px solid var(--next); }
-#next-zone.k-answer { border-left: 6px solid var(--accent); }
-.cmds { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 8px; margin-top: 14px; }
-.cmd { display: flex; gap: 8px; align-items: center; padding: 6px; border-radius: 9px; border: 1px solid transparent; }
-.cmd button { flex: none; min-width: 150px; text-align: left; font-family: var(--mono); font-size: 15px; white-space: nowrap; }
-.cmd input { flex: 1; min-width: 90px; font-family: var(--mono); font-size: 15px; }
-.cmd.hl { border-color: var(--next); background: var(--next-soft); }
+/* ------------------------------------------------------ dashboard */
+#next-card { padding: 28px 32px; border-left: 6px solid var(--accent); }
+#next-card .label { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--soft); margin-bottom: 6px; }
+#next-text { font-size: 26px; font-weight: 600; line-height: 1.3; margin-bottom: 18px; }
+#next-meta { margin-top: 14px; }
+.counters { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+.counter { display: block; text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 18px 24px; }
+.counter:hover { border-color: var(--accent); }
+.counter .n { font-size: 36px; font-weight: 650; line-height: 1.1; }
+.counter .n.zero { color: var(--soft); }
+.alerts { margin-top: 20px; }
+.alert { background: var(--warn-soft); color: var(--warn); border-radius: var(--radius); padding: 12px 18px; margin-bottom: 8px; }
+.alert button.link { color: inherit; }
+.runs { width: 100%; border-collapse: collapse; font-size: 15px; }
+.runs th { text-align: left; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); font-weight: 600; padding: 4px 10px 8px 0; }
+.runs td { padding: 10px 10px 10px 0; border-top: 1px solid var(--line); vertical-align: top; }
+.runs td.cmd { font-family: var(--mono); font-size: 14px; white-space: nowrap; }
+.runs td.log { font-family: var(--mono); font-size: 12px; color: var(--soft); word-break: break-all; }
 details summary { cursor: pointer; color: var(--accent); margin-top: 10px; }
 details pre { max-height: 360px; overflow: auto; background: var(--bg); padding: 12px; border-radius: 8px; }
 
-/* À répondre */
-.entry { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin-top: 12px; background: var(--card); }
-.entry.saved { border-color: var(--ok); }
-.entry.failed { border-color: var(--err); }
+/* ------------------------------------------------------ à répondre */
+#answer-top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
+#progress { font-size: 20px; font-weight: 650; }
+.filters { display: flex; gap: 8px; margin: 10px 0 4px; }
+.filters button { min-height: 38px; padding: 4px 16px; border-radius: 99px; }
+.filters button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 650; }
+.grp { margin-top: 20px; }
+.grp > summary { list-style: none; cursor: pointer; font-family: var(--mono); font-size: 14px; color: var(--soft);
+  padding: 8px 0; border-bottom: 1px solid var(--line); margin: 0; }
+.grp > summary::before { content: "▾ "; }
+.grp:not([open]) > summary::before { content: "▸ "; }
+.entry { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; margin-top: 14px; background: var(--card); }
+.entry.failed { border-color: var(--warn); }
 .entry .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 6px; }
 .entry .ctx { color: var(--soft); font-size: 15px; }
-.entry .q { margin: 6px 0 10px; }
+.entry .q { margin: 6px 0 12px; font-size: 18px; }
 .entry .lbl { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); margin-top: 8px; }
-.opts { display: grid; gap: 6px; margin: 8px 0; }
-.opt { display: flex; gap: 10px; align-items: flex-start; padding: 9px 12px; border: 1px solid var(--line);
+.opts { display: grid; gap: 8px; margin: 10px 0; }
+.opt { display: flex; gap: 12px; align-items: flex-start; padding: 13px 16px; min-height: 52px; border: 1px solid var(--line);
   border-radius: 8px; cursor: pointer; }
 .opt:hover { border-color: var(--accent); }
-.opt input { margin-top: 5px; width: 18px; height: 18px; flex: none; }
+.opt input { margin-top: 4px; width: 20px; height: 20px; flex: none; }
 .opt.chosen { border-color: var(--accent); background: var(--accent-soft); }
+.opt.later { min-height: 44px; padding: 8px 16px; }
 .opt.later.chosen { border-color: var(--line); background: none; }
-.result { margin-top: 8px; font-size: 15px; }
-.file-head { margin-top: 18px; font-family: var(--mono); font-size: 14px; color: var(--soft); }
-#save-bar { position: sticky; bottom: 0; background: var(--card); padding: 12px 0 4px; margin-top: 16px;
-  border-top: 1px solid var(--line); display: flex; gap: 12px; align-items: center; }
+#save-bar { position: sticky; bottom: 0; z-index: 10; background: var(--card); border-top: 1px solid var(--line);
+  padding: 12px 32px; display: flex; gap: 16px; align-items: center; box-shadow: 0 -6px 16px rgba(0,0,0,.06); }
+#save-hint { font-weight: 600; }
+.sumline { margin: 4px 0; font-size: 15px; }
+.sumline.ok { color: var(--ok); } .sumline.err { color: var(--warn); font-weight: 600; }
 
-/* Run */
-#perm-list .perm { border: 2px solid var(--next); background: var(--next-soft); border-radius: var(--radius); padding: 12px 14px; margin: 10px 0; }
-#perm-list pre { max-height: 220px; overflow: auto; background: var(--card); padding: 8px; border-radius: 6px; font-family: var(--mono); font-size: 13px; white-space: pre-wrap; }
-@media (min-width: 1101px) { #run-zone { position: sticky; top: 84px; } }
-#stream { height: min(520px, calc(100vh - 380px)); min-height: 200px; overflow: auto; background: var(--bg); border-radius: 8px; padding: 10px 12px; margin-top: 12px;
-  font-size: 15px; border: 1px solid var(--line); }
+/* -------------------------------------------------------------- run */
+#run-head .title { font-size: 20px; font-weight: 600; }
+#agents .badge { margin-right: 6px; }
+#stream { height: min(560px, calc(100vh - 360px)); min-height: 220px; overflow: auto; background: var(--card); border-radius: var(--radius);
+  padding: 12px 16px; margin-top: 16px; font-size: 15px; border: 1px solid var(--line); }
 #stream .ev { margin: 0 0 8px; }
 #stream .who { font-weight: 650; color: var(--accent); margin-right: 6px; }
 #stream .tool { color: var(--soft); font-family: var(--mono); font-size: 13px; margin: 0 0 4px; }
-#stream .sys { color: var(--next); font-size: 14px; margin: 6px 0; }
-#agents .badge { margin-right: 6px; }
+#stream .sys { color: var(--soft); font-size: 14px; margin: 6px 0; font-style: italic; }
+
+/* --------------------------------------------------------- settings */
+.sec + .sec { margin-top: 20px; }
+.cmd-group { margin-top: 18px; }
+.cmds { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 8px; margin-top: 6px; }
+.cmd { display: flex; gap: 8px; align-items: center; padding: 6px; border-radius: 9px; border: 1px solid transparent; }
+.cmd button { flex: none; min-width: 150px; text-align: left; font-family: var(--mono); font-size: 15px; white-space: nowrap; }
+.cmd input { flex: 1; min-width: 90px; font-family: var(--mono); font-size: 15px; }
+.cmd.hl { border-color: var(--accent); background: var(--accent-soft); }
+.modes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modes label { display: block; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; cursor: pointer; }
+.modes label.on { border-color: var(--accent); background: var(--accent-soft); }
+.diag li { list-style: none; margin: 6px 0; }
+.diag ul { padding: 0; margin: 10px 0; }
+.diag .ok { color: var(--ok); } .diag .fail { color: var(--warn); } .diag .skip { color: var(--soft); }
+@media (max-width: 1100px) { :root { --side: 188px; } .screen { padding: 22px 20px 40px; } #save-bar { padding: 12px 20px; } }
 </style>
 </head>
 <body>
-<header>
-  <h1>Cockpit de la chaîne</h1>
-  <div class="pair" id="pair-label"></div>
-  <button id="perm-alert" class="next hidden">Autorisation demandée</button>
-  <button id="btn-change" class="hidden">Changer de dossier</button>
-</header>
+<div id="chrome">
+  <div id="topbar">
+    <h1>Cockpit</h1>
+    <button id="tb-folder" class="chip hidden" title="Dossiers"></button>
+    <button id="tb-mode" class="chip hidden" title="Mode de permission"></button>
+    <span id="tb-run" class="chip hidden"></span>
+    <span class="grow"></span>
+    <button id="perm-badge" class="hidden">Autorisation demandée</button>
+  </div>
+  <div id="perm-banner" class="hidden" role="alert" aria-label="Autorisation demandée"></div>
+</div>
 
-<main>
-  <!-- ======================= Écran de démarrage ======================= -->
-  <section id="start" class="hidden">
-    <div id="start-error" class="notice err hidden"></div>
-    <div class="card">
-      <h2>Dossier de l'application</h2>
-      <p class="muted small">Le dossier qui contient <span class="mono">.claude/</span> et <span class="mono">docs/features/</span>.</p>
-      <div class="row">
-        <input type="text" id="app-path" class="grow" placeholder="C:\Dev\hyrox_tracker">
-        <button id="btn-browse">Parcourir…</button>
-        <button id="btn-app" class="primary">Valider</button>
+<div id="shell" class="nofolder">
+  <nav id="side" aria-label="Menu">
+    <a href="#dashboard" id="nav-dashboard">Tableau de bord</a>
+    <a href="#answer" id="nav-answer">À répondre <span id="nav-answer-count" class="count hidden"></span></a>
+    <a href="#run" id="nav-run">Run <span id="nav-run-dot" class="dot hidden" title="Une commande tourne"></span></a>
+    <span class="spacer"></span>
+    <a href="#settings" id="nav-settings">Paramètres</a>
+  </nav>
+
+  <div id="main">
+    <!-- ======================= Écran de démarrage ======================= -->
+    <section id="start" class="hidden">
+      <div id="start-error" class="notice err hidden"></div>
+      <div class="card">
+        <h2>Dossier de l'application</h2>
+        <p class="muted small">Le dossier qui contient <span class="mono">.claude/</span> et <span class="mono">docs/features/</span>.</p>
+        <div class="row">
+          <input type="text" id="app-path" class="grow" placeholder="C:\Dev\hyrox_tracker">
+          <button id="btn-browse">Parcourir…</button>
+          <button id="btn-app" class="primary">Valider</button>
+        </div>
+        <p class="muted small">Si la fenêtre de choix ne s'ouvre pas, collez le chemin dans le champ.</p>
       </div>
-      <p class="muted small">Si la fenêtre de choix ne s'ouvre pas, collez le chemin dans le champ.</p>
-    </div>
-    <div class="card" id="work-card">
-      <h2>Dossier de travail</h2>
-      <p class="muted small">Une feature de <span class="mono">docs/features/</span>, ou l'un de ses <span class="mono">bugfix-NN/</span>.</p>
-      <div class="folders" id="work-list"><span class="muted">Choisissez d'abord le dossier de l'application.</span></div>
-      <div class="row" style="margin-top:14px"><button id="btn-open" class="primary" disabled>Ouvrir</button></div>
-    </div>
-    <div class="card recent" id="recent-card">
-      <h2>Récents</h2>
-      <div id="recent-list" class="muted">Aucun.</div>
-    </div>
-  </section>
-
-  <!-- ========================= Écran principal ========================= -->
-  <section id="main" class="hidden">
-    <!-- Zone 1 -->
-    <div class="card zone" id="next-zone">
-      <h2>Prochaine étape</h2>
-      <div id="next-text">—</div>
-      <div id="next-detail" class="row"></div>
-      <div id="next-meta" class="muted small"></div>
-      <details id="relay-box" class="hidden"><summary>Relais complet</summary><pre class="text" id="relay"></pre></details>
-      <div id="cmds-box">
-        <div class="lbl muted small" style="margin-top:16px">Toutes les commandes</div>
-        <div class="cmds" id="cmds"></div>
+      <div class="card" id="work-card">
+        <h2>Dossier de travail</h2>
+        <p class="muted small">Une feature de <span class="mono">docs/features/</span>, ou l'un de ses <span class="mono">bugfix-NN/</span>.</p>
+        <div class="folders" id="work-list"><span class="muted">Choisissez d'abord le dossier de l'application.</span></div>
+        <div class="row" style="margin-top:14px"><button id="btn-open" class="primary" disabled>Ouvrir</button></div>
       </div>
-    </div>
+      <div class="card recent" id="recent-card">
+        <h2>Récents</h2>
+        <div id="recent-list" class="muted">Aucun.</div>
+      </div>
+    </section>
 
-    <div class="cols">
-      <!-- Zone 2 -->
-      <div class="card zone" id="answer-zone">
-        <div class="row"><h2 class="grow" style="margin:0">À répondre</h2>
-          <span id="answer-count" class="muted"></span>
-          <button id="btn-reload">Recharger</button></div>
+    <!-- ========================= Tableau de bord ========================= -->
+    <section id="scr-dashboard" class="screen hidden">
+      <div class="card" id="next-card">
+        <div class="label">Prochaine étape</div>
+        <div id="next-text">—</div>
+        <div id="next-detail" class="row"></div>
+        <div id="next-meta" class="muted small"></div>
+        <details id="relay-box" class="hidden"><summary>Relais complet</summary><pre class="text" id="relay"></pre></details>
+      </div>
+      <div class="counters">
+        <a class="counter" href="#answer" id="cnt-questions"><div class="muted">Questions ouvertes</div><div class="n" id="cnt-q">0</div></a>
+        <a class="counter" href="#answer" id="cnt-blocking"><div class="muted">Blocages ouverts</div><div class="n" id="cnt-b">0</div></a>
+      </div>
+      <div class="alerts" id="alerts"></div>
+      <div class="card">
+        <h2>Derniers runs</h2>
+        <div id="history" class="muted">Aucun run mémorisé pour ce dossier.</div>
+      </div>
+    </section>
+
+    <!-- ============================ À répondre ============================ -->
+    <section id="scr-answer" class="hidden" style="padding:0">
+      <div class="screen" style="padding-bottom:24px">
+        <div id="answer-top">
+          <h2 style="margin:0">À répondre</h2>
+          <span id="progress" class="muted">—</span>
+          <span class="grow"></span>
+          <button id="btn-reload">Recharger</button>
+        </div>
+        <div class="filters" id="filters"></div>
         <div id="save-summary"></div>
         <div id="form-errors"></div>
         <div id="form"></div>
-        <div id="save-bar">
-          <button id="btn-save" class="primary">Enregistrer</button>
-          <span id="save-hint" class="muted small"></span>
-        </div>
       </div>
+      <div id="save-bar">
+        <span id="save-hint">Aucune réponse à écrire pour l'instant.</span>
+        <span class="grow"></span>
+        <button id="btn-save" class="primary big">Enregistrer</button>
+      </div>
+    </section>
 
-      <!-- Zone 3 -->
-      <div class="card zone" id="run-zone">
-        <h2>Run en cours</h2>
-        <div id="run-status" class="muted">Aucune commande en cours.</div>
-        <div id="agents" style="margin-top:6px"></div>
+    <!-- ================================ Run ================================ -->
+    <section id="scr-run" class="screen hidden">
+      <div class="card" id="run-head">
+        <div class="title" id="run-status">Aucune commande lancée depuis l'ouverture du serveur.</div>
+        <div id="agents" style="margin-top:8px"></div>
         <div id="idle-box" class="notice warn hidden"></div>
-        <div id="end-box"></div>
-        <div id="stop-file" class="notice warn hidden"></div>
-        <div class="row" style="margin-top:10px">
+        <div class="row" style="margin-top:12px">
           <button id="btn-stop-now" class="danger" disabled>Arrêter maintenant</button>
           <button id="btn-stop-next" class="hidden" disabled>Arrêter au prochain lot</button>
         </div>
-        <div id="perm-list"></div>
-        <div id="stream"></div>
+        <div id="stop-file" class="notice warn hidden"></div>
       </div>
-    </div>
-  </section>
-</main>
+      <div id="stream" aria-label="Flux de la commande"></div>
+      <div class="card" id="run-end" style="margin-top:20px"></div>
+    </section>
+
+    <!-- ============================ Paramètres ============================ -->
+    <section id="scr-settings" class="screen hidden">
+      <div class="card sec" id="sec-folders">
+        <h2>Dossiers</h2>
+        <div id="set-folders"></div>
+        <h3 style="margin-top:16px">Paires récentes</h3>
+        <div id="set-recent" class="recent"></div>
+      </div>
+      <div class="card sec" id="sec-mode">
+        <h2>Mode</h2>
+        <div class="modes" id="set-mode"></div>
+        <p class="muted small" id="mode-note"></p>
+      </div>
+      <div class="card sec" id="sec-diag">
+        <h2>Diagnostic</h2>
+        <div class="row"><button id="btn-diag" class="primary">Lancer le diagnostic</button>
+          <span id="diag-wait" class="muted small hidden">En cours… jusqu'à 120 secondes : le premier appel de Gradle peut télécharger Gradle.</span></div>
+        <div id="diag-result" class="diag"></div>
+      </div>
+      <div class="card sec" id="sec-commands">
+        <h2>Commandes</h2>
+        <p class="muted small">La sortie de secours : le chemin normal est le bouton du tableau de bord. Une commande que le dernier relais n'a pas nommée demande confirmation.</p>
+        <div id="set-commands"></div>
+      </div>
+      <div class="card sec" id="sec-maint">
+        <h2>Maintenance</h2>
+        <div id="set-maint"></div>
+      </div>
+    </section>
+  </div>
+</div>
 
 <script>
 "use strict";
@@ -215,6 +336,7 @@ const el = (tag, attrs = {}, ...kids) => {
   for (const c of kids.flat()) if (c !== null && c !== undefined) n.append(c);
   return n;
 };
+const plural = (n, one, many) => `${n} ${n > 1 ? many : one}`;
 
 async function api(path, data) {
   const opts = data === undefined ? {} : {
@@ -235,15 +357,42 @@ let S = {};          // /api/state
 let F = null;        // /api/forms
 let seen = 0;        // last event seq
 let es = null;
+let answerFilter = "all";     // all | questions | blocking
+let savedCount = 0;           // entries saved since the page opened
+let diagBusy = false;
+
+const running = () => !!(S.run && S.run.status !== "ended");
+
+// ================================================================ routes
+const SCREENS = ["dashboard", "answer", "run", "settings"];
+function currentRoute() {
+  const h = (location.hash || "").replace("#", "");
+  return SCREENS.includes(h) ? h : "dashboard";
+}
+function go(name, section) {
+  if (location.hash === "#" + name) route(); else location.hash = "#" + name;
+  if (section) setTimeout(() => { const s = $(section); if (s) s.scrollIntoView({behavior: "smooth", block: "start"}); }, 30);
+}
+function route() {
+  const opened = !!S.open;
+  $("shell").classList.toggle("nofolder", !opened);
+  $("start").classList.toggle("hidden", opened);
+  const r = currentRoute();
+  for (const s of SCREENS) $("scr-" + s).classList.toggle("hidden", !opened || s !== r);
+  for (const s of SCREENS) {
+    const a = $("nav-" + s);
+    if (s === r && opened) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  }
+  if (opened && r === "answer") hint();
+}
+window.addEventListener("hashchange", route);
 
 // ============================================================ démarrage
 let chosenApp = null, chosenWork = null;
 
 function showStart(err) {
-  $("start").classList.remove("hidden");
-  $("main").classList.add("hidden");
-  $("btn-change").classList.add("hidden");
-  $("pair-label").textContent = "";
+  S.open = false;
+  route(); renderChrome();
   $("start-error").classList.toggle("hidden", !err);
   $("start-error").textContent = err || "";
   if (S.app_folder && !$("app-path").value) $("app-path").value = S.app_folder;
@@ -260,10 +409,9 @@ function renderWorkList(list) {
   const box = $("work-list"); box.replaceChildren();
   if (!list.length) box.append(el("span", {class: "muted", text: "Aucun dossier sous docs/features/."}));
   for (const w of list) {
-    const b = el("button", {text: w, class: w === chosenWork ? "sel" : "",
+    box.append(el("button", {text: w, class: w === chosenWork ? "sel" : "",
       onclick: () => { chosenWork = w; renderWorkList(list); $("btn-open").disabled = false; },
-      ondblclick: () => openPair(chosenApp, w)});
-    box.append(b);
+      ondblclick: () => openPair(chosenApp, w)}));
   }
   $("btn-open").disabled = !chosenWork;
 }
@@ -288,10 +436,10 @@ $("btn-browse").onclick = async () => {
 $("btn-app").onclick = validateApp;
 $("app-path").addEventListener("keydown", (e) => { if (e.key === "Enter") validateApp(); });
 $("btn-open").onclick = () => openPair(chosenApp, chosenWork);
-$("btn-change").onclick = async () => { await api("/api/close", {}); await refreshState(); };
 
+async function changeFolder() { await api("/api/close", {}); savedCount = 0; await refreshState(); }
 async function openPair(app, work) {
-  try { await api("/api/open", {app, work}); await refreshState(); }
+  try { await api("/api/open", {app, work}); savedCount = 0; location.hash = "#dashboard"; await refreshState(); }
   catch (e) { showStart(e.message); }
 }
 
@@ -299,83 +447,135 @@ async function openPair(app, work) {
 async function refreshState() {
   S = await api("/api/state");
   if (!S.open) { closeEvents(); showStart(S.load_error); return; }
-  $("start").classList.add("hidden");
-  $("main").classList.remove("hidden");
-  $("btn-change").classList.remove("hidden");
-  $("pair-label").replaceChildren(el("b", {text: S.working_folder}),
-    el("span", {text: "  —  " + S.app_folder}));
-  renderNext(); renderRun();
   openEvents();
+  route();
+  renderAll();
   await refreshForms();
 }
 
-// ==================================================== prochaine étape
-function currentNext() {
-  if (S.run && S.run.status !== "ended") return null;
-  return S.last ? S.last.next : null;
+function renderAll() {
+  renderChrome(); renderDashboard(); renderRun(); renderSettings();
 }
 
-function renderNext() {
-  const zone = $("next-zone"), n = currentNext();
-  const running = S.run && S.run.status !== "ended";
-  zone.className = "card zone" + (n ? " k-" + n.kind : "");
+// ---------------------------------------------------------- top bar
+function renderChrome() {
+  const open = !!S.open;
+  $("tb-folder").classList.toggle("hidden", !open);
+  $("tb-mode").classList.toggle("hidden", !open);
+  $("tb-run").classList.toggle("hidden", !open);
+  if (!open) return;
+  $("tb-folder").replaceChildren(el("b", {text: S.working_folder}),
+    el("span", {class: "muted", text: " · " + baseName(S.app_folder)}));
+  $("tb-mode").replaceChildren("Mode : ", el("b", {text: S.mode === "manuel" ? "Manuel" : "Auto"}));
+  const tb = $("tb-run");
+  tb.classList.toggle("running", running());
+  tb.textContent = running() ? `${S.run.prompt} — depuis ${S.run.started_at.slice(11, 16)}` : "Au repos";
+  $("nav-run-dot").classList.toggle("hidden", !running());
+}
+function baseName(p) { return (p || "").split(/[\\/]/).filter(Boolean).pop() || ""; }
+$("tb-folder").onclick = () => go("settings", "sec-folders");
+$("tb-mode").onclick = () => go("settings", "sec-mode");
+$("perm-badge").onclick = () => { $("perm-banner").scrollTop = 0; };
+
+// ---------------------------------------------------------- dashboard
+function currentNext() {
+  if (running()) return null;
+  return S.last ? S.last.next : null;
+}
+const openCount = () => F ? F.questions.length + F.blocking.length + (F.redecoupage ? 1 : 0) : 0;
+
+function renderDashboard() {
+  const n = currentNext();
   const detail = $("next-detail"); detail.replaceChildren();
-  let hlCmd = null, hlArgs = "";
-  if (running) {
+  const card = $("next-card");
+  $("relay-box").classList.add("hidden");
+  $("relay-box").open = false;
+  if (running()) {
     $("next-text").textContent = "Une commande tourne : " + S.run.prompt;
-  } else if (!S.last) {
-    $("next-text").textContent = "Aucun relais encore pour ce dossier.";
-    detail.append(el("span", {class: "muted", text: "Choisissez la commande à lancer : le cockpit ne devine jamais."}));
-  } else {
+    detail.append(el("button", {class: "primary big", text: "Voir le run", onclick: () => go("run")}));
+  } else if (!S.last || !n) {
+    $("next-text").textContent = "Aucune étape connue. Choisis une commande";
+    detail.append(el("button", {class: "link", text: "Voir la liste des commandes", onclick: () => go("settings", "sec-commands")}));
+  } else if (n.kind === "run") {
     $("next-text").textContent = n.french;
-    if (n.kind === "run") {
-      hlCmd = n.command; hlArgs = n.args;
-      detail.append(el("button", {class: "next", text: `Lancer /${n.command} ${n.args}`.trim(),
-        onclick: () => runCommand(n.command, n.args, true)}));
-    } else if (n.kind === "answer") {
-      detail.append(el("button", {class: "primary", text: "Aller au formulaire",
-        onclick: () => $("answer-zone").scrollIntoView({behavior: "smooth"})}));
-      if (n.command) {
-        hlCmd = n.command; hlArgs = n.args;
-        detail.append(el("span", {class: "muted", text: `Ensuite : /${n.command} ${n.args}`}));
-      }
-    } else if (n.kind === "unknown") {
-      $("relay-box").open = true;
-      detail.append(el("span", {class: "muted", text: "Aucune ligne Next: dans le relais."}));
-      if (S.run && S.run.can_continue) detail.append(el("button", {class: "primary", text: "Continuer la session", onclick: continueSession}));
-    }
+    detail.append(el("button", {class: "primary big", text: `Lancer /${n.command} ${n.args}`.trim(),
+      onclick: () => runCommand(n.command, n.args, true)}));
+  } else if (n.kind === "answer") {
+    $("next-text").textContent = n.french;
+    detail.append(el("button", {class: "primary big", text: `Répondre (${openCount()})`, onclick: () => go("answer")}));
+    if (n.command) detail.append(el("span", {class: "muted", text: `Ensuite : /${n.command} ${n.args}`}));
+  } else if (n.kind === "unknown") {
+    $("next-text").textContent = "Le dernier relais ne finit pas par une ligne Next:.";
+    $("relay-box").classList.remove("hidden"); $("relay-box").open = true;
+    if (S.run && S.run.can_continue) detail.append(el("button", {class: "primary big", text: "Continuer la session", onclick: continueSession}));
+  } else {                     // manual, stop, done: the text, no button
+    $("next-text").textContent = n.french;
   }
-  const meta = $("next-meta");
-  meta.textContent = S.last ? `Dernier relais : ${S.last.command} — ${S.last.outcome || ""} — ${S.last.at || ""}` : "";
-  $("relay-box").classList.toggle("hidden", !S.last || running);
+  $("next-meta").textContent = S.last ? `Dernier relais : ${S.last.command} — ${S.last.outcome || ""} — ${(S.last.at || "").replace("T", " ")}` : "";
+  if (S.last && !running() && n && n.kind !== "unknown") $("relay-box").classList.remove("hidden");
   $("relay").textContent = S.last ? (S.last.relay || "(relais vide)") : "";
 
-  $("cmds-box").classList.toggle("hidden", !!running);
-  const box = $("cmds"); box.replaceChildren();
-  for (const c of S.commands || []) {
-    const hl = c.name === hlCmd;
-    const key = "arg:" + S.working_folder + ":" + c.name;
-    const input = el("input", {type: "text", value: hl ? hlArgs : (c.argument_hint ? S.feature : ""),
-      placeholder: c.argument_hint || "sans argument", "aria-label": "argument de /" + c.name});
-    const btn = el("button", {class: hl ? "next" : "", text: "/" + c.name, title: c.description,
-      disabled: running || undefined, onclick: () => runCommand(c.name, input.value, hl)});
-    box.append(el("div", {class: "cmd" + (hl ? " hl" : "")}, btn, input));
+  const nq = F ? F.questions.length : 0, nb = F ? F.blocking.length + (F.redecoupage ? 1 : 0) : 0;
+  $("cnt-q").textContent = nq; $("cnt-q").classList.toggle("zero", !nq);
+  $("cnt-b").textContent = nb; $("cnt-b").classList.toggle("zero", !nb);
+  $("cnt-questions").onclick = () => { answerFilter = "questions"; renderForms(); };
+  $("cnt-blocking").onclick = () => { answerFilter = "blocking"; renderForms(); };
+
+  renderAlerts();
+  renderHistory();
+}
+
+function renderAlerts() {
+  const box = $("alerts"); box.replaceChildren();
+  const add = (cls, ...kids) => box.append(el("div", {class: "alert " + cls}, ...kids));
+  for (const w of S.worktrees || []) add("", `Un worktree est resté après un run : `, el("span", {class: "mono", text: w}));
+  if (S.stop_file) add("", "stop.md est présent : /8_code s'arrêtera après le lot en cours. ",
+    el("button", {class: "link", text: "Retirer stop.md", onclick: disarm}));
+  for (const e of (F && F.errors) || []) add("",
+    "Fichier illisible : ", el("b", {class: "mono", text: e.rel}), " — " + e.message);
+  const d = S.diagnostic;
+  if (!d) add("", "Le diagnostic n'a jamais été lancé. ",
+    el("button", {class: "link", text: "Le lancer", onclick: () => go("settings", "sec-diag")}));
+  else if (d.results.some((r) => r.status === "fail")) add("",
+    `Le dernier diagnostic (${d.at.replace("T", " ")}) a un échec : ` +
+    d.results.filter((r) => r.status === "fail").map((r) => r.label).join(", ") + ". ",
+    el("button", {class: "link", text: "Voir", onclick: () => go("settings", "sec-diag")}));
+}
+
+function renderHistory() {
+  const box = $("history"); box.replaceChildren();
+  const h = S.history || [];
+  if (!h.length) { box.append("Aucun run mémorisé pour ce dossier."); return; }
+  const tb = el("tbody");
+  for (const r of h) {
+    tb.append(el("tr", {},
+      el("td", {class: "cmd", text: r.command}),
+      el("td", {class: "small", text: (r.at || "").slice(11, 16) || "—"}),
+      el("td", {class: "small", text: (r.next && r.next.raw) || (r.next && r.next.french) || "pas de ligne Next:"}),
+      el("td", {class: "log", text: r.log_path || "—"})));
   }
+  box.append(el("table", {class: "runs"},
+    el("thead", {}, el("tr", {}, el("th", {text: "Commande"}), el("th", {text: "Fin"}), el("th", {text: "Next"}), el("th", {text: "Journal"}))), tb));
 }
 
 async function runCommand(name, args, named) {
-  if (S.run && S.run.status !== "ended") return;
+  if (running()) return;
   // One click for the command Next: names; a confirmation for any other.
   if (!named && !confirm(`Lancer /${name} ${args || ""} ? Ce n'est pas l'étape que le dernier relais a nommée.`)) return;
-  try { await api("/api/run", {command: name, args: args || ""}); $("stream").replaceChildren(); await refreshState(); }
-  catch (e) { alert(e.message); }
+  try {
+    await api("/api/run", {command: name, args: args || ""});
+    $("stream").replaceChildren();
+    location.hash = "#run";
+    await refreshState();
+  } catch (e) { alert(e.message); }
 }
 
-// ========================================================= formulaire
+// ========================================================= À répondre
 async function refreshForms() {
   try { F = await api("/api/forms"); }
   catch (e) { $("form").replaceChildren(el("div", {class: "notice err", text: e.message})); return; }
   renderForms();
+  renderDashboard();
 }
 $("btn-reload").onclick = () => { $("save-summary").replaceChildren(); refreshForms(); };
 
@@ -402,81 +602,97 @@ function choiceBlock(id, options, def, freeLabel) {
     return row;
   };
   wrap.append(mk("none", null, el("span", {class: "muted", text: "Plus tard — ne rien écrire maintenant"})));
+  const tag = () => el("span", {class: "badge", text: "par défaut"});
   for (const o of options) {
-    if (def !== null && def !== undefined && o === def) {
-      wrap.append(mk("default", o, o, el("span", {class: "badge next", text: " défaut "})));
-    } else wrap.append(mk("option", o, o));
+    if (def !== null && def !== undefined && o === def) wrap.append(mk("default", o, o, [" ", tag()]));
+    else wrap.append(mk("option", o, o));
   }
-  if (def && !options.includes(def)) wrap.append(mk("default", def, def, el("span", {class: "badge next", text: " défaut "})));
+  if (def && !options.includes(def)) wrap.append(mk("default", def, def, [" ", tag()]));
   wrap.append(mk("free", null, freeLabel || "Réponse libre (texte ci-dessous)"));
-  const ta = el("textarea", {placeholder: "Remarque ajoutée à l'option choisie, ou réponse libre"});
+  const ta = el("textarea", {placeholder: "Remarque ajoutée à l'option choisie, ou réponse libre", "aria-label": "Remarque ou réponse libre"});
   ta.value = d.text || "";
   ta.addEventListener("input", () => { d.text = ta.value; storeDrafts(); hint(); });
   return [wrap, ta];
 }
 
-function entryCard(id, cls, head, body, choice, result) {
-  const card = el("div", {class: "entry " + (cls || ""), id: "e-" + id}, el("div", {class: "head"}, head), body, choice);
-  if (result) card.append(result);
-  return card;
+function entryCard(id, head, body, choice) {
+  return el("div", {class: "entry", id: "e-" + id}, el("div", {class: "head"}, head), body, choice);
+}
+
+function renderFilters() {
+  const box = $("filters"); box.replaceChildren();
+  const nq = F ? F.questions.length : 0, nb = F ? F.blocking.length + (F.redecoupage ? 1 : 0) : 0;
+  for (const [k, label] of [["all", `Tout (${nq + nb})`], ["questions", `Questions (${nq})`], ["blocking", `Blocages (${nb})`]]) {
+    box.append(el("button", {class: answerFilter === k ? "on" : "", text: label,
+      onclick: () => { answerFilter = k; renderForms(); }}));
+  }
+}
+
+function group(rel, count, entries) {
+  return el("details", {class: "grp", open: true},
+    el("summary", {text: `${rel || "(sans fichier)"} — ${count}`}), ...entries);
 }
 
 function renderForms() {
+  if (!F) return;
   const form = $("form"); form.replaceChildren();
   const errs = $("form-errors"); errs.replaceChildren();
   for (const e of F.errors) {
     errs.append(el("div", {class: "notice " + (e.level === "warning" ? "warn" : "err")},
       el("b", {class: "mono", text: e.rel}), " — ", e.message));
   }
+  renderFilters();
   const nq = F.questions.length, nb = F.blocking.length + (F.redecoupage ? 1 : 0);
-  $("answer-count").textContent = `${nq} question${nq > 1 ? "s" : ""} · ${nb} blocage${nb > 1 ? "s" : ""}`;
+  const cnt = $("nav-answer-count");
+  cnt.textContent = nq + nb; cnt.classList.toggle("hidden", !(nq + nb));
   if (!nq && !nb) form.append(el("p", {class: "muted", text: "Rien n'attend de réponse dans ce dossier."}));
 
-  if (F.blocking.length || F.redecoupage) form.append(el("h3", {text: "Blocages"}));
-  if (F.redecoupage) {
-    const r = F.redecoupage;
-    const d = draftOf(r.id, null); if (d.kind === "none" && d.text) d.kind = "free";
-    const ta = el("textarea", {placeholder: "Votre décision, en français"}); ta.value = d.text || "";
-    ta.addEventListener("input", () => { d.text = ta.value; d.kind = ta.value.trim() ? "free" : "none"; storeDrafts(); hint(); });
-    form.append(entryCard(r.id, "", [el("span", {class: "badge err", text: `Redécoupage n° ${r.count}`}),
-        el("span", {class: "mono small", text: r.rel})],
-      [el("div", {class: "lbl", text: "Ce qui revient"}), el("pre", {class: "text", text: r.ce_qui_revient || "—"}),
-       el("div", {class: "lbl", text: "Ce que j'en fais"}), el("pre", {class: "text", text: r.ce_que_jen_fais || "—"}),
-       el("div", {class: "lbl", text: "Décision du Product Owner"})], [ta]));
-  }
-  for (const b of F.blocking) {
-    const tags = [el("span", {class: "badge", text: b.agent}), el("span", {class: "mono small", text: b.rel})];
-    if (b.number !== null) tags.push(el("span", {class: "badge", text: "Blocking " + b.number}));
-    if (b.lot) tags.push(el("span", {class: "badge", text: b.lot}));
-    if (b.worktree) tags.push(el("span", {class: "badge warn", text: "worktree en cours"}));
-    form.append(entryCard(b.id, "", tags, [
-      el("div", {class: "lbl", text: "Ce qui bloque"}), el("pre", {class: "text", text: b.what_blocks || "—"}),
-      b.where ? el("div", {class: "lbl", text: "Où"}) : null, b.where ? el("pre", {class: "text", text: b.where}) : null,
-      el("div", {class: "lbl", text: "Pour reprendre"}), el("pre", {class: "text", text: b.to_resume || "—"}),
-    ], choiceBlock(b.id, b.options, null, "Décision libre (texte ci-dessous)")));
-  }
-
-  let file = null;
-  for (const q of F.questions) {
-    if (q.rel !== file) {
-      file = q.rel;
-      if (file && form.querySelector("h3.q-title") === null) form.append(el("h3", {class: "q-title", text: "Questions"}));
-      form.append(el("div", {class: "file-head", text: file}));
+  if (answerFilter !== "questions") {
+    const blocks = new Map();             // rel -> cards
+    const put = (rel, card) => { if (!blocks.has(rel)) blocks.set(rel, []); blocks.get(rel).push(card); };
+    if (F.redecoupage) {
+      const r = F.redecoupage;
+      const d = draftOf(r.id, null); if (d.kind === "none" && d.text) d.kind = "free";
+      const ta = el("textarea", {placeholder: "Votre décision, en français", "aria-label": "Décision du Product Owner"}); ta.value = d.text || "";
+      ta.addEventListener("input", () => { d.text = ta.value; d.kind = ta.value.trim() ? "free" : "none"; storeDrafts(); hint(); });
+      put(r.rel, entryCard(r.id, [el("span", {class: "badge warn", text: `Redécoupage n° ${r.count}`})],
+        [el("div", {class: "lbl", text: "Ce qui revient"}), el("pre", {class: "text", text: r.ce_qui_revient || "—"}),
+         el("div", {class: "lbl", text: "Ce que j'en fais"}), el("pre", {class: "text", text: r.ce_que_jen_fais || "—"}),
+         el("div", {class: "lbl", text: "Décision du Product Owner"})], [ta]));
     }
-    const head = [el("b", {text: "Q" + q.number}), el("span", {class: "ctx", text: q.context.join(" · ")})];
-    if (q.default !== null) head.push(el("span", {class: "badge next", text: "défaut proposé"}));
-    const body = [el("pre", {class: "text q", text: q.question})];
-    if (q.default_source) body.push(el("div", {class: "muted small", text: "Source du défaut : " + q.default_source}));
-    if (q.answer) body.push(el("div", {class: "notice warn small", text: "Texte déjà présent sous Answer:, hors de la ligne — il sera remplacé : " + q.answer}));
-    form.append(entryCard(q.id, "", head, body, choiceBlock(q.id, q.options, q.default)));
+    for (const b of F.blocking) {
+      const tags = [el("span", {class: "badge", text: b.agent})];
+      if (b.number !== null) tags.push(el("span", {class: "badge", text: "Blocking " + b.number}));
+      if (b.lot) tags.push(el("span", {class: "badge", text: b.lot}));
+      if (b.worktree) tags.push(el("span", {class: "badge warn", text: "worktree en cours"}));
+      put(b.rel, entryCard(b.id, tags, [
+        el("div", {class: "lbl", text: "Ce qui bloque"}), el("pre", {class: "text", text: b.what_blocks || "—"}),
+        b.where ? el("div", {class: "lbl", text: "Où"}) : null, b.where ? el("pre", {class: "text", text: b.where}) : null,
+        el("div", {class: "lbl", text: "Pour reprendre"}), el("pre", {class: "text", text: b.to_resume || "—"}),
+      ], choiceBlock(b.id, b.options, null, "Décision libre (texte ci-dessous)")));
+    }
+    for (const [rel, cards] of blocks) form.append(group(rel, cards.length, cards));
+  }
+  if (answerFilter !== "blocking") {
+    const files = new Map();
+    for (const q of F.questions) {
+      const head = [el("b", {text: "Q" + q.number}), el("span", {class: "ctx", text: q.context.join(" · ")})];
+      const body = [el("pre", {class: "text q", text: q.question})];
+      if (q.default_source) body.push(el("div", {class: "muted small", text: "Source du défaut : " + q.default_source}));
+      if (q.answer) body.push(el("div", {class: "notice warn small", text: "Texte déjà présent sous Answer:, hors de la ligne — il sera remplacé : " + q.answer}));
+      if (!files.has(q.rel)) files.set(q.rel, []);
+      files.get(q.rel).push(entryCard(q.id, head, body, choiceBlock(q.id, q.options, q.default)));
+    }
+    for (const [rel, cards] of files) form.append(group(rel, cards.length, cards));
   }
   hint();
 }
 
+function allEntries() { return F ? [...F.questions, ...F.blocking, ...(F.redecoupage ? [F.redecoupage] : [])] : []; }
+
 function collectItems() {
   const items = [];
-  const all = [...F.questions, ...F.blocking, ...(F.redecoupage ? [F.redecoupage] : [])];
-  for (const e of all) {
+  for (const e of allEntries()) {
     const d = drafts[e.id];
     if (!d || d.kind === "none") continue;
     items.push({id: e.id, fingerprint: e.fingerprint, kind: d.kind, option: d.option, text: d.text || ""});
@@ -488,60 +704,87 @@ function hint() {
   if (!F) return;
   const items = collectItems();
   const n = items.filter((i) => !(i.kind === "default" && !i.text.trim())).length;
-  $("save-hint").textContent = n ? `${n} réponse${n > 1 ? "s" : ""} à écrire` : "Aucune réponse à écrire pour l'instant.";
+  $("save-hint").textContent = n ? `${plural(n, "réponse non enregistrée", "réponses non enregistrées")}` : "Aucune réponse à écrire pour l'instant.";
+  const total = allEntries().length + savedCount;
+  const answered = items.length + savedCount;
+  $("progress").textContent = `${answered} / ${total} répondues`;
+}
+
+function entryLabel(id) {
+  const q = F && F.questions.find((e) => e.id === id);
+  if (q) return `${q.rel} · Q${q.number}`;
+  const b = F && F.blocking.find((e) => e.id === id);
+  if (b) return `${b.rel}${b.number !== null ? " · Blocking " + b.number : ""}`;
+  if (F && F.redecoupage && F.redecoupage.id === id) return F.redecoupage.rel;
+  return id;
 }
 
 $("btn-save").onclick = async () => {
   const items = collectItems();
+  const labels = Object.fromEntries(items.map((i) => [i.id, entryLabel(i.id)]));
   const btn = $("btn-save"); btn.disabled = true;
   try {
     const r = await api("/api/save", {items});
     const sum = $("save-summary"); sum.replaceChildren();
-    let ok = 0, ko = 0, same = 0;
+    let ok = 0;
     for (const res of r.results) {
       if (res.status === "saved") { ok++; delete drafts[res.id]; }
-      else if (res.status === "unchanged") { same++; }
-      else if (res.status === "error") ko++;
     }
+    savedCount += ok;
     storeDrafts();
     await refreshForms();
-    if (ok) sum.append(el("div", {class: "notice ok", text: `${ok} enregistrée${ok > 1 ? "s" : ""} et relue${ok > 1 ? "s" : ""} comme répondue${ok > 1 ? "s" : ""}.`}));
-    if (same) sum.append(el("div", {class: "notice ok", text: `${same} défaut${same > 1 ? "s" : ""} gardé${same > 1 ? "s" : ""} : Answer: reste vide, la chaîne le lit comme accepté.`}));
     for (const res of r.results) {
-      const card = $("e-" + res.id);
-      if (res.status === "error") {
-        if (card) { card.classList.add("failed"); card.append(el("div", {class: "result notice err", text: "Non enregistré : " + res.message})); }
-        else sum.append(el("div", {class: "notice err", text: `${res.id} — non enregistré : ${res.message}`}));
-      } else if (res.status === "unchanged" && card) {
-        card.append(el("div", {class: "result muted", text: "Défaut gardé — rien d'écrit."}));
+      const l = labels[res.id] || res.id;
+      if (res.status === "saved") sum.append(el("div", {class: "sumline ok", text: `✓ ${l} — enregistrée et relue comme répondue.`}));
+      else if (res.status === "unchanged") sum.append(el("div", {class: "sumline ok", text: `✓ ${l} — défaut gardé : Answer: reste vide, la chaîne le lit comme accepté.`}));
+      else if (res.status === "error") {
+        sum.append(el("div", {class: "sumline err", text: `✗ ${l} — non enregistrée : ${res.message}`}));
+        const card = $("e-" + res.id); if (card) card.classList.add("failed");
       }
     }
     if (!r.results.length) sum.append(el("div", {class: "notice warn", text: "Rien à enregistrer : aucune réponse choisie."}));
-    $("answer-zone").scrollIntoView({behavior: "smooth"});
+    $("main").scrollTo({top: 0, behavior: "smooth"});
   } catch (e) { alert(e.message); }
-  finally { btn.disabled = false; }
+  finally { btn.disabled = false; hint(); }
 };
 
 // ================================================================ run
 function renderRun() {
-  const run = S.run, running = run && run.status !== "ended";
+  const run = S.run;
   $("run-status").textContent = !run ? "Aucune commande lancée depuis l'ouverture du serveur."
-    : running ? `${run.prompt} — en cours depuis ${run.started_at.slice(11)}`
+    : running() ? `${run.prompt} — en cours depuis ${run.started_at.slice(11)}`
     : `${run.prompt} — ${run.outcome}${run.error ? " : " + run.error : ""}`;
-  $("btn-stop-now").disabled = !running;
+  $("btn-stop-now").disabled = !running();
   $("btn-stop-next").classList.toggle("hidden", !(run && run.stop_next_lot));
-  $("btn-stop-next").disabled = !running;
-  renderAgents(running ? run.agents : []);
-  renderIdle(running ? run.idle : null);
-  renderEnd(run && !running ? run : null);
+  $("btn-stop-next").disabled = !running();
+  renderAgents(running() ? run.agents : []);
+  renderIdle(running() ? run.idle : null);
   const sf = $("stop-file");
   sf.classList.toggle("hidden", !S.stop_file);
   sf.replaceChildren();
   if (S.stop_file) sf.append("stop.md est présent : /8_code s'arrêtera après le lot en cours. ",
-    el("button", {class: "link", text: "Retirer stop.md (le renommer stop1.md)", onclick: disarm}));
-  const pl = $("perm-list"); pl.replaceChildren();
-  if (running) for (const p of run.permissions) addPermission(p);
+    el("button", {class: "link", text: "Le retirer", onclick: disarm}));
+  renderRunEnd();
+  const pl = $("perm-banner"); pl.replaceChildren();
+  if (running()) for (const p of run.permissions) addPermission(p);
   permAlert();
+}
+
+function renderRunEnd() {
+  const b = $("run-end"); b.replaceChildren();
+  const run = S.run;
+  b.classList.toggle("hidden", !run || running());
+  if (!run || running()) return;
+  const n = run.next || {kind: "unknown"};
+  b.append(el("div", {class: "label muted small", text: "Fin du run"}),
+    el("div", {style: "font-size:20px;font-weight:600;margin:4px 0 10px", text: n.kind === "unknown" ? "Aucune ligne Next: dans le relais." : n.french}));
+  if (run.log_path) b.append(el("div", {class: "muted small", text: "Journal brut : " + run.log_path}));
+  const wts = run.worktrees_left || [];
+  if (wts.length) b.append(el("div", {class: "notice warn"}, el("div", {text: `Worktree${wts.length > 1 ? "s" : ""} resté${wts.length > 1 ? "s" : ""} en place :`}),
+    ...wts.map((p) => el("div", {class: "small mono", text: p}))));
+  if (run.can_continue) b.append(el("pre", {class: "text", text: run.relay || "(relais vide)"}),
+    el("div", {class: "row", style: "margin-top:12px"}, el("button", {class: "primary", text: "Continuer la session", onclick: continueSession})));
+  b.append(el("div", {class: "row", style: "margin-top:12px"}, el("button", {class: run.can_continue ? "" : "primary", text: "Retour au tableau de bord", onclick: () => go("dashboard")})));
 }
 
 function renderIdle(idle) {
@@ -554,55 +797,39 @@ function renderIdle(idle) {
       el("button", {class: "danger", text: "Arrêter maintenant", onclick: stopNow})));
 }
 
-function renderEnd(run) {
-  const b = $("end-box"); b.replaceChildren();
-  if (!run) return;
-  if (run.log_path) b.append(el("div", {class: "muted small", text: "Journal brut : " + run.log_path}));
-  const wts = run.worktrees_left || [];
-  if (wts.length) b.append(el("div", {class: "notice warn"},
-    el("div", {text: `Worktree${wts.length > 1 ? "s" : ""} resté${wts.length > 1 ? "s" : ""} en place :`}),
-    ...wts.map((p) => el("div", {class: "small", text: p}))));
-  if (run.can_continue) {
-    b.append(el("div", {class: "notice warn"},
-      el("div", {text: "La commande s'est arrêtée sans ligne Next:."}),
-      el("pre", {class: "text", text: run.relay || "(relais vide)"}),
-      el("button", {class: "primary", text: "Continuer la session", onclick: continueSession})));
-  }
-}
-
 async function continueWait() { try { await api("/api/continue-wait", {}); await refreshState(); } catch (e) { alert(e.message); } }
 async function continueSession() {
-  try { const r = await api("/api/continue-session", {}); S.run = r.run; await refreshState(); }
+  try { const r = await api("/api/continue-session", {}); S.run = r.run; location.hash = "#run"; await refreshState(); }
   catch (e) { alert(e.message); }
 }
 async function stopNow() { try { await api("/api/stop-now", {}); } catch (e) { alert(e.message); } }
 
 function renderAgents(list) {
   const a = $("agents"); a.replaceChildren();
-  if (list && list.length) a.append(el("span", {class: "muted small", text: "Agent : "}), ...list.map((n) => el("span", {class: "badge", text: n})));
+  const names = [...new Set(list || [])];
+  if (names.length) a.append(el("span", {class: "muted small", text: "Agent : "}), ...names.map((n) => el("span", {class: "badge", text: n})));
 }
 
+// A permission card is a banner at the top of every screen: a run waits on it.
 function addPermission(p) {
   if ($("perm-" + p.id)) return;
-  const card = el("div", {class: "perm", id: "perm-" + p.id},
-    el("div", {}, el("b", {text: p.title || ("Autoriser " + p.tool + " ?")})),
+  $("perm-banner").append(el("div", {class: "perm", id: "perm-" + p.id},
+    el("div", {class: "title", text: p.title || ("Autoriser " + p.tool + " ?")}),
     el("div", {class: "muted small", text: `Outil : ${p.tool} · demandé par : ${p.agent}`}),
     el("pre", {text: p.input}),
     el("div", {class: "row"},
-      el("button", {class: "primary", text: "Autoriser", onclick: () => answerPerm(p.id, true)}),
-      el("button", {class: "danger", text: "Refuser", onclick: () => answerPerm(p.id, false)})));
-  $("perm-list").append(card);
-  card.scrollIntoView({behavior: "smooth", block: "center"});
+      el("button", {class: "allow", text: "Autoriser", onclick: () => answerPerm(p.id, true)}),
+      el("button", {class: "danger", text: "Refuser", onclick: () => answerPerm(p.id, false)}))));
   permAlert();
 }
 
 function permAlert() {
-  const n = $("perm-list").children.length;
-  const a = $("perm-alert");
-  a.classList.toggle("hidden", !n);
-  a.textContent = n > 1 ? `${n} autorisations demandées` : "Autorisation demandée";
+  const n = $("perm-banner").children.length;
+  $("perm-banner").classList.toggle("hidden", !n);
+  $("perm-badge").classList.toggle("hidden", !n);
+  $("perm-badge").textContent = n > 1 ? `${n} autorisations demandées` : "Autorisation demandée";
+  document.title = (n ? "● " : "") + "Cockpit de la chaîne";
 }
-$("perm-alert").onclick = () => { const c = $("perm-list").firstElementChild; if (c) c.scrollIntoView({behavior: "smooth", block: "center"}); };
 
 async function answerPerm(id, allow) {
   try { await api("/api/permission", {id, allow}); }
@@ -613,7 +840,7 @@ async function answerPerm(id, allow) {
 
 $("btn-stop-now").onclick = async () => {
   if (!confirm("Arrêter la commande maintenant ? Le tour en cours s'arrête inachevé.")) return;
-  try { await api("/api/stop-now", {}); } catch (e) { alert(e.message); }
+  await stopNow();
 };
 $("btn-stop-next").onclick = async () => {
   try { await api("/api/stop-next-lot", {}); await refreshState(); } catch (e) { alert(e.message); }
@@ -633,7 +860,9 @@ function onEvent(ev) {
   seen = ev.seq;
   const d = ev.data;
   switch (ev.type) {
-    case "run_started": streamAppend(el("div", {class: "sys", text: d.continued ? `▶ suite de ${d.prompt} (même session)` : `▶ ${d.prompt}`})); break;
+    case "run_started":
+      streamAppend(el("div", {class: "sys", text: d.continued ? `▶ suite de ${d.prompt} (même session)` : `▶ ${d.prompt}`}));
+      refreshState(); break;
     case "text": streamAppend(el("div", {class: "ev"}, el("span", {class: "who", text: d.agent}), el("pre", {class: "text", text: d.text}))); break;
     case "tool": streamAppend(el("div", {class: "tool", text: `${d.agent} · ${d.tool}  ${d.summary || ""}`})); break;
     case "agent_started":
@@ -653,7 +882,6 @@ function onEvent(ev) {
     case "status": break;
     case "run_ended":
       streamAppend(el("div", {class: "sys", text: `■ Fin : ${d.outcome}${d.error ? " — " + d.error : ""}${d.log_path ? " — journal : " + d.log_path : ""}`}));
-      if (S.run) S.run = d;
       refreshState(); break;
   }
 }
@@ -665,7 +893,89 @@ function openEvents() {
 }
 function closeEvents() { if (es) { es.close(); es = null; } }
 
-window.addEventListener("focus", () => { if (S.open && !(S.run && S.run.status !== "ended")) refreshForms(); });
+// ============================================================ paramètres
+const GROUP_ORDER = ["Amont", "Aval", "Correction", "Fusion", "Outils"];
+
+function renderSettings() {
+  // Dossiers
+  const f = $("set-folders"); f.replaceChildren(
+    el("div", {}, el("span", {class: "muted", text: "Application : "}), el("span", {class: "mono", text: S.app_folder || "—"})),
+    el("div", {style: "margin-top:4px"}, el("span", {class: "muted", text: "Dossier de travail : "}), el("span", {class: "mono", text: S.working_folder || "—"})),
+    el("div", {class: "row", style: "margin-top:12px"}, el("button", {text: "Changer", onclick: changeFolder})));
+  const rc = $("set-recent"); rc.replaceChildren();
+  if (!(S.recent || []).length) rc.append(el("span", {class: "muted", text: "Aucune."}));
+  for (const p of S.recent || []) rc.append(el("button", {onclick: () => openPair(p.app, p.work)},
+    el("b", {text: p.work}), el("span", {class: "muted small", text: "  —  " + p.app})));
+
+  // Mode
+  const m = $("set-mode"); m.replaceChildren();
+  for (const [k, title, text] of [
+    ["auto", "Auto", "Claude traite lui-même les demandes sans risque ; seules celles qu'il renvoie vers toi arrivent en bandeau."],
+    ["manuel", "Manuel", "Chaque modification et chaque commande que les règles ne permettent pas d'avance arrive en bandeau."]]) {
+    const input = el("input", {type: "radio", name: "mode", value: k, checked: S.mode === k || undefined});
+    input.addEventListener("change", async () => {
+      try { const r = await api("/api/mode", {mode: k}); S.mode = r.mode; renderChrome(); renderSettings(); }
+      catch (e) { alert(e.message); }
+    });
+    m.append(el("label", {class: S.mode === k ? "on" : ""}, el("div", {class: "row"}, input, el("b", {text: title})), el("div", {class: "muted small", text: text})));
+  }
+  $("mode-note").textContent = "Le mode choisi vaut pour le prochain run ; un run en cours garde le sien. Même en Auto, une demande renvoyée vers toi devient un bandeau.";
+
+  // Diagnostic
+  renderDiag();
+
+  // Commandes
+  const cm = $("set-commands"); cm.replaceChildren();
+  const nextCmd = (currentNext() || {}).command;
+  for (const g of GROUP_ORDER) {
+    const list = (S.commands || []).filter((c) => (c.group || "Outils") === g);
+    if (!list.length) continue;
+    const box = el("div", {class: "cmds"});
+    for (const c of list) {
+      const hl = c.name === nextCmd;
+      const input = el("input", {type: "text", value: c.argument_hint ? S.feature : "",
+        placeholder: c.argument_hint || "sans argument", "aria-label": "argument de /" + c.name});
+      const btn = el("button", {text: "/" + c.name, title: c.description, disabled: running() || undefined,
+        onclick: () => runCommand(c.name, input.value, hl)});
+      box.append(el("div", {class: "cmd" + (hl ? " hl" : "")}, btn, input));
+    }
+    cm.append(el("div", {class: "cmd-group"}, el("h3", {text: g}), box));
+  }
+
+  // Maintenance
+  const mt = $("set-maint"); mt.replaceChildren();
+  mt.append(el("div", {}, S.stop_file ? el("button", {text: "Retirer stop.md", onclick: disarm}) : el("span", {class: "muted", text: "Pas de stop.md."})));
+  const wts = S.worktrees || [];
+  mt.append(el("h3", {style: "margin-top:16px", text: "Worktrees restés"}));
+  if (!wts.length) mt.append(el("div", {class: "muted", text: "Aucun."}));
+  for (const w of wts) mt.append(el("div", {class: "mono", text: w}));
+  mt.append(el("h3", {style: "margin-top:16px", text: "Dossier des journaux bruts"}), el("div", {class: "mono", text: S.logs_dir || "—"}));
+}
+
+function renderDiag() {
+  const box = $("diag-result"); box.replaceChildren();
+  $("btn-diag").disabled = diagBusy;
+  $("diag-wait").classList.toggle("hidden", !diagBusy);
+  const d = S.diagnostic;
+  if (!d) { box.append(el("p", {class: "muted", text: "Jamais lancé."})); return; }
+  box.append(el("div", {class: "muted small", text: "Dernier résultat : " + d.at.replace("T", " ")}));
+  const ul = el("ul");
+  for (const r of d.results) {
+    const mark = r.status === "ok" ? "✓" : r.status === "fail" ? "✗" : "—";
+    ul.append(el("li", {class: r.status}, el("b", {text: `${mark} ${r.label}`}), "  ", r.detail));
+  }
+  box.append(ul);
+  for (const h of d.hints || []) box.append(el("div", {class: "notice warn", text: h}));
+}
+
+$("btn-diag").onclick = async () => {
+  diagBusy = true; renderDiag();
+  try { S.diagnostic = await api("/api/diagnostic", {}); }
+  catch (e) { alert(e.message); }
+  finally { diagBusy = false; renderDiag(); renderAlerts(); }
+};
+
+window.addEventListener("focus", () => { if (S.open && !running()) refreshForms(); });
 
 loadDrafts();
 refreshState().catch((e) => showStart(e.message));

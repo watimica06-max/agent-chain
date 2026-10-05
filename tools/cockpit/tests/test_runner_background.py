@@ -55,8 +55,9 @@ class LiveClient:
 
 
 def make_runner(log_dir, clients):
-    def factory(cwd, can_use_tool, resume=None):
+    def factory(cwd, can_use_tool, resume=None, mode=None):
         c = LiveClient(can_use_tool, resume)
+        c.mode = mode
         clients.append(c)
         return c
     return runner_mod.Runner(client_factory=factory, log_dir=str(log_dir))
