@@ -135,7 +135,8 @@ passed, failed on what, or not run — the other fields as they stand.**
 it. ⚠️ **A message in a reply gets lost; a file does not.**
 
 🔴 **Then commit what you wrote — the declarations, the report, the
-blocking file with them** — 📌 **the declarations that landed are work,
+blocking file with them**, under the message of move 5 — 📌 **the
+declarations that landed are work,
 and the next run starts from them.** ⚠️ **An uncommitted worktree
 cannot be merged**, and the orchestration may not force it: your block
 would never reach the Product Owner.
@@ -302,10 +303,15 @@ worktree holds**, and you stage explicitly what belongs to the lot:
 the declarations, the files the module needed and
 `code/<lot>/conception.md` — ⚠️ **nothing the listing shows that is
 not the lot's.** 📌 **A request under `architecte/` is not the lot's**
-— the command commits it, and it rides no `<lot>:` commit.
+— the command commits it, and it rides no `<working folder>/<lot>:`
+commit.
 
-🔴 **The message reads `<lot>: <what the commit carries>`** — 📌 **it is
-how the orchestration finds the lot's commits.**
+🔴 **The message reads `<working folder>/<lot>: <what the commit
+carries>`** — 📌 **`<working folder>` is the folder the prompt gives,
+as its path under `docs/features/`**: `premiere-app-3`,
+`premiere-app-3/bugfix-01`. ⚠️ **The subject is how the orchestration
+finds the lot's commits**, and it reads nothing else of the commit —
+📌 **on every commit you make, a blocked run's included.**
 
 ⚠️ **It is the lot's first commit unless a blocked run made one before
 it** — 🔴 **then the blocked run's is the first**, and the Relecteur's

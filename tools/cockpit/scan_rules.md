@@ -40,7 +40,7 @@ emulator (`/deploie`) → `/fusion`.
 | 6_convertit → conventions | 6_convertit.md:472 |
 | conventions → 7_lots | conventions.md:307 |
 | 7_lots → 8_code | 7_lots.md:208, :250 |
-| 8_code → 8_code (lots left) → 9_controle | 8_code.md:530, :519 |
+| 8_code → 8_code (lots left) → 9_controle | 8_code.md:551, :519 |
 | 9_controle → *manual* | 9_controle.md:509-510 — `Next: manual lire le rapport de contrôle et la recette, décider d'une bug-list` |
 | /deploie → *done* | deploie.md:68-70 |
 
@@ -127,10 +127,10 @@ to the command named after it in « `answer …, then run X` »: that step is
 | `OWN-CNV` | `convertisseur/blocked_*.md` | 6_convertit | 6_convertit.md:56 |
 | `OWN-ARC` | a root `questions-architecte-NN.md` | conventions | conventions.md:82 |
 | `OWN-ARB` | `blocked_architecte.md`, invocation other than 3 | conventions | conventions.md:78 |
-| `OWN-AR3` | `blocked_architecte.md`, invocation 3 | 8_code | 8_code.md:327-333 |
+| `OWN-AR3` | `blocked_architecte.md`, invocation 3 | 8_code | 8_code.md:348-354 |
 | `OWN-CAD` | `code/blocked_cadreur.md` | 7_lots | 7_lots.md:212 |
 | `OWN-RED` | `code/redecoupage.md`, third return | 7_lots | 7_lots.md:379-380 |
-| `OWN-COD` | `code/blocked_detailleur.md`, `code/<lot>/blocked_*.md` | 8_code | 8_code.md:333-334 · 8_code.md:752 |
+| `OWN-COD` | `code/blocked_detailleur.md`, `code/<lot>/blocked_*.md` | 8_code | 8_code.md:354-355 · 8_code.md:773 |
 | `OWN-FUS` | a root `questions-fusionneur-NN.md` | fusion | fusion.md:60 |
 | `OWN-FUB` | `blocked_fusionneur.md` | fusion | fusion.md:57 |
 | `OWN-DIA` | `investigation/blocked_*.md`, `blocked_diagnostiqueur.md` | diagnostique | diagnostique.md:233 · diagnostique.md:243 |
@@ -179,10 +179,10 @@ Rédacteur's.
 | `OWN-CNV` | 6_convertit | t'attend | see §3 | 6_convertit.md:56 |
 | `OWN-ARC` | conventions | t'attend | see §3 | conventions.md:82 |
 | `OWN-ARB` | conventions | t'attend | see §3 | conventions.md:78 |
-| `OWN-AR3` | 8_code | t'attend | see §3 | 8_code.md:327-333 |
+| `OWN-AR3` | 8_code | t'attend | see §3 | 8_code.md:348-354 |
 | `OWN-CAD` | 7_lots | t'attend | see §3 | 7_lots.md:212 |
 | `OWN-RED` | 7_lots | t'attend | see §3 | 7_lots.md:379-380 |
-| `OWN-COD` | 8_code | t'attend | see §3 | 8_code.md:333-334 · 8_code.md:752 |
+| `OWN-COD` | 8_code | t'attend | see §3 | 8_code.md:354-355 · 8_code.md:773 |
 | `OWN-FUS` | fusion | t'attend | see §3 | fusion.md:60 |
 | `OWN-FUB` | fusion | t'attend | see §3 | fusion.md:57 |
 | `OWN-DIA` | diagnostique | t'attend | see §3 | diagnostique.md:233 · diagnostique.md:243 |
@@ -270,7 +270,7 @@ Rédacteur's.
 | `LOT-9` | 7_lots | à faire | no split yet | 7_lots.md:141 |
 | `COD-1` | 8_code | à faire | no `code/sequence.md` | 8_code.md:80-83 |
 | `COD-2` | 8_code | à faire | defects, or `blocked_verificateur.md`: /7_lots first | 8_code.md:92-100 |
-| `COD-3` | 8_code | bloquée | a lot not PASS with `## Attempts` at 3 | 8_code.md:297-299 |
+| `COD-3` | 8_code | bloquée | a lot not PASS with `## Attempts` at 3 | 8_code.md:318-320 |
 | `COD-5` | 8_code | faite | every lot of `## Order` has a verdict opening on `PASS` | 8_code.md:85-87 |
 | `COD-6` | 8_code | à faire | « n / N lots en PASS », N > n | 8_code.md:80-83 |
 | `CTL-1` | 9_controle | à faire | no `desc-produit.md` | 9_controle.md:75-77 |

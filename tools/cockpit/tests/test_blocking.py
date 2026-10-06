@@ -177,7 +177,7 @@ def test_a_relecteur_entry_is_never_hidden():
     p, _ = parse("hand/blocked_relecteur-acte.md", as_name="blocked_relecteur.md")
     (e,) = p.entries
     assert e.waiting
-    assert "tests.md" in e.note and "missing" in e.note and "8_code.md:749-751" in e.note
+    assert "tests.md" in e.note and "missing" in e.note and "8_code.md:770-772" in e.note
 
 
 def test_a_relecteur_entry_is_in_the_scan_whatever_it_says(tmp_path):

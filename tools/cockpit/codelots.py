@@ -38,32 +38,32 @@ RULES = {
     "L-ORDRE": "8_code.md:38-39 · agents/verificateur.md:107-115",
     "L-TITRE": "agents/cadreur.md:848-854",
     "E-PASSE": "8_code.md:80-82 · agents/relecteur.md:116",
-    "E-ECHOUE": "8_code.md:241-243",
-    "E-TROIS": "8_code.md:297-299",
-    "E-ANNULE": "8_code.md:162-164 · agents/relecteur.md:183-186",
-    "E-BLOQUE": "8_code.md:327-334 · 8_code.md:727-737",
-    "E-REDEC": "8_code.md:609-612 · 8_code.md:646-649",
-    "E-ENTAME": "8_code.md:157-158 · 8_code.md:173-175",
-    "E-AFAIRE": "8_code.md:157-158",
-    "E-ENCOURS": "8_code.md:584-585 · 8_code.md:80-82",
+    "E-ECHOUE": "8_code.md:262-264",
+    "E-TROIS": "8_code.md:318-320",
+    "E-ANNULE": "8_code.md:163-165 · agents/relecteur.md:183-186",
+    "E-BLOQUE": "8_code.md:348-355 · 8_code.md:748-758",
+    "E-REDEC": "8_code.md:630-633 · 8_code.md:667-670",
+    "E-ENTAME": "8_code.md:158-159 · 8_code.md:174-176",
+    "E-AFAIRE": "8_code.md:158-159",
+    "E-ENCOURS": "8_code.md:605-606 · 8_code.md:80-82",
     "E-INCONNU": "aucune règle : un verdict sans « ## Status » lisible",
-    "T-ESSAIS": "8_code.md:297-299 · 8_code.md:301-302 · 8_code.md:310-315 · agents/relecteur.md:173-175",
-    "P-ORDRE": "8_code.md:157-158 · 8_code.md:173-175 · 8_code.md:189",
-    "P-ECRIT": "agents/detailleur.md:55-56 · agents/relecteur.md:140 · agents/concepteur.md:300-303 · "
+    "T-ESSAIS": "8_code.md:318-320 · 8_code.md:322-323 · 8_code.md:331-336 · agents/relecteur.md:173-175",
+    "P-ORDRE": "8_code.md:158-159 · 8_code.md:174-176 · 8_code.md:190",
+    "P-ECRIT": "agents/detailleur.md:55-56 · agents/relecteur.md:140 · agents/concepteur.md:301-304 · "
                "agents/realisateur.md:715",
-    "P-ARBITRE": "8_code.md:739-742 · agents/realisateur.md:342-349 · agents/detailleur.md:381-388",
-    "P-ARCHITECTE": "8_code.md:467-471 · agents/arbitre.md:476-486",
-    "P-DEMANDES": "agents/concepteur.md:226-229 · agents/realisateur.md:466 · agents/detailleur.md:421 · "
+    "P-ARBITRE": "8_code.md:760-763 · agents/realisateur.md:342-349 · agents/detailleur.md:381-388",
+    "P-ARCHITECTE": "8_code.md:488-492 · agents/arbitre.md:476-486",
+    "P-DEMANDES": "agents/concepteur.md:227-230 · agents/realisateur.md:466 · agents/detailleur.md:421 · "
                   "agents/detailleur.md:439-440 · agents/arbitre.md:451-460",
-    "B-OU": "8_code.md:727-737 · agents/detailleur.md:328-331",
-    "C-GREP": "8_code.md:197-202 · 8_code.md:204-209",
-    "C-DOSSIER": "agents/concepteur.md:300-303 · agents/testeur.md:315-317 · agents/realisateur.md:715-718",
-    "W-LIVE": "8_code.md:126-128 · 8_code.md:135-136 · 8_code.md:449-454",
-    "A-LOT": "8_code.md:584-585 · 8_code.md:543 · 8_code.md:552 · 8_code.md:561 · 8_code.md:576 · 8_code.md:421",
-    "A-DESC": "8_code.md:542 · 8_code.md:551 · 8_code.md:560 · 8_code.md:575 · agents/realisateur.md:346-348",
-    "A-BLOC": "8_code.md:397-398 · 8_code.md:419-420 · agents/detailleur.md:385-387",
-    "A-DOSSIER": "8_code.md:587-588",
-    "A-AUCUN": "8_code.md:488-489",
+    "B-OU": "8_code.md:748-758 · agents/detailleur.md:328-331",
+    "C-GREP": "8_code.md:198-201 · 8_code.md:217-220",
+    "C-DOSSIER": "agents/concepteur.md:301-304 · agents/testeur.md:315-316 · agents/realisateur.md:715-718",
+    "W-LIVE": "8_code.md:126-128 · 8_code.md:135-136 · 8_code.md:470-475",
+    "A-LOT": "8_code.md:605-606 · 8_code.md:564 · 8_code.md:573 · 8_code.md:582 · 8_code.md:597 · 8_code.md:442",
+    "A-DESC": "8_code.md:563 · 8_code.md:572 · 8_code.md:581 · 8_code.md:596 · agents/realisateur.md:346-348",
+    "A-BLOC": "8_code.md:418-419 · 8_code.md:440-441 · agents/detailleur.md:385-387",
+    "A-DOSSIER": "8_code.md:608-609",
+    "A-AUCUN": "8_code.md:509-510",
     "A-IMBRIQUE": "agents/realisateur.md:342-349 · agents/arbitre.md:476-486",
     "D-ESTIME": "demande 1.5, §4 : la médiane des lots passés de la feature",
 }
@@ -239,7 +239,7 @@ def read_lots(app, feature, folder="", worktrees=(), passes=None, run=None, open
         row["state"], row["detail"], row["rule"] = state, detail, STATE_RULE[state]
         row["attempts"] = {"used": v["attempts"] if v else 0, "cap": CAP,
                            "note": None if not v else (None if v["attempts_written"] else
-                                   "pas de ## Attempts dans le verdict : lu comme 1 (8_code.md:301-302)")}
+                                   "pas de ## Attempts dans le verdict : lu comme 1 (8_code.md:322-323)")}
         lp = [p for p in mine if p.get("lot") == lot]
         row["passes"] = [_pass_row(p) for p in lp]
         hist = _blocking_history(W, lot, names)

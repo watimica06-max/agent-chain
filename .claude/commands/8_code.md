@@ -137,14 +137,15 @@ invoking anything.
 
 ⚠️ **The `concepteur`, the `testeur` and the `realisateur` commit
 inside it, lot by lot** — 📌 **each its own work, with a message
-reading `<lot>: <what the commit carries>`.** That is theirs; you do
-not commit for them. 🔴 **Everything else the run leaves in the
-worktree is yours to commit** — 📌 **the sheets, the verdicts, every
+reading `<working folder>/<lot>: <what the commit carries>`**, see move
+3. That is theirs; you do not commit for them. 🔴 **Everything else
+the run leaves in the worktree is yours to commit** — 📌 **the sheets,
+the verdicts, every
 blocking file, the renames of 4b, the requests under `architecte/` and
 what the Architecte and the Arbitre write outside the feature
 folder**: the Détailleur, the Relecteur, the Architecte and the Arbitre
 have no Bash, and the three that commit stage their own work only. 🔴
-**A request is never a lot's** — it rides no `<lot>:` commit, so no
+**A request is never a lot's** — it rides no lot's commit, so no
 revert of the lot removes it. ⚠️ **You do it when the run ends** — see
 *Git, once it has reported*, whose step 1 enumerates the files —
 **and before `/7_lots` at a split-back**, see *When the split comes
@@ -194,23 +195,43 @@ first commit to `HEAD`** — ⚠️ **the parent, or the first commit's own
 files are left out.** 🔴 **The Relecteur cannot grep a commit**, and
 its check on `## Outside the lot` rests on that list.
 
-🔴 **The lot's first commit is found by `git log`** — 📌 **the three
-committing agents write `<lot>: <what the commit carries>` as their
-message**, so:
+🔴 **The lot's commits are found by their subject alone** — 📌 **the
+three committing agents write `<working folder>/<lot>: <what the commit
+carries>`**, `<working folder>` being the working folder as its path
+under `docs/features/` — `premiere-app-3`, `premiere-app-3/bugfix-01`.
+⚠️ **Lot names are reused by every split, every feature and every
+bug-fix cycle**: the folder in the subject is what tells them apart.
+Three commands, from the root of the worktree:
 
-    git log -1 --format=%H --grep='^Revert "<lot>: '
-    git log --reverse --format=%H --grep="^<lot>: " <that sha>..HEAD
+    git log -1 --diff-filter=A --format=%H -- docs/features/<working folder>/code/decoupage.md
+    git log --format='%H %s' <split>..HEAD | grep -m1 -E '^[0-9a-f]+ Revert "<working folder>/<lot>: '
+    git log --reverse --format='%H %s' <base>..HEAD | grep -E '^[0-9a-f]+ <working folder>/<lot>: '
 
-🔴 **The first command finds the lot's most recent revert** — 📌 **a
+🔴 **The first finds `<split>`, the split in force** — 📌 **the commit
+that added the current `code/decoupage.md`**: ⚠️ **only a first split
+creates that file** — a correction, a decision applied and a redécoupage
+amend it. 📌 **So a lot kept through a redécoupage — closed on a PASS —
+stays after it**, and the lots of a split the Product Owner deleted stay
+before it.
+
+🔴 **The second finds the lot's last revert after `<split>`** — 📌 **a
 `sheet` cause or a redécoupage reverted an earlier coding of the lot**,
-and those reverted commits still match the second grep. ⚠️ **The list
-is the lot's commits after that revert, none of the reverted ones** —
-📌 **no revert found → the whole history**, `<that sha>..HEAD` left
-out.
+and the commits it reverted still carry the lot's subject. 🔴
+**`<base>` is that revert's sha, or `<split>` when it finds none.**
 
-⚠️ **The first line is the lot's first commit** — a blocked run's when
-one came before, the concepteur's otherwise. 📌 **The same list is what
-the revert of *When the split comes back* and of move 4 works on** —
+🔴 **The third is the list** — 📌 **the lot's commits after `<base>`,
+oldest first, none of the reverted ones.**
+
+⚠️ **The subject, never the body** — 🔴 **never `--grep`**: 📌 **it
+reads every line of a message**, and a body line can open on a lot's
+subject. ⚠️ **Nor what a commit stages** — 📌 **a Réalisateur retry
+that touches only code is the lot's all the same**: the subject is the
+one test.
+
+⚠️ **The first line's sha is `<first>`, the lot's first commit** — a
+blocked run's when one came before, the concepteur's otherwise. 📌
+**The same list is what the revert of *When the split comes back* and
+of move 4 works on** —
 ⚠️ **cut the same way**: a revert reverts one coding, never the
 commits an earlier revert already undid. 🔴 **Several lots to revert →
 one list**: 📌 **each lot's, cut after its own last revert, merged and

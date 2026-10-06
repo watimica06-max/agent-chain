@@ -390,7 +390,7 @@ CODE_ANCHORS = {
     "P-DEMANDES": ["architecte/concepteur-<lot>.md", "architecte/realisateur-<lot>.md",
                    "architecte/detailleur-<lot>.md", "first lot of the block", "arbitre-<lot>-blocking-N.md"],
     "B-OU": ["three places", "## Blocking N — lot-NN"],
-    "C-GREP": ["<lot>: <what the commit carries>", "most recent revert"],
+    "C-GREP": ["<working folder>/<lot>: <what the commit\ncarries>", "last revert"],
     "C-DOSSIER": ["code/<lot>/conception.md", "your report", "Write the report"],
     "W-LIVE": ["git worktree add .claude/worktrees/<name> HEAD", "One worktree for the whole run",
                "she opens the worktree"],

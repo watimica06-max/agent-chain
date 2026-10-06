@@ -365,8 +365,8 @@ returned is an acknowledgement; the answer is in `## Decision`.**
 🔴 **Before you carry on, `git status`** — 📌 **a
 `docs/CURRENT_TECHNICAL_STATE.md` it shows modified holds a trap the
 Arbitre wrote**: commit that file alone, now, before move 7 touches it,
-under a message that does not begin with `<lot>: ` — `trap: <what it
-says>`. ⚠️ **The lot's revert list is built from that prefix**, and a
+under a message that does not begin with `<working folder>/<lot>: ` —
+`trap: <what it says>`. ⚠️ **The lot's revert list is built from that prefix**, and a
 trap committed outside it survives every revert of the lot. 📌 **The
 file unchanged, the Arbitre wrote no trap** — nothing to commit.
 
@@ -442,8 +442,8 @@ blocking file once the Product Owner has filled it, and this file.**
 🔴 **`En chantier` is the field that matters.** ⚠️ **Work undone and
 left unnamed is work the next run does not know it has to do again.**
 
-📌 **Commit what compiles before you stop** — 🔴 **never commit what
-does not.** 🔴 **`git restore` the non-compiling piece before you
+📌 **Commit what compiles before you stop**, under the message of move
+9 — 🔴 **never commit what does not.** 🔴 **`git restore` the non-compiling piece before you
 stop**, and ⚠️ **say in `En chantier` what was written and undone, and
 where** — 📌 **the tree you leave is clean, and `HEAD` compiles.**
 
@@ -718,6 +718,11 @@ fields are above.**
 **9. Commit**, staging explicitly what belongs to the lot — ⚠️ **never
 your request in `architecte/`**: 📌 **the command commits those**, so
 a revert of the lot leaves them standing. 🔴 **The message reads
-`<lot>: <what the commit carries>`** — 📌 **the orchestration finds the
-lot's first commit by `git log` on it.**
+`<working folder>/<lot>: <what the commit carries>`** — 📌
+**`<working folder>` is the folder the prompt gives, as its path under
+`docs/features/`**: `premiere-app-3`, `premiere-app-3/bugfix-01`. ⚠️
+**The orchestration finds the lot's commits by that subject alone** —
+📌 **never by what a commit stages**: a retry that touches only code is
+the lot's all the same. 🔴 **On every commit you make, a blocked run's
+included.**
 

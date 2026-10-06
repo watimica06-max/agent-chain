@@ -140,7 +140,8 @@ it the next run has nothing to resume from.**
 it.
 
 🔴 **Then commit the tests you did write, the report and the blocking
-file with them** — 📌 **the next run starts from them.** ⚠️ **An
+file with them**, under the message of move 6 — 📌 **the next run
+starts from them.** ⚠️ **An
 uncommitted worktree cannot be merged**, and your block would never
 reach the Product Owner.
 
@@ -313,8 +314,12 @@ cannot be placed.
 rather than a line saying so.**
 
 **6. Commit**, staging explicitly the tests you wrote, your report
-and the manual list. 🔴 **The message reads `<lot>: <what the commit
-carries>`.**
+and the manual list. 🔴 **The message reads `<working folder>/<lot>:
+<what the commit carries>`** — 📌 **`<working folder>` is the folder
+the prompt gives, as its path under `docs/features/`**:
+`premiere-app-3`, `premiere-app-3/bugfix-01`. ⚠️ **The subject is how
+the orchestration finds the lot's commits** — 📌 **on every commit you
+make, a blocked run's included.**
 
 🔴 **Uncommitted, your tests are lost** — 📌 **only what is committed
 is merged**, and the worktree is removed at the end of the run.
