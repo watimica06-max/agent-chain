@@ -579,6 +579,12 @@ class Scan:
                                  "désormais à un nouveau cycle.", ["code/decoupage.md"]))
             else:
                 getattr(self, "m_" + d.id)(s)
+            if d.id == "8_code" and s.lots is None:
+                # « n / N en PASS » shown whatever the state, as on a
+                # correction's flow (1.5: the badge opens « Code »).
+                tmp = Step("x", None, "")
+                self.m_8_code(tmp)
+                s.lots = tmp.lots
             steps.append(s)
         return steps
 
@@ -854,20 +860,14 @@ class Scan:
         seq = W.lines(W.p("code", "sequence.md"))
         if any(l.strip() for l in section(seq, "Defects")) or W.has("code", "blocked_verificateur.md"):
             return self.set(s, A_FAIRE, "COD-2", "Le découpage n'a jamais été corrigé : /7_lots d'abord.", [r("code", "sequence.md")])
-        order = re.findall(r"\blot-[A-Za-z0-9]+\b", "\n".join(section(seq, "Order")))
+        order = lot_order(W)
         done, failed = 0, []
         for lot in order:
-            v = W.p("code", lot, "verdict.md")
-            vl = W.lines(v) if os.path.isfile(v) else []
-            if first_after(vl, "## Status").startswith("PASS"):
+            v = lot_verdict(W, lot)
+            if v and v["pass"]:
                 done += 1
-            elif vl:
-                try:
-                    att = int(re.match(r"\d+", first_after(vl, "## Attempts") or "1").group(0))
-                except (AttributeError, ValueError):
-                    att = 1
-                if att >= 3:
-                    failed.append(lot)
+            elif v and v["lines"] and v["attempts"] >= 3:
+                failed.append(lot)
         s.lots = {"pass": done, "total": len(order)}
         if failed:
             return self.set(s, BLOQUEE, "COD-3", f"{failed[0]} a échoué trois fois : le lot est au Product Owner.", [r("code", failed[0], "verdict.md")])
@@ -968,6 +968,34 @@ def first_after(lines, heading):
                 if n.strip():
                     return n.strip() if not n.startswith("#") else ""
     return ""
+
+
+LOT_ID = re.compile(r"\blot-[A-Za-z0-9]+\b")
+
+
+def lot_order(W: Folder):
+    """The lots of `code/sequence.md`'s `## Order`, in order (cmd/8_code.md:38-39)."""
+    if not W.has("code", "sequence.md"):
+        return []
+    return LOT_ID.findall("\n".join(section(W.lines(W.p("code", "sequence.md")), "Order")))
+
+
+def lot_verdict(W: Folder, lot):
+    """What /8_code reads of `code/<lot>/verdict.md` (cmd/8_code.md:41-45),
+    or None when there is none. `pass`: `## Status` starts with `PASS`
+    (:80-82). `attempts`: `## Attempts`, read as 1 when the line is missing
+    (:301-302). One reader for « n / N en PASS » and for the Code tab (1.5)."""
+    v = W.p("code", lot, "verdict.md")
+    if not os.path.isfile(v):
+        return None
+    vl = W.lines(v)
+    status = first_after(vl, "## Status")
+    raw = first_after(vl, "## Attempts")
+    m = re.match(r"\d+", raw or "")
+    return {"path": v, "lines": vl, "readable": W.readable(v), "status": status,
+            "pass": status.startswith("PASS"),
+            "attempts": int(m.group(0)) if m else 1, "attempts_written": bool(m),
+            "cause": first_after(vl, "## Cause"), "causes_so_far": first_after(vl, "## Causes so far")}
 
 
 def pending_requests(W: Folder):

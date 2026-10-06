@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cockpit de la chaîne</title>
+<title>Cockpit</title>
 <link rel="icon" href="data:,">
 <style>
 :root {
@@ -220,22 +220,22 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
 #ctx-count { font-weight: 650; min-width: 64px; text-align: center; }
 #ctx-note { margin: 10px 20px 0; }
 #ctx-doc { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 12px 20px 40px; font-size: 15px; line-height: 1.5; position: relative; }
-#ctx-doc .ln { min-height: 1.5em; white-space: pre-wrap; word-wrap: break-word; padding: 0 6px; border-radius: 4px; }
-#ctx-doc .ln.blank { min-height: .6em; }
-#ctx-doc .h1 { font-size: 22px; font-weight: 700; margin-top: 14px; }
-#ctx-doc .h2 { font-size: 19px; font-weight: 700; margin-top: 12px; }
-#ctx-doc .h3 { font-size: 17px; font-weight: 650; margin-top: 10px; }
-#ctx-doc .h4, #ctx-doc .h5, #ctx-doc .h6 { font-weight: 650; margin-top: 6px; }
-#ctx-doc .li { padding-left: calc(22px + var(--ind, 0) * 18px); text-indent: -14px; }
-#ctx-doc .li .bul { color: var(--soft); display: inline-block; min-width: 14px; text-indent: 0; }
-#ctx-doc .code, #ctx-doc .tr { font-family: var(--mono); font-size: 13px; background: var(--bg); border-radius: 0; }
-#ctx-doc .bq { border-left: 3px solid var(--line); color: var(--soft); margin-left: 4px; }
-#ctx-doc .hr { border-bottom: 1px solid var(--line); min-height: 0; margin: 8px 0; }
-#ctx-doc code { font-family: var(--mono); font-size: .9em; background: var(--bg); padding: 0 3px; border-radius: 4px; }
+:is(#ctx-doc, .mdoc) .ln { min-height: 1.5em; white-space: pre-wrap; word-wrap: break-word; padding: 0 6px; border-radius: 4px; }
+:is(#ctx-doc, .mdoc) .ln.blank { min-height: .6em; }
+:is(#ctx-doc, .mdoc) .h1 { font-size: 22px; font-weight: 700; margin-top: 14px; }
+:is(#ctx-doc, .mdoc) .h2 { font-size: 19px; font-weight: 700; margin-top: 12px; }
+:is(#ctx-doc, .mdoc) .h3 { font-size: 17px; font-weight: 650; margin-top: 10px; }
+:is(#ctx-doc, .mdoc) .h4, :is(#ctx-doc, .mdoc) .h5, :is(#ctx-doc, .mdoc) .h6 { font-weight: 650; margin-top: 6px; }
+:is(#ctx-doc, .mdoc) .li { padding-left: calc(22px + var(--ind, 0) * 18px); text-indent: -14px; }
+:is(#ctx-doc, .mdoc) .li .bul { color: var(--soft); display: inline-block; min-width: 14px; text-indent: 0; }
+:is(#ctx-doc, .mdoc) .code, :is(#ctx-doc, .mdoc) .tr { font-family: var(--mono); font-size: 13px; background: var(--bg); border-radius: 0; }
+:is(#ctx-doc, .mdoc) .bq { border-left: 3px solid var(--line); color: var(--soft); margin-left: 4px; }
+:is(#ctx-doc, .mdoc) .hr { border-bottom: 1px solid var(--line); min-height: 0; margin: 8px 0; }
+:is(#ctx-doc, .mdoc) code { font-family: var(--mono); font-size: .9em; background: var(--bg); padding: 0 3px; border-radius: 4px; }
 #ctx-doc mark { background: var(--warn-soft); color: inherit; border-radius: 3px; padding: 0 1px; outline: 1px solid var(--warn); }
 #ctx-doc mark.cur { background: var(--warn); color: var(--card); }
-#ctx-doc .ln.inrange { background: var(--warn-soft); border-radius: 0; }
-#ctx-doc .ln.inrange.cur { background: var(--accent-soft); box-shadow: inset 4px 0 0 var(--accent); }
+:is(#ctx-doc, .mdoc) .ln.inrange { background: var(--warn-soft); border-radius: 0; }
+:is(#ctx-doc, .mdoc) .ln.inrange.cur { background: var(--accent-soft); box-shadow: inset 4px 0 0 var(--accent); }
 #ctx-empty { padding: 28px 20px; }
 
 /* ------------------------------------------------- usage gauges (1.4) */
@@ -383,6 +383,59 @@ table.st tr.detail > td { background: var(--bg); padding: 12px 16px 16px; cursor
 .st-pair h4 { margin: 0 0 8px; font-size: 15px; }
 .badge.odd { background: var(--warn-soft); color: var(--warn); }
 .st-empty { color: var(--soft); padding: 14px 16px; }
+/* ------------------------------------------------- tabs, the Code tab (1.5) */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin: 0 0 18px; }
+.tabs button { border: none; border-bottom: 3px solid transparent; border-radius: 0; background: none; min-height: 44px;
+  padding: 6px 20px; font-weight: 650; color: var(--soft); margin-bottom: -1px; }
+.tabs button:hover:not(:disabled) { color: var(--ink); border-color: transparent transparent var(--line); }
+.tabs button[aria-selected=true] { color: var(--accent); border-bottom-color: var(--accent); }
+.tabs .count { margin-left: 8px; }
+.code-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px 24px; align-items: start; }
+.code-figs { display: flex; gap: 10px 22px; flex-wrap: wrap; align-items: baseline; }
+.code-figs .big { font-size: 28px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.code-bar { height: 12px; border-radius: 99px; background: var(--idle-soft); overflow: hidden; margin: 8px 0 12px; display: flex; }
+.code-bar > span { display: block; height: 100%; }
+.code-bar .b-pass { background: var(--ok); } .code-bar .b-run { background: var(--accent); }
+.code-bar .b-fail { background: var(--warn); } .code-bar .b-block { background: var(--err); }
+.code-live { font-size: 16px; } .code-live b { font-weight: 650; }
+.code-actions { display: flex; flex-direction: column; gap: 8px; align-items: stretch; min-width: 240px; }
+.code-actions button.stopnext { background: var(--warn-soft); border: 2px solid var(--warn); color: var(--warn); font-weight: 650; }
+.code-notes { grid-column: 1 / -1; }
+.code-notes .notice { margin: 6px 0 0; font-size: 15px; }
+table.lots td { vertical-align: top; }
+table.lots tr.blockrow > td { background: var(--bg); color: var(--soft); font-size: 13px; padding: 7px 12px; }
+table.lots tr.blockrow b { color: var(--ink); text-transform: none; }
+table.lots .ltitle { color: var(--soft); font-size: 13px; margin-top: 2px; min-width: 220px; max-width: 420px; }
+table.lots .ag { white-space: nowrap; font-size: 13px; line-height: 1.55; }
+table.lots .ag b { font-weight: 650; }
+table.lots .ag .u { display: inline; margin-left: 4px; }
+.mark { display: inline-block; font-size: 12px; font-weight: 650; padding: 0 8px; border-radius: 99px; margin: 0 4px 3px 0;
+  border: 1px solid var(--accent); color: var(--accent); white-space: nowrap; }
+.mark.wait { border-color: var(--warn); color: var(--warn); }
+.lot-detail { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px; }
+.lot-detail h4 { margin: 0 0 6px; font-size: 15px; }
+.lot-detail .full { grid-column: 1 / -1; }
+.mdoc { max-height: 460px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; background: var(--card);
+  font-size: 14px; line-height: 1.5; }
+.vfield { margin: 2px 0; font-size: 14px; } .vfield b { display: inline-block; min-width: 150px; color: var(--soft); font-weight: 600; }
+.vfield pre { margin: 2px 0 6px; white-space: pre-wrap; font: 13px/1.45 var(--mono); background: var(--card); border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 8px; }
+.commit { border-top: 1px solid var(--line); padding: 6px 0; font-size: 14px; }
+.commit .mono { font-size: 12px; } .commit.undone .subj { text-decoration: line-through; color: var(--soft); }
+.commit ul { margin: 4px 0 0 18px; padding: 0; font: 12px/1.5 var(--mono); color: var(--soft); }
+.timeline { display: grid; gap: 4px; font-size: 13px; }
+.tl-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) 210px; gap: 10px; align-items: center; }
+.tl-track { position: relative; height: 14px; background: var(--idle-soft); border-radius: 4px; }
+.tl-bar { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: var(--accent); min-width: 3px; }
+.tl-bar.nested { top: 3px; bottom: 3px; background: var(--warn); }
+.tl-bar.live { background: repeating-linear-gradient(45deg, var(--accent), var(--accent) 6px, var(--accent-soft) 6px, var(--accent-soft) 10px); }
+.tl-axis { display: flex; justify-content: space-between; color: var(--soft); font-size: 12px; margin-left: 160px; margin-right: 220px; }
+/* « Arrêter le cockpit », the stopped page (1.5) */
+#stopped { position: fixed; inset: 0; z-index: 100; background: var(--bg); display: grid; place-items: center; padding: 24px; }
+#stopped .card { max-width: 620px; }
+.notes label { display: flex; gap: 10px; align-items: center; padding: 7px 0; }
+.notes input { width: 20px; height: 20px; }
+@media (max-width: 1100px) { .lot-detail { grid-template-columns: 1fr; } .code-top { grid-template-columns: 1fr; } }
 @media (max-width: 1100px) { .st-pair { grid-template-columns: 1fr; } .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 1100px) { :root { --side: 188px; } .screen { padding: 22px 20px 40px; } #save-bar { padding: 3px 20px; } #keys-legend { padding: 6px 20px; } }
 </style>
@@ -392,7 +445,7 @@ table.st tr.detail > td { background: var(--bg); padding: 12px 16px 16px; cursor
   <div id="topbar">
     <button id="tb-menu" class="hidden" aria-controls="side" aria-expanded="true" aria-label="Fermer le menu" title="Fermer le menu">
       <span class="bars"></span><span id="tb-menu-dot" class="hidden"></span></button>
-    <h1>Cockpit</h1>
+    <h1 title="Cockpit de la chaîne">Cockpit</h1>
     <button id="tb-folder" class="chip hidden" title="Dossiers"></button>
     <button id="tb-mode" class="chip hidden" title="Mode de permission"></button>
     <span id="tb-run" class="chip hidden"></span>
@@ -515,9 +568,16 @@ table.st tr.detail > td { background: var(--bg); padding: 12px 16px 16px; cursor
         <span class="grow"></span>
         <span class="legend" id="chaine-legend"></span>
       </div>
-      <div id="chaine-alerts"></div>
-      <ol class="flow" id="flow-main" aria-label="La chaîne principale"></ol>
-      <div id="run-fallback" class="flow-note"></div>
+      <div class="tabs" role="tablist" aria-label="Chaîne" id="chaine-tabs">
+        <button role="tab" id="tab-main-amont" data-chain="main" data-tab="amont" aria-controls="chaine-amont">Amont</button>
+        <button role="tab" id="tab-main-code" data-chain="main" data-tab="code" aria-controls="chaine-code">Code <span class="count plain hidden" id="tab-main-code-n"></span></button>
+      </div>
+      <div id="chaine-amont" role="tabpanel" aria-labelledby="tab-main-amont">
+        <div id="chaine-alerts"></div>
+        <ol class="flow" id="flow-main" aria-label="La chaîne principale"></ol>
+        <div id="run-fallback" class="flow-note"></div>
+      </div>
+      <div id="chaine-code" role="tabpanel" aria-labelledby="tab-main-code" class="hidden"></div>
     </section>
 
     <!-- ============================ Correction ============================ -->
@@ -529,8 +589,15 @@ table.st tr.detail > td { background: var(--bg); padding: 12px 16px 16px; cursor
       </div>
       <div id="corr-list" class="corr-list"></div>
       <div id="corr-note" class="muted small"></div>
-      <ol class="flow" id="flow-corr" aria-label="La chaîne de correction"></ol>
-      <div class="card" id="buglist-card" style="margin-top:20px"></div>
+      <div class="tabs" role="tablist" aria-label="Correction" id="corr-tabs" style="margin-top:12px">
+        <button role="tab" id="tab-corr-amont" data-chain="corr" data-tab="amont" aria-controls="corr-amont">Amont</button>
+        <button role="tab" id="tab-corr-code" data-chain="corr" data-tab="code" aria-controls="corr-code">Code <span class="count plain hidden" id="tab-corr-code-n"></span></button>
+      </div>
+      <div id="corr-amont" role="tabpanel" aria-labelledby="tab-corr-amont">
+        <ol class="flow" id="flow-corr" aria-label="La chaîne de correction"></ol>
+        <div class="card" id="buglist-card" style="margin-top:20px"></div>
+      </div>
+      <div id="corr-code" role="tabpanel" aria-labelledby="tab-corr-code" class="hidden"></div>
     </section>
 
     <!-- =========================== Statistiques =========================== -->
@@ -556,6 +623,9 @@ table.st tr.detail > td { background: var(--bg); padding: 12px 16px 16px; cursor
       <div class="st-sec" id="st-cmd"><h3>Par commande</h3><div id="st-cmd-table"></div></div>
       <div class="st-sec" id="st-agent"><h3>Par agent</h3><div id="st-agent-table"></div></div>
       <div class="st-sec hidden" id="st-feat"><h3>Par fonctionnalité</h3><div id="st-feat-table"></div></div>
+      <div class="st-sec hidden" id="st-lot"><h3>Par lot</h3>
+        <div class="sub" id="st-lot-sub">Les passages que la base rattache à un lot de /8_code (code_rules.md §7). Durée : les passages de premier niveau — l'Arbitre appelé par un Réalisateur tourne dans son temps. Essais : le « ## Attempts » du verdict, lu dans les fichiers.</div>
+        <div id="st-lot-table"></div></div>
       <div class="st-sec" id="st-costly"><h3>Les plus coûteux</h3>
         <div class="sub">Par tokens lus. « inhabituel » : plus de deux fois la médiane de sa commande (un run) ou de son agent (un passage), sur toute la base.</div>
         <div class="st-pair"><div><h4>Runs</h4><div id="st-costly-runs"></div></div><div><h4>Passages d'agent</h4><div id="st-costly-passes"></div></div></div>
@@ -589,12 +659,27 @@ table.st tr.detail > td { background: var(--bg); padding: 12px 16px 16px; cursor
         <p class="muted small">La sortie de secours : le chemin normal est la chaîne. Une commande que le dernier relais n'a pas nommée demande confirmation.</p>
         <div id="set-commands"></div>
       </div>
+      <div class="card sec" id="sec-notes">
+        <h2>Notifications</h2>
+        <p class="muted small">Quand l'onglet du cockpit n'est pas devant : le navigateur montre une notification ; un clic ramène l'onglet sur l'écran concerné. Devant, la page le montre déjà.</p>
+        <div id="set-notes" class="notes"></div>
+      </div>
       <div class="card sec" id="sec-maint">
         <h2>Maintenance</h2>
         <div id="set-maint"></div>
       </div>
+      <div class="card sec" id="sec-quit">
+        <h2>Cockpit</h2>
+        <p class="muted small">Fermer l'onglet ou le navigateur n'arrête rien : un run continue, et la page rouverte le reprend où il en est. Ceci arrête le serveur du cockpit lui-même ; le raccourci du bureau le relance.</p>
+        <div class="row"><button id="btn-quit" class="danger">Arrêter le cockpit</button><span id="quit-msg" class="muted small"></span></div>
+      </div>
     </section>
   </div>
+</div>
+
+<div id="stopped" class="hidden" role="alertdialog" aria-label="Cockpit arrêté">
+  <div class="card"><h2 id="stopped-title">Le cockpit est arrêté</h2>
+    <p id="stopped-text">Pour le rouvrir : le raccourci du bureau (lancer.bat). La page se recharge alors d'elle-même.</p></div>
 </div>
 
 <!-- The live run: moved under the step it belongs to. -->
@@ -1123,8 +1208,9 @@ function kindCount(kind) {
   const nq = F.questions.length, nb = F.blocking.length + (F.redecoupage ? 1 : 0);
   return kind === "questions" ? nq : kind === "blocking" ? nb : nq + nb;
 }
-function openAnswersOfKind(kind) { stepFilter = null; answerFilter = kind; renderForms(); go("answer"); }
+function openAnswersOfKind(kind) { stepFilter = null; lotFilter = null; answerFilter = kind; renderForms(); go("answer"); }
 function openAnswers(step, chain) {
+  lotFilter = null;
   stepFilter = step ? {step, chain: chain || null, name: stepName(step)} : null;
   answerFilter = "all";
   renderForms();
@@ -1161,7 +1247,9 @@ function renderFlow(box, steps, chain, launchable, offNote) {
       whyOpen.has(key) ? whyOpen.delete(key) : whyOpen.add(key); wb.classList.toggle("hidden"); }}));
     const line1 = el("div", {class: "line1"}, el("span", {class: "sname", text: s.name}),
       el("span", {class: "stc " + (STATE_CLASS[s.state] || "st-inconnu"), text: s.state}));
-    if (s.lots) line1.append(el("span", {class: "badge plain", text: `${s.lots.pass} / ${s.lots.total} en PASS`}));
+    // 1.5: « 7 / 12 en PASS » opens « Code ».
+    if (s.lots) line1.append(el("button", {class: "badge plain lots-link", style: "min-height:0;border:none;cursor:pointer", title: "Voir les lots (onglet Code)",
+      text: `${s.lots.pass} / ${s.lots.total} en PASS`, onclick: () => openCode(chain)}));
     if (isNext && d.source !== "run") line1.append(el("span", {class: "next-tag", text: `Prochaine étape · ${d.label || ""}`}));
     const cmdText = s.id === "test" ? "/deploie, puis à la main" : `/${s.command} ${s.command === "deploie" ? "" : S.feature}`;
     const main = el("div", {}, line1, el("div", {class: "scmd", text: cmdText + (s.note && chain === "main" ? " — " + s.note : "")}));
@@ -1184,6 +1272,8 @@ function renderChaine() {
   if ((S.bugfixes || []).length) al.append(el("div", {class: "notice warn small",
     text: `Une correction est ouverte (${S.bugfixes[S.bugfixes.length - 1]}) : /7_lots, /8_code et /9_controle agissent sur elle. Sa chaîne est sous « Correction ».`}));
   renderFlow($("flow-main"), S.scan.main, "main", true);
+  renderTabs("main");
+  if (TABS.main === "code") { if (!CODE.main) loadCode("main"); else renderCode($("chaine-code"), "main"); }
 }
 
 // ---------------------------------------------------------- correction
@@ -1193,14 +1283,17 @@ function renderCorrection() {
   const corr = S.scan.corrections;           // newest first
   if (!corrSel || !corr.find((c) => c.name === corrSel)) corrSel = corr.length ? corr[0].name : null;
   for (const c of corr) list.append(el("button", {class: c.name === corrSel ? "sel" : "", text: c.name + (c.highest ? " · en cours" : ""),
-    onclick: () => { corrSel = c.name; renderCorrection(); placeRun(); loadBuglist(); }}));
+    onclick: () => { corrSel = c.name; renderCorrection(); placeRun(); loadBuglist(); if (TABS.corr === "code") loadCode(c.name); }}));
   $("btn-new-bugfix").disabled = running();
   const c = corr.find((x) => x.name === corrSel);
   $("corr-note").textContent = !c ? "Aucune correction. « Nouvelle correction » crée bugfix-01/ et son bug-list.md, rien d'autre."
     : c.highest ? `Les commandes prennent la feature (${S.feature}) et agissent sur ${c.name}, la correction la plus haute.`
     : `Lecture seule : les commandes agissent sur la correction la plus haute (7_lots.md:18-19), pas sur ${c.name}.`;
-  if (!c) { $("flow-corr").replaceChildren(); $("buglist-card").classList.add("hidden"); return; }
+  $("corr-tabs").classList.toggle("hidden", !c);
+  if (!c) { $("flow-corr").replaceChildren(); $("buglist-card").classList.add("hidden"); $("corr-code").classList.add("hidden"); return; }
   renderFlow($("flow-corr"), c.steps, c.name, c.highest, "Seule la correction la plus haute se lance.");
+  renderTabs("corr");
+  if (TABS.corr === "code") { if (!CODE[c.name]) loadCode(c.name); else renderCode($("corr-code"), c.name); }
   $("buglist-card").classList.remove("hidden");
   if (!bug.name || bug.name !== corrSel) loadBuglist();
 }
@@ -1249,12 +1342,40 @@ $("btn-new-bugfix").onclick = async () => {
 async function refreshForms() {
   try { F = await api("/api/forms"); }
   catch (e) { $("form").replaceChildren(el("div", {class: "notice err", text: e.message})); return; }
+  for (const e of allEntries()) seenOpen.add(e.id);
+  formsPrimed = true;
   ctxCache.clear();                 // the documents are read again; the pane stays put if nothing moved
   renderForms();
   renderDashboard();
   renderChaine(); renderCorrection(); placeRun();
 }
 $("btn-reload").onclick = () => { $("save-summary").replaceChildren(); refreshForms(); };
+
+// During a run (1.5): « À répondre » read again when an agent hands back, or
+// when the Arbitre starts waiting on her. An entry not seen before is new: a
+// notification says so when the tab is not in front. A form being typed in is
+// not redrawn under her fingers — its counts are, the cards at the next render.
+const seenOpen = new Set();
+let formsPrimed = false;
+async function checkForms(notifyNew) {
+  let data;
+  try { data = await api("/api/forms"); } catch (e) { return; }
+  const all = [...data.questions, ...data.blocking, ...(data.redecoupage ? [data.redecoupage] : [])];
+  const fresh = formsPrimed ? all.filter((e) => !seenOpen.has(e.id)) : [];
+  for (const e of all) seenOpen.add(e.id);
+  formsPrimed = true;
+  F = data;
+  const typing = currentRoute() === "answer" && isTyping(document.activeElement);
+  if (!typing) { renderForms(); renderDashboard(); renderChaine(); renderCorrection(); placeRun(); }
+  else { const n = openCount(); $("nav-answer-count").textContent = n; $("nav-answer-count").classList.toggle("hidden", !n); updateTitle(); }
+  if (notifyNew && fresh.length) {
+    const nb = fresh.filter((e) => !e.question).length, nq = fresh.length - nb;
+    notify("reponse", fresh.length > 1 ? `${fresh.length} réponses vous attendent` : "Une réponse vous attend",
+      [nq ? plural(nq, "question", "questions") : null, nb ? plural(nb, "blocage", "blocages") : null].filter(Boolean).join(" et ") +
+      " : " + fresh.map((e) => e.rel).filter((v, i, a) => a.indexOf(v) === i).slice(0, 3).join(", "),
+      () => { const x = fresh.map(entryLot).find((y) => y.lot); x ? openAnswersLot(x.lot, x.chain) : openAnswersOfKind("all"); });
+  }
+}
 
 function draftOf(id, def) {
   if (!drafts[id]) drafts[id] = {kind: def ? "default" : "none", option: def || null, text: ""};
@@ -1303,7 +1424,17 @@ function entryCard(id, head, body, choice) {
     el("div", {class: "head"}, head), body, choice);
 }
 
-const inStep = (e) => !stepFilter || (e.step === stepFilter.step && (!stepFilter.chain || e.chain === stepFilter.chain));
+// 1.5: « À répondre » filtered on one lot, from the Code tab.
+let lotFilter = null;          // {lot, chain}
+function entryLot(e) {
+  const parts = (e.rel || "").split("/");
+  const chain = /^bugfix-\d+$/.test(parts[0]) ? parts.shift() : "main";
+  const lot = e.lot || (parts[0] === "code" && /^lot-/.test(parts[1] || "") ? parts[1] : null);
+  return {chain, lot};
+}
+const inLot = (e) => { if (!lotFilter) return true; const x = entryLot(e); return x.lot === lotFilter.lot && x.chain === lotFilter.chain; };
+const inStep = (e) => inLot(e) && (!stepFilter || (e.step === stepFilter.step && (!stepFilter.chain || e.chain === stepFilter.chain)));
+function openAnswersLot(lot, chain) { stepFilter = null; lotFilter = {lot, chain: chain || "main"}; answerFilter = "all"; renderForms(); go("answer"); }
 function stepBadge(e) { return e.step ? el("span", {class: "badge plain", text: stepName(e.step) + (e.chain && e.chain !== "main" ? " · " + e.chain : "")}) : null; }
 
 function renderFilters() {
@@ -1315,6 +1446,8 @@ function renderFilters() {
     box.append(el("button", {class: answerFilter === k ? "on" : "", text: label,
       onclick: () => { answerFilter = k; renderForms(); }}));
   }
+  if (lotFilter) box.append(el("span", {class: "badge", id: "lot-filter"}, `Lot : ${lotFilter.lot}${lotFilter.chain !== "main" ? " · " + lotFilter.chain : ""} `,
+    el("button", {class: "link", text: "✕ tout montrer", onclick: () => { lotFilter = null; renderForms(); }})));
   if (stepFilter) box.append(el("span", {class: "badge", id: "step-filter"}, `Étape : ${stepFilter.name}${stepFilter.chain && stepFilter.chain !== "main" ? " · " + stepFilter.chain : ""} `,
     el("button", {class: "link", text: "✕ tout montrer", onclick: () => { stepFilter = null; renderForms(); }})));
 }
@@ -1336,7 +1469,7 @@ function renderForms() {
   const nAll = F.questions.length + F.blocking.length + (F.redecoupage ? 1 : 0);
   const cnt = $("nav-answer-count");
   cnt.textContent = nAll; cnt.classList.toggle("hidden", !nAll);
-  menuDot();
+  menuDot(); updateTitle();
   const qs = F.questions.filter(inStep), bs = F.blocking.filter(inStep);
   const red = F.redecoupage && inStep(F.redecoupage) ? F.redecoupage : null;
   if (!qs.length && !bs.length && !red) form.append(el("p", {class: "muted", text: stepFilter ? "Rien n'attend de réponse pour cette étape." : "Rien n'attend de réponse dans cette feature."}));
@@ -1692,7 +1825,9 @@ function renderRun() {
     el("button", {class: "link", text: "Le retirer", onclick: disarm}));
   renderRunEnd();
   const pl = $("perm-banner"); pl.replaceChildren();
-  if (running()) for (const p of run.permissions) addPermission(p);
+  // The snapshot, and the cards events brought since it was taken: a state
+  // fetched just before a request arrived must not take its card away.
+  if (running()) for (const p of [...run.permissions, ...livePerms.values()]) if (!resolvedPerms.has(p.id)) addPermission(p);
   permAlert();
 }
 
@@ -1719,6 +1854,7 @@ function renderRunEnd() {
 function renderIdle(idle) {
   const b = $("idle-box"); b.replaceChildren();
   b.classList.toggle("hidden", !idle);
+  updateTitle();
   if (!idle) return;
   b.append(el("div", {text: `Aucun message depuis ${idle.minutes} min : la commande attend toujours ${(idle.agents || []).join(", ") || "un agent"}.`}),
     el("div", {class: "row", style: "margin-top:8px"},
@@ -1758,10 +1894,23 @@ function permAlert() {
   $("perm-banner").classList.toggle("hidden", !n);
   $("perm-badge").classList.toggle("hidden", !n);
   $("perm-badge").textContent = n > 1 ? `${n} autorisations demandées` : "Autorisation demandée";
-  document.title = (n ? "● " : "") + "Cockpit de la chaîne";
+  updateTitle();
 }
 
+// The tab's title carries the count of what waits on her (1.5): the entries
+// to answer, the permission cards, the idle question — « (2) Cockpit ».
+function waitingCount() {
+  return openCount() + $("perm-banner").children.length + (running() && S.run.idle ? 1 : 0);
+}
+function updateTitle() {
+  const n = S.open ? waitingCount() : 0;
+  const t = n ? `(${n}) Cockpit` : "Cockpit";
+  if (document.title !== t) document.title = t;
+}
+
+const livePerms = new Map(), resolvedPerms = new Set();
 async function answerPerm(id, allow) {
+  livePerms.delete(id); resolvedPerms.add(id);
   try { await api("/api/permission", {id, allow}); }
   catch (e) { alert(e.message); }
   const c = $("perm-" + id); if (c) c.remove();
@@ -1785,51 +1934,445 @@ function streamAppend(node) {
   if (atBottom) s.scrollTop = s.scrollHeight;
 }
 
-function onEvent(ev) {
-  if (ev.seq <= seen) return;
-  seen = ev.seq;
+// What an event writes in the stream — the same for a live event and for one
+// a reopened page is given from the run's log (1.5).
+function renderEvent(ev) {
   const d = ev.data;
   switch (ev.type) {
     case "run_started":
-      streamAppend(el("div", {class: "sys", text: d.continued ? `▶ suite de ${d.prompt} (même session)` : `▶ ${d.prompt}`}));
-      refreshState(); break;
+      streamAppend(el("div", {class: "sys", text: d.continued ? `▶ suite de ${d.prompt} (même session)` : `▶ ${d.prompt}`})); break;
     case "text": streamAppend(el("div", {class: "ev"}, el("span", {class: "who", text: d.agent}), el("pre", {class: "text", text: d.text}))); break;
     case "tool": streamAppend(el("div", {class: "tool", text: `${d.agent} · ${d.tool}  ${d.summary || ""}`})); break;
     case "agent_started":
-      streamAppend(el("div", {class: "sys", text: `→ ${d.agent}${d.description ? " — " + d.description : ""}`}));
-      if (S.run) { S.run.agents = [...(S.run.agents || []), d.agent]; renderAgents(S.run.agents); } break;
+      streamAppend(el("div", {class: "sys", text: `→ ${d.agent}${d.description ? " — " + d.description : ""}`})); break;
     case "agent_background":
       streamAppend(el("div", {class: "sys", text: `… ${d.agent} tourne en arrière-plan`})); break;
-    case "idle_wait":
-      if (S.run) { S.run.idle = d; renderIdle(d); } break;
     case "agent_ended":
       streamAppend(el("div", {class: "sys", text: `← ${d.agent} ${d.late ? "a fini (" + d.status + ")" : "a rendu la main"}`}));
       // « Lexicographe — 4 min 12 s — 182 k lus (dont 160 k en cache), écrits : à la fin du run »:
       // its output is known, if at all, from the run's model_usage once it is over.
       if (d.usage) streamAppend(el("div", {class: "use", text: `${cap(d.usage.agent || d.agent)} — ${usageText(d.usage, "à la fin du run")}`}));
-      if (S.run) { const i = S.run.agents.indexOf(d.agent); if (i >= 0) S.run.agents.splice(i, 1); renderAgents(S.run.agents); } break;
-    case "permission": addPermission(d); break;
-    case "permission_resolved": { const c = $("perm-" + d.id); if (c) c.remove(); permAlert(); break; }
+      break;
     case "stopping": streamAppend(el("div", {class: "sys", text: d.how === "maintenant" ? "■ Arrêt demandé" : "■ Arrêt au prochain lot demandé (stop.md écrit)"})); break;
     case "error": streamAppend(el("div", {class: "sys", text: "⚠ " + d.message})); break;
-    case "status": break;
-    case "limits":
-      S.limits = {...(S.limits || {}), [d.window]: d}; renderGauges(); break;
     case "limits_unavailable":
       streamAppend(el("div", {class: "sys", text: `Usage non remesuré en fin de run : ${d.reason}. Les jauges gardent leur dernière mesure, avec son âge.`})); break;
     case "run_ended":
-      streamAppend(el("div", {class: "sys", text: `■ Fin : ${d.outcome}${d.error ? " — " + d.error : ""}${d.log_path ? " — journal : " + d.log_path : ""}`}));
-      // After every run the scan runs; the run's own Next: is trusted as printed (§2.2).
-      refreshState(); break;
+      streamAppend(el("div", {class: "sys", text: `■ Fin : ${d.outcome}${d.error ? " — " + d.error : ""}${d.log_path ? " — journal : " + d.log_path : ""}`})); break;
   }
 }
 
+function onEvent(ev) {
+  const d = ev.data;
+  // A (re)opened connection starts with the run's stream so far, rebuilt from
+  // its log: written as it was, with none of the live side effects — the
+  // state of the page (agents, cards, the idle box) comes from /api/state.
+  if (ev.replay) {
+    if (ev.dropped) streamAppend(el("div", {class: "sys", text: `… ${ev.dropped} événements plus anciens ne sont pas repris ici : le journal du run les garde.`}));
+    renderEvent(ev); return;
+  }
+  if (ev.seq <= seen) return;
+  seen = ev.seq;
+  renderEvent(ev);
+  switch (ev.type) {
+    case "run_started":
+      // The first agent may start before this state is back: the Code tab
+      // is read once it is known the run is /8_code, then at each agent.
+      refreshState().then(() => { if (S.run && S.run.command === "8_code") loadCode(runChain(), {notify: true}); });
+      break;
+    case "agent_started":
+      if (S.run) { S.run.agents = [...(S.run.agents || []), d.agent]; renderAgents(S.run.agents); }
+      if (S.run && S.run.command === "8_code") loadCode(runChain(), {notify: true});
+      break;
+    case "tool":
+      // The Arbitre waits on her with `sleep` between two reads of the
+      // blocking file (agents/arbitre.md « When you wait »): what it left is hers now.
+      if (d.agent === "arbitre" && d.tool === "Bash" && /^sleep\b/.test(d.summary || "")) checkForms(true);
+      break;
+    case "idle_wait":
+      if (S.run) { S.run.idle = d; renderIdle(d); }
+      notify("attente", "Le run attend un agent depuis " + d.minutes + " min",
+        `${(d.agents || []).join(", ") || "un agent"} n'a rien envoyé : continuer d'attendre ou arrêter ?`,
+        () => goStep(runChain(), S.run_place && S.run_place.step));
+      break;
+    case "agent_ended":
+      if (S.run) { const i = S.run.agents.indexOf(d.agent); if (i >= 0) S.run.agents.splice(i, 1); renderAgents(S.run.agents); }
+      // Refreshed from the files when an agent hands back, never polled (1.5).
+      if (running()) checkForms(true);
+      if (S.run && S.run.command === "8_code") loadCode(runChain(), {notify: true});
+      break;
+    case "permission":
+      livePerms.set(d.id, d);
+      addPermission(d);
+      notify("autorisation", "Une autorisation attend", `${d.tool} — demandé par ${d.agent}. Le run attend votre réponse.`,
+        () => { $("perm-banner").scrollTop = 0; });
+      break;
+    case "permission_resolved": { livePerms.delete(d.id); resolvedPerms.add(d.id); const c = $("perm-" + d.id); if (c) c.remove(); permAlert(); break; }
+    case "limits":
+      S.limits = {...(S.limits || {}), [d.window]: d}; renderGauges(); break;
+    case "run_ended": {
+      const n = d.next || {kind: "unknown"};
+      const where = () => goStep(runChain(), S.run_place && S.run_place.step);
+      if (d.outcome === "erreur") notify("erreur", `${d.prompt} s'est arrêté sur une erreur`, d.error || "Erreur", where);
+      else notify("fin", `${d.prompt} — ${d.outcome}`, n.kind === "unknown" ? "Le relais ne finit pas par une ligne Next:." : "Ensuite : " + n.french, where);
+      if (d.command === "8_code") loadCode(runChain(), {notify: true});
+      // After every run the scan runs; the run's own Next: is trusted as printed (§2.2).
+      refreshState(); break;
+    }
+  }
+}
+
+let offline = false;
 function openEvents() {
   if (es) return;
   es = new EventSource("/api/events");
   es.onmessage = (m) => { try { onEvent(JSON.parse(m.data)); } catch (e) { console.error(e); } };
+  // Each connection starts with the run's stream so far, rebuilt from its
+  // log (1.5): the page starts afresh, and the server's sequence with it.
+  es.onopen = () => { seen = 0; $("stream").replaceChildren(); if (offline) { offline = false; $("stopped").classList.add("hidden"); refreshState().catch(() => {}); } };
+  es.onerror = async () => {
+    // The server gone: the stopped page; EventSource keeps trying, and the
+    // page comes back by itself when the cockpit is started again.
+    try { await fetch("/api/ping"); } catch (e) { showStopped(false); }
+  };
 }
 function closeEvents() { if (es) { es.close(); es = null; } }
+function showStopped(asked) {
+  offline = true;
+  $("stopped-title").textContent = asked ? "Le cockpit est arrêté" : "Le cockpit ne répond plus";
+  $("stopped").classList.remove("hidden");
+}
+
+// ======================================================= the Code tab (1.5)
+// « Chaîne » and « Correction » have two tabs: « Amont », the flow, and
+// « Code », /8_code lot by lot (tools/cockpit/code_rules.md). The data is
+// read again when an agent hands back, never polled.
+const runChain = () => (S.run_place && S.run_place.chain) || "main";
+const TABS = {main: "amont", corr: "amont"};
+try { Object.assign(TABS, JSON.parse(localStorage.getItem("cockpit-tabs") || "{}")); } catch (e) {}
+const CODE = {};            // chain ("main" | "bugfix-NN") -> /api/code
+const LOTD = {};            // chain:lot -> /api/code/lot
+const lotOpen = new Set();  // chain:lot opened
+const LOTSTATE = {};        // chain -> {lot: state}, to notify a lot that passes or fails
+const codeToken = {};
+const folderOf = (chain) => chain === "main" ? "" : chain;
+const shownChain = (which) => which === "main" ? "main" : corrSel;
+
+function setTab(which, tab) {
+  TABS[which] = tab;
+  try { localStorage.setItem("cockpit-tabs", JSON.stringify(TABS)); } catch (e) {}
+  renderTabs(which);
+  if (tab === "code" && shownChain(which)) loadCode(shownChain(which));
+}
+function renderTabs(which) {
+  const pre = which === "main" ? "chaine" : "corr";
+  const tab = TABS[which] === "code" ? "code" : "amont";
+  $(`${pre}-amont`).classList.toggle("hidden", tab !== "amont");
+  $(`${pre}-code`).classList.toggle("hidden", tab !== "code");
+  if (which === "main") $("chaine-legend").classList.toggle("hidden", tab === "code");   // the steps' states, not the lots
+  for (const t of ["amont", "code"]) $(`tab-${which}-${t}`).setAttribute("aria-selected", String(t === tab));
+  const c = CODE[shownChain(which)];
+  const n = $(`tab-${which}-code-n`);
+  n.classList.toggle("hidden", !(c && c.exists));
+  if (c && c.exists) n.textContent = `${c.passed} / ${c.total}`;
+}
+for (const b of document.querySelectorAll(".tabs button[role=tab]")) b.onclick = () => setTab(b.dataset.chain, b.dataset.tab);
+
+function openCode(chain, lot) {
+  if (chain && chain !== "main") { corrSel = chain; renderCorrection(); go("correction"); setTab("corr", "code"); }
+  else { go("chaine"); setTab("main", "code"); }
+  if (lot) {
+    lotOpen.add(`${chain || "main"}:${lot}`);
+    loadLot(chain || "main", lot).then(() => setTimeout(() => { const r = $(`lot-${chain || "main"}-${lot}`); if (r) r.scrollIntoView({block: "start"}); }, 40));
+  }
+}
+
+async function loadCode(chain, opts = {}) {
+  if (!chain || !S.open) return;
+  const tok = codeToken[chain] = (codeToken[chain] || 0) + 1;
+  let data;
+  try { data = await api("/api/code?" + new URLSearchParams({folder: folderOf(chain)})); }
+  catch (e) { data = {error: e.message, exists: false, lots: []}; }
+  if (tok !== codeToken[chain]) return;
+  const before = LOTSTATE[chain];
+  CODE[chain] = data;
+  LOTSTATE[chain] = Object.fromEntries((data.lots || []).map((l) => [l.lot, l.state]));
+  if (opts.notify && before) {
+    for (const l of data.lots || []) {
+      const was = before[l.lot], now = l.state;
+      if (was === now || !["passé", "échoué", "échoué 3 fois", "annulé"].includes(now)) continue;
+      notify("lot", `${l.lot} ${now === "passé" ? "est passé" : now === "annulé" ? "est annulé (cause sheet)" : now === "échoué 3 fois" ? "a échoué trois fois" : "a échoué"}`,
+        `${data.passed} / ${data.total} lots en PASS` + (l.title ? ` — ${l.title}` : ""), () => openCode(chain, l.lot));
+    }
+  }
+  for (const k of [...lotOpen]) if (k.startsWith(chain + ":")) loadLot(chain, k.slice(chain.length + 1));
+  renderCodeFor(chain);
+}
+async function loadLot(chain, lot) {
+  try { LOTD[`${chain}:${lot}`] = await api("/api/code/lot?" + new URLSearchParams({folder: folderOf(chain), lot})); }
+  catch (e) { LOTD[`${chain}:${lot}`] = {error: e.message}; }
+  renderCodeFor(chain);
+}
+function renderCodeFor(chain) {
+  if (chain === "main") { renderTabs("main"); renderCode($("chaine-code"), "main"); }
+  if (chain === corrSel) { renderTabs("corr"); renderCode($("corr-code"), chain); }
+}
+
+const LOT_CLASS = {"passé": "st-faite", "en cours": "st-encours", "échoué": "st-attend", "annulé": "st-attend",
+                   "redécoupé": "st-attend", "bloqué": "st-bloquee", "échoué 3 fois": "st-bloquee",
+                   "entamé": "st-afaire", "pas commencé": "st-afaire", "inconnu": "st-inconnu"};
+function sinceText(iso) {
+  const t = Date.parse(iso); if (!isFinite(t)) return "—";
+  return fmtDur(Math.max(0, (Date.now() - t) / 1000));
+}
+setInterval(() => { for (const x of document.querySelectorAll("[data-since]")) x.textContent = sinceText(x.dataset.since); }, 15000);
+
+function agentsCell(passes) {
+  // One line per agent: its passes summed — time, tokens read, written — a
+  // figure or « inconnu » (the rule of 1.4.3), « à la fin du run » while it goes.
+  const by = new Map();
+  for (const p of passes) { if (!by.has(p.agent)) by.set(p.agent, []); by.get(p.agent).push(p); }
+  const out = [];
+  for (const [agent, g] of by) {
+    const sum = (k) => g.some((p) => p[k] === null || p[k] === undefined) ? null : g.reduce((a, p) => a + p[k], 0);
+    const live = g.some((p) => p.live);
+    const dur = sum("duration_s"), read = sum("read_tokens"), wrote = sum("output_tokens");
+    out.push(el("div", {class: "ag"}, el("b", {text: cap(agent)}), g.length > 1 ? ` ×${g.length}` : "",
+      el("span", {class: "u", text: `${dur === null ? "durée inconnue" : fmtDur(dur)} · ${fmtTok(read)} lus · ` +
+        (wrote === null ? (live ? "écrits : à la fin du run" : "écrits : inconnu") : `${fmtTok(wrote)} écrits`)})));
+  }
+  return out.length ? out : el("span", {class: "muted small", text: "aucun passage connu"});
+}
+
+function codeBar(c) {
+  const n = c.total || 1;
+  const count = (st) => c.lots.filter((l) => st.includes(l.state)).length;
+  const seg = (k, cls, title) => k ? el("span", {class: cls, style: `width:${100 * k / n}%`, title}) : null;
+  return el("div", {class: "code-bar", role: "img", "aria-label": `${c.passed} lots en PASS sur ${c.total}`},
+    seg(c.passed, "b-pass", "passés"), seg(count(["en cours"]), "b-run", "en cours"),
+    seg(count(["échoué", "annulé", "redécoupé"]), "b-fail", "échoués, annulés, redécoupés"),
+    seg(count(["bloqué", "échoué 3 fois"]), "b-block", "bloqués"));
+}
+
+function renderCode(box, chain) {
+  if (!box) return;
+  const c = CODE[chain];
+  box.replaceChildren();
+  if (!c) { box.append(el("p", {class: "muted", text: "Lecture du dossier…"})); return; }
+  if (c.error) { box.append(el("div", {class: "notice err", text: c.error})); return; }
+  if (!c.exists) { box.append(el("p", {class: "muted", text: c.why || "Pas de lots."})); return; }
+  const running8 = running() && S.run.command === "8_code";
+  const here = (c.acts_on || "") === folderOf(chain);
+  const mine = running8 && here;
+  // ---- the top: the bar, the lot in progress, the time, the buttons
+  const live = [];
+  if (mine && c.current) live.push(el("div", {class: "code-live", id: "code-current"}, "En cours : ", el("b", {text: c.current.lot}),
+    ` — ${c.current.agent || "l'orchestrateur"}`, el("span", {class: "muted small", text: c.current.from === "flux" ? "  (le lot que nomme l'agent qui tourne)" : "  (le prochain lot sans PASS, 8_code.md:80-82)"})));
+  else if (mine) live.push(el("div", {class: "code-live muted", text: "Le run est entre deux lots."}));
+  if (mine) live.push(el("div", {class: "muted"}, "Depuis le début du run : ", el("b", {"data-since": S.run.started_at, text: sinceText(S.run.started_at)})));
+  const est = c.estimate || {};
+  live.push(el("div", {class: est.shown ? "" : "muted small", id: "code-estimate"},
+    est.shown ? [`Reste ≈ ${fmtDur(est.eta_s).replace(/ \d+ s$/, "")}`, el("span", {class: "muted small", text: ` — ${est.left} lot${est.left > 1 ? "s" : ""} × la médiane de ${est.lots_known} lots passés (${fmtDur(est.median_s)}), hors Détailleur`})]
+      : est.left === 0 ? "Tous les lots sont passés." : `Pas encore d'estimation : il faut deux lots passés au temps connu (${est.lots_known || 0} pour l'instant).`));
+  const acts = el("div", {class: "code-actions"});
+  if (here) {
+    const step = findStep(chain, "8_code");
+    if (!running()) acts.append(el("button", {class: "primary", text: "Lancer /8_code", onclick: () => launchStep(step, chain)}));
+    if (mine) {
+      acts.append(el("button", {class: "stopnext", text: S.stop_file ? "stop.md posé : arrêt après ce lot" : "Arrêter au prochain lot",
+        disabled: S.stop_file || undefined, onclick: async () => { try { await api("/api/stop-next-lot", {}); await refreshState(); loadCode(chain); } catch (e) { alert(e.message); } }}));
+      acts.append(el("button", {class: "danger", text: "Arrêter maintenant", onclick: () => $("btn-stop-now").click()}));
+    }
+    if (!mine && running()) acts.append(el("div", {class: "muted small", text: `Une commande tourne : ${S.run.prompt}.`}));
+  }
+  const notes = el("div", {class: "code-notes"});
+  if (!here) notes.append(el("div", {class: "notice warn", text: c.acts_on ? `Lecture seule : /8_code agit sur ${c.acts_on}, la correction la plus haute.` : "Lecture seule : /8_code agit sur le dossier de la feature."}));
+  if (c.source === "worktree") notes.append(el("div", {class: "notice ok", text: `Lu dans le worktree du run (${c.worktree}) : les agents y écrivent pendant le run.`}));
+  if (c.stop_file && here) notes.append(el("div", {class: "notice warn", text: "stop.md est présent : /8_code s'arrêtera après le lot en cours."}));
+  if (c.defects) notes.append(el("div", {class: "notice warn", text: `code/sequence.md porte ${plural(c.defects.length, "ligne", "lignes")} sous ## Defects (${c.defects.slice(0, 2).join(" · ")}) : /8_code s'arrêterait et renverrait à /7_lots (8_code.md:92-93) — « None. » est une ligne.`}));
+  if (c.redecoupage) notes.append(el("div", {class: "notice warn", text: `${c.redecoupage} : le découpage revient — les lots sans PASS repartent au découpage.`}));
+  if (c.architecte_blocked) notes.append(el("div", {class: "notice warn"}, `${c.architecte_blocked} à la racine du dossier : il bloque le run, pas un lot. `,
+    el("button", {class: "link", text: "À répondre", onclick: () => openAnswers("8_code", chain)})));
+  if ((c.outside || []).length) notes.append(el("div", {class: "muted small", text: `Dossiers de lot hors de ## Order, non lus : ${c.outside.join(", ")}.`}));
+  box.append(el("div", {class: "card"}, el("div", {class: "code-top"},
+    el("div", {}, el("div", {class: "code-figs"}, el("span", {class: "big", id: "code-count", text: `${c.passed} / ${c.total}`}), el("span", {class: "muted", text: "lots en PASS"})),
+      codeBar(c), ...live), acts, notes)));
+
+  // ---- the lots, by block
+  const tb = el("tbody");
+  const byBlock = new Map();
+  for (const l of c.lots) { const k = l.block || "(sans bloc)"; if (!byBlock.has(k)) byBlock.set(k, []); byBlock.get(k).push(l); }
+  for (const [block, lots] of byBlock) {
+    const bp = (c.block_passes || []).filter((p) => p.block === block);
+    tb.append(el("tr", {class: "blockrow"}, el("td", {colspan: "6"}, el("b", {text: block}),
+      ` — ${lots.length} lot${lots.length > 1 ? "s" : ""}`,
+      bp.length ? el("span", {}, " · par bloc : ", ...agentsCell(bp).map((x) => (x.style && (x.style.display = "inline-block"), x))) : null)));
+    for (const l of lots) {
+      const key = `${chain}:${l.lot}`, open = lotOpen.has(key);
+      const marks = [];
+      if (l.arbitre) marks.push(el("span", {class: "mark", title: "L'Arbitre est intervenu sur ce lot (code_rules.md P-ARBITRE) : " +
+        [l.arbitre.passes ? `${l.arbitre.passes} passage(s)` : null, ...l.arbitre.files.map((f) => f.rel)].filter(Boolean).join(" · "), text: "Arbitre"}));
+      if (l.architecte) {
+        const pending = l.architecte.requests.some((r) => !r.answered);
+        marks.push(el("span", {class: "mark" + (pending ? " wait" : ""), title: "L'Architecte (code_rules.md P-ARCHITECTE) : " +
+          [l.architecte.passes ? `${l.architecte.passes} passage(s)` : null, ...l.architecte.requests.map((r) => `${r.rel} — ${r.answered ? "verdict écrit" : "verdict à venir"}`)].filter(Boolean).join(" · "),
+          text: pending ? "Architecte · en attente" : "Architecte"}));
+      }
+      const att = l.attempts;
+      const row = el("tr", {class: "clickable" + (open ? " open" : ""), id: `lot-${chain}-${l.lot}`, tabindex: "0", "aria-expanded": String(open), "data-lot": l.lot, "data-state": l.state},
+        el("td", {class: "mono", text: String(l.index)}),
+        el("td", {}, el("b", {class: "mono", text: l.lot}), el("div", {class: "ltitle", text: l.title || "titre inconnu : pas de section dans code/decoupage.md"})),
+        el("td", {}, el("span", {class: "stc " + (LOT_CLASS[l.state] || "st-inconnu"), title: `Règle ${l.rule} (code_rules.md)`, text: l.state}),
+          l.detail ? el("div", {class: "muted small", text: l.detail}) : null),
+        el("td", {class: "num", title: att.note || "le ## Attempts du verdict"}, `${att.used} / ${att.cap}`, att.note ? el("span", {class: "u", text: "lu comme 1"}) : null),
+        el("td", {}, agentsCell(l.passes)),
+        el("td", {}, ...marks, l.blocking.length ? el("button", {class: "small primary", text: `À répondre (${l.blocking.length})`,
+          onclick: (e) => { e.stopPropagation(); openAnswersLot(l.lot, chain); }}) : null));
+      const toggle = () => { if (lotOpen.has(key)) lotOpen.delete(key); else { lotOpen.add(key); loadLot(chain, l.lot); } renderCode(box, chain); };
+      row.addEventListener("click", toggle);
+      row.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+      tb.append(row);
+      if (open) tb.append(el("tr", {class: "detail"}, el("td", {colspan: "6"}, lotDetail(chain, l))));
+    }
+  }
+  const unk = (c.unknown_passes || []).length;
+  box.append(el("div", {class: "st-sec"}, el("h3", {text: "Les lots, dans l'ordre de la séquence"}),
+    el("div", {class: "st-table-wrap"}, el("table", {class: "st lots", id: "lots-" + chain},
+      el("thead", {}, el("tr", {}, ...["#", "Lot", "État", "Essais", "Agents", ""].map((h) => el("th", {text: h})))), tb)),
+    unk ? el("div", {class: "muted small", style: "margin-top:6px", text: `${plural(unk, "passage", "passages")} de ce dossier sans lot ni bloc : l'Architecte de fin de lot, que /8_code ne rattache à aucun (code_rules.md A-AUCUN).`}) : null));
+}
+
+function lotDetail(chain, l) {
+  const d = LOTD[`${chain}:${l.lot}`];
+  if (!d) return el("div", {class: "muted", text: "Lecture du lot…"});
+  if (d.error) return el("div", {class: "notice err", text: d.error});
+  const sheet = d.sheet.exists ? el("div", {class: "mdoc", "aria-label": "fiche-executable.md, en lecture seule"}, ...renderDoc(d.sheet.lines, [], []))
+    : el("p", {class: "muted", text: "Pas de code/" + l.lot + "/fiche-executable.md" + (l.state === "annulé" ? " : supprimée après la cause « sheet », le Détailleur la réécrit." : " : le Détailleur ne l'a pas encore écrite.")});
+  const v = d.verdict;
+  const vbox = el("div", {});
+  if (!v) vbox.append(el("p", {class: "muted", text: "Pas de verdict : le Relecteur n'a pas encore relu ce lot."}));
+  else {
+    const f = (label, value, pre) => value ? el("div", {class: "vfield"}, el("b", {text: label}), pre ? el("pre", {text: value}) : value) : null;
+    vbox.append(...[f("Statut", v.status || "illisible"), f("Essais", `${v.attempts} / 3` + (v.attempts_written ? "" : " (pas de ## Attempts : lu comme 1)")),
+      f("Cause", v.cause), f("Causes jusqu'ici", v.causes_so_far), f("Vérifié", v.verified, true),
+      f("Constats du Relecteur", v.findings, true), f("Divergences de symboles", v.divergences, true)].filter(Boolean));
+    if (!v.findings) vbox.append(el("div", {class: "vfield"}, el("b", {text: "Constats du Relecteur"}), el("span", {class: "muted", text: "aucun champ « ## Findings » dans ce verdict"})));
+  }
+  if (d.reports.length) vbox.append(el("div", {class: "muted small", style: "margin-top:6px", text: "Comptes rendus : " + d.reports.join(", ")}));
+  if (d.blocking.length) vbox.append(el("div", {class: "muted small", style: "margin-top:4px", text: "Blocages : " + d.blocking.map((b) => b.rel + (b.archived ? " (réglé)" : "") + (b.entries ? ` (Blocking ${b.entries.join(", ")})` : "")).join(" · ")}));
+  // commits
+  const cm = el("div", {});
+  const C = d.commits || {list: []};
+  if (C.error) cm.append(el("div", {class: "notice warn", text: C.error}));
+  if (!C.list.length && !C.error) cm.append(el("p", {class: "muted", text: `Aucun commit « ${l.lot}: » sur ce dossier.`}));
+  for (const k of C.list) {
+    cm.append(el("div", {class: "commit" + (k.reverted ? " undone" : "")},
+      el("span", {class: "mono", text: k.short}), " ", el("span", {class: "subj", text: k.subject}), " ",
+      k.revert ? el("span", {class: "badge warn", text: "annulation"}) : null, k.reverted ? el("span", {class: "badge plain", text: "annulé ensuite"}) : null,
+      k.where !== "dossier" ? el("span", {class: "badge plain", title: "Ce commit ne touche le code/" + l.lot + "/ d'aucun dossier : il peut être d'un autre découpage (code_rules.md C-DOSSIER).", text: "sans dossier"}) : null,
+      el("span", {class: "muted small", text: "  " + fmtDate(k.at)}),
+      el("details", {}, el("summary", {text: plural(k.files.length, "fichier", "fichiers")}), el("ul", {}, ...k.files.map((x) => el("li", {text: x}))))));
+  }
+  if (C.elsewhere) cm.append(el("div", {class: "muted small", text: `${plural(C.elsewhere, "commit", "commits")} « ${l.lot}: » d'un autre dossier laissé${C.elsewhere > 1 ? "s" : ""} de côté.`}));
+  return el("div", {class: "lot-detail st-detail"},
+    el("div", {}, el("h4", {text: `code/${l.lot}/fiche-executable.md`}), sheet),
+    el("div", {}, el("h4", {text: "Verdict"}), vbox),
+    el("div", {class: "full"}, el("h4", {text: "Commits et fichiers changés"}), cm),
+    el("div", {class: "full"}, el("h4", {text: "Passages d'agent"}), timeline(d.passes)),
+    l.fields ? el("div", {class: "full muted small"}, ...["Needs", "Produces", "Modifies", "Touches"].filter((k) => l.fields[k]).map((k) => el("div", {}, el("b", {text: k + " : "}), l.fields[k]))) : null);
+}
+
+function timeline(passes) {
+  const ps = (passes || []).filter((p) => p.started_at);
+  if (!ps.length) return el("p", {class: "muted", text: "Aucun passage stocké pour ce lot : il n'a pas été codé depuis le cockpit, ou son journal manque."});
+  const t = (x) => Date.parse(x);
+  const t0 = Math.min(...ps.map((p) => t(p.started_at)));
+  const t1 = Math.max(...ps.map((p) => t(p.ended_at || p.started_at)), t0 + 1000);
+  const span = t1 - t0;
+  const rows = ps.map((p) => {
+    const a = (t(p.started_at) - t0) / span, b = ((p.ended_at ? t(p.ended_at) : t1) - t0) / span;
+    return el("div", {class: "tl-row"},
+      el("div", {}, el("b", {text: cap(p.agent)}), el("span", {class: "muted small", text: " " + fmtDate(p.started_at).split(" ").pop()})),
+      el("div", {class: "tl-track"}, el("span", {class: "tl-bar" + (p.parent ? " nested" : "") + (p.live ? " live" : ""),
+        style: `left:${(100 * a).toFixed(2)}%;width:${Math.max(0.6, 100 * (b - a)).toFixed(2)}%`, title: p.description || p.agent})),
+      el("div", {class: "muted small", text: `${fmtDurC(p.duration_s)} · ${fmtTok(p.read_tokens)} lus · ${p.output_tokens === null || p.output_tokens === undefined ? (p.live ? "écrits : à la fin du run" : "écrits : inconnu") : fmtTok(p.output_tokens) + " écrits"}`}));
+  });
+  return el("div", {class: "timeline"}, el("div", {class: "tl-axis"}, el("span", {text: fmtDate(new Date(t0).toISOString())}), el("span", {text: fmtDate(new Date(t1).toISOString())})), ...rows);
+}
+
+// ===================================================== notifications (1.5)
+// The browser's Notification API, nothing installed. Only when the tab is not
+// in front — in front, the page shows it already. Each kind on or off in
+// Paramètres; the browser's permission is asked the first time one is turned on.
+const NOTE_KINDS = [
+  ["fin", "Un run se termine — avec sa ligne Next: en clair"],
+  ["autorisation", "Une autorisation attend"],
+  ["reponse", "Une question ou un blocage vous arrive pendant un run"],
+  ["erreur", "Un run s'arrête sur une erreur"],
+  ["attente", "Le plafond d'attente est atteint (aucun message d'un agent depuis 10 min)"],
+  ["lot", "/8_code : un lot passe ou échoue"],
+];
+const notePrefs = (() => { try { return JSON.parse(localStorage.getItem("cockpit-notifications") || "{}") || {}; } catch (e) { return {}; } })();
+const tabInFront = () => document.visibilityState === "visible";
+const notesSent = [];
+function notify(kind, title, body, onclick) {
+  if (!notePrefs[kind] || tabInFront() || !("Notification" in window) || Notification.permission !== "granted") return false;
+  try {
+    const n = new Notification(title, {body, tag: "cockpit-" + kind + "-" + Date.now()});
+    n.onclick = () => { window.focus(); try { onclick && onclick(); } finally { n.close(); } };
+    notesSent.push({kind, title, body});
+    return true;
+  } catch (e) { console.error(e); return false; }
+}
+function noteStatus() {
+  if (!("Notification" in window)) return "Ce navigateur n'a pas de notifications.";
+  return {granted: "Le navigateur les autorise.", denied: "Le navigateur les a refusées : rétablissez-les dans les autorisations du site (le cadenas à gauche de l'adresse).",
+          default: "Le navigateur demandera l'autorisation la première fois que vous en activez une."}[Notification.permission] || "";
+}
+function renderNotes() {
+  const box = $("set-notes"); box.replaceChildren();
+  for (const [k, label] of NOTE_KINDS) {
+    const input = el("input", {type: "checkbox", id: "note-" + k, checked: notePrefs[k] || undefined});
+    input.addEventListener("change", async () => {
+      notePrefs[k] = input.checked;
+      try { localStorage.setItem("cockpit-notifications", JSON.stringify(notePrefs)); } catch (e) {}
+      if (input.checked && "Notification" in window && Notification.permission === "default") {
+        try { await Notification.requestPermission(); } catch (e) {}
+      }
+      renderNotes();
+    });
+    box.append(el("label", {for: "note-" + k}, input, label));
+  }
+  box.append(el("div", {class: "row", style: "margin-top:8px"}, el("span", {class: "muted small", id: "note-status", text: noteStatus()}),
+    el("button", {class: "small", text: "Essayer", title: "Une notification tout de suite, même l'onglet devant",
+      onclick: () => { if ("Notification" in window && Notification.permission === "granted") new Notification("Cockpit", {body: "Les notifications arrivent."}); else renderNotes(); }})));
+}
+document.addEventListener("visibilitychange", updateTitle);
+
+// =================================================== « Arrêter le cockpit »
+$("btn-quit").onclick = async () => {
+  const b = $("btn-quit"); b.disabled = true;
+  const post = async (data) => {
+    const x = await fetch("/api/shutdown", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(data)});
+    let body = {}; try { body = await x.json(); } catch (e) {}
+    return {status: x.status, body};
+  };
+  try {
+    let r = await post({});
+    if (r.status === 409 && r.body.running) {
+      // A run goes: it asks, and says the run will be stopped.
+      if (!confirm(`Une commande tourne : ${r.body.prompt}.\n\nArrêter le cockpit l'arrête maintenant, comme « Arrêter maintenant » : son tour s'arrête inachevé, et son worktree peut rester.\n\nArrêter le cockpit ?`)) { b.disabled = false; return; }
+      $("quit-msg").textContent = "Arrêt du run, puis du cockpit… (jusqu'à 30 s)";
+      r = await post({confirm: true});
+    }
+    if (r.status !== 200) throw new Error(r.body.error || `erreur ${r.status}`);
+    r = r.body;
+    closeEvents();
+    showStopped(true);
+    $("stopped-text").textContent = (r.stopped && r.stopped.length ? `Le run ${r.stopped.map((x) => x.prompt).join(", ")} a été arrêté. ` : "") +
+      "Pour le rouvrir : le raccourci du bureau (lancer.bat), puis rechargez cette page.";
+  } catch (e) { alert(e.message); b.disabled = false; }
+};
 
 // ============================================================ paramètres
 const GROUP_ORDER = ["Amont", "Aval", "Correction", "Fusion", "Outils"];
@@ -1864,6 +2407,7 @@ function renderSettings() {
   $("mode-note").textContent = "Le mode choisi vaut pour le prochain run ; un run en cours garde le sien. Même en Auto, une demande renvoyée vers toi devient un bandeau.";
 
   renderDiag();
+  renderNotes();
 
   // Commandes — the escape hatch, unchanged.
   const cm = $("set-commands"); cm.replaceChildren();
@@ -2251,6 +2795,20 @@ function renderStTables() {
     num("h5", "≈ % 5 h", (r) => r.five_hour, (r) => [fmtPct(r.five_hour), unknownNote(r.five_hour_unknown, "run sans mesure", "runs sans mesure")]),
     num("wk", "≈ % semaine", (r) => r.seven_day, (r) => [fmtPct(r.seven_day), unknownNote(r.seven_day_unknown, "run sans mesure", "runs sans mesure")]),
   ], ST.by_feature, {sort: {key: "read", dir: "desc"}}));
+
+  // 1.5 — « Par lot », one feature filtered: the passes the store gives a lot.
+  $("st-lot").classList.toggle("hidden", !ST.feature);
+  $("st-lot-table").replaceChildren(!ST.feature ? "" : stTable("lot", [
+    txt("lot", "Lot", (r) => (r.folder ? r.folder + "/" : "") + r.lot, (r) => [el("span", {class: "mono", text: r.lot}),
+      r.folder ? el("span", {class: "u", text: r.folder}) : null, r.status ? el("span", {class: "u", text: r.status}) : null], "nw"),
+    num("passes", "Passages", (r) => r.passes, (r) => [String(r.passes), el("span", {class: "u", text: r.agents.join(", ")})]),
+    num("dur", "Durée", (r) => r.duration_s, (r) => durCell(r.duration_s, r.duration_unknown)),
+    num("read", "Tokens lus", (r) => r.read_tokens, (r) => sumCell(r.read_tokens, r.read_unknown, "passe inconnue", "passes inconnues")),
+    num("out", "Tokens écrits", (r) => r.output_tokens, (r) => sumCell(r.output_tokens, r.output_unknown, "passe inconnue", "passes inconnues")),
+    num("att", "Essais", (r) => r.attempts, (r) => r.attempts === null || r.attempts === undefined ? "inconnu" : `${r.attempts} / 3`),
+    num("cod", "Codages", (r) => r.codings, (r) => [String(r.codings), el("span", {class: "u", text: "passages du Réalisateur"})]),
+  ], ST.by_lot || [], {sort: {key: "lot", dir: "asc"}, empty: "Aucun passage rattaché à un lot sur cette période : /8_code n'a pas tourné depuis le cockpit."}));
+  $("st-lot-sub").dataset.unknown = ST.by_lot_unknown || 0;
 
   const openRun = (id) => {
     stOpen.add(id); renderStHistory();
