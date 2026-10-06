@@ -7,8 +7,12 @@ Since 1.3 the working folder is the feature alone: its `bugfix-NN/` live
 under « Correction ». A 1.2 value `feature/bugfix-NN` reads as `feature`.
 
 1.5.1: `ignored`, the folders of `docs/features/` the cockpit never shows —
-the earlier chain's, whose files no current command produces. Prefilled
-when the key is absent; the Product Owner edits it in Paramètres → Dossiers."""
+the earlier chain's, whose files no current command produces. The Product
+Owner edits it in Paramètres → Dossiers.
+
+1.6: `ignored` is kept per application — `{application folder: [names]}` —
+and a new application has none. A 1.5.1 list, written when the cockpit
+knew one application, is that of the application open then."""
 import json
 import os
 import threading
@@ -19,11 +23,14 @@ DEFAULT_PATH = os.path.join(HERE, "config.json")
 MAX_RECENT = 8
 MAX_HISTORY = 30
 MODES = ("auto", "manuel")
-IGNORED_DEFAULT = ["premiere-app", "premiere-app-2"]
+
+
+def _app_key(app: str) -> str:
+    return os.path.normcase(os.path.abspath(app))
 
 
 def _key(app: str, work: str) -> str:
-    return f"{os.path.normcase(os.path.abspath(app))}|{work}"
+    return f"{_app_key(app)}|{work}"
 
 
 class State:
@@ -32,7 +39,7 @@ class State:
         self._lock = threading.Lock()
         self.data = {"app_folder": None, "working_folder": None, "recent": [], "relays": {},
                      "mode": "auto", "diagnostic": None, "history": [],
-                     "ignored": list(IGNORED_DEFAULT)}
+                     "ignored": {}}
         self.load_error = None
         # Relays of a run that has just ended, trusted without a check until
         # the next scan trigger (§2.2). In memory only: a restart is an opening.
@@ -47,6 +54,12 @@ class State:
             except (OSError, ValueError) as e:
                 # A broken config is reported, then replaced on next save.
                 self.load_error = f"config.json illisible : {e}"
+        ig = self.data.get("ignored")
+        if isinstance(ig, list):
+            app = self.data.get("app_folder")
+            self.data["ignored"] = {_app_key(app): ig} if app else {}
+        elif not isinstance(ig, dict):
+            self.data["ignored"] = {}
 
     def _save(self):
         tmp = self.path + ".tmp"
@@ -150,35 +163,45 @@ class State:
         return [{a: b for a, b in h.items() if a != "key"}
                 for h in self.data.get("history", []) if h.get("key") == k][:n]
 
-    @property
-    def ignored(self):
-        """The feature folders never shown (1.5.1), names under `docs/features/`."""
-        v = self.data.get("ignored")
+    def ignored_for(self, app):
+        """The feature folders of `app` never shown (1.5.1), names under its
+        `docs/features/`; none for an application never set (1.6)."""
+        v = self.data.get("ignored", {}).get(_app_key(app)) if app else None
         return [n for n in v if isinstance(n, str) and n] if isinstance(v, list) else []
 
-    def set_ignored(self, names):
-        """Stores the list, cleaned: one name per folder, never a path. The
-        feature open, once ignored, is closed."""
+    @property
+    def ignored(self):
+        """Those of the application open."""
+        return self.ignored_for(self.app_folder)
+
+    def set_ignored(self, names, app=None):
+        """Stores the list of `app`, the application open by default,
+        cleaned: one name per folder, never a path. The feature open, once
+        ignored, is closed."""
+        app = app or self.app_folder
+        if not app:
+            raise ValueError("aucune application")
         clean = []
         for n in names or []:
             n = (n if isinstance(n, str) else "").strip().strip("/")
             if n and "/" not in n and "\\" not in n and n not in (".", "..") and n not in clean:
                 clean.append(n)
         with self._lock:
-            self.data["ignored"] = clean
-            if (self.data.get("working_folder") or "").split("/")[0] in clean:
+            self.data.setdefault("ignored", {})[_app_key(app)] = clean
+            if (self.data.get("app_folder") and _app_key(self.data["app_folder"]) == _app_key(app)
+                    and (self.data.get("working_folder") or "").split("/")[0] in clean):
                 self.data["working_folder"] = None
             self._save()
         return clean
 
-    def is_ignored(self, work):
-        return bool(work) and work.split("/")[0] in self.ignored
+    def is_ignored(self, work, app=None):
+        return bool(work) and work.split("/")[0] in self.ignored_for(app or self.app_folder)
 
     def recent(self):
         out, seen = [], set()
         for r in self.data.get("recent", []):
             pair = (r.get("app"), (r.get("work") or "").split("/")[0])
-            if pair[1] and pair not in seen and pair[1] not in self.ignored:
+            if pair[1] and pair not in seen and pair[1] not in self.ignored_for(pair[0]):
                 seen.add(pair)
                 out.append({"app": pair[0], "work": pair[1]})
         return out

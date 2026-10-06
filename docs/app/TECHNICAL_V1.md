@@ -6,7 +6,8 @@ her the most time: **answering questions and blocking files**, and
 **knowing which command comes next**.
 
 *1.6 — the cockpit lives in the chain's own repository and installs the
-chain into an application (§20).*
+chain into an application (§20); the ignored folders are kept per
+application (§4).*
 
 *1.5 — the server outlives the page and has no console (§16); « Code », /8_code
 lot by lot (§17); which lot an agent pass works on (§18); notifications (§19);
@@ -131,8 +132,13 @@ Browser page  ⇄  local Python server  ⇄  Claude Agent SDK (Python)  ⇄  Cla
     `bugfix-NN/` are no longer picked here — they live under
     « Correction », §12. A 1.2 value `feature/bugfix-NN` reads as the
     feature.)*
-- Both are saved in `config.json` in the application's own folder, with
-  a short list of recent pairs.
+- Both are saved in `tools/cockpit/config.json` of the chain's
+  repository (ignored by git), with a short list of recent pairs.
+- **The ignored folders** (1.5.1) — those of `docs/features/` the cockpit
+  never shows — are kept **per application** in the same file (1.6):
+  `"ignored": {application folder: [names]}`; a new application has
+  none. A 1.5.1 list, written when the cockpit knew one application, is
+  read as that of the application open then.
 - On relaunch, the last pair opens directly. A "change" button returns
   to the picker.
 

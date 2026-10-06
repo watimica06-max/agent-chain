@@ -524,7 +524,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         err = check_app_folder(path)
         if err:
             return web.json_response({"error": err}, status=400)
-        return web.json_response({"path": path, "working_folders": working_folders(path, state.ignored)})
+        return web.json_response({"path": path, "working_folders": working_folders(path, state.ignored_for(path))})
 
     async def open_pair(request):
         data = await body(request)
@@ -533,18 +533,21 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         err = check_app_folder(a)
         if err:
             return web.json_response({"error": err}, status=400)
-        if w not in working_folders(a, state.ignored):
-            return web.json_response({"error": "dossier ignoré : Paramètres → Dossiers" if state.is_ignored(w)
+        if w not in working_folders(a, state.ignored_for(a)):
+            return web.json_response({"error": "dossier ignoré : Paramètres → Dossiers" if state.is_ignored(w, a)
                                       else "dossier de travail inconnu"}, status=400)
         state.open_pair(a, w)
         return web.json_response({"ok": True})
 
     async def set_ignored(request):
-        """Paramètres → Dossiers: the folders the cockpit never shows (1.5.1)."""
+        """Paramètres → Dossiers: the folders the cockpit never shows (1.5.1), those
+        of the application open (1.6)."""
         data = await body(request)
         names = data.get("ignored")
         if not isinstance(names, list):
             return web.json_response({"error": "liste attendue"}, status=400)
+        if not state.app_folder:
+            return web.json_response({"error": "aucune application ouverte"}, status=409)
         state.set_ignored(names)
         return web.json_response(state_payload())
 

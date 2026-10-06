@@ -321,6 +321,7 @@ def test_settings_lists_the_ignored_folders_and_edits_them(tmp_path, page):
     with FakeServer(tmp_path) as s:
         (s.app_root / "docs" / "features" / "premiere-app" / "bugfix-06").mkdir(parents=True)
         (s.app_root / "docs" / "features" / "g").mkdir()
+        s.state.set_ignored(["premiere-app", "premiere-app-2"])        # 1.6: per application
         page.goto(s.url)
         go(page, "Paramètres")
         page.wait_for_selector("#ignored-list input")

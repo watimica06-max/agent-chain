@@ -240,11 +240,15 @@ def test_an_ignored_folder_is_never_shown(tmp_path):
     async def body(c, app_root, feat, rn):
         old = app_root / "docs" / "features" / "premiere-app"
         (old / "bugfix-06").mkdir(parents=True)
+        # 1.6: a new application ignores nothing.
+        r = await post(c, "/api/app-folder", {"path": str(app_root)})
+        assert (await r.json())["working_folders"] == ["f", "premiere-app"]
+        await open_pair(c, app_root, "f")
+        s = await (await post(c, "/api/ignored", {"ignored": ["premiere-app", "premiere-app-2"]})).json()
         r = await post(c, "/api/app-folder", {"path": str(app_root)})
         assert (await r.json())["working_folders"] == ["f"]
         r = await post(c, "/api/open", {"app": str(app_root), "work": "premiere-app"})
         assert r.status == 400 and "ignoré" in (await r.json())["error"]
-        await open_pair(c, app_root, "f")
         s = await (await c.get("/api/state")).json()
         assert s["working_folders"] == ["f"] and s["all_folders"] == ["f", "premiere-app"]
         assert s["ignored"] == ["premiere-app", "premiere-app-2"]

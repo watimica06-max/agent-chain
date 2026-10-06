@@ -35,21 +35,35 @@ def test_broken_config_is_reported_not_fatal(tmp_path):
     assert json.loads(path.read_text(encoding="utf-8"))["working_folder"] == "b"
 
 
-def test_ignored_folders_prefilled_edited_and_never_recent(tmp_path):
-    # 1.5.1: the earlier chain's folders, prefilled when config.json has no list.
+def test_ignored_folders_per_application_edited_and_never_recent(tmp_path):
+    # 1.6: kept per application; a new one has none.
     path = tmp_path / "config.json"
     path.write_text(json.dumps({"app_folder": "C:/Dev/app", "working_folder": "premiere-app",
                                 "recent": [{"app": "C:/Dev/app", "work": "premiere-app"},
-                                           {"app": "C:/Dev/app", "work": "premiere-app-3"}]}), encoding="utf-8")
+                                           {"app": "C:/Dev/app", "work": "premiere-app-3"},
+                                           {"app": "C:/Dev/other", "work": "premiere-app"}]}), encoding="utf-8")
     s = State(str(path))
-    assert s.ignored == ["premiere-app", "premiere-app-2"]
-    assert s.is_ignored("premiere-app/bugfix-06") and not s.is_ignored("premiere-app-3")
-    assert [r["work"] for r in s.recent()] == ["premiere-app-3"]
+    assert s.ignored == [] and s.ignored_for("C:/Dev/other") == []
     # Edited: one name per folder, never a path; the feature open, once ignored, is closed.
     assert s.set_ignored(["premiere-app", " premiere-app-2/ ", "a/b", "..", "premiere-app"]) == \
         ["premiere-app", "premiere-app-2"]
     assert s.working_folder is None
-    assert json.loads(path.read_text(encoding="utf-8"))["ignored"] == ["premiere-app", "premiere-app-2"]
-    s.set_ignored([])
-    assert State(str(path)).ignored == [] and [r["work"] for r in State(str(path)).recent()] == \
-        ["premiere-app", "premiere-app-3"]
+    assert s.is_ignored("premiere-app/bugfix-06") and not s.is_ignored("premiere-app-3")
+    assert not s.is_ignored("premiere-app", "C:/Dev/other")
+    assert [(r["app"], r["work"]) for r in s.recent()] == [("C:/Dev/app", "premiere-app-3"),
+                                                          ("C:/Dev/other", "premiere-app")]
+    again = State(str(path))
+    assert again.ignored_for("C:/Dev/app") == ["premiere-app", "premiere-app-2"]
+    assert again.ignored_for("C:/Dev/other") == []
+    again.set_ignored([], "C:/Dev/app")
+    assert State(str(path)).ignored_for("C:/Dev/app") == []
+
+
+def test_a_one_application_list_belongs_to_the_application_open(tmp_path):
+    # 1.5.1 wrote one list, when the cockpit knew one application.
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps({"app_folder": "C:/Dev/app", "ignored": ["premiere-app", "premiere-app-2"]}),
+                    encoding="utf-8")
+    s = State(str(path))
+    assert s.ignored_for("C:/Dev/app") == ["premiere-app", "premiere-app-2"]
+    assert s.ignored_for("C:/Dev/other") == []

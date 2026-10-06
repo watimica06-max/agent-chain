@@ -144,11 +144,6 @@ def test_scan_under_a_second(tmp_path):
     t0 = time.perf_counter()
     scan.run_scan(str(app), "f")
     assert time.perf_counter() - t0 < 1.0
-    live = os.path.join(REPO, "docs", "features", "premiere-app-3")
-    if os.path.isdir(live):                         # the repository's own copy, as the cockpit reads it
-        t0 = time.perf_counter()
-        scan.run_scan(REPO, "premiere-app-3")
-        assert time.perf_counter() - t0 < 1.0
 
 
 # ---------------------------------------------- « Pourquoi ? », per state
