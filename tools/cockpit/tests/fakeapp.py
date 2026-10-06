@@ -16,7 +16,7 @@ from test_server import build_app_folder
 
 class FakeServer:
     def __init__(self, tmp_path, script=script_with_permission, opened=True, diag_runner=None, stats=None,
-                 measure_limits=False):
+                 measure_limits=False, picker=None, file_picker=None):
         self.tmp = tmp_path
         self.app_root = tmp_path / "app"
         self.feat = build_app_folder(self.app_root)
@@ -42,8 +42,9 @@ class FakeServer:
             client_factory=factory, log_dir=str(tmp_path / "logs"),
             on_end=server.make_on_end(self.state), mode_getter=lambda: self.state.mode,
             stats=stats, measure_limits=measure_limits)
-        self.app = server.make_app(self.state, self.rn, picker=lambda initial: str(self.app_root),
-                                   **({"diag_runner": diag_runner} if diag_runner else {}))
+        self.app = server.make_app(self.state, self.rn, picker=picker or (lambda initial: str(self.app_root)),
+                                   **({"diag_runner": diag_runner} if diag_runner else {}),
+                                   **({"file_picker": file_picker} if file_picker else {}))
         self.loop = asyncio.new_event_loop()
         self.url = ""
         self._ready = threading.Event()

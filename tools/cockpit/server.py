@@ -4,6 +4,7 @@
 """
 import argparse
 import asyncio
+import importlib.util
 import json
 import os
 import re
@@ -21,6 +22,7 @@ import blocking   # noqa: E402
 import chain as chain_mod  # noqa: E402
 import codelots   # noqa: E402
 import context as context_mod  # noqa: E402
+import create as create_mod  # noqa: E402
 import decide as decide_mod  # noqa: E402
 import diagnostic  # noqa: E402
 import gitref     # noqa: E402
@@ -37,7 +39,7 @@ from state import State  # noqa: E402
 HOST = "127.0.0.1"
 STATE_KEY = web.AppKey("state", State)
 DEFAULT_PORT = 8765
-VERSION = "1.6"
+VERSION = "1.7"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -282,6 +284,44 @@ def chain_state(app):
     return chain_mod.state(app, CHAIN_ROOT)
 
 
+_socle_cache = {}
+
+
+def socle_module(root=None):
+    """The chain's `.claude/scripts/socle.py`, loaded as a module — its
+    PROVIDE is what an application still provides (§22). The chain's copy,
+    so that an application installed before 1.7 is read the same way. None
+    when the chain has no such script."""
+    path = os.path.join(root or CHAIN_ROOT, ".claude", "scripts", "socle.py")
+    try:
+        mtime = os.path.getmtime(path)
+    except OSError:
+        return None
+    hit = _socle_cache.get(path)
+    if hit and hit[0] == mtime:
+        return hit[1]
+    try:
+        spec = importlib.util.spec_from_file_location("socle_of_the_chain", path)
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        m.PROVIDE[0]
+    except Exception as e:
+        print(f"socle.py illisible ({path}) : {e}", flush=True)
+        return None
+    _socle_cache[path] = (mtime, m)
+    return m
+
+
+def provide_lines(app):
+    """« À fournir avant le code » (§22): each thing socle.py says the
+    application provides, ✓ or ✗ read from its files."""
+    m = socle_module()
+    if m is None or not app:
+        return None
+    return [{"path": rel, "text": text, "ok": os.path.exists(os.path.join(app, *rel.split("/")))}
+            for rel, text in m.PROVIDE]
+
+
 # ------------------------------------------------------------- the scan
 
 def where(state: State, rn, app, feature, reason=None):
@@ -401,6 +441,26 @@ def make_on_end(state: State):
     return on_end
 
 
+def ask_idea_file(initial):
+    """The native file picker, for the idea file (§22): .md and .txt."""
+    import tkinter as tk
+    from tkinter import filedialog
+    root = tk.Tk()
+    root.withdraw()
+    try:
+        root.attributes("-topmost", True)
+    except tk.TclError:
+        pass
+    try:
+        start = initial if initial and os.path.isdir(initial) else (os.path.dirname(initial) if initial else "")
+        path = filedialog.askopenfilename(initialdir=start or None, title="Choisir le fichier d'idées",
+                                          filetypes=[("Fichier d'idées", "*.md *.txt"), ("Markdown", "*.md"),
+                                                     ("Texte", "*.txt")])
+    finally:
+        root.destroy()
+    return os.path.normpath(path) if path else ""
+
+
 def ask_export_folder(initial):
     return ask_directory(initial, title="Où enregistrer les deux fichiers CSV ?")
 
@@ -414,7 +474,7 @@ def default_export_folder():
 
 
 def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
-             diag_runner=None, export_picker=ask_export_folder, on_quit=None):
+             diag_runner=None, export_picker=ask_export_folder, on_quit=None, file_picker=ask_idea_file):
     store = rn.stats
     diag_runner = diag_runner or DIAG_RUNNER
     # The diagnostic run in the background (1.4.5): once, at the opening,
@@ -423,6 +483,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     diag = {"running": set(), "auto_done": set(), "tasks": {}}
     # « Tout mettre à jour » going (1.6): no launch, no other install meanwhile.
     bulk = {"going": False, "report": None}
+    # « Nouvelle application » (1.7): the one going, and the last one this
+    # server finished — config.json keeps those not finished.
+    making = {"current": None, "last": None}
     # 1.6: a run stored with no application is given its own — main()'s
     # backfill did it already; this covers a store handed over as it is.
     if store:
@@ -504,10 +567,13 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                # The two usage windows, each with when it was measured (§13.3).
                "limits": _limits(store), "now": datetime.now().isoformat(timespec="seconds")}
         out["ignored"] = state.ignored
+        out["creating"] = making["current"].path if making["current"] else None
         if state.app_folder and os.path.isdir(state.app_folder):
             # The chain installed in the application (§20) — 1.6: also where
             # it is not installed yet, and no feature can open.
             out["chain"] = chain_state(state.app_folder)
+            # 1.7: what the application still provides before the code (§22).
+            out["provide"] = provide_lines(state.app_folder)
         if state.app_folder and not check_app_folder(state.app_folder):
             out["working_folders"] = working_folders(state.app_folder, state.ignored)
             out["all_folders"] = all_folders(state.app_folder)
@@ -683,6 +749,149 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if os.path.isdir(folder):
             auto_diagnostic(folder)
         return web.json_response({"ok": True, "open": bool(a), "open_error": check_app_folder(folder)})
+
+    # --------------------------------------------- Nouvelle application (1.7)
+    def creation_args():
+        return {"listed": [x["folder"] for x in state.apps()],
+                "resumable": [r["values"]["path"] for r in state.creations()],
+                "chain_root": CHAIN_ROOT}
+
+    async def pick_file(request):
+        data = await body(request)
+        loop = asyncio.get_running_loop()
+        try:
+            path = await loop.run_in_executor(None, file_picker, data.get("initial") or "")
+        except Exception as e:
+            return web.json_response({"error": f"le sélecteur n'a pas pu s'ouvrir ({e}) — "
+                                               "collez le chemin dans le champ"}, status=500)
+        return web.json_response({"path": path})
+
+    def checked(data):
+        res = create_mod.check(data, **creation_args())
+        v = res["values"]
+        text = v.pop("idea_text")
+        out = {"ok": res["ok"], "errors": res["errors"], "values": v,
+               "idea_lines": text.splitlines() if text is not None else None,
+               "summary": create_mod.summary(v) if res["ok"] else None,
+               "default_parent": create_mod.default_parent()}
+        return out, res
+
+    async def create_check(request):
+        """The form, checked as she types: each field's refusal, the idea
+        file's lines for the read-only view, the summary when it holds."""
+        data = await body(request)
+        loop = asyncio.get_running_loop()
+        out, _ = await loop.run_in_executor(None, checked, data)
+        return web.json_response(out)
+
+    def save_creation(record):
+        # Finished: dropped from config.json — the list holds the application.
+        if record["status"] == create_mod.OK:
+            state.drop_creation(record["values"]["path"])
+        else:
+            state.set_creation(record)
+
+    def finish_creation(v):
+        """The last step: the application in the list, active, opened on
+        its feature; what the scan proposes there."""
+        state.add_app(v["path"], v["name"])
+        folder = state.app(v["path"])["folder"]
+        state.open_pair(folder, v["feature"])
+        sc = scan_mod.run_scan(folder, v["feature"])
+        nxt = decide_mod.proposal_next(sc, sc["proposal"], v["feature"])
+        return (f"« {v['name']} » ajoutée à la liste, active, ouverte sur {v['feature']} — "
+                f"le relevé du dossier propose : {nxt['french']}")
+
+    def launch_creation(c):
+        making["current"] = c
+        loop = asyncio.get_running_loop()
+
+        async def go():
+            try:
+                rec = await loop.run_in_executor(None, c.run)
+            except Exception as e:      # said, never raised into the loop
+                rec = c.record()
+                rec.update(status=create_mod.FAILED, error=f"{type(e).__name__} : {e}")
+            making["current"], making["last"] = None, rec
+            print(f"Nouvelle application {c.path} : {rec['status']}"
+                  + (f" — {rec['error']}" if rec.get("error") else ""), flush=True)
+            if rec["status"] == create_mod.OK:
+                auto_diagnostic(c.path)
+        loop.create_task(go())
+
+    def creation_busy():
+        if making["current"]:
+            return web.json_response({"error": f"une création est en cours : {making['current'].path}"}, status=409)
+        return None
+
+    async def create_start(request):
+        """« Créer »: the form checked again, then the creation, in the
+        background — the page follows it on GET /api/create."""
+        data = await body(request)
+        busy = creation_busy()
+        if busy:
+            return busy
+        loop = asyncio.get_running_loop()
+        out, res = await loop.run_in_executor(None, checked, data)
+        if not res["ok"]:
+            return web.json_response({"error": "le formulaire n'est pas complet", **out}, status=400)
+        v = res["values"]
+        if v["resume"]:
+            return web.json_response({"error": "la création de ce dossier attend « Reprendre »"}, status=409)
+        v.pop("idea_text", None)
+        c = create_mod.Creation(v, save_creation, finish_creation, CHAIN_ROOT)
+        state.set_creation(c.record())
+        launch_creation(c)
+        return web.json_response({"creation": c.record()})
+
+    async def create_resume(request):
+        """« Reprendre »: from the step that failed — each step checks what
+        is already there. Only a creation this cockpit started."""
+        data = await body(request)
+        busy = creation_busy()
+        if busy:
+            return busy
+        rec = state.creation((data.get("path") or "").strip())
+        if not rec:
+            return web.json_response({"error": "aucune création à reprendre pour ce dossier"}, status=404)
+        if state.has_app(rec["values"]["path"]):
+            state.drop_creation(rec["values"]["path"])
+            return web.json_response({"error": "ce dossier est déjà une application de la liste"}, status=409)
+        c = create_mod.Creation(rec["values"], save_creation, finish_creation, CHAIN_ROOT, record=rec)
+        launch_creation(c)
+        return web.json_response({"creation": c.record()})
+
+    async def create_forget(request):
+        """« Abandonner »: the creation leaves config.json; the folder stays
+        as it is, never deleted."""
+        data = await body(request)
+        path = (data.get("path") or "").strip()
+        if making["current"] and runner_mod.repo_key(making["current"].path) == runner_mod.repo_key(path):
+            return web.json_response({"error": "cette création est en cours"}, status=409)
+        state.drop_creation(path)
+        return web.json_response({"ok": True, "contents": create_mod.contents(path)})
+
+    def interrupted(r):
+        """A creation the server stopped in the middle — closed, or crashed —
+        is shown stopped at the step it was on, « Reprendre » offered."""
+        if r.get("status") not in (create_mod.GOING, create_mod.TODO):
+            return r
+        r = {**r, "steps": [dict(x) for x in r["steps"]]}
+        step = next((x for x in r["steps"] if x["status"] == create_mod.GOING), None) or             next((x for x in r["steps"] if x["status"] == create_mod.TODO), None)
+        why = "interrompue : le cockpit s'est arrêté pendant cette étape — « Reprendre » regarde ce qui est déjà là"
+        if step:
+            step.update(status=create_mod.FAILED, detail=why)
+        r.update(status=create_mod.FAILED, error=why, failed_at=step["id"] if step else None,
+                 contents=create_mod.contents(r["values"]["path"]))
+        return r
+
+    async def create_get(request):
+        cur = making["current"]
+        going = cur.record() if cur else None
+        pending = [interrupted(r) for r in state.creations()
+                   if not (going and runner_mod.repo_key(r["values"]["path"]) == runner_mod.repo_key(going["values"]["path"]))]
+        return web.json_response({"going": going, "pending": pending, "last": making["last"],
+                                  "default_parent": create_mod.default_parent()})
 
     async def set_ignored(request):
         """Paramètres → Dossiers: the folders the cockpit never shows (1.5.1), those
@@ -1160,6 +1369,12 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/apps/rename", apps_rename)
     r.add_post("/api/apps/remove", apps_remove)
     r.add_post("/api/apps/open", apps_open)
+    r.add_post("/api/pick-file", pick_file)
+    r.add_post("/api/create/check", create_check)
+    r.add_get("/api/create", create_get)
+    r.add_post("/api/create", create_start)
+    r.add_post("/api/create/resume", create_resume)
+    r.add_post("/api/create/forget", create_forget)
     r.add_post("/api/ignored", set_ignored)
     r.add_post("/api/diagnostic", run_diagnostic)
     r.add_post("/api/continue-wait", continue_wait)

@@ -224,6 +224,14 @@ def _dirty(app, paths):
     return sorted(set(res))
 
 
+def _has_commit(app):
+    try:
+        _git(app, "rev-parse", "-q", "--verify", "HEAD")
+        return True
+    except InstallError:
+        return False
+
+
 def plan(app, root=CHAIN_ROOT):
     """What an install would do, nothing written: the files to write, to
     remove, those it asks before overwriting, and why it would refuse."""
@@ -236,8 +244,11 @@ def plan(app, root=CHAIN_ROOT):
         raise InstallError("le dossier de l'application n'est pas un dépôt git")
     if os.path.normcase(os.path.abspath(top)) != os.path.normcase(app):
         raise InstallError(f"le dossier de l'application n'est pas la racine de son dépôt ({top})")
+    # 1.7: a repository with no commit yet has no previous install, whatever
+    # its working tree holds — a first install that failed before its commit
+    # left its files there, and the next one compares them by content.
     try:
-        prev = read_version(app)
+        prev = read_version(app) if _has_commit(app) else None
     except (OSError, ValueError) as e:
         raise InstallError(f"{VERSION_FILE} illisible ({e}) : le corriger, ou le supprimer — "
                            "l'installation demandera alors avant de remplacer chaque fichier")
@@ -273,7 +284,8 @@ def version_text(info, hashes, crlf=False):
 def install(app, root=CHAIN_ROOT, confirm=False, push=True):
     """Copies the chain into the application, commits those files alone —
     `chain: <id> <date>` — and pushes. Raises InstallError on a refusal,
-    NeedsConfirm when it must ask first."""
+    NeedsConfirm when it must ask first. 1.7: on a repository with no commit
+    yet it makes the first one, and its push sets the branch's upstream."""
     app = os.path.abspath(app)
     pl = plan(app, root)
     if pl["ask"] and not confirm:
@@ -311,8 +323,22 @@ def install(app, root=CHAIN_ROOT, confirm=False, push=True):
     result["message"] = message
     if push:
         try:
-            _git(app, "push", "-q", timeout=PUSH_TIMEOUT)
+            push_branch(app)
             result["pushed"] = True
         except InstallError as e:
             result["push_error"] = str(e)
     return result
+
+
+def push_branch(app):
+    """Pushes the current branch. 1.7: a branch with no upstream yet — the
+    first commit of a new application — is pushed to `origin` and set to
+    track it, so that every later push, the chain's commands' included, is a
+    plain `git push`. Raises InstallError when it fails."""
+    try:
+        _git(app, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
+    except InstallError:
+        if "origin" in _git(app, "remote").decode("utf-8", "replace").split():
+            _git(app, "push", "-q", "-u", "origin", "HEAD", timeout=PUSH_TIMEOUT)
+            return
+    _git(app, "push", "-q", timeout=PUSH_TIMEOUT)

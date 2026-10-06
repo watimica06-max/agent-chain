@@ -162,6 +162,31 @@ button.chip:hover { border-color: var(--accent); }
 #apps-report .oc { font-weight: 650; } #apps-report .oc.updated { color: var(--ok); } #apps-report .oc.skipped { color: var(--warn); }
 #apps-report .oc.failed { color: var(--err); }
 @media (max-width: 1100px) { .app-row .facts { grid-template-columns: 1fr 1fr; } #apps-report .line { grid-template-columns: 1fr; } }
+/* « Nouvelle application » (1.7) */
+.nf { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 16px 18px; align-items: start; margin-top: 12px; }
+.nf > label { font-weight: 600; padding-top: 9px; }
+.nf .hint { font-size: 14px; color: var(--soft); margin-top: 4px; }
+.nf-err { color: var(--err); font-size: 14px; margin-top: 4px; }
+.nf-err:empty { display: none; }
+#nf-idea-view { margin-top: 8px; max-height: 320px; }
+#nf-summary h4 { margin: 18px 0 4px; font-size: 15px; }
+#nf-summary ul { margin: 0 0 0 18px; padding: 0; font-size: 15px; }
+.mk { margin-bottom: 16px; }
+.mk h3 { margin-bottom: 2px; }
+.mk-steps { list-style: none; padding: 0; margin: 12px 0 0; }
+.mk-steps li { display: grid; grid-template-columns: 28px 270px minmax(0, 1fr); gap: 8px; padding: 7px 0;
+  border-top: 1px solid var(--line); align-items: baseline; }
+.mk-steps .ic { font-weight: 700; text-align: center; font-size: 18px; color: var(--soft); }
+.mk-steps li.ok .ic { color: var(--ok); } .mk-steps li.failed .ic { color: var(--err); } .mk-steps li.going .ic { color: var(--accent); }
+.mk-steps li.going .lb { font-weight: 650; }
+.mk-steps .dt { font-size: 14px; color: var(--soft); word-break: break-word; }
+.mk-steps li.failed .dt { color: var(--err); }
+.provide { list-style: none; padding: 0; margin: 4px 0 0; }
+.provide li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
+.provide .ic { font-weight: 700; text-align: center; font-size: 18px; }
+.provide li.ok .ic { color: var(--ok); } .provide li.ko .ic { color: var(--err); }
+@media (max-width: 1100px) { .nf { grid-template-columns: 1fr; } .nf > label { padding-top: 0; }
+  .mk-steps li { grid-template-columns: 28px minmax(0, 1fr); } .mk-steps .dt { grid-column: 2; } }
 .folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; margin-top: 10px; }
 .folders button { text-align: left; }
 .folders button.sel { border: 2px solid var(--accent); background: var(--accent-soft); }
@@ -530,8 +555,9 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
         <h2>Applications</h2>
         <span class="muted small" id="apps-count"></span>
         <span class="grow"></span>
+        <button id="btn-app-new" class="primary">Nouvelle application</button>
         <button id="btn-app-add">Ajouter une application</button>
-        <button id="btn-update-all" class="primary" title="Installe la chaîne du dépôt dans chaque application « en retard », l'une après l'autre">Tout mettre à jour</button>
+        <button id="btn-update-all" title="Installe la chaîne du dépôt dans chaque application « en retard », l'une après l'autre">Tout mettre à jour</button>
       </div>
       <div class="card hidden" id="apps-add" style="margin-bottom:16px">
         <h3>Ajouter une application</h3>
@@ -543,6 +569,42 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
         </div>
         <p class="muted small" style="margin:8px 0 0">Si la fenêtre de choix ne s'ouvre pas, collez le chemin dans le champ.</p>
       </div>
+      <div class="card hidden" id="new-app" style="margin-bottom:16px" aria-label="Nouvelle application">
+        <h3>Nouvelle application</h3>
+        <p class="muted small" style="margin:0">Un dossier neuf, son dépôt git, la chaîne installée, le socle de l'application, votre fichier d'idées — et la feature s'ouvre sur /1_lexique. Rien ne passe par Claude : chaque étape est écrite d'avance.</p>
+        <div class="nf">
+          <label for="nf-name">Le nom de l'application</label>
+          <div><input type="text" id="nf-name" placeholder="Mon application" maxlength="60" autocomplete="off">
+            <div class="hint">Le nom que le cockpit montre.</div><div class="nf-err" id="nf-err-name"></div></div>
+          <label for="nf-parent">Le dossier</label>
+          <div>
+            <div class="row"><input type="text" id="nf-parent" class="grow" style="width:auto;flex:1" aria-label="Le dossier où la créer" autocomplete="off">
+              <button id="nf-parent-pick" class="small">Parcourir…</button></div>
+            <div class="row" style="margin-top:8px"><span class="small muted">Nom du dossier</span>
+              <input type="text" id="nf-folder" style="width:auto;flex:1" aria-label="Nom du dossier" autocomplete="off"></div>
+            <div class="hint">Chemin complet : <span class="mono" id="nf-path">—</span></div>
+            <div class="nf-err" id="nf-err-parent"></div><div class="nf-err" id="nf-err-folder"></div>
+          </div>
+          <label for="nf-idea">Le fichier d'idées</label>
+          <div>
+            <div class="row"><input type="text" id="nf-idea" style="width:auto;flex:1" placeholder="C:\…\idees.md" aria-label="Le fichier d'idées" autocomplete="off">
+              <button id="nf-idea-pick" class="small">Parcourir…</button></div>
+            <div class="hint">Un .md ou un .txt. Il est copié tel quel en docs/features/&lt;fonctionnalité&gt;/idees.md.</div>
+            <div class="nf-err" id="nf-err-idea"></div>
+            <div class="mdoc hidden" id="nf-idea-view" aria-label="Le fichier d'idées, en lecture seule"></div>
+          </div>
+          <label for="nf-feature">La première fonctionnalité</label>
+          <div><input type="text" id="nf-feature" placeholder="premiere-app" autocomplete="off">
+            <div class="hint" id="nf-feature-note">Son dossier sous docs/features/ : minuscules, chiffres et tirets.</div><div class="nf-err" id="nf-err-feature"></div></div>
+          <label for="nf-remote">Le dépôt GitHub <span class="muted small" style="font-weight:400">— facultatif</span></label>
+          <div><input type="text" id="nf-remote" placeholder="https://github.com/vous/mon-application.git" autocomplete="off">
+            <div class="hint" id="nf-remote-note"></div><div class="nf-err" id="nf-err-remote"></div></div>
+        </div>
+        <div id="nf-summary" aria-label="Ce qui sera créé"></div>
+        <div class="row" style="margin-top:14px"><button id="nf-create" class="primary" disabled>Créer</button>
+          <button id="nf-cancel">Fermer</button><span class="small" id="nf-msg"></span></div>
+      </div>
+      <div id="new-runs" aria-label="Les créations"></div>
       <div class="card hidden" id="apps-report" style="margin-bottom:16px" aria-label="Tout mettre à jour : le compte rendu"></div>
       <div id="apps-msg" class="notice warn hidden" role="status"></div>
       <div id="apps-list" aria-label="Les applications"><p class="muted">Lecture des applications…</p></div>
@@ -565,6 +627,11 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
         <a class="counter" href="#answer" id="cnt-blocking"><div class="muted">Blocages ouverts</div><div class="n" id="cnt-b">0</div></a>
       </div>
       <div id="chain-line" class="small" aria-label="La chaîne de l'application"></div>
+      <div class="card hidden" id="provide-card" style="margin-top:16px" aria-label="À fournir avant le code">
+        <h2 style="margin-bottom:4px">À fournir avant le code</h2>
+        <p class="muted small" style="margin:0 0 6px">Ce que l'application apporte elle-même, d'après socle.py. Rien ne bloque l'amont : il les faut à partir de /7_lots.</p>
+        <ul class="provide" id="provide-list"></ul>
+      </div>
       <div class="gauges" id="gauges" aria-label="Usage de l'abonnement"></div>
       <div class="alerts" id="alerts"></div>
       <div class="card">
@@ -919,7 +986,7 @@ function route() {
     const a = $("nav-" + s);
     if (s === r && isOpen) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   }
-  if (r === "apps") { renderWorkCard(); loadApps(); }
+  if (r === "apps") { renderWorkCard(); loadApps(); loadCreations(); }
   if (isOpen && r === "answer") hint();
   if (isOpen && (r === "chaine" || r === "correction")) placeRun();
   if (isOpen && r === "stats") loadStats();
@@ -996,6 +1063,167 @@ $("btn-browse").onclick = async () => {
 $("btn-app").onclick = addApp;
 $("app-path").addEventListener("keydown", (e) => { if (e.key === "Enter") addApp(); });
 
+// ============================================ « Nouvelle application » (1.7)
+// The form is checked by the server as she types (POST /api/create/check):
+// each field's refusal, the idea file's lines, the summary. « Créer » runs
+// the creation in the background; the page follows it on GET /api/create.
+const NF_FIELDS = ["name", "parent", "folder", "idea", "feature", "remote"];
+const NF = {check: null, token: 0, timer: null, folderTouched: false, touched: new Set()};
+let MK = null, mkPoll = null, mkWasGoing = false;
+const slugify = (t) => (t || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+function nfForm() { const f = {}; for (const k of NF_FIELDS) f[k] = $("nf-" + k).value; return f; }
+async function openNewApp() {
+  $("new-app").classList.remove("hidden"); $("apps-add").classList.add("hidden");
+  if (!$("nf-parent").value) {
+    try { const r = await api("/api/create"); $("nf-parent").value = r.default_parent || ""; } catch (e) { /* typed by hand */ }
+  }
+  $("nf-name").focus();
+  nfCheck();
+}
+$("btn-app-new").onclick = () => $("new-app").classList.contains("hidden") ? openNewApp() : $("new-app").classList.add("hidden");
+$("nf-cancel").onclick = () => $("new-app").classList.add("hidden");
+function nfLater() { clearTimeout(NF.timer); NF.timer = setTimeout(nfCheck, 250); }
+for (const k of NF_FIELDS) $("nf-" + k).addEventListener("input", () => { NF.touched.add(k); nfLater(); });
+$("nf-name").addEventListener("input", () => { if (!NF.folderTouched) $("nf-folder").value = slugify($("nf-name").value); });
+$("nf-folder").addEventListener("input", () => { NF.folderTouched = !!$("nf-folder").value.trim(); });
+// The feature, normalised as she types — lower case, hyphens, no spaces;
+// a trailing hyphen waits for the next word.
+$("nf-feature").addEventListener("input", () => {
+  const i = $("nf-feature"), v = i.value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    .replace(/[\s_]+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-{2,}/g, "-").replace(/^-+/, "");
+  if (v !== i.value) i.value = v;
+});
+$("nf-feature").addEventListener("blur", () => { const i = $("nf-feature"); if (i.value !== slugify(i.value)) { i.value = slugify(i.value); nfCheck(); } });
+async function nfCheck() {
+  const tok = ++NF.token;
+  let r;
+  try { r = await api("/api/create/check", nfForm()); } catch (e) { $("nf-msg").textContent = e.message; return; }
+  if (tok !== NF.token) return;
+  NF.check = r; renderNf();
+}
+function renderNf() {
+  const r = NF.check; if (!r) return;
+  const v = r.values, err = r.errors;
+  for (const k of NF_FIELDS) {
+    const e = $("nf-err-" + k);
+    if (e) e.textContent = (NF.touched.has(k) || (k === "folder" && NF.touched.has("name"))) && err[k] ? err[k] : "";
+  }
+  $("nf-path").textContent = v.path || "—";
+  const view = $("nf-idea-view");
+  view.classList.toggle("hidden", !r.idea_lines);
+  if (r.idea_lines) view.replaceChildren(...renderDoc(r.idea_lines));
+  else view.replaceChildren();
+  $("nf-feature-note").textContent = v.feature && !err.feature ? `→ docs/features/${v.feature}/idees.md`
+    : "Son dossier sous docs/features/ : minuscules, chiffres et tirets.";
+  $("nf-remote-note").textContent = v.remote
+    ? "Créez-le vous-même sur GitHub, vide : sans README, sans .gitignore, sans licence. S'il contient déjà des commits, la création s'arrête : rien n'est forcé."
+    : "Vide : aucun dépôt distant — les push seront dits en échec jusqu'à ce qu'on en ajoute un.";
+  const sm = $("nf-summary"); sm.replaceChildren();
+  if (v.resume) sm.append(el("div", {class: "notice warn", text: "La création de ce dossier s'est arrêtée : « Reprendre », plus bas, la continue depuis l'étape en échec."}));
+  else if (r.summary) sm.append(el("h4", {text: "Ce qui sera créé"}), el("ul", {}, r.summary.map((x) => el("li", {text: x}))));
+  $("nf-create").disabled = !r.ok || !!v.resume || !!(MK && MK.going);
+  $("nf-msg").textContent = "";
+}
+async function nfPick(btn, route, field) {
+  btn.disabled = true; const label = btn.textContent; btn.textContent = "Fenêtre ouverte…";
+  try {
+    const r = await api(route, {initial: $(field).value});
+    if (r.path) { $(field).value = r.path; NF.touched.add(field.slice(3)); await nfCheck(); }
+  } catch (e) { $("nf-msg").textContent = e.message; }
+  finally { btn.disabled = false; btn.textContent = label; }
+}
+$("nf-parent-pick").onclick = () => nfPick($("nf-parent-pick"), "/api/pick-folder", "nf-parent");
+$("nf-idea-pick").onclick = () => nfPick($("nf-idea-pick"), "/api/pick-file", "nf-idea");
+$("nf-create").onclick = async () => {
+  for (const k of NF_FIELDS) NF.touched.add(k);
+  const b = $("nf-create"); b.disabled = true;
+  try {
+    await api("/api/create", nfForm());
+    $("new-app").classList.add("hidden");
+    for (const k of NF_FIELDS) $("nf-" + k).value = k === "parent" ? $("nf-parent").value : "";
+    NF.touched.clear(); NF.folderTouched = false; NF.check = null; $("nf-summary").replaceChildren(); $("nf-idea-view").classList.add("hidden");
+    await loadCreations();
+  } catch (e) {
+    if (e.body && e.body.errors) { NF.check = e.body; renderNf(); }
+    $("nf-msg").textContent = e.message; b.disabled = false;
+  }
+};
+
+// The creations: the one going, those stopped (config.json keeps them until
+// they finish), the last one finished. Each step ✓ or ✗, and why.
+const MK_ICON = {"fait": "✓", "échec": "✗", "en cours": "…", "à faire": "·", "sans objet": "—"};
+const MK_CLS = {"fait": "ok", "échec": "failed", "en cours": "going", "à faire": "todo", "sans objet": "none"};
+async function loadCreations() {
+  let r;
+  try { r = await api("/api/create"); } catch (e) { return; }
+  MK = r;
+  renderCreations();
+  if (r.going) { if (!mkPoll) mkPoll = setInterval(loadCreations, 400); mkWasGoing = true; return; }
+  if (mkPoll) { clearInterval(mkPoll); mkPoll = null; }
+  if (mkWasGoing) {
+    mkWasGoing = false;
+    await refreshState();
+    // Finished: the application is active, opened on its feature (§22).
+    if (r.last && r.last.status === "fait") setTimeout(() => { resetForApp(); location.hash = "#dashboard"; refreshState(); }, 1200);
+  }
+}
+function renderCreations() {
+  const box = $("new-runs"); box.replaceChildren();
+  if (!MK) return;
+  const seen = new Set();
+  const recs = [];
+  for (const x of [MK.going, ...(MK.pending || []), MK.last]) {
+    if (!x || seen.has(appKey(x.values.path))) continue;
+    seen.add(appKey(x.values.path)); recs.push(x);
+  }
+  for (const x of recs) box.append(creationCard(x));
+  if (NF.check) renderNf();
+}
+function creationCard(rec) {
+  const v = rec.values, st = rec.status;
+  const head = {"en cours": "en cours…", "échec": "arrêtée", "fait": "créée", "à faire": "en attente"}[st] || st;
+  const card = el("div", {class: "card mk", "data-path": v.path, "data-status": st},
+    el("h3", {text: `Nouvelle application « ${v.name} » — ${head}`}),
+    el("div", {class: "mono small muted", text: v.path}));
+  const ol = el("ol", {class: "mk-steps"});
+  for (const s of rec.steps) ol.append(el("li", {class: MK_CLS[s.status] || "todo", "data-step": s.id, "data-status": s.status},
+    el("span", {class: "ic", text: MK_ICON[s.status] || "·", "aria-label": s.status}),
+    el("span", {class: "lb", text: s.label}),
+    el("span", {class: "dt", text: s.detail || (s.status === "à faire" ? "à faire" : "")})));
+  card.append(ol);
+  if (st === "échec") {
+    const failed = rec.steps.find((s) => s.status === "échec");
+    card.append(el("div", {class: "notice warn", style: "margin-top:12px"}, el("b", {text: `Arrêtée à « ${failed ? failed.label : "?"} » : `}), rec.error || ""),
+      el("div", {class: "small"}, "Le cockpit ne supprime jamais le dossier qu'il a créé. Il contient : ",
+        el("span", {class: "mono", text: (rec.contents || []).length ? rec.contents.join("  ") : "rien"})),
+      el("div", {class: "row", style: "margin-top:12px"},
+        el("button", {class: "primary", text: "Reprendre", disabled: !!MK.going || undefined,
+          title: "Continue depuis l'étape en échec ; chaque étape vérifie ce qui est déjà là", onclick: () => resumeCreation(v.path)}),
+        el("button", {class: "small", text: "Abandonner", disabled: !!MK.going || undefined,
+          title: "La création quitte la liste du cockpit ; le dossier reste tel quel", onclick: () => forgetCreation(rec)})));
+  }
+  if (st === "fait") {
+    if ((rec.provide || []).length) card.append(el("div", {class: "small", style: "margin-top:10px"},
+      el("b", {text: "À fournir avant le code : "}), rec.provide.join(" · ")));
+    card.append(el("div", {class: "row", style: "margin-top:10px"},
+      el("button", {class: "primary small", text: "Ouvrir le tableau de bord", onclick: () => activateApp(v.path, true)})));
+  }
+  return card;
+}
+async function resumeCreation(path) {
+  try { await api("/api/create/resume", {path}); mkWasGoing = true; await loadCreations(); }
+  catch (e) { alert(e.message); }
+}
+async function forgetCreation(rec) {
+  if (!confirm(`Abandonner la création de « ${rec.values.name} » ?\n\n${rec.values.path}\n\nElle quitte la liste du cockpit. Le dossier reste tel quel : le cockpit ne le supprime jamais.`)) return;
+  try {
+    const r = await api("/api/create/forget", {path: rec.values.path});
+    appsMsg(`Création abandonnée. Le dossier ${rec.values.path} reste, avec : ${(r.contents || []).join("  ") || "rien"}.`, "warn");
+    await loadCreations();
+  } catch (e) { alert(e.message); }
+}
+
 function appsMsg(text, kind = "warn") {
   const m = $("apps-msg");
   m.className = "notice " + kind + (text ? "" : " hidden");
@@ -1018,7 +1246,7 @@ function renderApps() {
   const rows = (A && A.apps) || [];
   $("apps-count").textContent = rows.length ? plural(rows.length, "application", "applications") : "";
   if (!rows.length) {
-    box.append(el("div", {class: "card"}, el("p", {style: "margin:0", text: "Aucune application dans la liste. « Ajouter une application » : la racine d'un dépôt git."})));
+    box.append(el("div", {class: "card"}, el("p", {style: "margin:0", text: "Aucune application dans la liste. « Nouvelle application » en crée une, du dossier vide à /1_lexique ; « Ajouter une application » en ajoute une qui existe : la racine d'un dépôt git."})));
     $("apps-add").classList.remove("hidden");
   }
   for (const r of rows) box.append(appRow(r));
@@ -1395,7 +1623,8 @@ function renderDashboard() {
       detail.append(el("button", {class: "primary big", text: "Écrire la bug-list", onclick: () => { corrSel = d.chain; bug.name = null; renderCorrection(); go("correction"); }}));
     }
     if (d.step === "test" || (d.proposal && d.proposal.step === "test" && !n.command)) {
-      detail.append(el("button", {class: "primary big", text: "Déployer", onclick: () => launchStep(findStep("main", "test"), "main")}));
+      if (hasDeploie()) detail.append(el("button", {class: "primary big", text: "Déployer", onclick: () => launchStep(findStep("main", "test"), "main")}));
+      else detail.append(el("span", {class: "muted", text: NO_DEPLOIE}));
       if (S.recette) detail.append(el("span", {class: "muted", text: `À tester : ${S.recette.rel} (${S.recette.count} points)`}));
     }
     if (n.command) detail.append(el("span", {class: "muted", text: `Ensuite : /${n.command} ${n.args || ""}`}));
@@ -1437,7 +1666,24 @@ function renderDashboard() {
   renderGauges();
   renderAlerts();
   renderHistory();
+  renderProvide();
 }
+
+// « À fournir avant le code » (1.7): what socle.py says the application
+// provides itself, ✓ or ✗ read from its files; hidden once all are ✓.
+function renderProvide() {
+  const card = $("provide-card"), p = S.provide;
+  const show = !!(p && p.length && p.some((x) => !x.ok));
+  card.classList.toggle("hidden", !show);
+  if (!show) return;
+  $("provide-list").replaceChildren(...p.map((x) => el("li", {class: x.ok ? "ok" : "ko", "data-path": x.path},
+    el("span", {class: "ic", text: x.ok ? "✓" : "✗", "aria-label": x.ok ? "présent" : "manquant"}),
+    el("div", {}, el("span", {class: "mono", text: x.path}), el("div", {class: "small muted", text: x.text})))));
+}
+// The test step's « Déployer » runs the application's own /deploie: one
+// that has none is not offered it (1.7 — deploying comes with 1.8).
+const hasDeploie = () => (S.commands || []).some((c) => c.name === "deploie");
+const NO_DEPLOIE = "Le déploiement viendra avec une prochaine version du cockpit : cette application n'a pas de /deploie.";
 
 function renderAlerts() {
   const box = $("alerts"); box.replaceChildren();
@@ -1612,7 +1858,7 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     if (s.command && s.id !== "test") acts.append(el("button", {class: isNext && d.next && d.next.kind === "run" ? "primary" : "",
       text: "Lancer", disabled: !launchable || anyRun() || undefined, title: elsewhere() ? busyNote() : launchable ? `/${s.command}` : offNote,
       onclick: () => launchStep(s, chain)}));
-    if (s.id === "test") acts.append(el("button", {class: isNext ? "primary" : "", text: "Déployer",
+    if (s.id === "test" && hasDeploie()) acts.append(el("button", {class: isNext ? "primary" : "", text: "Déployer",
       disabled: anyRun() || undefined, title: elsewhere() ? busyNote() : "/deploie", onclick: () => launchStep(s, chain)}));
     const key = `${chain}:${s.id}`;
     const wb = whyBox(s);
@@ -1625,8 +1871,9 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     if (s.lots) line1.append(el("button", {class: "badge plain lots-link", style: "min-height:0;border:none;cursor:pointer", title: "Voir les lots (onglet Code)",
       text: `${s.lots.pass} / ${s.lots.total} en PASS`, onclick: () => openCode(chain)}));
     if (isNext && d.source !== "run") line1.append(el("span", {class: "next-tag", text: `Prochaine étape · ${d.label || ""}`}));
-    const cmdText = s.id === "test" ? "/deploie, puis à la main" : `/${s.command} ${s.command === "deploie" ? "" : S.feature}`;
+    const cmdText = s.id === "test" ? (hasDeploie() ? "/deploie, puis à la main" : "à la main") : `/${s.command} ${s.command === "deploie" ? "" : S.feature}`;
     const main = el("div", {}, line1, el("div", {class: "scmd", text: cmdText + (s.note && chain === "main" ? " — " + s.note : "")}));
+    if (s.id === "test" && !hasDeploie()) main.append(el("div", {class: "extra", text: NO_DEPLOIE}));
     if (s.id === "test") main.append(el("div", {class: "extra", text: S.recette
       ? `À tester : ${S.recette.rel} — ${S.recette.count} points${S.recette.first.length ? " : " + S.recette.first[0] : ""}`
       : "code/recette-ordonnee.md n'existe pas encore : /9_controle l'écrit."}));

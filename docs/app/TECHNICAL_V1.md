@@ -1,9 +1,15 @@
-# Chain cockpit — technical design, version 1.6
+# Chain cockpit — technical design, version 1.7
 
 A local application that lets the Product Owner run the agent chain
 without editing files by hand. Version 1 covers the two things that cost
 her the most time: **answering questions and blocking files**, and
 **knowing which command comes next**.
+
+*1.7 — « Nouvelle application »: an application created from an empty
+folder to /1_lexique, every step deterministic, no Claude call; `/socle`
+becomes `.claude/scripts/socle.py`, which the cockpit runs; « À fournir
+avant le code » on the dashboard; no « Déployer » where there is no
+`/deploie` (§22).*
 
 *1.6 — the cockpit lives in the chain's own repository and installs the
 chain into an application (§20); the ignored folders are kept per
@@ -90,7 +96,10 @@ is read by `/8_code` only (§7); `Next:` carries a second step (§9).*
    - `## Décision du Product Owner` in `code/redecoupage.md`;
    - `stop.md`;
    - *(1.3)* a new `bugfix-NN/` and its `bug-list.md`, which she used to
-     create by hand (§12).
+     create by hand (§12);
+   - *(1.7)* `docs/features/<feature>/idees.md` of an application it
+     creates — her input, copied from the file she picked — and that new
+     folder itself (§22).
 
    Everything else is read-only.
 4. **Write back to the file you read.** A blocking file read from a live
@@ -407,7 +416,9 @@ entry or a run is going.*
   `scan_rules.md` §2 flags. A step « t'attend » opens « À répondre »
   filtered on it; the running step shows the live run under it; the test
   step carries « Déployer » (`/deploie`) and what to test from
-  `code/recette-ordonnee.md`.
+  `code/recette-ordonnee.md`. *1.7: only where the application has its
+  `.claude/commands/deploie.md`; elsewhere the step says deploying comes
+  with a later version (§22).*
 - **Correction** — the feature's `bugfix-NN/`, newest first, each as the
   correction flow. Only the highest launches. « Nouvelle correction »
   creates the next `bugfix-NN/` and its empty `bug-list.md` — those two
@@ -424,7 +435,7 @@ entry or a run is going.*
   `JAVA_HOME` is set, `java -version` from the PATH otherwise; the
   `JAVA_HOME` hint shows only when it is not set, or points to nothing.*
 
-The page writes nothing beyond §2.3's places — the last of them, `bugfix-NN/bug-list.md`, new in 1.3.
+The page writes nothing beyond §2.3's places — `bugfix-NN/bug-list.md` new in 1.3, a new application's `idees.md` in 1.7.
 
 ## 13. Consumption (1.4)
 
@@ -790,3 +801,74 @@ diagnostic slot (`state.py:143-149`), skipped when any result was stored
   its own once for an application that has none — at the server's start,
   at the page's opening, when an application becomes active — never again
   for one that has one. Paramètres → Diagnostic runs the active one's.
+
+## 22. A new application (1.7)
+
+What 1.7 found, from its code: `/socle` was a command that had Claude write
+four fixed files and commit (`socle.md:10-57`) — no agent, no decision
+(`:59-60`), named by no command or agent (`CLAUDE.md:51`). It created no
+folder, no repository, no `.claude/`. `/1_lexique` needs a first commit (its
+worktree is cut from `HEAD`) and `docs/features/<name>/idees.md`, no remote.
+chain.py's install had never made a repository's first commit: it ran there
+(`git commit --only` works on an unborn branch), but its push was a plain
+`git push`, which fails on a branch with no upstream.
+
+- **`.claude/scripts/socle.py`** — a script of the chain, installed with
+  it, run by the cockpit; the `/socle` command is removed. It writes what is
+  still read, and nothing else — `docs/PRODUIT_GLOBAL.md` (`# Application`;
+  the Rédacteur, the sondeur at invocation 3, the Fusionneur),
+  `docs/features/` (every command), `docs/CURRENT_TECHNICAL_STATE.md`
+  (`# Technical state`, kept when there; the Détailleur, the Réalisateur,
+  the Arbitre, the Diagnostiqueur), and in `.gitignore`, appended when
+  absent, `docs/features/*/stop.md` and `stop1.md` (`/8_code`, the
+  cockpit's « Arrêter au prochain lot ») with `.claude/worktrees/` and
+  `.claude/settings.local.json`. It refuses when the global exists (exit
+  2), asks git who commits before writing anything, commits those files
+  alone (`--only`) as `chore: scaffolding for the chain`, and does not push.
+  It prints, one per line, what the application still provides — its
+  `PROVIDE`: the conventions, written at `/conventions`, and the
+  `technical-state-format` skill. `/deploie` is not in it: deploying moves
+  into the cockpit (1.8). `--list` prints that alone. Standard library only.
+- **chain.py** — `push_branch`: a branch with no upstream is pushed with
+  `-u origin HEAD`, so that every later push, the chain's commands' too, is a
+  plain one. A repository with no commit has no previous install: a first
+  install that failed before its commit is done again, its files compared by
+  content.
+- **The form** (`POST /api/create/check`, as she types; `create.check`):
+  the name (60 characters at most); the parent folder (the folder picker,
+  `C:\Dev` by default) and the folder's name, proposed from the name (lower
+  case, hyphens, no accent), the full path shown — refused when it exists and
+  is not empty, is listed, or lies in the chain's repository; the idea file
+  (`POST /api/pick-file`, `askopenfilename`, `.md` and `.txt`; or pasted),
+  UTF-8, not empty, its lines shown read-only with « À répondre »'s
+  renderer; the feature (`^[a-z0-9]+(-[a-z0-9]+)*$`, never `bugfix-NN`),
+  normalised as it is typed; the GitHub URL, optional — empty, the page says
+  in one line that pushes will be reported failed until one is added. A
+  summary, then « Créer » (`POST /api/create`).
+- **The creation** (`create.Creation`, in a worker thread, followed on
+  `GET /api/create`): (1) the folder, `git init -b master`, a `.gitignore`
+  with the worktrees and the local settings, and git's committer asked for;
+  (2) the remote — `git ls-remote`: a commit that is not this creation's own
+  stops it, never forced; `origin` added; (3) chain.py's install, the first
+  commit; (4) `socle.py`, run with the console Python; (5) the idea file
+  copied byte for byte, `feat: <feature> — idées`; (6) the application
+  added, active, opened on the feature, and the scan's proposal said — on a
+  new application, `/1_lexique <feature>`. After 3, 4 and 5, a push when
+  there is a remote. Each step ✓ or ✗, with what it did.
+- **A step that fails** stops the creation, says which and why, and lists
+  what the folder holds; it is never deleted. The creation is kept in
+  `config.json` (`creations`, keyed by folder) until it finishes, so that
+  « Reprendre » (`POST /api/create/resume`) survives a restart; it goes on
+  from the step that failed, and every step checks what is there first — a
+  folder already a repository, a remote holding only this creation's
+  commits, the chain or the scaffolding committed, the idea file there and
+  the same — and does not redo it; an idea file there and different is never
+  overwritten. A creation the server stopped in the middle — closed, crashed — is shown stopped at the step it was on. Only a folder held there can be resumed. « Abandonner »
+  (`POST /api/create/forget`) drops the record, the folder untouched. One
+  creation at a time.
+- **« À fournir avant le code »** — on the dashboard, `provide` in
+  `/api/state`: `PROVIDE` read from the chain's own `socle.py` (loaded as a
+  module, never a copy), each line ✓ or ✗ from the application's files.
+  Hidden once every line is ✓, and when the chain has no `socle.py`.
+- **« Déployer »** — shown only where `.claude/commands/deploie.md` exists;
+  elsewhere the test step says deploying comes with a later version.

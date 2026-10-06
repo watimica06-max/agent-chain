@@ -336,3 +336,60 @@ def test_server_install_asks_before_overwriting(tmp_path, monkeypatch):
         r = await post(c, "/api/chain/install", {"confirm": True})
         assert r.status == 200 and (await r.json())["chain"]["state"] == chain.UP_TO_DATE
     with_client(tmp_path, body)
+
+
+# --------------------------------------------- the first commit (1.7)
+
+def test_first_install_on_an_empty_repository_is_its_first_commit(tmp_path, repos):
+    root, _, _ = repos
+    app = tmp_path / "neuve"
+    init(app)
+    res = chain.install(str(app), str(root), push=True)
+    assert res["app_commit"] and git(app, "rev-list", "--count", "HEAD").strip() == "1"
+    assert git(app, "log", "-1", "--format=%s").strip() == res["message"]
+    assert files_of(app) == sorted([".claude/CLAUDE.md", ".claude/agents/a.md", ".claude/agents/b.md",
+                                    ".claude/commands/1_x.md", ".claude/scripts/s.py",
+                                    ".claude/grids/GRILLE_G.md", ".claude/chain-version.json"])
+    # No remote: the commit stands, the push says why.
+    assert not res["pushed"] and "push" in res["push_error"]
+    assert chain.state(str(app), str(root))["state"] == chain.UP_TO_DATE
+
+
+def test_first_push_sets_the_upstream(tmp_path, repos):
+    root, _, _ = repos
+    app = tmp_path / "neuve"
+    init(app)
+    remote = tmp_path / "neuve.git"
+    subprocess.run(["git", "init", "-q", "--bare", str(remote)], check=True)
+    git(app, "remote", "add", "origin", str(remote))
+    res = chain.install(str(app), str(root), push=True)
+    assert res["pushed"], res["push_error"]
+    assert git(app, "rev-parse", "--abbrev-ref", "@{u}").strip() == "origin/master"
+    assert git(remote, "rev-parse", "master") == git(app, "rev-parse", "HEAD")
+    # Every later push is a plain one.
+    write(root, ".claude/agents/a.md", "agent a, two\n")
+    commit(root, "chain two")
+    chain._chain_cache.clear()
+    assert chain.install(str(app), str(root), push=True)["pushed"]
+    assert git(remote, "rev-parse", "master") == git(app, "rev-parse", "HEAD")
+
+
+def test_a_first_install_that_failed_before_its_commit_is_done_again(tmp_path, repos, monkeypatch):
+    """Its files and chain-version.json are there, uncommitted: with no
+    commit yet, nothing counts as installed, and they compare by content."""
+    root, _, _ = repos
+    app = tmp_path / "neuve"
+    init(app)
+    real = chain._git
+
+    def no_commit(repo, *args, **kw):
+        if args and args[0] == "commit":
+            raise chain.InstallError("git commit : simulated")
+        return real(repo, *args, **kw)
+    monkeypatch.setattr(chain, "_git", no_commit)
+    with pytest.raises(chain.InstallError):
+        chain.install(str(app), str(root), push=False)
+    assert (app / ".claude" / "chain-version.json").exists()
+    monkeypatch.setattr(chain, "_git", real)
+    res = chain.install(str(app), str(root), push=False)
+    assert res["app_commit"] and git(app, "status", "--porcelain").strip() == ""

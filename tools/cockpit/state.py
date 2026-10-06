@@ -22,7 +22,11 @@ entry with:
 written before 1.6 is migrated in place at the first load, nothing lost: its
 application becomes the first entry, with its relays, its ignored folders
 and its diagnostic. `history` stays one list, its keys `folder|feature`,
-kept to MAX_HISTORY entries per application."""
+kept to MAX_HISTORY entries per application.
+
+1.7 — `creations`: the « Nouvelle application » not finished, keyed by
+their folder, each with its values and its steps (create.py). Only a folder
+held there can be resumed; a creation finished is dropped."""
 import json
 import os
 import threading
@@ -379,6 +383,34 @@ class State:
         prefix = _app_key(app) + "|"
         return [{**{a: b for a, b in h.items() if a != "key"}, "feature": h["key"][len(prefix):]}
                 for h in self.data.get("history", []) if (h.get("key") or "").startswith(prefix)][:n]
+
+    # ----------------------------------------------------- creations (1.7)
+
+    def creations(self):
+        """The creations not finished, newest first: copies."""
+        c = self.data.get("creations")
+        rows = list(c.values()) if isinstance(c, dict) else []
+        return sorted((dict(r) for r in rows if isinstance(r, dict) and (r.get("values") or {}).get("path")),
+                      key=lambda r: r.get("started_at") or "", reverse=True)
+
+    def creation(self, folder):
+        c = self.data.get("creations")
+        r = c.get(_app_key(folder)) if isinstance(c, dict) and folder else None
+        return dict(r) if isinstance(r, dict) else None
+
+    def set_creation(self, record):
+        with self._lock:
+            c = self.data.get("creations")
+            if not isinstance(c, dict):
+                c = self.data["creations"] = {}
+            c[_app_key(record["values"]["path"])] = record
+            self._save()
+
+    def drop_creation(self, folder):
+        with self._lock:
+            c = self.data.get("creations")
+            if isinstance(c, dict) and c.pop(_app_key(folder), None) is not None:
+                self._save()
 
     # ------------------------------------------------------------ ignored
 

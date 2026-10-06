@@ -56,6 +56,34 @@ jamais. Sur chaque ligne : « Ouvrir » (elle devient l'active),
 « Renommer », « Retirer de la liste » (il demande d'abord ; le dossier
 n'est pas touché, seule la liste change), et, quand sa chaîne n'est pas à
 jour, « Installer » ou « Mettre à jour la chaîne ». En haut :
+- **« Nouvelle application »** (1.7) : crée une application de rien,
+  jusqu'à `/1_lexique`, sans appeler Claude. Un seul écran : son nom ; son
+  dossier — le dossier parent (la fenêtre de choix, `C:\Dev\` d'abord) et
+  le nom du dossier, proposé d'après le nom (minuscules, tirets), le chemin
+  complet affiché ; un dossier qui existe et n'est pas vide est refusé ;
+  votre fichier d'idées (`.md` ou `.txt`, la fenêtre de choix ou le chemin
+  collé), montré en lecture seule avant que rien ne soit créé ; le nom de
+  la première fonctionnalité (minuscules, chiffres, tirets) ; et, si vous
+  voulez, l'adresse d'un dépôt GitHub que vous avez créé **vide** (sans
+  README, sans `.gitignore`, sans licence). Sans dépôt, rien n'est poussé,
+  et les commandes de la chaîne diront leurs push en échec jusqu'à ce
+  qu'on en ajoute un. Un récapitulatif, puis « Créer ». Chaque étape
+  s'affiche ✓ ou ✗ : le dossier et son dépôt git (branche `master`, un
+  `.gitignore`) ; le dépôt distant — s'il contient déjà des commits, tout
+  s'arrête là, rien n'est forcé ; la chaîne, premier commit du dépôt ; le
+  socle (`.claude/scripts/socle.py`, que la chaîne apporte : le global, le
+  dossier des features, l'état technique, `chore: scaffolding for the
+  chain`) ; votre fichier d'idées, copié tel quel en
+  `docs/features/<fonctionnalité>/idees.md` et commité (`feat: … —
+  idées`) ; enfin l'application dans la liste, active, ouverte sur sa
+  feature, et le tableau de bord propose `/1_lexique`. Chaque commit est
+  poussé quand il y a un dépôt distant. **Une étape qui échoue** arrête la
+  création, dit laquelle et pourquoi, et propose « Reprendre », qui
+  continue depuis elle : chaque étape regarde ce qui est déjà là et ne le
+  refait pas. Le cockpit ne supprime jamais le dossier qu'il a créé : il
+  dit ce qu'il contient. Une création arrêtée reste proposée, même après
+  un redémarrage du cockpit ; « Abandonner » la retire de la liste, le
+  dossier reste tel quel.
 - **« Ajouter une application »** : la fenêtre de choix de Windows, ou le
   chemin collé. Il faut la racine d'un dépôt git ; un autre dossier est
   refusé, et la page dit pourquoi. Ajouter n'écrit rien dans le dossier.
@@ -112,7 +140,17 @@ avant un de leurs tests — la confirmation dit pourquoi). Une étape
 « t'attend » ouvre « À répondre » filtré sur elle. L'étape qui tourne
 montre le run dessous : l'agent, le texte, « Arrêter », « Continuer la
 session ». L'étape de test porte « Déployer » (`/deploie`) et ce qu'il
-faut tester, d'après `code/recette-ordonnee.md`.
+faut tester, d'après `code/recette-ordonnee.md`. Une application qui n'a
+pas de `/deploie` — une application neuve n'en a pas — n'a pas ce bouton,
+et l'étape dit que le déploiement viendra avec une prochaine version du
+cockpit.
+
+**À fournir avant le code** (1.7) — sur le tableau de bord, ce que
+l'application apporte elle-même, d'après `socle.py` : ses conventions
+techniques, `docs/TECHNICAL_CONVENTIONS.md`, écrites par `/conventions` ;
+la compétence `technical-state-format`. Chaque ligne ✓ ou ✗, lue dans ses
+fichiers. Rien ne bloque l'amont : il les faut à partir de `/7_lots`. La
+carte disparaît quand tout est ✓.
 
 **Chaîne → Code** — `/8_code` lot par lot : les lots passés sur le total,
 en barre ; pendant un run, le lot en cours et l'agent qui y travaille, le
@@ -264,6 +302,10 @@ avec ce qu'il a vu.
   l'application, leur commit et son push. Tout le reste est en lecture.
 - Ajouter, renommer ou retirer une application ne change que sa liste,
   dans `config.json` : rien n'est écrit dans son dossier.
+- « Nouvelle application » n'écrit que dans le dossier qu'elle crée, neuf
+  ou vide, et ne le supprime jamais ; elle ne force jamais un dépôt
+  distant qui contient déjà des commits. Elle ne reprend qu'une création
+  qu'elle a commencée : une application existante n'est jamais touchée.
 - Il ne touche jamais au travail non commité d'une application.
 - Après chaque écriture, il relit le fichier avec le test de la commande ;
   si la commande le lirait encore comme sans réponse, il annule l'écriture
