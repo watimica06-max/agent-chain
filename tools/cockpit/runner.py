@@ -25,9 +25,15 @@ from datetime import datetime
 
 import nextline
 import stats as stats_mod
+import stream as stream_mod
 
-AGENT_TOOLS = {"Agent", "Task"}
 MAX_EVENTS = 5000
+# The events a run's log does not hold — the page's own and the server's —
+# kept in memory and merged by time with the log's when a page opens (1.5).
+CONTROL_EVENTS = {"run_started", "status", "permission", "permission_resolved", "stopping",
+                  "error", "idle_wait", "limits", "limits_unavailable", "run_ended"}
+# A reopened page is given at most this many events: it keeps no more.
+REPLAY_MAX = 3000
 STOP_COMMAND = "8_code"
 
 # No message for this long while an agent is pending: the page asks.
@@ -41,9 +47,6 @@ CONTINUE_PROMPT = "Continue the command where you stopped, and end with its Next
 # model call (TECHNICAL_V1 §13.2). Its report gives both usage windows.
 USAGE_COMMAND = "/usage"
 USAGE_TIMEOUT = 30.0
-# What the Agent tool's result says when the subagent was started in the background.
-BACKGROUND_RESULT = re.compile(r"async_launched|in the background|agentId", re.I)
-TERMINAL_STATUSES = {"completed", "failed", "stopped", "killed"}
 
 
 class Busy(Exception):
@@ -124,21 +127,19 @@ class Run:
     error: str = ""
     client: object = None
     task: asyncio.Task | None = None
-    agents: dict = field(default_factory=dict)       # tool_use_id -> label
-    active: list = field(default_factory=list)       # tool_use_ids running
+    # What the stream says of the agents, the same reader the log is replayed
+    # with (stream.py).
+    reader: stream_mod.Reader = field(default_factory=stream_mod.Reader, repr=False)
     permissions: dict = field(default_factory=dict)
     events: list = field(default_factory=list)
     subscribers: set = field(default_factory=set)
     stop_requested: bool = False
-    last_text: str = ""
     message: str = ""                 # what is sent; the command, or the continuation
     resume: str | None = None         # session id to continue
     session_id: str = ""
     log_path: str = ""
     mode: str = "auto"
     worktrees_left: list = field(default_factory=list)
-    tasks: dict = field(default_factory=dict)        # task_id -> tool_use_id
-    background: set = field(default_factory=set)     # tool_use_ids started in the background
     turn_ended: bool = False
     state: str | None = None          # the CLI's last session state, None if never sent
     idle: dict | None = None          # set while the page is asked to wait or stop
@@ -146,15 +147,32 @@ class Run:
     tally: stats_mod.Tally = field(default_factory=stats_mod.Tally, repr=False)
     ended_at: str = ""
     usage: dict | None = None         # the run's totals, once it ended
+    replay_cache: object = field(default=None, repr=False)
+    logged: int = 0                   # the run's lines in its log, probes left out
 
     @property
     def prompt(self):
         return f"/{self.command} {self.args}".rstrip()
 
+    @property
+    def agents(self):
+        return self.reader.agents
+
+    @property
+    def active(self):
+        return self.reader.active
+
+    @property
+    def last_text(self):
+        return self.reader.last_text
+
     def label(self, parent_id):
-        if not parent_id:
-            return "orchestrateur"
-        return self.agents.get(parent_id, "agent")
+        return self.reader.label(parent_id)
+
+    def active_inputs(self):
+        """The Agent tool's input of each agent running, oldest first."""
+        return [{"id": t, "agent": self.agents.get(t, "agent"), "input": self.reader.inputs.get(t) or {}}
+                for t in self.active]
 
     def snapshot(self):
         return {
@@ -163,6 +181,9 @@ class Run:
             "outcome": self.outcome, "error": self.error,
             "started_at": self.started_at,
             "agents": [self.agents.get(t, "agent") for t in self.active],
+            "active": [{"id": a["id"], "agent": a["agent"],
+                        "description": a["input"].get("description") or "",
+                        "lot": stats_mod.lot_of_input(a["input"])["lot"]} for a in self.active_inputs()],
             "permissions": [p.to_dict() for p in self.permissions.values()],
             "relay": self.relay, "next": self.next,
             "stop_next_lot": self.command == STOP_COMMAND,
@@ -290,7 +311,7 @@ class Runner:
                 msg, at = payload
                 body = self._log(run, msg, at)
                 self._count(run, msg, body, at)
-                self._handle(run, msg)
+                self._handle(run, msg, body, at)
                 if self._over(run):
                     return
         finally:
@@ -354,7 +375,7 @@ class Runner:
         if run.idle_future and not run.idle_future.done():
             run.idle_future.set_result("stop")
         run.idle = None
-        run.active.clear()
+        run.reader.active.clear()
         if not run.relay:
             run.relay = run.last_text
         run.next = nextline.parse(run.relay).to_dict()
@@ -390,10 +411,7 @@ class Runner:
     def _log(self, run: Run, msg, at=None, probe=False):
         """One line per message, with the time it was received. Returns the
         body, which the count reads too."""
-        try:
-            body = asdict(msg) if is_dataclass(msg) else repr(msg)
-        except (TypeError, ValueError):
-            body = repr(msg)
+        body = _body(msg)
         if not run.log_path:
             return body
         try:
@@ -403,6 +421,8 @@ class Runner:
             line = json.dumps(entry, ensure_ascii=False, default=str)
             with open(run.log_path, "a", encoding="utf-8") as f:
                 f.write(line + "\n")
+            if not probe:
+                run.logged += 1
         except (OSError, TypeError, ValueError):
             pass
         return body
@@ -467,71 +487,30 @@ class Runner:
 
     # ------------------------------------------------------------ messages
 
-    def _handle(self, run: Run, msg):
-        from claude_agent_sdk import (AssistantMessage, UserMessage, ResultMessage, SystemMessage,
-                                      TextBlock, ToolUseBlock, ToolResultBlock,
-                                      TaskStartedMessage, TaskNotificationMessage,
-                                      TaskUpdatedMessage)
-        if isinstance(msg, AssistantMessage):
+    def _handle(self, run: Run, msg, body=None, at=None):
+        """The message as the log holds it, read by the stream's reader —
+        the one a reopened page's replay uses — then what ends a turn."""
+        kind = type(msg).__name__
+        body = body if isinstance(body, dict) else _body(msg)
+        if not isinstance(body, dict):
+            return
+        if kind in ("AssistantMessage", "UserMessage"):
             run.turn_ended = False
-            who = run.label(msg.parent_tool_use_id)
-            for block in msg.content:
-                if isinstance(block, TextBlock):
-                    if not msg.parent_tool_use_id:
-                        run.last_text = block.text
-                    self._emit(run, "text", {"agent": who, "text": block.text})
-                elif isinstance(block, ToolUseBlock):
-                    if block.name in AGENT_TOOLS:
-                        inp = block.input or {}
-                        name = inp.get("subagent_type") or "agent"
-                        desc = inp.get("description") or ""
-                        run.agents[block.id] = name
-                        run.active.append(block.id)
-                        self._emit(run, "agent_started", {"agent": name, "description": desc,
-                                                          "by": who})
-                    else:
-                        self._emit(run, "tool", {"agent": who, "tool": block.name,
-                                                 "summary": _summary(block.name, block.input)})
-        elif isinstance(msg, UserMessage):
-            run.turn_ended = False
-            content = msg.content if isinstance(msg.content, list) else []
-            for block in content:
-                if isinstance(block, ToolResultBlock) and block.tool_use_id in run.active:
-                    if BACKGROUND_RESULT.search(_text_of(block.content)):
-                        # Started in the background: still pending until its
-                        # completion notification.
-                        run.background.add(block.tool_use_id)
-                        self._emit(run, "agent_background",
-                                   {"agent": run.agents.get(block.tool_use_id)})
-                    else:
-                        run.active.remove(block.tool_use_id)
-                        self._emit(run, "agent_ended", {"agent": run.agents.get(block.tool_use_id),
-                                                        "usage": _pass_usage(run, block.tool_use_id)})
-        elif isinstance(msg, TaskStartedMessage):
-            if msg.tool_use_id:
-                run.tasks[msg.task_id] = msg.tool_use_id
-        elif isinstance(msg, (TaskNotificationMessage, TaskUpdatedMessage)):
-            status = msg.status
-            if status in TERMINAL_STATUSES:
-                tid = getattr(msg, "tool_use_id", None) or run.tasks.get(msg.task_id)
-                if tid in run.active:
-                    run.active.remove(tid)
-                    run.background.discard(tid)
-                    self._emit(run, "agent_ended", {"agent": run.agents.get(tid), "late": True,
-                                                    "status": status, "usage": _pass_usage(run, tid)})
-        elif isinstance(msg, ResultMessage):
+        for t, d in run.reader.feed(kind, body, run.tally):
+            self._emit(run, t, d, at)
+        if kind == "ResultMessage":
             run.turn_ended = True
-            if msg.session_id:
-                run.session_id = msg.session_id
-            run.relay = msg.result or run.last_text
-            if msg.is_error:
+            if body.get("session_id"):
+                run.session_id = body["session_id"]
+            run.relay = body.get("result") or run.last_text
+            if body.get("is_error"):
                 run.outcome = "erreur"
-                run.error = "; ".join(getattr(msg, "errors", None) or []) or (msg.subtype or "erreur")
-            reason = getattr(msg, "terminal_reason", None) or ""
+                run.error = "; ".join(body.get("errors") or []) or (body.get("subtype") or "erreur")
+            reason = body.get("terminal_reason") or ""
             if reason.startswith("aborted"):
                 run.outcome = "interrompu"
-        elif isinstance(msg, SystemMessage) and msg.subtype == "session_state_changed":
-            run.state = (msg.data or {}).get("state")
+        elif kind == "SystemMessage" and body.get("subtype") == "session_state_changed":
+            run.state = (body.get("data") or {}).get("state")
 
     # --------------------------------------------------------- permissions
 
@@ -617,6 +596,43 @@ class Runner:
             os.replace(path, target)
         return target
 
+    # -------------------------------------------------------------- replay
+
+    def replay(self, repo: str):
+        """What a page opening now is given (1.5): the run's message events
+        rebuilt from its log — the same reader as live — and the server's own
+        events kept in memory, in time order. The last REPLAY_MAX of them,
+        and how many were left out before."""
+        run = self.current(repo)
+        if not run or not run.id:
+            return [], 0
+        if run.log_path and os.path.isfile(run.log_path):
+            msgs, run.replay_cache = stream_mod.replay(run.log_path, run.replay_cache)
+            # Each server event sits after the log lines written when it was
+            # emitted (`after`): its place among the log's events is exact.
+            keyed = [((line, 1, k), {"seq": 0, "type": t, "run": run.id, "data": d, "at": at})
+                     for k, (line, at, t, d) in enumerate(msgs)]
+            keyed += [((e.get("after", 0), 0, e["seq"]), e) for e in run.events if e["type"] in CONTROL_EVENTS]
+            keyed.sort(key=lambda x: x[0])
+            evs = [e for _, e in keyed]
+        else:
+            evs = list(run.events)          # no log: what memory holds
+        dropped = max(0, len(evs) - REPLAY_MAX)
+        return evs[dropped:], dropped
+
+    async def wait_ended(self, repo: str, timeout: float) -> bool:
+        """True once the run's task is over, within `timeout` seconds."""
+        run = self.current(repo)
+        if not run or not run.task or run.task.done():
+            return True
+        try:
+            await asyncio.wait_for(asyncio.shield(run.task), timeout)
+        except asyncio.TimeoutError:
+            return False
+        except Exception:
+            pass
+        return True
+
     # ----------------------------------------------------------- worktrees
 
     def live_worktrees(self, repo: str) -> list[str]:
@@ -644,8 +660,9 @@ class Runner:
         if run:
             run.subscribers.discard(q)
 
-    def _emit(self, run: Run, kind: str, data: dict):
-        ev = {"seq": next(self._seq), "type": kind, "run": run.id, "data": data}
+    def _emit(self, run: Run, kind: str, data: dict, at: str | None = None):
+        ev = {"seq": next(self._seq), "type": kind, "run": run.id, "data": data, "at": at or _now(),
+              "after": run.logged}
         run.events.append(ev)
         if len(run.events) > MAX_EVENTS:
             del run.events[: len(run.events) - MAX_EVENTS]
@@ -655,11 +672,6 @@ class Runner:
 
 def _now() -> str:
     return datetime.now().isoformat(timespec="milliseconds")
-
-
-def _pass_usage(run: Run, tid):
-    p = run.tally.passes.get(tid)
-    return p.summary() if p else None
 
 
 def list_worktrees(repo: str) -> list[str]:
@@ -673,19 +685,17 @@ def list_worktrees(repo: str) -> list[str]:
     return [p for p in paths if repo_key(p) != main]
 
 
-def _text_of(content) -> str:
-    if isinstance(content, str):
-        return content
-    if isinstance(content, list):
-        return " ".join(b.get("text", "") if isinstance(b, dict) else str(b) for b in content)
-    return str(content or "")
-
-
-def _summary(tool, inp):
-    inp = inp or {}
-    for k in ("command", "file_path", "path", "pattern", "description", "url", "skill"):
-        v = inp.get(k)
-        if isinstance(v, str) and v:
-            v = v.replace("\n", " ")
-            return v if len(v) <= 160 else v[:160] + "…"
-    return ""
+def _body(msg):
+    """The message as a dict — what the log writes and what the reader reads.
+    A message `asdict` cannot copy is read one level down, field by field."""
+    if not is_dataclass(msg):
+        return repr(msg)
+    try:
+        return asdict(msg)
+    except (TypeError, ValueError):
+        out = {}
+        for k, v in vars(msg).items():
+            if isinstance(v, list):
+                v = [_body(x) if is_dataclass(x) else x for x in v]
+            out[k] = v
+        return out

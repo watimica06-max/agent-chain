@@ -275,3 +275,33 @@ def test_stats_without_a_store(tmp_path):
         d = await (await c.get("/api/stats")).json()
         assert d["runs"] == [] and d["error"] and d["totals"]["runs"] == 0
     serve(tmp_path, None, body)
+
+
+# ------------------------------------------------------------- 1.5: par lot
+
+def test_by_lot_one_feature_filtered(tmp_path):
+    """« Par lot »: the passes the store gives a lot, by working folder and
+    lot; a lot's time its top-level passes', a nested one inside its
+    caller's; no section for « Toutes »."""
+    path = str(tmp_path / "s.sqlite")
+    stats.Store(path)
+    db = sqlite3.connect(path)
+    db.execute("INSERT INTO runs (id, feature, command, started_at) VALUES ('r1', 'f', '/8_code f', ?)",
+               (datetime.now().isoformat(timespec="seconds"),))
+    rows = [("t1", None, "concepteur", 100, 5, "lot-01", ""), ("t2", None, "realisateur", 300, None, "lot-01", ""),
+            ("t3", "t2", "arbitre", 120, 7, "lot-01", ""), ("t4", None, "realisateur", 50, 3, "lot-01", "bugfix-02"),
+            ("t5", None, "detailleur", 400, 9, None, "")]
+    for tid, parent, agent, dur, out, lot, folder in rows:
+        db.execute("INSERT INTO agent_passes (run_id, tool_use_id, parent_tool_use_id, agent, duration_s, input_tokens,"
+                   " cache_read_tokens, cache_creation_tokens, output_tokens, lot, folder) VALUES"
+                   " ('r1', ?, ?, ?, ?, 10, 0, 0, ?, ?, ?)", (tid, parent, agent, dur, out, lot, folder))
+    db.commit()
+    db.close()
+    d = statsview.build(path, "f", "tout")
+    by = {(r["folder"], r["lot"]): r for r in d["by_lot"]}
+    main = by[("", "lot-01")]
+    assert main["passes"] == 3 and main["duration_s"] == 400 and main["read_tokens"] == 30
+    assert main["output_tokens"] == 12 and main["output_unknown"] == 1 and main["codings"] == 1
+    assert by[("bugfix-02", "lot-01")]["passes"] == 1
+    assert d["by_lot_unknown"] == 1                          # the Détailleur's, on a block
+    assert statsview.build(path, None, "tout")["by_lot"] == []

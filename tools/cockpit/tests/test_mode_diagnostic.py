@@ -2,6 +2,7 @@
 command: the SDK client and the commands the diagnostic runs are fakes."""
 import asyncio
 import json
+import os
 import subprocess
 
 import pytest
@@ -164,6 +165,58 @@ def test_java_failure_with_gradle_present_explains_java_home(tmp_path):
     (hint,) = res["hints"]
     assert "JAVA_HOME" in hint and r"C:\Program Files\Android\Android Studio\jbr" in hint
     assert "variables d'environnement de Windows" in hint and "Redémarrez" in hint
+
+
+def _java_home(tmp_path, with_java=True):
+    home = tmp_path / "jdk"
+    (home / "bin").mkdir(parents=True)
+    if with_java:
+        (home / "bin" / ("java.exe" if os.name == "nt" else "java")).write_text("")
+    return str(home)
+
+
+def test_java_home_set_checks_its_java_not_the_path(tmp_path):
+    # 1.5: Gradle runs %JAVA_HOME%\bin\java. That one works, the PATH has none: ✓, no hint.
+    home = _java_home(tmp_path)
+    seen = []
+
+    def ex(argv, cwd, timeout):
+        seen.append(argv[0])
+        if argv[0] == "java":
+            raise FileNotFoundError("java introuvable (PATH)")
+        return ALL_GOOD["java"] if argv[0].startswith(home) else (0, "ok")
+    (tmp_path / "app").mkdir()
+    res = diagnostic.run_diagnostic(app_with(tmp_path / "app", gradle=True), ex, env={"JAVA_HOME": home})
+    j = by_id(res)["java"]
+    assert seen[0] == os.path.join(home, "bin", "java.exe" if os.name == "nt" else "java")
+    assert j["status"] == "ok" and j["label"] == "Java (JAVA_HOME)" and home in j["detail"]
+    assert res["hints"] == []
+
+
+def test_java_home_set_but_failing_is_a_failure_without_the_java_home_hint(tmp_path):
+    home = _java_home(tmp_path)
+    (tmp_path / "app").mkdir()
+    table = lambda argv, cwd, t: (1, "Error: could not open jvm.cfg") if argv[0].startswith(home) else (0, "ok")
+    res = diagnostic.run_diagnostic(app_with(tmp_path / "app", gradle=True), table, env={"JAVA_HOME": home})
+    assert by_id(res)["java"]["status"] == "fail" and res["hints"] == []
+
+
+def test_java_home_pointing_to_nothing_says_so(tmp_path):
+    home = _java_home(tmp_path, with_java=False)
+    (tmp_path / "app").mkdir()
+    res = diagnostic.run_diagnostic(app_with(tmp_path / "app", gradle=True), diagnostic.system_exec,
+                                    env={"JAVA_HOME": home})
+    assert by_id(res)["java"]["status"] == "fail"
+    (hint,) = res["hints"]
+    assert "JAVA_HOME pointe vers" in hint and home in hint
+
+
+def test_java_home_unset_checks_the_path_and_keeps_the_hint(tmp_path):
+    table = dict(ALL_GOOD, java=FileNotFoundError("java introuvable (PATH)"))
+    fe = fake_exec(table)
+    res = diagnostic.run_diagnostic(app_with(tmp_path, gradle=True), fe, env={})
+    assert fe.calls[0][0][0] == "java" and by_id(res)["java"]["label"] == "Java (PATH)"
+    assert res["hints"] == [diagnostic.JAVA_HINT]
 
 
 def test_java_failure_without_gradle_has_no_hint(tmp_path):

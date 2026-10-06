@@ -31,7 +31,7 @@ from test_stats import two_agents  # noqa: E402
 FEATURES = os.path.join(HERE, "fixtures", "features")
 # 1.4.5: the cockpit runs the diagnostic on its own; here, a fake, all ✓.
 from test_mode_diagnostic import ALL_GOOD, fake_exec  # noqa: E402
-server.DIAG_RUNNER = lambda app: diagnostic.run_diagnostic(app, fake_exec(ALL_GOOD))
+server.DIAG_RUNNER = lambda app: diagnostic.run_diagnostic(app, fake_exec(ALL_GOOD), env={})
 
 
 def snap(page, out, name, full=False):
@@ -186,8 +186,76 @@ def main(out_dir):
                 page.evaluate("location.hash = '#answer'")            # the menu is closed
                 snap(page, out, "11b-repondre-menu-ferme")
                 page.get_by_role("button", name="Ouvrir le menu").click()
+            shots_1_5(page, out, Path(t))
         browser.close()
         print("js errors:", errors)
+
+
+def shots_1_5(page, out, t):
+    """1.5: the Code tab, a lot opened, a run of /8_code going, the real
+    bugfix-06, Paramètres (notifications, stop), « Par lot », the stopped page."""
+    from claude_agent_sdk import AssistantMessage, TextBlock, ToolUseBlock
+    from test_page_code import store_with, with_lots
+    from test_runner import script_until_interrupted
+
+    lots = {"lot-01": 640, "lot-02": 1180, "lot-03": 900}
+    with FakeServer(t / "m", stats=store_with(str(t / "stats-m.sqlite"), lots)) as s:
+        with_lots(s, t / "m-src")
+        page.goto(s.url + "#chaine")
+        page.wait_for_selector("#flow-main li.step")
+        page.locator("#tab-main-code").click()
+        page.wait_for_selector("#lots-main tbody tr[data-lot]")
+        snap(page, out, "12-chaine-code", full=True)
+        page.locator("#lot-main-lot-03").click()
+        page.wait_for_selector(".lot-detail .mdoc .ln")
+        page.evaluate("document.getElementById('lot-main-lot-03').scrollIntoView({block: 'start'})")
+        snap(page, out, "12b-chaine-code-lot-ouvert")
+        page.get_by_role("link", name="Paramètres").first.click()
+        page.evaluate("document.getElementById('sec-notes').scrollIntoView({block: 'start'})")
+        snap(page, out, "14-parametres-notifications")
+        page.evaluate("document.getElementById('sec-quit').scrollIntoView({block: 'end'})")
+        snap(page, out, "14b-parametres-arreter-le-cockpit")
+        page.get_by_role("link", name="Statistiques").first.click()
+        page.wait_for_selector("#st-lot", state="visible")
+        page.evaluate("document.getElementById('st-lot').scrollIntoView({block: 'start'})")
+        snap(page, out, "15-statistiques-par-lot")
+
+    async def realisateur_on_lot_06(c):
+        yield AssistantMessage(content=[TextBlock("Lot lot-06 : le testeur a rendu la main, je lance le réalisateur."),
+                                        ToolUseBlock(id="r6", name="Agent", input={
+                                            "subagent_type": "realisateur", "description": "Code lot-06",
+                                            "prompt": "Working folder: docs/features/f. Your lot: lot-06."})], model="m")
+        async for m in script_until_interrupted(c):
+            yield m
+    with FakeServer(t / "n", script=realisateur_on_lot_06,
+                    stats=store_with(str(t / "stats-n.sqlite"), lots)) as s:
+        with_lots(s, t / "n-src")
+        page.goto(s.url + "#chaine")
+        page.wait_for_selector("#flow-main li.step")
+        page.locator("#tab-main-code").click()
+        s.call(s.rn.start(str(s.app_root), "f", "f", "8_code", "f"))
+        page.wait_for_function("(document.getElementById('code-current') || {}).textContent?.includes('lot-06')")
+        snap(page, out, "12c-chaine-code-run-en-cours")
+        s.call(s.rn.stop_now(str(s.app_root)))
+
+    with FakeServer(t / "o") as s:
+        with_feature(s, "premiere-app")
+        page.goto(s.url + "#correction")
+        page.wait_for_selector("#flow-corr li.step")
+        page.locator("#corr-list button", has_text="bugfix-06").click()
+        page.locator("#tab-corr-code").click()
+        page.wait_for_selector("#lots-bugfix-06 tbody tr[data-lot]")
+        snap(page, out, "13-correction-code-bugfix-06")
+        page.locator("#lot-bugfix-06-lot-20").click()
+        page.wait_for_selector(".lot-detail .mdoc .ln")
+        page.evaluate("document.getElementById('lot-bugfix-06-lot-20').scrollIntoView({block: 'start'})")
+        snap(page, out, "13b-correction-code-lot-20-ouvert")
+        page.get_by_role("link", name="Paramètres").first.click()
+        page.locator("#btn-quit").click()
+        page.wait_for_selector("#stopped", state="visible")
+        snap(page, out, "16-cockpit-arrete")
+    # The tabs remembered by the browser: back to « Amont » for a later run of these shots.
+    page.evaluate("localStorage.removeItem('cockpit-tabs')")
 
 
 if __name__ == "__main__":

@@ -1,9 +1,13 @@
-# Chain cockpit — technical design, version 1.4
+# Chain cockpit — technical design, version 1.5
 
 A local application that lets the Product Owner run the agent chain
 without editing files by hand. Version 1 covers the two things that cost
 her the most time: **answering questions and blocking files**, and
 **knowing which command comes next**.
+
+*1.5 — the server outlives the page and has no console (§16); « Code », /8_code
+lot by lot (§17); which lot an agent pass works on (§18); notifications (§19);
+the Java the builds use (§12).*
 
 *1.4.5 — « Statistiques », what the store holds read in depth (§15); the
 side menu closes; « Où on en est ? » moves to « Chaîne »; the diagnostic
@@ -399,7 +403,10 @@ entry or a run is going.*
   once, in the background, at the cockpit's opening (the server's start
   with a feature open, or the page's first load), and its result is kept.
   The dashboard alert shows only when the last result has a ✗.
-  Paramètres → Diagnostic still runs it on demand.
+  Paramètres → Diagnostic still runs it on demand. *1.5: the Java check is
+  the Java the builds use — `%JAVA_HOME%\bin\java -version` when
+  `JAVA_HOME` is set, `java -version` from the PATH otherwise; the
+  `JAVA_HOME` hint shows only when it is not set, or points to nothing.*
 
 The page writes nothing beyond §2.3's places — the last of them, `bugfix-NN/bug-list.md`, new in 1.3.
 
@@ -561,3 +568,68 @@ with the Windows picker and writes the two CSV files there.
 - **Export** — the runs and passes of the current filters, `;`-separated
   UTF-8 with a BOM, decimal commas: what a French Excel opens as columns.
   An unknown count is written « inconnu », an empty difference its reason.
+
+## 16. Closing the page, reopening it (1.5)
+
+What 1.4.5 did, from its code: a closed tab left the run going (the run is
+an asyncio task of the server, `runner.py:222`; the page's stream handler
+only unsubscribes, `server.py:751-754`); `lancer.bat` started again failed on
+the port and paused on the error, the page not opened (`lancer.bat:5-6`,
+`server.py:861`); a reopened page got the last 1 500 events the server kept
+in memory (`server.py:742-744`, at most 5 000, `runner.py:30`); a card
+waited without limit (`runner.py:312-313`, `:550`) and the reopened page
+showed it (`index.html:1695`); closing the console window killed the server
+and the CLI with it — no relay stored, no stats, the worktree left.
+
+- **`lancer.bat` starts `pythonw server.py --ouvrir`**: no console window.
+  `server.py` asks `GET /api/ping` on its port first; a cockpit answering,
+  it opens the browser on it and exits — no second server. Something else
+  on the port: said in `logs/server.log` and in a message box.
+- **No console**: stdout and stderr go to `tools/cockpit/logs/server.log`
+  (kept once as `server.log.1` past 5 MB). Every program the server starts
+  — the CLI, git, the diagnostic — is started with `CREATE_NO_WINDOW`:
+  from a windowless process a console program would otherwise open a
+  window of its own (`startup.py`).
+- **Paramètres → « Arrêter le cockpit »** (`POST /api/shutdown`): with a run
+  going it answers 409 and the page asks; confirmed, the run is stopped now
+  (`interrupt()`), given 30 s to end and record its relay, and the server
+  stops.
+- **A reopened page** is given the run's stream so far **rebuilt from its
+  log** by the same reader the live run uses (`stream.py`), the server's
+  own events (cards, stops, errors) placed after the log lines written when
+  they were emitted; the last 3 000, the page keeping no more. Its agents,
+  cards and idle question come from `/api/state`.
+
+## 17. « Code » — /8_code lot by lot (1.5)
+
+« Chaîne » and « Correction » have two tabs: « Amont », the flow, and
+« Code », the lots of the working folder shown. `codelots.py` reads them
+the way the command and its agents do — **`tools/cockpit/code_rules.md`**
+is the table, every rule with its lines, checked by `test_scan.py` like
+`scan_rules.md`. The verdict reader is the scan's (`scan.lot_verdict`): the
+bar and « n / N en PASS » cannot disagree. During a run the files are read
+in its worktree; `git log` (read-only) gives a lot's commits. Routes:
+`GET /api/code?folder=`, `GET /api/code/lot?folder=&lot=`. The data is read
+again when an agent starts or hands back, never polled.
+
+## 18. Which lot an agent pass works on (1.5)
+
+The Agent tool's input reaches the stream whole. `stats.lot_of_input` reads
+`Your lot:`, else the description (`Declare <lot>`, `Code <lot>`, `Settle
+<lot>`…), else the Arbitre's `Blocking file: code/<lot>/…`; `Your block:` for
+the Détailleur; `Working folder:` for the folder. A nested agent takes its
+caller's. Stored as `agent_passes.lot`, `block`, `folder`; the passes of a
+1.4 store are read again from their logs once (`meta.lots_read`).
+« Statistiques » shows « Par lot » when one feature is filtered.
+
+## 19. Notifications (1.5)
+
+The browser's Notification API, from `http://127.0.0.1` — a secure context
+for both Edge and Chrome. On or off per kind in Paramètres (the browser's
+permission asked the first time one is turned on), sent only when the
+cockpit's tab is not in front: a run's end with its `Next:` in French, a
+permission card, an entry reaching « À répondre » during a run (after a
+hand-back, or when the Arbitre starts waiting on her), an error, the idle
+ceiling, a lot of /8_code that passes or fails. A click brings the tab to
+the screen concerned. The tab's title carries the count of what waits:
+« (2) Cockpit ».

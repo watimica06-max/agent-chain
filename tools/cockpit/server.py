@@ -17,6 +17,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import blocking   # noqa: E402
+import codelots   # noqa: E402
 import context as context_mod  # noqa: E402
 import decide as decide_mod  # noqa: E402
 import diagnostic  # noqa: E402
@@ -24,6 +25,7 @@ import gitref     # noqa: E402
 import questions  # noqa: E402
 import runner as runner_mod  # noqa: E402
 import scan as scan_mod  # noqa: E402
+import startup  # noqa: E402
 import stats as stats_mod  # noqa: E402
 import statsview  # noqa: E402
 import textfile   # noqa: E402
@@ -33,6 +35,12 @@ from state import State  # noqa: E402
 HOST = "127.0.0.1"
 STATE_KEY = web.AppKey("state", State)
 DEFAULT_PORT = 8765
+VERSION = "1.5"
+# « Arrêter le cockpit » with a run going: how long the run is given to end
+# once it was told to stop now, before the server goes all the same.
+STOP_GRACE = 30.0
+# What opens the browser; the tests put a fake here.
+OPEN_BROWSER = webbrowser.open
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
 # `.claude/CLAUDE.md`'s table: upstream cycle, downstream cycle, bug-fix entry,
 # merge, and what is run by hand outside the chain. A command not listed is a tool.
@@ -385,7 +393,7 @@ def default_export_folder():
 
 
 def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
-             diag_runner=None, export_picker=ask_export_folder):
+             diag_runner=None, export_picker=ask_export_folder, on_quit=None):
     store = rn.stats
     diag_runner = diag_runner or DIAG_RUNNER
     # The diagnostic run in the background (1.4.5): once, at the opening,
@@ -653,7 +661,69 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     async def stats_get(request):
         feature, period = stats_args(request)
-        return web.json_response(stats_data(feature, period))
+        data = stats_data(feature, period)
+        # « Par lot »: its attempts are the verdict's (code_rules.md, T-ESSAIS),
+        # read from the files — the store does not hold them.
+        if feature and data.get("by_lot"):
+            a, _ = need_pair()
+            for row in data["by_lot"]:
+                W = scan_mod.Folder(codelots.work_path(a, feature, row["folder"]))
+                v = scan_mod.lot_verdict(W, row["lot"]) if W.has("code", row["lot"]) else None
+                row["attempts"] = v["attempts"] if v else (0 if W.has("code", row["lot"]) else None)
+                row["status"] = (v["status"] or None) if v else None
+        return web.json_response(data)
+
+    # ------------------------------------------------------ the Code tab (1.5)
+    def code_args(request):
+        a, w = need_pair()
+        feature = feature_of(w)
+        folder = (request.query.get("folder") or "").strip("/")
+        if folder and folder not in bugfixes(a, feature):
+            raise web.HTTPBadRequest(text=json.dumps({"error": "dossier de correction inconnu"}),
+                                     content_type="application/json")
+        return a, feature, folder
+
+    def code_payload(a, feature, folder):
+        run = rn.current(a)
+        snap = run.snapshot() if run and run.id else None
+        wts = rn.live_worktrees(a)
+        _, _, bs, _, _, _ = collect_forms(a, feature, rn)
+        opens = [{"id": b.id, "rel": b.rel, "lot": b.lot} for b in bs]
+        passes = codelots.store_passes(store.path if store else None, feature) + live_passes(snap, feature)
+        out = codelots.read_lots(a, feature, folder, wts, passes, snap, opens)
+        bf = bugfixes(a, feature)
+        out["acts_on"] = bf[-1] if bf else ""
+        out["run"] = ({"command": snap["command"], "started_at": snap["started_at"], "status": snap["status"],
+                       "prompt": snap["prompt"]} if snap else None)
+        out["stop_file"] = os.path.exists(rn.stop_file(a, feature))
+        return out
+
+    async def code_get(request):
+        a, feature, folder = code_args(request)
+        loop = asyncio.get_running_loop()
+        return web.json_response(await loop.run_in_executor(None, code_payload, a, feature, folder))
+
+    def live_passes(snap, feature):
+        """The passes of the run going that have handed back: stored only when
+        the run ends, read from the runner meanwhile. Their written tokens are
+        known at the end of the run alone."""
+        if not snap or snap.get("status") == "ended" or (snap.get("work") or "").split("/")[0] != feature:
+            return []
+        return [{**p, "parent_tool_use_id": p.get("parent"), "run_id": snap["id"], "live": True,
+                 "run_command": snap["prompt"], "output_tokens": None} for p in snap.get("passes") or []]
+
+    async def code_lot(request):
+        a, feature, folder = code_args(request)
+        lot = request.query.get("lot", "")
+        run = rn.current(a)
+        snap = run.snapshot() if run and run.id else None
+        passes = codelots.store_passes(store.path if store else None, feature) + live_passes(snap, feature)
+        loop = asyncio.get_running_loop()
+        out = await loop.run_in_executor(None, codelots.lot_detail, a, feature, folder, lot,
+                                         rn.live_worktrees(a), passes)
+        if out is None:
+            return web.json_response({"error": f"{lot} n'est pas dans la séquence de ce dossier"}, status=404)
+        return web.json_response(out)
 
     async def stats_csv(request):
         feature, period = stats_args(request)
@@ -737,11 +807,17 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                                            "Cache-Control": "no-cache",
                                            "X-Accel-Buffering": "no"})
         await resp.prepare(request)
+        # 1.5 — a page opening during a run is given its stream so far,
+        # rebuilt from the run's log, then everything after. Subscribing and
+        # reading the log happen with no await between: what the log holds
+        # has been emitted, what comes next is in the queue.
+        # Replayed events carry `replay`, the first of them how many older
+        # ones were left out; the page starts afresh on each connection.
         q = rn.subscribe(a)
+        evs, dropped = rn.replay(a)
         try:
-            current = rn.current(a)
-            for ev in list(current.events if current else [])[-1500:]:
-                await resp.write(_sse(ev))
+            for i, ev in enumerate(evs):
+                await resp.write(_sse({**ev, "replay": True, **({"dropped": dropped} if i == 0 and dropped else {})}))
             while True:
                 try:
                     ev = await asyncio.wait_for(q.get(), timeout=15)
@@ -754,8 +830,37 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             rn.unsubscribe(a, q)
         return resp
 
+    async def ping(request):
+        """What a second start asks before starting a server of its own."""
+        return web.json_response({"cockpit": True, "version": VERSION, "pid": os.getpid()})
+
+    async def shutdown(request):
+        """Paramètres → « Arrêter le cockpit ». With a run going, it asks
+        first; confirmed, the run is stopped now, given STOP_GRACE seconds to
+        end and record its relay, and the server stops."""
+        data = await body(request)
+        going = [x for x in rn.runs.values() if x.id and x.status != "ended"]
+        if going and not data.get("confirm"):
+            return web.json_response({"running": True, "prompt": going[0].prompt}, status=409)
+        stopped = []
+        for x in going:
+            try:
+                await rn.stop_now(x.repo)
+            except runner_mod.NotRunning:
+                continue
+            ended = await rn.wait_ended(x.repo, STOP_GRACE)
+            stopped.append({"prompt": x.prompt, "ended": ended})
+        print("Arrêt du cockpit demandé depuis la page"
+              + (f" ; run arrêté : {', '.join(x['prompt'] for x in stopped)}" if stopped else "") + ".",
+              flush=True)
+        if on_quit:
+            asyncio.get_running_loop().call_later(0.3, on_quit)
+        return web.json_response({"ok": True, "stopped": stopped})
+
     r = app.router
     r.add_get("/", index)
+    r.add_get("/api/ping", ping)
+    r.add_post("/api/shutdown", shutdown)
     r.add_get("/api/state", get_state)
     r.add_post("/api/check", check)
     r.add_post("/api/bugfix/new", bugfix_new)
@@ -779,6 +884,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/permission", permission)
     r.add_get("/api/events", events)
     r.add_get("/api/stats", stats_get)
+    r.add_get("/api/code", code_get)
+    r.add_get("/api/code/lot", code_lot)
     r.add_get("/api/stats/csv", stats_csv)
     r.add_post("/api/stats/export", stats_export)
     app.on_startup.append(opening)
@@ -823,6 +930,8 @@ def backfill(store, state, log_dir):
     # The runs already stored: their agents' output, from their logs'
     # model_usage (1.4.3).
     done["outputs"] = store.backfill_outputs()
+    # The lot of each pass already stored, once (1.5).
+    done["lots"] = store.backfill_lots()
     return done
 
 
@@ -830,36 +939,94 @@ def _sse(ev):
     return f"data: {json.dumps(ev, ensure_ascii=False)}\n\n".encode("utf-8")
 
 
+async def serve(app, port, url, ouvrir, quit_box):
+    """Serve until « Arrêter le cockpit » (or Ctrl+C in a console)."""
+    quit_box["event"] = asyncio.Event()
+    runner = web.AppRunner(app, shutdown_timeout=2)
+    await runner.setup()
+    site = web.TCPSite(runner, HOST, port)
+    try:
+        await site.start()
+    except OSError:
+        await runner.cleanup()
+        raise
+    print(f"Cockpit : {url}", flush=True)
+    if ouvrir:
+        asyncio.get_running_loop().call_later(0.3, OPEN_BROWSER, url)
+    try:
+        await quit_box["event"].wait()
+    finally:
+        print("Le cockpit s'arrête.", flush=True)
+        await runner.cleanup()
+
+
 def main(argv=None):
+    """`pythonw server.py --ouvrir`, from lancer.bat. When a cockpit already
+    answers on the port, only the browser opens on it. Returns the exit code."""
     p = argparse.ArgumentParser(description="Cockpit de la chaîne")
     p.add_argument("--port", type=int, default=DEFAULT_PORT)
     p.add_argument("--ouvrir", action="store_true", help="ouvrir le navigateur")
     p.add_argument("--config", default=None)
+    p.add_argument("--stats", default=None, help="la base de consommation (stats.sqlite par défaut)")
+    p.add_argument("--journaux", default=None, help="le dossier des journaux (logs/ par défaut)")
     args = p.parse_args(argv)
+    url = f"http://{HOST}:{args.port}/"
+    log_dir = args.journaux or runner_mod.LOG_DIR
+
+    startup.open_log(os.path.join(log_dir, startup.LOG_NAME))
+    if startup.windowless():
+        startup.hide_child_consoles()
+    print(f"--- {datetime.now().isoformat(timespec='seconds')} · démarrage, pid {os.getpid()}, "
+          + ("sans console" if startup.windowless() else "dans une console"), flush=True)
+
+    other = startup.ping(args.port)
+    if other:
+        print(f"Un cockpit répond déjà sur {url} (pid {other.get('pid')}) : la page s'ouvre sur lui, "
+              "aucun second serveur.", flush=True)
+        if args.ouvrir:
+            OPEN_BROWSER(url)
+        return 0
 
     state = State(args.config) if args.config else State()
-
-    store = stats_mod.Store()
-    rn = runner_mod.Runner(on_end=make_on_end(state), mode_getter=lambda: state.mode, stats=store)
-    done = backfill(store, state, rn.log_dir)
+    store = stats_mod.Store(args.stats) if args.stats else stats_mod.Store()
+    rn = runner_mod.Runner(on_end=make_on_end(state), mode_getter=lambda: state.mode, stats=store,
+                           log_dir=log_dir)
+    done = backfill(store, state, log_dir)
     if done["runs"]:
         print(f"Consommation : {done['runs']} journal(aux) ancien(s) chargé(s) dans stats.sqlite "
               f"({done['passes']} passage(s) d'agent, {done['limits']} mesure(s) d'usage).", flush=True)
     if done["outputs"]["runs"]:
         print(f"Consommation : tokens écrits retrouvés pour {done['outputs']['runs']} run(s) "
               f"({done['outputs']['passes']} passage(s) d'agent), d'après le model_usage des journaux.", flush=True)
-    app = make_app(state, rn)
-    url = f"http://{HOST}:{args.port}/"
+    if not done["lots"]["done"]:
+        print(f"Consommation : le lot de chaque passage relu dans {done['lots']['runs']} journal(aux) "
+              f"({done['lots']['passes']} passage(s) portent un lot).", flush=True)
+    quit_box = {"event": None}
 
-    async def opened(_app):
-        print(f"Cockpit : {url}  (Ctrl+C pour arrêter)", flush=True)
-        if args.ouvrir:
-            # on_startup runs just before the socket is bound.
-            asyncio.get_running_loop().call_later(1.0, webbrowser.open, url)
+    def on_quit():
+        if quit_box["event"] is not None:
+            quit_box["event"].set()
 
-    app.on_startup.append(opened)
-    web.run_app(app, host=HOST, port=args.port, print=None)
+    app = make_app(state, rn, on_quit=on_quit)
+    try:
+        asyncio.run(serve(app, args.port, url, args.ouvrir, quit_box))
+    except KeyboardInterrupt:
+        return 0
+    except OSError as e:
+        # Taken between the ping and the bind: by a cockpit started at the
+        # same moment, or by another program.
+        if startup.ping(args.port):
+            print(f"Un cockpit a démarré sur {url} au même moment : la page s'ouvre sur lui.", flush=True)
+            if args.ouvrir:
+                OPEN_BROWSER(url)
+            return 0
+        msg = (f"Le port {args.port} est pris par un autre programme : le cockpit ne peut pas démarrer.\n"
+               f"({e})")
+        print(msg, flush=True)
+        startup.error_box(msg)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -17,6 +17,21 @@ GRADLE_TIMEOUT = 120      # the first call may download Gradle
 JAVA_HINT = ("Java ne se lance pas alors que Gradle est présent : JAVA_HOME doit être défini dans "
              "les variables d'environnement de Windows, en général sur "
              "C:\\Program Files\\Android\\Android Studio\\jbr. Redémarrez ensuite le cockpit.")
+JAVA_HOME_EMPTY = ("JAVA_HOME pointe vers {path}, où il n'y a pas de java : Gradle n'y trouve pas de Java. "
+                   "Corrigez JAVA_HOME dans les variables d'environnement de Windows, en général sur "
+                   "C:\\Program Files\\Android\\Android Studio\\jbr. Redémarrez ensuite le cockpit.")
+
+
+def java_of(env=None):
+    """The Java the builds use (1.5): Gradle runs `%JAVA_HOME%\\bin\\java`
+    when JAVA_HOME is set, the `java` of the PATH otherwise.
+    (argv, where, java_home, java_home_points_to_nothing)."""
+    env = os.environ if env is None else env
+    home = (env.get("JAVA_HOME") or "").strip().strip('"')
+    if not home:
+        return ["java", "-version"], "PATH", None, False
+    exe = os.path.join(home, "bin", "java.exe" if os.name == "nt" else "java")
+    return [exe, "-version"], "JAVA_HOME", home, not os.path.isfile(exe)
 
 
 def system_exec(argv, cwd, timeout):
@@ -38,12 +53,13 @@ def gradle_wrapper(app):
     return None
 
 
-def plan(app):
+def plan(app, env=None):
     """The checks for this folder: (id, label, argv or None, timeout)."""
     wrapper = gradle_wrapper(app)
     has_pubspec = os.path.isfile(os.path.join(app, "pubspec.yaml"))
+    java, where, _, _ = java_of(env)
     return [
-        ("java", "Java", ["java", "-version"], DEFAULT_TIMEOUT),
+        ("java", f"Java ({where})", java, DEFAULT_TIMEOUT),
         ("gradle", "Gradle", [wrapper, "--version"] if wrapper else None, GRADLE_TIMEOUT),
         ("flutter", "Flutter", ["flutter", "--version"] if has_pubspec else None, DEFAULT_TIMEOUT),
         ("adb", "adb", ["adb", "version"], DEFAULT_TIMEOUT),
@@ -61,9 +77,10 @@ def first_line(text):
     return ""
 
 
-def run_diagnostic(app, exec_fn=system_exec, now=None):
+def run_diagnostic(app, exec_fn=system_exec, now=None, env=None):
     results = []
-    for cid, label, argv, timeout in plan(app):
+    _, where, home, nothing = java_of(env)
+    for cid, label, argv, timeout in plan(app, env):
         if argv is None:
             results.append({"id": cid, "label": label, "status": "skip", "detail": "non concerné"})
             continue
@@ -84,9 +101,16 @@ def run_diagnostic(app, exec_fn=system_exec, now=None):
                 results.append({"id": cid, "label": label, "status": "fail",
                                 "detail": f"code {code}" + (f" — {line}" if line else "")})
     by = {r["id"]: r for r in results}
+    if where == "JAVA_HOME":
+        by["java"]["detail"] += f" — JAVA_HOME : {home}"
     hints = []
+    # The JAVA_HOME hint only when JAVA_HOME is not set, or points to nothing:
+    # set and pointing to a Java that fails, setting it is not the answer.
     if by["java"]["status"] == "fail" and by["gradle"]["status"] != "skip":
-        hints.append(JAVA_HINT)
+        if where == "PATH":
+            hints.append(JAVA_HINT)
+        elif nothing:
+            hints.append(JAVA_HOME_EMPTY.format(path=home))
     return {"at": (now or datetime.now()).isoformat(timespec="seconds"), "app": app,
             "results": results, "hints": hints,
             "ok": all(r["status"] != "fail" for r in results)}

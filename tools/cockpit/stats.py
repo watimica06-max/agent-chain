@@ -46,6 +46,43 @@ def _seconds(a, b):
     return round((tb - ta).total_seconds(), 3) if ta and tb else None
 
 
+# Which lot an agent pass works on (1.5) — from what /8_code puts in the
+# Agent tool's input, never from timing (code_rules.md, « Le lot d'un
+# passage »): the prompt's `Your lot:` line, else the description's lot
+# (`Declare <lot>`, `Code <lot>`…, the Arbitre's `Settle <lot>`), else the
+# lot folder of the Arbitre's `Blocking file:`. The Détailleur names a
+# block; the Architecte of move 7 neither.
+LOT_LINE = re.compile(r"\bYour lot:\s*(lot-[A-Za-z0-9]+)")
+LOT_DESC = re.compile(r"^(?:Declare|Test|Code|Review|Settle)\s+(lot-[A-Za-z0-9]+)\b")
+LOT_FILE = re.compile(r"\bBlocking file:\s*code/(lot-[A-Za-z0-9]+)/")
+BLOCK_LINE = re.compile(r"\bYour block:\s*(block-[A-Za-z0-9]+)")
+BLOCK_DESC = re.compile(r"^(?:Detail|Propagate|Settle)\s+(block-[A-Za-z0-9]+)\b")
+FOLDER_LINE = re.compile(r"\bWorking folder:\s*(\S+)")
+BUGFIX_PART = re.compile(r"^bugfix-\d+$")
+
+
+def lot_of_input(inp):
+    """{"lot", "block", "folder"} of one Agent tool input; None where the
+    input does not say. `folder` is the working folder's `bugfix-NN`, or ""
+    for the feature folder itself."""
+    inp = inp if isinstance(inp, dict) else {}
+    prompt, desc = str(inp.get("prompt") or ""), str(inp.get("description") or "").strip()
+    lot = None
+    for rx, text in ((LOT_LINE, prompt), (LOT_DESC, desc), (LOT_FILE, prompt)):
+        m = rx.search(text)
+        if m:
+            lot = m.group(1)
+            break
+    m = BLOCK_LINE.search(prompt) or BLOCK_DESC.search(desc)
+    block = m.group(1) if m else None
+    folder = None
+    m = FOLDER_LINE.search(prompt)
+    if m:
+        parts = [x for x in re.split(r"[\\/]+", m.group(1).rstrip(".,;")) if x]
+        folder = parts[-1] if parts and BUGFIX_PART.match(parts[-1]) else ""
+    return {"lot": lot, "block": block, "folder": folder}
+
+
 @dataclass
 class Pass:
     tool_use_id: str
@@ -62,6 +99,9 @@ class Pass:
     background: bool = False
     ended: bool = False
     output_tokens: int | None = None    # its model's, when it alone used it (apply_model_usage)
+    lot: str | None = None              # 1.5 — from its own input, else its caller's
+    block: str | None = None
+    folder: str | None = None
 
     @property
     def duration_s(self):
@@ -75,7 +115,9 @@ class Pass:
                 # Never the stream's placeholder: its model's figure, or
                 # unknown (TECHNICAL_V1 §13.1).
                 "output_tokens": self.output_tokens, "tool_calls": self.tool_calls,
-                "started_at": self.started_at, "ended_at": self.ended_at}
+                "started_at": self.started_at, "ended_at": self.ended_at,
+                "lot": self.lot, "block": self.block, "folder": self.folder,
+                "tool_use_id": self.tool_use_id, "parent": self.parent}
 
 
 @dataclass
@@ -155,10 +197,18 @@ class Tally:
                 self.orchestrator["tool_calls"] += 1
             if block["name"] in AGENT_TOOLS:
                 inp = block.get("input") or {}
+                where = lot_of_input(inp)
+                if p is not None:
+                    # A nested agent — the Arbitre a Réalisateur calls, the
+                    # Architecte the Arbitre calls — works for its caller:
+                    # what its own input leaves out, its caller's says.
+                    for k in ("lot", "block", "folder"):
+                        if where[k] is None:
+                            where[k] = getattr(p, k)
                 self.passes[block["id"]] = Pass(
                     tool_use_id=block["id"], parent=parent,
                     agent=inp.get("subagent_type") or "agent",
-                    description=inp.get("description") or "", started_at=at)
+                    description=inp.get("description") or "", started_at=at, **where)
 
     def _user(self, body, at):
         out = []
@@ -337,22 +387,34 @@ CREATE TABLE IF NOT EXISTS agent_passes (
   tool_use_id TEXT, parent_tool_use_id TEXT, agent TEXT, description TEXT, model TEXT,
   started_at TEXT, ended_at TEXT, duration_s REAL,
   input_tokens INTEGER, cache_read_tokens INTEGER, cache_creation_tokens INTEGER,
-  output_tokens INTEGER, tool_calls INTEGER, backfilled INTEGER NOT NULL DEFAULT 0);
+  output_tokens INTEGER, tool_calls INTEGER, backfilled INTEGER NOT NULL DEFAULT 0,
+  lot TEXT, block TEXT, folder TEXT);
 CREATE TABLE IF NOT EXISTS rate_limits (
   id INTEGER PRIMARY KEY AUTOINCREMENT, run_id TEXT, measured_at TEXT, source TEXT,
   window TEXT, utilization REAL, resets_at INTEGER, status TEXT,
   backfilled INTEGER NOT NULL DEFAULT 0);
 CREATE INDEX IF NOT EXISTS agent_passes_run ON agent_passes(run_id);
 CREATE INDEX IF NOT EXISTS rate_limits_window ON rate_limits(window, measured_at);
+CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 """
+# 1.5: the columns a 1.4 store lacks, added in place.
+NEW_PASS_COLUMNS = ("lot", "block", "folder")
 
 
 class Store:
     def __init__(self, path: str = DEFAULT_PATH):
         self.path = path
         self._lock = threading.Lock()
-        with self._db() as db:
-            db.executescript(SCHEMA)
+        db = self._db()
+        try:
+            with db:
+                db.executescript(SCHEMA)
+                have = {r["name"] for r in db.execute("PRAGMA table_info(agent_passes)")}
+                for c in NEW_PASS_COLUMNS:
+                    if c not in have:
+                        db.execute(f"ALTER TABLE agent_passes ADD COLUMN {c} TEXT")
+        finally:
+            db.close()
 
     def _db(self):
         db = sqlite3.connect(self.path, timeout=10)
@@ -407,11 +469,11 @@ class Store:
                 db.execute("INSERT INTO agent_passes (run_id, tool_use_id, parent_tool_use_id, agent,"
                            " description, model, started_at, ended_at, duration_s, input_tokens,"
                            " cache_read_tokens, cache_creation_tokens, output_tokens, tool_calls,"
-                           " backfilled) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                           " backfilled, lot, block, folder) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                            (run_id, p.tool_use_id, p.parent, p.agent, p.description, p.model,
                             p.started_at, p.ended_at, p.duration_s, p.input_tokens,
                             p.cache_read_tokens, p.cache_creation_tokens, p.output_tokens, p.tool_calls,
-                            int(backfilled)))
+                            int(backfilled), p.lot, p.block, p.folder))
             return totals_summary(totals, dur)
         return self._exec(go)
 
@@ -551,6 +613,32 @@ class Store:
         for x in limits:
             self.record_limit(run_id, x, backfilled=True)
         return {"passes": len(tally.passes), "limits": len(limits)}
+
+    def backfill_lots(self):
+        """1.5 — the lot of every pass already stored, read again from its
+        run's log the way a live run reads it (lot_of_input). Once: a mark in
+        `meta` says it was done. A log gone leaves its passes' lot unknown."""
+        if self._exec(lambda db: db.execute("SELECT value FROM meta WHERE key='lots_read'").fetchone()):
+            return {"runs": 0, "passes": 0, "missing": 0, "done": True}
+        runs = self._exec(lambda db: [dict(r) for r in db.execute(
+            "SELECT id, log_path FROM runs WHERE log_path IS NOT NULL")])
+        done = {"runs": 0, "passes": 0, "missing": 0, "done": False}
+        for r in runs:
+            read = self._read_log(r["log_path"]) if os.path.isfile(r["log_path"]) else None
+            if read is None:
+                done["missing"] += 1
+                continue
+            rows = [(p.lot, p.block, p.folder, r["id"], tid) for tid, p in read[0].passes.items()]
+
+            def go(db, rows=rows):
+                for x in rows:
+                    db.execute("UPDATE agent_passes SET lot=?, block=?, folder=?"
+                               " WHERE run_id=? AND tool_use_id=?", x)
+            self._exec(go)
+            done["runs"] += 1
+            done["passes"] += sum(1 for x in rows if x[0])
+        self._exec(lambda db: db.execute("INSERT OR REPLACE INTO meta (key, value) VALUES ('lots_read', '1')"))
+        return done
 
     def backfill_outputs(self):
         """The agents' output of the runs already stored, from their logs:

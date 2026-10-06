@@ -194,7 +194,7 @@ def _pass_view(p, run):
     out = {k: p.get(k) for k in ("id", "run_id", "tool_use_id", "parent_tool_use_id", "agent", "description",
                                  "model", "started_at", "ended_at", "duration_s", "input_tokens",
                                  "cache_read_tokens", "cache_creation_tokens", "output_tokens", "tool_calls",
-                                 "backfilled")}
+                                 "backfilled", "lot", "block", "folder")}
     out["read_tokens"] = _read(p)
     out["run_command"] = run["command"] if run else None
     out["run_cmd"] = run["cmd"] if run else None
@@ -243,6 +243,23 @@ def build(path, feature=None, period="tout", now=None):
                          "median_s": _median([p["duration_s"] for p in g]), "duration_s": dur,
                          "duration_unknown": dur_u, "read_tokens": read, "read_unknown": read_u,
                          "output_tokens": wrote, "output_unknown": wrote_u, "tool_calls": calls})
+    # 1.5 — « Par lot », one feature filtered: the passes the store gives a
+    # lot (code_rules.md §7), by working folder and lot. A lot's time is its
+    # top-level passes' — a nested one runs inside its caller's.
+    by_lot = []
+    if feature is not None:
+        for (folder, lot), g in _by([p for p in passes if p.get("lot")],
+                                    lambda p: (p.get("folder") or "", p["lot"])).items():
+            top = [p for p in g if not p["parent_tool_use_id"]]
+            dur, dur_u = _sum([p["duration_s"] for p in top])
+            read, read_u = _sum([p["read_tokens"] for p in g])
+            wrote, wrote_u = _sum([p["output_tokens"] for p in g])
+            by_lot.append({"folder": folder, "lot": lot, "passes": len(g),
+                           "agents": sorted({p["agent"] for p in g if p["agent"]}),
+                           "codings": sum(1 for p in g if p["agent"] == "realisateur"),
+                           "duration_s": dur, "duration_unknown": dur_u, "read_tokens": read,
+                           "read_unknown": read_u, "output_tokens": wrote, "output_unknown": wrote_u})
+    by_lot_unknown = sum(1 for p in passes if not p.get("lot")) if feature is not None else 0
     by_feature = []
     if feature is None:
         for feat, g in _by(runs, lambda r: r["feature"] or "(inconnue)").items():
@@ -273,6 +290,8 @@ def build(path, feature=None, period="tout", now=None):
         "by_command": sorted(by_command, key=lambda x: x["cmd"]),
         "by_agent": sorted(by_agent, key=lambda x: x["agent"] or ""),
         "by_feature": sorted(by_feature, key=lambda x: x["feature"]),
+        "by_lot": sorted(by_lot, key=lambda x: (x["folder"], x["lot"])),
+        "by_lot_unknown": by_lot_unknown,
         "costly_runs": [r["id"] for r in costly_runs],
         "costly_passes": [{"run_id": p["run_id"], "id": p["id"]} for p in costly_passes],
         "runs": runs,

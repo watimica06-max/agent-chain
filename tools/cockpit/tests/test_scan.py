@@ -368,6 +368,78 @@ def test_each_cited_line_still_says_what_the_rule_reads():
             assert anchor in "\n".join(lines[a - 1:b]), (rid, part, anchor)
 
 
+# 1.5 — code_rules.md and codelots.RULES: the same check, the same way.
+CODE_RULES_MD = os.path.join(COCKPIT, "code_rules.md")
+CODE_ANCHORS = {
+    "L-ORDRE": ["the order, the blocks", "## Blocks"],
+    "L-TITRE": ["Anchor:"],
+    "E-PASSE": ["starts with `PASS`", "PASS with reservation"],
+    "E-ECHOUE": ["On FAIL"],
+    "E-TROIS": ["reaching 3 stops the lot"],
+    "E-ANNULE": ["reverted the", "reverts the"],
+    "E-BLOQUE": ["blocked_*.md", "three places"],
+    "E-REDEC": ["back\nto the split", "with no PASS"],
+    "E-ENTAME": ["No `code/<lot>/fiche-executable.md`", "skipped when"],
+    "E-AFAIRE": ["No `code/<lot>/fiche-executable.md`"],
+    "E-ENCOURS": ["Name the lot", "The next lot is the first"],
+    "T-ESSAIS": ["reaching 3", "read it as 1", "empty first\nattempt", "plus\none"],
+    "P-ORDRE": ["`detailleur`", "`concepteur`", "`relecteur`"],
+    "P-ECRIT": ["fiche-executable.md", "code/<lot>/verdict.md", "conception.md", "compte-rendu.md"],
+    "P-ARBITRE": ["call it themselves", "Settle <lot>", "Settle <block>"],
+    "P-ARCHITECTE": ["invocation 3", "Called by the Arbitre"],
+    "P-DEMANDES": ["architecte/concepteur-<lot>.md", "architecte/realisateur-<lot>.md",
+                   "architecte/detailleur-<lot>.md", "first lot of the block", "arbitre-<lot>-blocking-N.md"],
+    "B-OU": ["three places", "## Blocking N — lot-NN"],
+    "C-GREP": ["<lot>: <what the commit carries>", "most recent revert"],
+    "C-DOSSIER": ["code/<lot>/conception.md", "your report", "Write the report"],
+    "W-LIVE": ["git worktree add .claude/worktrees/<name> HEAD", "One worktree for the whole run",
+               "she opens the worktree"],
+    "A-LOT": ["Name the lot", "Your lot: <lot>", "Your lot: <lot>", "Your lot: <lot>", "Your lot: <lot>",
+              "Your lot: <lot>"],
+    "A-DESC": ['"Declare <lot>"', '"Test <lot>"', '"Code <lot>"', '"Review <lot>"', "Settle <lot>"],
+    "A-BLOC": ["Your block: <block>", "Your block: <block>", "Settle <block>"],
+    "A-DOSSIER": ["Pass the working folder"],
+    "A-AUCUN": ["Invocation 3 — Requests"],
+    "A-IMBRIQUE": ['subagent_type="arbitre"', 'subagent_type="architecte"'],
+}
+
+
+def _cite_parts(cite):
+    return [p for p in cite.split(" · ") if re.match(r"^(?:agents/)?\w+\.md:\d", p)]
+
+
+def test_every_code_rule_is_in_code_rules_md_and_cites_what_the_code_cites():
+    import codelots
+    md = open(CODE_RULES_MD, encoding="utf-8").read()
+    in_md = set(re.findall(r"`([A-Z]-[A-Z]+)`", md))
+    assert set(codelots.RULES) <= in_md
+    src = open(os.path.join(COCKPIT, "codelots.py"), encoding="utf-8").read()
+    used = set(re.findall(r'"([A-Z]-[A-Z]+)"', src))
+    assert used <= set(codelots.RULES) | {"L-ORDRE"}, used - set(codelots.RULES)
+    for rid, cite in codelots.RULES.items():
+        for part in _cite_parts(cite):
+            assert part in md, (rid, part)
+
+
+def test_each_code_rule_cited_line_still_says_what_the_rule_reads():
+    import codelots
+    base = os.path.join(REPO, ".claude")
+    for rid, cite in codelots.RULES.items():
+        parts = _cite_parts(cite)
+        if not parts:
+            continue
+        anchors = CODE_ANCHORS[rid]
+        assert len(anchors) == len(parts), rid
+        for part, anchor in zip(parts, anchors):
+            m = re.match(r"^((?:agents/)?\w+\.md):(\d+)(?:-(\d+))?", part)
+            f, a, b = m.group(1), int(m.group(2)), int(m.group(3) or m.group(2))
+            path = os.path.join(base, f if f.startswith("agents/") else os.path.join("commands", f))
+            with open(path, encoding="utf-8") as fh:
+                lines = fh.read().splitlines()
+            assert b <= len(lines), (rid, part)
+            assert anchor in "\n".join(lines[a - 1:b]), (rid, part, anchor)
+
+
 def test_confirmations_match_the_flagged_commands_of_scan_rules_md():
     md = open(RULES_MD, encoding="utf-8").read()
     flagged = set(re.findall(r"^\| `/(\w+)` \| ⚠️", md, re.M))

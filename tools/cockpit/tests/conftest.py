@@ -34,6 +34,13 @@ def _logs_in_tmp(tmp_path_factory, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _no_java_home(monkeypatch):
+    """1.5: the diagnostic checks the Java of JAVA_HOME when it is set. A
+    test sets it itself, never this machine's."""
+    monkeypatch.delenv("JAVA_HOME", raising=False)
+
+
+@pytest.fixture(autouse=True)
 def _no_real_diagnostic(monkeypatch):
     """1.4.5: the cockpit runs the diagnostic on its own when none is stored.
     In a test it is always a fake, all ✓, unless the test passes its own."""

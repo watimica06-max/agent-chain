@@ -13,11 +13,17 @@ Une fois, avec Python 3.12 :
 
 ## Lancer
 
-Double-cliquer sur **`lancer.bat`**. Le serveur démarre et le navigateur
-s'ouvre sur `http://127.0.0.1:8765/`. Pour l'arrêter : fermer la fenêtre
-noire, ou `Ctrl+C` dedans.
+Double-cliquer sur **`lancer.bat`** (ou son raccourci sur le bureau). Le
+serveur démarre sans fenêtre et le navigateur s'ouvre sur
+`http://127.0.0.1:8765/` ; s'il tourne déjà, seul le navigateur s'ouvre.
+Ce qu'il écrivait dans la fenêtre noire va dans `logs/server.log`.
 
-Sans le `.bat` : `python server.py --ouvrir`.
+- **Fermer la page** (l'onglet ou le navigateur) n'arrête rien : un run continue.
+- **La rouvrir** (le raccourci, ou l'adresse) la remet où en sont les choses : le run, son flux depuis le début, l'agent qui travaille, une autorisation qui attend.
+- **Arrêter le cockpit** : Paramètres → « Arrêter le cockpit » ; si un run tourne, il demande d'abord, et le run est arrêté.
+
+Dans une console, pour voir ce qu'il écrit : `python server.py --ouvrir`
+(`Ctrl+C` l'arrête).
 
 ## Au démarrage
 
@@ -62,11 +68,36 @@ montre le run dessous : l'agent, le texte, « Arrêter », « Continuer la
 session ». L'étape de test porte « Déployer » (`/deploie`) et ce qu'il
 faut tester, d'après `code/recette-ordonnee.md`.
 
+**Chaîne → Code** — `/8_code` lot par lot : les lots passés sur le total,
+en barre ; pendant un run, le lot en cours et l'agent qui y travaille, le
+temps depuis le début et, dès que deux lots sont passés, ce qui reste
+« ≈ 40 min » ; « Lancer /8_code », « Arrêter au prochain lot »,
+« Arrêter maintenant ». Puis chaque lot, dans l'ordre de la séquence, par
+bloc : son titre (l'`Anchor` de `code/decoupage.md`), son état — pas
+commencé · entamé · en cours · passé · échoué · échoué 3 fois · annulé ·
+bloqué · redécoupé · inconnu —, ses essais sur 3, les agents qui y ont
+travaillé (temps, tokens lus, écrits), une marque quand l'Arbitre ou
+l'Architecte est intervenu, et « À répondre » filtré sur lui quand un
+blocage l'attend. Un clic ouvre le lot : sa fiche exécutable, son verdict
+et les constats du Relecteur, ses commits et les fichiers qu'ils
+changent, ses passages d'agent sur une ligne de temps. Chaque règle est
+écrite dans `code_rules.md`. Pendant un run, les fichiers sont lus dans
+son worktree, et relus quand un agent rend la main.
+
 **Correction** — les `bugfix-NN/` de la feature, le plus récent d'abord,
-chacun en chaîne de correction. Seul le plus haut se lance : les
+chacun en chaîne de correction, avec les mêmes onglets « Amont » et
+« Code ». Seul le plus haut se lance : les
 commandes agissent sur lui. « Nouvelle correction » crée le `bugfix-NN/`
 suivant et son `bug-list.md` vide, rien d'autre, et l'ouvre pour l'écrire
 ici, tant que le diagnostic ne l'a pas lu.
+
+**Notifications** — Paramètres → Notifications : une case par événement
+(fin d'un run avec sa ligne `Next:` en clair, autorisation qui attend,
+question ou blocage qui arrive pendant un run, erreur, plafond d'attente,
+lot de `/8_code` qui passe ou échoue). Le navigateur demande l'autorisation
+la première fois qu'une case est cochée. Elles ne viennent que quand
+l'onglet du cockpit n'est pas devant ; un clic ramène l'onglet sur l'écran
+concerné. Le titre de l'onglet compte ce qui vous attend : « (2) Cockpit ».
 
 **Usage de l'abonnement** — sur le tableau de bord, deux jauges : la
 fenêtre de 5 heures et la semaine. Pour chacune : le pourcentage utilisé,
@@ -83,7 +114,8 @@ souvient. En bref ; l'usage des deux fenêtres dans le temps, les runs
 marqués sous l'axe ; par commande, par agent, par fonctionnalité ; les
 dix runs et les dix passages d'agent les plus coûteux, « inhabituel »
 au-delà de deux fois la médiane des leurs ; l'historique des runs, un clic
-ouvrant ses passages d'agent et le chemin de son journal. Les tableaux se
+ouvrant ses passages d'agent et le chemin de son journal ; une feature
+choisie, « Par lot » : passages, temps, tokens et essais de chaque lot. Les tableaux se
 trient sur chaque colonne. « ≈ 4 % de la fenêtre 5 h » : l'écart entre
 la mesure du début du run et celle de sa fin — les limites comptent tout
 ce que le compte a utilisé entre-temps, et se lisent au pour cent. Un
@@ -145,7 +177,6 @@ devine qu'une entrée n'est peut-être pas à vous (un manque que `/8_code`
 règle seul, un verdict de l'Architecte), elle reste dans « À répondre »
 avec ce qu'il a vu.
 
-Fermer l'onglet n'arrête pas la commande ; rouvrir la page la retrouve.
 
 ## Ce que le cockpit ne fait jamais
 
@@ -155,6 +186,8 @@ Fermer l'onglet n'arrête pas la commande ; rouvrir la page la retrouve.
   Il ne saute jamais une étape bloquée ou inconnue.
 - Le relevé du dossier ne fait que lire : aucun appel à Claude, aucune
   commande git, aucune écriture.
+- L'onglet « Code » ne fait que lire : les fichiers, `stats.sqlite`, et
+  `git log` pour les commits d'un lot.
 - Le volet du document ne fait que lire.
 - Il n'écrit qu'où vous écrivez déjà : les champs `Answer:`, les
   `## Decision`, `## Décision du Product Owner` dans
