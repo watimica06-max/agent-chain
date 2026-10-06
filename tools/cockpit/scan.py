@@ -86,10 +86,11 @@ CONFIRM = {
                    "choisit l'invocation (:110-120), le vocabulaire (:135-139) et les réponses (:167-169) : ils lisent "
                    "la racine après ce rangement, et aucune ligne ne défait le git mv quand ils arrêtent",
     "9_controle": "elle commite et crée le worktree (9_controle.md:104, :110) avant le contrôle de la carte des lots "
-                  "(:225-228), qui lit ce que la phase 1 écrit — et sa section Git ne part qu'une fois la phase 6 "
-                  "écrite (:449-450)",
+                  "(:225-228), qui lit ce que la phase 1 écrit : sur cet arrêt, elle commite, fusionne et pousse "
+                  "tracabilite-full.md avant de refermer son worktree (:449-451)",
     "diagnostique": "elle commite et crée le worktree (diagnostique.md:86, :96) avant de retenir la phase 2 "
-                    "(:142-147) — quand la phase 1 n'émet rien, aucune ligne ne referme le worktree (:184-185)",
+                    "(:142-147) : quand la phase 1 n'émet rien, elle referme son worktree (:184-186) mais laisse "
+                    "commité et poussé ce qui attendait dans le dossier",
 }
 
 # Every rule the scan applies, with the lines it comes from. scan_rules.md
@@ -99,7 +100,7 @@ RULES = {
     "G-ATT": "« À qui est une réponse » : la commande nommée après « answer …, then run »",
     "G-AMONT": "6_convertit.md:35-38 · 2_structure.md:248-255",
     "G-AVAL": "§1.3 de la demande : « nothing upstream changed it since »",
-    "G-BUGFIX": "7_lots.md:18-19 · 8_code.md:25-26 · 9_controle.md:20-21 · 9_controle.md:510-511",
+    "G-BUGFIX": "7_lots.md:18-19 · 8_code.md:25-26 · 9_controle.md:20-21 · 9_controle.md:512-513",
     "G-WT": "1_lexique.md:138-140 — git worktree add .claude/worktrees/<name>, dans chaque commande à agent",
     "G-ERR": "TECHNICAL_V1 §8.1 : un fichier illisible est une erreur, jamais un fichier sans question",
     "G-RUN": "le run en cours du cockpit",
@@ -125,7 +126,7 @@ RULES = {
     "OWN-COD": "8_code.md:333-334 · 8_code.md:751",
     "OWN-FUS": "fusion.md:60",
     "OWN-FUB": "fusion.md:57",
-    "OWN-DIA": "diagnostique.md:231 · diagnostique.md:241",
+    "OWN-DIA": "diagnostique.md:232 · diagnostique.md:242",
     "OWN-?": "aucune commande ne nomme ce fichier",
     "LEX-1": "1_lexique.md:93-104",
     "LEX-2": "1_lexique.md:56",
@@ -214,17 +215,17 @@ RULES = {
     "COD-5": "8_code.md:85-87",
     "COD-6": "8_code.md:80-83",
     "CTL-1": "9_controle.md:75-77",
-    "CTL-3": "9_controle.md:486-493 · 9_controle.md:507-508",
-    "CTL-4": "9_controle.md:486-493",
+    "CTL-3": "9_controle.md:488-495 · 9_controle.md:509-510",
+    "CTL-4": "9_controle.md:488-495",
     "TST-1": "fusion.md:59",
-    "TST-2": "9_controle.md:507-511",
-    "TST-3": "9_controle.md:510-511",
-    "TST-4": "9_controle.md:507-511",
+    "TST-2": "9_controle.md:509-513",
+    "TST-3": "9_controle.md:512-513",
+    "TST-4": "9_controle.md:509-513",
     "FUS-1": "fusion.md:56",
     "FUS-2": "fusion.md:59",
     "FUS-3": "fusion.md:61-66",
     "DIA-1": "diagnostique.md:21-25",
-    "DIA-2": "diagnostique.md:75-77 · diagnostique.md:226",
+    "DIA-2": "diagnostique.md:75-77 · diagnostique.md:227",
     "DIA-3": "diagnostique.md:60-67",
 }
 
@@ -878,7 +879,7 @@ class Scan:
         F = self.F
         if not F.has("desc-produit.md"):
             return self.set(s, A_FAIRE, "CTL-1", "desc-produit.md absent : rien à confronter encore.", [])
-        # 9_controle.md:486-493 — the four files a run writes.
+        # 9_controle.md:488-495 — the four files a run writes.
         four = [F.rel(W.p("code", "recette-ordonnee.md")), F.rel(W.p("code", "decisions-produit.md")), "registre-questions.md"]
         have = [x for x in four if os.path.isfile(os.path.join(self.fpath, *x.split("/")))]
         reports = [n for n in (os.listdir(F.p("code")) if F.has("code") else []) if re.match(r"^rapport-controle.*\.md$", n)]
@@ -1027,7 +1028,7 @@ def run_scan(app, feature, run=None):
 
     # Superseded by a correction cycle: the commands' working folder is the
     # highest bugfix-NN/ (cmd/7_lots.md:19-21, 8_code.md:26-28, 9_controle.md:20-22),
-    # and a bug-list is what follows a control (9_controle.md:509-511).
+    # and a bug-list is what follows a control (9_controle.md:511-513).
     if hb:
         for s in main:
             if s.id in ("7_lots", "8_code", "9_controle") and s.state in (A_FAIRE, INCONNU):

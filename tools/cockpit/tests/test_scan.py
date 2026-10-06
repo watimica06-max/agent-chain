@@ -52,7 +52,7 @@ def test_premiere_app_main_and_corrections(tmp_path):
         "2_structure": F, "3_decoupe": F, "3a_genre": F, "3b_nature": F,
         "4_grille": F, "5_reclasse": F, "6_convertit": F,
         "conventions": F, "7_lots": F, "8_code": F,
-        # A correction is open: the feature was controlled and tested (9_controle.md:510-511).
+        # A correction is open: the feature was controlled and tested (9_controle.md:512-513).
         "9_controle": F, "test": F,
         "fusion": AF,
     }

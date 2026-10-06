@@ -181,8 +181,9 @@ notifies on completion. Do not pass it; wait for the notification.
 
 ## Git, once it has reported
 
-**Then, once the last call you issued reports** — phase 2's, or
-phase 1's when phase 2 is withheld — 📌 **five steps, in this order:**
+🔴 **Every end of the run merges first, once the worktree exists — a
+stop included, phase 2 withheld among them, whether phase 1 issued
+calls or none.** 📌 **Five steps, in this order:**
 
 1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
    agent has no Bash and commits nothing**, and the renames of *What

@@ -416,7 +416,7 @@ Coût et écarté : le commit avant le worktree · écarté : brancher sur l'arb
 
 Utilisé par: `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique` ; `CLAUDE.md`.
 
-Cinq pas, dans cet ordre, une fois que le dernier agent a rapporté :
+Cinq pas, dans cet ordre, une fois que le dernier agent a rapporté — et à toute fin du run une fois le worktree créé, un arrêt compris (`/6_convertit`, `/9_controle` et `/diagnostique` le disent dans leur section git) :
 
 1. `git add` et `git commit` dans le worktree — les agents sans `Bash` ne commitent rien, et les renommages, classements, copies et retraits que la commande a faits sont dans l'arbre, pas dans un commit ; `git merge` prend les commits de la branche, pas les fichiers du worktree, et `git worktree remove` refuse un arbre sale. `/7_lots` et `/8_code` énumèrent ce qui est hors du dossier de feature et que le `git add` doit atteindre : les requêtes sous `architecte/`, `docs/TECHNICAL_CONVENTIONS.md` et `couverture.md` (l'Architecte, invocation 3), `docs/CURRENT_TECHNICAL_STATE.md` (les pièges de l'Arbitre). Les trois agents à `Bash` de `/8_code` ont commité leur propre travail seul.
 2. Sortie du worktree — une session isolée dans un worktree ne peut pas émettre une commande git contre le dépôt principal : la fusion émise de l'intérieur est refusée.
