@@ -103,8 +103,11 @@ workflow.
 aucun : c'est la ligne `/deploie` de `CLAUDE.md` (ligne 59).
 L'application l'écrit dans son propre `.claude/commands/deploie.md` ;
 l'installation de la chaîne dans l'application ne le touche jamais
-(`docs/app/TECHNICAL_V1.md` §20), et `/socle` le range parmi ce que
-l'application fournit elle-même.
+(`docs/app/TECHNICAL_V1.md` §20). `/socle` le rangeait parmi ce que
+l'application fournit elle-même ; `socle.py`, qui le remplace (cockpit
+1.7), ne le nomme plus : le déploiement passe dans le cockpit (1.8), et
+une application neuve n'a pas de `/deploie` — l'étape de test du
+cockpit n'y montre pas « Déployer ».
 
 Ce document n'en décrit donc ni les étapes ni les décisions : ce qu'il
 installe, où et comment, est propre à chaque application. La chaîne n'en

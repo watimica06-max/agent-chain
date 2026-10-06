@@ -11,7 +11,7 @@
 | Document | Ce qu'il tient |
 |---|---|
 | `PROCESS_MECANISMES.md` | Ce document. Le fichier de blocage, le fichier de questions, `stop.md`, la forme d'un relais et sa ligne `Next:`, le renommage `-NN` et l'archivage, l'invocation d'un agent et son frontmatter, les sections Git et worktree, les protocoles de lecture, la disposition du dossier de feature, les ensembles de valeurs fermés. Il énonce aussi, une fois pour les cinq, le périmètre d'audit. |
-| `PROCESS_ENTREES.md` | Les trois entrées de la chaîne — `idees.md`, `/socle`, `/diagnostique` — ce que chacune garantit à ce qui suit, et ce qu'elle laisse manquant. Une quatrième, `/extrait`, n'existe pas : ni commande, ni agent, absente de `CLAUDE.md` — la carte ne la nomme pas comme entrée, parce qu'une carte qui nomme une commande que personne ne peut lancer trompe son lecteur ; mais le fait qu'elle a été retirée, et comment le global naît à sa place (`INIT` du Fusionneur sur la première feature fusionnée), est ce que la section enregistre → `PROCESS_ENTREES.md` §/extrait. |
+| `PROCESS_ENTREES.md` | Les trois entrées de la chaîne — `idees.md`, `socle.py` (le script que le cockpit lance à la création d'une application, `/socle` jusqu'au cockpit 1.7), `/diagnostique` — ce que chacune garantit à ce qui suit, et ce qu'elle laisse manquant. Une quatrième, `/extrait`, n'existe pas : ni commande, ni agent, absente de `CLAUDE.md` — la carte ne la nomme pas comme entrée, parce qu'une carte qui nomme une commande que personne ne peut lancer trompe son lecteur ; mais le fait qu'elle a été retirée, et comment le global naît à sa place (`INIT` du Fusionneur sur la première feature fusionnée), est ce que la section enregistre → `PROCESS_ENTREES.md` §/extrait. |
 | `PROCESS_AMONT.md` | De l'idée à `spec-technique.md` : `/1_lexique` à `/6_convertit`, plus `/conventions` et la fusion (`/fusion`, `/fusion_compare`, `/fusion_applique`). Les agents lexicographe, redacteur, decoupeur, qualifieur, classeur, sondeur, assembleur, convertisseur, fusionneur, architecte. |
 | `PROCESS_AVAL.md` | De `spec-technique.md` au code fusionné : `/7_lots`, `/8_code`, `/9_controle`. Les agents cadreur, verificateur, detailleur, arbitre, concepteur, testeur, realisateur, relecteur, controleur. |
 | `PROCESS_ANNEXES.md` | Hors périmètre d'audit : ce qui ne change aucun artefact que la chaîne produit. |
@@ -82,9 +82,9 @@ Coût et écarté : `effort` sur tous les agents · écarté : la règle d'un `e
 
 ### Frontmatter d'une commande
 
-Utilisé par: les dix-neuf commandes de la chaîne.
+Utilisé par: les dix-huit commandes de la chaîne.
 
-Chaque `.claude/commands/<commande>.md` ouvre sur `description`, `allowed-tools` et, sauf `/socle`, `argument-hint`. Les quinze commandes qui invoquent un agent portent `allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent` ; `/5_reclasse` : `Read, Grep, Glob, Write, Bash` ; `/socle` : `Read, Grep, Glob, Edit, Write, Bash` ; `/audit_blocages` et `/audit_conventions` : `Read, Grep, Glob, Edit, Write`. `argument-hint` vaut `"<feature folder name>"` partout sauf `/8_code` (`"<feature folder name> [N]"`) ; `/conventions` lit un second argument nommant un `bugfix-NN` bien que son `argument-hint` n'en dise rien. Le premier argument est obligatoire : sans lui la commande demande et s'arrête ; `$ARGUMENTS` porte les deux quand il y en a deux, et le dossier de feature se dérive du premier seul.
+Chaque `.claude/commands/<commande>.md` ouvre sur `description`, `allowed-tools` et `argument-hint`. Les quinze commandes qui invoquent un agent portent `allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent` ; `/5_reclasse` : `Read, Grep, Glob, Write, Bash` ; `/audit_blocages` et `/audit_conventions` : `Read, Grep, Glob, Edit, Write`. `argument-hint` vaut `"<feature folder name>"` partout sauf `/8_code` (`"<feature folder name> [N]"`) ; `/conventions` lit un second argument nommant un `bugfix-NN` bien que son `argument-hint` n'en dise rien. Le premier argument est obligatoire : sans lui la commande demande et s'arrête ; `$ARGUMENTS` porte les deux quand il y en a deux, et le dossier de feature se dérive du premier seul.
 
 Coût et écarté : aucun écart connu · raison : à retrouver · inconnu.
 
@@ -368,7 +368,7 @@ Coût et écarté : un relais sans lecture · écarté : l'orchestrateur résume
 
 ### Ligne Next:
 
-Utilisé par: les dix-neuf commandes de la chaîne — `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/5_reclasse`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique`, `/audit_blocages`, `/audit_conventions`, `/socle` ; `CLAUDE.md` (*The `Next:` line*, la grammaire) ; l'application cockpit, lectrice (`docs/app/TECHNICAL_V1.md` §9).
+Utilisé par: les dix-huit commandes de la chaîne — `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/5_reclasse`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique`, `/audit_blocages`, `/audit_conventions` ; `CLAUDE.md` (*The `Next:` line*, la grammaire) ; l'application cockpit, lectrice (`docs/app/TECHNICAL_V1.md` §9).
 
 Chaque relais finit sur une ligne, et une seule, dans cette grammaire — les arrêts compris, un arrêt étant un relais aussi :
 
@@ -378,15 +378,15 @@ Chaque relais finit sur une ligne, et une seule, dans cette grammaire — les ar
     Next: stop <reason>
     Next: done
 
-C'est la dernière ligne du relais, rien après elle. `run` nomme la commande à lancer ; `answer` dit ce qui attend le Product Owner — les questions, le `## Decision`, ou les deux — et la commande qui suit ; `manual` dit le geste qui est le sien (écrire `idees.md` après `/socle`, une décision sous `## Décision du Product Owner` de `code/redecoupage.md`, lire le rapport de contrôle et décider d'une bug-list) ; `stop` donne la raison (`Next: stop argument missing`, un classement qui a échoué, une valeur hors table) ; `done` dit l'étape finie (`/audit_blocages`, `/audit_conventions` toujours ; la fusion écrite). Une commande qui ne connaît pas la suite imprime `Next: stop <reason>`, jamais une supposition. `CLAUDE.md` donne la grammaire et rien d'autre ; chaque commande donne ses valeurs, issue par issue — une colonne `Next:` à sa table *What to run next*, ou la ligne écrite à l'arrêt qui la produit. L'application cockpit lit cette ligne, et elle seule, pour désigner la commande suivante ; sans ligne `Next:`, elle dit la suite inconnue et montre le relais entier.
+C'est la dernière ligne du relais, rien après elle. `run` nomme la commande à lancer ; `answer` dit ce qui attend le Product Owner — les questions, le `## Decision`, ou les deux — et la commande qui suit ; `manual` dit le geste qui est le sien (une décision sous `## Décision du Product Owner` de `code/redecoupage.md`, lire le rapport de contrôle et décider d'une bug-list) ; `stop` donne la raison (`Next: stop argument missing`, un classement qui a échoué, une valeur hors table) ; `done` dit l'étape finie (`/audit_blocages`, `/audit_conventions` toujours ; la fusion écrite). Une commande qui ne connaît pas la suite imprime `Next: stop <reason>`, jamais une supposition. `CLAUDE.md` donne la grammaire et rien d'autre ; chaque commande donne ses valeurs, issue par issue — une colonne `Next:` à sa table *What to run next*, ou la ligne écrite à l'arrêt qui la produit. L'application cockpit lit cette ligne, et elle seule, pour désigner la commande suivante ; sans ligne `Next:`, elle dit la suite inconnue et montre le relais entier.
 
 Coût et écarté : une ligne à grammaire fermée en fin de chaque relais · écarté : laisser l'application lire la table *What to run next* ou deviner la suite · raison : `Next: stop <reason>` est ce que la chaîne imprime quand elle ne sait pas, et l'application ne comble jamais ce manque (`CLAUDE.md`, *The `Next:` line* ; `docs/app/TECHNICAL_V1.md` §9) · inconnu.
 
 ### stop.md
 
-Utilisé par: `/socle` ; `/8_code`.
+Utilisé par: `socle.py` ; `/8_code`.
 
-`docs/features/<name>/stop.md`, créé à la main par le Product Owner dans le dépôt principal — jamais dans le worktree, coupé avant lui. `/8_code` le cherche au mouvement 6, à la fin de chaque lot, dans le dépôt principal : présent, la commande s'arrête là, le lot fini fusionné et poussé, et dit combien de lots restent ; absent, lot suivant. `stop1.md` est la forme désarmée : le Product Owner renomme l'un en l'autre pour arrêter et reprendre ; aucun des deux présent n'est une erreur. `/socle` ajoute à `.gitignore` les lignes `docs/features/*/stop.md` et `docs/features/*/stop1.md` — aucun des deux n'est jamais commité. Un `## Decision` rempli pendant un run vif prend le chemin inverse : dans le worktree, où l'Arbitre le sonde ; un `## Decision` écrit dans le dépôt principal n'atteint aucun agent du worktree.
+`docs/features/<name>/stop.md`, créé à la main par le Product Owner dans le dépôt principal — jamais dans le worktree, coupé avant lui. `/8_code` le cherche au mouvement 6, à la fin de chaque lot, dans le dépôt principal : présent, la commande s'arrête là, le lot fini fusionné et poussé, et dit combien de lots restent ; absent, lot suivant. `stop1.md` est la forme désarmée : le Product Owner renomme l'un en l'autre pour arrêter et reprendre ; aucun des deux présent n'est une erreur. `socle.py` ajoute à `.gitignore` les lignes `docs/features/*/stop.md` et `docs/features/*/stop1.md` — aucun des deux n'est jamais commité, même quand une commande fait `git add docs/features/<name>/` dans le dépôt principal. Un `## Decision` rempli pendant un run vif prend le chemin inverse : dans le worktree, où l'Arbitre le sonde ; un `## Decision` écrit dans le dépôt principal n'atteint aucun agent du worktree.
 
 Coût et écarté : deux fichiers, deux lieux · écarté : un seul lieu pour `stop.md` et le `## Decision` · raison : un fichier créé dans le dépôt principal n'atteint pas un worktree coupé avant lui, et l'inverse pour la décision (`/8_code`, mouvement 6 ; `docs/verification3/plan.md` entrée 28) · inconnu.
 
@@ -430,9 +430,9 @@ Coût et écarté : le commit par la commande, au pas 1 · écarté : rapporter 
 
 ### Commit sans worktree
 
-Utilisé par: `/5_reclasse` ; `/socle` ; `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/conventions` sur leur branche « invoke nothing ».
+Utilisé par: `/5_reclasse` ; `socle.py` ; `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/conventions` sur leur branche « invoke nothing ».
 
-Quand aucun agent ne tourne, la commande écrit en place dans le dépôt principal et commite : `/5_reclasse` commite le dossier de feature sous `chore: product file by nature` et pousse ; `/socle` commite seul sous `chore: scaffolding for the chain` et pousse ; les commandes du cycle qui n'ont rien à invoquer commitent ce que le classement a déplacé, s'il y a quelque chose, et poussent — `/4_grille` y ajoute le `questions-sondeur-NN.md` ou `questions-existant-NN.md` vide qu'il écrit sans agent, `/conventions` le fichier architecte vide qu'il classe. Un push qui échoue est rapporté, pas retenté.
+Quand aucun agent ne tourne, la commande écrit en place dans le dépôt principal et commite : `/5_reclasse` commite le dossier de feature sous `chore: product file by nature` et pousse ; `socle.py`, que le cockpit lance à la création d'une application, commite seul sous `chore: scaffolding for the chain` et ne pousse pas — le cockpit pousse, et dit un push qui échoue ; les commandes du cycle qui n'ont rien à invoquer commitent ce que le classement a déplacé, s'il y a quelque chose, et poussent — `/4_grille` y ajoute le `questions-sondeur-NN.md` ou `questions-existant-NN.md` vide qu'il écrit sans agent, `/conventions` le fichier architecte vide qu'il classe. Un push qui échoue est rapporté, pas retenté.
 
 Coût et écarté : pas de worktree sans agent · écarté : un worktree systématique · raison : un run qui n'invoque personne n'a rien à isoler (`docs/verification3/plan.md` entrée 49) · inconnu.
 
@@ -491,9 +491,9 @@ Coût et écarté : un chemin obligatoire · écarté : un motif nu · raison : 
 
 ### Lecture de l'état technique
 
-Utilisé par: detailleur, realisateur, diagnostiqueur (lecteurs) ; realisateur, arbitre (scripteurs) ; `/socle` (le crée) ; `CLAUDE.md` et les commandes (ne l'ouvrent jamais).
+Utilisé par: detailleur, realisateur, diagnostiqueur (lecteurs) ; realisateur, arbitre (scripteurs) ; `socle.py` (le crée) ; `CLAUDE.md` et les commandes (ne l'ouvrent jamais).
 
-`docs/CURRENT_TECHNICAL_STATE.md`, unique pour le projet, créé par `/socle` avec `# Technical state` pour seule ligne. Personne ne le lit entier : deux sections ouvertes, `## Traps — general` et `## Dead state`, trouvées par un grep du titre puis un `Read` borné jusqu'au `## ` suivant — on ne peut pas grepper une règle qu'on ne sait pas s'appliquer à soi — puis des greps par symbole : le Détailleur pour chaque symbole d'une signature (deux greps par symbole, code et état), le Réalisateur pour les symboles marqués *modified* et ceux de `## Dependencies`, le Diagnostiqueur pour ses termes de recherche comme aide, jamais comme verdict. Le Réalisateur y écrit à la fin de chaque lot (`## State` de son rapport en rend compte), l'Arbitre y place un piège de plateforme sous `## Traps — general` ou sous le `###` du sujet qui le possède — `## Traps` seul n'est pas un titre de ce fichier ; tous deux chargent la compétence `technical-state-format` avant d'écrire. Le Cadreur ne l'ouvre pas : il établit ce que le code porte par grep. `## Traps — general`, `## Dead state` : titres que le fichier de format fixe, pas ce document.
+`docs/CURRENT_TECHNICAL_STATE.md`, unique pour le projet, créé par `socle.py` avec `# Technical state` pour seule ligne. Personne ne le lit entier : deux sections ouvertes, `## Traps — general` et `## Dead state`, trouvées par un grep du titre puis un `Read` borné jusqu'au `## ` suivant — on ne peut pas grepper une règle qu'on ne sait pas s'appliquer à soi — puis des greps par symbole : le Détailleur pour chaque symbole d'une signature (deux greps par symbole, code et état), le Réalisateur pour les symboles marqués *modified* et ceux de `## Dependencies`, le Diagnostiqueur pour ses termes de recherche comme aide, jamais comme verdict. Le Réalisateur y écrit à la fin de chaque lot (`## State` de son rapport en rend compte), l'Arbitre y place un piège de plateforme sous `## Traps — general` ou sous le `###` du sujet qui le possède — `## Traps` seul n'est pas un titre de ce fichier ; tous deux chargent la compétence `technical-state-format` avant d'écrire. Le Cadreur ne l'ouvre pas : il établit ce que le code porte par grep. `## Traps — general`, `## Dead state` : titres que le fichier de format fixe, pas ce document.
 
 Coût et écarté : deux sections puis des greps · écarté : le fichier entier · raison : « you cannot grep a rule you do not know applies to you » pour les sections ; le reste est trouvé par symbole (detailleur, realisateur, arbitre) · inconnu. Deux scripteurs · écarté : le Réalisateur seul · raison : un piège de plateforme qu'un test rouge révèle est tenu partout où un lot lit, quand une convention n'est tenue que si la fiche la nomme (`arbitre.md`, *When a rule would settle it*) · inconnu.
 
@@ -515,7 +515,7 @@ Coût et écarté : deux portées · écarté : tout le monde lit tout · raison
 
 Utilisé par: redacteur, fusionneur, sondeur (invocation 3).
 
-`docs/PRODUIT_GLOBAL.md`, hors du dossier de feature, créé par `/socle` avec `# Application` pour seule ligne. Il se lit par son index — un grep des titres sur `^#` — puis les seules sections nécessaires, jamais le fichier entier : le Rédacteur cherche un titre couvrant un sujet et charge une section proche pour le test *même déclencheur, même sortie* ; le Fusionneur localise section, bloc, phrase ; le Sondeur charge les sections que les lignes `Global:` de ses blocs nomment, une section une fois. Le Fusionneur seul y écrit ; le Rédacteur jamais.
+`docs/PRODUIT_GLOBAL.md`, hors du dossier de feature, créé par `socle.py` avec `# Application` pour seule ligne. Il se lit par son index — un grep des titres sur `^#` — puis les seules sections nécessaires, jamais le fichier entier : le Rédacteur cherche un titre couvrant un sujet et charge une section proche pour le test *même déclencheur, même sortie* ; le Fusionneur localise section, bloc, phrase ; le Sondeur charge les sections que les lignes `Global:` de ses blocs nomment, une section une fois. Le Fusionneur seul y écrit ; le Rédacteur jamais.
 
 Coût et écarté : l'index d'abord · écarté : lire le global entier · raison : c'est le produit entier, et une poignée de sections suffit (redacteur, fusionneur, sondeur) · inconnu.
 
@@ -525,7 +525,7 @@ Coût et écarté : l'index d'abord · écarté : lire le global entier · raiso
 
 ### Disposition du dossier de feature
 
-Utilisé par: les vingt agents ; les dix-neuf commandes.
+Utilisé par: les vingt agents ; les dix-huit commandes.
 
 `docs/features/<name>/` — `<name>` est l'argument de chaque commande. Tout ce qui suit est relatif à ce dossier ; un `bugfix-NN/` reprend la partie aval sous lui.
 
@@ -981,7 +981,7 @@ Un seul utilisateur : décrit dans le document de l'agent ou de la commande qui 
 - Les mouvements 1 à 7 de `/8_code`, le compte de trois tentatives (`## Attempts`), la tentative vide, le retour au découpage à trois → `PROCESS_AVAL.md` §/8_code — coder les lots en attente d'un découpage, un par un
 - Les six phases de `/9_controle`, `grouper.py`, le tri par état de `recette-ordonnee.md`, la forme de `decisions-produit.md` (identifiant, deux espaces, une ligne par décision) → `PROCESS_AVAL.md` §/9_controle — confronter le fichier produit à toutes les fiches
 - Les cinq lieux et les cinq trouvailles de `/audit_blocages`, les sept trouvailles de `/audit_conventions` → `PROCESS_ANNEXES.md`
-- `docs/PRODUIT_GLOBAL.md` à `# Application`, `docs/CURRENT_TECHNICAL_STATE.md` à `# Technical state` — ce que `/socle` crée → `PROCESS_ENTREES.md` §/socle
+- `docs/PRODUIT_GLOBAL.md` à `# Application`, `docs/CURRENT_TECHNICAL_STATE.md` à `# Technical state` — ce que `socle.py` crée → `PROCESS_ENTREES.md` §socle.py
 
 ---
 
@@ -998,8 +998,8 @@ Un seul utilisateur : décrit dans le document de l'agent ou de la commande qui 
 | `questions/qualifieur/` et `questions/classeur/`, le plus haut avec `### Q` | `/3a_genre`, `/3b_nature` le nomment à leur agent (troisième déclencheur) | Le grep `^### Q` sur le plus haut classé ; le fichier vide suivant de l'agent fait taire le déclencheur | `PROCESS_AMONT.md` |
 | `questions-fusionneur-NN.md` répondu | `/fusion` (lignes 7, 9), `/fusion_applique` ; le Fusionneur relit ses propres fichiers | `Answer:` vide → arrêt ; `### Q` n'arrête pas `/fusion_compare` | `PROCESS_AMONT.md` |
 | `stop.md` créé dans le dépôt principal (→ `### stop.md`) | `/8_code`, mouvement 6, fin de lot | Présence dans le dépôt principal, jamais dans le worktree | `PROCESS_AVAL.md` |
-| Les lignes `.gitignore` de `stop.md` et `stop1.md` | `/socle` les ajoute si absentes | Jamais commités | `PROCESS_ENTREES.md` |
-| Le commit `chore: scaffolding for the chain` de `/socle` — en place dans le dépôt principal, sans worktree, poussé (→ `### Commit sans worktree`) | Le `HEAD` local depuis lequel chaque commande qui invoque crée son worktree (→ `### Git, avant l'invocation`, pas 2) | `git worktree add .claude/worktrees/<name> HEAD`, jamais une base choisie par l'outillage ; un push qui échoue est rapporté, ni retenté ni contourné, et le commit tient localement | `PROCESS_ENTREES.md` |
+| Les lignes `.gitignore` de `stop.md` et `stop1.md` | `socle.py` les ajoute si absentes | Jamais commités | `PROCESS_ENTREES.md` |
+| Le commit `chore: scaffolding for the chain` de `socle.py` — en place dans le dépôt principal, sans worktree, poussé par le cockpit quand l'application a un dépôt distant (→ `### Commit sans worktree`) | Le `HEAD` local depuis lequel chaque commande qui invoque crée son worktree (→ `### Git, avant l'invocation`, pas 2) | `git worktree add .claude/worktrees/<name> HEAD`, jamais une base choisie par l'outillage ; un push qui échoue est rapporté, ni retenté ni contourné, et le commit tient localement | `PROCESS_ENTREES.md` |
 | Le `model` du frontmatter (→ `### Frontmatter d'un agent`) | Le `model=` de chaque `Agent()` | Concorde avec le frontmatter ; l'exception `opus` du troisième realisateur | tous |
 | `Bash` absent du frontmatter | Le pas 1 des cinq pas Git : la commande commite ce que l'agent a écrit | `git status` avant le `remove` ; jamais de force | tous |
 | Un worktree créé depuis `HEAD` par la commande (→ `### Git, avant l'invocation`) | Chaque agent écrit en chemins relatifs, dans ce worktree | Un chemin absolu échoue | tous |
@@ -1013,7 +1013,7 @@ Un seul utilisateur : décrit dans le document de l'agent ou de la commande qui 
 | `tracabilite.md` (→ `### tracabilite.md`) | L'Architecte (invocations 1 et 4, mouvement 2) ; `/9_controle` (phase 1) | Première colonne contre les titres de `desc-produit.md` ; un tiret ne lève `inconsistency` que sur `comportement` et `référence` | `PROCESS_AMONT.md`, `PROCESS_AVAL.md` |
 | `code/decisions-produit.md` par cycle (→ `### Identifiants`, `B<n>`) | Le Rédacteur, invocation 3, nommé par `/fusion` dans l'ordre des cycles | Une décision par ligne, l'identifiant d'abord ou un tiret, en français | `PROCESS_AVAL.md` → `PROCESS_AMONT.md` |
 | `(B<n>)` en fin de première ligne d'un manque de `bug-list.md` | Le Diagnostiqueur le copie dans le titre d'entrée, le Cadreur dans l'`Anchor:`, `/9_controle` marque `carried` (→ `### Marque carried`) | La forme exacte, entre parenthèses, en fin de première ligne | `PROCESS_ENTREES.md` → `PROCESS_AVAL.md` |
-| `docs/CURRENT_TECHNICAL_STATE.md` créé par `/socle` (→ `### Lecture de l'état technique`) | Le Réalisateur et l'Arbitre y écrivent, le Détailleur, le Réalisateur et le Diagnostiqueur y lisent deux sections puis des greps | La compétence `technical-state-format` chargée avant d'écrire | `PROCESS_ENTREES.md`, `PROCESS_AVAL.md` |
+| `docs/CURRENT_TECHNICAL_STATE.md` créé par `socle.py` (→ `### Lecture de l'état technique`) | Le Réalisateur et l'Arbitre y écrivent, le Détailleur, le Réalisateur et le Diagnostiqueur y lisent deux sections puis des greps | La compétence `technical-state-format` chargée avant d'écrire | `PROCESS_ENTREES.md`, `PROCESS_AVAL.md` |
 | `docs/TECHNICAL_CONVENTIONS.md` écrit par l'Architecte (→ `### Lecture des conventions — divergence`, `### permanente / spécifique`) | Tout l'aval le lit, entier ou par `permanente` et `R<n>` ; `/audit_conventions` | Le mot `permanente` sur la ligne ; sans marqueur, tout lire | `PROCESS_AMONT.md` → `PROCESS_AVAL.md` |
 
 ## Boucles

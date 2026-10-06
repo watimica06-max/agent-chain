@@ -1,7 +1,7 @@
 # PROCESS_ENTREES.md — les quatre entrées de la chaîne
 
 > Document de pilotage, en français. Il décrit les quatre façons
-> d'entrer dans la chaîne — `idees.md`, `/socle`, `/extrait`,
+> d'entrer dans la chaîne — `idees.md`, `socle.py`, `/extrait`,
 > `/diagnostique` — ce que chacune garantit à ce qui suit, et ce
 > qu'elle laisse manquant. Il décrit en entier le seul agent que ces
 > entrées invoquent, le Diagnostiqueur, en deux blocs, un par
@@ -129,8 +129,9 @@ et rien ne le détecterait : voir *Ce qu'elle laisse manquant*.
 **Ce qu'elle laisse manquant**
 
 - Qui crée `docs/features/<name>/` : aucun fichier de commande ni
-  d'agent ne le dit ; `/socle` crée `docs/features/` vide et s'arrête
-  là. Un `<name>` sans dossier ne fait échouer aucun test nommé —
+  d'agent ne le dit ; `socle.py` crée `docs/features/` vide, et le
+  cockpit, quand il crée l'application, y copie le fichier d'idées de la
+  première fonctionnalité — les suivantes, le Product Owner les crée. Un `<name>` sans dossier ne fait échouer aucun test nommé —
   `/1_lexique` cherche `blocked_lexicographe.md` par `Glob`, ne le
   trouve pas, invoque, et le Lexicographe bloque sur *no idea file*,
   ce qui crée le dossier par l'écriture du fichier de blocage.
@@ -180,58 +181,83 @@ et rien ne le détecterait : voir *Ce qu'elle laisse manquant*.
 
 ---
 
-# Entrée 2 — `/socle`, l'application neuve
+# Entrée 2 — `socle.py`, l'application neuve
 
-## /socle
+## socle.py
 
-Prend: aucun argument (`socle.md`, frontmatter sans `argument-hint` ;
-→ MECANISMES §Frontmatter d'une commande — `allowed-tools: Read, Grep,
-Glob, Edit, Write, Bash`, sans `Agent`).
+Ce n'est plus une commande : `/socle` est retiré de la chaîne (cockpit
+1.7). Ce qu'il écrivait est écrit par `.claude/scripts/socle.py`, un
+script de la chaîne, installé avec elle comme `coherence.py` et
+`grouper.py`, et que le cockpit lance quand il crée une application
+(`docs/app/TECHNICAL_V1.md` §22) — aucun appel à Claude, aucun agent,
+aucune décision. La chaîne garde le savoir de ce qu'une application
+neuve demande ; le cockpit ne fait que l'exécuter, et il est le seul
+chemin pour créer une application. Aucune commande ni aucun agent ne le
+nomme ; `CLAUDE.md` le range, dans sa table des commandes, sur la ligne
+*Outside the cycle* — « Set up is a script, not a command ».
+
+Prend: aucun argument ; `--list` imprime le rapport seul, sans rien
+écrire. L'application est le dossier qui tient le `.claude/` où le
+script est installé ; elle doit être la racine de son dépôt git — le
+cockpit y a fait le premier commit en installant la chaîne.
 Rend: `docs/PRODUIT_GLOBAL.md` à une ligne, `# Application` ;
-`docs/features/` vide ; deux lignes dans `.gitignore` à la racine du
-projet, `docs/features/*/stop.md` et `docs/features/*/stop1.md` ;
-`docs/CURRENT_TECHNICAL_STATE.md` à une ligne, `# Technical state` ; un
-commit `chore: scaffolding for the chain`, poussé ; un rapport disant
-ce qu'il reste au Product Owner à fournir.
+`docs/features/` vide ; `docs/CURRENT_TECHNICAL_STATE.md` à une ligne,
+`# Technical state` ; dans `.gitignore`, à la racine, quatre lignes,
+ajoutées si absentes — `docs/features/*/stop.md`,
+`docs/features/*/stop1.md`, `.claude/worktrees/`,
+`.claude/settings.local.json` ; un commit `chore: scaffolding for the
+chain`, **non poussé** ; une ligne par chose que l'application doit
+encore fournir. Code de sortie 0, 2 sur le refus, 1 quand git échoue.
 
 **Étapes**
 
-1. Tester `docs/PRODUIT_GLOBAL.md` : présent → arrêt, rien n'est
-   créé. Le fichier de commande énonce ce test après la liste des
-   créations, mais il gouverne la commande entière (« This command is
-   for a new application, and overwriting the global would lose every
-   domain in it »).
-2. Créer `docs/PRODUIT_GLOBAL.md` avec `# Application` pour seule ligne
+1. Tester `docs/PRODUIT_GLOBAL.md` : présent → refus, code 2, rien
+   n'est écrit (« overwriting the global would lose every domain in
+   it », que `socle.md` disait et que le script garde).
+2. Tester que le dossier est la racine de son dépôt, puis que git sait
+   qui commite (`git var GIT_COMMITTER_IDENT`) — avant toute écriture :
+   un commit qui échouerait laisserait le global écrit, et le run
+   suivant refusé.
+3. Créer `docs/PRODUIT_GLOBAL.md` avec `# Application` pour seule ligne
    (→ MECANISMES §Lecture du global par l'index).
-3. Créer `docs/features/` vide.
-4. Ajouter à `.gitignore`, à la racine du projet, les deux lignes
-   `docs/features/*/stop.md` et `docs/features/*/stop1.md` — ajoutées
-   si absentes, jamais le fichier réécrit (→ MECANISMES §stop.md).
-5. Créer `docs/CURRENT_TECHNICAL_STATE.md` avec `# Technical state`
-   pour seule ligne (→ MECANISMES §Lecture de l'état technique).
-6. Ne pas créer `docs/TECHNICAL_CONVENTIONS.md`, et le dire : l'Architecte
-   l'écrit à `/conventions`, lancé à la main après `/6_convertit` et
-   avant `/7_lots`.
-7. Rapporter ce que le Product Owner doit encore fournir avant que la
-   chaîne tourne de bout en bout : `docs/TECHNICAL_CONVENTIONS.md`, par
-   `/conventions` et non à la main ; la compétence
-   `technical-state-format`, chargée par le Réalisateur et l'Arbitre
-   avant d'écrire dans l'état technique. Ni l'un ni l'autre ne bloque
-   l'amont — seulement `/7_lots` et la suite. Le rapport finit sur
-   `Next: manual écrire docs/features/<name>/idees.md, then run
-   /1_lexique <name>` ; l'arrêt de l'étape 1 sur `Next: stop
-   docs/PRODUIT_GLOBAL.md already exists` (→ MECANISMES §Ligne Next:).
-8. Commit seul, `chore: scaffolding for the chain`, et push.
+4. Créer `docs/CURRENT_TECHNICAL_STATE.md` avec `# Technical state`
+   pour seule ligne, s'il n'existe pas (→ MECANISMES §Lecture de l'état
+   technique).
+5. Créer `docs/features/` vide.
+6. Ajouter à `.gitignore` les quatre lignes absentes, jamais le fichier
+   réécrit, ses fins de ligne gardées (→ MECANISMES §stop.md).
+7. Ne pas créer `docs/TECHNICAL_CONVENTIONS.md` : l'Architecte l'écrit
+   à `/conventions`, lancé à la main après `/6_convertit` et avant
+   `/7_lots`.
+8. Commiter ces fichiers seuls (`--only`), `chore: scaffolding for the
+   chain` ; ce que le Product Owner a indexé reste hors du commit. Ne
+   pas pousser : le cockpit pousse quand l'application a un dépôt
+   distant, et dit un push qui échoue.
+9. Imprimer, une par ligne, ce que l'application doit encore fournir —
+   `PROVIDE` dans le script, que la carte « À fournir avant le code » du
+   cockpit lit au script même, jamais une copie :
+   `docs/TECHNICAL_CONVENTIONS.md`, par `/conventions` et non à la
+   main ; la compétence `technical-state-format`
+   (`.claude/skills/technical-state-format/SKILL.md`), chargée par le
+   Réalisateur et l'Arbitre avant d'écrire dans l'état technique. Ni
+   l'un ni l'autre ne bloque l'amont — seulement `/7_lots` et la suite.
+   `/deploie` n'est plus dans la liste : le déploiement passe dans le
+   cockpit (1.8), et une application neuve n'a pas de `/deploie`. Aucune
+   ligne `Next:` : ce n'est pas un relais ; le cockpit, après avoir
+   copié `idees.md`, propose `/1_lexique`.
 
-**Git** — → MECANISMES §Commit sans worktree : aucun agent, aucun
-worktree, la commande écrit en place dans le dépôt principal et
-commite ; un push qui échoue est rapporté, pas retenté.
+**Git** — en place dans le dépôt principal, sans worktree (→ MECANISMES
+§Commit sans worktree) ; pas de push.
 
-**La Product Owner intervient** — elle lance `/socle` une fois, sur un
-projet dont `docs/PRODUIT_GLOBAL.md` n'existe pas ; elle fournit ce que
-le rapport nomme ; elle crée ensuite `docs/features/<name>/idees.md`
-(entrée 1). Aucune question, aucun fichier de blocage : la commande
-n'invoque personne.
+**La Product Owner intervient** — elle ne lance pas le script : elle
+remplit le formulaire « Nouvelle application » du cockpit (le nom, le
+dossier, le fichier d'idées, le nom de la première fonctionnalité, le
+dépôt GitHub facultatif, qu'elle crée vide elle-même). Le cockpit crée
+le dossier et le dépôt, installe la chaîne, lance le script, pousse,
+copie son fichier d'idées en `docs/features/<name>/idees.md` et le
+commite (`feat: <name> — idées`). Elle fournit ensuite ce que la carte
+« À fournir avant le code » nomme. Aucune question, aucun fichier de
+blocage.
 
 **Ce qu'elle garantit à la suite**
 
@@ -244,76 +270,70 @@ n'invoque personne.
   même titre seul pour savoir où écrire.
 - Au Détailleur, au Réalisateur, au Diagnostiqueur : un état technique
   présent, dont les deux sections ouvertes `## Traps — general` et
-  `## Dead state` n'existent pas encore au sortir de `/socle` — le
+  `## Dead state` n'existent pas encore au sortir du script — le
   fichier n'a que `# Technical state`, un grep du titre ne rend rien,
   la lecture bornée ne lit rien ; elles apparaissent quand le
   Réalisateur ou l'Arbitre y écrit, sous la compétence
-  `technical-state-format` qui fixe ces deux titres (sur ce projet,
-  après les lots codés, le fichier a 2 305 lignes et les porte, lignes
-  1985 et 2297) ; au Réalisateur et à l'Arbitre, un fichier où écrire
-  sous cette compétence.
+  `technical-state-format` qui fixe ces deux titres ; au Réalisateur et
+  à l'Arbitre, un fichier où écrire sous cette compétence.
 - À `/8_code` : deux lignes de `.gitignore` qui gardent `stop.md` et
-  `stop1.md` hors de tout commit — la commande les cherche dans le
-  dépôt principal, jamais dans le worktree (→ MECANISMES §stop.md).
+  `stop1.md` hors de tout commit, quand une commande fait `git add
+  docs/features/<name>/` dans le dépôt principal (`8_code.md`, le
+  commit `chore: pre-code`) — la commande les cherche dans le dépôt
+  principal, jamais dans le worktree (→ MECANISMES §stop.md).
 - À toute commande : `docs/features/` comme racine des dossiers de
-  feature (→ MECANISMES §Disposition du dossier de feature).
+  feature (→ MECANISMES §Disposition du dossier de feature) ; les
+  worktrees sous `.claude/worktrees/` et les réglages locaux de la
+  session hors de tout commit.
 
 **Ce qu'elle laisse manquant**
 
 - `docs/TECHNICAL_CONVENTIONS.md` — l'Architecte, invocation 1, à
   `/conventions` (`PROCESS_AMONT.md` §architecte, invocation 1 — Deriving : la première dérivation du dépôt, §/conventions).
-- `docs/features/<name>/` et `idees.md` — le Product Owner, entrée 1.
-- Les quatre grilles de `.claude/grids/` — `GRILLE_CADRAGE_PRODUIT_V2.md`
-  (Sondeur 1, 2), `GRILLE_EXISTANT.md` (Sondeur 3),
-  `GRILLE_FERMETURE_TECHNIQUE.md` (Convertisseur, Diagnostiqueur 2),
-  `GRILLE_CONVENTIONS.md` (Architecte) : `/socle` n'en crée aucune ;
-  elles font partie de la chaîne, que le cockpit installe dans chaque
-  application ; `CLAUDE.md` dit que la chaîne tourne sur plusieurs projets.
-- `.claude/` entier, `.claude/scripts/grouper.py` compris : hors de
-  `/socle`.
-- La compétence `technical-state-format` : `/socle` la rapporte comme à
-  fournir par le Product Owner ; sur ce projet elle est livrée avec
+- La compétence `technical-state-format` : le script la rapporte comme
+  à fournir par l'application ; sur ce projet elle est livrée avec
   `.claude/skills/`.
+- `docs/features/<name>/` et `idees.md` — hors du script : le cockpit
+  les écrit pour la première fonctionnalité ; le Product Owner, pour les
+  suivantes (entrée 1).
+- Les grilles de `.claude/grids/`, `.claude/` entier — hors du script :
+  c'est la chaîne, que le cockpit installe avant de le lancer.
 - `docs/features/` vide n'entre dans aucun commit : git ne suit pas un
   dossier vide. Le commit `chore: scaffolding for the chain` porte
-  trois fichiers, pas quatre, et un clone n'a pas `docs/features/`
-  avant la première feature.
-- Le seul arrêt teste le global : un `docs/CURRENT_TECHNICAL_STATE.md`
-  déjà présent sans global n'arrête rien, et le fichier de commande ne
-  dit pas s'il est réécrit ou laissé.
-- Sur ce projet, rien de ce que `/socle` crée ne manque au disque :
-  `.gitignore` porte les deux lignes (18-19), les trois fichiers
-  existent, et `docs/features/` tient déjà deux dossiers de feature —
-  la vérification ne dit rien de plus sur le run qui les a posés.
+  trois fichiers ; `docs/features/` y entre avec `idees.md`, au commit
+  suivant du cockpit.
+- Le seul refus teste le global : un `docs/CURRENT_TECHNICAL_STATE.md`
+  déjà présent sans global n'arrête rien, et il est laissé tel quel —
+  le script ne le réécrit pas et ne le commite pas.
 
 **Décisions**
 
+- Un script de la chaîne, lancé par le cockpit · écartée : la commande
+  `/socle`, qui faisait écrire par Claude quatre fichiers fixes et
+  commiter · raison : rien n'y demande un jugement ; le cockpit est le
+  seul chemin pour créer une application (cockpit 1.7) · non éprouvée
 - Arrêt sur un global existant · écartée : réécrire le global · raison :
   « overwriting the global would lose every domain in it »
-  (`socle.md`) · inconnu
+  (`socle.md`, retiré) · inconnu
 - `.gitignore` en ajout, jamais réécrit · écartée : écrire le fichier ·
   raison : à retrouver · inconnu
 - Ne pas créer `docs/TECHNICAL_CONVENTIONS.md` · écartée : un fichier
   vide à compléter · raison : l'Architecte l'écrit à `/conventions`,
   et à son invocation 1 il ne lit aucun fichier au nom de *convention*
   (→ MECANISMES §Lecture des conventions — divergence) · inconnu
-- Deux scripteurs de l'état technique nommés — le Réalisateur dès le
-  premier lot, l'Arbitre pour le piège de plateforme · écartée : le
-  Réalisateur seul · raison : `docs/verification2/arbitre.md` F21 et
-  `docs/verification2/plans/arbitre.md` (« Name the Arbitre in
-  `socle.md` as a writer of `CURRENT_TECHNICAL_STATE.md` (traps) and a
-  loader of the skill, beside the Réalisateur ») · inconnu
-- Le Cadreur nommé comme non-lecteur de l'état technique · écartée :
-  le nommer lecteur · raison : « it establishes what the code carries
-  by grep » (`socle.md` ; → MECANISMES §Lecture de l'état technique)
-  · inconnu
+- Pas de push dans le script · écartée : le push de `/socle` · raison :
+  le cockpit pousse, et la première fois fixe la branche suivie sur
+  `origin` ; sans dépôt distant, il le dit (cockpit 1.7) · non éprouvée
+- `/deploie` retiré du rapport · écartée : le garder parmi ce que
+  l'application fournit · raison : le déploiement passe dans le cockpit
+  (1.8) · non éprouvée
 - Aucun agent, aucun worktree · écartée : un worktree systématique ·
   raison : → MECANISMES §Commit sans worktree · inconnu
 - `stop.md` et `stop1.md` jamais commités, d'où les deux lignes ·
   écartée : les commiter · raison : « Neither is ever committed, which
-  is why both are ignored » (`socle.md`) ; le fichier est créé dans le
-  dépôt principal et n'atteint pas un worktree coupé avant lui (→
-  MECANISMES §stop.md) · inconnu
+  is why both are ignored » (`socle.md`, retiré) ; le fichier est créé
+  dans le dépôt principal et n'atteint pas un worktree coupé avant lui
+  (→ MECANISMES §stop.md) · inconnu
 
 ---
 
@@ -356,7 +376,7 @@ is gone from the chain, and the line stands without it ». Le rôle que
 l'Extracteur tenait — faire naître le global depuis un code existant —
 est aujourd'hui tenu par le Fusionneur seul : le global naît de
 `INIT` sur la première feature fusionnée (→ MECANISMES §Les verbes du
-plan de fusion — ce qu'une phrase devient), et `/socle` le crée vide.
+plan de fusion — ce qu'une phrase devient), et `socle.py` le crée vide.
 
 **Ce que la chaîne tient sous le mot « existant ».** Une recherche de
 `extrait`, `extract`, `existant`, `GRILLE_EXISTANT` sous `.claude/`
@@ -405,7 +425,7 @@ ni commande, ni agent, ni fichier de sortie.
 
 **Ce qu'elle laisse manquant** — l'entrée entière. Un projet dont le
 code existe avant la chaîne n'a aucune commande qui écrive
-`docs/PRODUIT_GLOBAL.md` depuis ce code : `/socle` le crée à
+`docs/PRODUIT_GLOBAL.md` depuis ce code : `socle.py` le crée à
 `# Application`, et le Fusionneur le remplit feature après feature
 depuis les fichiers produit. Un comportement que le code porte et
 qu'aucune feature n'a décrit reste invisible au Sondeur 3 — sa grille
@@ -1113,11 +1133,11 @@ blocage.
 |---|---|---|---|
 | `docs/features/<name>/idees.md`, écrit à la main, en français, textes affichés entre guillemets | `/1_lexique`, invocation 1 puis 2 — le Lexicographe le lit entier, y remplace les termes retirés, ajoute ou retire des guillemets | Le Lexicographe bloque sur *no idea file* ou fichier vide ; la commande ne l'ouvre jamais ; le fichier atteint le worktree par `chore: answers` | `PROCESS_AMONT.md` |
 | `idees.md` au vocabulaire réglé, `lexique.md` à côté, le plus haut `questions-lexicographe-NN.md` sans `### Q` | `/2_structure`, invocation 1 — le Rédacteur transcrit en `desc-produit.md`, une fois | `^### Q` sur le plus haut fichier du lexicographe, à la racine ou sous `questions/lexicographe/` ; aucun `desc-produit.md` ; le Rédacteur bloque sur deux sujets sans lien | `PROCESS_AMONT.md` |
-| `docs/features/`, créé par `/socle` — vide au moment où `/socle` le pose, et hors commit, git ne suit pas un dossier vide ; sur ce projet il tient aujourd'hui `premiere-app/` et `premiere-app-2/` | Le Product Owner y crée `<name>/` ; chaque commande amont et aval dérive `docs/features/<name>/` de son argument (→ MECANISMES §Disposition du dossier de feature) | Rien — aucune commande ne teste l'existence du dossier de feature ; sur un `<name>` sans dossier, `/1_lexique` invoque et le Lexicographe bloque sur *no idea file* | `PROCESS_AMONT.md`, `PROCESS_AVAL.md` |
+| `docs/features/`, créé par `socle.py` — vide au moment où le script le pose, et hors commit, git ne suit pas un dossier vide ; sur ce projet il tient aujourd'hui `premiere-app/` et `premiere-app-2/` | Le cockpit y crée `<name>/idees.md` pour la première fonctionnalité, le Product Owner `<name>/` pour les suivantes ; chaque commande amont et aval dérive `docs/features/<name>/` de son argument (→ MECANISMES §Disposition du dossier de feature) | Rien — aucune commande ne teste l'existence du dossier de feature ; sur un `<name>` sans dossier, `/1_lexique` invoque et le Lexicographe bloque sur *no idea file* | `PROCESS_AMONT.md`, `PROCESS_AVAL.md` |
 | `docs/PRODUIT_GLOBAL.md` à `# Application` (→ MECANISMES §Lecture du global par l'index) | Le Rédacteur (index `^#`), le Sondeur invocation 3 (sections nommées), le Fusionneur (invocations 1 et 3) | Le Fusionneur teste le seul titre : rien d'autre → `INIT`, et l'invocation 3 écrit dans `desc-produit-fusion.md` | `PROCESS_AMONT.md` |
-| `docs/CURRENT_TECHNICAL_STATE.md` à `# Technical state` — l'état du fichier au sortir de `/socle`, avant tout lot (→ MECANISMES §Lecture de l'état technique) | Le Réalisateur et l'Arbitre y écrivent ; le Détailleur, le Réalisateur, le Diagnostiqueur (invocation 1, ce document) y lisent `## Traps — general` et `## Dead state` par grep puis lecture bornée | Tant qu'aucun lot n'a écrit, un grep de titre qui ne rend rien lit rien ; les deux titres existent une fois qu'un lot a écrit (`PROCESS_AVAL.md`, même ligne) ; la compétence `technical-state-format` chargée avant d'écrire | `PROCESS_AVAL.md`, `PROCESS_MECANISMES.md` |
+| `docs/CURRENT_TECHNICAL_STATE.md` à `# Technical state` — l'état du fichier au sortir de `socle.py`, avant tout lot (→ MECANISMES §Lecture de l'état technique) | Le Réalisateur et l'Arbitre y écrivent ; le Détailleur, le Réalisateur, le Diagnostiqueur (invocation 1, ce document) y lisent `## Traps — general` et `## Dead state` par grep puis lecture bornée | Tant qu'aucun lot n'a écrit, un grep de titre qui ne rend rien lit rien ; les deux titres existent une fois qu'un lot a écrit (`PROCESS_AVAL.md`, même ligne) ; la compétence `technical-state-format` chargée avant d'écrire | `PROCESS_AVAL.md`, `PROCESS_MECANISMES.md` |
 | Les lignes `.gitignore` `docs/features/*/stop.md` et `docs/features/*/stop1.md` (→ MECANISMES §stop.md) | `/8_code`, mouvement 6, cherche `stop.md` dans le dépôt principal | Ajoutées si absentes ; ni l'un ni l'autre jamais commité ; aucun des deux présent n'est une erreur | `PROCESS_AVAL.md`, `PROCESS_MECANISMES.md` |
-| `docs/TECHNICAL_CONVENTIONS.md` non créé par `/socle`, dit dans son rapport | `/conventions`, l'Architecte invocation 1 l'écrit depuis les deux documents de la feature | L'Architecte à l'invocation 1 ne lit aucun fichier au nom de *convention* ; tout l'aval le lit ensuite | `PROCESS_AMONT.md` → `PROCESS_AVAL.md` |
+| `docs/TECHNICAL_CONVENTIONS.md` non créé par `socle.py`, imprimé parmi ce que l'application fournit | `/conventions`, l'Architecte invocation 1 l'écrit depuis les deux documents de la feature | L'Architecte à l'invocation 1 ne lit aucun fichier au nom de *convention* ; tout l'aval le lit ensuite | `PROCESS_AMONT.md` → `PROCESS_AVAL.md` |
 | `code/rapport-controle.md` de `/9_controle`, phase 5 — `## Intentions missing`, `## Doubts` relayés | Le Product Owner écrit `bugfix-NN/bug-list.md` à la main : un manque par `G<n>`, `(B<n>)` en fin de première ligne pour un manque pris du rapport | `/diagnostique` lit `G<n>` sur la ligne et s'arrête sur un manque sans ; le Diagnostiqueur (2) lit `(B<n>)` par cette forme seule | `PROCESS_AVAL.md` → ce document |
 | `/8_code` : ce que le Contrôleur rapporte ne revient jamais par un blocage sur un lot fermé | Un `bug-list.md` et un cycle de correction | `/8_code` L755-757 ; aucune autre voie de retour | `PROCESS_AVAL.md` → ce document |
 | `bugfix-NN/` comme dossier de travail, créé par le Product Owner (→ MECANISMES §Dossier de travail) | `/diagnostique` exige le dossier et `bug-list.md` ; `/7_lots`, `/8_code`, `/9_controle`, `/conventions` (second argument), `/audit_blocages`, `/audit_conventions` prennent le plus haut | Le plus haut `bugfix-NN/` par nom ; `desc-bug.md` à sa racine ; jamais créé par une commande | `PROCESS_AVAL.md`, `PROCESS_MECANISMES.md` |
@@ -1130,7 +1150,7 @@ blocage.
 | `docs/TECHNICAL_CONVENTIONS.md` entier, à l'invocation 1 (→ MECANISMES §Lecture des conventions — divergence, §Grep du code avec chemin) | Le Diagnostiqueur en tire les dossiers de code à grepper | Chaque grep avec un chemin ; les conventions qui ne nomment aucun dossier n'ont pas de règle écrite chez lui | `PROCESS_MECANISMES.md`, `PROCESS_AMONT.md` |
 | `.claude/grids/GRILLE_FERMETURE_TECHNIQUE.md`, trois fermetures nommées | Le Diagnostiqueur, invocation 2, mouvement 9 ; le Convertisseur en lit d'autres | Les titres `## Completeness`, `## Resources`, `## Agreement between entries` existent dans la grille | `PROCESS_AMONT.md` |
 | `.claude/grids/GRILLE_EXISTANT.md` — la grille de l'existant, sans commande d'extraction | Le Sondeur, invocation 3, à `/4_grille` second temps ; `questions-existant-NN.md`, `blocked_existant.md` | Le plus haut `questions-existant-NN.md` sans `### Q` avant `/5_reclasse` | `PROCESS_AMONT.md` |
-| Le commit `chore: scaffolding for the chain` poussé, sans worktree (→ MECANISMES §Commit sans worktree) | Le dépôt distant ; le `HEAD` local que tout worktree suivant branche | Un push qui échoue est rapporté | `PROCESS_MECANISMES.md` |
+| Le commit `chore: scaffolding for the chain` de `socle.py`, sans worktree, poussé par le cockpit quand l'application a un dépôt distant (→ MECANISMES §Commit sans worktree) | Le dépôt distant ; le `HEAD` local que tout worktree suivant branche | Le cockpit dit un push qui échoue, et la création s'arrête là, reprenable | `PROCESS_MECANISMES.md` |
 
 ## Boucles
 
@@ -1191,11 +1211,12 @@ Agents décrits en entier : diagnostiqueur (invocation 1 — Investigation
 ; invocation 2 — Assembly).
 Agents portés en entrée courte : sondeur, invocation 3 — sous la forme
 `### sondeur, invocation 3 — ce que l'entrée /extrait en retient`,
-parce qu'aucune commande de ce document ne l'invoque ; `/socle`
+parce qu'aucune commande de ce document ne l'invoque ; `socle.py`
 n'invoque personne, `/diagnostique` n'invoque que le Diagnostiqueur,
 et aucun autre document ne l'invoque.
-Commandes décrites : `/socle` ; `/diagnostique` ; `/extrait` (absente
-de la chaîne, décrite comme telle).
+Commandes décrites : `/diagnostique` ; `/extrait` (absente de la
+chaîne, décrite comme telle).
+Script décrit : `socle.py` (`/socle` jusqu'au cockpit 1.7).
 Entrée décrite hors commande : `idees.md`.
 Agents nommés ici et décrits ailleurs, sans entrée courte parce
 qu'aucune commande de ce document ne les invoque : lexicographe,

@@ -48,7 +48,7 @@ never wait for her on anything an agent can settle.
 
 | Command | Argument | What it runs |
 |---|---|---|
-| `/socle` · `/diagnostique` | see each | **Outside the cycle** — set up, enter on a bug |
+| `.claude/scripts/socle.py` · `/diagnostique` | none · a feature name | **Outside the cycle** — set up, enter on a bug. 📌 **Set up is a script, not a command**: the cockpit runs it when it creates an application, ❌ never you |
 | `/1_lexique` · `/2_structure` · `/3_decoupe` · `/3a_genre` · `/3b_nature` · `/fusion_compare` · `/fusion_applique` | a feature name | **Cycle, upstream** — one agent per command |
 | `/4_grille` | a feature name | **Cycle, upstream** — four sondeurs at once, three angles and one global invocation, then the assembleur |
 | `/5_reclasse` | a feature name | **Cycle, upstream** — no agent; sorts the product file by nature |
