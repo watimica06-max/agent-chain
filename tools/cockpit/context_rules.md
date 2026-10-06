@@ -56,8 +56,13 @@ without context; only the cases of §2 are, entry by entry.
 
 ## 3. How a passage is found
 
-- **Terms** — case-insensitive, whole word or phrase: `atelier` never
-  matches `ateliers`. Several occurrences → « 1 / 5 », previous, next.
+- **Terms** — `Terms:` is split on its commas, and only there (« carries
+  the terms, comma-separated », agents/lexicographe.md:318). Each term is
+  matched **as a whole**: its words in order, case ignored, any run of
+  spaces or one line break between two words — never a single word of a
+  multi-word term. Whole words: `atelier` never matches `ateliers`. Where
+  two terms start at the same place, the longer wins: `bloc final`, not
+  `bloc`. Several occurrences → « 1 / 5 », previous and next, `←` and `→`.
 - **A block** — the heading `#… B<n>` (the title and a marker after it
   allowed), down to the next heading of the same level or higher.
 - **An entry** — the heading `#… §n.m`, down to the next heading of the

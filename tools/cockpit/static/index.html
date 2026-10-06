@@ -164,7 +164,7 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
 .opt.chosen { border-color: var(--accent); background: var(--accent-soft); }
 .opt.later { min-height: 44px; padding: 8px 16px; }
 .opt.later.chosen { border-color: var(--line); background: none; }
-#answer-foot { position: sticky; bottom: 0; z-index: 10; box-shadow: 0 -6px 16px rgba(0,0,0,.06); }
+#answer-foot { position: relative; z-index: 10; box-shadow: 0 -6px 16px rgba(0,0,0,.06); }
 #save-bar { background: var(--card); border-top: 1px solid var(--line);
   padding: 12px 32px; display: flex; gap: 16px; align-items: center; }
 #save-hint { font-weight: 600; }
@@ -172,9 +172,14 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
 .sumline.ok { color: var(--ok); } .sumline.err { color: var(--warn); font-weight: 600; }
 
 /* ------------------------------------- à répondre: two panes (1.4) */
-#scr-answer { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-#answer-left { min-width: 0; overflow: auto; display: flex; flex-direction: column; }
-#answer-left > .screen { flex: 1; width: 100%; }
+/* The two panes scroll on their own, between the top bar and the save
+   bar: neither moves the other, nor the page (1.4.4). */
+#scr-answer { height: 100%; overflow: hidden; display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+#main:has(> #scr-answer:not(.hidden)) { overflow: hidden; }
+#answer-left { grid-row: 1; grid-column: 1; min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+#answer-left > .screen { width: 100%; }
+#answer-foot { grid-row: 2; grid-column: 1 / -1; }
 .entry { cursor: default; scroll-margin: 16px; }
 .entry:focus { outline: none; }
 .entry.focused { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
@@ -183,7 +188,8 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
 #keys-legend { font-size: 13px; color: var(--soft); padding: 6px 32px; border-top: 1px solid var(--line); background: var(--card); }
 #keys-legend kbd { font-family: var(--mono); font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px;
   border-radius: 5px; padding: 0 5px; background: var(--bg); color: var(--ink); }
-#ctx-pane { min-width: 0; border-left: 1px solid var(--line); background: var(--card); display: flex; flex-direction: column; }
+#ctx-pane { grid-row: 1; grid-column: 2; min-width: 0; min-height: 0; border-left: 1px solid var(--line); background: var(--card);
+  display: flex; flex-direction: column; }
 #ctx-head { padding: 14px 20px 10px; border-bottom: 1px solid var(--line); }
 #ctx-head .doc { font-family: var(--mono); font-size: 14px; font-weight: 650; }
 #ctx-head .what { font-size: 14px; color: var(--soft); margin-top: 2px; }
@@ -191,7 +197,7 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
 #ctx-nav button { min-height: 32px; padding: 2px 12px; }
 #ctx-count { font-weight: 650; min-width: 64px; text-align: center; }
 #ctx-note { margin: 10px 20px 0; }
-#ctx-doc { flex: 1; overflow: auto; padding: 12px 20px 40px; font-size: 15px; line-height: 1.5; position: relative; }
+#ctx-doc { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 12px 20px 40px; font-size: 15px; line-height: 1.5; position: relative; }
 #ctx-doc .ln { min-height: 1.5em; white-space: pre-wrap; word-wrap: break-word; padding: 0 6px; border-radius: 4px; }
 #ctx-doc .ln.blank { min-height: .6em; }
 #ctx-doc .h1 { font-size: 22px; font-weight: 700; margin-top: 14px; }
@@ -383,7 +389,21 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
         <div id="form-errors"></div>
         <div id="form"></div>
       </div>
-      <div id="answer-foot">
+     </div>
+     <aside id="ctx-pane" aria-label="Le document de la question">
+      <div id="ctx-head">
+        <div class="doc" id="ctx-docname">—</div>
+        <div class="what" id="ctx-what"></div>
+        <div id="ctx-nav" class="hidden">
+          <button id="ctx-prev" class="small" title="Occurrence précédente (←)">‹ Précédente</button>
+          <span id="ctx-count"></span>
+          <button id="ctx-next" class="small" title="Occurrence suivante (→)">Suivante ›</button>
+        </div>
+      </div>
+      <div id="ctx-note" class="notice warn hidden" role="status"></div>
+      <div id="ctx-doc" aria-label="Document, en lecture seule"><p class="muted" id="ctx-empty">Choisissez une question : le passage dont elle parle s'affiche ici.</p></div>
+     </aside>
+     <div id="answer-foot">
       <div id="save-bar">
         <span id="save-hint">Aucune réponse à écrire pour l'instant.</span>
         <span class="grow"></span>
@@ -391,23 +411,10 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
       </div>
       <div id="keys-legend" aria-label="Raccourcis clavier">
         <kbd>1</kbd>–<kbd>6</kbd> option · <kbd>T</kbd> texte libre · <kbd>Échap</kbd> quitter le texte ·
-        <kbd>Entrée</kbd> ou <kbd>↓</kbd> suivante · <kbd>↑</kbd> précédente · <kbd>Ctrl</kbd>+<kbd>S</kbd> enregistrer
-      </div>
+        <kbd>Entrée</kbd> ou <kbd>↓</kbd> suivante · <kbd>↑</kbd> précédente ·
+        <kbd>←</kbd> <kbd>→</kbd> occurrence · <kbd>Ctrl</kbd>+<kbd>S</kbd> enregistrer
       </div>
      </div>
-     <aside id="ctx-pane" aria-label="Le document de la question">
-      <div id="ctx-head">
-        <div class="doc" id="ctx-docname">—</div>
-        <div class="what" id="ctx-what"></div>
-        <div id="ctx-nav" class="hidden">
-          <button id="ctx-prev" class="small" title="Occurrence précédente">‹ Précédente</button>
-          <span id="ctx-count"></span>
-          <button id="ctx-next" class="small" title="Occurrence suivante">Suivante ›</button>
-        </div>
-      </div>
-      <div id="ctx-note" class="notice warn hidden" role="status"></div>
-      <div id="ctx-doc" aria-label="Document, en lecture seule"><p class="muted" id="ctx-empty">Choisissez une question : le passage dont elle parle s'affiche ici.</p></div>
-     </aside>
     </section>
 
     <!-- ============================== Chaîne ============================== -->
@@ -1312,8 +1319,9 @@ function goToMatch(k) {
   for (const x of box.querySelectorAll(".cur")) x.classList.remove("cur");
   let target;
   if (ctxShown.data.kind === "terms") {
+    // An occurrence across a line break is one mark per line, the same k.
+    for (const x of box.querySelectorAll(`mark[data-k="${k}"]`)) x.classList.add("cur");
     target = box.querySelector(`mark[data-k="${k}"]`);
-    if (target) target.classList.add("cur");
   } else {
     for (const x of box.querySelectorAll(`.ln[data-k="${k}"]`)) x.classList.add("cur");
     target = box.querySelector(`.ln[data-line="${ms[k].start}"]`);
@@ -1356,7 +1364,9 @@ function segments(raw, pre, marks, plain) {
 }
 function renderDoc(lines, termMatches, ranges) {
   const byLine = new Map();
-  (termMatches || []).forEach((m, k) => { if (!byLine.has(m.line)) byLine.set(m.line, []); byLine.get(m.line).push({...m, k}); });
+  (termMatches || []).forEach((m, k) => {
+    for (const p of m.parts || [m]) { if (!byLine.has(p.line)) byLine.set(p.line, []); byLine.get(p.line).push({start: p.start, end: p.end, k}); }
+  });
   const inRange = new Map();
   (ranges || []).forEach((r, k) => { for (let i = r.start; i <= r.end; i++) if (!inRange.has(i)) inRange.set(i, k); });
   const out = []; let code = false;
@@ -1382,7 +1392,8 @@ function renderDoc(lines, termMatches, ranges) {
 
 // ------------------------------------------------------------ keyboard
 // 1-6 an option · T the text field, Échap out of it · Entrée or ↓ next,
-// ↑ previous · Ctrl+S saves. None fires while typing in a text field.
+// ↑ previous · ← → the document's occurrences · Ctrl+S saves. None fires
+// while typing in a text field.
 function isTyping(t) {
   if (!t || !t.tagName) return false;
   if (t.isContentEditable || t.tagName === "TEXTAREA" || t.tagName === "SELECT") return true;
@@ -1411,7 +1422,11 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key === "Enter" && t && ["BUTTON", "A", "SUMMARY"].includes(t.tagName)) return;
   if (e.key === "Enter" || e.key === "ArrowDown") { e.preventDefault(); moveFocus(1); return; }
-  if (e.key === "ArrowUp") { e.preventDefault(); moveFocus(-1); }
+  if (e.key === "ArrowUp") { e.preventDefault(); moveFocus(-1); return; }
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    e.preventDefault();                // never the radio buttons' own arrows
+    if (ctxShown) goToMatch(ctxShown.idx + (e.key === "ArrowRight" ? 1 : -1));
+  }
 }, true);
 
 function allEntries() { return F ? [...F.questions, ...F.blocking, ...(F.redecoupage ? [F.redecoupage] : [])] : []; }

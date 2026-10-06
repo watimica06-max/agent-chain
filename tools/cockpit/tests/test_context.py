@@ -114,6 +114,33 @@ def test_lexicographe_alone_points_to_every_occurrence_in_idees(feat):
     assert r["missing"] == []
 
 
+def test_a_term_of_several_words_is_matched_as_a_whole():
+    lines = ["Le bloc final ferme.", "Un bloc  final, puis le bloc", "final ; le final, un bloc.", "",
+             "BLOC FINAL", "bloc finale"]
+    got = [[(p["line"], lines[p["line"]][p["start"]:p["end"]]) for p in m["parts"]]
+           for m in context.term_matches(lines, ["bloc final"])]
+    # Any case, any run of spaces, one line break; never « bloc » or « final » alone.
+    assert got == [[(0, "bloc final")], [(1, "bloc  final")], [(1, "bloc"), (2, "final")], [(4, "BLOC FINAL")]]
+    # Beside a term that is one of its words, the longer one wins where both start.
+    both = context.term_matches(lines, ["bloc", "bloc final"])
+    assert [m["label"] for m in both] == ["bloc final", "bloc final", "bloc final", "bloc", "bloc final", "bloc"]
+    # A blank line between the words is not one line break.
+    assert context.term_matches(["bloc", "", "final"], ["bloc final"]) == []
+    # An occurrence across lines is only kept when every line is allowed.
+    assert len(context.term_matches(lines, ["bloc final"], allowed={0, 1})) == 2
+
+
+def test_a_real_question_highlights_whole_terms():
+    real = os.path.join(HERE, "fixtures", "context", "premiere-app-3")
+    r = resolve_one(os.path.join(real, "questions-lexicographe-02.md"), real)            # Q1
+    assert r["rule"] == "CTX-LEX12" and r["terms"][3] == "bloc final"   # `Terms:` split on commas only
+    texts = [r["lines"][m["line"]][m["start"]:m["end"]].lower() for m in r["matches"]]
+    assert texts.count("bloc final") == 4 and "final" not in texts
+    for m in r["matches"]:                                              # no « bloc » cut out of « bloc final »
+        if m["label"] == "bloc":
+            assert not r["lines"][m["line"]][m["end"]:].lower().startswith(" final")
+
+
 def test_lexicographe_beside_an_answered_file_points_into_its_answers(feat):
     (feat / "questions-sondeur-02.md").write_text(
         "### Q1\nBlock: B1\nQuestion: is the atelier timed?\nAnswer: Oui, chaque atelier est chronométré.\n\n"

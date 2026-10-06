@@ -75,11 +75,15 @@ ce n'est plus le chiffre du moment.
 vous attendent, dans un seul formulaire, **à gauche** ; **à droite**, le
 document dont parle la question choisie, en lecture seule, le passage
 surligné : chaque occurrence des termes (« 1 / 5 », précédente,
-suivante), ou le bloc entier. Si le passage n'est pas dans le fichier, le
+suivante), ou le bloc entier. Un terme de plusieurs mots est surligné
+entier, jamais mot par mot. Les deux volets défilent chacun de son côté,
+entre la barre du haut et la barre d'enregistrement : faire défiler le
+document ne fait jamais quitter la question. Si le passage n'est pas dans le fichier, le
 volet le dit. Ce que chaque question vise est écrit dans
 `context_rules.md`. Au clavier : `1` à `6` choisissent une option, `T`
 place le curseur dans le texte libre, `Échap` en sort, `Entrée` ou `↓`
-passent à la question suivante, `↑` revient, `Ctrl+S` enregistre. Les
+passent à la question suivante, `↑` revient, `←` et `→` passent d'une
+occurrence à l'autre dans le document, `Ctrl+S` enregistre. Les
 touches ne font rien pendant la saisie d'un texte (sauf `Ctrl+S`).
 Dans le formulaire :
 - choisir une option, éventuellement avec une remarque ;
