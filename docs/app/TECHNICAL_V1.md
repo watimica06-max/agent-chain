@@ -1,9 +1,12 @@
-# Chain cockpit — technical design, version 1.3
+# Chain cockpit — technical design, version 1.4
 
 A local application that lets the Product Owner run the agent chain
 without editing files by hand. Version 1 covers the two things that cost
 her the most time: **answering questions and blocking files**, and
 **knowing which command comes next**.
+
+*1.4 — each question beside the passage it is about (§14); what every
+run and every agent consumes, and the two usage windows (§13).*
 
 *1.3 — where the feature stands: a scan of the files (§10), the stored
 `Next:` checked against them (§2.2, §11); « Chaîne » and « Correction »
@@ -376,3 +379,82 @@ and « Où on en est ? » in the top bar.
 
 The page writes nothing beyond §2.3's places — the last of them, `bugfix-NN/bug-list.md`, new in 1.3.
 
+## 13. Consumption (1.4)
+
+### 13.1 What the stream gives — checked on a real stream
+
+There were no run logs in `tools/cockpit/logs/` to check against. The
+check was made on two real sessions run for it — not chain commands: a
+Haiku session in a scratch folder, an agent nesting another, two parallel
+tool calls, then `/usage` (Claude Code 2.1.285, `claude-agent-sdk`
+0.2.163). Its second stream is `tests/fixtures/logs/2026-10-06-094500-probe.jsonl`.
+
+- **Input and cache tokens, per agent: exact.** Assistant messages carry
+  `usage` and `message_id`; parallel tool calls repeat one id; the
+  subagent's messages carry its `parent_tool_use_id`, a nested agent's
+  its own. Deduplicated per id, the orchestrator plus every agent equals
+  the result's `model_usage` input (28 + 3 805 + 1 600 = 5 433). 🔴 **Only
+  with `forward_subagent_text`**: without it a subagent message holding no
+  tool call never reaches the stream — the nested agent of the first
+  session was missing whole. The runner turns it on.
+- **Output tokens, per agent: not available — recorded as unknown.**
+  - per-step `output_tokens` is a placeholder (« Per-step `output_tokens`
+    is a placeholder », Agent SDK, *Track cost and usage*) — seen: 1, 3, 6
+    on messages that wrote 51 to 202;
+  - the Agent tool's result gives `subagent_tokens` (one total, input and
+    output mixed) for a foreground agent, and `async_launched` for a
+    background one; `TaskNotificationMessage.usage.total_tokens` is one
+    total too — neither is an output count;
+  - `message_delta` stream events carry the real count, but for the main
+    session only: `StreamEvent.parent_tool_use_id` is « Always `None`.
+    Stream events are emitted for the main session only » (Python SDK
+    reference) — seen: none for either subagent.
+- **Run totals:** the latest result's `model_usage`, which counts
+  subagents (« Use `modelUsage`… for whole-tree token accounting; the
+  `usage` field undercounts as soon as nesting occurs »). A resumed
+  session's results count its earlier spend: a continuation records what
+  it added since the session's last run.
+
+### 13.2 The usage windows
+
+- **A `RateLimitEvent` comes at the first response of every session**,
+  and again when a value changes (seen 0.04 → 0.05). Its
+  `rate_limit_info.raw.unifiedWindows` holds **both** windows,
+  `five_hour` and `seven_day`, each with `utilization` and `resetsAt`.
+- **`/usage` sent in the run's own session answers without a model call**
+  — `duration_api_ms` 0, `num_turns` 0, cost unchanged — and its text gives
+  « Current session: N% used · resets … » and « Current week (all models):
+  N% used · resets … ». The runner asks it once, when the run is over,
+  logs it as a probe (never the run's work, never its relay) and stores
+  both windows. If it fails, the last measure stays, with its age.
+- Not used: a status line script receives `rate_limits` too (« only
+  after the first API response in the session »), but it is a script the
+  terminal interface runs; `/usage` needs no script and no setting.
+
+### 13.3 What is stored and shown
+
+- Every log line carries `at`, the time the message was received.
+- `tools/cockpit/stats.sqlite` (`sqlite3`, ignored by git): `runs`,
+  `agent_passes`, `rate_limits`. A subagent's `output_tokens` is NULL —
+  unknown —, never the placeholder.
+- The logs written since 1.1 are loaded at the server's start, once each
+  (by path), marked `backfilled`. They carry `at` on every line since
+  1.1, so their durations are known; a log without it would leave them
+  unknown.
+- Dashboard: two gauges — percent used, left, the reset, and « mesuré il
+  y a … ». A measure whose window has reset since is shown as such, never
+  as current. Under the run: one line per agent that hands back, the
+  run's totals at its end. Tokens and time only.
+
+## 14. « À répondre » beside its document (1.4)
+
+- Two panes: the questions; the document the focused question points to,
+  read-only. `tools/cockpit/context_rules.md` gives, writer by writer and
+  with its lines, what an entry points to — `Terms:` to words, `Block:`
+  to a `### B<n>` section, `Entries:` to `§n.m` headings. A target no
+  instruction gives is no context, said.
+- Several occurrences: « 1 / n », previous and next. A target not in the
+  file: said, nothing highlighted. A blocking entry: no document.
+- Keyboard: `1`-`6` an option, `T` the text field, `Échap` out of it,
+  `Entrée` or `↓` next, `↑` previous, `Ctrl+S` save. None but `Ctrl+S`
+  fires in a text field.

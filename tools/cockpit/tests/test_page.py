@@ -127,7 +127,8 @@ def test_save_bar_stays_visible_while_the_form_scrolls(tmp_path, page):
         page.goto(s.url)
         go(page, "À répondre")
         page.wait_for_selector(".entry")
-        main = page.locator("#main")
+        # 1.4: the questions scroll in their own pane, beside the document.
+        main = page.locator("#answer-left")
         assert main.evaluate("e => e.scrollHeight > e.clientHeight + 400")        # the form does scroll
         for top in (0, 600, 100000):
             main.evaluate(f"e => e.scrollTo(0, {top})")

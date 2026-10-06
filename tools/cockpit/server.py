@@ -17,12 +17,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import blocking   # noqa: E402
+import context as context_mod  # noqa: E402
 import decide as decide_mod  # noqa: E402
 import diagnostic  # noqa: E402
 import gitref     # noqa: E402
 import questions  # noqa: E402
 import runner as runner_mod  # noqa: E402
 import scan as scan_mod  # noqa: E402
+import stats as stats_mod  # noqa: E402
 import textfile   # noqa: E402
 import writer     # noqa: E402
 from state import State  # noqa: E402
@@ -191,6 +193,8 @@ def forms_payload(app, work, rn):
     for e in qs:
         d = e.to_dict()
         d.update(step=_owner(e.rel, e.kind, e.file), chain=_chain(e.rel))
+        t = context_mod.target(e, work_dir(app, feature_of(work)))
+        d["ctx"] = {k: t.get(k) for k in ("status", "rule", "reason", "kind")}
         out_q.append(d)
     for e in bs:
         d = e.to_dict()
@@ -207,6 +211,16 @@ def forms_payload(app, work, rn):
         "errors": [e.to_dict() for e in qerr] + [n.to_dict() for n in notices],
         "worktrees": wts,
     }
+
+
+def question_context(app, work, rn, qid):
+    """The document a question points to and its passages — read only
+    (`context_rules.md`)."""
+    qs, _, _, _, _, _ = collect_forms(app, work, rn)
+    entry = next((q for q in qs if q.id == qid), None)
+    if entry is None:
+        return None
+    return context_mod.resolve(entry, work_dir(app, feature_of(work)))
 
 
 def save_items(app, work, rn, items):
@@ -356,6 +370,7 @@ def make_on_end(state: State):
 
 def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
              diag_runner=diagnostic.run_diagnostic):
+    store = rn.stats
     @web.middleware
     async def guard(request, handler):
         # Only this machine's browser, on this page: a foreign site cannot
@@ -403,7 +418,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         out = {"app_folder": state.app_folder, "working_folder": state.working_folder,
                "recent": state.recent(), "load_error": state.load_error,
                "open": bool(a), "mode": state.mode, "diagnostic": state.diagnostic(),
-               "logs_dir": rn.log_dir, "groups": GROUPS}
+               "logs_dir": rn.log_dir, "groups": GROUPS,
+               # The two usage windows, each with when it was measured (§13.3).
+               "limits": _limits(store), "now": datetime.now().isoformat(timespec="seconds")}
         if state.app_folder and not check_app_folder(state.app_folder):
             out["working_folders"] = working_folders(state.app_folder)
         if a:
@@ -416,7 +433,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                 "last": state.relay(a, w),
                 "run": run.snapshot() if run and run.id else None,
                 "stop_file": os.path.exists(rn.stop_file(a, feature)),
-                "history": state.history(a, w),
+                "history": _with_usage(store, state.history(a, w)),
                 # Worktrees other than the main checkout, once nothing runs.
                 "worktrees": [] if rn.is_running(a) else runner_mod.list_worktrees(a),
                 "scan": sc,
@@ -475,6 +492,13 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     async def forms(request):
         a, w = need_pair()
         return web.json_response(forms_payload(a, w, rn))
+
+    async def question_ctx(request):
+        a, w = need_pair()
+        out = question_context(a, w, rn, request.query.get("id", ""))
+        if out is None:
+            return web.json_response({"error": "cette question n'est plus à répondre — rechargez"}, status=404)
+        return web.json_response(out)
 
     async def save(request):
         a, w = need_pair()
@@ -648,6 +672,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/open", open_pair)
     r.add_post("/api/close", close_pair)
     r.add_get("/api/forms", forms)
+    r.add_get("/api/context", question_ctx)
     r.add_post("/api/save", save)
     r.add_post("/api/run", run)
     r.add_post("/api/stop-now", stop_now)
@@ -660,6 +685,43 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/permission", permission)
     r.add_get("/api/events", events)
     return app
+
+
+def _limits(store):
+    if not store:
+        return {}
+    try:
+        return store.latest_limits()
+    except Exception:
+        return {}
+
+
+def _with_usage(store, hist):
+    """Each remembered run with its totals, read from the store by its log."""
+    if not store or not hist:
+        return hist
+    try:
+        found = store.runs_by_logs([h.get("log_path") for h in hist])
+    except Exception:
+        return hist
+    for h in hist:
+        r = found.get(h.get("log_path"))
+        if r:
+            h["usage"] = stats_mod.totals_summary(
+                {k: r[k] for k in ("input_tokens", "cache_read_tokens", "cache_creation_tokens",
+                                   "output_tokens")} if r["input_tokens"] is not None else None,
+                r["duration_s"])
+    return hist
+
+
+def backfill(store, state, log_dir):
+    """The logs written since 1.1, loaded once: a log already in the store is
+    skipped. The feature and the `Next:` come from the remembered history."""
+    hist = {}
+    for h in state.all_history():
+        if h.get("log_path"):
+            hist[os.path.normcase(h["log_path"])] = {**h, "work": h.get("key", "").split("|", 1)[-1]}
+    return store.backfill(log_dir, hist)
 
 
 def _sse(ev):
@@ -675,7 +737,12 @@ def main(argv=None):
 
     state = State(args.config) if args.config else State()
 
-    rn = runner_mod.Runner(on_end=make_on_end(state), mode_getter=lambda: state.mode)
+    store = stats_mod.Store()
+    rn = runner_mod.Runner(on_end=make_on_end(state), mode_getter=lambda: state.mode, stats=store)
+    done = backfill(store, state, rn.log_dir)
+    if done["runs"]:
+        print(f"Consommation : {done['runs']} journal(aux) ancien(s) chargé(s) dans stats.sqlite "
+              f"({done['passes']} passage(s) d'agent, {done['limits']} mesure(s) d'usage).", flush=True)
     app = make_app(state, rn)
     url = f"http://{HOST}:{args.port}/"
 
