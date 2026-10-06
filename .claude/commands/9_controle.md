@@ -76,6 +76,10 @@ reach the Contrôleur marked `carried`, through the map of phase 1.**
 and stop**: there is nothing to confront the sheets with —
 `Next: stop desc-produit.md missing`.
 
+🔴 **`tracabilite.md` absent from the feature folder** — 📌 **phase 1
+reads it**: say so and stop, the conversion did not finish —
+`Next: stop tracabilite.md missing`.
+
 🔴 **Stop if a lot of a sequence has no `verdict.md` whose `## Status`
 opens on `PASS`** — name it: `Next: stop <lot> not PASS`. 📌 **Two sequences when the working folder
 is a `bugfix-NN/`**: ⚠️ **the feature folder's, whose sheets phases 1
@@ -119,10 +123,6 @@ isolated.
 ## How it runs
 
 **Six phases.**
-
-🔴 **`tracabilite.md` absent from the feature folder** — 📌 **phase 1
-reads it**: say so and stop, the conversion did not finish —
-`Next: stop tracabilite.md missing`.
 
 📌 **`code/recette.md` absent from the working folder** — ⚠️ **normal,
 not a stop**: no lot had a criterion beyond a test. 🔴 **Phase 4 then

@@ -49,9 +49,33 @@ blocking file. 🔴 **A blocking file is opened for its `## Decision`
 alone**, to tell empty from filled — never for what it says.
 
 **`desc-bug.md`** — 📌 **its existence, nothing more**: a `Glob` before
-phase 2.
+the commit, see *Before anything else*.
 
 ⚠️ **Nothing else.** `CLAUDE.md`'s standing reading rules apply.
+
+---
+
+## Before anything else
+
+🔴 **Sort every gap of `bug-list.md` before issuing anything**, on
+what `investigation/` holds for its identifier — the first row that
+matches decides:
+
+| For `<id>` | Phase 1 |
+|---|---|
+| `investigation/blocked_<id>.md` with a filled `## Decision` | **Issue it**, naming the file in the prompt — the agent applies it, then investigates |
+| `investigation/blocked_<id>.md` with an empty `## Decision` | 🔴 **Skip it, and relay it as standing** — nothing changed since it was written; re-issuing it costs a full investigation that stops at the same place |
+| `investigation/<id>.md` exists | **Skip it** — 🔴 **an existing report is done; a re-run costs a full investigation** |
+| Nothing | **Issue it** |
+
+📌 **That is how a single failed investigation is re-run**: the Product
+Owner fills its blocking file, you launch this command again, and only
+that one goes.
+
+🔴 **Before issuing phase 2, `Glob` `desc-bug.md` in the folder** — 📌
+**here, before the commit and before phase 1.** ⚠️ **It exists → do
+not issue phase 2, and phase 1 neither**: 📌 **relay it as done** —
+what it holds is settled, and the agent would only stop on it.
 
 ---
 
@@ -88,21 +112,6 @@ invocation is redone.)*
 
 **Two phases, in this order.**
 
-🔴 **Sort every gap of `bug-list.md` before issuing anything**, on
-what `investigation/` holds for its identifier — the first row that
-matches decides:
-
-| For `<id>` | Phase 1 |
-|---|---|
-| `investigation/blocked_<id>.md` with a filled `## Decision` | **Issue it**, naming the file in the prompt — the agent applies it, then investigates |
-| `investigation/blocked_<id>.md` with an empty `## Decision` | 🔴 **Skip it, and relay it as standing** — nothing changed since it was written; re-issuing it costs a full investigation that stops at the same place |
-| `investigation/<id>.md` exists | **Skip it** — 🔴 **an existing report is done; a re-run costs a full investigation** |
-| Nothing | **Issue it** |
-
-📌 **That is how a single failed investigation is re-run**: the Product
-Owner fills its blocking file, you launch this command again, and only
-that one goes.
-
 **Phase 1 — one `Agent()` per gap to issue, all issued together.**
 🔴 **Each call carries one gap and its identifier**, nothing about the
 others.
@@ -120,7 +129,8 @@ Agent(
 )
 ```
 
-📌 **The bracketed line goes in only on the first row of the table.**
+📌 **The bracketed line goes in only on the first row of the table of
+*Before anything else*.**
 
 ⚠️ **Wait for every call to report** before phase 2. 📌 **A call that
 returns a blocking file does not stop the others** — relay it, let the
@@ -135,10 +145,6 @@ invocation 2 would only block in turn, on a file no decision can
 supply a report to. 📌 **Report the blocked identifiers from your own
 phase-1 results** — the calls that returned a blocking file, and the
 gaps skipped as standing — and stop there; see *What you relay*.
-
-🔴 **Before issuing phase 2, `Glob` `desc-bug.md` in the folder.** ⚠️
-**It exists → do not issue phase 2**: 📌 **relay it as done** — what
-it holds is settled, and the agent would only stop on it.
 
 **Phase 2 — one `Agent()`, once every report exists and no
 `desc-bug.md` does.**
@@ -176,8 +182,7 @@ notifies on completion. Do not pass it; wait for the notification.
 ## Git, once it has reported
 
 **Then, once the last call you issued reports** — phase 2's, or
-phase 1's when phase 2 is withheld or not issued — 📌 **five steps, in
-this order:**
+phase 1's when phase 2 is withheld — 📌 **five steps, in this order:**
 
 1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
    agent has no Bash and commits nothing**, and the renames of *What

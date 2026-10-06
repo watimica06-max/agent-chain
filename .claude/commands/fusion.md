@@ -37,10 +37,10 @@ run to row 7, 9 or 10 instead of row 8.**
 
 **Only what the routing table tests** — the presence of files, whether
 a `## Decision` or an `Answer:` field is empty, what a blocking file's
-`## Invocation` line says — the file numbers *Git, before
-invoking* reads off their names and its one grep of `^### Q`, and the
-one grep *On `INIT` — the copy* names. 🔴 **Never their content beyond
-that.**
+`## Invocation` line says — the one grep of `^### Q` *Where to resume*
+makes before row 6's copy, the file numbers *Git, before invoking*
+reads off their names, and the one grep *On `INIT` — the copy* names.
+🔴 **Never their content beyond that.**
 
 ⚠️ **Nothing else.** `CLAUDE.md`'s standing reading rules apply.
 
@@ -109,6 +109,18 @@ global.** ⚠️ **The agent tests the global itself**; the routing does
 not change. 🔴 **A line of its own in the global would make `INIT`
 never fire** — the copy *On `INIT`* makes carries over what it merged.
 
+🔴 **A row that invokes fired — 3, or 6 to 11: test the root first,
+before the copy of row 6 and before any git step.**
+
+🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is
+neither `fusionneur` nor `architecte` before touching it** — 📌 **a
+file holding questions is not yours to file**: ⚠️ **it waits on an
+answer, or its answers were never integrated.** 🔴 **Stop and say
+which** — `Next: stop <file> waits on an answer or an integration`. 📌 **The two exceptions are the two the filing below already
+carries** — ⚠️ **the architecte's is `/conventions`'s, not this
+command's**, and a `### Q` in it says nothing about the run; the
+Fusionneur's own is what the routing table reads, rows 7 and 9.
+
 🔴 **Row 6 fired: copy the product file, then invoke.** 📌 **In that
 order** — ⚠️ **the row tests the copy's absence**, so copying first
 would make it never fire:
@@ -138,17 +150,9 @@ Fusionneur must never have to choose its source.**
 
 ## Git, before invoking
 
-🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is
-neither `fusionneur` nor `architecte` before touching it** — 📌 **a
-file holding questions is not yours to file**: ⚠️ **it waits on an
-answer, or its answers were never integrated.** 🔴 **Stop and say
-which** — `Next: stop <file> waits on an answer or an integration`. 📌 **The two exceptions are the two the filing below already
-carries** — ⚠️ **the architecte's is `/conventions`'s, not this
-command's**, and a `### Q` in it says nothing about the run; the
-Fusionneur's own is what the routing table reads, rows 7 and 9.
-
-🔴 **Then move every root `questions-*.md` whose prefix is not the
-one the phase you are about to run writes:**
+🔴 **Once the root has passed the `### Q` test of *Where to resume*,
+move every root `questions-*.md` whose prefix is not the one the phase
+you are about to run writes:**
 
     git mv docs/features/<name>/questions-<other>-NN.md \
            docs/features/<name>/questions/<other>/

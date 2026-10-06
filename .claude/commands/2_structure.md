@@ -58,40 +58,6 @@ above are counts, not reading.
 
 ---
 
-## Git, before invoking
-
-📌 **The lexicographe's questions file was filed first, or the command
-stopped on it** — see *How it runs*.
-
-🔴 **Commit the feature folder**, before creating the worktree:
-
-    git add docs/features/<name>/ && git commit -m "chore: answers"
-
-⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
-session.** A worktree branches from the last commit — uncommitted
-answers are invisible inside it, and the agent works on a stale
-`questions.md`. *(Seen once: 186 lines in the worktree, 195 in the main
-checkout.)*
-
-📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then create a worktree from local `HEAD`, and register it:**
-
-    git worktree add .claude/worktrees/<name> HEAD
-
-⚠️ **Never let the tooling branch it for you** — its default base is
-`origin/master`, which can sit several commits behind local. An agent
-would then work on stale content and its output would have to be
-discarded. *(Seen once: a whole invocation lost that way.)*
-
-📌 **Enter the worktree before invoking the agent**, not after it
-fails — the harness blocks a subagent's writes until the session is
-isolated. *(Measured on three
-phases: the agent does the full job, cannot write, and the whole
-invocation is redone.)*
-
----
-
 ## How it runs
 
 **First, a lexicographe's questions file at the root.** 🔴 **Grep it
@@ -105,8 +71,23 @@ settled vocabulary after its invocation 4 wrote none. 📌 **None at the
 root → nothing to guard**, carry on. 🔴 **The stop prints `Next: run
 /1_lexique <name>`.**
 
-📌 **No `### Q` → file it**, 🔴 **the choice of invocation below reads
-the root after it:**
+**Then, the Rédacteur's blocking file.** 🔴 **Does `blocked_redacteur.md`
+sit in the feature folder?**
+
+| | What you do |
+|---|---|
+| Absent | 📌 Carry on |
+| Its `## Invocation` says **3** | 🔴 **Stop** — 📌 **it is `/fusion`'s**: the merge blocked, not the structuring; say so — `Next: run /fusion <name>` |
+| It says 1 or 2, and its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands — `Next: answer blocking, then run /2_structure <name>` |
+| It says 1 or 2, and its `## Decision` is filled | 📌 **Name it in the prompt**, beside the file to read |
+
+⚠️ **Read those two headings, nothing else** — 📌 the agent reads the
+file. 🔴 **The `## Invocation` line is what routes the file**: ⚠️ **the
+Rédacteur has three invocations and one blocking-file name**, and
+`/fusion` looks for the same file.
+
+📌 **The lexicographe's file holding no `### Q` → file it**, 🔴 **the
+choice of invocation below reads the root after it:**
 
     git mv docs/features/<name>/questions-lexicographe-NN.md \
            docs/features/<name>/questions/lexicographe/
@@ -125,21 +106,6 @@ its fourth**, when its work is done.
 📌 **Create `questions/lexicographe/` if it does not exist.** ⚠️
 **Nothing to file is a normal outcome.** 📌 **What remains at the root
 is the file to integrate — one at most.**
-
-**Then, the Rédacteur's blocking file.** 🔴 **Does `blocked_redacteur.md`
-sit in the feature folder?**
-
-| | What you do |
-|---|---|
-| Absent | 📌 Carry on |
-| Its `## Invocation` says **3** | 🔴 **Stop** — 📌 **it is `/fusion`'s**: the merge blocked, not the structuring; say so — `Next: run /fusion <name>` |
-| It says 1 or 2, and its `## Decision` is empty | 🔴 **Stop** — say the blocking file still stands — `Next: answer blocking, then run /2_structure <name>` |
-| It says 1 or 2, and its `## Decision` is filled | 📌 **Name it in the prompt**, beside the file to read |
-
-⚠️ **Read those two headings, nothing else** — 📌 the agent reads the
-file. 🔴 **The `## Invocation` line is what routes the file**: ⚠️ **the
-Rédacteur has three invocations and one blocking-file name**, and
-`/fusion` looks for the same file.
 
 **Then, which invocation and which file:**
 
@@ -206,6 +172,44 @@ then run /1_lexique <name>`.
 line is answered** — 📌 **silence accepts the proposal**, and that is
 what the line exists for. 🔴 **Test both**: `^Answer:\s*$` with no
 `Défaut:` above it in the same entry.
+
+---
+
+## Git, before invoking
+
+📌 **Every test of *How it runs* came first** — the lexicographe's
+questions file was filed, or the command stopped on one of them.
+
+🔴 **Commit the feature folder**, before creating the worktree:
+
+    git add docs/features/<name>/ && git commit -m "chore: answers"
+
+⚠️ **The Product Owner fills `Answer:` fields by hand, outside this
+session.** A worktree branches from the last commit — uncommitted
+answers are invisible inside it, and the agent works on a stale
+`questions.md`. *(Seen once: 186 lines in the worktree, 195 in the main
+checkout.)*
+
+📌 **Nothing to commit is a normal outcome** — carry on.
+
+🔴 **Then create a worktree from local `HEAD`, and register it:**
+
+    git worktree add .claude/worktrees/<name> HEAD
+
+⚠️ **Never let the tooling branch it for you** — its default base is
+`origin/master`, which can sit several commits behind local. An agent
+would then work on stale content and its output would have to be
+discarded. *(Seen once: a whole invocation lost that way.)*
+
+📌 **Enter the worktree before invoking the agent**, not after it
+fails — the harness blocks a subagent's writes until the session is
+isolated. *(Measured on three
+phases: the agent does the full job, cannot write, and the whole
+invocation is redone.)*
+
+---
+
+## The invocation
 
 ```
 Agent(

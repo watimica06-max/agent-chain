@@ -62,7 +62,7 @@ def test_premiere_app_main_and_corrections(tmp_path):
     assert states(corr(r, "bugfix-06")["steps"]) == {"diagnostique": F, "7_lots": F, "8_code": F, "9_controle": AF}
     assert step(corr(r, "bugfix-06")["steps"], "8_code")["lots"] == {"pass": 55, "total": 55}
     for old in ("bugfix-05", "bugfix-04", "bugfix-03"):
-        # Their `## Defects` holds « None. »: a line, by 7_lots.md:188's own test.
+        # Their `## Defects` holds « None. »: a line, by 7_lots.md:208's own test.
         assert states(corr(r, old)["steps"]) == {"diagnostique": F, "7_lots": AF, "8_code": AF, "9_controle": AF}
     for old in ("bugfix-02", "bugfix-01"):
         assert states(corr(r, old)["steps"]) == {"diagnostique": F, "7_lots": F, "8_code": F, "9_controle": AF}
@@ -129,7 +129,7 @@ def test_why_names_the_rule_and_the_files_for_each_state(tmp_path):
         (step(r2["main"], "1_lexique"), A, "G-ATT", ["questions-classeur-01.md"], "« À qui est une réponse »"),
         (step(r4["main"], "1_lexique"), EC, "G-RUN", [], "le run en cours"),
         (step(r2["main"], "4_grille"), BL, "GRI-5", ["desc-produit.md"], "4_grille.md:134-140"),
-        (step(r3["main"], "2_structure"), AF, "STR-1", ["questions-lexicographe-01.md"], "2_structure.md:97-106"),
+        (step(r3["main"], "2_structure"), AF, "STR-1", ["questions-lexicographe-01.md"], "2_structure.md:63-72"),
     ]
     for st, state, rule, files, cite in cases:
         assert st["state"] == state
@@ -161,7 +161,7 @@ def turn_folder(tmp_path, root_files=(), markers=True, filed_sondeur=True):
 @pytest.mark.parametrize("root,expect", [
     # After /2_structure: the Rédacteur's file at the root (agents/redacteur.md:275).
     (["questions-redacteur-02.md"], {"2_structure": F, "3_decoupe": AF, "3a_genre": AF, "3b_nature": AF}),
-    # After /3_decoupe: it filed that file (3_decoupe.md:62-65) — the root is empty.
+    # After /3_decoupe: it filed that file (3_decoupe.md:66-69) — the root is empty.
     ([], {"2_structure": F, "3_decoupe": F, "3a_genre": AF, "3b_nature": AF}),
     # After /3a_genre: its own file (agents/qualifieur.md:3).
     (["questions-qualifieur-01.md"], {"3_decoupe": F, "3a_genre": F, "3b_nature": AF, "4_grille": AF}),
@@ -339,7 +339,7 @@ ANCHORS = {
     "CNV-6": ["Skip to the assembly"],
     "CON-1": ["spec-technique.md` is absent"], "CON-2": ["filled"], "CON-3": ["Requests"], "CON-4": ["Integrating"],
     "CON-5": ["Deriving"], "CON-6": ["Completing"], "CON-7": ["/7_lots"],
-    "LOT-1": ["spec-technique.md` or `desc-bug.md`"], "LOT-2": ["/fusion"], "LOT-3": ["blocked_verificateur.md"],
+    "LOT-1": ["spec-technique.md` or `desc-bug.md`", "the technical document has to be there"], "LOT-2": ["/fusion"], "LOT-3": ["blocked_verificateur.md"],
     "LOT-4": ["redecoupage.md"], "LOT-5": ["filled"], "LOT-6": ["Once the split holds"], "LOT-7": ["The split holds"],
     "LOT-8": ["/7_lots", "carries lines"], "LOT-9": ["first split"],
     "COD-1": ["PASS"], "COD-2": ["/7_lots"], "COD-3": ["reaching 3"], "COD-5": ["/9_controle"], "COD-6": ["PASS"],

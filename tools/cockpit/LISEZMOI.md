@@ -100,10 +100,19 @@ seulement) écrit `stop.md` ; « Retirer stop.md » le renomme `stop1.md`.
 
 Quand un agent rend la main, une ligne dit ce qu'il a consommé :
 « Lexicographe — 4 min 12 s — 182 k lus (dont 160 k en cache), écrits :
-inconnu ». Ce qu'un sous-agent écrit n'est donné par aucune source exacte :
-le cockpit écrit « inconnu » plutôt qu'un faux chiffre. À la fin du run,
-ses totaux, écrits compris. Tout est gardé dans `stats.sqlite` (hors git) ;
-les anciens journaux y sont chargés une fois au démarrage du serveur.
+inconnu ». Pendant le run, rien ne donne ce qu'un sous-agent écrit : le
+cockpit écrit « inconnu » plutôt qu'un faux chiffre. À la fin du run, ses
+totaux, écrits compris, et ce que chaque agent a écrit, lu dans les
+transcriptions que Claude Code garde sur le disque — seulement si leur
+somme tombe juste sur le total du run ; sinon tous restent « inconnu ».
+Tout est gardé dans `stats.sqlite` (hors git) ; les anciens journaux y
+sont chargés une fois au démarrage du serveur, et les runs déjà gardés y
+retrouvent leurs chiffres tant que leurs transcriptions sont là.
+
+Un blocage n'est jamais caché sur une supposition : quand le cockpit
+devine qu'une entrée n'est peut-être pas à vous (un manque que `/8_code`
+règle seul, un verdict de l'Architecte), elle reste dans « À répondre »
+avec ce qu'il a vu.
 
 Fermer l'onglet n'arrête pas la commande ; rouvrir la page la retrouve.
 

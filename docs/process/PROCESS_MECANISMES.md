@@ -398,6 +398,8 @@ Coût et écarté : deux fichiers, deux lieux · écarté : un seul lieu pour `s
 
 Utilisé par: `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique` ; `CLAUDE.md`.
 
+Avant ces gestes, et avant le classement, chaque test de précondition de la commande : le premier geste qui change le dépôt (`git mv`, copie, commit, worktree) et le premier agent ne viennent qu'après. Trois commandes gardent un test après ce geste, parce qu'il lit ce que le geste ou une phase produit : `/2_structure` (la racine après le classement), `/9_controle` (la carte que la phase 1 écrit), `/diagnostique` (la porte de la phase 2) — le cockpit demande toujours confirmation pour elles (`tools/cockpit/scan_rules.md` §2).
+
 Trois gestes, dans cet ordre, une fois le classement des fichiers de questions fait :
 
 1. Commit du dossier de feature : `git add docs/features/<name>/ && git commit -m "chore: answers"` — le Product Owner remplit `Answer:`, `## Decision` et `bug-list.md` à la main hors session, et un worktree branche sur le dernier commit : une réponse non commitée y est invisible. Rien à commiter est l'issue normale. Le message diverge par commande : `chore: answers` (amont, `/conventions`, `/diagnostique`, `/fusion*`), `chore: pre-split` (`/7_lots`), `chore: pre-code` (`/8_code`), `chore: pre-control` (`/9_controle`).
@@ -770,7 +772,7 @@ Les valeurs — le test dépend de la forme du fichier :
 - vide sous chaque `## Blocking N`, forme 3 — chaque `## Decision` testé un par un ; un seul vide arrête (`/2_structure`, `/3a_genre`, `/3b_nature`) ; une décision peut nommer un genre ou une nature (écrit par l'agent), une réécriture ou un retrait (la ligne reste vide, le bloc *waits on the Rédacteur*, le fichier reste au nom non numéroté pour `/2_structure`), une valeur hors table (ligne vide, rien ne tourne)
 - numérotée complète, forme 4 — chaque `## Blocking N` a sa ligne `N.` sous l'unique `## Decision` (grep `^## Blocking ` contre les lignes numérotées) : remplie
 - numérotée partielle, forme 4 — moins de numéros que de titres : l'agent a appliqué les répondus et s'est arrêté sur les autres ; la commande s'arrête sans renommer ; le numéro absent est le signal, jamais un numéro vide ni une note ; le detailleur l'énumère à la reprise — un `## Blocking N` sans numéro dessous est un blocage encore debout, il s'arrête (`detailleur.md` L491)
-- `Not settled here. <whose it is, and why>` — l'Arbitre sur un blocage qui n'est pas le sien (Relecteur, Architecte, Cadreur avec requête) ; le Réalisateur s'arrête et relaie la ligne. Pas une divergence : la valeur n'atteint ni le Détailleur ni `/8_code` — l'Arbitre ne l'émet que sur un bloc dont `Written by` n'est ni detailleur ni realisateur (`arbitre.md` L172-177, L275-281) ; le fichier du Détailleur est le sien, et aucun des cinq fichiers que 4b lit ne peut la porter, `/8_code` n'invoquant jamais l'Arbitre (`8_code.md` L726)
+- `Not settled here. <whose it is, and why>` — l'Arbitre sur un blocage qui n'est pas le sien (Relecteur, Architecte, Cadreur avec requête) ; le Réalisateur s'arrête et relaie la ligne. Pas une divergence : la valeur n'atteint ni le Détailleur ni `/8_code` — l'Arbitre ne l'émet que sur un bloc dont `Written by` n'est ni detailleur ni realisateur (`arbitre.md` L172-177, L275-281) ; le fichier du Détailleur est le sien, et aucun des cinq fichiers que 4b lit ne peut la porter, `/8_code` n'invoquant jamais l'Arbitre (`8_code.md` L733)
 - une décision qui renvoie le lot au découpage — testée par la présence de `code/redecoupage.md`, jamais par les mots de la décision (realisateur, detailleur, `/8_code`)
 - le `## Verdict` d'une requête, forme 1 empilée du Cadreur — `## Decision` reste vide ; rempli sur le `# Request N` que `## Where` nomme, il lève le blocage (cadreur, `/7_lots`) ; refusé, le blocage tient et le Product Owner décide
 - absent — forme 5 du Vérificateur : rien n'est à trancher
@@ -819,7 +821,7 @@ Les valeurs :
 - `FAIL mineur` — tout le reste, quel que soit le nombre de constats ; une correction ciblée par un Réalisateur neuf, une re-revue entière
 - `FAIL structurel` — le module du lot rouge ou ses tests non lancés (première règle de tête), une section manquante de la fiche (`Cause` `sheet`), ou un symbole promis absent ou divergent sans décision (point 1) ; le lot est repris du mouvement 1
 
-Tout lecteur apparie le préfixe `PASS`. Divergence : aucune — `PASS` et `PASS with reservation` n'atteignent pas le realisateur : il n'est invoqué sur un verdict que sur FAIL (`8_code.md` L226, L547-549), et une reprise sur décision remplie passe le fichier de blocage, jamais `Verdict:` (`8_code.md` L74-78, L538-543) ; `/8_code` dit que `FAIL mineur` et `FAIL structurel` sont un seul FAIL pour elle, la forme étant celle du Réalisateur, et branche sur `## Cause` seul (`8_code.md` L230-234).
+Tout lecteur apparie le préfixe `PASS`. Divergence : aucune — `PASS` et `PASS with reservation` n'atteignent pas le realisateur : il n'est invoqué sur un verdict que sur FAIL (`8_code.md` L240, L547-549), et une reprise sur décision remplie passe le fichier de blocage, jamais `Verdict:` (`8_code.md` L74-78, L538-543) ; `/8_code` dit que `FAIL mineur` et `FAIL structurel` sont un seul FAIL pour elle, la forme étant celle du Réalisateur, et branche sur `## Cause` seul (`8_code.md` L244-248).
 
 ### Les trois causes d'un FAIL — d'où vient la faute
 
@@ -830,7 +832,7 @@ Les valeurs :
 - `reasoning` — la fiche bien lue, le raisonnement qui en part manqué ; la seule qui justifie `opus`, au seuil de deux occurrences dans `## Causes so far`
 - `sheet` — la faute est en amont, dans la fiche ; `## Findings` dit ce que la fiche manque ; `/8_code` revert les commits du lot, supprime quatre fichiers, relance le Détailleur en mode ordinaire avec `Findings:` et `Your lot:` — jamais un Réalisateur ; cela compte comme une tentative ; sur un lot qui n'est pas le dernier codé, tous les lots suivants tombent avec lui
 
-Divergence : aucune — le realisateur énumère les trois : `understanding` ou `reasoning`, rien au-delà de la ligne du statut, la cause est à l'orchestration (`realisateur.md` L605) ; `/8_code` énumère les trois : `understanding` est la reprise ordinaire sur `sonnet`, ni le revert ni le changement de modèle (`8_code.md` L307-310).
+Divergence : aucune — le realisateur énumère les trois : `understanding` ou `reasoning`, rien au-delà de la ligne du statut, la cause est à l'orchestration (`realisateur.md` L605) ; `/8_code` énumère les trois : `understanding` est la reprise ordinaire sur `sonnet`, ni le revert ni le changement de modèle (`8_code.md` L321-324).
 
 ### Les onze types de défaut — ce que le Vérificateur constate
 

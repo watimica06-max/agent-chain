@@ -178,12 +178,13 @@ class Run:
 
 class Runner:
     def __init__(self, client_factory=sdk_client_factory, on_end=None, log_dir=None,
-                 mode_getter=lambda: "auto", stats=None, measure_limits=None):
+                 mode_getter=lambda: "auto", stats=None, measure_limits=None, transcripts_root=None):
         self.client_factory = client_factory
         self.on_end = on_end
         self.mode_getter = mode_getter
         self.log_dir = log_dir or LOG_DIR
         self.stats = stats                # a stats.Store, or None
+        self.transcripts_root = transcripts_root   # Claude Code's config folder; None: its default
         # The end-of-run /usage: on for the real SDK client, off for fakes
         # unless a test asks for it.
         self.measure_limits = (client_factory is sdk_client_factory
@@ -449,7 +450,12 @@ class Runner:
             self._store_limit(run, m)
 
     def _record(self, run: Run):
-        """The run and its agents, into the store."""
+        """The run and its agents, into the store. The agents' output comes
+        from the transcripts, read now: the run is over, `/usage` included."""
+        try:
+            stats_mod.apply_transcripts(run.tally, self.transcripts_root)
+        except Exception as e:
+            self._emit(run, "error", {"message": f"transcriptions non lues : {e}"})
         run.usage = stats_mod.totals_summary(run.tally.totals,
                                              stats_mod._seconds(run.started_at, run.ended_at))
         if not self.stats or not run.id:
@@ -585,7 +591,7 @@ class Runner:
 
     @staticmethod
     def stop_file(repo: str, feature: str) -> str:
-        # cmd/8_code.md:437-440 — at the feature folder's root, in the main
+        # cmd/8_code.md:444-447 — at the feature folder's root, in the main
         # checkout, never in the worktree.
         return os.path.join(repo, "docs", "features", feature, "stop.md")
 
@@ -604,7 +610,7 @@ class Runner:
 
     @staticmethod
     def disarm_stop_file(repo: str, feature: str) -> str | None:
-        """`stop1.md` is the disarmed form (cmd/8_code.md:455-457)."""
+        """`stop1.md` is the disarmed form (cmd/8_code.md:462-464)."""
         path = Runner.stop_file(repo, feature)
         if not os.path.exists(path):
             return None

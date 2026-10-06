@@ -297,3 +297,19 @@ def test_a_command_the_relay_did_not_name_asks_for_confirmation(tmp_path, page):
         assert len(asked) == 1 and "n'est pas l'étape" in asked[0]
         assert s.clients == []                                         # dismissed: nothing ran
         assert page.locator(".cmd.hl").count() == 1                    # the named one is highlighted
+
+
+def test_a_guessed_entry_is_shown_with_what_the_guess_saw(tmp_path, page):
+    """1.4.1: the Relecteur's « missing input » guess never hides an entry."""
+    with FakeServer(tmp_path) as s:
+        lot = s.feat / "code" / "lot-09"
+        lot.mkdir(parents=True)
+        (lot / "blocked_relecteur.md").write_text(
+            "## What blocks\n\n`code/lot-09/tests.md` is missing.\n\n## Where\n\ncode/lot-09\n\n"
+            "## To resume\n\nRun the testeur.\n\n## Decision\n\n", encoding="utf-8")
+        page.goto(s.url)
+        go(page, "À répondre")
+        card = page.locator(".entry", has_text="is missing")
+        card.wait_for()
+        assert "8_code.md:748-750" in card.locator(".notice").inner_text()
+        assert no_real_errors(page) == []

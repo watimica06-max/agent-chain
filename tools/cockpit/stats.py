@@ -1,4 +1,4 @@
-"""What every run and every agent consumes — cockpit 1.4.
+"""What every run and every agent consumes — cockpit 1.4, 1.4.1.
 
 Counting rules (TECHNICAL_V1 §13, the Agent SDK's « Track cost and usage »):
 - per-step usage is read on assistant messages, **once per message id** —
@@ -6,7 +6,9 @@ Counting rules (TECHNICAL_V1 §13, the Agent SDK's « Track cost and usage »):
 - a message belongs to the agent its `parent_tool_use_id` names, nested
   agents included; no parent is the orchestrator;
 - per-step `output_tokens` is a placeholder: **never stored**. A subagent's
-  output is unknown (no source in the stream gives it, see §13);
+  output comes from the transcripts Claude Code writes (`transcripts.py`),
+  once the run is over, and only when they add up exactly to the run's
+  `model_usage` — otherwise every agent's output stays unknown;
 - run totals come from the latest result's `model_usage`, which counts the
   subagents; its `usage` alone does not.
 
@@ -20,6 +22,8 @@ import sqlite3
 import threading
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+
+import transcripts
 
 AGENT_TOOLS = {"Agent", "Task"}
 BACKGROUND_RESULT = re.compile(r"async_launched|in the background|agentId", re.I)
@@ -55,6 +59,7 @@ class Pass:
     tool_calls: int = 0
     background: bool = False
     ended: bool = False
+    output_tokens: int | None = None    # from the transcripts, all or none (apply_transcripts)
 
     @property
     def duration_s(self):
@@ -65,9 +70,9 @@ class Pass:
                 "input_tokens": self.input_tokens, "cache_read_tokens": self.cache_read_tokens,
                 "cache_creation_tokens": self.cache_creation_tokens,
                 "read_tokens": self.input_tokens + self.cache_read_tokens + self.cache_creation_tokens,
-                # Per-step output_tokens is a placeholder; no source gives the
-                # exact output of one subagent (TECHNICAL_V1 §13.1).
-                "output_tokens": None, "tool_calls": self.tool_calls,
+                # Never the stream's placeholder: the transcripts' figure, or
+                # unknown (TECHNICAL_V1 §13.1).
+                "output_tokens": self.output_tokens, "tool_calls": self.tool_calls,
                 "started_at": self.started_at, "ended_at": self.ended_at}
 
 
@@ -189,6 +194,17 @@ class Tally:
             t["output_tokens"] += u.get("outputTokens") or 0
         # The running total of the call: the latest result, never a sum of results.
         self.totals = t
+
+
+def apply_transcripts(tally, root=None) -> bool:
+    """Every pass's output from the transcripts, or every one unknown. True
+    when they were filled. Compared with the latest result's model_usage as
+    it came — never the figure a resumed run stores after subtraction."""
+    total = tally.totals.get("output_tokens") if tally.totals else None
+    got = transcripts.agent_outputs(tally.session_id, total, list(tally.passes), root)
+    for tid, p in tally.passes.items():
+        p.output_tokens = got[tid] if got is not None else None
+    return got is not None
 
 
 def _text_of(content) -> str:
@@ -376,7 +392,7 @@ class Store:
                            " backfilled) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                            (run_id, p.tool_use_id, p.parent, p.agent, p.description, p.model,
                             p.started_at, p.ended_at, p.duration_s, p.input_tokens,
-                            p.cache_read_tokens, p.cache_creation_tokens, None, p.tool_calls,
+                            p.cache_read_tokens, p.cache_creation_tokens, p.output_tokens, p.tool_calls,
                             int(backfilled)))
             return totals_summary(totals, dur)
         return self._exec(go)
@@ -434,10 +450,11 @@ class Store:
 
     # ----------------------------------------------------------- backfill
 
-    def backfill(self, log_dir, history=None):
+    def backfill(self, log_dir, history=None, transcripts_root=None):
         """Load every run log not yet in the store, once (by its path). Old
         logs are marked backfilled; their durations come from each line's
-        `at` when it is there, and are unknown otherwise."""
+        `at` when it is there, and are unknown otherwise; their agents'
+        output from the transcripts still on disk."""
         history = history or {}
         done = {"files": 0, "runs": 0, "passes": 0, "limits": 0, "skipped": 0}
         try:
@@ -449,7 +466,7 @@ class Store:
             if name.startswith("next-ecarte") or self.run_by_log(path):
                 done["skipped"] += 1
                 continue
-            got = self._backfill_one(path, history.get(os.path.normcase(path)) or {})
+            got = self._backfill_one(path, history.get(os.path.normcase(path)) or {}, transcripts_root)
             if got is None:
                 done["skipped"] += 1
                 continue
@@ -459,7 +476,10 @@ class Store:
             done["limits"] += got["limits"]
         return done
 
-    def _backfill_one(self, path, hist):
+    @staticmethod
+    def _read_log(path):
+        """A run log fed to a Tally, its probe lines left out: (tally,
+        limits, lines, every line timed), or None when it cannot be read."""
         tally = Tally()
         limits = []
         at_all = True
@@ -484,8 +504,16 @@ class Store:
                             limits.append(x)
         except OSError:
             return None
+        return tally, limits, lines, at_all
+
+    def _backfill_one(self, path, hist, transcripts_root=None):
+        read = self._read_log(path)
+        if read is None:
+            return None
+        tally, limits, lines, at_all = read
         if not lines:
             return None
+        apply_transcripts(tally, transcripts_root)
         if not at_all:
             # No receive time on every line: durations are not known.
             tally.first_at = tally.last_at = None
@@ -505,3 +533,30 @@ class Store:
         for x in limits:
             self.record_limit(run_id, x, backfilled=True)
         return {"passes": len(tally.passes), "limits": len(limits)}
+
+    def backfill_outputs(self, transcripts_root=None):
+        """The agents' output of the runs already stored, from the
+        transcripts still on disk: each run read again from its log (the
+        model_usage it got, never the stored difference of a resumed run),
+        all or none. A run whose agents already have a figure is skipped."""
+        def todo(db):
+            return [dict(r) for r in db.execute(
+                "SELECT r.id, r.log_path FROM runs r WHERE r.session_id IS NOT NULL"
+                " AND r.log_path IS NOT NULL AND EXISTS (SELECT 1 FROM agent_passes a"
+                " WHERE a.run_id=r.id) AND NOT EXISTS (SELECT 1 FROM agent_passes a"
+                " WHERE a.run_id=r.id AND a.output_tokens IS NOT NULL)")]
+        done = {"runs": 0, "passes": 0, "unknown": 0}
+        for r in self._exec(todo):
+            read = self._read_log(r["log_path"]) if os.path.isfile(r["log_path"]) else None
+            if read is None or not apply_transcripts(read[0], transcripts_root):
+                done["unknown"] += 1
+                continue
+            figures = [(p.output_tokens, r["id"], tid) for tid, p in read[0].passes.items()]
+
+            def go(db, figures=figures):
+                for f in figures:
+                    db.execute("UPDATE agent_passes SET output_tokens=? WHERE run_id=? AND tool_use_id=?", f)
+            self._exec(go)
+            done["runs"] += 1
+            done["passes"] += len(figures)
+        return done
