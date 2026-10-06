@@ -1,0 +1,11 @@
+.claude/worktrees/
+.claude/settings.local.json
+
+tools/cockpit/config.json
+tools/cockpit/config.json.tmp
+tools/cockpit/**/__pycache__/
+tools/cockpit/.pytest_cache/
+tools/cockpit/logs/
+tools/cockpit/stats.sqlite
+tools/cockpit/stats.sqlite-journal
+tools/cockpit/screens/
