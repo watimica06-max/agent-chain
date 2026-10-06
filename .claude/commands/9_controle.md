@@ -446,13 +446,15 @@ even empty** — 📌 **its absence would read as *the phase did not run*.**
 
 ## Git, once it has reported
 
-**Then, once phase 6 has written its file — 📌 five steps, in this
-order:**
+🔴 **Every end of the run merges first, once the worktree exists — a
+stop included, the map's crossing among them, as much as phase 6
+written.** 📌 **Five steps, in this order:**
 
 1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
-   agent has no Bash and commits nothing**, and the four files phases
-   1, 4, 5 and 6 wrote by hand are uncommitted too; 📌 **`git merge`
-   takes the branch's commits, not the worktree's files**, and
+   agent has no Bash and commits nothing**, and the files phases 1, 4,
+   5 and 6 wrote by hand — those the run reached — are uncommitted
+   too; 📌 **`git merge` takes the branch's commits, not the
+   worktree's files**, and
    `git worktree remove` refuses a dirty tree
 2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
    cannot issue a git command against the main checkout**: the merge

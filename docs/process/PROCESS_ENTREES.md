@@ -504,9 +504,8 @@ rapport de l'agent relayé, et *What to run next* : `/7_lots`.
    s'arrête là.
    Cette porte vient après le commit et le worktree : elle lit les
    résultats de la phase 1. Quand la phase 1 n'envoie rien, elle ne
-   repose que sur le tri, et aucune ligne de la commande ne referme
-   alors le worktree — le Git d'après le rapport part du dernier appel
-   envoyé.
+   repose que sur le tri ; le Git d'après le rapport referme alors le
+   worktree comme à toute autre fin (étape 9).
 7. Phase 2 — un `Agent()`, une fois que chaque rapport existe et
    qu'aucun `desc-bug.md` n'existe : `subagent_type="diagnostiqueur"`,
    `model="sonnet"`, `description="assemble <feature>"`, prompt
@@ -526,8 +525,8 @@ rapport de l'agent relayé, et *What to run next* : `/7_lots`.
    identifiant, parmi les `blocked_diagnostiqueur-NN.md` de la racine.
    Une décision remplie laissée au nom non numéroté renvoie le manque
    au run suivant, et `/audit_blocages` la liste comme encore ouverte.
-9. Git une fois le dernier appel envoyé rapporté — celui de la phase 2,
-   ou ceux de la phase 1 quand la phase 2 est retenue —
+9. Git à toute fin du run une fois le worktree créé, un arrêt compris —
+   la phase 2 retenue, que la phase 1 ait envoyé des appels ou aucun —
    → MECANISMES §Git, après le rapport — les cinq pas ; jamais de
    `remove` forcé ; un `blocked_*.md` fusionne aussi.
 10. Relayer, → MECANISMES §Forme d'un relais : le rapport de l'agent et
