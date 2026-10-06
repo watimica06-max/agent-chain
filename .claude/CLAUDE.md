@@ -194,12 +194,21 @@ isolated session, and the write fails.
 🔴 **Create it from local `HEAD`** — see the rule at the top of this
 file — and register it.
 
-🔴 **Merge before handing back, always.** `git merge --no-ff <branch>`
-from the main checkout root, then `git worktree remove <path>`.
+🔴 **No branch, ever.** The worktree stays on the detached `HEAD` it
+was created on; ❌ **you never create a branch**, in it or for it.
+📌 **You merge its commit, by its id** — nothing to name, nothing to
+delete, no name an earlier run already took. Its commits stay
+reachable until `git worktree remove`, which comes after the merge.
+
+🔴 **Merge before handing back, always.** Before leaving the worktree,
+read its commit id — `git -C <path> rev-parse HEAD` — then, from the
+main checkout root, `git merge --no-ff -m "<message>" <commit id>`,
+where `<message>` reads `Merge /<command> <name>`; then
+`git worktree remove <path>`.
 
 ⚠️ **A worktree holding an unmerged commit never self-cleans** — the
-periodic sweep skips anything that still holds work. If you abandon a
-branch deliberately, remove its worktree with `--force` or it stays on
+periodic sweep skips anything that still holds work. If you abandon its
+work deliberately, remove the worktree with `--force` or it stays on
 disk forever.
 
 ## What you never do

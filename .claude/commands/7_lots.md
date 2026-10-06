@@ -325,12 +325,13 @@ requests* ran it — has reported — 📌 five steps, in this order:**
    under `architecte/`, `docs/TECHNICAL_CONVENTIONS.md` and the feature
    folder's `couverture.md`** — ⚠️ **a `git add` that reaches them
    all**, never the working folder alone; 📌 **`git merge` takes the
-   branch's commits, not the worktree's files**, and `git worktree
+   worktree's commit, not its files**, and `git worktree
    remove` refuses a dirty tree
-2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
-   cannot issue a git command against the main checkout**: the merge
-   below, issued from inside it, is refused
-3. `git merge --no-ff <branch>` from the main checkout root
+2. 🔴 **Read the worktree's commit id, then leave it** —
+   `git -C <path> rev-parse HEAD`; ⚠️ **a session isolated in a
+   worktree cannot issue a git command against the main checkout**:
+   the merge below, issued from inside it, is refused
+3. `git merge --no-ff -m "<message>" <commit id>` from the main checkout root
 4. `git push`
 5. `git worktree remove <path>`
 

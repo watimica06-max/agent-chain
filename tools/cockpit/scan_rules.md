@@ -30,14 +30,14 @@ emulator (`/deploie`) → `/fusion`.
 
 | Link | Where the command says it |
 |---|---|
-| 1_lexique → 2_structure | 1_lexique.md:271, :275, :277 |
-| 2_structure → 3_decoupe | 2_structure.md:404 |
-| 3_decoupe → 3a_genre | 3_decoupe.md:260 |
-| 3a_genre → 3b_nature | 3a_genre.md:294 |
-| 3b_nature → 4_grille | 3b_nature.md:306 |
-| 4_grille → 4_grille (second time) → 5_reclasse | 4_grille.md:638, :640 |
+| 1_lexique → 2_structure | 1_lexique.md:272, :276, :278 |
+| 2_structure → 3_decoupe | 2_structure.md:405 |
+| 3_decoupe → 3a_genre | 3_decoupe.md:261 |
+| 3a_genre → 3b_nature | 3a_genre.md:295 |
+| 3b_nature → 4_grille | 3b_nature.md:307 |
+| 4_grille → 4_grille (second time) → 5_reclasse | 4_grille.md:639, :641 |
 | 5_reclasse → 6_convertit | 5_reclasse.md:227 |
-| 6_convertit → conventions | 6_convertit.md:471 |
+| 6_convertit → conventions | 6_convertit.md:472 |
 | conventions → 7_lots | conventions.md:307 |
 | 7_lots → 8_code | 7_lots.md:208, :250 |
 | 8_code → 8_code (lots left) → 9_controle | 8_code.md:530, :519 |
@@ -51,21 +51,21 @@ emulator (`/deploie`) → `/fusion`.
   (deploie.md:68-70). /fusion is named by `Next: run` in two places only:
   `/7_lots` when the technical document holds no `### §` (7_lots.md:72-78)
   and `/2_structure` on a Rédacteur block of invocation 3
-  (2_structure.md:80). 6_convertit.md:471 says `/fusion_compare`
+  (2_structure.md:80). 6_convertit.md:472 says `/fusion_compare`
   « branches off here whenever you choose ». **The test and /fusion are
   the Product Owner's to start**: the scan proposes the test step once a
   control is written, and /fusion is one click with a confirmation.
 - **Every answer loops back to `/1_lexique`**, not to the step that asked
-  (2_structure.md:403, 3a_genre.md:293, 3b_nature.md:305, 4_grille.md:637,
-  :639, 6_convertit.md:468) — except technical answers (6_convertit.md:467)
+  (2_structure.md:404, 3a_genre.md:294, 3b_nature.md:306, 4_grille.md:638,
+  :640, 6_convertit.md:469) — except technical answers (6_convertit.md:468)
   and the architecte's (conventions.md:300).
 - **`/4_grille` runs twice**: a first time, then a second time against the
-  global (4_grille.md:638 then :640).
+  global (4_grille.md:639 then :641).
 - **`/conventions` is run by hand** — « no command chains it »
-  (conventions.md:60-61) — though `/6_convertit` names it (6_convertit.md:471).
+  (conventions.md:60-61) — though `/6_convertit` names it (6_convertit.md:472).
 
 **Correction chain**, in a `bugfix-NN/` — `/diagnostique` → `/7_lots` →
-`/8_code` → `/9_controle` (diagnostique.md:13, :227). Every command
+`/8_code` → `/9_controle` (diagnostique.md:13, :228). Every command
 takes the feature's name and acts on **the highest** `bugfix-NN/`
 (7_lots.md:18-19, 8_code.md:25-26, 9_controle.md:20-21,
 diagnostique.md:22): the cockpit launches the highest one only; an
@@ -95,7 +95,7 @@ even when it is the step proposed** (`scan.CONFIRM`).
 | `/6_convertit` | ✓ | Tests :35-60, the `### Q` guard :62-66, which natures run :85-95 and « nothing to write » :114-118 — then `git mv` :128, commit :160, worktree :170; the walk's deletions and copies :183-188 are made inside the worktree. |
 | `/conventions` | ✓ | Table :76-88 walked first (its last rows invoke nothing; :86 files and commits as its outcome), guard :123-126 — then `git mv` :133, commit :158, worktree :168. |
 | `/7_lots` | ✓ | Tests :58-66 (the technical document exists) and :72-78 (`^### §`) — then `git mv` :91, commit :103, worktree :109. What the Cadreur and the Vérificateur leave is read once the Cadreur hands back (:205-214), not before acting; « the command is the trigger, never the state of the folder » (:131-132). |
-| `/8_code` | ✓ | Tests :74-100, `blocked_architecte.md` :102-107 and the two stop rows of 4b on the lot found :109-114 — then commit :122, worktree :128. 4b runs again on every later lot (:327-334): what it reads there, an agent of this run wrote; a stop there ends the run through « When the run ends » (:794). |
+| `/8_code` | ✓ | Tests :74-100, `blocked_architecte.md` :102-107 and the two stop rows of 4b on the lot found :109-114 — then commit :122, worktree :128. 4b runs again on every later lot (:327-334): what it reads there, an agent of this run wrote; a stop there ends the run through « When the run ends » (:795). |
 | `/9_controle` | ⚠️ | Tests :75-77, :79-81 (`tracabilite.md`), :83-87 — then commit :104, worktree :110 — **then** the map's crossing :225-228, which stays: it reads `tracabilite-full.md`, which phase 1 writes in the worktree (:192-193). Its git section runs at every end once the worktree exists, that stop included (:449-451): the run commits, merges and pushes `tracabilite-full.md`, and closes its worktree. |
 | `/deploie` | ✓ | The device test :27 comes before the installs :42-46. No git, no agent. |
 | `/fusion` | ✓ | Rows 1-5 :56-60 and other blocking files :68-73 first, then — a row that invokes — the `### Q` guard :112-122 — then row 6 copies `desc-produit-fusion.md` :128-129, `git mv` :157, commit :183, worktree :193. |
@@ -123,17 +123,17 @@ to the command named after it in « `answer …, then run X` »: that step is
 | `OWN-GEN` | `blocked_qualifieur.md` | 3a_genre | 3a_genre.md:39 |
 | `OWN-NAT` | `blocked_classeur.md` | 3b_nature | 3b_nature.md:38 |
 | `OWN-GRI` | `cadrage-produit/blocked_*.md`, `blocked_existant.md`, `blocked_assembleur.md` | 4_grille | 4_grille.md:47-61 |
-| `OWN-TEC` | `convertisseur/technique-*.md` | 6_convertit | 6_convertit.md:467 · 6_convertit.md:469 |
+| `OWN-TEC` | `convertisseur/technique-*.md` | 6_convertit | 6_convertit.md:468 · 6_convertit.md:470 |
 | `OWN-CNV` | `convertisseur/blocked_*.md` | 6_convertit | 6_convertit.md:56 |
 | `OWN-ARC` | a root `questions-architecte-NN.md` | conventions | conventions.md:82 |
 | `OWN-ARB` | `blocked_architecte.md`, invocation other than 3 | conventions | conventions.md:78 |
 | `OWN-AR3` | `blocked_architecte.md`, invocation 3 | 8_code | 8_code.md:327-333 |
 | `OWN-CAD` | `code/blocked_cadreur.md` | 7_lots | 7_lots.md:212 |
-| `OWN-RED` | `code/redecoupage.md`, third return | 7_lots | 7_lots.md:378-379 |
-| `OWN-COD` | `code/blocked_detailleur.md`, `code/<lot>/blocked_*.md` | 8_code | 8_code.md:333-334 · 8_code.md:751 |
+| `OWN-RED` | `code/redecoupage.md`, third return | 7_lots | 7_lots.md:379-380 |
+| `OWN-COD` | `code/blocked_detailleur.md`, `code/<lot>/blocked_*.md` | 8_code | 8_code.md:333-334 · 8_code.md:752 |
 | `OWN-FUS` | a root `questions-fusionneur-NN.md` | fusion | fusion.md:60 |
 | `OWN-FUB` | `blocked_fusionneur.md` | fusion | fusion.md:57 |
-| `OWN-DIA` | `investigation/blocked_*.md`, `blocked_diagnostiqueur.md` | diagnostique | diagnostique.md:232 · diagnostique.md:242 |
+| `OWN-DIA` | `investigation/blocked_*.md`, `blocked_diagnostiqueur.md` | diagnostique | diagnostique.md:233 · diagnostique.md:243 |
 | `OWN-?` | any other | none — listed under « unknown owner » | aucune commande ne nomme ce fichier |
 
 The form reads the feature folder and its highest `bugfix-NN/`.
@@ -175,17 +175,17 @@ Rédacteur's.
 | `OWN-GEN` | 3a_genre | t'attend | see §3 | 3a_genre.md:39 |
 | `OWN-NAT` | 3b_nature | t'attend | see §3 | 3b_nature.md:38 |
 | `OWN-GRI` | 4_grille | t'attend | see §3 | 4_grille.md:47-61 |
-| `OWN-TEC` | 6_convertit | t'attend | see §3 | 6_convertit.md:467 · 6_convertit.md:469 |
+| `OWN-TEC` | 6_convertit | t'attend | see §3 | 6_convertit.md:468 · 6_convertit.md:470 |
 | `OWN-CNV` | 6_convertit | t'attend | see §3 | 6_convertit.md:56 |
 | `OWN-ARC` | conventions | t'attend | see §3 | conventions.md:82 |
 | `OWN-ARB` | conventions | t'attend | see §3 | conventions.md:78 |
 | `OWN-AR3` | 8_code | t'attend | see §3 | 8_code.md:327-333 |
 | `OWN-CAD` | 7_lots | t'attend | see §3 | 7_lots.md:212 |
-| `OWN-RED` | 7_lots | t'attend | see §3 | 7_lots.md:378-379 |
-| `OWN-COD` | 8_code | t'attend | see §3 | 8_code.md:333-334 · 8_code.md:751 |
+| `OWN-RED` | 7_lots | t'attend | see §3 | 7_lots.md:379-380 |
+| `OWN-COD` | 8_code | t'attend | see §3 | 8_code.md:333-334 · 8_code.md:752 |
 | `OWN-FUS` | fusion | t'attend | see §3 | fusion.md:60 |
 | `OWN-FUB` | fusion | t'attend | see §3 | fusion.md:57 |
-| `OWN-DIA` | diagnostique | t'attend | see §3 | diagnostique.md:232 · diagnostique.md:242 |
+| `OWN-DIA` | diagnostique | t'attend | see §3 | diagnostique.md:233 · diagnostique.md:243 |
 | `OWN-?` | — | — | an open entry no command names | aucune commande ne nomme ce fichier |
 | `LEX-1` | 1_lexique | faite | `desc-produit.md` exists and no other agent's file waits at the root: invocations 1 and 2 stop | 1_lexique.md:93-104 |
 | `LEX-2` | 1_lexique | à faire | no questions file at the root, no product file: invocation 1 | 1_lexique.md:56 |
@@ -284,7 +284,7 @@ Rédacteur's.
 | `FUS-2` | fusion | faite | `rapport-fusion.md` exists: the merge is done | fusion.md:59 |
 | `FUS-3` | fusion | à faire | no `rapport-fusion.md` | fusion.md:61-66 |
 | `DIA-1` | diagnostique | à faire | `bug-list.md` absent or empty: hers to write first | diagnostique.md:21-25 |
-| `DIA-2` | diagnostique | faite | `desc-bug.md` exists | diagnostique.md:75-77 · diagnostique.md:227 |
+| `DIA-2` | diagnostique | faite | `desc-bug.md` exists | diagnostique.md:75-77 · diagnostique.md:228 |
 | `DIA-3` | diagnostique | à faire | `bug-list.md` written, no `desc-bug.md` | diagnostique.md:60-67 |
 
 ---
@@ -324,6 +324,6 @@ proposes the correction chain: the commands act on it.
 - **A filled `blocked_qualifieur.md` / `blocked_classeur.md`**: /2_structure
   takes any of them (2_structure.md:116) and /3a_genre, /3b_nature name
   them too (3a_genre.md:40, 3b_nature.md:39-40); which one applies depends
-  on what the decision says (3a_genre.md:288-290). The scan follows the
+  on what the decision says (3a_genre.md:289-291). The scan follows the
   chain order and proposes /2_structure; a stored `Next:` naming the other
   is not contradicted by it.
