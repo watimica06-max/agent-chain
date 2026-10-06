@@ -120,8 +120,8 @@ often means the earlier answer was too narrow.
 
 **And the code**, by grep — 🔴 **to confirm a fact, never to review**.
 
-🔴 **Nothing else** — ⚠️ **not the product file, not `docs/process/`,
-not another lot's code.**
+🔴 **Nothing else** — ⚠️ **not the product file, not `docs/process/`
+or `.claude/grids/`, not another lot's code.**
 
 📌 **One exception**: `docs/CURRENT_TECHNICAL_STATE.md`, 🔴 **and only
 to place a trap in it** — see *When a rule would settle it*.
@@ -262,7 +262,7 @@ that led you there is not the agent's business.
 - 🔴 **Send a lot back to the split without writing
   `code/redecoupage.md`** — the Cadreur would have nothing to work
   from
-- Read the product file, or anything in `docs/process/`
+- Read the product file, or anything in `docs/process/` or `.claude/grids/`
 
 ---
 

@@ -274,8 +274,8 @@ no blocking file beside it, is found the same way** — 📌 **nothing in
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — those are the Product
-  Owner's documents, not yours
+- 🔴 **Open anything in `docs/process/` or `.claude/grids/`** — those
+  are the Product Owner's documents, not yours
 - 🔴 **Copy a rule from the technical document**
 - 🔴 **Cite a bare `§3`**, or entries from two sections — ⚠️ **unless
   the unit is a bearer, on a `desc-bug.md`**

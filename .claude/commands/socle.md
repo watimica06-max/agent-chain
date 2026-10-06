@@ -44,8 +44,12 @@ chain runs end to end:**
   not by hand
 - the `technical-state-format` skill, which the Réalisateur and the
   Arbitre load before writing to `CURRENT_TECHNICAL_STATE.md`
+- the `/deploie` command, which installs the application where the
+  Product Owner tests it — 📌 **each application writes its own**; the
+  chain carries none
 
-📌 **Neither blocks the upstream chain** — only `/7_lots` onward.
+📌 **None of them blocks the upstream chain** — the first two are
+needed from `/7_lots` onward, `/deploie` by no command of the chain.
 
 🔴 **The report ends on its `Next:` line**, in `CLAUDE.md`'s grammar:
 `Next: manual écrire docs/features/<name>/idees.md, then run /1_lexique <name>`.

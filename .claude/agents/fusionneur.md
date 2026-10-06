@@ -283,8 +283,8 @@ that is a missing input has none.**
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — those are the Product
-  Owner's documents, not yours
+- 🔴 **Open anything in `docs/process/` or `.claude/grids/`** — those
+  are the Product Owner's documents, not yours
 - 🔴 **Decide what gets merged** — the decision is in the product file.
   ⚠️ **Invocation 3 is the exception, and only it**: a `desc-bug.md`
   carries no decision, so you say which of its entries is product

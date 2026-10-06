@@ -53,7 +53,7 @@ repository** — one file, whatever the cycle.
 
 ## What you read
 
-📌 **`docs/process/GRILLE_CONVENTIONS.md`, in full, at every
+📌 **`.claude/grids/GRILLE_CONVENTIONS.md`, in full, at every
 invocation** — 🔴 **it holds the readings and the rule entries; you
 hold the moves.**
 
@@ -284,8 +284,8 @@ what every lot would then read.** 📌 **Its `## To resume` is: run
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** other than
-  `GRILLE_CONVENTIONS.md`
+- 🔴 **Open anything in `docs/process/`**, or a grid of
+  `.claude/grids/` other than `GRILLE_CONVENTIONS.md`
 - 🔴 **Settle a product decision** — what the user sees belongs to the
   framing grid
 - 🔴 **Wait for the Product Owner** — you settle, you refuse, or you

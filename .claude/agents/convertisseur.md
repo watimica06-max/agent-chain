@@ -64,7 +64,7 @@ root** — its row says so.
 | **your technical questions** | 🔴 **`convertisseur/technique-<nature>.md`** — see *Two kinds of question* |
 | the technical document | `spec-technique.md` |
 | the traceability file | `tracabilite.md` |
-| the grid | 🔴 **`docs/process/GRILLE_FERMETURE_TECHNIQUE.md`** — ⚠️ **from the repository root**, not the feature folder |
+| the grid | 🔴 **`.claude/grids/GRILLE_FERMETURE_TECHNIQUE.md`** — ⚠️ **from the repository root**, not the feature folder |
 
 📌 **`<nature>` is the nature's name from the table below, a hyphen for
 a space** — `external-exchange`.
@@ -663,7 +663,7 @@ write, not what the block says.
 - 🔴 **Rewrite a rule another invocation wrote** — 📌 **at the
   transversal pass you would be re-deciding blind what a nature
   invocation decided with its blocks in front of it**
-- 🔴 **Open anything in `docs/process/`** but the grid
+- 🔴 **Open anything in `docs/process/`**, or a grid of `.claude/grids/` but yours
 - 🔴 **Settle a product matter**, however trivial
 - 🔴 **Write in the product file, or in the global**
 - 🔴 **Decide that a service, a table or a screen is needed** — cutting

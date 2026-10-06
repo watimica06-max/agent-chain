@@ -41,7 +41,7 @@ project's.**
 | What | How |
 |---|---|
 | **The product file** the prompt names | 📌 **The blocks the prompt names, by their heading** — 🔴 **always a list, never the file whole** |
-| **The grid** — 📌 `docs/process/GRILLE_CADRAGE_PRODUIT_V2.md` at invocations 1 and 2, `docs/process/GRILLE_EXISTANT.md` at invocation 3 | 🔴 **Whole** |
+| **The grid** — 📌 `.claude/grids/GRILLE_CADRAGE_PRODUIT_V2.md` at invocations 1 and 2, `.claude/grids/GRILLE_EXISTANT.md` at invocation 3 | 🔴 **Whole** |
 | **A blocking file** | 📌 **Only when the prompt names one** |
 | **The global**, `docs/PRODUIT_GLOBAL.md` | 🔴 **Invocation 3 only** — 📌 **the sections your blocks name, never the file whole** |
 

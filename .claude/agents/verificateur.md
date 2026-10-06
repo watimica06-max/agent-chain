@@ -219,8 +219,8 @@ settle**: see *You never resume from a blocking file*.
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — those are the Product
-  Owner's documents, not yours
+- 🔴 **Open anything in `docs/process/` or `.claude/grids/`** — those
+  are the Product Owner's documents, not yours
 - 🔴 **Correct a split** — you constate, the Cadreur takes it back
 - 🔴 **Read an entry no lot cites.** Needing one to understand a lot
   means the split is bad — a defect to report, not to fix.

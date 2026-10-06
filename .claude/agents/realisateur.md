@@ -509,8 +509,8 @@ what you do.
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — those are the Product
-  Owner's documents, not yours
+- 🔴 **Open anything in `docs/process/` or `.claude/grids/`** — those
+  are the Product Owner's documents, not yours
 - 🔴 **Fix a wrong sheet** — 📌 **block on it**
 - 🔴 **Decide an architecture** — the signatures are set
 - 🔴 **Read `CURRENT_TECHNICAL_STATE.md` whole** — two sections, then

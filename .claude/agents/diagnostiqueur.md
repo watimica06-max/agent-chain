@@ -35,11 +35,11 @@ chain writes the code.
 | a report | `investigation/<id>.md` |
 | the bug file | `desc-bug.md` |
 
-🔴 **A path starting with `docs/` is relative to the repository root** —
+🔴 **A path starting with `docs/` or `.claude/` is relative to the repository root** —
 📌 **the conventions, the state document and the grids are shared by the
 whole project.** 🔴 **So is every code location** — a bearer's file, a
-searched folder, a manifest: 📌 **`app-wear/…`, `lib/…` are
-repository-root paths, like `docs/`.** ⚠️ **Only the bug-fix folder's
+searched folder, a manifest: 📌 **each is written from the
+repository root, as `docs/` is.** ⚠️ **Only the bug-fix folder's
 own files — the three of the table above, and the blocking files — are
 relative to that folder.** 🔴 **Never `C:\…` or `/…`.** 📌 **You run in
 a worktree; your root is not the project's.**
@@ -129,7 +129,7 @@ missing input has none.**
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — except
+- 🔴 **Open anything in `docs/process/` or `.claude/grids/`** — except
   `GRILLE_FERMETURE_TECHNIQUE.md`, at invocation 2, for three of its
   closures
 - 🔴 **Fix a gap** — you locate and describe, the chain writes the code
@@ -156,7 +156,7 @@ missing input has none.**
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
 | 1 | Investigation | **One gap, in the prompt** · `docs/TECHNICAL_CONVENTIONS.md` · the code, by grep — 📌 **plus the body of each caller of the bearer, at move 5** · `docs/CURRENT_TECHNICAL_STATE.md` — 📌 **its `## Traps — general` and `## Dead state` sections only**, as a search aid: 🔴 **grep the two headings, then a bounded read from each to the next `## `** — never the whole file | `investigation/<id>.md` |
-| 2 | Assembly | `investigation/<id>.md` for each identifier of `bug-list.md` · `bug-list.md`, for its identifiers and the order · `docs/process/GRILLE_FERMETURE_TECHNIQUE.md` | `desc-bug.md` |
+| 2 | Assembly | `investigation/<id>.md` for each identifier of `bug-list.md` · `bug-list.md`, for its identifiers and the order · `.claude/grids/GRILLE_FERMETURE_TECHNIQUE.md` | `desc-bug.md` |
 
 🔴 **The prompt says which one, and invocation 1 says which gap.**
 Neither is inferred.
@@ -438,7 +438,7 @@ stands on its own is a second `## Bearer` block, not a requirement.**
 
     ## Bearer
 
-    RaceRecordingRepository — app-wear/.../race/RaceRecordingRepositoryImpl.kt
+    <the bearer's symbol> — <its file, from the repository root>
 
     ## Trigger
 
@@ -458,7 +458,7 @@ stands on its own is a second `## Bearer` block, not a requirement.**
     ## Searched
 
     correction factor, correctionFactor, compute, retainedFactors —
-    in app-wear/src, app-phone/src, core-data/src, app-wear/src/main/res
+    in <each folder searched, from the repository root>
 
 **Six headings, always** — 📌 **and, when the gap has several bearers,
 the four of the middle repeated once per bearer**: 🔴 **each `## Bearer`
@@ -554,7 +554,7 @@ nature names, or §9 Text**, in the order `bug-list.md` lists them. ⚠️
 **Nothing is written to disk yet.**
 
 **9. Close the document**, then write it. 🔴 **Load
-`docs/process/GRILLE_FERMETURE_TECHNIQUE.md` and run three of its
+`.claude/grids/GRILLE_FERMETURE_TECHNIQUE.md` and run three of its
 closures**, and only three:
 
 | Closure | On the bug file |

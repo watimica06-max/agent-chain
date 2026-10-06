@@ -313,8 +313,8 @@ it.
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — those are the Product
-  Owner's documents, not yours
+- 🔴 **Open anything in `docs/process/` or `.claude/grids/`** — those
+  are the Product Owner's documents, not yours
 - 🔴 **Correct anything yourself** — you constate, a fresh agent fixes
 - 🔴 **Re-check that the lot matches its source** — the Vérificateur
   did

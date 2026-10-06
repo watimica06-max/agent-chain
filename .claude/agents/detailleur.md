@@ -445,8 +445,8 @@ lot from the file's name.
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — those are the Product
-  Owner's documents, not yours
+- 🔴 **Open anything in `docs/process/` or `.claude/grids/`** — those
+  are the Product Owner's documents, not yours
 - 🔴 **Settle an ambiguous rule** — *you are not the safety net of the
   upstream chain*
 - 🔴 **Use a type without confirming it by grep**

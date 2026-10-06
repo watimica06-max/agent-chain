@@ -263,12 +263,12 @@ n'invoque personne.
 - `docs/TECHNICAL_CONVENTIONS.md` — l'Architecte, invocation 1, à
   `/conventions` (`PROCESS_AMONT.md` §architecte, invocation 1 — Deriving : la première dérivation du dépôt, §/conventions).
 - `docs/features/<name>/` et `idees.md` — le Product Owner, entrée 1.
-- Les quatre grilles de `docs/process/` — `GRILLE_CADRAGE_PRODUIT_V2.md`
+- Les quatre grilles de `.claude/grids/` — `GRILLE_CADRAGE_PRODUIT_V2.md`
   (Sondeur 1, 2), `GRILLE_EXISTANT.md` (Sondeur 3),
   `GRILLE_FERMETURE_TECHNIQUE.md` (Convertisseur, Diagnostiqueur 2),
-  `GRILLE_CONVENTIONS.md` (Architecte) : `/socle` n'en crée aucune et
-  aucun fichier ne dit qui les fournit sur un projet neuf ; `CLAUDE.md`
-  dit que la chaîne tourne sur plusieurs projets.
+  `GRILLE_CONVENTIONS.md` (Architecte) : `/socle` n'en crée aucune ;
+  elles font partie de la chaîne, que le cockpit installe dans chaque
+  application ; `CLAUDE.md` dit que la chaîne tourne sur plusieurs projets.
 - `.claude/` entier, `.claude/scripts/grouper.py` compris : hors de
   `/socle`.
 - La compétence `technical-state-format` : `/socle` la rapporte comme à
@@ -362,7 +362,7 @@ plan de fusion — ce qu'une phrase devient), et `/socle` le crée vide.
 `extrait`, `extract`, `existant`, `GRILLE_EXISTANT` sous `.claude/`
 rend une seule mécanique, qui n'est pas une extraction :
 
-- `docs/process/GRILLE_EXISTANT.md` — la *grille de l'existant*. Elle
+- `.claude/grids/GRILLE_EXISTANT.md` — la *grille de l'existant*. Elle
   ferme une feature **contre le produit déjà construit**, quand la
   grille de cadrage l'a fermée sur elle-même : elle tourne une fois,
   après que la grille de cadrage a rendu un fichier de questions vide,
@@ -913,7 +913,7 @@ de `desc-bug.md`, par `Glob` · `investigation/<id>.md` pour chaque
 identifiant de `bug-list.md`, tous, entiers — jamais un `blocked_*.md`
 de ce dossier · `bug-list.md`, entier, pour le `G<n>` de chaque manque,
 l'ordre du Product Owner et le `(B<n>)` qu'un manque porte ·
-`docs/process/GRILLE_FERMETURE_TECHNIQUE.md`, pour trois de ses
+`.claude/grids/GRILLE_FERMETURE_TECHNIQUE.md`, pour trois de ses
 fermetures · jamais le code, jamais les conventions, jamais l'état
 technique, jamais le fichier produit, le document technique ou le
 global.
@@ -1128,8 +1128,8 @@ blocage.
 | Le `## Decision` rempli, nommé au prompt par `[Blocking file: … — its ## Decision is filled.]` (→ MECANISMES §Reprise sur décision — divergence) | L'agent l'applique à son manque (1) ou refait l'appariement (2), et le dit dans son rapport | `/diagnostique` renomme en `-NN` sur cette ligne, par identifiant et à la racine, avant les cinq pas | `PROCESS_MECANISMES.md` |
 | Les lignes de prompt `Bug-fix folder:`, `Invocation 1 — Investigation.` / `Invocation 2 — Assembly.`, `Gap G<n>:` (→ MECANISMES §Invocation d'un agent, §Numéros d'invocation) | Le Diagnostiqueur aiguille sur elles, jamais sur le dossier | `model="sonnet"` concorde avec le frontmatter ; aucun `effort`, `isolation`, `run_in_background` | `PROCESS_MECANISMES.md` |
 | `docs/TECHNICAL_CONVENTIONS.md` entier, à l'invocation 1 (→ MECANISMES §Lecture des conventions — divergence, §Grep du code avec chemin) | Le Diagnostiqueur en tire les dossiers de code à grepper | Chaque grep avec un chemin ; les conventions qui ne nomment aucun dossier n'ont pas de règle écrite chez lui | `PROCESS_MECANISMES.md`, `PROCESS_AMONT.md` |
-| `docs/process/GRILLE_FERMETURE_TECHNIQUE.md`, trois fermetures nommées | Le Diagnostiqueur, invocation 2, mouvement 9 ; le Convertisseur en lit d'autres | Les titres `## Completeness`, `## Resources`, `## Agreement between entries` existent dans la grille | `PROCESS_AMONT.md` |
-| `docs/process/GRILLE_EXISTANT.md` — la grille de l'existant, sans commande d'extraction | Le Sondeur, invocation 3, à `/4_grille` second temps ; `questions-existant-NN.md`, `blocked_existant.md` | Le plus haut `questions-existant-NN.md` sans `### Q` avant `/5_reclasse` | `PROCESS_AMONT.md` |
+| `.claude/grids/GRILLE_FERMETURE_TECHNIQUE.md`, trois fermetures nommées | Le Diagnostiqueur, invocation 2, mouvement 9 ; le Convertisseur en lit d'autres | Les titres `## Completeness`, `## Resources`, `## Agreement between entries` existent dans la grille | `PROCESS_AMONT.md` |
+| `.claude/grids/GRILLE_EXISTANT.md` — la grille de l'existant, sans commande d'extraction | Le Sondeur, invocation 3, à `/4_grille` second temps ; `questions-existant-NN.md`, `blocked_existant.md` | Le plus haut `questions-existant-NN.md` sans `### Q` avant `/5_reclasse` | `PROCESS_AMONT.md` |
 | Le commit `chore: scaffolding for the chain` poussé, sans worktree (→ MECANISMES §Commit sans worktree) | Le dépôt distant ; le `HEAD` local que tout worktree suivant branche | Un push qui échoue est rapporté | `PROCESS_MECANISMES.md` |
 
 ## Boucles

@@ -380,7 +380,7 @@ nothing; ten together let a shape show.**
 
 📌 **Its reader is the Product Owner, across cycles** — 🔴 **she decides
 whether a recurring kind of escaped question becomes an entry of
-`GRILLE_CADRAGE_PRODUIT_V2.md`.** ⚠️ **Append, never overwrite**: the
+`.claude/grids/GRILLE_CADRAGE_PRODUIT_V2.md`.** ⚠️ **Append, never overwrite**: the
 file is the record of every cycle, not of this one.
 
 **Write `registre-questions.md`, at the feature folder's root** — 🔴

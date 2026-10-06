@@ -386,7 +386,7 @@ Agent(
   subagent_type="sondeur", model="opus",
   description="Cross <name> against the global",
   prompt="The product file: docs/features/<name>/desc-produit.md.
-          The grid: docs/process/GRILLE_EXISTANT.md.
+          The grid: .claude/grids/GRILLE_EXISTANT.md.
           The global: docs/PRODUIT_GLOBAL.md.
           Invocation 3 — Existant.
           These blocks, with the global section each names:
@@ -429,7 +429,7 @@ Agent(
   subagent_type="sondeur", model="opus",
   description="Probe <name>, by block",
   prompt="The product file: docs/features/<name>/desc-produit.md.
-          The grid: docs/process/GRILLE_CADRAGE_PRODUIT_V2.md.
+          The grid: .claude/grids/GRILLE_CADRAGE_PRODUIT_V2.md.
           Invocation 1 — Angle.
           Pass A on these blocks: <list>.
           The transverse blocks, to hold beside them: <list — or: none>.
@@ -445,7 +445,7 @@ Agent(
   subagent_type="sondeur", model="opus",
   description="Probe <name>, by question",
   prompt="The product file: docs/features/<name>/desc-produit.md.
-          The grid: docs/process/GRILLE_CADRAGE_PRODUIT_V2.md.
+          The grid: .claude/grids/GRILLE_CADRAGE_PRODUIT_V2.md.
           Invocation 1 — Angle.
           Pass A on these blocks: <list>.
           The transverse blocks, to hold beside them: <list — or: none>.
@@ -462,7 +462,7 @@ Agent(
   subagent_type="sondeur", model="opus",
   description="Probe <name>, by nature",
   prompt="The product file: docs/features/<name>/desc-produit.md.
-          The grid: docs/process/GRILLE_CADRAGE_PRODUIT_V2.md.
+          The grid: .claude/grids/GRILLE_CADRAGE_PRODUIT_V2.md.
           Invocation 1 — Angle.
           Pass A on these blocks: <list>.
           The transverse blocks, to hold beside them: <list — or: none>.
@@ -481,7 +481,7 @@ Agent(
   subagent_type="sondeur", model="opus",
   description="Record and cross <name>",
   prompt="The product file: docs/features/<name>/desc-produit.md.
-          The grid: docs/process/GRILLE_CADRAGE_PRODUIT_V2.md.
+          The grid: .claude/grids/GRILLE_CADRAGE_PRODUIT_V2.md.
           Invocation 2 — Global: every behaviour block: <list>.
           The transverse blocks, to hold beside them: <list — or: none>.
           The out-of-scope blocks: <list — or: none>.

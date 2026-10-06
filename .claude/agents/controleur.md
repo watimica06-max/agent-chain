@@ -99,8 +99,8 @@ read in the report.**
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/`** — those are the Product
-  Owner's documents, not yours
+- 🔴 **Open anything in `docs/process/` or `.claude/grids/`** — those
+  are the Product Owner's documents, not yours
 - 🔴 **Read the code** — the Relecteur covers sheet → code
 - 🔴 **Overwrite or open an earlier report** — invocation 2 names the
   file

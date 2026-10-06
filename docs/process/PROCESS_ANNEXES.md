@@ -34,7 +34,7 @@ candidat ; les trente derniers messages de commit (`git log --oneline
 | `.claude/commands/audit_blocages.md` | Les `blocked_*-NN.md` et `blocked_*.md` de cinq lieux du dossier de travail (lignes 26-39) ; `audit-blocages.md` de ses passes antérieures (ligne 44) | `audit-blocages.md` à la racine du dossier de travail, en ajout (ligne 140) | Personne — ligne 9-10 : « No command calls it » ; `/diagnostique` ligne 242 le cite pour dire qu'un fichier non renommé y sera listé « still open », ce n'est pas un appel | Non — voir l'argument ci-dessous | **annexe** |
 | `.claude/commands/audit_conventions.md` | `architecte/*.md`, `docs/TECHNICAL_CONVENTIONS.md` entier, `couverture.md`, les entrées du document technique que `couverture.md` nomme, les lignes `Anchor` de `code/decoupage.md`, ses passes antérieures (lignes 26-63) | `audit-conventions.md` à la racine du dossier de travail, en ajout (ligne 164) | Personne — lignes 9-10 ; `/9_controle` ligne 15 le cite comme exemple de dérivation des dossiers, `architecte.md` ligne 779 le cite pour justifier la ligne de `couverture.md` ; ni l'un ni l'autre n'est un appel | Non — voir l'argument ci-dessous | **annexe** |
 | `.claude/scripts/coherence.py` | `.claude/agents/*.md` et `.claude/commands/*.md`, ou le fichier passé en argument (lignes 165-171) | Sur la sortie standard, les défauts trouvés ; code de sortie 1 s'il en trouve (ligne 184). Il ne modifie aucun fichier | Personne dans la chaîne — aucune commande, aucun agent, pas `CLAUDE.md` ; ses appelants sont les campagnes de correction (`docs/verification2/correction.md` lignes 379 et 412) | Non — il vérifie la forme des fichiers de la chaîne, pas un artefact qu'elle produit | **annexe** |
-| `docs/process/GRILLE_CONVENTIONS_RETIREES.md` | — (un document) | — | Personne — aucun agent, aucune commande ; nommé une fois, par `docs/process/GRILLE_CONVENTIONS.md` lignes 580-582 | Non — l'Architecte ne le lit pas, et rien n'en dérive une règle | **annexe** |
+| `docs/process/GRILLE_CONVENTIONS_RETIREES.md` | — (un document) | — | Personne — aucun agent, aucune commande ; nommé une fois, par `.claude/grids/GRILLE_CONVENTIONS.md` lignes 580-582 | Non — l'Architecte ne le lit pas, et rien n'en dérive une règle | **annexe** |
 
 **L'argument sur les deux rapports d'audit.** `audit-blocages.md` et
 `audit-conventions.md` sont écrits dans le dossier de feature, sous le
@@ -537,7 +537,7 @@ chaîne écrit `python` partout depuis la phase 7. Même point que pour
 ### GRILLE_CONVENTIONS_RETIREES.md — les trente-quatre entrées retirées de la grille des conventions, avec leur texte, pour pouvoir les remettre
 
 **Ce qu'il tient.** Trente-quatre des soixante-dix entrées de la partie
-B de `docs/process/GRILLE_CONVENTIONS.md`, retirées, avec leur texte
+B de `.claude/grids/GRILLE_CONVENTIONS.md`, retirées, avec leur texte
 entier (lignes 3-5). Une explication du retrait (lignes 7-22) : chaque
 entrée a été mesurée — sa *Question* lue seule, une réponse écrite à
 froid, puis la *Form* comparée — et classée en trois classes : *open
