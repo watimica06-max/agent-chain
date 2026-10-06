@@ -20,7 +20,10 @@ sys.path.insert(0, HERE)
 from playwright.sync_api import sync_playwright  # noqa: E402
 
 import nextline  # noqa: E402
+import stats  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
+from test_page_context import IDEAS, LEX, MODEL, PRODUCT  # noqa: E402
+from test_stats import two_agents  # noqa: E402
 
 FEATURES = os.path.join(HERE, "fixtures", "features")
 
@@ -56,7 +59,19 @@ def main(out_dir):
                 page.goto(s.url)
                 snap(page, out, "01-demarrage")
             # The fake folder of the « before » set, with the same relay on file.
-            with FakeServer(Path(t) / "b") as s:
+            # 1.4: two measures on file, one 12 min old, one from the day before.
+            from datetime import datetime, timedelta
+            store = stats.Store(str(Path(t) / "stats-b.sqlite"))
+            now = datetime.now()
+            store.record_limit("r0", {"measured_at": (now - timedelta(minutes=12)).isoformat(timespec="seconds"),
+                                      "source": "usage", "window": "five_hour", "utilization": 0.34,
+                                      "resets_at": int((now + timedelta(hours=2, minutes=20)).timestamp())})
+            store.record_limit("r0", {"measured_at": (now - timedelta(minutes=12)).isoformat(timespec="seconds"),
+                                      "source": "usage", "window": "seven_day", "utilization": 0.61,
+                                      "resets_at": int((now + timedelta(days=4)).timestamp())})
+            with FakeServer(Path(t) / "b", stats=store) as s:
+                (s.feat / "desc-produit.md").write_text(PRODUCT, encoding="utf-8")
+                (s.feat / "convertisseur" / "model.md").write_text(MODEL, encoding="utf-8")
                 line = "Next: answer questions, then run /4_grille f"
                 s.state.set_relay(str(s.app_root), "f", "/4_grille f", "Fini.\n" + line,
                                   nextline.parse(line).to_dict(), "terminé")
@@ -68,6 +83,12 @@ def main(out_dir):
                 snap(page, out, "02-tableau-de-bord")
                 page.get_by_role("link", name="À répondre").first.click()
                 snap(page, out, "03-repondre")
+                page.locator('.entry[data-id="q:questions-sondeur-02.md#1"] .head').click()
+                page.wait_for_function("document.getElementById('ctx-docname').textContent === 'desc-produit.md'")
+                snap(page, out, "03b-repondre-bloc")
+                page.locator('.entry[data-id="q:questions-sondeur-02.md#2"] .head').click()
+                page.wait_for_function("document.getElementById('ctx-note').textContent.includes('B14')")
+                snap(page, out, "03c-repondre-introuvable")
                 page.get_by_role("link", name="Chaîne").first.click()
                 snap(page, out, "04-chaine-repos")
                 page.get_by_role("link", name="Paramètres").first.click()
@@ -83,6 +104,30 @@ def main(out_dir):
                 page.get_by_role("link", name="Tableau de bord").first.click()
                 snap(page, out, "05b-tableau-run")
                 s.call(s.rn.stop_now(str(s.app_root)))
+            # 1.4: the lexicographe's terms, occurrence 2 of 4, the keyboard legend.
+            with FakeServer(Path(t) / "h") as s:
+                feat = s.app_root / "docs" / "features" / "lex"
+                feat.mkdir(parents=True)
+                (feat / "idees.md").write_text(IDEAS, encoding="utf-8")
+                (feat / "questions-lexicographe-01.md").write_text(LEX, encoding="utf-8")
+                s.state.open_pair(str(s.app_root), "lex")
+                page.goto(s.url + "#answer")
+                page.wait_for_function("document.getElementById('ctx-count').textContent === '1 / 4'")
+                page.keyboard.press("2")
+                page.get_by_role("button", name="Suivante ›").click()
+                snap(page, out, "03d-repondre-termes-clavier")
+            # 1.4: a run that ended — each hand-back with its figures, the totals.
+            with FakeServer(Path(t) / "i", script=two_agents, stats=stats.Store(str(Path(t) / "stats-i.sqlite")),
+                            measure_limits=True) as s:
+                page.goto(s.url + "#chaine")
+                page.wait_for_selector("#flow-main li.step")
+                s.call(s.rn.start(str(s.app_root), "f", "f", "1_lexique", "f"))
+                page.wait_for_selector("#run-total")
+                page.locator("#run-total").scroll_into_view_if_needed()
+                snap(page, out, "05c-chaine-run-fini-consommation")
+                page.get_by_role("link", name="Tableau de bord").first.click()
+                page.wait_for_function("document.getElementById('gauge-five_hour').textContent.includes('5 %')")
+                snap(page, out, "02b-tableau-apres-run", full=True)
             # A stored Next: the files contradict, after « Où on en est ? ».
             with FakeServer(Path(t) / "d") as s:
                 page.goto(s.url)

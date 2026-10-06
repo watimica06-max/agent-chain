@@ -63,8 +63,25 @@ commandes agissent sur lui. « Nouvelle correction » crée le `bugfix-NN/`
 suivant et son `bug-list.md` vide, rien d'autre, et l'ouvre pour l'écrire
 ici, tant que le diagnostic ne l'a pas lu.
 
+**Usage de l'abonnement** — sur le tableau de bord, deux jauges : la
+fenêtre de 5 heures et la semaine. Pour chacune : le pourcentage utilisé,
+ce qui reste, l'heure de réinitialisation et **quand la mesure a été
+prise** (« mesuré il y a 12 min »). Elles se mettent à jour à la fin de
+chaque run (le cockpit demande `/usage` à la session, sans appel au
+modèle). Une mesure dont la fenêtre s'est réinitialisée depuis le dit :
+ce n'est plus le chiffre du moment.
+
 **À répondre** — toutes les questions ouvertes et tous les blocages qui
-vous attendent, dans un seul formulaire :
+vous attendent, dans un seul formulaire, **à gauche** ; **à droite**, le
+document dont parle la question choisie, en lecture seule, le passage
+surligné : chaque occurrence des termes (« 1 / 5 », précédente,
+suivante), ou le bloc entier. Si le passage n'est pas dans le fichier, le
+volet le dit. Ce que chaque question vise est écrit dans
+`context_rules.md`. Au clavier : `1` à `6` choisissent une option, `T`
+place le curseur dans le texte libre, `Échap` en sort, `Entrée` ou `↓`
+passent à la question suivante, `↑` revient, `Ctrl+S` enregistre. Les
+touches ne font rien pendant la saisie d'un texte (sauf `Ctrl+S`).
+Dans le formulaire :
 - choisir une option, éventuellement avec une remarque ;
 - ou écrire une réponse libre ;
 - ou laisser « Plus tard ».
@@ -81,6 +98,13 @@ d'autorisation apparaît en bandeau sur tous les écrans : « Autoriser » ou
 interrompt le tour en cours. « Arrêter au prochain lot » (sur `/8_code`
 seulement) écrit `stop.md` ; « Retirer stop.md » le renomme `stop1.md`.
 
+Quand un agent rend la main, une ligne dit ce qu'il a consommé :
+« Lexicographe — 4 min 12 s — 182 k lus (dont 160 k en cache), écrits :
+inconnu ». Ce qu'un sous-agent écrit n'est donné par aucune source exacte :
+le cockpit écrit « inconnu » plutôt qu'un faux chiffre. À la fin du run,
+ses totaux, écrits compris. Tout est gardé dans `stats.sqlite` (hors git) ;
+les anciens journaux y sont chargés une fois au démarrage du serveur.
+
 Fermer l'onglet n'arrête pas la commande ; rouvrir la page la retrouve.
 
 ## Ce que le cockpit ne fait jamais
@@ -91,6 +115,7 @@ Fermer l'onglet n'arrête pas la commande ; rouvrir la page la retrouve.
   Il ne saute jamais une étape bloquée ou inconnue.
 - Le relevé du dossier ne fait que lire : aucun appel à Claude, aucune
   commande git, aucune écriture.
+- Le volet du document ne fait que lire.
 - Il n'écrit qu'où vous écrivez déjà : les champs `Answer:`, les
   `## Decision`, `## Décision du Product Owner` dans
   `code/redecoupage.md`, `stop.md`, et le `bug-list.md` d'une nouvelle

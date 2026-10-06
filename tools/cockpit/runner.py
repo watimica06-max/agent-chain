@@ -24,6 +24,7 @@ from dataclasses import asdict, dataclass, field, is_dataclass
 from datetime import datetime
 
 import nextline
+import stats as stats_mod
 
 AGENT_TOOLS = {"Agent", "Task"}
 MAX_EVENTS = 5000
@@ -36,6 +37,10 @@ IDLE_CEILING = 600.0
 END_GRACE = 15.0
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 CONTINUE_PROMPT = "Continue the command where you stopped, and end with its Next: line."
+# Asked once at the end of a run, in its own session: a local command, no
+# model call (TECHNICAL_V1 §13.2). Its report gives both usage windows.
+USAGE_COMMAND = "/usage"
+USAGE_TIMEOUT = 30.0
 # What the Agent tool's result says when the subagent was started in the background.
 BACKGROUND_RESULT = re.compile(r"async_launched|in the background|agentId", re.I)
 TERMINAL_STATUSES = {"completed", "failed", "stopped", "killed"}
@@ -63,11 +68,19 @@ def build_options(cwd: str, can_use_tool, resume: str | None = None, mode: str =
     CLI default) and nothing asks for bare mode. The session-state frames are
     asked for: `idle` is how the CLI says no agent is live and no wake-up turn
     is owed. In auto mode a request still reaches `can_use_tool` when the
-    classifier sends it back to a prompt: it becomes a card, as in manual."""
+    classifier sends it back to a prompt: it becomes a card, as in manual.
+
+    1.4: subagent text is forwarded. Without it, a subagent message holding
+    no tool call never reaches the stream — a nested agent that only
+    answers is missing, and its usage with it (TECHNICAL_V1 §13.1)."""
+    from dataclasses import fields
     from claude_agent_sdk import ClaudeAgentOptions
+    extra = {}
+    if "forward_subagent_text" in {f.name for f in fields(ClaudeAgentOptions)}:
+        extra["forward_subagent_text"] = True
     return ClaudeAgentOptions(cwd=cwd, can_use_tool=can_use_tool, resume=resume,
                               permission_mode=PERMISSION_MODES[mode],
-                              env={"CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS": "1"})
+                              env={"CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS": "1"}, **extra)
 
 
 def sdk_client_factory(cwd: str, can_use_tool, resume: str | None = None, mode: str = "auto"):
@@ -130,6 +143,9 @@ class Run:
     state: str | None = None          # the CLI's last session state, None if never sent
     idle: dict | None = None          # set while the page is asked to wait or stop
     idle_future: asyncio.Future | None = field(default=None, repr=False)
+    tally: stats_mod.Tally = field(default_factory=stats_mod.Tally, repr=False)
+    ended_at: str = ""
+    usage: dict | None = None         # the run's totals, once it ended
 
     @property
     def prompt(self):
@@ -153,6 +169,8 @@ class Run:
             "continued": bool(self.resume), "mode": self.mode, "session_id": self.session_id,
             "log_path": self.log_path, "worktrees_left": list(self.worktrees_left),
             "idle": self.idle,
+            "usage": self.usage,
+            "passes": [p.summary() for p in self.tally.passes.values() if p.ended],
             "can_continue": (self.status == "ended" and bool(self.session_id)
                              and bool(self.next) and self.next.get("kind") == "unknown"),
         }
@@ -160,11 +178,16 @@ class Run:
 
 class Runner:
     def __init__(self, client_factory=sdk_client_factory, on_end=None, log_dir=None,
-                 mode_getter=lambda: "auto"):
+                 mode_getter=lambda: "auto", stats=None, measure_limits=None):
         self.client_factory = client_factory
         self.on_end = on_end
         self.mode_getter = mode_getter
         self.log_dir = log_dir or LOG_DIR
+        self.stats = stats                # a stats.Store, or None
+        # The end-of-run /usage: on for the real SDK client, off for fakes
+        # unless a test asks for it.
+        self.measure_limits = (client_factory is sdk_client_factory
+                               if measure_limits is None else measure_limits)
         self.runs: dict[str, Run] = {}
         self._seq = itertools.count(1)
 
@@ -215,6 +238,8 @@ class Runner:
                     raise asyncio.CancelledError()
                 await client.query(run.message)
                 await self._read(run, client)
+                if self.measure_limits and not run.stop_requested:
+                    await self._measure_limits(run, client)
             run.outcome = "interrompu" if run.stop_requested else (run.outcome or "terminé")
         except asyncio.CancelledError:
             run.outcome = "interrompu"
@@ -233,7 +258,8 @@ class Runner:
         async def pump():
             try:
                 async for msg in client.receive_messages():
-                    queue.put_nowait(("msg", msg))
+                    # The time it was received: messages carry none of their own.
+                    queue.put_nowait(("msg", (msg, _now())))
                     # Let the handler see this message before the stream moves
                     # on: a permission request is labelled from what it handled.
                     await asyncio.sleep(0)
@@ -261,8 +287,10 @@ class Runner:
                     return
                 if kind == "err":
                     raise payload
-                self._log(run, payload)
-                self._handle(run, payload)
+                msg, at = payload
+                body = self._log(run, msg, at)
+                self._count(run, msg, body, at)
+                self._handle(run, msg)
                 if self._over(run):
                     return
         finally:
@@ -330,6 +358,8 @@ class Runner:
         if not run.relay:
             run.relay = run.last_text
         run.next = nextline.parse(run.relay).to_dict()
+        run.ended_at = _now()
+        self._record(run)
         run.worktrees_left = list_worktrees(run.repo)
         run.status = "ended"
         run.client = None
@@ -357,18 +387,81 @@ class Runner:
         except OSError as e:
             self._emit(run, "error", {"message": f"journal brut non ouvert : {e}"})
 
-    def _log(self, run: Run, msg):
-        if not run.log_path:
-            return
+    def _log(self, run: Run, msg, at=None, probe=False):
+        """One line per message, with the time it was received. Returns the
+        body, which the count reads too."""
         try:
             body = asdict(msg) if is_dataclass(msg) else repr(msg)
-            line = json.dumps({"at": datetime.now().isoformat(timespec="milliseconds"),
-                               "type": type(msg).__name__, "message": body},
-                              ensure_ascii=False, default=str)
+        except (TypeError, ValueError):
+            body = repr(msg)
+        if not run.log_path:
+            return body
+        try:
+            entry = {"at": at or _now(), "type": type(msg).__name__, "message": body}
+            if probe:
+                entry["probe"] = "usage"     # the end-of-run /usage: not the run's work
+            line = json.dumps(entry, ensure_ascii=False, default=str)
             with open(run.log_path, "a", encoding="utf-8") as f:
                 f.write(line + "\n")
         except (OSError, TypeError, ValueError):
             pass
+        return body
+
+    # --------------------------------------------------------- consumption
+
+    def _count(self, run: Run, msg, body, at):
+        for kind, x in run.tally.feed(type(msg).__name__, body, at):
+            if kind == "limit":
+                self._store_limit(run, x)
+
+    def _store_limit(self, run: Run, m):
+        if self.stats:
+            try:
+                self.stats.record_limit(run.id, m)
+            except Exception as e:
+                self._emit(run, "error", {"message": f"mesure d'usage non enregistrée : {e}"})
+        self._emit(run, "limits", m)
+
+    async def _measure_limits(self, run: Run, client):
+        """`/usage` in the run's own session, once it is over: a local
+        command, no model call. Its lines are logged as a probe, never
+        counted as the run's work, and its text never becomes the relay."""
+        from claude_agent_sdk import ResultMessage
+
+        async def ask():
+            await client.query(USAGE_COMMAND)
+            async for msg in client.receive_messages():
+                self._log(run, msg, _now(), probe=True)
+                if isinstance(msg, ResultMessage):
+                    return msg.result or ""
+            return ""
+        try:
+            text = await asyncio.wait_for(ask(), USAGE_TIMEOUT)
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            self._emit(run, "limits_unavailable", {"reason": f"{type(e).__name__}: {e}"})
+            return
+        got = stats_mod.limits_from_usage(text, _now())
+        if not got:
+            self._emit(run, "limits_unavailable", {"reason": "le rapport /usage ne donne aucune fenêtre"})
+        for m in got:
+            self._store_limit(run, m)
+
+    def _record(self, run: Run):
+        """The run and its agents, into the store."""
+        run.usage = stats_mod.totals_summary(run.tally.totals,
+                                             stats_mod._seconds(run.started_at, run.ended_at))
+        if not self.stats or not run.id:
+            return
+        try:
+            run.usage = self.stats.record_run(
+                run_id=run.id, feature=run.feature, work=run.work, command=run.prompt,
+                mode=run.mode, started_at=run.started_at, ended_at=run.ended_at,
+                tally=run.tally, next_line=(run.next or {}).get("raw") or None,
+                outcome=run.outcome, log_path=run.log_path, resumed=bool(run.resume))
+        except Exception as e:
+            self._emit(run, "error", {"message": f"consommation non enregistrée : {e}"})
 
     # ------------------------------------------------------------ messages
 
@@ -410,7 +503,8 @@ class Runner:
                                    {"agent": run.agents.get(block.tool_use_id)})
                     else:
                         run.active.remove(block.tool_use_id)
-                        self._emit(run, "agent_ended", {"agent": run.agents.get(block.tool_use_id)})
+                        self._emit(run, "agent_ended", {"agent": run.agents.get(block.tool_use_id),
+                                                        "usage": _pass_usage(run, block.tool_use_id)})
         elif isinstance(msg, TaskStartedMessage):
             if msg.tool_use_id:
                 run.tasks[msg.task_id] = msg.tool_use_id
@@ -422,7 +516,7 @@ class Runner:
                     run.active.remove(tid)
                     run.background.discard(tid)
                     self._emit(run, "agent_ended", {"agent": run.agents.get(tid), "late": True,
-                                                    "status": status})
+                                                    "status": status, "usage": _pass_usage(run, tid)})
         elif isinstance(msg, ResultMessage):
             run.turn_ended = True
             if msg.session_id:
@@ -555,6 +649,15 @@ class Runner:
             del run.events[: len(run.events) - MAX_EVENTS]
         for q in list(run.subscribers):
             q.put_nowait(ev)
+
+
+def _now() -> str:
+    return datetime.now().isoformat(timespec="milliseconds")
+
+
+def _pass_usage(run: Run, tid):
+    p = run.tally.passes.get(tid)
+    return p.summary() if p else None
 
 
 def list_worktrees(repo: str) -> list[str]:

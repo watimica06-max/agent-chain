@@ -136,6 +136,9 @@ class State:
             del hist[MAX_HISTORY:]
             self._save()
 
+    def all_history(self):
+        return [dict(h) for h in self.data.get("history", [])]
+
     def history(self, app: str, work: str, n: int = 5):
         k = _key(app, work)
         return [{a: b for a, b in h.items() if a != "key"}
