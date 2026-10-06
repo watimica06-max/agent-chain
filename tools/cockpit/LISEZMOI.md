@@ -130,6 +130,22 @@ chiffre absent de la base est « inconnu » et n'entre dans aucune somme,
 qui le dit. « Exporter » écrit les runs et les passages des filtres en
 deux fichiers CSV, dans le dossier choisi.
 
+**La chaîne de l'application** — les agents, les commandes, les scripts
+et les grilles qu'une application lit viennent du dépôt de la chaîne, ce
+dépôt-ci, à son dernier commit : on ne les change que là. Le tableau de
+bord dit leur état en une ligne : **à jour** ; **en retard** (combien de
+commits de la chaîne depuis l'installation, et lesquels) ; **modifiée sur
+place** (les fichiers changés dans l'application) ; **absente** (jamais
+installée). Pas à jour, un bandeau le dit sur tous les écrans, et lancer
+une commande demande d'abord. Paramètres → Chaîne → « Installer / mettre
+à jour la chaîne » copie les fichiers, retire ceux que la chaîne n'a plus,
+écrit `.claude/chain-version.json`, commite ces seuls fichiers dans
+l'application (`chain: <id> <date>`) et pousse. Il refuse pendant un run,
+et tant qu'un fichier de la chaîne a des modifications non commitées dans
+l'application ; il demande avant de remplacer un fichier changé sur place.
+Les fichiers propres à l'application — son `/deploie` — ne sont jamais
+touchés.
+
 **Le diagnostic** — s'il n'a jamais tourné, le cockpit le lance une fois
 de lui-même à l'ouverture et garde le résultat. Le tableau de bord ne
 l'affiche que s'il a un échec ; Paramètres → Diagnostic le relance à la
@@ -199,7 +215,9 @@ avec ce qu'il a vu.
 - Il n'écrit qu'où vous écrivez déjà : les champs `Answer:`, les
   `## Decision`, `## Décision du Product Owner` dans
   `code/redecoupage.md`, `stop.md`, et le `bug-list.md` d'une nouvelle
-  correction. Tout le reste est en lecture.
+  correction — et, quand vous cliquez « Installer / mettre à jour la
+  chaîne », les fichiers de la chaîne dans l'application, leur commit et
+  son push. Tout le reste est en lecture.
 - Après chaque écriture, il relit le fichier avec le test de la commande ;
   si la commande le lirait encore comme sans réponse, il annule l'écriture
   et vous le dit.

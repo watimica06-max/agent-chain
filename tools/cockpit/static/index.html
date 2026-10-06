@@ -90,6 +90,12 @@ button.chip:hover { border-color: var(--accent); }
 #tb-menu-dot { position: absolute; top: 6px; right: 6px; width: 10px; height: 10px; border-radius: 50%;
   background: var(--accent); box-shadow: 0 0 0 2px var(--card); }
 #perm-badge { background: var(--err); border-color: var(--err); color: #fff; font-weight: 650; border-radius: 99px; min-height: 0; padding: 5px 14px; }
+/* The chain installed in the application, not « à jour » (§20) */
+#chain-banner { border-top: 1px solid var(--warn); background: var(--warn-soft); color: var(--warn); padding: 8px 20px; }
+#chain-banner button.link { color: inherit; }
+#chain-line { margin: 0 0 14px; }
+#chain-line.off { color: var(--warn); }
+.chain-list { margin: 6px 0 0; padding-left: 20px; }
 #perm-banner { border-top: 1px solid var(--err); background: var(--err-soft); padding: 10px 20px 12px;
   max-height: 46vh; overflow: auto; }
 .perm { background: var(--card); border: 2px solid var(--err); border-radius: var(--radius); padding: 10px 14px; margin-top: 8px; }
@@ -453,6 +459,7 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
     <button id="perm-badge" class="hidden">Autorisation demandée</button>
   </div>
   <div id="perm-banner" class="hidden" role="alert" aria-label="Autorisation demandée"></div>
+  <div id="chain-banner" class="hidden" role="status" aria-label="État de la chaîne"></div>
 </div>
 
 <div id="shell" class="nofolder">
@@ -508,6 +515,7 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
         <a class="counter" href="#answer" id="cnt-questions"><div class="muted">Questions ouvertes</div><div class="n" id="cnt-q">0</div></a>
         <a class="counter" href="#answer" id="cnt-blocking"><div class="muted">Blocages ouverts</div><div class="n" id="cnt-b">0</div></a>
       </div>
+      <div id="chain-line" class="small" aria-label="La chaîne de l'application"></div>
       <div class="gauges" id="gauges" aria-label="Usage de l'abonnement"></div>
       <div class="alerts" id="alerts"></div>
       <div class="card">
@@ -654,6 +662,12 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
           <span id="diag-wait" class="muted small hidden">En cours… jusqu'à 120 secondes : le premier appel de Gradle peut télécharger Gradle.</span></div>
         <div id="diag-result" class="diag"></div>
       </div>
+      <div class="card sec" id="sec-chain">
+        <h2>Chaîne</h2>
+        <p class="muted small">Les agents, les commandes, les scripts et les grilles de l'application viennent du dépôt de la chaîne, à son dernier commit. On ne les change que là-bas ; ici, on les installe. Les fichiers propres à l'application — son <span class="mono">/deploie</span> — ne sont jamais touchés.</p>
+        <div id="set-chain"></div>
+        <div class="row" style="margin-top:12px"><button id="btn-chain" class="primary">Installer / mettre à jour la chaîne</button><span id="chain-msg" class="muted small"></span></div>
+      </div>
       <div class="card sec" id="sec-commands">
         <h2>Commandes</h2>
         <p class="muted small">La sortie de secours : le chemin normal est la chaîne. Une commande que le dernier relais n'a pas nommée demande confirmation.</p>
@@ -795,7 +809,7 @@ async function api(path, data) {
   const r = await fetch(path, opts);
   let body = {};
   try { body = await r.json(); } catch (e) { /* not json */ }
-  if (!r.ok) throw new Error(body.error || `erreur ${r.status}`);
+  if (!r.ok) { const e = new Error(body.error || `erreur ${r.status}`); e.status = r.status; e.body = body; throw e; }
   return body;
 }
 
@@ -925,7 +939,7 @@ async function refreshState(reason) {
 }
 
 function renderAll() {
-  renderChrome(); renderDashboard(); renderChaine(); renderCorrection(); renderRun(); renderSettings();
+  renderChrome(); renderChainState(); renderDashboard(); renderChaine(); renderCorrection(); renderRun(); renderSettings();
   placeRun();
   watchDiagnostic();
 }
@@ -1157,6 +1171,52 @@ function renderHistory() {
       el("th", {text: "Consommation"}), el("th", {text: "Journal"}))), tb));
 }
 
+// ------------------------------------------------------------ the chain (§20)
+function chainDetails(c) {
+  const box = el("div");
+  if (c.subjects && c.subjects.length) box.append(el("div", {class: "small", style: "margin-top:6px", text: "Commits de la chaîne depuis l'installation :"}),
+    el("ul", {class: "chain-list small mono"}, c.subjects.map((x) => el("li", {text: x}))));
+  if (c.modified && c.modified.length) box.append(el("div", {class: "small", style: "margin-top:6px",
+    text: "Modifiés dans l'application depuis l'installation — la chaîne ne se change que dans son dépôt :"}),
+    el("ul", {class: "chain-list small mono"}, c.modified.map((x) => el("li", {text: x}))));
+  return box;
+}
+function renderChainState() {
+  const c = S.chain;
+  const b = $("chain-banner");
+  b.classList.toggle("hidden", !S.open || !chainOff(c));
+  if (chainOff(c)) b.replaceChildren(el("b", {text: c.summary}), " — une commande lancée maintenant demande d'abord. ",
+    el("button", {class: "link", text: "Paramètres → Chaîne", onclick: () => go("settings", "sec-chain")}));
+  const line = $("chain-line");
+  line.textContent = c ? c.summary : "";
+  line.className = "small" + (chainOff(c) ? " off" : " muted");
+  const box = $("set-chain"); box.replaceChildren();
+  if (!c) { box.append(el("span", {class: "muted", text: "—"})); return; }
+  box.append(el("div", {}, el("b", {text: c.summary})),
+    el("div", {class: "muted small", text: `Dans le dépôt de la chaîne : ${c.chain_commit || "—"} du ${c.chain_date || "—"}.`}),
+    chainDetails(c));
+  $("btn-chain").disabled = running() || !c.state;
+}
+$("btn-chain").onclick = async () => {
+  const b = $("btn-chain"), msg = $("chain-msg");
+  b.disabled = true; msg.textContent = "Installation…";
+  try {
+    let r;
+    try { r = await api("/api/chain/install", {}); }
+    catch (e) {
+      if (!(e.status === 409 && e.body && e.body.overwrite)) throw e;
+      const f = e.body.overwrite;
+      if (!confirm(`${plural(f.length, "fichier n'est pas", "fichiers ne sont pas")} tel que la chaîne l'a laissé ou ne vient pas d'elle ; l'installation le remplace :\n\n${f.join("\n")}\n\nRemplacer ?`)) { msg.textContent = "Rien n'a été installé."; return; }
+      r = await api("/api/chain/install", {confirm: true});
+    }
+    const x = r.result;
+    msg.textContent = `Installée : ${x.commit} du ${x.date}` +
+      (x.app_commit ? ` — commit ${x.app_commit} « ${x.message} »` + (x.pushed ? ", poussé." : x.push_error ? `, non poussé : ${x.push_error}` : ".") : " — rien n'avait changé.");
+    await refreshState();
+  } catch (e) { msg.textContent = ""; alert(e.message); }
+  finally { b.disabled = running() || !(S.chain && S.chain.state); }
+};
+
 // ------------------------------------------------------------ launch
 // One click for the step the chain named or the folder proposes; a
 // confirmation for any other, and always for the commands §1.2 flagged.
@@ -1187,10 +1247,28 @@ function launchNext(d) {
   launchStep(st, d.chain || "main");
 }
 
+// §20 — the chain not « à jour »: the banner says so, and a launch asks
+// first. The server asks too (409 with `chain`) when the page knew older.
+const chainOff = (c) => !!(c && c.state !== "à jour");
+function chainQuestion(c) {
+  return `${c.summary}.\n\nLa commande tournerait avec la chaîne telle qu'elle est installée dans l'application, pas avec celle du dépôt de la chaîne. Paramètres → Chaîne l'installe.\n\nLancer quand même ?`;
+}
+async function postRun(name, args) {
+  if (chainOff(S.chain) && !confirm(chainQuestion(S.chain))) return false;
+  try {
+    await api("/api/run", {command: name, args: args || "", chain_ok: chainOff(S.chain)});
+  } catch (e) {
+    if (!(e.status === 409 && e.body && e.body.chain)) throw e;
+    if (!confirm(chainQuestion(e.body.chain))) return false;
+    await api("/api/run", {command: name, args: args || "", chain_ok: true});
+  }
+  return true;
+}
+
 async function runCommand(name, args, chain, stepId) {
   if (running()) return;
   try {
-    await api("/api/run", {command: name, args: args || ""});
+    if (!(await postRun(name, args))) return;
     $("stream").replaceChildren();
     await refreshState();
     goStep(chain || (S.run_place && S.run_place.chain) || "main", stepId || (S.run_place && S.run_place.step));
@@ -2465,7 +2543,7 @@ async function runRaw(name, args, named) {
   if (running()) return;
   if (!named && !confirm(`Lancer /${name} ${args || ""} ? Ce n'est pas l'étape que le dernier relais a nommée.`)) return;
   try {
-    await api("/api/run", {command: name, args: args || ""});
+    if (!(await postRun(name, args))) return;
     $("stream").replaceChildren();
     await refreshState();
     goStep((S.run_place && S.run_place.chain) || "main", S.run_place && S.run_place.step);

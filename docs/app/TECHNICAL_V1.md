@@ -1,9 +1,12 @@
-# Chain cockpit — technical design, version 1.5
+# Chain cockpit — technical design, version 1.6
 
 A local application that lets the Product Owner run the agent chain
 without editing files by hand. Version 1 covers the two things that cost
 her the most time: **answering questions and blocking files**, and
 **knowing which command comes next**.
+
+*1.6 — the cockpit lives in the chain's own repository and installs the
+chain into an application (§20).*
 
 *1.5 — the server outlives the page and has no console (§16); « Code », /8_code
 lot by lot (§17); which lot an agent pass works on (§18); notifications (§19);
@@ -636,3 +639,46 @@ hand-back, or when the Arbitre starts waiting on her), an error, the idle
 ceiling, a lot of /8_code that passes or fails. A click brings the tab to
 the screen concerned. The tab's title carries the count of what waits:
 « (2) Cockpit ».
+
+## 20. The chain, installed into an application (1.6)
+
+The cockpit lives in the chain's repository, `agent-chain`. **The chain,
+for an application, is exactly the files under `.claude/CLAUDE.md`,
+`.claude/agents/`, `.claude/commands/`, `.claude/scripts/` and
+`.claude/grids/` of this repository, at its `HEAD`** — read from git,
+never from the working tree. Nothing else is ever written in the
+application; its own files in those folders — its `commands/deploie.md`,
+its skills, its settings — are never touched. The chain is changed in its
+repository only, never in an application's copy. `chain.py`.
+
+- **`.claude/chain-version.json`**, written at each install: the chain's
+  commit and its date, every installed file with its hash. The chain's
+  commit is **the last commit of `HEAD` that changed one of its files**:
+  a commit of the cockpit alone changes no application's state. A hash is
+  the SHA-256 of the file, CRLF read as LF — git's `autocrlf` is not a
+  change.
+- **The state**, in `/api/state` as `chain`, one line on the dashboard:
+  « à jour » — the installed commit is the chain's, every hash matches;
+  « en retard » — an older commit, with how many commits of the chain
+  since and their subjects; « modifiée sur place » — a hash differs, or a
+  file is gone: the files listed; « absente » — no `chain-version.json`.
+  Reading the chain's commit runs `git log` and `git ls-tree` in the
+  chain's repository, once per `HEAD`; the application's files are only
+  read.
+- **Paramètres → « Installer / mettre à jour la chaîne »**
+  (`POST /api/chain/install`): copies the files, removes those the
+  previous `chain-version.json` listed and the chain no longer has,
+  writes `chain-version.json`, then commits in the application those
+  files alone — `chain: <id> <date>`, with `--only`, so that what the
+  Product Owner staged stays out — and pushes. Nothing changed: no
+  commit. It **refuses** while a run goes, while a file the previous
+  install wrote (or `chain-version.json`) has changes git has not
+  committed, outside a repository's root, and in the chain's repository
+  itself. It **asks first** (409 with `overwrite`, then `confirm`) before
+  replacing a file changed in place since the last install, an
+  application file the chain now brings, or — at a first install — any
+  file already there that differs. A push that fails leaves the commit and
+  says why.
+- **Before any launch**, a chain not « à jour »: a banner on every screen
+  says so, and the launch asks; `POST /api/run` answers 409 with `chain`
+  unless the page sends `chain_ok`.

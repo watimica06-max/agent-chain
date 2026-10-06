@@ -17,6 +17,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import blocking   # noqa: E402
+import chain as chain_mod  # noqa: E402
 import codelots   # noqa: E402
 import context as context_mod  # noqa: E402
 import decide as decide_mod  # noqa: E402
@@ -35,10 +36,14 @@ from state import State  # noqa: E402
 HOST = "127.0.0.1"
 STATE_KEY = web.AppKey("state", State)
 DEFAULT_PORT = 8765
-VERSION = "1.5"
+VERSION = "1.6"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
+# The chain's repository, which the cockpit installs into an application
+# (§20), and whether an install pushes; the tests put a scratch one here.
+CHAIN_ROOT = chain_mod.CHAIN_ROOT
+CHAIN_PUSH = True
 # What opens the browser; the tests put a fake here.
 OPEN_BROWSER = webbrowser.open
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
@@ -267,6 +272,13 @@ def save_items(app, work, rn, items):
     return [r.to_dict() for r in results]
 
 
+# ------------------------------------------------------------- the chain
+
+def chain_state(app):
+    """The chain's state in the application (§20); the tests put a stub here."""
+    return chain_mod.state(app, CHAIN_ROOT)
+
+
 # ------------------------------------------------------------- the scan
 
 def where(state: State, rn, app, feature, reason=None):
@@ -460,6 +472,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if state.app_folder and not check_app_folder(state.app_folder):
             out["working_folders"] = working_folders(state.app_folder, state.ignored)
             out["all_folders"] = all_folders(state.app_folder)
+            # The chain installed in the application (§20).
+            out["chain"] = chain_state(state.app_folder)
         if a:
             run = rn.current(a)
             feature = feature_of(w)
@@ -612,6 +626,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": f"commande inconnue : /{cmd}"}, status=400)
         if "\n" in args or "\r" in args:
             return web.json_response({"error": "l'argument tient sur une ligne"}, status=400)
+        # A chain not « à jour » (§20): the launch asks first.
+        ch = chain_state(a)
+        if ch.get("state") != chain_mod.UP_TO_DATE and not data.get("chain_ok"):
+            return web.json_response({"error": ch["summary"], "chain": ch}, status=409)
         try:
             r = await rn.start(a, w, feature_of(w), cmd, args)
         except runner_mod.Busy as e:
@@ -625,6 +643,31 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         except runner_mod.NotRunning as e:
             return web.json_response({"error": str(e)}, status=409)
         return web.json_response({"ok": True})
+
+    async def chain_install(request):
+        """Paramètres → « Installer / mettre à jour la chaîne » (§20). Refused
+        while a run goes; files the chain did not leave as they are: 409 with
+        the list, and the page asks before sending `confirm`."""
+        data = await body(request)
+        a = state.app_folder
+        if not a or check_app_folder(a):
+            return web.json_response({"error": "aucune application ouverte"}, status=409)
+        if any(x.id and x.status != "ended" for x in rn.runs.values()):
+            return web.json_response({"error": "une commande tourne : pas d'installation maintenant"}, status=409)
+        loop = asyncio.get_running_loop()
+        try:
+            res = await loop.run_in_executor(None, lambda: chain_mod.install(
+                a, CHAIN_ROOT, confirm=bool(data.get("confirm")), push=CHAIN_PUSH))
+        except chain_mod.NeedsConfirm as e:
+            return web.json_response({"error": "fichiers à confirmer", "overwrite": e.files,
+                                      "chain": chain_state(a)}, status=409)
+        except chain_mod.InstallError as e:
+            return web.json_response({"error": str(e)}, status=409)
+        print(f"Chaîne installée dans {a} : {res['commit']} du {res['date']}"
+              + (f", commit {res['app_commit']}" if res["app_commit"] else ", rien à commiter")
+              + (" et poussé" if res["pushed"] else f" — push : {res['push_error']}" if res["push_error"] else "")
+              + ".", flush=True)
+        return web.json_response({"ok": True, "result": res, "chain": chain_state(a)})
 
     async def set_mode(request):
         data = await body(request)
@@ -897,6 +940,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/run", run)
     r.add_post("/api/stop-now", stop_now)
     r.add_post("/api/mode", set_mode)
+    r.add_post("/api/chain/install", chain_install)
     r.add_post("/api/ignored", set_ignored)
     r.add_post("/api/diagnostic", run_diagnostic)
     r.add_post("/api/continue-wait", continue_wait)

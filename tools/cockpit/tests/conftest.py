@@ -40,6 +40,23 @@ def _no_java_home(monkeypatch):
     monkeypatch.delenv("JAVA_HOME", raising=False)
 
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "real_chain: the chain's state is computed, not stubbed « à jour »")
+
+
+@pytest.fixture(autouse=True)
+def _chain_up_to_date(request, monkeypatch):
+    """§20: a launch asks first when the application's chain is not « à
+    jour ». A test's application is a folder with no chain installed: its
+    state is « à jour » unless the test is marked `real_chain`."""
+    if request.node.get_closest_marker("real_chain"):
+        return
+    import server
+    monkeypatch.setattr(server, "chain_state", lambda app: {
+        "state": "à jour", "summary": "Chaîne à jour — test", "commit": "0000000", "date": "2026-10-06",
+        "chain_commit": "0000000", "chain_date": "2026-10-06", "behind": None, "subjects": [], "modified": []})
+
+
 @pytest.fixture(autouse=True)
 def _no_real_diagnostic(monkeypatch):
     """1.4.5: the cockpit runs the diagnostic on its own when none is stored.
