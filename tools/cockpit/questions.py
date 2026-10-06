@@ -1,9 +1,14 @@
 """Every open question of a working folder — TECHNICAL_V1 §8.1.
 
-Reads the root `questions-<agent>-NN.md` and `convertisseur/technique-*.md`.
-Tolerant of the real shapes (prose before the first `### Q`, a `Question:`
-over several lines, `Answer:` with no space, a title on the `Block:` line);
-a file it cannot read is an error, never a file with no questions.
+Reads the root `questions-<agent>-NN.md` and `convertisseur/technique-*.md`,
+in the shape the writers' templates give: `### Q<n>`, `Key: value` lines
+(`Block:`, `Terms:`, `Entries:`, `Kind:`), `Question:`, an optional
+`Options:` list of `- ` items, an optional `Défaut:`, `Answer:`. What a
+current template produces besides, and is read: a `Question:` over several
+lines (agents/lexicographe.md:348-350), a title on the `Block:` line
+(agents/architecte.md:547), and the file's own title above the first `### Q`
+(the lexicographe's, premiere-app-3). Anything else is an error, and a file
+it cannot read is an error, never a file with no questions.
 """
 import hashlib
 import os
@@ -24,8 +29,8 @@ ANSWER_EMPTY = re.compile(r"^Answer:\s*$")          # the commands' own test
 QUESTION = re.compile(r"^Question:(.*)$")
 OPTIONS = re.compile(r"^Options:\s*$")
 DEFAUT = re.compile(r"^Défaut:(.*)$")
-OPTION_ITEM = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+(.*)$")
-SEPARATOR = re.compile(r"^\s*(?:-{3,}|\*{3,}|_{3,})\s*$")
+OPTION_ITEM = re.compile(r"^- (.*)$")                 # `- <a proposal…>`, every template
+CONTEXT_KEY = re.compile(r"^[A-Z][A-Za-z]*:\s")       # `Block:`, `Terms:`, `Entries:`, `Kind:`
 
 
 @dataclass
@@ -191,10 +196,11 @@ def _parse_entry(lines, start, end, number, path, rel, kind):
             mode = "defaut"
             continue
         if mode == "context":
-            if not line.strip() or SEPARATOR.match(line):
+            if not line.strip():
                 continue
-            # `Block:`, `Terms:`, `Entries:`, `Kind:` — or prose with no key,
-            # kept as context rather than lost.
+            if not CONTEXT_KEY.match(line):
+                return None, (f"ligne {j + 1} : Q{number}, ligne hors gabarit avant « Question: » "
+                              "— attendu « Block: », « Terms: », « Entries: » ou « Kind: »")
             context.append(line.strip())
         elif mode == "question":
             question_lines.append(line.rstrip())
@@ -202,19 +208,19 @@ def _parse_entry(lines, start, end, number, path, rel, kind):
             m = OPTION_ITEM.match(line)
             if m:
                 options.append(m.group(1).strip())
-            elif line.strip() and options:
-                options[-1] += " " + line.strip()
+            elif line.strip():
+                return None, f"ligne {j + 1} : Q{number}, sous « Options: », une ligne qui n'ouvre pas sur « - »"
         elif mode == "defaut":
             if line.strip():
-                default_line += " " + line.strip()
+                return None, f"ligne {j + 1} : Q{number}, « Défaut: » tient sur une ligne"
 
     if answer_line is None:
         return None, f"ligne {start + 1} : Q{number} n'a pas de ligne « Answer: »"
 
-    # The answer runs to the end of the entry, less trailing blanks and rules.
+    # The answer runs to the end of the entry, less trailing blanks.
     answer_end = answer_line
     for j in range(end - 1, answer_line, -1):
-        if lines[j].strip() and not SEPARATOR.match(lines[j]):
+        if lines[j].strip():
             answer_end = j
             break
     first = ANSWER.match(lines[answer_line]).group(1)
@@ -223,7 +229,7 @@ def _parse_entry(lines, start, end, number, path, rel, kind):
 
     question = "\n".join(question_lines).strip()
     if not question:
-        question = "\n".join(context).strip()
+        return None, f"ligne {start + 1} : Q{number} n'a pas de « Question: »"
     default = default_source = None
     if default_line is not None:
         default, default_source = _split_default(default_line, options)

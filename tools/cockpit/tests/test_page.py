@@ -314,3 +314,21 @@ def test_a_guessed_entry_is_shown_with_what_the_guess_saw(tmp_path, page):
         card.wait_for()
         assert "8_code.md:770-772" in card.locator(".notice").inner_text()
         assert no_real_errors(page) == []
+
+
+def test_settings_lists_the_ignored_folders_and_edits_them(tmp_path, page):
+    # 1.5.1: Paramètres → Dossiers, one box per folder of docs/features/.
+    with FakeServer(tmp_path) as s:
+        (s.app_root / "docs" / "features" / "premiere-app" / "bugfix-06").mkdir(parents=True)
+        (s.app_root / "docs" / "features" / "g").mkdir()
+        page.goto(s.url)
+        go(page, "Paramètres")
+        page.wait_for_selector("#ignored-list input")
+        boxes = {b.get_attribute("value"): b.is_checked() for b in page.locator("#ignored-list input").all()}
+        assert boxes == {"f": False, "g": False, "premiere-app": True, "premiere-app-2": True}
+        assert "absent de docs/features/" in page.locator("#ignored-list label", has_text="premiere-app-2").inner_text()
+        assert page.locator("#feature-list button").all_inner_texts() == ["f", "g"]
+        page.locator("#ignored-list input[value=g]").check()
+        page.wait_for_function("document.querySelectorAll('#feature-list button').length === 1")
+        assert s.state.ignored == ["g", "premiere-app", "premiere-app-2"]
+        assert no_real_errors(page) == []

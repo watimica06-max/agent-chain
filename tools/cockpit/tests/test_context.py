@@ -206,7 +206,7 @@ def test_block_dash_and_unknown_writers_have_no_context(feat):
     p = feat / "questions-sondeur-01.md"
     p.write_text(q(1, "Block: -"), encoding="utf-8")
     assert resolve_one(p, feat)["status"] == "none"
-    a = feat / "questions-analyste-01.md"
+    a = feat / "questions-inconnu-01.md"
     p.unlink()
     a.write_text(q(), encoding="utf-8")
     r = resolve_one(a, feat)

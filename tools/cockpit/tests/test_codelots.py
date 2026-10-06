@@ -1,13 +1,12 @@
 """Cockpit 1.5 — the « Code » tab's reader (codelots.py, code_rules.md).
 
-Real files first: the frozen copies of premiere-app and its bugfix-NN/
-(tests/fixtures/features/). They are in an older shape than the current
-8_code.md: three-field verdicts (no `## Attempts`, `## Findings`…), no
-`conception.md` / `tests.md`, no `Round:` line, the Détailleur's blocking
-files in the lot's folder — and every lot PASS. Every other state is a
-hand-written folder following the templates of the command and its agents
-(verificateur.md:107-115, cadreur.md:848-854, relecteur.md:140-170,
-detailleur.md:328-352, arbitre.md:451-460). No command runs."""
+Hand-written folders following the templates of the command and its agents:
+the sequence (verificateur.md:107-115), the lot list (cadreur.md:848-854),
+the verdict (relecteur.md:140-170), the Détailleur's blocking file at the
+split's root (detailleur.md:328-352), the Réalisateur's (realisateur.md:306-321),
+the requests (arbitre.md:451-460), `code/redecoupage.md` (arbitre.md:379-399,
+cadreur.md:1054-1061) and the lot's commits (8_code.md:198-229). No real
+folder of the current chain has a `code/` yet. No command runs."""
 import os
 import shutil
 import sqlite3
@@ -20,66 +19,6 @@ import scan
 import stats
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-FEATURES = os.path.join(HERE, "fixtures", "features")
-
-
-def real_app(tmp_path):
-    app = tmp_path / "app"
-    (app / ".claude").mkdir(parents=True)
-    (app / "docs" / "features").mkdir(parents=True)
-    shutil.copytree(os.path.join(FEATURES, "premiere-app"), app / "docs" / "features" / "premiere-app")
-    return app
-
-
-# ------------------------------------------------------------------ real files
-
-def test_real_folders_read_every_lot_passed_and_agree_with_the_scan(tmp_path):
-    app = real_app(tmp_path)
-    sc = scan.run_scan(str(app), "premiere-app")
-    by_name = {c["name"]: c for c in sc["corrections"]}
-    for folder in ["", "bugfix-01", "bugfix-02", "bugfix-03", "bugfix-04", "bugfix-05", "bugfix-06"]:
-        r = codelots.read_lots(str(app), "premiere-app", folder)
-        assert r["exists"] and r["passed"] == r["total"] > 0
-        assert {l["state"] for l in r["lots"]} == {codelots.PASSE}
-        steps = by_name[folder]["steps"] if folder else sc["main"]
-        step8 = next(s for s in steps if s["id"] == "8_code")
-        if r["defects"]:
-            # bugfix-03 to 05: `## Defects` holds « None. », a line — /8_code would
-            # stop (COD-2) and the scan counts nothing; the tab says why.
-            assert folder in ("bugfix-03", "bugfix-04", "bugfix-05") and r["defects"] == ["None."] and step8["lots"] is None
-            assert any(w["rule"] == "COD-2" for w in step8["why"])
-            continue
-        # The bar and « n / N en PASS » come from one reader.
-        assert step8["lots"] == {"pass": r["passed"], "total": r["total"]}, folder
-        # Old verdicts carry no `## Attempts`: read as 1, and said so.
-        assert all(l["attempts"]["used"] == 1 and l["attempts"]["note"] for l in r["lots"])
-        assert not r["estimate"]["shown"]
-    r = codelots.read_lots(str(app), "premiere-app", "")
-    assert r["lots"][0]["title"].startswith("§1.1") and r["lots"][0]["fields"]["Produces"].startswith("Segment")
-    assert [b["name"] for b in r["blocks"]][:2] == ["block-1", "block-2"]
-    # bugfix-07 has no split yet.
-    assert not codelots.read_lots(str(app), "premiere-app", "bugfix-07")["exists"]
-
-
-def test_real_marks_of_the_arbitre_and_the_architecte(tmp_path):
-    app = real_app(tmp_path)
-    r = codelots.read_lots(str(app), "premiere-app", "bugfix-06")
-    lot20 = next(l for l in r["lots"] if l["lot"] == "lot-20")
-    assert {f["rel"] for f in lot20["arbitre"]["files"]} >= {"code/lot-20/blocked_realisateur-01.md",
-                                                           "code/lot-20/blocked_detailleur-01.md"}
-    assert lot20["architecte"]["requests"] == [{"rel": "architecte/detailleur-lot-20.md", "by": "detailleur",
-                                                "answered": True}]
-    lot01 = next(l for l in r["lots"] if l["lot"] == "lot-01")
-    assert lot01["arbitre"] is None and lot01["architecte"]["requests"][0]["rel"] == "architecte/realisateur-lot-01.md"
-    assert sum(1 for l in r["lots"] if not l["arbitre"] and not l["architecte"]) > 20
-
-
-def test_real_lot_detail_renders_the_sheet_and_the_verdict(tmp_path):
-    app = real_app(tmp_path)
-    d = codelots.lot_detail(str(app), "premiere-app", "bugfix-06", "lot-01")
-    assert d["sheet"]["exists"] and any(l.startswith("## ") for l in d["sheet"]["lines"])
-    assert d["verdict"]["status"] == "PASS" and d["verdict"]["findings"] is None   # an older verdict: no ## Findings
-    assert codelots.lot_detail(str(app), "premiere-app", "bugfix-06", "lot-999") is None
 
 
 # ------------------------------------------------------- hand-written shapes
@@ -201,11 +140,80 @@ def test_each_state_from_the_hand_written_shapes(tmp_path):
         assert l["rule"] in codelots.RULES
 
 
-def test_a_redecoupage_sends_every_lot_without_pass_back(tmp_path):
+# The Arbitre's section of `code/redecoupage.md` (agents/arbitre.md:379-399), a
+# Réalisateur's block: the lot in hand, whose code is dropped, and the lots left.
+ARBITRE_REDEC = """## Ce qui bloque
+
+lot-06 needs `S8`, which lot-08 produces after it.
+
+## Où
+
+lot-06, S8, §6.1
+
+## Ce qui est déjà codé
+
+lot-01, lot-02
+
+## Ce qui ne l'est pas
+
+lot-06, whose code is dropped; lot-03, lot-04, lot-05 left
+
+## Ce que le découpage doit permettre
+
+S8 exists before lot-06 is coded.
+"""
+# The Cadreur's two sections, at the end, once it has cut again (agents/cadreur.md:1054-1061).
+CADREUR_REDEC = "\n## Ce qui revient\n\nrien\n\n## Ce que j'en fais\n\nrien de récurrent\n"
+
+
+def test_a_redecoupage_marks_the_lots_of_the_split_that_came_back(tmp_path):
     app, f = hand_folder(tmp_path)
-    (f / "code" / "redecoupage.md").write_text("## Ce qui revient\n\nlot-06\n", encoding="utf-8")
-    s = states(codelots.read_lots(str(app), "h", ""))
-    assert s["lot-01"] == codelots.PASSE and s["lot-06"] == codelots.REDECOUPE and s["lot-03"] == codelots.REDECOUPE
+    (f / "code" / "redecoupage.md").write_text(ARBITRE_REDEC, encoding="utf-8")
+    r = codelots.read_lots(str(app), "h", "")
+    s = states(r)
+    assert r["redecoupage_lots"] == ["lot-03", "lot-04", "lot-05", "lot-06"]
+    assert {l for l, st in s.items() if st == codelots.REDECOUPE} == {"lot-03", "lot-04", "lot-05", "lot-06"}
+    # Named under « Ce qui est déjà codé », or not named at all: the other rules.
+    assert s["lot-01"] == codelots.PASSE and s["lot-07"] == codelots.PAS_COMMENCE and s["lot-08"] == codelots.ENTAME
+    assert codelots.STATE_RULE[codelots.REDECOUPE] == "E-REDEC"
+
+
+def test_a_re_split_that_does_not_hold_leaves_its_lots_to_the_other_rules(tmp_path):
+    # /7_lots ran, the Cadreur wrote its sections, the split did not hold: the
+    # file stays unnumbered (7_lots.md:150-160, :209, :212), the lots in code/
+    # are the new split's.
+    app, f = hand_folder(tmp_path)
+    (f / "code" / "redecoupage.md").write_text(ARBITRE_REDEC + CADREUR_REDEC, encoding="utf-8")
+    (f / "code" / "sequence.md").write_text(SEQ + "lot-06 | needs S8 | lot-08 runs after it\n", encoding="utf-8")
+    r = codelots.read_lots(str(app), "h", "")
+    assert r["redecoupage_lots"] == [] and codelots.REDECOUPE not in states(r).values()
+    assert r["redecoupage"] == "code/redecoupage.md" and r["defects"]
+    assert states(r)["lot-06"] == codelots.ENTAME
+    # Coding sends it back again: the Arbitre's new section, after the Cadreur's, names its lots.
+    (f / "code" / "redecoupage.md").write_text(
+        ARBITRE_REDEC + CADREUR_REDEC + "\n" + ARBITRE_REDEC.replace("lot-03, lot-04, lot-05 left", "lot-07 left"),
+        encoding="utf-8")
+    assert codelots.read_lots(str(app), "h", "")["redecoupage_lots"] == ["lot-06", "lot-07"]
+
+
+def test_a_lot_folder_holds_the_four_agents_blocking_files_only(tmp_path):
+    # 8_code.md:751-754: code/<lot>/ for the Concepteur, the Testeur, the
+    # Réalisateur, the Relecteur; the Détailleur's at the split's root.
+    app, f = hand_folder(tmp_path)
+    (f / "code" / "lot-07" / "blocked_concepteur.md").write_text(
+        "## What blocks\n\nx\n\n## Where\n\ny\n\n## To resume\n\nz\n\n## Decision\n\n", encoding="utf-8")
+    (f / "code" / "lot-07" / "blocked_detailleur.md").write_text("## Blocking 1\n\n## Decision\n\n", encoding="utf-8")
+    d = codelots.lot_detail(str(app), "h", "", "lot-07")
+    assert [b["rel"] for b in d["blocking"]] == ["code/lot-07/blocked_concepteur.md"]
+
+
+def test_lot_detail_renders_the_sheet_and_the_verdict(tmp_path):
+    app, f = hand_folder(tmp_path)
+    d = codelots.lot_detail(str(app), "h", "", "lot-03")
+    assert d["sheet"]["exists"] and d["sheet"]["lines"][0] == "## Signatures"
+    assert d["verdict"]["status"] == "FAIL mineur" and d["verdict"]["findings"] == "point 2 — criterion 3 has no test"
+    assert d["reports"] == ["conception.md", "tests.md", "compte-rendu.md"]
+    assert codelots.lot_detail(str(app), "h", "", "lot-999") is None
 
 
 def test_the_detailleurs_entry_names_its_lot(tmp_path):
@@ -290,26 +298,61 @@ def commit(repo, message, *files):
     git(repo, "commit", "-q", "-m", message)
 
 
+def sha_of(repo, subject):
+    out = subprocess.run(["git", "-C", str(repo), "log", "--format=%H %s"], capture_output=True, text=True).stdout
+    return next(line.split(" ", 1)[0] for line in out.splitlines() if line.split(" ", 1)[1] == subject)
+
+
 @pytest.mark.skipif(shutil.which("git") is None, reason="git absent")
-def test_a_lots_commits_are_this_folders_reverts_marked(tmp_path):
+def test_a_lots_commits_are_found_by_their_subject_after_the_split_in_force(tmp_path):
+    """8_code.md:198-229: the subject `<working folder>/<lot>: ` alone, after
+    the commit that added the current code/decoupage.md, cut after the lot's
+    last revert. Every shape the 1.5.1 scratch repository ran."""
     repo = tmp_path / "repo"
     repo.mkdir()
     git(repo, "init", "-q")
     commit(repo, "init", "README.md")
-    commit(repo, "lot-01: declarations", "src/A.kt", "docs/features/h/code/lot-01/conception.md")
-    commit(repo, "lot-01: another split's", "src/B.kt", "docs/features/h/bugfix-01/code/lot-01/conception.md")
-    commit(repo, "lot-01: no report staged", "src/C.kt")
-    commit(repo, "lot-02: not this lot", "src/D.kt", "docs/features/h/code/lot-02/tests.md")
-    sha = subprocess.run(["git", "-C", str(repo), "log", "-1", "--format=%H", "--grep=^lot-01: declarations"],
-                         capture_output=True, text=True).stdout.strip()
-    git(repo, "revert", "--no-edit", sha)
-    c = codelots.commits(str(repo), "docs/features/h", "lot-01")
-    assert c["error"] is None and c["elsewhere"] == 1
-    subjects = [(k["subject"], k["where"], k["revert"], k["reverted"]) for k in c["list"]]
-    assert subjects == [('Revert "lot-01: declarations"', "dossier", True, False),
-                        ("lot-01: no report staged", "sans dossier", False, False),
-                        ("lot-01: declarations", "dossier", False, True)]
-    assert c["list"][2]["files"] == ["docs/features/h/code/lot-01/conception.md", "src/A.kt"]
+    # The earlier chain: unprefixed subjects, another folder.
+    commit(repo, "lot-03: declare old", "src/Old.kt", "docs/features/old/bugfix-06/code/lot-03/conception.md")
+    # A first split of h, then the Product Owner deletes code/ and a new one is cut.
+    commit(repo, "split 1", "docs/features/h/code/decoupage.md")
+    commit(repo, "h/lot-03: declare (split 1)", "src/A.kt", "docs/features/h/code/lot-03/conception.md")
+    git(repo, "rm", "-q", "-r", "docs/features/h/code")
+    git(repo, "commit", "-q", "-m", "chore: pre-split")
+    commit(repo, "split 2", "docs/features/h/code/decoupage.md", "docs/features/h/code/sequence.md")
+    commit(repo, "h/lot-01: declare", "src/B.kt", "docs/features/h/code/lot-01/conception.md")
+    commit(repo, "h/lot-03: declare", "src/C.kt", "docs/features/h/code/lot-03/conception.md")
+    commit(repo, "h/lot-03: bodies", "src/C2.kt", "docs/features/h/code/lot-03/compte-rendu.md")
+    git(repo, "revert", "--no-edit", sha_of(repo, "h/lot-03: bodies"))
+    git(repo, "revert", "--no-edit", sha_of(repo, "h/lot-03: declare"))
+    # The redécoupage amends decoupage.md: lot-01, PASS, stays after the split in force.
+    commit(repo, "redecoupage", "docs/features/h/code/decoupage.md")
+    commit(repo, "h/lot-03: declare again", "src/C3.kt", "docs/features/h/code/lot-03/conception.md")
+    commit(repo, "h/lot-03: fix the retry", "src/C4.kt")          # a Réalisateur retry, code only
+    (repo / "x.md").write_text("x\n", encoding="utf-8")
+    git(repo, "add", "x.md")
+    git(repo, "commit", "-q", "-m", "trap: a trap", "-m", "h/lot-03: a body line that looks like a subject")
+    # A bug-fix folder: its own split, its own lot-03.
+    commit(repo, "bug split", "docs/features/h/bugfix-01/code/decoupage.md")
+    commit(repo, "h/bugfix-01/lot-03: declare", "src/D.kt", "docs/features/h/bugfix-01/code/lot-03/conception.md")
+
+    c = codelots.commits(str(repo), "docs/features/h", "lot-03")
+    assert c["error"] is None and c["split"]["sha"] == sha_of(repo, "split 2")
+    rows = [(k["subject"], k["revert"], k["in_list"], k["reverted"]) for k in c["list"]]
+    assert rows == [("h/lot-03: fix the retry", False, True, False),
+                    ("h/lot-03: declare again", False, True, False),
+                    ('Revert "h/lot-03: declare"', True, False, False),
+                    ('Revert "h/lot-03: bodies"', True, False, False),
+                    ("h/lot-03: bodies", False, False, True),
+                    ("h/lot-03: declare", False, False, True)]
+    assert c["list"][0]["files"] == ["src/C4.kt"]
+    assert [k["subject"] for k in codelots.commits(str(repo), "docs/features/h", "lot-01")["list"]] == \
+        ["h/lot-01: declare"]
+    b = codelots.commits(str(repo), "docs/features/h/bugfix-01", "lot-03")
+    assert b["split"]["sha"] == sha_of(repo, "bug split")
+    assert [k["subject"] for k in b["list"]] == ["h/bugfix-01/lot-03: declare"]
+    # No split cut yet: nothing to list, and no error.
+    assert codelots.commits(str(repo), "docs/features/z", "lot-01") == {"error": None, "list": [], "split": None}
 
 
 # ------------------------------------------------------ which lot a pass is

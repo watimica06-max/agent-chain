@@ -266,7 +266,7 @@ Rédacteur's.
 | `LOT-5` | 7_lots | à faire | `code/blocked_cadreur.md`, last decision filled | 7_lots.md:140 |
 | `LOT-6` | 7_lots | à faire | the split holds, a request waits on its verdict | 7_lots.md:241-250 |
 | `LOT-7` | 7_lots | faite | `code/sequence.md`, `## Defects` carries no line | 7_lots.md:208 |
-| `LOT-8` | 7_lots | à faire | `## Defects` carries lines — `None.` is a line | 8_code.md:92-93 · 7_lots.md:142 |
+| `LOT-8` | 7_lots | à faire | `## Defects` carries lines | 8_code.md:92-93 · 7_lots.md:142 |
 | `LOT-9` | 7_lots | à faire | no split yet | 7_lots.md:141 |
 | `COD-1` | 8_code | à faire | no `code/sequence.md` | 8_code.md:80-83 |
 | `COD-2` | 8_code | à faire | defects, or `blocked_verificateur.md`: /7_lots first | 8_code.md:92-100 |
@@ -303,7 +303,7 @@ proposes the correction chain: the commands act on it.
 
 - **`inconnu`: /3_decoupe, /3a_genre, /3b_nature** (`DEC-9`, `GEN-9`,
   `NAT-9`) when the root holds a file of an agent outside the upstream
-  turn (`analyste`, `convertisseur`…) beside markers or before the grid:
+  turn (`convertisseur`, `architecte`…) beside markers or before the grid:
   nothing says whether the step ran.
 - **The test on the emulator** has no file of its own. It is read from
   what follows it — a `bugfix-NN/` (`TST-3`), `rapport-fusion.md`

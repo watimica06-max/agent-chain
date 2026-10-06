@@ -59,7 +59,7 @@ def dialogs(page, accept):
 
 def test_the_flow_shows_each_state(tmp_path, page):
     with FakeServer(tmp_path) as s:
-        add_turn_feature(s.app_root, "t", ["questions-analyste-01.md"], blocked_classeur=True)
+        add_turn_feature(s.app_root, "t", ["questions-convertisseur-01.md"], blocked_classeur=True)
         open_feature(s, page, "t")
         got = states_shown(page)
         assert got["1_lexique"] == "faite" and got["2_structure"] == "faite"
@@ -86,10 +86,10 @@ def test_the_flow_shows_each_state(tmp_path, page):
 
 def test_why_shows_the_rule_and_the_files_for_each_state(tmp_path, page):
     with FakeServer(tmp_path) as s:
-        add_turn_feature(s.app_root, "t", ["questions-analyste-01.md"], blocked_classeur=True)
+        add_turn_feature(s.app_root, "t", ["questions-convertisseur-01.md"], blocked_classeur=True)
         open_feature(s, page, "t")
-        for sid, rule, file in [("1_lexique", "LEX-7", "questions-analyste-01.md"),
-                                ("3_decoupe", "DEC-9", "questions-analyste-01.md"),
+        for sid, rule, file in [("1_lexique", "LEX-7", "questions-convertisseur-01.md"),
+                                ("3_decoupe", "DEC-9", "questions-convertisseur-01.md"),
                                 ("3b_nature", "G-ATT", "blocked_classeur.md"),
                                 ("4_grille", "GRI-6", "questions/sondeur/questions-sondeur-01.md")]:
             row = page.locator(f"#step-main-{sid}")

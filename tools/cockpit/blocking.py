@@ -28,7 +28,7 @@ LOT_IN_HEADING = re.compile(r"\b(lot-[A-Za-z0-9-]+)")
 DECISION = re.compile(r"^## Decision\s*$")
 INVOCATION = re.compile(r"^## Invocation\s*$")
 OPTIONS = re.compile(r"^Options:\s*$")
-OPTION_ITEM = re.compile(r"^\s*(?:[-*•])\s+(.*)$")
+OPTION_ITEM = re.compile(r"^- (.*)$")
 NUMBERED = re.compile(r"^(\d+)\.")
 REQUEST_IN_WHERE = re.compile(r"architecte/cadreur\.md\s*[—–-]+\s*Request\s+(\d+)")
 REQUEST = re.compile(r"^# Request (\d+)\b")
@@ -145,17 +145,20 @@ def _section(lines, heads, a, b, title):
 
 
 def _split_options(text):
+    """`Options:` and its `- ` items (every template: « two to six, in
+    French », one line each). A line under it that is not an item stays in
+    the text, never lost."""
     lines = text.split("\n")
     for k, line in enumerate(lines):
         if OPTIONS.match(line):
-            opts = []
+            opts, rest = [], []
             for l in lines[k + 1:]:
                 m = OPTION_ITEM.match(l)
                 if m:
                     opts.append(m.group(1).strip())
-                elif l.strip() and opts:
-                    opts[-1] += " " + l.strip()
-            return "\n".join(lines[:k]).strip(), opts
+                elif l.strip():
+                    rest.append(l)
+            return "\n".join(lines[:k] + rest).strip(), opts
     return text, []
 
 

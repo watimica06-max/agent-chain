@@ -63,12 +63,8 @@ only, never `Answer:`.
 
 **Real shapes, beside the instructions.**
 
-- `lexicographe` — feat/premiere-app-2/questions/lexicographe/questions-lexicographe-01.md:1-14: a French title and paragraph **above** `### Q1`, then `Terms:`/`Question:`/`Answer:` as instructed. feat/premiere-app-3/questions-lexicographe-01.md:1-12: a `Question:` **wrapped over seven lines**. The instructions show a multi-line `Question:` too (agt/lexicographe.md:338-341). The parser must accept prose before the first `### Q` and a `Question:` running until `Answer:`.
-- `classeur` — feat/premiere-app-2/questions-classeur-01.md:1-4: the shape as instructed; the candidate natures are in the prose (« which nature should the whole block carry? »).
-- `redacteur` — feat/premiere-app-2/questions/redacteur/questions-redacteur-01.md:1-5: `Answer:L'autorisation…` (no space after the colon), then a line `[integrated: B163, B164, B165]`. No `integrated:` anywhere in `.claude/` today: an older rule.
-- `sondeur`/`assembleur` — feat/premiere-app/questions-sondeur-01.md:1-6: older shape — a title line, `Block: B1 — Race segment structure` (the title on the `Block:` line, which agt/sondeur.md:419-421 now forbids).
-- `convertisseur` — feat/premiere-app/questions/convertisseur/questions-convertisseur-02.md:1-5: older shape, `Block:` with a title.
-- **Not found** in any real file: a `Défaut:` line (`^Défaut:` returns nothing under `docs/features/`), an `Options:` line, a non-empty `questions-architecte-*`, any `questions-qualifieur-*`, `questions-fusionneur-*`, `questions-existant-*` or `technique-*`. `questions/analyste/` belongs to an agent no longer in `.claude/agents/`.
+- `lexicographe` — feat/premiere-app-3/questions-lexicographe-01.md:1-12: a title **above** `### Q1`, and a `Question:` **wrapped over seven lines**. The instructions show a multi-line `Question:` too (agt/lexicographe.md:338-341). The parser must accept the file's title before the first `### Q` and a `Question:` running until `Answer:`.
+- *1.5.1:* the files of the earlier chain (premiere-app, premiere-app-2) are no longer read; the cockpit ignores those folders, and the shapes only they carried are no longer accepted.
 
 **A questions file outside the `questions-*-NN.md` name.**
 `convertisseur/technique-<nature>.md` and `technique-transversal.md`
@@ -104,11 +100,8 @@ English, they meet two readers:
 The language of option text has to be decided before any template
 changes.
 
-**Multi-line answers.** Yes, they are needed. 141 real entries carry
-text on lines below `Answer:`, mostly feat/premiere-app-2/questions/
-lexicographe/questions-lexicographe-02…14.md, plus
-questions-convertisseur-02, 03, 06 (e.g.
-questions-convertisseur-02.md:17-27, five paragraphs). In all 141 the
+**Multi-line answers.** Yes, they are needed: the Product Owner's
+answers run over several lines, and the writer keeps them whole. The
 first line after `Answer:` is non-empty. The readers above test only
 the `Answer:` line, so the free-text field must **start its text on the
 `Answer:` line**. Text that begins on the next line reads as empty to
@@ -235,18 +228,6 @@ under a number reads as an answer — never a note » (:215-216). The
 Arbitre may touch nothing but `## Decision` (:133-134, :141-142). The
 form can show the entry and its `### To resume`, nothing the Arbitre
 found.
-
-**Real files.** All 26 real blocking files sit in feat/premiere-app/
-(`bugfix-06/code/lot-*/` and `code/lot-23/`). Not found: any file in
-shape 3, 4 or 5 (`^## Blocking` returns nothing under `docs/features/`).
-They are the older one-block shape, written **under the lot**
-(`code/lot-20/blocked_detailleur.md`) where the current rule writes
-`code/blocked_detailleur.md` (agt/detailleur.md:312-314). Their
-decisions run 20 to 42 lines (e.g.
-feat/premiere-app/bugfix-06/code/lot-24/blocked_realisateur-02.md).
-feat/premiere-app/bugfix-06/code/lot-20/blocked_detailleur.md:1-4 opens
-on a « SETTLED AND APPLIED » banner above the headings, written by
-hand.
 
 **A fourth place the Product Owner writes.** `## Décision du Product
 Owner` in `code/redecoupage.md`, after a third return

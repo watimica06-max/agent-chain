@@ -14,39 +14,34 @@ def parse(rel, as_name=None, work_dir=None):
                                 work_dir=work_dir), path
 
 
-# ------------------------------------------------------------ real files
+# ------------------------------------------------- decided, broken, empty
 
-def test_real_shape1_decided_is_not_waiting():
-    p, path = parse("real/premiere-app/bugfix-06/code/lot-22/blocked_realisateur-01.md",
-                    as_name="blocked_realisateur.md")
+def test_shape1_decided_is_not_waiting():
+    # agents/concepteur.md:150-166, its `## Decision` filled.
+    p, path = parse("hand/blocked_concepteur-01.md", as_name="blocked_concepteur.md")
     (e,) = p.entries
     assert e.shape == 1 and not e.waiting
-    assert e.what_blocks and e.where and e.to_resume
+    assert e.what_blocks and e.where and e.to_resume and len(e.options) == 2
     assert cmdtests.a2_empty(path) == [False]
 
 
-def test_real_settled_banner_file():
-    p, path = parse("real/premiere-app/bugfix-06/code/lot-20/blocked_detailleur.md")
-    (e,) = p.entries
-    assert e.shape == 1 and not e.waiting
-    assert e.what_blocks.startswith("Nothing.")
-
-
-def test_real_empty_file_is_a_warning():
-    p, _ = parse("real/premiere-app/bugfix-06/code/lot-11/blocked_detailleur.md")
+def test_an_empty_file_is_a_warning():
+    p = blocking.parse_lines(["", ""], "x/blocked_testeur.md", "blocked_testeur.md")
     assert p.entries == [] and p.notices == [] and p.warnings
 
 
-def test_real_file_without_decision_is_a_notice():
-    p, _ = parse("real/premiere-app/bugfix-06/code/lot-31/blocked_detailleur.md")
+def test_a_file_without_decision_is_a_notice():
+    p = blocking.parse_lines(["## What blocks", "", "x", "", "## Where", "", "y"],
+                             "x/blocked_testeur.md", "blocked_testeur.md")
     assert p.entries == [] and p.notices
 
 
-def test_real_shape1_with_decision_emptied_is_waiting():
-    p, path = parse("hand/blocked_realisateur-reel-ouvert.md", as_name="blocked_realisateur.md")
-    (e,) = p.entries
-    assert e.shape == 1 and e.waiting
-    assert cmdtests.a2_empty(path) == [True]
+def test_an_option_list_holds_dash_items_only():
+    # Every template: `Options:`, then `- ` items, one line each.
+    lines = ["## What blocks", "", "x", "", "## Where", "", "y", "", "## To resume", "", "Say which.", "",
+             "Options:", "- Une.", "- Deux.", "* pas une option", "", "## Decision", ""]
+    (e,) = blocking.parse_lines(lines, "x/blocked_testeur.md", "blocked_testeur.md").entries
+    assert e.options == ["Une.", "Deux."] and "* pas une option" in e.to_resume
 
 
 # ---------------------------------------------------------- the shapes

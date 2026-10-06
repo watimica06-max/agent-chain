@@ -203,17 +203,20 @@ def _pass_view(p, run):
     return out
 
 
-def build(path, feature=None, period="tout", now=None):
-    """The whole screen's data for one filter: `feature` None is « toutes »."""
+def build(path, feature=None, period="tout", now=None, ignored=()):
+    """The whole screen's data for one filter: `feature` None is « toutes ».
+    `ignored` (1.5.1): features never shown — their runs are in no filter,
+    no table and no total."""
     now = now or datetime.now()
     period = period if period in PERIODS else "tout"
     since = period_start(period, now)
     raw_runs, raw_passes, raw_limits, error = read_store(path)
 
     limits_of = _by(raw_limits, lambda m: m.get("run_id"))
-    all_runs = [_run_view(r, limits_of) for r in raw_runs]
+    all_runs = [_run_view(r, limits_of) for r in raw_runs if r.get("feature") not in ignored]
     by_id = {r["id"]: r for r in all_runs}
-    all_passes = [_pass_view(p, by_id.get(p["run_id"])) for p in raw_passes]
+    hidden = {r["id"] for r in raw_runs if r.get("feature") in ignored}
+    all_passes = [_pass_view(p, by_id.get(p["run_id"])) for p in raw_passes if p["run_id"] not in hidden]
     _mark_unusual(all_runs, lambda r: r["cmd"], all_runs)
     _mark_unusual(all_passes, lambda p: p["agent"], all_passes)
 

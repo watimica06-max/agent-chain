@@ -1,4 +1,5 @@
-"""Cockpit 1.3, §1 — the scan, on real copies of three features and on
+"""Cockpit 1.3, §1 — the scan, on the real files of premiere-app-3, on a
+feature built through the whole chain after the commands' templates, and on
 small folders built for one rule each. Reads only: no command runs."""
 import os
 import re
@@ -40,13 +41,69 @@ def corr(r, name):
     return next(c for c in r["corrections"] if c["name"] == name)
 
 
-# ------------------------------------------------- the three real features
+# ----------------------------- a feature through the whole chain, two corrections
 
-def test_premiere_app_main_and_corrections(tmp_path):
-    app = make_app(tmp_path, "premiere-app")
-    r = scan.run_scan(str(app), "premiere-app")
+VERDICT_PASS = ("## Status\n\nPASS\n\n## Attempts\n\n1\n\n## Verified\n\n./gradlew test green\n\n## Findings\n\n—\n\n"
+                "## Cause\n\n—\n\n## Causes so far\n\n—\n\n## Symbol divergences\n\n—\n")
+
+
+def write(path, text=""):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+def split(code, lots):
+    """A split that holds: `code/decoupage.md` (agents/cadreur.md:848-854) and
+    `code/sequence.md` with an empty `## Defects` (agents/verificateur.md:105-117),
+    every lot reviewed PASS (agents/relecteur.md:140-170)."""
+    write(code / "decoupage.md", "".join(
+        f"## {l}\n\nAnchor: §{k}.1 — Entry {k}\nNeeds: —\nProduces: S{k}\nModifies: —\nTouches: —\n\n"
+        for k, l in enumerate(lots, 1)))
+    write(code / "sequence.md", f"Round: 1\n\n## Order\n\n{', '.join(lots)}\n\n## Blocks\n\n"
+                                f"block-1: {', '.join(lots)}\n\n## Defects\n\n")
+    for l in lots:
+        write(code / l / "verdict.md", VERDICT_PASS)
+
+
+def chain_app(tmp_path):
+    app = make_app(tmp_path)
+    build_chain(app, "f")
+    return app
+
+
+def build_chain(app, name):
+    """Feature `name`: split, coded and controlled; `bugfix-01/` diagnosed,
+    coded and controlled; `bugfix-02/` diagnosed, not split yet. A sondeur
+    question left open at the root. Every file after its command's template."""
+    f = app / "docs" / "features" / name
+    write(f / "idees.md", "# Idée\n")
+    write(f / "desc-produit.md", "# Produit\n\n### B1 — Une course\nGenre: comportement\nNature: model\n\nTexte.\n")
+    write(f / "spec-technique.md", "# Preamble\n\n### §1.1 — Entry 1\n")
+    write(f / "couverture.md", "§1.1\n")
+    write(f / "questions-sondeur-03.md", "### Q1\nBlock: B1\nQuestion: what is missing?\nAnswer:\n")
+    split(f / "code", ["lot-01", "lot-02"])
+    # /9_controle's four files (9_controle.md:488-495).
+    write(f / "code" / "rapport-controle.md", "# Rapport\n")
+    write(f / "code" / "recette-ordonnee.md", "# Recette\n")
+    write(f / "code" / "decisions-produit.md", "# Décisions\n")
+    write(f / "registre-questions.md", "# Registre\n")
+    b1 = f / "bugfix-01"
+    write(b1 / "bug-list.md", "G01 Le chronomètre saute une seconde\n")
+    write(b1 / "desc-bug.md", "# Preamble\n\n### §1 — G01\n")
+    split(b1 / "code", ["lot-01"])
+    write(b1 / "code" / "recette-ordonnee.md", "# Recette\n")
+    write(b1 / "code" / "decisions-produit.md", "# Décisions\n")
+    b2 = f / "bugfix-02"
+    write(b2 / "bug-list.md", "G01 La liste ne se trie pas\n")
+    write(b2 / "desc-bug.md", "# Preamble\n\n### §1 — G01\n")
+    return f
+
+
+def test_a_feature_through_the_chain_and_its_corrections(tmp_path):
+    app = chain_app(tmp_path)
+    r = scan.run_scan(str(app), "f")
     assert states(r["main"]) == {
-        # 190 unanswered questions of a sondeur file left at the root: 1_lexique stops on them.
+        # The sondeur question left at the root: 1_lexique stops on it (OWN-Q).
         "1_lexique": A,
         # The split is cut: the upstream is closed (6_convertit.md:35-38).
         "2_structure": F, "3_decoupe": F, "3a_genre": F, "3b_nature": F,
@@ -56,37 +113,17 @@ def test_premiere_app_main_and_corrections(tmp_path):
         "9_controle": F, "test": F,
         "fusion": AF,
     }
-    assert step(r["main"], "8_code")["lots"] == {"pass": 45, "total": 45}
-    assert [c["name"] for c in r["corrections"]] == [f"bugfix-0{n}" for n in range(7, 0, -1)]
-    assert states(corr(r, "bugfix-07")["steps"]) == {"diagnostique": F, "7_lots": AF, "8_code": AF, "9_controle": AF}
-    assert states(corr(r, "bugfix-06")["steps"]) == {"diagnostique": F, "7_lots": F, "8_code": F, "9_controle": AF}
-    assert step(corr(r, "bugfix-06")["steps"], "8_code")["lots"] == {"pass": 55, "total": 55}
-    for old in ("bugfix-05", "bugfix-04", "bugfix-03"):
-        # Their `## Defects` holds « None. »: a line, by 7_lots.md:208's own test.
-        assert states(corr(r, old)["steps"]) == {"diagnostique": F, "7_lots": AF, "8_code": AF, "9_controle": AF}
-    for old in ("bugfix-02", "bugfix-01"):
-        assert states(corr(r, old)["steps"]) == {"diagnostique": F, "7_lots": F, "8_code": F, "9_controle": AF}
+    assert step(r["main"], "8_code")["lots"] == {"pass": 2, "total": 2}
+    assert [c["name"] for c in r["corrections"]] == ["bugfix-02", "bugfix-01"]
+    assert states(corr(r, "bugfix-02")["steps"]) == {"diagnostique": F, "7_lots": AF, "8_code": AF, "9_controle": AF}
+    assert states(corr(r, "bugfix-01")["steps"]) == {"diagnostique": F, "7_lots": F, "8_code": F, "9_controle": F}
+    assert step(corr(r, "bugfix-01")["steps"], "8_code")["lots"] == {"pass": 1, "total": 1}
     # The highest correction is open: the dashboard proposes it, the main chain keeps its own.
-    assert r["proposal"] == {"chain": "bugfix-07", "step": "7_lots", "command": "7_lots",
+    assert r["proposal"] == {"chain": "bugfix-02", "step": "7_lots", "command": "7_lots",
                              "name": "Découper en lots", "state": AF, "proposable": True}
     assert r["main_proposal"]["step"] == "1_lexique" and r["main_proposal"]["state"] == A
-    assert len([o for o in r["opens"] if o["step"] == "1_lexique"]) == 190
+    assert [o["step"] for o in r["opens"]] == ["1_lexique"]
     assert r["alerts"] == [] and r["unknown_owner"] == []
-
-
-def test_premiere_app_2(tmp_path):
-    app = make_app(tmp_path, "premiere-app-2")
-    r = scan.run_scan(str(app), "premiere-app-2")
-    assert states(r["main"]) == {
-        "1_lexique": A,          # questions-classeur-01.md: four questions, no answer
-        "2_structure": AF,       # that file, once answered, is the one to integrate
-        "3_decoupe": AF, "3a_genre": AF, "3b_nature": AF,   # each stops on a root file holding questions
-        "4_grille": BL,          # no `Genre: comportement` in a product file written before genres
-        "5_reclasse": AF, "6_convertit": AF, "conventions": AF, "7_lots": AF,
-        "8_code": AF, "9_controle": AF, "test": AF, "fusion": AF,
-    }
-    assert r["corrections"] == []
-    assert r["proposal"]["step"] == "1_lexique" and r["proposal"]["state"] == A
 
 
 def test_premiere_app_3(tmp_path):
@@ -102,31 +139,36 @@ def test_premiere_app_3(tmp_path):
     assert r["proposal"]["step"] == "1_lexique"
 
 
-def test_scan_under_a_second_on_premiere_app(tmp_path):
-    app = make_app(tmp_path, "premiere-app")
+def test_scan_under_a_second(tmp_path):
+    app = chain_app(tmp_path)
     t0 = time.perf_counter()
-    scan.run_scan(str(app), "premiere-app")
+    scan.run_scan(str(app), "f")
     assert time.perf_counter() - t0 < 1.0
-    live = os.path.join(REPO, "docs", "features", "premiere-app")
+    live = os.path.join(REPO, "docs", "features", "premiere-app-3")
     if os.path.isdir(live):                         # the repository's own copy, as the cockpit reads it
         t0 = time.perf_counter()
-        scan.run_scan(REPO, "premiere-app")
+        scan.run_scan(REPO, "premiere-app-3")
         assert time.perf_counter() - t0 < 1.0
 
 
 # ---------------------------------------------- « Pourquoi ? », per state
 
 def test_why_names_the_rule_and_the_files_for_each_state(tmp_path):
-    app = make_app(tmp_path, "premiere-app", "premiere-app-2", "premiere-app-3")
-    r1 = scan.run_scan(str(app), "premiere-app")
-    r2 = scan.run_scan(str(app), "premiere-app-2")
+    app = chain_app(tmp_path)
+    shutil.copytree(os.path.join(FEATURES, "premiere-app-3"), app / "docs" / "features" / "premiere-app-3")
+    # A product file written before any behaviour block, the grid never run
+    # (4_grille.md:134-140).
+    write(app / "docs" / "features" / "g" / "desc-produit.md",
+          "# Produit\n\n### B1 — Une règle\nGenre: règle\nNature: model\n\nTexte.\n")
+    r1 = scan.run_scan(str(app), "f")
+    r2 = scan.run_scan(str(app), "g")
     r3 = scan.run_scan(str(app), "premiere-app-3")
     run = {"status": "running", "command": "1_lexique", "work": "premiere-app-3",
            "prompt": "/1_lexique premiere-app-3", "started_at": "2026-10-05T10:00:00"}
     r4 = scan.run_scan(str(app), "premiere-app-3", run)
     cases = [
         (step(r1["main"], "conventions"), F, "CON-7", ["couverture.md"], "conventions.md:86-88"),
-        (step(r2["main"], "1_lexique"), A, "G-ATT", ["questions-classeur-01.md"], "« À qui est une réponse »"),
+        (step(r1["main"], "1_lexique"), A, "G-ATT", ["questions-sondeur-03.md"], "« À qui est une réponse »"),
         (step(r4["main"], "1_lexique"), EC, "G-RUN", [], "le run en cours"),
         (step(r2["main"], "4_grille"), BL, "GRI-5", ["desc-produit.md"], "4_grille.md:134-140"),
         (step(r3["main"], "2_structure"), AF, "STR-1", ["questions-lexicographe-01.md"], "2_structure.md:63-72"),
@@ -179,7 +221,7 @@ def test_the_turn_is_read_from_the_one_file_at_the_root(tmp_path, root, expect):
 
 
 def test_a_file_out_of_the_turn_leaves_the_step_unknown(tmp_path):
-    app = turn_folder(tmp_path, ["questions-analyste-01.md"])
+    app = turn_folder(tmp_path, ["questions-convertisseur-01.md"])
     r = scan.run_scan(str(app), "t")
     s = step(r["main"], "3_decoupe")
     assert s["state"] == IN and s["why"][-1]["rule"] == "DEC-9"
@@ -378,20 +420,23 @@ CODE_ANCHORS = {
     "E-TROIS": ["reaching 3 stops the lot"],
     "E-ANNULE": ["reverted the", "reverts the"],
     "E-BLOQUE": ["blocked_*.md", "three places"],
-    "E-REDEC": ["back\nto the split", "with no PASS"],
+    "E-REDEC": ["## Ce qui ne l'est pas", "## Ce qui revient", "`## Redécoupage: archivable`", "carries lines",
+                "block standing"],
     "E-ENTAME": ["No `code/<lot>/fiche-executable.md`", "skipped when"],
     "E-AFAIRE": ["No `code/<lot>/fiche-executable.md`"],
     "E-ENCOURS": ["Name the lot", "The next lot is the first"],
     "T-ESSAIS": ["reaching 3", "read it as 1", "empty first\nattempt", "plus\none"],
     "P-ORDRE": ["`detailleur`", "`concepteur`", "`relecteur`"],
     "P-ECRIT": ["fiche-executable.md", "code/<lot>/verdict.md", "conception.md", "compte-rendu.md"],
-    "P-ARBITRE": ["call it themselves", "Settle <lot>", "Settle <block>"],
+    "P-ARBITRE": ["call it themselves", "Settle <lot>", "Settle <block>", "the concepteur, the testeur"],
     "P-ARCHITECTE": ["invocation 3", "Called by the Arbitre"],
     "P-DEMANDES": ["architecte/concepteur-<lot>.md", "architecte/realisateur-<lot>.md",
                    "architecte/detailleur-<lot>.md", "first lot of the block", "arbitre-<lot>-blocking-N.md"],
     "B-OU": ["three places", "## Blocking N — lot-NN"],
-    "C-GREP": ["<working folder>/<lot>: <what the commit\ncarries>", "last revert"],
-    "C-DOSSIER": ["code/<lot>/conception.md", "your report", "Write the report"],
+    "C-GREP": ["<working folder>/<lot>: <what the commit\ncarries>", "<base>..HEAD | grep -E", "last revert"],
+    "C-DOSSIER": ["Lot names are reused by every split", "that added the current `code/decoupage.md`", "never `--grep`",
+                  "`<working folder>` is the folder the prompt gives", "`<working folder>` is the folder",
+                  "never by what a commit stages"],
     "W-LIVE": ["git worktree add .claude/worktrees/<name> HEAD", "One worktree for the whole run",
                "she opens the worktree"],
     "A-LOT": ["Name the lot", "Your lot: <lot>", "Your lot: <lot>", "Your lot: <lot>", "Your lot: <lot>",

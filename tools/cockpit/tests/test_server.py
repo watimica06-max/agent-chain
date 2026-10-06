@@ -30,7 +30,7 @@ def build_app_folder(root):
                      ("hand/convertisseur/technique-model.md", "convertisseur/technique-model.md"),
                      ("hand/blocked_qualifieur.md", "blocked_qualifieur.md"),
                      ("hand/blocked_detailleur.md", "code/blocked_detailleur.md"),
-                     ("real/premiere-app/questions/architecte/questions-architecte-01.md",
+                     ("hand/questions-hors-gabarit.md",
                       "questions-architecte-01.md")]:
         shutil.copyfile(fixture_path(*src.split("/")), feat / dst)
     return feat
@@ -232,3 +232,30 @@ def test_permission_route(tmp_path):
         s = await (await c.get("/api/state")).json()
         assert s["last"]["next"]["kind"] == "answer" and s["last"]["next"]["command"] == "1_lexique"
     with_client(tmp_path, body, script=script_with_permission)
+
+
+def test_an_ignored_folder_is_never_shown(tmp_path):
+    # 1.5.1 — config.json « ignored »: no feature list, no opening, no
+    # statistics filter; Paramètres → Dossiers edits it.
+    async def body(c, app_root, feat, rn):
+        old = app_root / "docs" / "features" / "premiere-app"
+        (old / "bugfix-06").mkdir(parents=True)
+        r = await post(c, "/api/app-folder", {"path": str(app_root)})
+        assert (await r.json())["working_folders"] == ["f"]
+        r = await post(c, "/api/open", {"app": str(app_root), "work": "premiere-app"})
+        assert r.status == 400 and "ignoré" in (await r.json())["error"]
+        await open_pair(c, app_root, "f")
+        s = await (await c.get("/api/state")).json()
+        assert s["working_folders"] == ["f"] and s["all_folders"] == ["f", "premiere-app"]
+        assert s["ignored"] == ["premiere-app", "premiere-app-2"]
+        r = await c.get("/api/stats?feature=premiere-app")
+        assert r.status == 400
+        # Un-ticked: shown again.
+        s = await (await post(c, "/api/ignored", {"ignored": ["premiere-app-2"]})).json()
+        assert s["working_folders"] == ["f", "premiere-app"] and s["open"]
+        # Ticking the feature open closes it.
+        s = await (await post(c, "/api/ignored", {"ignored": ["f"]})).json()
+        assert s["open"] is False and s["working_folders"] == ["premiere-app"]
+        r = await post(c, "/api/ignored", {"ignored": "f"})
+        assert r.status == 400
+    with_client(tmp_path, body)

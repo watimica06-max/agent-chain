@@ -1,5 +1,6 @@
-"""Screenshots of the cockpit page against a fake application folder, and
-against frozen copies of real features (tests/fixtures/features/).
+"""Screenshots of the cockpit page against a fake application folder: the
+real files of premiere-app-3 (tests/fixtures/features/), and a feature built
+through the whole chain after the commands' templates (test_scan.build_chain).
 
     python tests/shots.py <out-dir>
 
@@ -48,6 +49,22 @@ def snap(page, out, name, full=False):
 def with_feature(s, name):
     shutil.copytree(os.path.join(FEATURES, name), s.app_root / "docs" / "features" / name)
     (s.app_root / "docs" / "TECHNICAL_CONVENTIONS.md").write_text("# Conventions\n", encoding="utf-8")
+    s.state.open_pair(str(s.app_root), name)
+
+
+def with_chain(s, name="chaine"):
+    """A feature through the whole chain, two corrections (test_scan.build_chain)."""
+    from test_scan import build_chain
+    build_chain(s.app_root, name)
+    (s.app_root / "docs" / "TECHNICAL_CONVENTIONS.md").write_text("# Conventions\n", encoding="utf-8")
+    s.state.open_pair(str(s.app_root), name)
+
+
+def with_product_before_genres(s, name="produit"):
+    """A product file with no behaviour block, the grid never run (4_grille.md:134-140)."""
+    from test_scan import write
+    write(s.app_root / "docs" / "features" / name / "desc-produit.md",
+          "# Produit\n\n### B1 — Une règle\nGenre: règle\nNature: model\n\nTexte.\n")
     s.state.open_pair(str(s.app_root), name)
 
 
@@ -146,23 +163,23 @@ def main(out_dir):
                 page.get_by_role("link", name="Tableau de bord").first.click()
                 page.get_by_role("button", name="Pourquoi ?").first.click()
                 snap(page, out, "06-tableau-contradiction")
-            # Real copies: premiere-app (a correction open) and premiere-app-2.
+            # A feature through the chain (a correction open), and a product file before genres.
             with FakeServer(Path(t) / "e") as s:
-                with_feature(s, "premiere-app")
+                with_chain(s)
                 page.goto(s.url)
                 page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
                 page.get_by_role("button", name="Pourquoi ?").first.click()
-                snap(page, out, "07-tableau-premiere-app")
+                snap(page, out, "07-tableau-chaine")
                 page.get_by_role("link", name="Chaîne").first.click()
-                snap(page, out, "07b-chaine-premiere-app", full=True)
+                snap(page, out, "07b-chaine-chaine", full=True)
                 page.get_by_role("link", name="Correction").first.click()
-                snap(page, out, "08-correction-premiere-app")
+                snap(page, out, "08-correction-chaine")
             with FakeServer(Path(t) / "g") as s:
-                with_feature(s, "premiere-app-2")
+                with_product_before_genres(s)
                 page.goto(s.url + "#chaine")
                 page.wait_for_selector("#flow-main li.step")
                 page.locator("#step-main-4_grille").get_by_role("button", name="Pourquoi ?").click()
-                snap(page, out, "07c-chaine-premiere-app-2", full=True)
+                snap(page, out, "07c-chaine-produit-avant-les-genres", full=True)
             # 1.4.5: « Statistiques » on a fixture store, a run opened; the menu closed.
             with FakeServer(Path(t) / "k", stats=fixture_store(str(Path(t) / "stats-k.sqlite"))) as s:
                 page.goto(s.url + "#stats")
@@ -192,8 +209,8 @@ def main(out_dir):
 
 
 def shots_1_5(page, out, t):
-    """1.5: the Code tab, a lot opened, a run of /8_code going, the real
-    bugfix-06, Paramètres (notifications, stop), « Par lot », the stopped page."""
+    """1.5: the Code tab, a lot opened, a run of /8_code going, a correction's
+    Code tab, Paramètres (notifications, stop), « Par lot », the stopped page."""
     from claude_agent_sdk import AssistantMessage, TextBlock, ToolUseBlock
     from test_page_code import store_with, with_lots
     from test_runner import script_until_interrupted
@@ -239,17 +256,17 @@ def shots_1_5(page, out, t):
         s.call(s.rn.stop_now(str(s.app_root)))
 
     with FakeServer(t / "o") as s:
-        with_feature(s, "premiere-app")
+        with_chain(s)
         page.goto(s.url + "#correction")
         page.wait_for_selector("#flow-corr li.step")
-        page.locator("#corr-list button", has_text="bugfix-06").click()
+        page.locator("#corr-list button", has_text="bugfix-01").click()
         page.locator("#tab-corr-code").click()
-        page.wait_for_selector("#lots-bugfix-06 tbody tr[data-lot]")
-        snap(page, out, "13-correction-code-bugfix-06")
-        page.locator("#lot-bugfix-06-lot-20").click()
-        page.wait_for_selector(".lot-detail .mdoc .ln")
-        page.evaluate("document.getElementById('lot-bugfix-06-lot-20').scrollIntoView({block: 'start'})")
-        snap(page, out, "13b-correction-code-lot-20-ouvert")
+        page.wait_for_selector("#lots-bugfix-01 tbody tr[data-lot]")
+        snap(page, out, "13-correction-code-bugfix-01")
+        page.locator("#lot-bugfix-01-lot-01").click()
+        page.wait_for_selector(".lot-detail")
+        page.evaluate("document.getElementById('lot-bugfix-01-lot-01').scrollIntoView({block: 'start'})")
+        snap(page, out, "13b-correction-code-lot-01-ouvert")
         page.get_by_role("link", name="Paramètres").first.click()
         page.locator("#btn-quit").click()
         page.wait_for_selector("#stopped", state="visible")

@@ -71,12 +71,18 @@ def check_app_folder(app):
     return None
 
 
-def working_folders(app):
-    """The features of `docs/features/`. Since 1.3 a feature's `bugfix-NN/`
-    are not picked here: they live under « Correction »."""
+def all_folders(app):
+    """Every folder of `docs/features/`, ignored ones included."""
     base = features_dir(app)
     return [name for name in sorted(os.listdir(base))
             if os.path.isdir(os.path.join(base, name)) and not name.startswith(".")]
+
+
+def working_folders(app, ignored=()):
+    """The features of `docs/features/`, less the ignored ones (1.5.1): an
+    ignored folder and its `bugfix-NN/` are never shown. Since 1.3 a
+    feature's `bugfix-NN/` are not picked here: they live under « Correction »."""
+    return [name for name in all_folders(app) if name not in ignored]
 
 
 def bugfixes(app, feature):
@@ -418,7 +424,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     def pair():
         a, w = state.app_folder, state.working_folder
-        if not a or check_app_folder(a) or not w or not os.path.isdir(work_dir(a, w)):
+        if not a or check_app_folder(a) or not w or not os.path.isdir(work_dir(a, w)) or state.is_ignored(w):
             return None, None
         return a, w
 
@@ -450,8 +456,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                "logs_dir": rn.log_dir, "groups": GROUPS,
                # The two usage windows, each with when it was measured (§13.3).
                "limits": _limits(store), "now": datetime.now().isoformat(timespec="seconds")}
+        out["ignored"] = state.ignored
         if state.app_folder and not check_app_folder(state.app_folder):
-            out["working_folders"] = working_folders(state.app_folder)
+            out["working_folders"] = working_folders(state.app_folder, state.ignored)
+            out["all_folders"] = all_folders(state.app_folder)
         if a:
             run = rn.current(a)
             feature = feature_of(w)
@@ -502,7 +510,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         err = check_app_folder(path)
         if err:
             return web.json_response({"error": err}, status=400)
-        return web.json_response({"path": path, "working_folders": working_folders(path)})
+        return web.json_response({"path": path, "working_folders": working_folders(path, state.ignored)})
 
     async def open_pair(request):
         data = await body(request)
@@ -511,10 +519,20 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         err = check_app_folder(a)
         if err:
             return web.json_response({"error": err}, status=400)
-        if w not in working_folders(a):
-            return web.json_response({"error": "dossier de travail inconnu"}, status=400)
+        if w not in working_folders(a, state.ignored):
+            return web.json_response({"error": "dossier ignoré : Paramètres → Dossiers" if state.is_ignored(w)
+                                      else "dossier de travail inconnu"}, status=400)
         state.open_pair(a, w)
         return web.json_response({"ok": True})
+
+    async def set_ignored(request):
+        """Paramètres → Dossiers: the folders the cockpit never shows (1.5.1)."""
+        data = await body(request)
+        names = data.get("ignored")
+        if not isinstance(names, list):
+            return web.json_response({"error": "liste attendue"}, status=400)
+        state.set_ignored(names)
+        return web.json_response(state_payload())
 
     async def close_pair(request):
         state.forget_pair()
@@ -654,10 +672,13 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         q = data if data is not None else request.query
         f = (q.get("feature") or "").strip()
         feature = None if f == "*" else (f or feature_of(w))
+        if feature is not None and state.is_ignored(feature):
+            raise web.HTTPBadRequest(text=json.dumps({"error": "fonctionnalité ignorée : Paramètres → Dossiers"}),
+                                     content_type="application/json")
         return feature, q.get("period") or "tout"
 
     def stats_data(feature, period):
-        return statsview.build(store.path if store else None, feature, period)
+        return statsview.build(store.path if store else None, feature, period, ignored=state.ignored)
 
     async def stats_get(request):
         feature, period = stats_args(request)
@@ -876,6 +897,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/run", run)
     r.add_post("/api/stop-now", stop_now)
     r.add_post("/api/mode", set_mode)
+    r.add_post("/api/ignored", set_ignored)
     r.add_post("/api/diagnostic", run_diagnostic)
     r.add_post("/api/continue-wait", continue_wait)
     r.add_post("/api/continue-session", continue_session)

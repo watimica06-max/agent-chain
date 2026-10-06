@@ -136,8 +136,8 @@ it. ⚠️ **A message in a reply gets lost; a file does not.**
 
 🔴 **Then commit what you wrote — the declarations, the report, the
 blocking file with them**, under the message of move 5 — 📌 **the
-declarations that landed are work,
-and the next run starts from them.** ⚠️ **An uncommitted worktree
+declarations that landed are work, and the next run starts from
+them.** ⚠️ **An uncommitted worktree
 cannot be merged**, and the orchestration may not force it: your block
 would never reach the Product Owner.
 

@@ -31,6 +31,13 @@ Dans une console, pour voir ce qu'il écrit : `python server.py --ouvrir`
   de Windows ; si elle ne s'ouvre pas, coller le chemin dans le champ.
 - **Feature** : une feature de `docs/features/`. Ses corrections
   `bugfix-NN/` sont sous « Correction », plus ici.
+- **Dossiers ignorés** (1.5.1) : ceux de l'ancienne chaîne,
+  `premiere-app` et `premiere-app-2`, écrits d'avance dans
+  `config.json` (`"ignored"`). Un dossier ignoré et ses `bugfix-NN/` ne
+  paraissent nulle part : ni dans la liste des features, ni sous
+  « Correction », ni dans le scan, les Statistiques ou le Code.
+  Paramètres → Dossiers montre la liste ; une case par dossier la
+  modifie.
 - **Récents** : les dernières paires. Au lancement suivant, la dernière
   paire s'ouvre directement ; « Changer d'application » revient ici.
 

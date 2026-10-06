@@ -26,15 +26,17 @@ def b_entries(path, base=None):
 
 # ============================================================ questions
 
-REAL_Q = [
+# The real files of premiere-app-3, and hand-written files after the current
+# templates (tests/fixtures/SOURCES.md).
+FILES_Q = [
     "real/premiere-app-3/questions-lexicographe-01.md",
-    "real/premiere-app-2/questions-classeur-01.md",
-    "real/premiere-app/questions-sondeur-01.md",
+    "hand/questions-classeur-01.md",
+    "hand/questions-architecte-02.md",
 ]
 
 
-@pytest.mark.parametrize("src", REAL_Q)
-def test_real_question_free_text_round_trip(place, src):
+@pytest.mark.parametrize("src", FILES_Q)
+def test_question_free_text_round_trip(place, src):
     path = place(src, os.path.basename(src))
     before = cmdtests.unanswered_questions(path)
     e = q_entry(path, 1)
@@ -106,7 +108,7 @@ def test_lexicographe_two_meanings_and_text_below_answer(place):
     r = writer.write_question(e3, Choice("free", text="Oui, un tour est le segment de course."))
     assert r.status == "saved"
     raw = open(path, encoding="utf-8").read()
-    assert "Answer: Oui, un tour est le segment de course.\n\n---\n\n### Q4" in raw
+    assert "Answer: Oui, un tour est le segment de course.\n\n### Q4" in raw
     assert cmdtests.unanswered_questions(path) == [1, 4]
 
 
@@ -116,17 +118,6 @@ def test_technique_option(place, tmp_path):
     assert not cmdtests.technique_answered(path)
     assert writer.write_question(e, Choice("option", option=e.options[0])).status == "saved"
     assert cmdtests.technique_answered(path)
-
-
-def test_technique_default_kept_is_written_out(place):
-    """/6_convertit has no `Défaut:` exception: leaving `Answer:` empty would
-    leave the file unanswered for it."""
-    path = place("hand/convertisseur/technique-transversal.md", "w/convertisseur/technique-transversal.md")
-    e = q_entry(path, 1)
-    r = writer.write_question(e, Choice("default", option=e.default))
-    assert r.status == "saved"
-    assert cmdtests.technique_answered(path)
-    assert q_entry(path, 1).answer == "Une seule table, avec une colonne de type."
 
 
 # ======================================================== write safety
@@ -192,8 +183,9 @@ def test_compose_rules():
 
 # ============================================================= blocking
 
-def test_real_shape1_round_trip(place):
-    path = place("hand/blocked_realisateur-reel-ouvert.md", "code/lot-22/blocked_realisateur.md")
+def test_shape1_round_trip(place):
+    # agents/relecteur.md:279-295: four headings, `## Decision` left empty.
+    path = place("hand/blocked_relecteur-autre.md", "code/lot-22/blocked_relecteur.md")
     (e,) = b_entries(path)
     text = "Le lot core-sync porte ces deux fichiers.\nLot-22 attend qu'il soit livré."
     r = writer.write_blocking(e, Choice("free", text=text))

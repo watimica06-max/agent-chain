@@ -6,6 +6,6 @@
 
 code/
 
-## To resume
+## What has to happen
 
 Run the Cadreur.

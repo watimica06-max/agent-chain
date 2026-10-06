@@ -47,7 +47,7 @@ the convertisseur's — one row each above.
 | An architecte `forme` question naming a grid entry, no `§` | « its `Block:` names the grid entry » — the grid is the Product Owner's, outside the feature | agents/architecte.md:582 |
 | A technical question whose `Entries:` holds only bracket references, or names the nature | « or the nature, when no entry exists yet »; a bracket is « outside » the section | agents/convertisseur.md:399 · agents/convertisseur.md:300 |
 | A fusionneur title question | its `Block:` shape is the block's (agents/fusionneur.md:116); a title is a section of the global, and no rule names how the entry points to it | agents/fusionneur.md:174 |
-| A file of an agent no row names (`questions/analyste/` and the like) | no instruction gives its target | — |
+| A file of an agent no row names (`questions-<agent>-NN.md` of an agent the chain does not have) | no instruction gives its target | — |
 
 **Every writer of §1 has a target.** No writer of the eleven is left
 without context; only the cases of §2 are, entry by entry.

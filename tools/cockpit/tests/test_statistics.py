@@ -305,3 +305,11 @@ def test_by_lot_one_feature_filtered(tmp_path):
     assert by[("bugfix-02", "lot-01")]["passes"] == 1
     assert d["by_lot_unknown"] == 1                          # the Détailleur's, on a block
     assert statsview.build(path, None, "tout")["by_lot"] == []
+
+
+def test_an_ignored_feature_is_in_no_filter_no_table_no_total(store):
+    # 1.5.1: config.json « ignored » — its runs and their passes leave the screen.
+    every = statsview.build(store.path, None, "tout", ignored=("g",))
+    assert every["features"] == ["f"] and ids(every) == ["r1", "r2"]          # r3, r4: g
+    assert [x["feature"] for x in every["by_feature"]] == ["f"]
+    assert {p["run_id"] for r in every["runs"] for p in r["passes"]} <= {"r1", "r2"}

@@ -1,7 +1,5 @@
 # Questions — lexicographe (invocation 3)
 
-Des réponses de la grille ont apporté des termes.
-
 ### Q1
 Terms: sas, PREPARATION
 Question: I read these as one same thing: the waiting screen before the
@@ -27,8 +25,6 @@ Terms: tour, RUN
 Question: is "tour" the running segment?
 Answer:
 Oui, un tour est le segment de course.
-
----
 
 ### Q4
 Terms: piste

@@ -31,6 +31,13 @@ REQUEST = re.compile(r"^(concepteur|testeur|realisateur|detailleur|arbitre)-(lot
                      r"(?:-blocking-\d+)?(?:-\d+)?\.md$")
 BLOCKED = re.compile(r"^blocked_([A-Za-z0-9_]+?)(?:-(\d+))?\.md$")
 DETAILLEUR_ENTRY = re.compile(r"^## Blocking (\d+)\s*[—–-]+\s*(lot-[A-Za-z0-9]+)\b")
+# Who writes a blocking file in `code/<lot>/` (`B-OU`, cmd/8_code.md:751-752).
+LOT_AGENTS = ("concepteur", "testeur", "realisateur", "relecteur")
+# The lots the Arbitre names in `code/redecoupage.md`, and the Cadreur's two
+# sections, written once the split is cut again (`E-REDEC`).
+REDEC_LOTS = ("ce qui ne l'est pas",)
+REDEC_CADREUR = ("ce qui revient", "ce que j'en fais")
+REDEC_ARBITRE = "ce qui bloque"
 GIT_TIMEOUT = 20
 
 # Every rule, with the lines it comes from (code_rules.md is the same table).
@@ -42,7 +49,7 @@ RULES = {
     "E-TROIS": "8_code.md:318-320",
     "E-ANNULE": "8_code.md:163-165 · agents/relecteur.md:183-186",
     "E-BLOQUE": "8_code.md:348-355 · 8_code.md:748-758",
-    "E-REDEC": "8_code.md:630-633 · 8_code.md:667-670",
+    "E-REDEC": "agents/arbitre.md:392-396 · agents/cadreur.md:1054-1061 · 7_lots.md:150-152 · 7_lots.md:209 · 7_lots.md:212",
     "E-ENTAME": "8_code.md:158-159 · 8_code.md:174-176",
     "E-AFAIRE": "8_code.md:158-159",
     "E-ENCOURS": "8_code.md:605-606 · 8_code.md:80-82",
@@ -51,13 +58,14 @@ RULES = {
     "P-ORDRE": "8_code.md:158-159 · 8_code.md:174-176 · 8_code.md:190",
     "P-ECRIT": "agents/detailleur.md:55-56 · agents/relecteur.md:140 · agents/concepteur.md:301-304 · "
                "agents/realisateur.md:715",
-    "P-ARBITRE": "8_code.md:760-763 · agents/realisateur.md:342-349 · agents/detailleur.md:381-388",
+    "P-ARBITRE": "8_code.md:760-763 · agents/realisateur.md:342-349 · agents/detailleur.md:381-388 · 8_code.md:751-754",
     "P-ARCHITECTE": "8_code.md:488-492 · agents/arbitre.md:476-486",
     "P-DEMANDES": "agents/concepteur.md:227-230 · agents/realisateur.md:466 · agents/detailleur.md:421 · "
                   "agents/detailleur.md:439-440 · agents/arbitre.md:451-460",
     "B-OU": "8_code.md:748-758 · agents/detailleur.md:328-331",
-    "C-GREP": "8_code.md:198-201 · 8_code.md:217-220",
-    "C-DOSSIER": "agents/concepteur.md:301-304 · agents/testeur.md:315-316 · agents/realisateur.md:715-718",
+    "C-GREP": "8_code.md:198-201 · 8_code.md:206-208 · 8_code.md:217-223",
+    "C-DOSSIER": "8_code.md:202-203 · 8_code.md:210-215 · 8_code.md:225-229 · agents/concepteur.md:309-312 · "
+                 "agents/testeur.md:317-320 · agents/realisateur.md:720-726",
     "W-LIVE": "8_code.md:126-128 · 8_code.md:135-136 · 8_code.md:470-475",
     "A-LOT": "8_code.md:605-606 · 8_code.md:564 · 8_code.md:573 · 8_code.md:582 · 8_code.md:597 · 8_code.md:442",
     "A-DESC": "8_code.md:563 · 8_code.md:572 · 8_code.md:581 · 8_code.md:596 · agents/realisateur.md:346-348",
@@ -130,6 +138,34 @@ def blocks(W):
     return out
 
 
+def redecoupage_lots(W):
+    """The lots of the split that came back (`E-REDEC`). `code/redecoupage.md`
+    holds the Arbitre's sections — `## Ce qui ne l'est pas`: « the lot in
+    hand, whose code is dropped, and the lots left », or « the block's lots »
+    (agents/arbitre.md:392-396), one set per return, appended. Once the
+    Cadreur has cut the split again it writes `## Ce qui revient` and `## Ce
+    que j'en fais` at the end (agents/cadreur.md:1054-1061); the file stays
+    unnumbered when that split does not hold (cmd/7_lots.md:150-160, :209,
+    :212). So: the lots named under `## Ce qui ne l'est pas` in the Arbitre's
+    sections after the Cadreur's last one — none when the Cadreur's come
+    last: the lots in `code/` are then the new split's, read by the other
+    rules."""
+    p = W.p("code", "redecoupage.md")
+    if not os.path.isfile(p):
+        return set()
+    lines = W.lines(p)
+    heads = [(i, l[3:].strip().lower()) for i, l in enumerate(lines) if l.startswith("## ")]
+    cut = max((i for i, t in heads if t in REDEC_CADREUR), default=-1)
+    if not any(t == REDEC_ARBITRE and i > cut for i, t in heads):
+        return set()
+    out = set()
+    for k, (i, t) in enumerate(heads):
+        if i > cut and t in REDEC_LOTS:
+            end = heads[k + 1][0] if k + 1 < len(heads) else len(lines)
+            out.update(scan_mod.LOT_ID.findall("\n".join(lines[i + 1:end])))
+    return out
+
+
 def _files_of_lot(W, lot):
     d = W.p("code", lot)
     try:
@@ -139,12 +175,13 @@ def _files_of_lot(W, lot):
 
 
 def _blocking_history(W, lot, names):
-    """Every blocking file of the lot, settled (`-NN`) or not, in its folder,
-    and the Détailleur's entries naming it at the split's root (`B-OU`)."""
+    """Every blocking file of the lot, settled (`-NN`) or not, in its folder —
+    the Concepteur's, the Testeur's, the Réalisateur's, the Relecteur's — and
+    the Détailleur's entries naming it at the split's root (`B-OU`)."""
     out = []
     for n in names:
         m = BLOCKED.match(n)
-        if m:
+        if m and m.group(1) in LOT_AGENTS:
             out.append({"rel": f"code/{lot}/{n}", "agent": m.group(1), "archived": bool(m.group(2))})
     code = W.p("code")
     try:
@@ -202,15 +239,15 @@ def read_lots(app, feature, folder="", worktrees=(), passes=None, run=None, open
         out["why"] = "Pas de code/sequence.md : /7_lots n'a pas encore découpé ce dossier."
         return out
     order = scan_mod.lot_order(W)
-    # `## Defects` carrying lines — `None.` is a line: /8_code stops and sends
-    # to /7_lots (8_code.md:92-93, scan rule COD-2). The lots are shown all the same.
+    # `## Defects` carrying lines: /8_code stops and sends to /7_lots
+    # (8_code.md:92-93, scan rule COD-2). The lots are shown all the same.
     out["defects"] = [l.strip() for l in scan_mod.section(W.lines(W.p("code", "sequence.md")), "Defects")
                       if l.strip()] or None
     split = decoupage(W)
     bl = blocks(W)
     block_of = {lot: b["name"] for b in bl for lot in b["lots"]}
-    redec = W.has("code", "redecoupage.md")
-    mine = [p for p in (passes or []) if (p.get("folder") or "") == folder and p.get("folder") is not None]
+    redec = redecoupage_lots(W)
+    mine =[p for p in (passes or []) if (p.get("folder") or "") == folder and p.get("folder") is not None]
     current = _current(run, feature, folder, order, W)
     waiting = {}
     for e in opens or []:
@@ -254,7 +291,8 @@ def read_lots(app, feature, folder="", worktrees=(), passes=None, run=None, open
     out["blocks"] = bl
     out["total"], out["passed"] = len(order), passed
     out["current"] = current
-    out["redecoupage"] = "code/redecoupage.md" if redec else None
+    out["redecoupage"] = "code/redecoupage.md" if W.has("code", "redecoupage.md") else None
+    out["redecoupage_lots"] = sorted(redec)
     out["outside"] = sorted(n for n in _dirs(W.p("code")) if re.match(r"^lot-", n) and n not in order)
     out["block_passes"] = [_pass_row(p) for p in mine if not p.get("lot") and p.get("block")]
     out["unknown_passes"] = [_pass_row(p) for p in mine if not p.get("lot") and not p.get("block")]
@@ -291,8 +329,8 @@ def _state(lot, v, names, redec, waiting, current):
         return BLOQUE, "une décision vous attend"
     if v and v["pass"]:
         return PASSE, "avec réserve" if "reservation" in v["status"].lower() else None
-    if redec:
-        return REDECOUPE, "code/redecoupage.md : le lot repart au découpage"
+    if lot in redec:
+        return REDECOUPE, "code/redecoupage.md le nomme : le lot repart au découpage"
     if v:
         if not v["lines"] or not v["status"]:
             return INCONNU, "verdict.md sans « ## Status » lisible"
@@ -421,29 +459,44 @@ def _section_text(lines, title):
     return text or None
 
 
-def commits(repo, work, lot):
-    """The lot's commits, read-only (`C-GREP`): `<lot>: ` and `Revert
-    "<lot>: ` messages, newest first, each with the files it changed. A
-    lot's name is reused by every split, so a commit is this folder's when it
-    touches `<work>/code/<lot>/` (`C-DOSSIER`), another folder's when it
-    touches another one — left out —, and « sans dossier » otherwise."""
-    fmt = "%x1e%H%x1f%h%x1f%aI%x1f%s"
+def _git(repo, args):
+    """`git -C repo <args>`, read-only: (stdout, None) or (None, message)."""
     try:
-        out = subprocess.run(["git", "-C", repo, "log", "-E", f"--grep=^(Revert \")?{re.escape(lot)}: ",
-                              f"--format={fmt}", "--name-only"],
-                             capture_output=True, text=True, encoding="utf-8", errors="replace",
-                             timeout=GIT_TIMEOUT, stdin=subprocess.DEVNULL)
+        out = subprocess.run(["git", "-C", repo, *args], capture_output=True, text=True, encoding="utf-8",
+                             errors="replace", timeout=GIT_TIMEOUT, stdin=subprocess.DEVNULL)
     except (OSError, subprocess.SubprocessError) as e:
-        return {"error": f"git log n'a pas répondu : {e}", "list": []}
+        return None, f"git n'a pas répondu : {e}"
     if out.returncode != 0:
         err = (out.stderr or "").strip()
         if "not a git repository" in err:
             err = "Ce dossier n'est pas dans un dépôt git : les commits ne se lisent pas."
-        return {"error": err or f"git log : code {out.returncode}", "list": []}
-    mine_prefix = f"{work}/code/{lot}/"
-    other = re.compile(r"^docs/features/[^/]+(?:/bugfix-\d+)?/code/" + re.escape(lot) + "/")
-    found, elsewhere = [], 0
-    for chunk in out.stdout.split("\x1e"):
+        return None, err or f"git {args[0]} : code {out.returncode}"
+    return out.stdout, None
+
+
+def commits(repo, work, lot):
+    """The lot's commits, read-only — the search of /8_code's move 3, exactly
+    (`C-GREP`, `C-DOSSIER`). `<split>`: the commit that added the current
+    `<work>/code/decoupage.md`. After it, the subjects opening on
+    `<folder>/<lot>: ` and `Revert "<folder>/<lot>: `, `<folder>` the working
+    folder under `docs/features/` — the subject alone, never the body, never
+    the files a commit stages. Newest first, each with the files it changed.
+    The command's list is what follows the lot's last revert (`in_list`); a
+    commit before that revert is marked `reverted`."""
+    folder = work[len("docs/features/"):] if work.startswith("docs/features/") else work
+    prefix, rprefix = f"{folder}/{lot}: ", f'Revert "{folder}/{lot}: '
+    out, err = _git(repo, ["log", "-1", "--diff-filter=A", "--format=%H%x1f%h", "--",
+                           f"{work}/code/decoupage.md"])
+    if err:
+        return {"error": err, "list": [], "split": None}
+    if not out.strip():
+        return {"error": None, "list": [], "split": None}
+    split_sha, _, split_short = out.strip().partition("\x1f")
+    out, err = _git(repo, ["log", "--format=%x1e%H%x1f%h%x1f%aI%x1f%s", "--name-only", f"{split_sha}..HEAD"])
+    if err:
+        return {"error": err, "list": [], "split": {"sha": split_sha, "short": split_short}}
+    found = []
+    for chunk in out.split("\x1e"):
         chunk = chunk.strip("\n")
         if not chunk:
             continue
@@ -451,22 +504,17 @@ def commits(repo, work, lot):
         parts = head.split("\x1f")
         if len(parts) < 4:
             continue
-        files = [f for f in rest.splitlines() if f.strip()]
         subject = parts[3]
-        if not (subject.startswith(f"{lot}: ") or subject.startswith(f'Revert "{lot}: ')):
-            continue
-        here = any(f.startswith(mine_prefix) for f in files)
-        there = any(other.match(f) and not f.startswith(mine_prefix) for f in files)
-        if there and not here:
-            elsewhere += 1
+        if not (subject.startswith(prefix) or subject.startswith(rprefix)):
             continue
         found.append({"sha": parts[0], "short": parts[1], "at": parts[2], "subject": subject,
-                      "revert": subject.startswith("Revert "), "files": files,
-                      "where": "dossier" if here else "sans dossier"})
-    reverted = {c["subject"][len('Revert "'):-1] for c in found if c["revert"] and c["subject"].endswith('"')}
-    for c in found:
-        c["reverted"] = (not c["revert"]) and c["subject"] in reverted
-    return {"list": found, "elsewhere": elsewhere, "error": None}
+                      "revert": subject.startswith(rprefix),
+                      "files": [f for f in rest.splitlines() if f.strip()]})
+    last = next((k for k, c in enumerate(found) if c["revert"]), None)
+    for k, c in enumerate(found):
+        c["in_list"] = not c["revert"] and (last is None or k < last)
+        c["reverted"] = not c["revert"] and last is not None and k > last
+    return {"list": found, "split": {"sha": split_sha, "short": split_short}, "error": None}
 
 
 # ------------------------------------------------------------ the passes

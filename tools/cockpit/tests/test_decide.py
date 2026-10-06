@@ -102,12 +102,12 @@ def test_no_stored_next_is_the_scan_labelled(tmp_path):
 
 
 def test_stop_and_manual_hold_unless_head_moved(tmp_path):
-    _, sc = sc_of(tmp_path, "premiere-app")
+    _, sc = sc_of(tmp_path, "premiere-app-3")
     for line in ("Next: stop lot-07 failed three times",
                  "Next: manual lire le rapport de contrôle et la recette, décider d'une bug-list"):
-        d = decide.decide(sc, "premiere-app", stored=stored(line, head="a" * 40), head_now="a" * 40)
+        d = decide.decide(sc, "premiere-app-3", stored=stored(line, head="a" * 40), head_now="a" * 40)
         assert d["source"] == "chaine" and d["next"]["raw"] == line
-        d = decide.decide(sc, "premiere-app", stored=stored(line, head="a" * 40), head_now="c" * 40)
+        d = decide.decide(sc, "premiere-app-3", stored=stored(line, head="a" * 40), head_now="c" * 40)
         assert d["source"] == "dossier" and d["dropped"]["rule"] == "G-HEAD"
 
 

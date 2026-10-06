@@ -2189,7 +2189,7 @@ function renderCode(box, chain) {
   if (!here) notes.append(el("div", {class: "notice warn", text: c.acts_on ? `Lecture seule : /8_code agit sur ${c.acts_on}, la correction la plus haute.` : "Lecture seule : /8_code agit sur le dossier de la feature."}));
   if (c.source === "worktree") notes.append(el("div", {class: "notice ok", text: `Lu dans le worktree du run (${c.worktree}) : les agents y écrivent pendant le run.`}));
   if (c.stop_file && here) notes.append(el("div", {class: "notice warn", text: "stop.md est présent : /8_code s'arrêtera après le lot en cours."}));
-  if (c.defects) notes.append(el("div", {class: "notice warn", text: `code/sequence.md porte ${plural(c.defects.length, "ligne", "lignes")} sous ## Defects (${c.defects.slice(0, 2).join(" · ")}) : /8_code s'arrêterait et renverrait à /7_lots (8_code.md:92-93) — « None. » est une ligne.`}));
+  if (c.defects) notes.append(el("div", {class: "notice warn", text: `code/sequence.md porte ${plural(c.defects.length, "ligne", "lignes")} sous ## Defects (${c.defects.slice(0, 2).join(" · ")}) : /8_code s'arrêterait et renverrait à /7_lots (8_code.md:92-93).`}));
   if (c.redecoupage) notes.append(el("div", {class: "notice warn", text: `${c.redecoupage} : le découpage revient — les lots sans PASS repartent au découpage.`}));
   if (c.architecte_blocked) notes.append(el("div", {class: "notice warn"}, `${c.architecte_blocked} à la racine du dossier : il bloque le run, pas un lot. `,
     el("button", {class: "link", text: "À répondre", onclick: () => openAnswers("8_code", chain)})));
@@ -2264,16 +2264,18 @@ function lotDetail(chain, l) {
   const cm = el("div", {});
   const C = d.commits || {list: []};
   if (C.error) cm.append(el("div", {class: "notice warn", text: C.error}));
-  if (!C.list.length && !C.error) cm.append(el("p", {class: "muted", text: `Aucun commit « ${l.lot}: » sur ce dossier.`}));
+  // code_rules.md C-GREP, C-DOSSIER: the subject `<dossier>/<lot>: `, after the split in force.
+  const subj = `${S.feature}${d.folder ? "/" + d.folder : ""}/${l.lot}: `;
+  if (C.split) cm.append(el("div", {class: "muted small", text: `Depuis ${C.split.short}, le commit qui a ajouté le code/decoupage.md en vigueur ; sujets « ${subj}… » seulement.`}));
+  else if (!C.error) cm.append(el("div", {class: "muted small", text: "Aucun commit n'a ajouté le code/decoupage.md en vigueur : aucun commit à lister."}));
+  if (!C.list.length && !C.error && C.split) cm.append(el("p", {class: "muted", text: `Aucun commit « ${subj}» depuis ce découpage.`}));
   for (const k of C.list) {
     cm.append(el("div", {class: "commit" + (k.reverted ? " undone" : "")},
       el("span", {class: "mono", text: k.short}), " ", el("span", {class: "subj", text: k.subject}), " ",
       k.revert ? el("span", {class: "badge warn", text: "annulation"}) : null, k.reverted ? el("span", {class: "badge plain", text: "annulé ensuite"}) : null,
-      k.where !== "dossier" ? el("span", {class: "badge plain", title: "Ce commit ne touche le code/" + l.lot + "/ d'aucun dossier : il peut être d'un autre découpage (code_rules.md C-DOSSIER).", text: "sans dossier"}) : null,
       el("span", {class: "muted small", text: "  " + fmtDate(k.at)}),
       el("details", {}, el("summary", {text: plural(k.files.length, "fichier", "fichiers")}), el("ul", {}, ...k.files.map((x) => el("li", {text: x}))))));
   }
-  if (C.elsewhere) cm.append(el("div", {class: "muted small", text: `${plural(C.elsewhere, "commit", "commits")} « ${l.lot}: » d'un autre dossier laissé${C.elsewhere > 1 ? "s" : ""} de côté.`}));
   return el("div", {class: "lot-detail st-detail"},
     el("div", {}, el("h4", {text: `code/${l.lot}/fiche-executable.md`}), sheet),
     el("div", {}, el("h4", {text: "Verdict"}), vbox),
@@ -2387,6 +2389,26 @@ function renderSettings() {
     onclick: () => { if (w !== S.feature) openPair(S.app_folder, w); }}));
   f.append(el("div", {class: "muted small", style: "margin-top:12px", text: "Changer de feature :"}), fl,
     el("div", {class: "row", style: "margin-top:12px"}, el("button", {text: "Changer d'application", onclick: changeFolder})));
+  // 1.5.1 — the folders never shown: the earlier chain's. Ticked, a folder and
+  // its bugfix-NN/ leave the feature list, « Correction », the scan, the
+  // Statistics and the Code tab.
+  const ignored = S.ignored || [];
+  const names = [...new Set([...(S.all_folders || []), ...ignored])].sort();
+  const ig = el("div", {class: "folders", id: "ignored-list"});
+  for (const n of names) {
+    const box = el("input", {type: "checkbox", value: n, checked: ignored.includes(n) || undefined});
+    box.addEventListener("change", async () => {
+      const next = [...ig.querySelectorAll("input:checked")].map((x) => x.value);
+      try { await api("/api/ignored", {ignored: next}); await refreshState(); }
+      catch (e) { alert(e.message); renderSettings(); }
+    });
+    const absent = !(S.all_folders || []).includes(n);
+    ig.append(el("label", {class: "row"}, box, el("span", {class: "mono", text: n}),
+      absent ? el("span", {class: "muted small", text: "  —  absent de docs/features/"}) : ""));
+  }
+  if (!names.length) ig.append(el("span", {class: "muted", text: "Aucun dossier."}));
+  f.append(el("div", {class: "muted small", style: "margin-top:12px",
+    text: "Dossiers ignorés : jamais montrés — ni dans la liste, ni sous « Correction », ni dans les Statistiques, ni dans le Code."}), ig);
   const rc = $("set-recent"); rc.replaceChildren();
   if (!(S.recent || []).length) rc.append(el("span", {class: "muted", text: "Aucune."}));
   for (const p of S.recent || []) rc.append(el("button", {onclick: () => openPair(p.app, p.work)},

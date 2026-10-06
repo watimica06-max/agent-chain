@@ -98,10 +98,6 @@ def write_question(entry: questions.Question, choice: Choice) -> Result:
         text = compose(choice, entry.options, entry.default)
     except WriteError as e:
         return Result(entry.id, "error", str(e))
-    if text is None and choice.kind == "default" and entry.kind == "technique":
-        # /6_convertit reads `technique-*.md` on `^Answer:\s*$` alone, with no
-        # `Défaut:` exception: the kept default has to be written out.
-        text = entry.default
     if text is None:
         if choice.kind == "default":
             return Result(entry.id, "unchanged",

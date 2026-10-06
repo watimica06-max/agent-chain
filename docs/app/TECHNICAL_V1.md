@@ -226,15 +226,18 @@ Answer:
 | writes free text | the text as typed |
 
 - 🔴 **The text always starts on the `Answer:` line**, after one space.
-  Further lines may follow: 141 real answers run over several lines. A
+  Further lines may follow: an answer can run over several lines. A
   text that starts on the next line reads as empty to `^Answer:\s*$`.
 
-**What the parser accepts.** Real files carry prose before the first
-`### Q`, a `Question:` running over several lines, `Answer:` with no
-space after the colon, and older shapes with a title on the `Block:`
-line. The parser accepts all of them, and treats a file it cannot read
-as an error shown to the Product Owner, never as a file with no
-questions.
+**What the parser accepts.** The writers' templates, and what a current
+template produces besides: a `Question:` running over several lines
+(agt/lexicographe.md:348-350), a title on the `Block:` line
+(agt/architecte.md:547), the file's own title above the first `### Q`
+(the lexicographe's, premiere-app-3). Since 1.5.1 nothing else: a line
+above `Question:` that is not `Key: value`, an entry with no
+`Question:`, an option that does not open on `- `, a `Défaut:` over two
+lines are errors. A file it cannot read is an error shown to the Product
+Owner, never a file with no questions.
 
 ### 8.2 Blocking files
 
@@ -330,7 +333,7 @@ its values.
 
 `tools/cockpit/scan.py` reads the feature folder and its `bugfix-NN/` —
 **files only**: no Claude call, no git command (`HEAD` is read from
-`.git/`), no write; about 40 ms on `premiere-app`. Every step of the main
+`.git/`), no write; about 2 ms on `premiere-app-3` (1.5.1). Every step of the main
 chain and of each correction chain gets one state — **faite**,
 **t'attend**, **en cours**, **bloquée**, **à faire**, or **inconnu** when
 no rule places it. Each rule is a test of the command itself, with its
