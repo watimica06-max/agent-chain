@@ -2,6 +2,9 @@
 usage gauges, in a headless browser (Microsoft Edge through Playwright).
 The SDK client is a fake: no chain command runs."""
 import hashlib
+import os
+import re
+import shutil
 from datetime import datetime, timedelta
 
 import pytest
@@ -227,6 +230,128 @@ def test_the_keyboard(tmp_path, page):
         page.get_by_role("link", name="Tableau de bord").first.click()
         page.keyboard.press("2")
         assert page.evaluate("location.hash") == "#dashboard"
+        assert no_real_errors(page) == []
+
+
+# --------------------------------------------- 1.4.4, on the real files
+# Frozen copies of docs/features/premiere-app-3/ as the Product Owner was
+# answering it: the lexicographe's questions file and the idea file.
+REAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "context", "premiere-app-3")
+REAL_Q = "questions-lexicographe-02.md"
+
+SCROLLS = """() => { const d = document.getElementById('ctx-doc'), l = document.getElementById('answer-left');
+  const c = document.querySelector('.entry.focused').getBoundingClientRect(), p = l.getBoundingClientRect();
+  return {win: window.scrollY, main: document.getElementById('main').scrollTop, doc: d.scrollTop,
+          docRoom: d.scrollHeight - d.clientHeight, left: l.scrollTop,
+          cardSeen: c.bottom > p.top + 20 && c.top < p.bottom - 20,
+          cur: [...d.querySelectorAll('mark.cur')].map((m) => m.dataset.k)}; }"""
+
+
+def real_answer(s, page, width, n):
+    feat = s.app_root / "docs" / "features" / "premiere-app-3"
+    shutil.copytree(REAL, feat)
+    page.set_viewport_size({"width": width, "height": 800})
+    open_answer(s, page, "premiere-app-3")
+    card(page, REAL_Q, n).click()
+    page.wait_for_function(f"document.getElementById('ctx-what').textContent.includes('{n == 9 and 'arrivée estimée' or 'page de fin'}')")
+    page.wait_for_function("document.querySelector('#ctx-doc mark.cur')")
+
+
+def phrase_count(text, phrases):
+    return sum(len(re.findall(r"(?<!\w)" + r"\s+".join(map(re.escape, p.split())) + r"(?!\w)", text, re.I))
+               for p in phrases)
+
+
+@pytest.mark.parametrize("width", [1280, 1024])
+def test_a_term_of_several_words_is_highlighted_whole(tmp_path, page, width):
+    with FakeServer(tmp_path) as s:
+        real_answer(s, page, width, 9)
+        phrases = ["arrivée estimée", "estimation du temps d'arrivée", "temps d'arrivée estimé"]
+        n = phrase_count(open(os.path.join(REAL, "idees.md"), encoding="utf-8").read(), phrases)
+        assert n == 8                                  # one across a line break: « arrivée⏎estimée »
+        occ = page.evaluate("""() => { const o = {}; for (const m of document.querySelectorAll('#ctx-doc mark'))
+            o[m.dataset.k] = (o[m.dataset.k] ? o[m.dataset.k] + ' ' : '') + m.textContent; return Object.values(o); }""")
+        occ = [" ".join(m.split()).lower() for m in occ]
+        assert len(occ) == n and set(occ) <= set(phrases)                  # the phrase, never one of its words
+        assert occ.count("arrivée estimée") == 6
+        assert page.locator("#ctx-count").inner_text() == f"1 / {n}"
+        # Beside a one-word term, the phrase still wins: « page de fin », never « page » alone in it.
+        card(page, REAL_Q, 4).click()
+        page.wait_for_function("document.getElementById('ctx-what').textContent.includes('page de fin')")
+        marks = [m.lower() for m in page.locator("#ctx-doc mark").all_inner_texts()]
+        assert marks.count("page de fin") == 5 and marks.count("écran de fin") == 1
+        assert page.evaluate("""() => [...document.querySelectorAll('#ctx-doc mark')].filter((m) =>
+            m.textContent.toLowerCase() === 'page' && /^\\s+de fin/i.test(m.nextSibling ? m.nextSibling.textContent : '')).length""") == 0
+        assert no_real_errors(page) == []
+
+
+@pytest.mark.parametrize("width", [1280, 1024])
+def test_next_and_previous_move_the_document(tmp_path, page, width):
+    with FakeServer(tmp_path) as s:
+        real_answer(s, page, width, 4)
+        st = page.evaluate(SCROLLS)
+        assert st["docRoom"] > 10000 and st["cur"] == ["0"]                 # the document scrolls in its pane
+        moves = [("click", "#ctx-next", "2 / 72"), ("key", "ArrowRight", "3 / 72"), ("key", "ArrowRight", "4 / 72"),
+                 ("key", "ArrowLeft", "3 / 72"), ("click", "#ctx-prev", "2 / 72")]
+        for how, what, count in moves:
+            before = page.evaluate(SCROLLS)
+            if how == "click":
+                page.click(what)
+            else:
+                page.keyboard.press(what)
+            st = page.evaluate(SCROLLS)
+            assert page.locator("#ctx-count").inner_text() == count
+            assert st["cur"] == [str(int(count.split(" /")[0]) - 1)]
+            assert st["doc"] != before["doc"]                                # the right pane moved
+            assert st["win"] == 0 and st["main"] == 0                        # the page did not
+            assert st["left"] == before["left"] and st["cardSeen"]
+        # ↑ and ↓ stay on the questions.
+        page.keyboard.press("ArrowDown")
+        assert "focused" in card(page, REAL_Q, 5).get_attribute("class")
+        page.keyboard.press("ArrowUp")
+        assert "focused" in card(page, REAL_Q, 4).get_attribute("class")
+        page.wait_for_function("document.getElementById('ctx-count').textContent.endsWith('/ 72')")
+        # Never while typing: the arrows move the caret.
+        shown = page.locator("#ctx-count").inner_text()
+        page.keyboard.press("t")
+        page.keyboard.type("ab")
+        page.keyboard.press("ArrowLeft")
+        page.keyboard.press("ArrowRight")
+        assert page.locator("#ctx-count").inner_text() == shown
+        assert card(page, REAL_Q, 4).locator("textarea").input_value() == "ab"
+        assert "←" in page.locator("#keys-legend").inner_text() and "→" in page.locator("#keys-legend").inner_text()
+        assert no_real_errors(page) == []
+
+
+@pytest.mark.parametrize("width", [1280, 1024])
+def test_scrolling_the_document_keeps_the_question(tmp_path, page, width):
+    with FakeServer(tmp_path) as s:
+        real_answer(s, page, width, 4)
+        before = page.evaluate(SCROLLS)
+        box = page.locator("#ctx-doc").bounding_box()
+        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+        page.mouse.wheel(0, 3000)
+        page.wait_for_function(f"document.getElementById('ctx-doc').scrollTop > {before['doc'] + 1000}")
+        st = page.evaluate(SCROLLS)
+        assert st["win"] == 0 and st["main"] == 0 and st["left"] == before["left"] and st["cardSeen"]
+        # Down to its end: the page still does not move.
+        page.mouse.wheel(0, 60000)
+        page.wait_for_timeout(400)
+        st = page.evaluate(SCROLLS)
+        assert st["win"] == 0 and st["main"] == 0 and st["left"] == before["left"] and st["cardSeen"]
+        # The left pane scrolls on its own too, the right one stays. (In its
+        # margin: a long question's text is a scroller of its own.)
+        box = page.locator("#answer-left").bounding_box()
+        page.mouse.move(box["x"] + 8, box["y"] + box["height"] / 2)
+        page.mouse.wheel(0, 600)
+        page.wait_for_function(f"document.getElementById('answer-left').scrollTop > {before['left']}")
+        after = page.evaluate(SCROLLS)
+        assert after["doc"] == st["doc"] and after["win"] == 0 and after["main"] == 0
+        # Both panes end above the save bar.
+        bar = page.locator("#answer-foot").bounding_box()
+        for pane in ("#answer-left", "#ctx-pane"):
+            b = page.locator(pane).bounding_box()
+            assert abs(b["y"] + b["height"] - bar["y"]) <= 1
         assert no_real_errors(page) == []
 
 

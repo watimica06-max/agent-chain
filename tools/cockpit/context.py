@@ -6,6 +6,7 @@ heading, `Entries:` to `§n.m` headings. This module finds that place in
 that document, read-only. A writer whose target the instructions do not
 give resolves to no context, and says so — never a guess.
 """
+import bisect
 import os
 import re
 
@@ -94,28 +95,54 @@ def heading_ranges(lines, wanted, pattern):
     return out
 
 
+# Between two words of a term: a run of spaces, or one line break.
+GAP = r"(?:[^\S\n]+|[^\S\n]*\n[^\S\n]*)"
+
+
 def term_pattern(term):
-    # A whole word or phrase, any case: `atelier` never matches `ateliers`.
-    return re.compile(r"(?<![\w])" + re.escape(term) + r"(?![\w])", re.IGNORECASE)
+    # A term as a whole, any case: its words in order, never one of them
+    # alone; `atelier` never matches `ateliers`.
+    words = term.split()
+    return re.compile(r"(?<![\w])" + GAP.join(map(re.escape, words)) + r"(?![\w])", re.IGNORECASE)
+
+
+def _parts(starts, lines, s, e):
+    """The span [s, e) of the joined text, cut line by line."""
+    first = bisect.bisect_right(starts, s) - 1
+    out = []
+    for i in range(first, len(lines)):
+        if starts[i] >= e:
+            break
+        a = max(s, starts[i]) - starts[i]
+        b = min(e, starts[i] + len(lines[i])) - starts[i]
+        if b > a:
+            out.append({"line": i, "start": a, "end": b})
+    return out
 
 
 def term_matches(lines, terms, allowed=None):
-    """Every occurrence of every term: [{label, line, start, end}], in
-    document order. `allowed` limits the search to a set of line numbers."""
-    pats = [(t, term_pattern(t)) for t in terms]
-    out = []
-    for i, line in enumerate(lines):
-        if allowed is not None and i not in allowed:
+    """Every occurrence of every term: [{label, line, start, end, parts}],
+    in document order. `line`, `start`, `end` are the first part; `parts`
+    holds one span per line the occurrence covers. `allowed` limits the
+    search to a set of line numbers."""
+    text = "\n".join(lines)
+    starts, pos = [], 0
+    for line in lines:
+        starts.append(pos)
+        pos += len(line) + 1
+    hits = []
+    for t in terms:
+        hits += [(m.start(), -m.end(), t) for m in term_pattern(t).finditer(text)]
+    hits.sort()                        # in document order; at one place, the longest term first
+    out, last = [], -1
+    for s, neg_e, t in hits:
+        if s < last:                   # overlapping terms: the first wins
             continue
-        hits = []
-        for t, p in pats:
-            hits += [(m.start(), m.end(), t) for m in p.finditer(line)]
-        hits.sort()
-        last = -1
-        for s, e, t in hits:
-            if s >= last:              # overlapping terms: the first wins
-                out.append({"label": t, "line": i, "start": s, "end": e})
-                last = e
+        parts = _parts(starts, lines, s, -neg_e)
+        if not parts or (allowed is not None and any(p["line"] not in allowed for p in parts)):
+            continue
+        out.append({"label": t, **parts[0], "parts": parts})
+        last = -neg_e
     return out
 
 

@@ -497,6 +497,14 @@ tool calls, then `/usage` (Claude Code 2.1.285, `claude-agent-sdk`
   instruction gives is no context, said.
 - Several occurrences: « 1 / n », previous and next. A target not in the
   file: said, nothing highlighted. A blocking entry: no document.
+- A term is matched as a whole (1.4.4): its words in order, any case, any
+  run of spaces or one line break between two; where two terms start at
+  one place, the longer wins. An occurrence across a line break is one
+  occurrence, one mark per line.
+- The two panes scroll on their own (1.4.4), between the top bar and the
+  save bar, which spans both; going to an occurrence scrolls the right
+  pane only, never the page.
 - Keyboard: `1`-`6` an option, `T` the text field, `Échap` out of it,
-  `Entrée` or `↓` next, `↑` previous, `Ctrl+S` save. None but `Ctrl+S`
+  `Entrée` or `↓` next, `↑` previous, `←` `→` the previous and next
+  occurrence (1.4.4), `Ctrl+S` save. None but `Ctrl+S`
   fires in a text field.
