@@ -26,7 +26,12 @@ kept to MAX_HISTORY entries per application.
 
 1.7 — `creations`: the « Nouvelle application » not finished, keyed by
 their folder, each with its values and its steps (create.py). Only a folder
-held there can be resumed; a creation finished is dropped."""
+held there can be resumed; a creation finished is dropped.
+
+1.8 — `deploy_devices`: the devices deployed to, by their own key, with the
+name the Product Owner gave and the last Wi-Fi address; and in each
+application's entry, `deploy_choice`, the targets and destinations last
+chosen in « Déployer »."""
 import json
 import os
 import threading
@@ -411,6 +416,47 @@ class State:
             c = self.data.get("creations")
             if isinstance(c, dict) and c.pop(_app_key(folder), None) is not None:
                 self._save()
+
+    # -------------------------------------------------- deployment (1.8)
+
+    def deploy_devices(self):
+        """The devices the Product Owner deploys to, by their own key (an
+        Android device's hardware serial): the name she gave, the last Wi-Fi
+        address, what it is. Copies."""
+        d = self.data.get("deploy_devices")
+        return {k: dict(v) for k, v in d.items() if isinstance(v, dict)} if isinstance(d, dict) else {}
+
+    def set_deploy_device(self, key, **fields):
+        with self._lock:
+            d = self.data.get("deploy_devices")
+            if not isinstance(d, dict):
+                d = self.data["deploy_devices"] = {}
+            d.setdefault(key, {}).update(fields)
+            self._save()
+
+    def forget_deploy_device(self, key):
+        with self._lock:
+            d = self.data.get("deploy_devices")
+            if isinstance(d, dict) and d.pop(key, None) is not None:
+                self._save()
+
+    def deploy_choice(self, folder):
+        """The targets and destinations last chosen in « Déployer », for this
+        application: {target name: [destination ids]}."""
+        a = self._entry(folder)
+        c = a.get("deploy_choice") if a else None
+        return dict(c) if isinstance(c, dict) else {}
+
+    def set_deploy_choice(self, folder, choice):
+        clean = {str(k): [str(x) for x in v if isinstance(x, str)] for k, v in (choice or {}).items()
+                 if isinstance(v, list)}
+        with self._lock:
+            a = self._entry(folder)
+            if not a:
+                raise KeyError(folder)
+            a["deploy_choice"] = clean
+            self._save()
+        return clean
 
     # ------------------------------------------------------------ ignored
 

@@ -1,9 +1,16 @@
-# Chain cockpit — technical design, version 1.7
+# Chain cockpit — technical design, version 1.8
 
 A local application that lets the Product Owner run the agent chain
 without editing files by hand. Version 1 covers the two things that cost
 her the most time: **answering questions and blocking files**, and
 **knowing which command comes next**.
+
+*1.8 — « Déploiement »: build the active application and put it where it
+runs, without Claude, then watch it run — a generic frame, one adapter per
+kind of target (`android`, `commande`), the profile `.claude/deploy.json`
+whose contract is `docs/app/DEPLOY_PROFILE.md`; the test step's « Déployer »
+opens it; the diagnostic says whether scrcpy and the emulator are here
+(§23).*
 
 *1.7 — « Nouvelle application »: an application created from an empty
 folder to /1_lexique, every step deterministic, no Claude call; `/socle`
@@ -61,7 +68,7 @@ is read by `/8_code` only (§7); `Next:` carries a second step (§9).*
 - No autopilot. The application never runs a command the Product Owner
   did not click.
 - No multi-feature dashboard, no test checklist, no deployment page, no
-  bug list.
+  bug list. *(1.8: a deployment page, §23.)*
 
 ---
 
@@ -99,7 +106,9 @@ is read by `/8_code` only (§7); `Next:` carries a second step (§9).*
      create by hand (§12);
    - *(1.7)* `docs/features/<feature>/idees.md` of an application it
      creates — her input, copied from the file she picked — and that new
-     folder itself (§22).
+     folder itself (§22);
+   - *(1.8)* `.claude/deploy.json`, the deploy profile, written from
+     Paramètres → Déploiement and committed alone (§23).
 
    Everything else is read-only.
 4. **Write back to the file you read.** A blocking file read from a live
@@ -872,3 +881,117 @@ chain.py's install had never made a repository's first commit: it ran there
   Hidden once every line is ✓, and when the chain has no `socle.py`.
 - **« Déployer »** — shown only where `.claude/commands/deploie.md` exists;
   elsewhere the test step says deploying comes with a later version.
+
+## 23. « Déploiement » (1.8)
+
+What 1.8 found, from its code and Hyrox's: deploying was the application's
+own `/deploie`, a command Claude ran — `adb devices -l`, the devices told
+apart by model (`hyrox_tracker/.claude/commands/deploie.md:13-21`), then
+`.\gradlew :app-phone:installDebug` and `:app-wear:installDebug` with the
+device in `ANDROID_SERIAL` (`:42-48`); no launch, no log, no screenshot. The
+cockpit ran it from the test step only where the file existed (§22). The
+diagnostic checked `adb version` alone (`diagnostic.py:65`).
+
+The chain builds any kind of application — Android today; iOS, the web, a
+desktop program, a Python tool tomorrow — so the screen and the profile are
+generic, and what is specific to a platform lives in one **adapter** per
+kind of target. Adding a platform is adding an adapter: the page never
+tests a type's name, it shows what the adapter declares.
+
+### 23.1 The profile
+
+`.claude/deploy.json` of the application, its contract written once in
+**`docs/app/DEPLOY_PROFILE.md`**: `format` (1) and `targets`, each the
+frame's `name`, `type`, `build`, then its adapter's fields. A key nobody
+declares is refused. `deploy_profile.py` checks, loads and saves it; saving
+writes it in the contract's order, commits it alone — `deploy: profil`,
+`--only` — and pushes (chain.py's `push_branch`). The chain's install never
+touches it (`chain.PATHS`). Hyrox's profile is DEPLOY_PROFILE.md §5, each
+value with its line, written into the application from Paramètres →
+Déploiement; Belivo and a new application have none until one is written.
+
+### 23.2 The adapters
+
+`tools/cockpit/adapters/`, one module each, behind `adapters/base.py`'s
+`Adapter`:
+
+- `FIELDS` — its fields, as the page renders them (`text`, `bool`,
+  `choice`) and `check` checks them;
+- `destinations(targets, app)` — where it can deploy, live: `{id, name,
+  kind, state, connected, facts, note, actions}`; `panels(targets, app)` —
+  what the page shows beside them (title, paragraphs, items, forms);
+- `accepts(target, dest)` — whether a target goes there;
+- `deploy_steps(target, dest, app)` — its steps, each `run(out)` → (ok,
+  said, last lines);
+- `journal(target, dest, app)` — a handle on a `LogStream`;
+- `act(action, dest, args, …)`, `image(action, dest, …)` — the actions it
+  declared;
+- `CRASHES` — the rules that mark a crash in its log: a start, the lines
+  that continue it, the line that ends it.
+
+An action says how the page does it, never what it is: `post`, `image`,
+`link`, `journal`, `rename`, with `fields` for a small form.
+
+**`android`** — `adb devices -l`; each device's `getprop` (once a minute) and
+`dumpsys battery`. Its key is `ro.serialno`, which a device keeps between USB
+and Wi-Fi when adb's serial does not: its name and its last Wi-Fi address are
+kept under it in `config.json` (`deploy_devices`). Kind: watch when
+`ro.build.characteristics` holds `watch`, emulator when the serial is
+`emulator-…` or `ro.kernel.qemu` is 1, phone otherwise; a target's `kind`
+filters on it. States `device`, `unauthorized` and `offline` each with a
+French line; a device gone stays greyed, « déconnecté », with « Reconnecter ».
+Wi-Fi: `adb pair`, `adb connect`, `adb mdns check`/`services`. Emulators: the
+emulator tool on the PATH or in the SDK, `-list-avds`, `-avd`. Deploy: the
+install command with `{serial}` or `ANDROID_SERIAL`, then `monkey -p <app_id>
+-c android.intent.category.LAUNCHER 1`. Log: `logcat -v threadtime -b
+main,system,crash -T 500`, kept to the application's pids and the lines that
+name it, a new pid followed from ActivityManager's « Start proc » and a
+`pidof` every 3 s. Screenshot `exec-out screencap -p`; mirror scrcpy.
+
+**`commande`** — one destination, « cet ordinateur ». The run command from the
+application's root, in its own process group; a command that keeps running is
+deployed when it still runs 3 s later, « Arrêter » stops its tree, deploying
+again restarts it; one that ends is waited for. Its output is its log, kept
+across restarts. `url` gives « Ouvrir » while it runs. No screenshot, no
+mirror: not declared.
+
+### 23.3 The screen
+
+« Déploiement », a menu entry, three tabs, reading the active application:
+`GET /api/deploy` (the adapters, the profile, the main checkout's commit and
+uncommitted files, the run going there, the job, the choice remembered);
+`GET /api/deploy/destinations`, polled every 4 s while the screen is shown;
+`POST /api/deploy/action`, `GET /api/deploy/image`; `POST /api/deploy/choice`
+(kept in the application's entry of `config.json`, `deploy_choice`).
+
+- **Destinations** — every adapter's destinations as cards, its panels after.
+- **Déployer** — `POST /api/deploy/start`: a `deploy.Job` in a worker thread —
+  per target its build once, then on each destination its steps; a failed
+  build skips its target, a failed install skips that device's launch. Each
+  step ✓ or ✗ with its duration and, failed, its last lines; the full output
+  in `logs/deploy-<time>.log`. One deploy at a time, whatever the application.
+  🔴 Refused while a chain run goes in the same application — the build would
+  race its merge —, and `POST /api/run` refused while a deploy goes there.
+  Its steps and its end reach the page through the runs' stream
+  (`deploy_step`, `deploy_ended`); a notification when it ends.
+- **Journal** — `GET /api/deploy/journal?after=` once a second; opening one
+  stops the one followed before. The adapter's crashes listed at the top,
+  `deploy_crash` on the stream, a notification when the tab is not in front.
+  Pause, clear and the filter are the page's; « Enregistrer »
+  (`POST /api/deploy/journal/save`) writes it to `logs/`; « Copier le crash »
+  gives the destination, the time and its lines.
+
+**Paramètres → Déploiement** — the targets, the fields their adapter
+declares; `POST /api/deploy/profile` saves; refused while a run or a deploy
+goes in the application.
+
+**The test step** — « Déployer » opens « Déploiement », for every application.
+`/deploie` stays under Paramètres → Commandes; it goes in 1.8.x, once a real
+deploy has worked from here.
+
+**The diagnostic** — `optional`: scrcpy and the emulator, found where the
+adapter finds them, each ✓ or « non trouvé »; never a failure, never an
+alert.
+
+**At the server's stop** — the journals followed and the commands it started
+are stopped.

@@ -2,7 +2,8 @@
 through Playwright): the form refusing a folder, normalising the names and
 showing the idea file; the creation's progress, a step that fails and «
 Reprendre »; the new application opened on /1_lexique, with « À fournir
-avant le code » and no « Déployer ». Skipped when Playwright or Edge is
+avant le code », its « Déployer » opening « Déploiement » with no profile
+yet (1.8). Skipped when Playwright or Edge is
 missing. Every repository is a scratch one; no chain command runs."""
 import pytest
 
@@ -99,12 +100,14 @@ def test_progress_failure_reprendre_then_lexique(tmp_path, page, chain_root, ide
         # À fournir avant le code: both ✗, read from the files.
         prov = page.locator("#provide-card")
         assert prov.is_visible() and prov.locator("li.ko").count() == 2
-        # No /deploie in a new application: no « Déployer », and it says so.
+        # 1.8: « Déployer » opens « Déploiement », which says there is no
+        # profile yet — a new application has none.
         page.get_by_role("link", name="Chaîne").first.click()
         page.wait_for_selector("#step-main-test")
         t = page.locator("#step-main-test")
-        assert t.get_by_role("button", name="Déployer").count() == 0
-        assert "prochaine version du cockpit" in t.inner_text()
+        t.get_by_role("button", name="Déployer").click()
+        page.wait_for_selector("#dp-no-profile")
+        assert "pas de .claude/deploy.json" in page.locator("#dp-no-profile").inner_text()
         assert no_real_errors(page) == []
 
 
@@ -123,7 +126,7 @@ def test_the_provide_card_each_line_both_ways(tmp_path, page, chain_root):
         page.reload()
         page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
         assert prov.is_hidden()
-        # The fake application has its /deploie: « Déployer » stays.
+        # « Déployer » stays on the test step (1.8: it opens « Déploiement »).
         page.get_by_role("link", name="Chaîne").first.click()
         page.wait_for_selector("#step-main-test")
         assert page.locator("#step-main-test").get_by_role("button", name="Déployer").count() == 1

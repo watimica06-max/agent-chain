@@ -4,6 +4,10 @@ run inherits). Runs no chain command.
 
 Each check ends as `ok` (the first line of output), `fail` (the error) or
 `skip` (« non concerné »: its file is absent).
+
+1.8 — `optional`: scrcpy and the Android emulator, which « Déploiement »
+uses when they are here. Each is `ok` or `absent` (« non trouvé »), never a
+failure: neither is needed, and neither makes an alert.
 """
 import os
 import re
@@ -68,6 +72,43 @@ def plan(app, env=None):
     ]
 
 
+# The optional tools (1.8): (id, label, the flag that prints its version).
+OPTIONAL = [("scrcpy", "scrcpy — afficher l'écran d'un appareil", "--version"),
+            ("emulator", "Émulateur Android", "-version")]
+
+
+def find_tool(tool):
+    """Where an optional tool is — the deploy adapter's own lookup — or None."""
+    from adapters import android
+    return android.scrcpy_argv() if tool == "scrcpy" else android.emulator_argv()
+
+
+# What finds them; the tests put a fake here.
+FIND = find_tool
+
+
+def optional_checks(app, exec_fn, find):
+    out = []
+    for tid, label, flag in OPTIONAL:
+        argv = find(tid)
+        if not argv:
+            out.append({"id": tid, "label": label, "status": "absent", "detail": "non trouvé — facultatif"})
+            continue
+        try:
+            code, text = exec_fn([*argv, flag], app, DEFAULT_TIMEOUT)
+        except (OSError, subprocess.TimeoutExpired) as e:
+            out.append({"id": tid, "label": label, "status": "absent",
+                        "detail": f"trouvé ({argv[0]}), sans réponse : {e}"})
+            continue
+        line = first_line(text)
+        if code == 0:
+            out.append({"id": tid, "label": label, "status": "ok", "detail": f"{line} — {argv[0]}"})
+        else:
+            out.append({"id": tid, "label": label, "status": "absent",
+                        "detail": f"trouvé ({argv[0]}), sans réponse : code {code}"})
+    return out
+
+
 def first_line(text):
     """The first line that says something: `gradlew --version` opens on a
     rule of dashes (1.4.5)."""
@@ -77,7 +118,7 @@ def first_line(text):
     return ""
 
 
-def run_diagnostic(app, exec_fn=system_exec, now=None, env=None):
+def run_diagnostic(app, exec_fn=system_exec, now=None, env=None, find=None):
     results = []
     _, where, home, nothing = java_of(env)
     for cid, label, argv, timeout in plan(app, env):
@@ -113,4 +154,5 @@ def run_diagnostic(app, exec_fn=system_exec, now=None, env=None):
             hints.append(JAVA_HOME_EMPTY.format(path=home))
     return {"at": (now or datetime.now()).isoformat(timespec="seconds"), "app": app,
             "results": results, "hints": hints,
+            "optional": optional_checks(app, exec_fn, find or FIND),
             "ok": all(r["status"] != "fail" for r in results)}

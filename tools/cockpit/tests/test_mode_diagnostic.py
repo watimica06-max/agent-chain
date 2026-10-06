@@ -326,3 +326,22 @@ def test_a_stored_result_is_not_run_again(tmp_path):
 def test_first_line_skips_a_rule_of_dashes():
     out = "\n------------------------------------------------------------\nGradle 8.7\n----\n"
     assert diagnostic.first_line(out) == "Gradle 8.7"
+
+
+def test_scrcpy_and_the_emulator_are_optional(tmp_path):
+    # 1.8: each ✓ or « non trouvé », never a failure, never an alert.
+    def ex(argv, cwd, timeout):
+        if argv[0] == r"C:\sdk\emulator\emulator.exe":
+            return 0, "INFO    | Android emulator version 37.1.11.0 (build_id 15917651)"
+        return fake_exec(ALL_GOOD)(argv, cwd, timeout)
+    found = {"emulator": [r"C:\sdk\emulator\emulator.exe"], "scrcpy": None}
+    res = diagnostic.run_diagnostic(app_with(tmp_path), ex, find=lambda tool: found[tool])
+    opt = {r["id"]: r for r in res["optional"]}
+    assert opt["scrcpy"]["status"] == "absent" and "non trouvé" in opt["scrcpy"]["detail"]
+    assert opt["emulator"]["status"] == "ok" and "Android emulator version 37.1.11.0" in opt["emulator"]["detail"]
+    assert res["ok"] and [r["id"] for r in res["results"]] == ["java", "gradle", "flutter", "adb", "claude", "git"]
+    # Found but not answering: still not a failure.
+    res = diagnostic.run_diagnostic(app_with(tmp_path), lambda a, c, t: (1, "boom") if a[0] == "scrcpy" else (0, "ok"),
+                                    find=lambda tool: [tool])
+    s = {r["id"]: r for r in res["optional"]}["scrcpy"]
+    assert s["status"] == "absent" and "sans réponse" in s["detail"] and res["ok"]

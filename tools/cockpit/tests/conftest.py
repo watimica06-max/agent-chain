@@ -65,3 +65,5 @@ def _no_real_diagnostic(monkeypatch):
     import server
     from test_mode_diagnostic import ALL_GOOD, fake_exec
     monkeypatch.setattr(server, "DIAG_RUNNER", lambda app: diagnostic.run_diagnostic(app, fake_exec(ALL_GOOD)))
+    # 1.8: scrcpy and the emulator, never this machine's.
+    monkeypatch.setattr(diagnostic, "FIND", lambda tool: None)

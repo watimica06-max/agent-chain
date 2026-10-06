@@ -31,7 +31,8 @@ def test_statistics_screen_every_section(tmp_path, page):
         open_stats(page, s)
         # Six in « Statistiques », between Correction and Paramètres.
         assert page.locator("#side a").evaluate_all("as => as.map(a => a.id)") == [
-            "nav-dashboard", "nav-answer", "nav-chaine", "nav-correction", "nav-stats", "nav-apps", "nav-settings"]   # 1.6: « Applications »
+            "nav-dashboard", "nav-answer", "nav-chaine", "nav-correction", "nav-deploy", "nav-stats", "nav-apps",
+            "nav-settings"]   # 1.6: « Applications », 1.8: « Déploiement »
         tiles = page.locator("#st-tiles .tile").all_inner_texts()
         assert len(tiles) == 6
         assert tiles[0].startswith("Runs\n2")

@@ -24,6 +24,8 @@ import codelots   # noqa: E402
 import context as context_mod  # noqa: E402
 import create as create_mod  # noqa: E402
 import decide as decide_mod  # noqa: E402
+import deploy as deploy_mod  # noqa: E402
+import deploy_profile  # noqa: E402
 import diagnostic  # noqa: E402
 import gitref     # noqa: E402
 import questions  # noqa: E402
@@ -38,8 +40,9 @@ from state import State  # noqa: E402
 
 HOST = "127.0.0.1"
 STATE_KEY = web.AppKey("state", State)
+DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.7"
+VERSION = "1.8"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -47,6 +50,8 @@ STOP_GRACE = 30.0
 # (§20), and whether an install pushes; the tests put a scratch one here.
 CHAIN_ROOT = chain_mod.CHAIN_ROOT
 CHAIN_PUSH = True
+# Whether saving a deploy profile pushes (1.8); the tests put False here.
+PROFILE_PUSH = True
 # What opens the browser; the tests put a fake here.
 OPEN_BROWSER = webbrowser.open
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
@@ -509,6 +514,27 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     app = web.Application(middlewares=[guard])
     app[STATE_KEY] = state
+
+    # « Déploiement » (1.8): its jobs and journals run in worker threads; what
+    # they say reaches the page through the runs' stream, from the loop.
+    loop_box = {"loop": None}
+
+    def broadcast(kind, data):
+        loop = loop_box["loop"]
+        if loop is None:
+            return
+        ev = {"seq": next(rn._seq), "type": kind, "run": "", "app": data.get("app") or state.app_folder,
+              "data": data, "at": runner_mod._now()}
+
+        def put():
+            for q in list(rn.watchers):
+                q.put_nowait(ev)
+        try:
+            loop.call_soon_threadsafe(put)
+        except RuntimeError:
+            pass
+    dep = deploy_mod.Deployer(state, rn.log_dir, emit=broadcast)
+    app[DEPLOY_KEY] = dep
 
     def pair():
         a, w = state.app_folder, state.working_folder
@@ -989,6 +1015,11 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         busy = busy_payload()
         if busy:
             return web.json_response({"error": busy_text(busy), "busy": busy}, status=409)
+        # A deploy building in this application (1.8): its build and the run's
+        # merge would race.
+        if dep.going_in(a):
+            return web.json_response({"error": "un déploiement construit dans cette application : lancer après sa fin"},
+                                     status=409)
         # A chain not « à jour » (§20): the launch asks first.
         ch = chain_state(a)
         if ch.get("state") != chain_mod.UP_TO_DATE and not data.get("chain_ok"):
@@ -1111,6 +1142,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         diag["tasks"][key] = asyncio.get_running_loop().create_task(go())
 
     async def opening(_app):
+        loop_box["loop"] = asyncio.get_running_loop()
         # 1.6: the active application's, a feature open or not.
         a = state.app_folder
         if a and os.path.isdir(a):
@@ -1316,6 +1348,151 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             rn.unwatch(q)
         return resp
 
+    # ---------------------------------------------------- Déploiement (1.8)
+    def deploy_app():
+        a = state.app_folder
+        if not a or not os.path.isdir(a):
+            raise web.HTTPConflict(text=json.dumps({"error": "aucune application active"}),
+                                   content_type="application/json")
+        return a
+
+    def run_here(a):
+        """The chain run going in this application, or None."""
+        x = rn.going()
+        return x if x and runner_mod.repo_key(x.repo) == runner_mod.repo_key(a) else None
+
+    def run_refusal(a, what):
+        x = run_here(a)
+        if not x:
+            return None
+        return web.json_response({"error": f"une commande de la chaîne tourne dans cette application : {x.prompt} — "
+                                           f"{what}", "run": {"prompt": x.prompt, "started_at": x.started_at}},
+                                 status=409)
+
+    async def deploy_get(request):
+        """The screen's frame: the adapters, the profile, the main checkout's
+        commit, the run going here, the job, the choice remembered."""
+        a = deploy_app()
+        loop = asyncio.get_running_loop()
+        head = await loop.run_in_executor(None, deploy_mod.head_of, a)
+        x, j = run_here(a), dep.going()
+        return web.json_response({
+            "app": a, "app_name": state.app_name, "describe": dep.describe(), "profile": dep.profile(a),
+            "head": head, "run": {"prompt": x.prompt, "started_at": x.started_at} if x else None,
+            "job": dep.job_for(a),
+            "elsewhere": {"app_name": j.app_name} if j and deploy_mod.app_key(j.app) != deploy_mod.app_key(a) else None,
+            "choice": state.deploy_choice(a), "logs_dir": rn.log_dir})
+
+    async def deploy_destinations(request):
+        a = deploy_app()
+        loop = asyncio.get_running_loop()
+        return web.json_response(await loop.run_in_executor(None, dep.destinations, a))
+
+    async def deploy_job(request):
+        a = deploy_app()
+        return web.json_response({"job": dep.job_for(a)})
+
+    async def deploy_choice(request):
+        a = deploy_app()
+        data = await body(request)
+        if not isinstance(data.get("choice"), dict):
+            return web.json_response({"error": "choix attendu"}, status=400)
+        return web.json_response({"choice": state.set_deploy_choice(a, data["choice"])})
+
+    async def deploy_start(request):
+        """« Construire et installer ». Refused while a chain run goes in this
+        application: the build would race the run's merge."""
+        a = deploy_app()
+        data = await body(request)
+        refused = run_refusal(a, "le build ferait la course avec son merge : déployer après sa fin")
+        if refused:
+            return refused
+        choice = data.get("choice") if isinstance(data.get("choice"), dict) else {}
+        state.set_deploy_choice(a, choice)
+        loop = asyncio.get_running_loop()
+        head = await loop.run_in_executor(None, deploy_mod.head_of, a)
+        try:
+            job = await loop.run_in_executor(None, dep.start, a, state.app_name, choice, head)
+        except (deploy_mod.DeployError, deploy_mod.ActionError) as e:
+            return web.json_response({"error": str(e)}, status=409)
+        return web.json_response({"job": job.record()})
+
+    async def deploy_action(request):
+        a = deploy_app()
+        data = await body(request)
+        args = data.get("args") if isinstance(data.get("args"), dict) else {}
+        loop = asyncio.get_running_loop()
+        try:
+            res = await loop.run_in_executor(None, dep.act, a, data.get("type", ""), data.get("action", ""),
+                                             data.get("dest", ""), args)
+        except deploy_mod.ActionError as e:
+            return web.json_response({"error": str(e)}, status=409)
+        return web.json_response(res)
+
+    async def deploy_image(request):
+        a = deploy_app()
+        q = request.query
+        loop = asyncio.get_running_loop()
+        try:
+            png = await loop.run_in_executor(None, dep.image, a, q.get("type", ""), q.get("action", ""),
+                                             q.get("dest", ""), {})
+        except deploy_mod.ActionError as e:
+            return web.json_response({"error": str(e)}, status=409)
+        return web.Response(body=png, content_type="image/png", headers={"Cache-Control": "no-store"})
+
+    async def deploy_journal(request):
+        a = deploy_app()
+        q = request.query
+        try:
+            after = int(q.get("after") or 0)
+        except ValueError:
+            after = 0
+        loop = asyncio.get_running_loop()
+        try:
+            out = await loop.run_in_executor(None, lambda: dep.journal(
+                a, q.get("type", ""), q.get("dest", ""), q.get("target") or None, after, q.get("reopen") == "1"))
+        except deploy_mod.ActionError as e:
+            return web.json_response({"error": str(e)}, status=409)
+        return web.json_response(out)
+
+    async def deploy_journal_save(request):
+        a = deploy_app()
+        data = await body(request)
+        try:
+            path = dep.journal_save(a, data.get("dest", ""), data.get("target") or None)
+        except (deploy_mod.ActionError, OSError) as e:
+            return web.json_response({"error": str(e)}, status=409)
+        return web.json_response({"path": path})
+
+    async def deploy_profile_save(request):
+        """Paramètres → Déploiement: the targets written to deploy.json,
+        committed alone in the application and pushed. Refused while a run
+        or a deploy goes there."""
+        a = deploy_app()
+        data = await body(request)
+        refused = run_refusal(a, "le profil s'enregistre après sa fin")
+        if refused:
+            return refused
+        if dep.going_in(a):
+            return web.json_response({"error": "un déploiement est en cours dans cette application : "
+                                               "le profil s'enregistre après sa fin"}, status=409)
+        targets = data.get("targets")
+        if not isinstance(targets, list):
+            return web.json_response({"error": "liste de cibles attendue"}, status=400)
+        loop = asyncio.get_running_loop()
+        try:
+            res = await loop.run_in_executor(None, lambda: deploy_profile.save(a, targets, push=PROFILE_PUSH))
+        except deploy_profile.ProfileError as e:
+            return web.json_response({"error": str(e), "errors": e.errors}, status=400)
+        print(f"Profil de déploiement de {a} : "
+              + ((f"commit {res['commit']}" + (" et poussé" if res["pushed"] else
+                                               f" — push : {res['push_error']}" if res["push_error"] else ""))
+                 if res["commit"] else "rien n'avait changé") + ".", flush=True)
+        return web.json_response({**res, "profile": dep.profile(a)})
+
+    async def deploy_cleanup(_app):
+        dep.stop_all()
+
     async def ping(request):
         """What a second start asks before starting a server of its own."""
         return web.json_response({"cockpit": True, "version": VERSION, "pid": os.getpid()})
@@ -1388,7 +1565,18 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_get("/api/code/lot", code_lot)
     r.add_get("/api/stats/csv", stats_csv)
     r.add_post("/api/stats/export", stats_export)
+    r.add_get("/api/deploy", deploy_get)
+    r.add_get("/api/deploy/destinations", deploy_destinations)
+    r.add_get("/api/deploy/job", deploy_job)
+    r.add_post("/api/deploy/choice", deploy_choice)
+    r.add_post("/api/deploy/start", deploy_start)
+    r.add_post("/api/deploy/action", deploy_action)
+    r.add_get("/api/deploy/image", deploy_image)
+    r.add_get("/api/deploy/journal", deploy_journal)
+    r.add_post("/api/deploy/journal/save", deploy_journal_save)
+    r.add_post("/api/deploy/profile", deploy_profile_save)
     app.on_startup.append(opening)
+    app.on_cleanup.append(deploy_cleanup)
     return app
 
 

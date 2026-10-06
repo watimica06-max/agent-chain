@@ -139,11 +139,76 @@ la demandent toujours (celles qui commitent ou déplacent des fichiers
 avant un de leurs tests — la confirmation dit pourquoi). Une étape
 « t'attend » ouvre « À répondre » filtré sur elle. L'étape qui tourne
 montre le run dessous : l'agent, le texte, « Arrêter », « Continuer la
-session ». L'étape de test porte « Déployer » (`/deploie`) et ce qu'il
-faut tester, d'après `code/recette-ordonnee.md`. Une application qui n'a
-pas de `/deploie` — une application neuve n'en a pas — n'a pas ce bouton,
-et l'étape dit que le déploiement viendra avec une prochaine version du
-cockpit.
+session ». L'étape de test porte « Déployer », qui ouvre l'écran
+« Déploiement » (1.8), et ce qu'il faut tester, d'après
+`code/recette-ordonnee.md`. `/deploie` reste sous Paramètres → Commandes,
+jusqu'à ce qu'un vrai déploiement ait marché depuis le cockpit.
+
+**Déploiement** (1.8) — construire l'application active et l'installer là
+où elle tourne, sans Claude, puis la regarder tourner. Ce qu'il faut
+construire et où l'installer est le **profil de déploiement** de
+l'application, `.claude/deploy.json` : une liste de **cibles** —
+« Téléphone », « Montre », « Site » —, chacune avec son type, la commande
+qui la construit, et ce que son type demande. Le contrat de ce fichier est
+`docs/app/DEPLOY_PROFILE.md`, un exemple par type. Deux types aujourd'hui :
+**android** (des appareils par adb : en USB, en Wi-Fi, des émulateurs) et
+**commande** (une commande lancée sur cet ordinateur : un serveur web, un
+programme, un script). Un autre type viendra en ajoutant un adaptateur :
+l'écran ne montre que ce que chaque adaptateur dit savoir faire. Trois
+onglets :
+- **Destinations** — les appareils, groupés par type, en cartes : le nom
+  que vous leur donnez (« Renommer », gardé par le cockpit sous le numéro
+  de série de l'appareil, qui ne change pas entre USB et Wi-Fi), le
+  modèle, montre, téléphone ou émulateur, la version d'Android, la
+  batterie, USB ou Wi-Fi, l'état. **Non autorisé** : une ligne dit quoi
+  accepter sur l'appareil. **Hors ligne** : le rebrancher. Un appareil qui
+  disparaît reste, grisé, « déconnecté », avec sa dernière adresse Wi-Fi et
+  « Reconnecter ». Rafraîchi toutes les quelques secondes, et par
+  « Rafraîchir ». Sur un appareil : « Journal », « Capture d'écran »
+  (affichée dans la carte), « Afficher l'écran » (scrcpy, quand il est
+  installé ; sinon, où le trouver), « Lancer » et « Arrêter »
+  l'application. **Wi-Fi** : « Associer » (l'adresse IP, le port et le
+  code à six chiffres que l'appareil affiche), « Connecter » (l'adresse et
+  le port de connexion), et où trouver tout cela sur Wear OS. **Le port de
+  connexion change chaque fois que le débogage sans fil redémarre** : il
+  faut alors reconnecter avec le nouveau ; l'association, elle, reste. Ce
+  qu'adb trouve seul sur le réseau est listé, prêt à connecter.
+  **Émulateurs** : les appareils virtuels d'Android Studio, « Démarrer ».
+  Pour une cible « commande », une seule destination : « cet ordinateur »,
+  avec « Arrêter » et « Ouvrir » (son adresse) quand elle tourne.
+- **Déployer** — d'abord le commit du dépôt principal, et s'il a des
+  fichiers non commités (le build part de ce qui est sur le disque, eux
+  compris). Puis les cibles, une case chacune, et sous chacune les
+  destinations que son type propose (une cible « téléphone » n'est pas
+  proposée sur la montre) ; le choix est gardé par application.
+  « Construire et installer » : par cible, son build une fois, puis sur
+  chaque destination son installation, puis son lancement. Chaque étape
+  ✓ ou ✗ avec sa durée ; un échec montre la fin de sa sortie ; la sortie
+  complète va dans `tools/cockpit/logs/deploy-….log`. Un build qui échoue
+  saute les installations de sa cible ; une installation qui échoue sur un
+  appareil n'empêche pas les autres. **Refusé pendant qu'une commande de
+  la chaîne tourne dans la même application** : le build ferait la course
+  avec son merge — l'écran dit laquelle. Et l'inverse : une commande ne se
+  lance pas pendant qu'un déploiement construit dans son application. Le
+  déploiement tourne dans le cockpit, comme un run : fermer la page ne
+  l'arrête pas, et une notification dit quand il finit.
+- **Journal** — une destination à la fois, son journal en direct : pour
+  Android, `adb logcat` réduit aux processus de l'application, suivi quand
+  elle redémarre ; pour une commande, sa sortie. **Les crashs ressortent**
+  — Android : `FATAL EXCEPTION`, `ANR in` et la pile dessous ; commande :
+  une trace Python, une ligne qui commence par une erreur ou une
+  exception —, listés en haut avec leur heure, et une notification quand
+  l'onglet n'est pas devant. Pause, Effacer, un filtre, « Enregistrer »
+  (le journal entier, dans `tools/cockpit/logs/`), « Copier le crash »
+  (prêt à donner à Claude : l'appareil, l'heure, ses lignes).
+
+**Paramètres → Déploiement** (1.8) — le profil de l'application active :
+ses cibles, à modifier, ajouter, retirer ; les champs montrés sont ceux du
+type choisi, chacun avec ce qu'il veut dire. « Enregistrer le profil »
+écrit `.claude/deploy.json`, le commite seul dans l'application
+(`deploy: profil`) et pousse. Refusé pendant qu'un run ou un déploiement
+tourne dans l'application. Une application neuve n'a pas de profil tant
+qu'on n'en a pas écrit un.
 
 **À fournir avant le code** (1.7) — sur le tableau de bord, ce que
 l'application apporte elle-même, d'après `socle.py` : ses conventions
@@ -231,7 +296,8 @@ touchés.
 l'une, Flutter pour l'autre) : quand l'application active n'en a pas, le
 cockpit le lance une fois de lui-même et garde le résultat. Le tableau de bord ne
 l'affiche que s'il a un échec ; Paramètres → Diagnostic le relance à la
-demande.
+demande. Il dit aussi (1.8) si scrcpy et l'émulateur Android sont là, ✓ ou
+« non trouvé » : tous deux facultatifs, jamais une alerte.
 
 **À répondre** — toutes les questions ouvertes et tous les blocages qui
 vous attendent, dans un seul formulaire, **à gauche** ; **à droite**, le
@@ -299,7 +365,13 @@ avec ce qu'il a vu.
   `code/redecoupage.md`, `stop.md`, et le `bug-list.md` d'une nouvelle
   correction — et, quand vous cliquez « Installer / mettre à jour la
   chaîne » ou « Tout mettre à jour », les fichiers de la chaîne dans
-  l'application, leur commit et son push. Tout le reste est en lecture.
+  l'application, leur commit et son push ; quand vous cliquez « Enregistrer
+  le profil », `.claude/deploy.json`, son commit et son push. Tout le reste
+  est en lecture.
+- « Déploiement » ne lance que les commandes du profil, quand vous
+  cliquez ; il n'installe, ne lance, n'associe ni ne connecte rien sur un
+  appareil sans un clic. Les noms de vos appareils restent dans
+  `config.json`, jamais dans l'application.
 - Ajouter, renommer ou retirer une application ne change que sa liste,
   dans `config.json` : rien n'est écrit dans son dossier.
 - « Nouvelle application » n'écrit que dans le dossier qu'elle crée, neuf

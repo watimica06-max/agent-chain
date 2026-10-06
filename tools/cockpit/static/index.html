@@ -506,6 +506,92 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
 @media (max-width: 1100px) { .lot-detail { grid-template-columns: 1fr; } .code-top { grid-template-columns: 1fr; } }
 @media (max-width: 1100px) { .st-pair { grid-template-columns: 1fr; } .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 1100px) { :root { --side: 188px; } .screen { padding: 22px 20px 40px; } #save-bar { padding: 3px 20px; } #keys-legend { padding: 6px 20px; } }
+/* ------------------------------------------------- Déploiement (1.8) */
+.dp-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }
+.dp-head h2 { margin: 0; }
+.dp-group + .dp-group { margin-top: 26px; }
+.dp-group > h3 { display: flex; gap: 10px; align-items: baseline; }
+.dp-group > h3 .muted { font-weight: 400; font-size: 14px; }
+.dp-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+.dp-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.dp-card.off { opacity: .62; border-style: dashed; }
+.dp-card.warn { border-color: var(--warn); }
+.dp-card .top { display: flex; gap: 8px; align-items: center; }
+.dp-card .nm { font-size: 18px; font-weight: 650; }
+.dp-card .kind { color: var(--soft); font-size: 14px; }
+.dp-st { margin-left: auto; font-size: 12px; font-weight: 650; padding: 1px 10px; border-radius: 99px; white-space: nowrap; }
+.dp-st.on { background: var(--ok-soft); color: var(--ok); } .dp-st.ko { background: var(--warn-soft); color: var(--warn); }
+.dp-st.gone { background: var(--idle-soft); color: var(--soft); }
+.dp-facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1px 12px; font-size: 14px; margin: 0; }
+.dp-facts dt { color: var(--soft); } .dp-facts dd { margin: 0; overflow-wrap: anywhere; }
+.dp-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.dp-acts button, .dp-acts a.btn { min-height: 34px; padding: 3px 12px; font-size: 14px; }
+a.btn { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); text-decoration: none; background: var(--card); }
+a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+.dp-acts button.missing { color: var(--soft); border-style: dashed; }
+.dp-msg { font-size: 14px; border-radius: 6px; padding: 6px 10px; }
+.dp-msg.ok { background: var(--ok-soft); color: var(--ok); } .dp-msg.warn { background: var(--warn-soft); color: var(--warn); }
+.dp-shot { display: flex; gap: 10px; align-items: flex-start; }
+.dp-shot img { max-width: 160px; max-height: 300px; border-radius: 8px; border: 1px solid var(--line); background: #000; }
+.dp-panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 14px; margin-top: 14px; }
+.dp-panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; }
+.dp-panel h4 { margin: 0 0 6px; font-size: 16px; }
+.dp-panel p { margin: 4px 0; font-size: 14px; color: var(--soft); }
+.dp-panel p.port { color: var(--warn); }
+.dp-items { margin: 8px 0; }
+.dp-item { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 6px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.dp-item .sub { font-family: var(--mono); font-size: 12px; color: var(--soft); }
+.dp-form { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-top: 10px; }
+.dp-form label { display: flex; flex-direction: column; font-size: 12px; color: var(--soft); gap: 2px; }
+.dp-form input[type=text] { width: auto; min-width: 0; padding: 6px 10px; font-size: 15px; }
+.dp-form input.w-ip { width: 150px; } .dp-form input.w-port { width: 90px; } .dp-form input.w-code { width: 110px; }
+.dp-form button { min-height: 38px; }
+.dp-commit { font-size: 15px; } .dp-commit .mono { font-size: 13px; }
+.dp-commit ul { margin: 4px 0 0 18px; padding: 0; font: 12px/1.5 var(--mono); color: var(--warn); }
+.dp-target { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; }
+.dp-target + .dp-target { margin-top: 10px; }
+.dp-target.on { border-color: var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
+.dp-target > label { display: flex; gap: 10px; align-items: center; font-weight: 650; font-size: 17px; }
+.dp-target input[type=checkbox] { width: 19px; height: 19px; }
+.dp-target .cmd { font: 13px var(--mono); color: var(--soft); margin: 2px 0 0 29px; overflow-wrap: anywhere; }
+.dp-dests { display: flex; gap: 8px 18px; flex-wrap: wrap; margin: 8px 0 0 29px; }
+.dp-dests label { display: flex; gap: 8px; align-items: center; font-size: 15px; }
+.dp-dests label.off { color: var(--soft); }
+.dp-steps { list-style: none; padding: 0; margin: 10px 0 0; }
+.dp-steps li { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; padding: 7px 0; border-top: 1px solid var(--line); align-items: baseline; }
+.dp-steps .ic { font-weight: 700; text-align: center; }
+.dp-steps li.done .ic { color: var(--ok); } .dp-steps li.failed .ic { color: var(--err); } .dp-steps li.going .ic { color: var(--accent); }
+.dp-steps li.skip { color: var(--soft); }
+.dp-steps .dur { font-variant-numeric: tabular-nums; color: var(--soft); font-size: 14px; white-space: nowrap; }
+.dp-steps pre { grid-column: 2 / -1; margin: 6px 0 0; max-height: 220px; overflow: auto; font: 12px/1.45 var(--mono); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; white-space: pre-wrap; }
+.dp-jbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.dp-jbar select { font: inherit; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); min-height: 40px; }
+.dp-jbar input[type=text] { width: 220px; }
+.dp-jbar button { min-height: 38px; padding: 4px 14px; font-size: 15px; }
+.dp-live { font-size: 13px; color: var(--ok); } .dp-live.ended { color: var(--warn); }
+.dp-crashes { margin-bottom: 10px; }
+.dp-crash { display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; gap: 10px; align-items: center; background: var(--err-soft);
+  color: var(--err); border-radius: 8px; padding: 7px 12px; margin-bottom: 6px; font-size: 14px; }
+.dp-crash .t { font-variant-numeric: tabular-nums; font-weight: 650; }
+.dp-crash .ti { font-family: var(--mono); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.dp-crash button { min-height: 32px; padding: 2px 12px; font-size: 14px; }
+.dp-log { height: 52vh; min-height: 260px; overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+  padding: 6px 0; font: 12.5px/1.45 var(--mono); }
+.dp-log .l { padding: 0 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dp-log .l.crash { background: var(--err-soft); color: var(--err); }
+.dp-log .l.marker { color: var(--accent); font-style: italic; }
+.dp-log .l.hit { outline: 2px solid var(--err); }
+.dp-set .dp-tgt { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; margin-top: 12px; }
+.dp-set .dp-tgt h3 { display: flex; gap: 10px; align-items: center; margin: 0 0 8px; }
+.dp-set .grid { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 8px 14px; align-items: start; }
+.dp-set .grid > label { font-weight: 600; padding-top: 8px; font-size: 15px; }
+.dp-set .grid select { font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.dp-set .hint { font-size: 13px; color: var(--soft); margin-top: 2px; }
+.dp-set .err { font-size: 13px; color: var(--err); }
+.dp-set .bool { display: flex; gap: 8px; align-items: center; padding-top: 8px; }
+.dp-set .bool input { width: 19px; height: 19px; }
+@media (max-width: 1100px) { .dp-set .grid { grid-template-columns: 1fr; } .dp-set .grid > label { padding-top: 0; } }
 </style>
 </head>
 <body>
@@ -535,6 +621,7 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
     <a href="#answer" id="nav-answer">À répondre <span id="nav-answer-count" class="count hidden"></span></a>
     <a href="#chaine" id="nav-chaine">Chaîne <span id="nav-run-dot" class="dot hidden" title="Une commande tourne"></span></a>
     <a href="#correction" id="nav-correction">Correction <span id="nav-corr-count" class="count hidden"></span></a>
+    <a href="#deploy" id="nav-deploy">Déploiement</a>
     <a href="#stats" id="nav-stats">Statistiques</a>
     <a href="#apps" id="nav-apps">Applications</a>
     <span class="spacer"></span>
@@ -724,6 +811,39 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
       <div id="corr-code" role="tabpanel" aria-labelledby="tab-corr-code" class="hidden"></div>
     </section>
 
+    <!-- ======================== Déploiement (1.8) ======================== -->
+    <section id="scr-deploy" class="screen hidden">
+      <div class="dp-head">
+        <h2>Déploiement</h2>
+        <span class="muted" id="dp-app"></span>
+        <span class="grow"></span>
+        <button id="dp-refresh" class="small" title="Relire les appareils et les destinations maintenant">Rafraîchir</button>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Déploiement" id="dp-tabs">
+        <button role="tab" id="dp-tab-destinations" data-tab="destinations" aria-controls="dp-destinations">Destinations</button>
+        <button role="tab" id="dp-tab-deployer" data-tab="deployer" aria-controls="dp-deployer">Déployer</button>
+        <button role="tab" id="dp-tab-journal" data-tab="journal" aria-controls="dp-journal">Journal <span class="count hidden" id="dp-crash-n"></span></button>
+      </div>
+      <div id="dp-msg" class="notice warn hidden" role="status"></div>
+      <div id="dp-destinations" role="tabpanel" aria-labelledby="dp-tab-destinations"><p class="muted">Lecture des destinations…</p></div>
+      <div id="dp-deployer" role="tabpanel" aria-labelledby="dp-tab-deployer" class="hidden"></div>
+      <div id="dp-journal" role="tabpanel" aria-labelledby="dp-tab-journal" class="hidden">
+        <div class="dp-jbar">
+          <select id="dp-j-dest" aria-label="Destination"></select>
+          <select id="dp-j-target" aria-label="Cible" class="hidden"></select>
+          <button id="dp-j-pause">Pause</button>
+          <button id="dp-j-clear">Effacer</button>
+          <input type="text" id="dp-j-filter" placeholder="Filtrer…" aria-label="Filtrer le journal" autocomplete="off">
+          <button id="dp-j-save" title="Le journal entier, dans tools/cockpit/logs/">Enregistrer</button>
+          <button id="dp-j-reopen" class="hidden">Reprendre le journal</button>
+          <span class="dp-live" id="dp-j-live"></span>
+        </div>
+        <div id="dp-j-note" class="muted small"></div>
+        <div class="dp-crashes" id="dp-j-crashes" aria-label="Les crashs"></div>
+        <div class="dp-log" id="dp-j-log" aria-label="Le journal"></div>
+      </div>
+    </section>
+
     <!-- =========================== Statistiques =========================== -->
     <section id="scr-stats" class="screen hidden">
       <div class="flow-head">
@@ -784,6 +904,10 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
         <p class="muted small">Les agents, les commandes, les scripts et les grilles de l'application viennent du dépôt de la chaîne, à son dernier commit. On ne les change que là-bas ; ici, on les installe. Les fichiers propres à l'application — son <span class="mono">/deploie</span> — ne sont jamais touchés.</p>
         <div id="set-chain"></div>
         <div class="row" style="margin-top:12px"><button id="btn-chain" class="primary">Installer / mettre à jour la chaîne</button><span id="chain-msg" class="muted small"></span></div>
+      </div>
+      <div class="card sec" id="sec-deploy">
+        <h2>Déploiement</h2>
+        <div id="set-deploy"><p class="muted">Lecture du profil…</p></div>
       </div>
       <div class="card sec" id="sec-commands">
         <h2>Commandes</h2>
@@ -966,7 +1090,7 @@ const STATE_CLASS = {"faite": "st-faite", "t'attend": "st-attend", "en cours": "
                      "bloquée": "st-bloquee", "à faire": "st-afaire", "inconnu": "st-inconnu"};
 
 // ================================================================ routes
-const SCREENS = ["dashboard", "answer", "chaine", "correction", "stats", "apps", "settings"];
+const SCREENS = ["dashboard", "answer", "chaine", "correction", "deploy", "stats", "apps", "settings"];
 function currentRoute() {
   const h = (location.hash || "").replace("#", "");
   return SCREENS.includes(h) ? h : "dashboard";
@@ -990,6 +1114,9 @@ function route() {
   if (isOpen && r === "answer") hint();
   if (isOpen && (r === "chaine" || r === "correction")) placeRun();
   if (isOpen && r === "stats") loadStats();
+  // 1.8: « Déploiement » polls its destinations while it is shown, and only then.
+  if (isOpen && r === "deploy") enterDeploy(); else leaveDeploy();
+  if (isOpen && r === "settings") loadDeploySettings();
 }
 window.addEventListener("hashchange", route);
 
@@ -1312,6 +1439,7 @@ function resetForApp() {
   lotOpen.clear(); seenOpen.clear(); formsPrimed = false; ctxCache.clear(); ctxShown = null; focusedId = null; whyOpen.clear();
   ST = null; stOpen.clear(); stPrefs.feature = ""; stSavePrefs();
   bug.name = null;
+  resetDeploy();
   swapDrafts();
   $("stream").replaceChildren(); parkRun();
   closeEvents(); opened = false;
@@ -1623,8 +1751,7 @@ function renderDashboard() {
       detail.append(el("button", {class: "primary big", text: "Écrire la bug-list", onclick: () => { corrSel = d.chain; bug.name = null; renderCorrection(); go("correction"); }}));
     }
     if (d.step === "test" || (d.proposal && d.proposal.step === "test" && !n.command)) {
-      if (hasDeploie()) detail.append(el("button", {class: "primary big", text: "Déployer", onclick: () => launchStep(findStep("main", "test"), "main")}));
-      else detail.append(el("span", {class: "muted", text: NO_DEPLOIE}));
+      detail.append(el("button", {class: "primary big", text: "Déployer", onclick: () => openDeploy("deployer")}));
       if (S.recette) detail.append(el("span", {class: "muted", text: `À tester : ${S.recette.rel} (${S.recette.count} points)`}));
     }
     if (n.command) detail.append(el("span", {class: "muted", text: `Ensuite : /${n.command} ${n.args || ""}`}));
@@ -1680,10 +1807,8 @@ function renderProvide() {
     el("span", {class: "ic", text: x.ok ? "✓" : "✗", "aria-label": x.ok ? "présent" : "manquant"}),
     el("div", {}, el("span", {class: "mono", text: x.path}), el("div", {class: "small muted", text: x.text})))));
 }
-// The test step's « Déployer » runs the application's own /deploie: one
-// that has none is not offered it (1.7 — deploying comes with 1.8).
-const hasDeploie = () => (S.commands || []).some((c) => c.name === "deploie");
-const NO_DEPLOIE = "Le déploiement viendra avec une prochaine version du cockpit : cette application n'a pas de /deploie.";
+// The test step's « Déployer » opens « Déploiement » (1.8) — /deploie stays
+// under Paramètres → Commandes until a real deploy has worked from here.
 
 function renderAlerts() {
   const box = $("alerts"); box.replaceChildren();
@@ -1858,8 +1983,8 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     if (s.command && s.id !== "test") acts.append(el("button", {class: isNext && d.next && d.next.kind === "run" ? "primary" : "",
       text: "Lancer", disabled: !launchable || anyRun() || undefined, title: elsewhere() ? busyNote() : launchable ? `/${s.command}` : offNote,
       onclick: () => launchStep(s, chain)}));
-    if (s.id === "test" && hasDeploie()) acts.append(el("button", {class: isNext ? "primary" : "", text: "Déployer",
-      disabled: anyRun() || undefined, title: elsewhere() ? busyNote() : "/deploie", onclick: () => launchStep(s, chain)}));
+    if (s.id === "test") acts.append(el("button", {class: isNext ? "primary" : "", text: "Déployer",
+      title: "Ouvre « Déploiement » : construire, installer, regarder tourner", onclick: () => openDeploy("deployer")}));
     const key = `${chain}:${s.id}`;
     const wb = whyBox(s);
     wb.classList.toggle("hidden", !whyOpen.has(key));
@@ -1871,9 +1996,8 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     if (s.lots) line1.append(el("button", {class: "badge plain lots-link", style: "min-height:0;border:none;cursor:pointer", title: "Voir les lots (onglet Code)",
       text: `${s.lots.pass} / ${s.lots.total} en PASS`, onclick: () => openCode(chain)}));
     if (isNext && d.source !== "run") line1.append(el("span", {class: "next-tag", text: `Prochaine étape · ${d.label || ""}`}));
-    const cmdText = s.id === "test" ? (hasDeploie() ? "/deploie, puis à la main" : "à la main") : `/${s.command} ${s.command === "deploie" ? "" : S.feature}`;
+    const cmdText = s.id === "test" ? "« Déploiement », puis à la main" : `/${s.command} ${S.feature}`;
     const main = el("div", {}, line1, el("div", {class: "scmd", text: cmdText + (s.note && chain === "main" ? " — " + s.note : "")}));
-    if (s.id === "test" && !hasDeploie()) main.append(el("div", {class: "extra", text: NO_DEPLOIE}));
     if (s.id === "test") main.append(el("div", {class: "extra", text: S.recette
       ? `À tester : ${S.recette.rel} — ${S.recette.count} points${S.recette.first.length ? " : " + S.recette.first[0] : ""}`
       : "code/recette-ordonnee.md n'existe pas encore : /9_controle l'écrit."}));
@@ -2599,6 +2723,8 @@ function onEvent(ev) {
   }
   if (ev.seq <= seen) return;
   seen = ev.seq;
+  // 1.8: a deploy and a crash, whatever the screen.
+  if ((ev.type || "").startsWith("deploy_")) { onDeployEvent(ev); return; }
   // 1.6: every run's events arrive; another application's run is not this
   // one's — its cards, its end and its idle question only, named.
   if (ev.app && !sameApp(ev.app, S.app_folder)) { otherAppEvent(ev); return; }
@@ -2976,6 +3102,8 @@ const NOTE_KINDS = [
   ["erreur", "Un run s'arrête sur une erreur"],
   ["attente", "Le plafond d'attente est atteint (aucun message d'un agent depuis 10 min)"],
   ["lot", "/8_code : un lot passe ou échoue"],
+  ["deploiement", "Un déploiement se termine"],
+  ["crash", "Un crash paraît dans le journal d'une destination"],
 ];
 const notePrefs = (() => { try { return JSON.parse(localStorage.getItem("cockpit-notifications") || "{}") || {}; } catch (e) { return {}; } })();
 const tabInFront = () => document.visibilityState === "visible";
@@ -3151,6 +3279,12 @@ function renderDiag() {
     ul.append(el("li", {class: r.status}, el("b", {text: `${mark} ${r.label}`}), "  ", r.detail));
   }
   box.append(ul);
+  // 1.8: scrcpy and the emulator — ✓ or « non trouvé », never an alert.
+  if ((d.optional || []).length) {
+    box.append(el("div", {class: "muted small", text: "Facultatifs — « Déploiement » s'en sert quand ils sont là :"}));
+    box.append(el("ul", {id: "diag-optional"}, d.optional.map((r) => el("li", {class: r.status === "ok" ? "ok" : "skip", "data-id": r.id},
+      el("b", {text: `${r.status === "ok" ? "✓" : "○"} ${r.label}`}), "  ", r.detail))));
+  }
   for (const h of d.hints || []) box.append(el("div", {class: "notice warn", text: h}));
 }
 
@@ -3160,6 +3294,510 @@ $("btn-diag").onclick = async () => {
   catch (e) { alert(e.message); }
   finally { diagBusy = false; renderDiag(); renderAlerts(); }
 };
+
+// ====================================================== Déploiement (1.8)
+// Build the active application and put it where it runs, then watch it run
+// (TECHNICAL_V1 §23). Every adapter says what its destinations are and what
+// can be done there: this page renders what it is told, and never tests a
+// type's name.
+const DP = {data: null, dests: null, tab: "destinations", poll: null, jpoll: null, jobPoll: null, msgs: {}, shots: {},
+            vals: {}, shown: "", choice: null, edit: null, editErr: null, editMsg: null, settingsFor: null,
+            j: {sel: null, after: 0, lines: [], crashes: [], paused: false, filter: "", floor: 0, live: false, ended: "",
+                key: null, busy: false, crashSeen: 0}};
+try { const t = localStorage.getItem("cockpit-deploy-tab"); if (["destinations", "deployer", "journal"].includes(t)) DP.tab = t; } catch (e) {}
+const DP_STEP = {"fait": ["✓", "done"], "échec": ["✗", "failed"], "en cours": ["…", "going"], "sans objet": ["—", "skip"], "à faire": ["·", "todo"]};
+const DP_STATE = {device: ["connecté", "on"], unauthorized: ["non autorisé", "ko"], offline: ["hors ligne", "ko"], "déconnecté": ["déconnecté", "gone"]};
+const dpAdapter = (type) => ((DP.data && DP.data.describe.adapters) || []).find((a) => a.type === type) || null;
+const dpGroup = (type) => ((DP.dests && DP.dests.groups) || []).find((g) => g.type === type) || null;
+const dpGoing = () => !!(DP.data && DP.data.job && DP.data.job.going);
+function dpMsg(text, kind = "warn") {
+  const m = $("dp-msg"); m.className = "notice " + kind + (text ? "" : " hidden"); m.textContent = text || "";
+}
+
+function openDeploy(tab) { if (tab) DP.tab = tab; go("deploy"); }
+async function enterDeploy() {
+  setDeployTab(DP.tab, true);
+  await loadDeploy();
+  await loadDests(true);
+  if (DP.tab === "journal") startJournal();
+  clearInterval(DP.poll);
+  DP.poll = setInterval(() => { if (DP.tab !== "journal") loadDests(); }, 4000);
+}
+function leaveDeploy() {
+  clearInterval(DP.poll); DP.poll = null;
+  clearInterval(DP.jpoll); DP.jpoll = null;
+  clearInterval(DP.jobPoll); DP.jobPoll = null;
+}
+function resetDeploy() {
+  leaveDeploy();
+  Object.assign(DP, {data: null, dests: null, msgs: {}, shots: {}, vals: {}, shown: "", choice: null, edit: null, editErr: null,
+    editMsg: null, settingsFor: null});
+  Object.assign(DP.j, {sel: null, after: 0, lines: [], crashes: [], paused: false, floor: 0, live: false, ended: "", key: null, crashSeen: 0});
+}
+function setDeployTab(tab, quiet) {
+  DP.tab = tab;
+  try { localStorage.setItem("cockpit-deploy-tab", tab); } catch (e) {}
+  for (const t of ["destinations", "deployer", "journal"]) {
+    $("dp-tab-" + t).setAttribute("aria-selected", String(t === tab));
+    $("dp-" + t).classList.toggle("hidden", t !== tab);
+  }
+  clearInterval(DP.jpoll); DP.jpoll = null;
+  if (quiet) return;
+  if (tab === "journal") { renderJournalBar(); startJournal(); }
+  else { renderDeployTab(); loadDests(); }
+}
+for (const t of ["destinations", "deployer", "journal"]) $("dp-tab-" + t).onclick = () => setDeployTab(t);
+$("dp-refresh").onclick = async () => { await loadDeploy(); await loadDests(true); };
+
+async function loadDeploy() {
+  try { DP.data = await api("/api/deploy"); }
+  catch (e) { dpMsg(e.message); return; }
+  if (DP.choice === null) DP.choice = DP.data.choice || {};
+  $("dp-app").textContent = DP.data.app_name || "";
+  if (dpGoing()) watchJob();
+  renderDeployTab();
+}
+async function loadDests(force) {
+  if (!DP.data) return;
+  // Never under her fingers: a field being typed in is not re-rendered.
+  const a = document.activeElement;
+  if (!force && a && $("scr-deploy").contains(a) && ["INPUT", "SELECT"].includes(a.tagName) && DP.tab !== "deployer") return;
+  try { DP.dests = await api("/api/deploy/destinations"); }
+  catch (e) { dpMsg(e.message); return; }
+  renderDeployTab(force);
+}
+function renderDeployTab(force) {
+  if (!DP.data) return;
+  dpMsg("");
+  if (DP.tab === "destinations") renderDests(force);
+  else if (DP.tab === "deployer") renderDeployer();
+  else renderJournalBar();
+}
+
+// ------------------------------------------------------------ Destinations
+function renderDests(force) {
+  const box = $("dp-destinations");
+  if (!DP.dests) { box.replaceChildren(el("p", {class: "muted", text: "Lecture des destinations…"})); return; }
+  const sig = JSON.stringify(DP.dests.groups) + JSON.stringify(DP.msgs) + Object.keys(DP.shots).join();
+  if (!force && sig === DP.shown && box.children.length) return;
+  DP.shown = sig;
+  box.replaceChildren(...DP.dests.groups.map((g) => {
+    const sec = el("section", {class: "dp-group", "data-type": g.type, "aria-label": g.label},
+      el("h3", {}, g.label, el("span", {class: "muted", text: g.targets.length ? "cibles : " + g.targets.join(", ") : "aucune cible de ce type dans le profil"})));
+    for (const n of g.notes || []) sec.append(el("div", {class: "notice warn", text: n}));
+    sec.append(el("div", {class: "dp-cards"}, g.destinations.map((d) => destCard(g, d))));
+    if ((g.panels || []).length) sec.append(el("div", {class: "dp-panels"}, g.panels.map((p) => panelCard(g, p))));
+    return sec;
+  }));
+}
+function destCard(g, d) {
+  const [stText, stCls] = DP_STATE[d.state] || [d.state, "ko"];
+  const card = el("div", {class: "dp-card" + (d.connected ? "" : d.state === "déconnecté" ? " off" : " warn"), "data-dest": d.id},
+    el("div", {class: "top"}, el("span", {class: "nm", text: d.name}), el("span", {class: "kind", text: d.kind}),
+      el("span", {class: "dp-st " + stCls, text: stText})));
+  if ((d.facts || []).length) card.append(el("dl", {class: "dp-facts"}, d.facts.flatMap(([k, v]) => [el("dt", {text: k}), el("dd", {text: v})])));
+  if (d.note) card.append(el("div", {class: "dp-msg warn", text: d.note}));
+  if (d.targets && d.targets.length) card.append(el("div", {class: "small muted", text: "Reçoit : " + d.targets.join(", ")}));
+  card.append(el("div", {class: "dp-acts"}, (d.actions || []).map((a) => actionNode(g, d, a, d.id))));
+  const m = DP.msgs[d.id];
+  if (m) card.append(el("div", {class: "dp-msg " + m.kind, text: m.text}));
+  const shot = DP.shots[d.id];
+  if (shot) card.append(el("div", {class: "dp-shot"}, el("img", {src: shot.url, alt: "Capture d'écran de " + d.name}),
+    el("div", {class: "small muted"}, `Capture de ${shot.at}`, el("br"), el("a", {href: shot.url, target: "_blank", rel: "noopener", text: "Ouvrir en grand"}))));
+  return card;
+}
+function actionNode(g, d, a, msgKey) {
+  if (a.kind === "link") return el("a", {class: "btn" + (a.primary ? " primary" : ""), href: a.url, target: "_blank", rel: "noopener",
+    title: a.title || a.url, text: a.label});
+  return el("button", {class: (a.primary ? "primary" : "") + (a.args && a.args.missing ? " missing" : ""), title: a.title || undefined,
+    text: a.label, onclick: (e) => doAction(g, d, a, msgKey, {}, e.currentTarget)});
+}
+async function doAction(g, d, a, msgKey, extra, btn) {
+  if (a.kind === "journal") { DP.j.sel = {type: g.type, dest: d.id, target: null}; setDeployTab("journal"); return; }
+  if (a.args && a.args.missing) { DP.msgs[msgKey] = {text: a.title, kind: "warn"}; renderDests(true); return; }
+  let args = {...(a.args || {}), ...(extra || {})};
+  if (a.kind === "rename") {
+    const name = prompt(`Le nom de cet appareil, gardé par le cockpit :`, d.name);
+    if (name === null) return;
+    args.name = name;
+  }
+  if (a.confirm && !confirm(a.confirm)) return;
+  if (btn) btn.disabled = true;
+  try {
+    if (a.kind === "image") {
+      const r = await fetch(`/api/deploy/image?type=${encodeURIComponent(g.type)}&action=${encodeURIComponent(a.id)}&dest=${encodeURIComponent(d.id)}`);
+      if (!r.ok) { let b = {}; try { b = await r.json(); } catch (e) {} throw new Error(b.error || `erreur ${r.status}`); }
+      const old = DP.shots[d.id]; if (old) URL.revokeObjectURL(old.url);
+      DP.shots[d.id] = {url: URL.createObjectURL(await r.blob()), at: new Date().toLocaleTimeString("fr-FR")};
+      delete DP.msgs[msgKey];
+    } else {
+      const res = await api("/api/deploy/action", {type: g.type, action: a.id, dest: d.id || "", args});
+      DP.msgs[msgKey] = {text: res.message || "Fait.", kind: "ok"};
+    }
+  } catch (e) { DP.msgs[msgKey] = {text: e.message, kind: "warn"}; }
+  finally { if (btn) btn.disabled = false; }
+  renderDests(true);
+  loadDests(true);
+}
+function fieldInput(f, key, value, onInput) {
+  const id = "dpf-" + key;
+  const input = el("input", {type: "text", id, placeholder: f.placeholder || "", autocomplete: "off",
+    class: f.key === "ip" ? "w-ip" : f.key === "port" ? "w-port" : f.key === "code" ? "w-code" : ""});
+  input.value = value || "";
+  input.addEventListener("input", () => onInput(input.value));
+  return el("label", {for: id}, f.label, input);
+}
+function formNode(g, owner, a, msgKey) {
+  const key = `${g.type}-${owner}-${a.id}`;
+  const vals = DP.vals[key] || (DP.vals[key] = {});
+  const form = el("form", {class: "dp-form", "data-action": a.id},
+    a.fields.map((f) => fieldInput(f, `${key}-${f.key}`, vals[f.key], (v) => { vals[f.key] = v; })),
+    el("button", {type: "submit", class: a.primary ? "primary" : "", text: a.label}));
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    doAction(g, {id: ""}, a, msgKey, {...vals}, form.querySelector("button"));
+  });
+  return form;
+}
+function panelCard(g, p) {
+  const box = el("div", {class: "dp-panel", "data-panel": p.id}, el("h4", {text: p.title}));
+  (p.text || []).forEach((t, i) => box.append(el("p", {class: /port de connexion change|port change/.test(t) ? "port" : "", text: t})));
+  if (p.list_title) box.append(el("div", {class: "small", style: "margin-top:8px;font-weight:600", text: p.list_title}));
+  if ((p.items || []).length) box.append(el("div", {class: "dp-items"}, p.items.map((it, i) => {
+    const row = el("div", {class: "dp-item"}, el("span", {text: it.label}), el("span", {class: "sub", text: it.sub || ""}), el("span", {class: "grow"}));
+    for (const a of it.actions || []) row.append(a.fields && a.fields.length ? formNode(g, `${p.id}-${i}`, a, p.id) : actionNode(g, {id: ""}, a, p.id));
+    return row;
+  })));
+  for (const a of p.forms || []) box.append(formNode(g, p.id, a, p.id));
+  const m = DP.msgs[p.id];
+  if (m) box.append(el("div", {class: "dp-msg " + m.kind, style: "margin-top:8px", text: m.text}));
+  return box;
+}
+
+// ----------------------------------------------------------------- Déployer
+function dpOffered(t) {
+  const g = dpGroup(t.type);
+  return g ? g.destinations.filter((d) => (d.targets || []).includes(t.name)) : [];
+}
+async function saveChoice() {
+  try { await api("/api/deploy/choice", {choice: DP.choice}); } catch (e) { /* remembered next time */ }
+}
+function renderDeployer() {
+  const box = $("dp-deployer"), D = DP.data;
+  const prof = D.profile, head = D.head || {};
+  const out = [];
+  const c = el("div", {class: "card dp-commit", id: "dp-commit"},
+    head.commit ? el("div", {}, "Le dépôt principal est au commit ", el("b", {class: "mono", text: head.commit}),
+      head.subject ? ` « ${head.subject} »` : "", head.date ? el("span", {class: "muted", text: ` — ${head.date}`}) : null)
+      : el("div", {class: "muted", text: "Le commit du dépôt principal est inconnu : git ne le dit pas pour ce dossier."}));
+  if (head.dirty) c.append(el("div", {class: "notice warn", style: "margin:8px 0 0"},
+    `${plural(head.dirty, "fichier modifié", "fichiers modifiés")} et non commité${head.dirty > 1 ? "s" : ""} : le build part de ce qui est sur le disque, eux compris.`,
+    el("ul", {}, (head.dirty_files || []).map((x) => el("li", {text: x})))));
+  else if (head.dirty === 0) c.append(el("div", {class: "muted small", text: "Aucune modification non commitée : ce qui est construit est ce commit."}));
+  out.push(c);
+  if (D.run) out.push(el("div", {class: "notice warn", id: "dp-run-refusal"},
+    `Une commande de la chaîne tourne dans cette application : ${D.run.prompt}. Le build ferait la course avec son merge — déployer après sa fin.`));
+  if (D.elsewhere) out.push(el("div", {class: "notice warn", text: `Un déploiement est en cours dans « ${D.elsewhere.app_name} » : un seul à la fois.`}));
+  const general = (prof.errors && prof.errors.general) || [];
+  if (!prof.exists) {
+    out.push(el("div", {class: "card", id: "dp-no-profile"}, el("h3", {text: "Aucun profil de déploiement"}),
+      el("p", {class: "muted", text: `Cette application n'a pas de ${prof.path} : rien ne dit encore quoi construire, ni où l'installer.`}),
+      el("button", {class: "primary", text: "Paramètres → Déploiement", onclick: () => go("settings", "sec-deploy")})));
+  } else if (general.length || Object.keys(prof.errors.targets || {}).length) {
+    out.push(el("div", {class: "notice warn"}, `${prof.path} a des erreurs — Paramètres → Déploiement : `,
+      [...general, ...Object.entries(prof.errors.targets || {}).map(([i, e]) => `cible ${+i + 1} : ` + Object.entries(e).map(([k, v]) => `${k} ${v}`).join(", "))].join(" · ")));
+  }
+  const targets = prof.targets || [];
+  const list = el("div", {id: "dp-targets"});
+  for (const t of targets) {
+    const on = Object.prototype.hasOwnProperty.call(DP.choice, t.name);
+    const offered = dpOffered(t);
+    const chosen = new Set(DP.choice[t.name] || []);
+    const ad = dpAdapter(t.type);
+    const tick = el("input", {type: "checkbox", checked: on || undefined, "data-target": t.name});
+    tick.addEventListener("change", () => {
+      if (tick.checked) DP.choice[t.name] = (DP.choice[t.name] || []).length ? DP.choice[t.name]
+        : offered.filter((d) => d.connected).map((d) => d.id);
+      else delete DP.choice[t.name];
+      saveChoice(); renderDeployer();
+    });
+    const card = el("div", {class: "dp-target" + (on ? " on" : ""), "data-target": t.name},
+      el("label", {}, tick, t.name, el("span", {class: "badge plain", text: ad ? ad.label : t.type})),
+      el("div", {class: "cmd", text: t.build ? `build : ${t.build}` : "rien à construire"}));
+    const dl = el("div", {class: "dp-dests"});
+    if (!offered.length) dl.append(el("span", {class: "muted small", text: DP.dests ? "Aucune destination pour cette cible : voir l'onglet Destinations." : "Lecture des destinations…"}));
+    for (const d of offered) {
+      const cb = el("input", {type: "checkbox", disabled: (!on || !d.connected) || undefined, checked: (on && chosen.has(d.id)) || undefined, "data-dest": d.id});
+      cb.addEventListener("change", () => {
+        const s = new Set(DP.choice[t.name] || []);
+        cb.checked ? s.add(d.id) : s.delete(d.id);
+        DP.choice[t.name] = [...s]; saveChoice(); renderDeployer();
+      });
+      dl.append(el("label", {class: d.connected ? "" : "off", title: d.connected ? d.kind : `${d.state} — ne reçoit rien`}, cb, d.name,
+        el("span", {class: "muted small", text: d.connected ? `· ${d.kind}` : `· ${(DP_STATE[d.state] || [d.state])[0]}`})));
+    }
+    card.append(dl);
+    list.append(card);
+  }
+  if (targets.length) out.push(list);
+  const n = Object.entries(DP.choice).filter(([k, v]) => targets.some((t) => t.name === k) && (v || []).length).length;
+  const go_ = el("button", {class: "primary big", id: "dp-go", text: "Construire et installer",
+    disabled: (!n || !!D.run || !!D.elsewhere || dpGoing()) || undefined, onclick: startDeploy});
+  if (targets.length) out.push(el("div", {class: "row", style: "margin-top:16px"}, go_,
+    el("span", {class: "muted small", text: dpGoing() ? "Un déploiement est en cours." : n ? "Par cible : son build une fois, puis sur chaque destination son installation, puis son lancement."
+      : "Choisissez au moins une cible et une destination."})));
+  if (D.job) out.push(jobCard(D.job));
+  box.replaceChildren(...out);
+}
+async function startDeploy() {
+  const b = $("dp-go"); if (b) b.disabled = true;
+  try {
+    const r = await api("/api/deploy/start", {choice: DP.choice});
+    DP.data.job = r.job;
+    watchJob();
+  } catch (e) { dpMsg(e.message); if (e.body && e.body.run) DP.data.run = e.body.run; }
+  renderDeployer();
+}
+function watchJob() {
+  clearInterval(DP.jobPoll);
+  DP.jobPoll = setInterval(loadJob, 1000);
+}
+async function loadJob() {
+  try {
+    const r = await api("/api/deploy/job");
+    if (DP.data) DP.data.job = r.job;
+    if (!r.job || !r.job.going) { clearInterval(DP.jobPoll); DP.jobPoll = null; }
+    if (DP.tab === "deployer" && currentRoute() === "deploy") renderDeployer();
+  } catch (e) { /* the next tick tries again */ }
+}
+function jobCard(j) {
+  const when = (j.started_at || "").slice(11, 16);
+  const st = j.going ? "en cours" : j.status === "fait" ? "réussi" : "en échec";
+  const card = el("div", {class: "card", id: "dp-job", "data-status": j.going ? "going" : j.status, style: "margin-top:20px"},
+    el("h3", {}, `Déploiement de ${when}`, " ", el("span", {class: "badge" + (j.going ? "" : j.status === "fait" ? "" : " err"), text: st})));
+  if (j.head && j.head.commit) card.append(el("div", {class: "muted small", text: `Commit ${j.head.commit} « ${j.head.subject || ""} »` +
+    (j.head.dirty ? ` — avec ${plural(j.head.dirty, "fichier non commité", "fichiers non commités")}` : "")}));
+  card.append(el("ul", {class: "dp-steps"}, j.steps.map((s) => {
+    const [ic, cls] = DP_STEP[s.status] || ["?", "todo"];
+    const li = el("li", {class: cls, "data-n": s.n, "data-kind": s.kind},
+      el("span", {class: "ic", text: ic}),
+      el("div", {}, el("b", {text: s.target}), ` — ${s.label}`, s.dest_name ? ` sur ${s.dest_name}` : "",
+        s.detail ? el("span", {class: "muted small", text: `  · ${s.detail}`}) : null),
+      el("span", {class: "dur", text: s.duration_s !== null && s.duration_s !== undefined ? `${frNum(s.duration_s, 1)} s` : s.status === "en cours" ? "…" : ""}));
+    if (s.status === "échec" && (s.tail || []).length) li.append(el("pre", {text: s.tail.join("\n")}));
+    return li;
+  })));
+  card.append(el("div", {class: "muted small", style: "margin-top:8px"}, "Sortie complète : ", el("span", {class: "mono", text: j.log_path})));
+  return card;
+}
+
+// ------------------------------------------------------------------ Journal
+function journalDests() {
+  const out = [];
+  for (const g of (DP.dests && DP.dests.groups) || []) for (const d of g.destinations) if (d.connected) out.push({g, d});
+  return out;
+}
+function renderJournalBar() {
+  const ds = journalDests();
+  const sel = $("dp-j-dest");
+  if (!DP.j.sel && ds.length) DP.j.sel = {type: ds[0].g.type, dest: ds[0].d.id, target: null};
+  const cur = DP.j.sel ? `${DP.j.sel.type}|${DP.j.sel.dest}` : "";
+  sel.replaceChildren(...ds.map(({g, d}) => el("option", {value: `${g.type}|${d.id}`, text: `${d.name} — ${d.kind}`, selected: `${g.type}|${d.id}` === cur || undefined})));
+  if (DP.j.sel && !ds.some(({g, d}) => `${g.type}|${d.id}` === cur)) sel.prepend(el("option", {value: cur, selected: true, text: "(destination absente)"}));
+  if (!ds.length) sel.replaceChildren(el("option", {value: "", text: DP.dests ? "Aucune destination connectée" : "Lecture…"}));
+  const hit = ds.find(({g, d}) => `${g.type}|${d.id}` === cur);
+  const ts = hit ? hit.d.targets || [] : [];
+  const tsel = $("dp-j-target");
+  tsel.classList.toggle("hidden", ts.length < 2);
+  tsel.replaceChildren(...ts.map((t) => el("option", {value: t, text: t, selected: (DP.j.sel && DP.j.sel.target === t) || undefined})));
+  $("dp-j-pause").textContent = DP.j.paused ? "Reprendre" : "Pause";
+}
+$("dp-j-dest").onchange = () => {
+  const [type, ...rest] = $("dp-j-dest").value.split("|");
+  if (!type) return;
+  DP.j.sel = {type, dest: rest.join("|"), target: null};
+  resetJournalView(); renderJournalBar(); startJournal();
+};
+$("dp-j-target").onchange = () => { DP.j.sel.target = $("dp-j-target").value; resetJournalView(); startJournal(); };
+$("dp-j-pause").onclick = () => { DP.j.paused = !DP.j.paused; renderJournalBar(); if (!DP.j.paused) startJournal(); };
+$("dp-j-clear").onclick = () => { DP.j.floor = DP.j.after; DP.j.lines = []; renderJournal(); };
+$("dp-j-filter").oninput = () => { DP.j.filter = $("dp-j-filter").value; renderJournal(); };
+$("dp-j-reopen").onclick = () => { startJournal(true); };
+$("dp-j-save").onclick = async () => {
+  if (!DP.j.sel) return;
+  try { const r = await api("/api/deploy/journal/save", {dest: DP.j.sel.dest, target: DP.j.sel.target});
+        $("dp-j-note").textContent = "Enregistré : " + r.path; }
+  catch (e) { $("dp-j-note").textContent = e.message; }
+};
+function resetJournalView() { Object.assign(DP.j, {after: 0, lines: [], crashes: [], floor: 0, live: false, ended: "", key: null}); renderJournal(); }
+async function startJournal(reopen) {
+  clearInterval(DP.jpoll); DP.jpoll = null;
+  if (!DP.data) await loadDeploy();
+  if (!DP.dests) await loadDests(true);
+  if (DP.tab !== "journal") return;
+  renderJournalBar();
+  if (!DP.j.sel) { renderJournal(); return; }
+  await pullJournal(reopen);
+  if (!DP.j.paused) DP.jpoll = setInterval(() => pullJournal(false), 1000);
+}
+async function pullJournal(reopen) {
+  if (DP.j.busy || !DP.j.sel || (DP.j.paused && !reopen)) return;
+  DP.j.busy = true;
+  const s = DP.j.sel;
+  try {
+    const r = await api(`/api/deploy/journal?type=${encodeURIComponent(s.type)}&dest=${encodeURIComponent(s.dest)}`
+      + (s.target ? `&target=${encodeURIComponent(s.target)}` : "") + `&after=${reopen ? 0 : DP.j.after}` + (reopen ? "&reopen=1" : ""));
+    if (DP.j.sel !== s) return;
+    if (DP.j.key && r.key !== DP.j.key && !reopen) {
+      // Another log than the one shown: read it from its first line.
+      Object.assign(DP.j, {key: null, after: 0, lines: [], floor: 0}); DP.j.busy = false; return pullJournal(false);
+    }
+    if (r.key !== DP.j.key || reopen) { DP.j.key = r.key; DP.j.lines = []; DP.j.floor = 0; }
+    DP.j.target = r.target;
+    DP.j.lines.push(...r.lines);
+    if (DP.j.lines.length > 5000) DP.j.lines.splice(0, DP.j.lines.length - 5000);
+    DP.j.after = r.last; DP.j.crashes = r.crashes; DP.j.live = r.live; DP.j.ended = r.ended;
+    $("dp-j-note").textContent = r.skipped ? `${r.skipped} lignes plus anciennes ne sont pas reprises ici : « Enregistrer » les garde.` : "";
+    renderJournal();
+  } catch (e) {
+    $("dp-j-note").textContent = e.message;
+  } finally { DP.j.busy = false; }
+}
+function renderJournal() {
+  const live = $("dp-j-live");
+  live.textContent = !DP.j.key ? "" : DP.j.live ? (DP.j.paused ? "● en pause" : "● en direct") : `■ ${DP.j.ended || "arrêté"}`;
+  live.classList.toggle("ended", !!DP.j.key && !DP.j.live);
+  $("dp-j-reopen").classList.toggle("hidden", !DP.j.key || DP.j.live);
+  const crashes = DP.j.crashes.filter((c) => c.n > DP.j.floor);
+  const cn = $("dp-crash-n"); cn.textContent = crashes.length; cn.classList.toggle("hidden", !crashes.length);
+  $("dp-j-crashes").replaceChildren(...crashes.slice().reverse().map((c) => el("div", {class: "dp-crash", "data-crash": c.id},
+    el("span", {class: "t", text: (c.at || "").slice(11, 19)}),
+    el("span", {class: "ti", title: c.title, text: c.title.startsWith(c.rule) ? c.title : `${c.rule} — ${c.title}`,
+      onclick: () => scrollToLine(c.n)}),
+    el("button", {text: "Copier le crash", onclick: (e) => copyCrash(c, e.currentTarget)}))));
+  const f = DP.j.filter.trim().toLowerCase();
+  const lines = DP.j.lines.filter((x) => x.n > DP.j.floor && (!f || x.text.toLowerCase().includes(f))).slice(-2500);
+  const log = $("dp-j-log");
+  const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 60;
+  log.replaceChildren(...lines.map((x) => el("div", {class: "l" + (x.crash ? " crash" : "") + (x.marker ? " marker" : ""), "data-n": x.n, text: x.text})));
+  if (!lines.length) log.append(el("div", {class: "l muted", text: DP.j.sel ? (f ? "Rien ne correspond au filtre." : "Rien encore.") : "Choisissez une destination."}));
+  if (atBottom) log.scrollTop = log.scrollHeight;
+}
+function scrollToLine(n) {
+  const x = $("dp-j-log").querySelector(`[data-n="${n}"]`);
+  if (x) { x.scrollIntoView({block: "center"}); x.classList.add("hit"); setTimeout(() => x.classList.remove("hit"), 1600); }
+}
+// « Copier le crash »: what to give Claude — where, when, and its lines.
+async function copyCrash(c, btn) {
+  const s = DP.j.sel || {};
+  const dname = (journalDests().find(({d}) => d.id === s.dest) || {d: {name: s.dest}}).d.name;
+  const tname = s.target || DP.j.target;
+  const text = `Crash sur « ${dname} »${tname ? ` (cible « ${tname} »)` : ""} — ${(c.at || "").replace("T", " ")} — ${c.rule}\n\n${c.lines.join("\n")}\n`;
+  window.cockpitLastCopy = text;
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+    const ta = el("textarea", {style: "position:fixed;left:-9999px"}); ta.value = text; document.body.append(ta); ta.select();
+    try { ok = document.execCommand("copy"); } catch (e2) {} ta.remove();
+  }
+  btn.textContent = ok ? `Copié — ${plural(c.lines.length, "ligne", "lignes")}` : "Copie refusée";
+  setTimeout(() => { btn.textContent = "Copier le crash"; }, 2500);
+}
+
+// The server's word on a deploy and on a crash, through the runs' stream.
+function onDeployEvent(ev) {
+  const d = ev.data || {};
+  const here = currentRoute() === "deploy" && S.open;
+  if (ev.type === "deploy_step") { if (here && DP.tab === "deployer") loadJob(); return; }
+  if (ev.type === "deploy_ended") {
+    if (here) { loadJob(); loadDests(true); }
+    notify("deploiement", `${d.app_name} — déploiement ${d.status === "fait" ? "réussi" : "en échec"}`, d.summary || "",
+      () => { if (sameApp(d.app, S.app_folder)) openDeploy("deployer"); });
+    return;
+  }
+  if (ev.type === "deploy_crash") {
+    notify("crash", `${S.app_name} — crash sur ${d.dest_name}`, `${d.rule} — ${d.title}`, () => openDeploy("journal"));
+    if (here && DP.tab === "destinations") loadDests(true);
+  }
+}
+
+// ------------------------------------------------- Paramètres → Déploiement
+async function loadDeploySettings() {
+  if (!S.app_folder) return;
+  if (!DP.data || DP.settingsFor !== S.app_folder) {
+    try { DP.data = await api("/api/deploy"); } catch (e) { $("set-deploy").replaceChildren(el("div", {class: "notice warn", text: e.message})); return; }
+    if (DP.choice === null) DP.choice = DP.data.choice || {};
+    DP.settingsFor = S.app_folder; DP.edit = null;
+  }
+  if (!DP.edit) DP.edit = JSON.parse(JSON.stringify(DP.data.profile.targets || []));
+  renderDeploySettings();
+}
+function dpFields(t) {
+  const a = dpAdapter(t.type);
+  return [...DP.data.describe.frame, ...(a ? a.fields : [])];
+}
+function renderDeploySettings() {
+  const box = $("set-deploy"); if (!DP.data || !DP.edit) return;
+  const prof = DP.data.profile, errs = DP.editErr || prof.errors || {general: [], targets: {}};
+  const out = [];
+  out.push(el("p", {class: "muted small", style: "margin-top:0"}, "Le profil de l'application : ", el("span", {class: "mono", text: prof.path}),
+    ". Il lui appartient — la chaîne ne le touche jamais. Enregistrer l'écrit, le commite seul dans l'application (« deploy: profil ») et pousse. ",
+    "Le contrat : docs/app/DEPLOY_PROFILE.md du dépôt de la chaîne."));
+  if (!prof.exists && !DP.edit.length) out.push(el("div", {class: "muted", id: "dp-set-empty", text: "Aucun profil : rien ne se déploie encore. Ajoutez une cible."}));
+  for (const g of errs.general || []) out.push(el("div", {class: "notice warn", text: g}));
+  DP.edit.forEach((t, i) => {
+    const te = (errs.targets || {})[i] || {};
+    const grid = el("div", {class: "grid"});
+    for (const f of dpFields(t)) {
+      const id = `dps-${i}-${f.key}`;
+      let input;
+      if (f.kind === "choice") {
+        input = el("select", {id}, f.choices.map(([v, l]) => el("option", {value: v, text: l, selected: (t[f.key] ?? f.default) === v || undefined})));
+        input.addEventListener("change", () => { t[f.key] = input.value; if (f.key === "type") renderDeploySettings(); });
+        if (t[f.key] === undefined && f.default !== null) t[f.key] = f.default;
+      } else if (f.kind === "bool") {
+        input = el("input", {type: "checkbox", id, checked: (t[f.key] ?? f.default) ? true : undefined});
+        input.addEventListener("change", () => { t[f.key] = input.checked; });
+        input = el("label", {class: "bool"}, input, el("span", {class: "small", text: "oui"}));
+      } else {
+        input = el("input", {type: "text", id, placeholder: f.placeholder || "", autocomplete: "off"});
+        input.value = t[f.key] || "";
+        input.addEventListener("input", () => { t[f.key] = input.value; });
+      }
+      grid.append(el("label", {for: id, text: f.label + (f.required ? "" : "")}),
+        el("div", {}, input, f.help ? el("div", {class: "hint", text: f.help}) : null, te[f.key] ? el("div", {class: "err", text: te[f.key]}) : null));
+    }
+    out.push(el("div", {class: "dp-tgt", "data-i": i},
+      el("h3", {}, el("span", {text: t.name || `Cible ${i + 1}`}), el("span", {class: "grow"}),
+        el("button", {class: "small danger", text: "Retirer", onclick: () => { DP.edit.splice(i, 1); DP.editErr = null; renderDeploySettings(); }})),
+      te._ ? el("div", {class: "err", text: te._}) : null, grid));
+  });
+  const typeSel = el("select", {id: "dps-new-type", "aria-label": "Type de la nouvelle cible"},
+    DP.data.describe.adapters.map((a) => el("option", {value: a.type, text: a.label})));
+  out.push(el("div", {class: "row", style: "margin-top:14px"}, typeSel,
+    el("button", {text: "Ajouter une cible", onclick: () => {
+      const a = dpAdapter(typeSel.value), t = {name: "", type: typeSel.value, build: ""};
+      for (const f of a.fields) t[f.key] = f.default ?? (f.kind === "bool" ? false : "");
+      DP.edit.push(t); renderDeploySettings();
+    }}),
+    el("span", {class: "grow"}),
+    el("button", {class: "primary", id: "dps-save", text: "Enregistrer le profil", onclick: saveDeployProfile}),
+    el("button", {text: "Annuler", onclick: () => { DP.edit = null; DP.editErr = null; DP.editMsg = null; loadDeploySettings(); }})));
+  if (DP.editMsg) out.push(el("div", {class: "notice " + DP.editMsg.kind, id: "dps-msg", text: DP.editMsg.text}));
+  box.replaceChildren(el("div", {class: "dp-set"}, out));
+}
+async function saveDeployProfile() {
+  const b = $("dps-save"); b.disabled = true;
+  try {
+    const r = await api("/api/deploy/profile", {targets: DP.edit});
+    DP.data.profile = r.profile; DP.edit = JSON.parse(JSON.stringify(r.profile.targets)); DP.editErr = null;
+    DP.editMsg = {kind: "ok", text: r.commit ? `Enregistré — commit ${r.commit} « deploy: profil »` +
+      (r.pushed ? ", poussé." : r.push_error ? `, non poussé : ${r.push_error}` : ".") : "Rien n'avait changé : aucun commit."};
+  } catch (e) {
+    DP.editErr = e.body && e.body.errors ? e.body.errors : null;
+    DP.editMsg = {kind: "warn", text: e.message};
+  }
+  renderDeploySettings();
+}
 
 // ====================================================== statistiques (1.4.5)
 // What stats.sqlite holds, read in depth (TECHNICAL_V1 §15). Never a figure

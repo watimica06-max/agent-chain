@@ -215,7 +215,9 @@ def test_a_run_ended_without_next_offers_to_continue_under_its_step(tmp_path, pa
         assert no_real_errors(page) == []
 
 
-def test_the_test_step_deploys_and_says_what_to_test(tmp_path, page):
+def test_the_test_step_opens_deploiement_and_says_what_to_test(tmp_path, page):
+    # 1.8: « Déployer » opens « Déploiement » on its « Déployer » tab — it no
+    # longer runs /deploie, which stays under Paramètres → Commandes.
     with FakeServer(tmp_path, script=script_until_interrupted) as s:
         (s.feat / "bugfix-01" / "code").mkdir(parents=True)
         (s.feat / "bugfix-01" / "code" / "recette-ordonnee.md").write_text(
@@ -224,11 +226,11 @@ def test_the_test_step_deploys_and_says_what_to_test(tmp_path, page):
         row = page.locator("#step-main-test")
         row.wait_for()
         assert "À tester : bugfix-01/code/recette-ordonnee.md — 2 points" in row.inner_text()
-        dialogs(page, accept=True)
         row.get_by_role("button", name="Déployer").click()
-        page.wait_for_selector("#slot-main-test #run-panel")
-        assert s.clients[0].prompts == ["/deploie"]
-        stop_run(s)
+        page.wait_for_selector("#scr-deploy:not(.hidden) #dp-deployer:not(.hidden)")
+        assert page.locator("#dp-tab-deployer").get_attribute("aria-selected") == "true"
+        assert s.clients == []
+        assert no_real_errors(page) == []
 
 
 def test_correction_lists_newest_first_and_starts_a_cycle(tmp_path, page):
