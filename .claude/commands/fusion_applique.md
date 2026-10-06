@@ -158,12 +158,13 @@ the merge and leaves the tree dirty for step 5.**
 1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
    agent has no Bash and commits nothing**, and the copy *On `INIT`*
    makes and the rename above are committed by nobody else; 📌 **`git
-   merge` takes the branch's commits, not the worktree's files**, and
+   merge` takes the worktree's commit, not its files**, and
    `git worktree remove` refuses a dirty tree
-2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
-   cannot issue a git command against the main checkout**: the merge
-   below, issued from inside it, is refused
-3. `git merge --no-ff <branch>` from the main checkout root
+2. 🔴 **Read the worktree's commit id, then leave it** —
+   `git -C <path> rev-parse HEAD`; ⚠️ **a session isolated in a
+   worktree cannot issue a git command against the main checkout**:
+   the merge below, issued from inside it, is refused
+3. `git merge --no-ff -m "<message>" <commit id>` from the main checkout root
 4. `git push`
 5. `git worktree remove <path>`
 
@@ -175,7 +176,7 @@ retried and not worked around.** The merge holds locally; say so and
 carry on.
 
 🔴 **Merge before handing back, always** — a phase whose output sits on
-an unmerged branch is invisible to the next one. ⚠️ **A
+an unmerged commit is invisible to the next one. ⚠️ **A
 `blocked_*.md` merges too**: the Product Owner has to see it.
 
 ---

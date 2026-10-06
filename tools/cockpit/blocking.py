@@ -289,7 +289,7 @@ def parse_lines(lines, path, rel, work_dir=None, worktree=None) -> ParsedBlockin
             # Perhaps an act row, retired by /8_code: a guess, so shown all the same.
             entry.note = (f"« Ce qui bloque » nomme « {seen.group(0)} » et dit « {missing.group(0)} » : "
                           "peut-être une des lignes que /8_code retire par un acte "
-                          "(8_code.md:748-750), sans décision. Ce n'est qu'une lecture du texte : "
+                          "(8_code.md:749-751), sans décision. Ce n'est qu'une lecture du texte : "
                           "l'entrée reste à décider.")
     out.entries.append(entry)
     return out

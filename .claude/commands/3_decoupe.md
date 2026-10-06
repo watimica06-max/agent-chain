@@ -211,12 +211,13 @@ reported* included, when there was one — 📌 five steps, in this order:**
 
 1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
    agent has no Bash and commits nothing**; 📌 **`git merge` takes the
-   branch's commits, not the worktree's files**, and
+   worktree's commit, not its files**, and
    `git worktree remove` refuses a dirty tree
-2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
-   cannot issue a git command against the main checkout**: the merge
-   below, issued from inside it, is refused
-3. `git merge --no-ff <branch>` from the main checkout root
+2. 🔴 **Read the worktree's commit id, then leave it** —
+   `git -C <path> rev-parse HEAD`; ⚠️ **a session isolated in a
+   worktree cannot issue a git command against the main checkout**:
+   the merge below, issued from inside it, is refused
+3. `git merge --no-ff -m "<message>" <commit id>` from the main checkout root
 4. `git push`
 5. `git worktree remove <path>`
 

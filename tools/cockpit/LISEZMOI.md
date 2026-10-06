@@ -100,14 +100,16 @@ seulement) écrit `stop.md` ; « Retirer stop.md » le renomme `stop1.md`.
 
 Quand un agent rend la main, une ligne dit ce qu'il a consommé :
 « Lexicographe — 4 min 12 s — 182 k lus (dont 160 k en cache), écrits :
-inconnu ». Pendant le run, rien ne donne ce qu'un sous-agent écrit : le
-cockpit écrit « inconnu » plutôt qu'un faux chiffre. À la fin du run, ses
-totaux, écrits compris, et ce que chaque agent a écrit, lu dans les
-transcriptions que Claude Code garde sur le disque — seulement si leur
-somme tombe juste sur le total du run ; sinon tous restent « inconnu ».
-Tout est gardé dans `stats.sqlite` (hors git) ; les anciens journaux y
-sont chargés une fois au démarrage du serveur, et les runs déjà gardés y
-retrouvent leurs chiffres tant que leurs transcriptions sont là.
+à la fin du run ». Pendant le run, rien ne donne ce qu'un sous-agent
+écrit. À la fin du run, ses totaux, écrits compris, et ce que chaque
+agent a écrit : le chiffre de son modèle dans le total du run, quand il
+est seul à l'avoir utilisé — ce qu'il a lu sur ce modèle doit tomber
+exactement sur ce que le total en dit ; sinon « inconnu », jamais une
+estimation. Deux agents sur le même modèle, ou l'orchestrateur sur le
+modèle de l'agent : « inconnu » pour eux. Tout est gardé dans
+`stats.sqlite` (hors git) ; les anciens journaux y sont chargés une fois
+au démarrage du serveur, et les runs déjà gardés y retrouvent leurs
+chiffres depuis leurs journaux.
 
 Un blocage n'est jamais caché sur une supposition : quand le cockpit
 devine qu'une entrée n'est peut-être pas à vous (un manque que `/8_code`

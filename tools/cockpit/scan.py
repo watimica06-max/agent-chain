@@ -81,10 +81,11 @@ for _s in MAIN + CORRECTION:
 # §1.2 — commands whose own text puts a test after a git action, a write or
 # an agent: clicking them in the wrong state is not harmless, so the flow
 # always asks. The reasons are scan_rules.md's « Préconditions » table.
+# /2_structure left the list in 1.4.3: its three stops after the filing
+# (2_structure.md:110-120, :135-139, :167-169) leave only the lexicographe's
+# empty questions file filed (:89-93), a state the next command reads
+# correctly — nothing a confirmation would protect.
 CONFIRM = {
-    "2_structure": "elle range le fichier du lexicographe par git mv (2_structure.md:89-93) avant le tableau qui "
-                   "choisit l'invocation (:110-120), le vocabulaire (:135-139) et les réponses (:167-169) : ils lisent "
-                   "la racine après ce rangement, et aucune ligne ne défait le git mv quand ils arrêtent",
     "9_controle": "elle commite et crée le worktree (9_controle.md:104, :110) avant le contrôle de la carte des lots "
                   "(:225-228), qui lit ce que la phase 1 écrit : sur cet arrêt, elle commite, fusionne et pousse "
                   "tracabilite-full.md avant de refermer son worktree (:449-451)",
@@ -116,17 +117,17 @@ RULES = {
     "OWN-GEN": "3a_genre.md:39",
     "OWN-NAT": "3b_nature.md:38",
     "OWN-GRI": "4_grille.md:47-61",
-    "OWN-TEC": "6_convertit.md:467 · 6_convertit.md:469",
+    "OWN-TEC": "6_convertit.md:468 · 6_convertit.md:470",
     "OWN-CNV": "6_convertit.md:56",
     "OWN-ARC": "conventions.md:82",
     "OWN-ARB": "conventions.md:78",
     "OWN-AR3": "8_code.md:327-333",
     "OWN-CAD": "7_lots.md:212",
-    "OWN-RED": "7_lots.md:378-379",
-    "OWN-COD": "8_code.md:333-334 · 8_code.md:751",
+    "OWN-RED": "7_lots.md:379-380",
+    "OWN-COD": "8_code.md:333-334 · 8_code.md:752",
     "OWN-FUS": "fusion.md:60",
     "OWN-FUB": "fusion.md:57",
-    "OWN-DIA": "diagnostique.md:232 · diagnostique.md:242",
+    "OWN-DIA": "diagnostique.md:233 · diagnostique.md:243",
     "OWN-?": "aucune commande ne nomme ce fichier",
     "LEX-1": "1_lexique.md:93-104",
     "LEX-2": "1_lexique.md:56",
@@ -225,7 +226,7 @@ RULES = {
     "FUS-2": "fusion.md:59",
     "FUS-3": "fusion.md:61-66",
     "DIA-1": "diagnostique.md:21-25",
-    "DIA-2": "diagnostique.md:75-77 · diagnostique.md:227",
+    "DIA-2": "diagnostique.md:75-77 · diagnostique.md:228",
     "DIA-3": "diagnostique.md:60-67",
 }
 

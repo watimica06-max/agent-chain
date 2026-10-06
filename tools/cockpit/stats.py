@@ -1,14 +1,17 @@
-"""What every run and every agent consumes — cockpit 1.4, 1.4.1.
+"""What every run and every agent consumes — cockpit 1.4, 1.4.1, 1.4.3.
 
 Counting rules (TECHNICAL_V1 §13, the Agent SDK's « Track cost and usage »):
 - per-step usage is read on assistant messages, **once per message id** —
   parallel tool calls repeat it;
 - a message belongs to the agent its `parent_tool_use_id` names, nested
   agents included; no parent is the orchestrator;
-- per-step `output_tokens` is a placeholder: **never stored**. A subagent's
-  output comes from the transcripts Claude Code writes (`transcripts.py`),
-  once the run is over, and only when they add up exactly to the run's
-  `model_usage` — otherwise every agent's output stays unknown;
+- per-step `output_tokens` is a placeholder: **never stored**. A pass's
+  output is its model's `outputTokens` in the latest result's
+  `model_usage`, once the run is over, and only when that model's input
+  and cache figures equal the pass's own exactly — the proof that nothing
+  else used the model in the run; otherwise unknown (1.4.3). Never the
+  transcripts: on a real run a subagent's keeps the placeholder on the
+  last line of most of its messages;
 - run totals come from the latest result's `model_usage`, which counts the
   subagents; its `usage` alone does not.
 
@@ -23,7 +26,6 @@ import threading
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
-import transcripts
 
 AGENT_TOOLS = {"Agent", "Task"}
 BACKGROUND_RESULT = re.compile(r"async_launched|in the background|agentId", re.I)
@@ -59,7 +61,7 @@ class Pass:
     tool_calls: int = 0
     background: bool = False
     ended: bool = False
-    output_tokens: int | None = None    # from the transcripts, all or none (apply_transcripts)
+    output_tokens: int | None = None    # its model's, when it alone used it (apply_model_usage)
 
     @property
     def duration_s(self):
@@ -70,7 +72,7 @@ class Pass:
                 "input_tokens": self.input_tokens, "cache_read_tokens": self.cache_read_tokens,
                 "cache_creation_tokens": self.cache_creation_tokens,
                 "read_tokens": self.input_tokens + self.cache_read_tokens + self.cache_creation_tokens,
-                # Never the stream's placeholder: the transcripts' figure, or
+                # Never the stream's placeholder: its model's figure, or
                 # unknown (TECHNICAL_V1 §13.1).
                 "output_tokens": self.output_tokens, "tool_calls": self.tool_calls,
                 "started_at": self.started_at, "ended_at": self.ended_at}
@@ -85,6 +87,7 @@ class Tally:
     orchestrator: dict = field(default_factory=lambda: {"input_tokens": 0, "cache_read_tokens": 0,
                                                          "cache_creation_tokens": 0, "tool_calls": 0})
     totals: dict | None = None                      # the latest result's model_usage, summed
+    model_usage: dict | None = None                 # the latest result's model_usage, per model
     session_id: str | None = None
     first_at: str | None = None
     last_at: str | None = None
@@ -194,17 +197,32 @@ class Tally:
             t["output_tokens"] += u.get("outputTokens") or 0
         # The running total of the call: the latest result, never a sum of results.
         self.totals = t
+        self.model_usage = {m: u for m, u in mu.items() if isinstance(u, dict)}
 
 
-def apply_transcripts(tally, root=None) -> bool:
-    """Every pass's output from the transcripts, or every one unknown. True
-    when they were filled. Compared with the latest result's model_usage as
-    it came — never the figure a resumed run stores after subtraction."""
-    total = tally.totals.get("output_tokens") if tally.totals else None
-    got = transcripts.agent_outputs(tally.session_id, total, list(tally.passes), root)
-    for tid, p in tally.passes.items():
-        p.output_tokens = got[tid] if got is not None else None
-    return got is not None
+def apply_model_usage(tally) -> int:
+    """Each pass's output from the latest result's model_usage, as it came —
+    never the figure a resumed run stores after subtraction. A pass gets its
+    model's `outputTokens` only when that model's input, cache-read and
+    cache-creation figures equal the pass's own deduplicated sums exactly:
+    then nothing else — the orchestrator, another agent, an internal call
+    of Claude Code, an earlier run of a resumed session — used that model.
+    Otherwise unknown, never an estimate. Returns how many got a figure."""
+    mu = tally.model_usage or {}
+    models = [p.model for p in tally.passes.values()]
+    got = 0
+    for p in tally.passes.values():
+        u = mu.get(p.model) if p.model else None
+        if (u is not None and models.count(p.model) == 1
+                and u.get("inputTokens") == p.input_tokens
+                and u.get("cacheReadInputTokens") == p.cache_read_tokens
+                and u.get("cacheCreationInputTokens") == p.cache_creation_tokens
+                and isinstance(u.get("outputTokens"), int)):
+            p.output_tokens = u["outputTokens"]
+            got += 1
+        else:
+            p.output_tokens = None
+    return got
 
 
 def _text_of(content) -> str:
@@ -450,11 +468,11 @@ class Store:
 
     # ----------------------------------------------------------- backfill
 
-    def backfill(self, log_dir, history=None, transcripts_root=None):
+    def backfill(self, log_dir, history=None):
         """Load every run log not yet in the store, once (by its path). Old
         logs are marked backfilled; their durations come from each line's
         `at` when it is there, and are unknown otherwise; their agents'
-        output from the transcripts still on disk."""
+        output from the log's own model_usage."""
         history = history or {}
         done = {"files": 0, "runs": 0, "passes": 0, "limits": 0, "skipped": 0}
         try:
@@ -466,7 +484,7 @@ class Store:
             if name.startswith("next-ecarte") or self.run_by_log(path):
                 done["skipped"] += 1
                 continue
-            got = self._backfill_one(path, history.get(os.path.normcase(path)) or {}, transcripts_root)
+            got = self._backfill_one(path, history.get(os.path.normcase(path)) or {})
             if got is None:
                 done["skipped"] += 1
                 continue
@@ -506,14 +524,14 @@ class Store:
             return None
         return tally, limits, lines, at_all
 
-    def _backfill_one(self, path, hist, transcripts_root=None):
+    def _backfill_one(self, path, hist):
         read = self._read_log(path)
         if read is None:
             return None
         tally, limits, lines, at_all = read
         if not lines:
             return None
-        apply_transcripts(tally, transcripts_root)
+        apply_model_usage(tally)
         if not at_all:
             # No receive time on every line: durations are not known.
             tally.first_at = tally.last_at = None
@@ -534,11 +552,11 @@ class Store:
             self.record_limit(run_id, x, backfilled=True)
         return {"passes": len(tally.passes), "limits": len(limits)}
 
-    def backfill_outputs(self, transcripts_root=None):
-        """The agents' output of the runs already stored, from the
-        transcripts still on disk: each run read again from its log (the
-        model_usage it got, never the stored difference of a resumed run),
-        all or none. A run whose agents already have a figure is skipped."""
+    def backfill_outputs(self):
+        """The agents' output of the runs already stored, from their logs:
+        each run read again (the model_usage it got, never the stored
+        difference of a resumed run), each pass by apply_model_usage. A run
+        any of whose agents already has a figure is skipped."""
         def todo(db):
             return [dict(r) for r in db.execute(
                 "SELECT r.id, r.log_path FROM runs r WHERE r.session_id IS NOT NULL"
@@ -548,10 +566,11 @@ class Store:
         done = {"runs": 0, "passes": 0, "unknown": 0}
         for r in self._exec(todo):
             read = self._read_log(r["log_path"]) if os.path.isfile(r["log_path"]) else None
-            if read is None or not apply_transcripts(read[0], transcripts_root):
+            if read is None or not apply_model_usage(read[0]):
                 done["unknown"] += 1
                 continue
-            figures = [(p.output_tokens, r["id"], tid) for tid, p in read[0].passes.items()]
+            figures = [(p.output_tokens, r["id"], tid) for tid, p in read[0].passes.items()
+                       if p.output_tokens is not None]
 
             def go(db, figures=figures):
                 for f in figures:

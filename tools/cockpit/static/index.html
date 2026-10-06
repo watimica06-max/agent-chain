@@ -520,10 +520,11 @@ function fmtDur(s) {
   return `${r} s`;
 }
 const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-// « 182 k lus (dont 160 k en cache), 9 k écrits » — or « écrits : inconnu ».
-function usageText(u) {
+// « 182 k lus (dont 160 k en cache), 9 k écrits » — or « écrits : inconnu »,
+// or, when an agent hands back mid-run, « écrits : à la fin du run ».
+function usageText(u, missing = "inconnu") {
   if (!u) return "";
-  const out = u.output_tokens === null || u.output_tokens === undefined ? "écrits : inconnu" : `${fmtTok(u.output_tokens)} écrits`;
+  const out = u.output_tokens === null || u.output_tokens === undefined ? `écrits : ${missing}` : `${fmtTok(u.output_tokens)} écrits`;
   return `${fmtDur(u.duration_s)} — ${fmtTok(u.read_tokens)} lus (dont ${fmtTok(u.cache_read_tokens)} en cache), ${out}`;
 }
 
@@ -1620,8 +1621,9 @@ function onEvent(ev) {
       if (S.run) { S.run.idle = d; renderIdle(d); } break;
     case "agent_ended":
       streamAppend(el("div", {class: "sys", text: `← ${d.agent} ${d.late ? "a fini (" + d.status + ")" : "a rendu la main"}`}));
-      // « Lexicographe — 4 min 12 s — 182 k lus (dont 160 k en cache), écrits : inconnu »
-      if (d.usage) streamAppend(el("div", {class: "use", text: `${cap(d.usage.agent || d.agent)} — ${usageText(d.usage)}`}));
+      // « Lexicographe — 4 min 12 s — 182 k lus (dont 160 k en cache), écrits : à la fin du run »:
+      // its output is known, if at all, from the run's model_usage once it is over.
+      if (d.usage) streamAppend(el("div", {class: "use", text: `${cap(d.usage.agent || d.agent)} — ${usageText(d.usage, "à la fin du run")}`}));
       if (S.run) { const i = S.run.agents.indexOf(d.agent); if (i >= 0) S.run.agents.splice(i, 1); renderAgents(S.run.agents); } break;
     case "permission": addPermission(d); break;
     case "permission_resolved": { const c = $("perm-" + d.id); if (c) c.remove(); permAlert(); break; }

@@ -628,7 +628,7 @@ the fresh worktree** — 📌 **the reverts, the deletions, and the five
 git steps that close the worktree**: ⚠️ **`code/redecoupage.md` and the
 blocking file reach `HEAD` tracked**, where she reads them, and the
 tree she runs `/7_lots` on is the one it expects. 🔴 **A stop that
-leaves them in an unmerged branch hands her nothing.**
+leaves them in an unmerged worktree hands her nothing.**
 
 📌 **What resets the count is hers** — 🔴 **she writes her decision
 into `code/redecoupage.md` under a `## Décision du Product Owner`
@@ -680,14 +680,15 @@ five steps of *Git, once it has reported*, in this order:**
    feature folder's `couverture.md` and
    `docs/CURRENT_TECHNICAL_STATE.md`**, as step 1 of *Git, once it has
    reported* says
-2. **Leave the worktree** — the merge is refused from inside it
-3. `git merge --no-ff <branch>` from the main checkout root
+2. **Read the worktree's commit id, then leave it** —
+   `git -C <path> rev-parse HEAD`; the merge is refused from inside it
+3. `git merge --no-ff -m "<message>" <commit id>` from the main checkout root
 4. `git push`
 5. `git worktree remove <path>`
 
-⚠️ **`/7_lots` creates its worktree from `HEAD`** — 📌 **and yours was
-a branch of its own**: unmerged, none of this run's lots are in the
-`HEAD` it branches from. 🔴 **The Vérificateur would then see no
+⚠️ **`/7_lots` creates its worktree from `HEAD`** — 📌 **and yours sat
+outside it**: unmerged, none of this run's lots are in the
+`HEAD` it starts from. 🔴 **The Vérificateur would then see no
 `PASS`**, and the Cadreur could re-cut lots already coded.
 
 **Then run `/7_lots` on this working folder**, and wait for it.
@@ -803,12 +804,13 @@ fix that passes: carry on.
    `couverture.md`, the Architecte's invocation 3;
    `docs/CURRENT_TECHNICAL_STATE.md`, the Arbitre's traps** — ⚠️ **a
    `git add` that reaches them all**, never the feature folder alone.
-   📌 **`git merge` takes the branch's commits, not the worktree's
+   📌 **`git merge` takes the worktree's commit, not its
    files**, and `git worktree remove` refuses a dirty tree
-2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
-   cannot issue a git command against the main checkout**: the merge
-   below, issued from inside it, is refused
-3. `git merge --no-ff <branch>` from the main checkout root
+2. 🔴 **Read the worktree's commit id, then leave it** —
+   `git -C <path> rev-parse HEAD`; ⚠️ **a session isolated in a
+   worktree cannot issue a git command against the main checkout**:
+   the merge below, issued from inside it, is refused
+3. `git merge --no-ff -m "<message>" <commit id>` from the main checkout root
 4. `git push`
 5. `git worktree remove <path>`
 

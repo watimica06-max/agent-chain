@@ -260,13 +260,13 @@ answer left a hole open, and it waits on the Product Owner.
 1. 🔴 **`git add` and `git commit` inside the worktree** — ⚠️ **the
    agent has no Bash and commits nothing**, and the rename and the
    filing above are staged, not committed; 📌 **`git merge` takes the
-   branch's commits, not the worktree's files**, and
+   worktree's commit, not its files**, and
    `git worktree remove` refuses a dirty tree
-2. 🔴 **Leave the worktree** — ⚠️ **a session isolated in a worktree
-   cannot issue a git command against the main checkout**: the merge
-   below, issued from inside it, is refused
-3. `git merge --no-ff -m "Merge <branch>" <branch>` from the main
-   checkout root
+2. 🔴 **Read the worktree's commit id, then leave it** —
+   `git -C <path> rev-parse HEAD`; ⚠️ **a session isolated in a
+   worktree cannot issue a git command against the main checkout**:
+   the merge below, issued from inside it, is refused
+3. `git merge --no-ff -m "<message>" <commit id>` from the main checkout root
 4. `git push`
 5. `git worktree remove <path>`
 
@@ -276,7 +276,7 @@ answer left a hole open, and it waits on the Product Owner.
 retried and not worked around.** The merge holds locally; say so and
 carry on.
 
-🔴 **Merge before handing back, always** — an unmerged branch is
+🔴 **Merge before handing back, always** — an unmerged commit is
 invisible to whoever reads next.
 
 ---
