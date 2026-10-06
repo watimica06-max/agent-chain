@@ -197,7 +197,7 @@ def test_the_csv_export(store):
     assert rtext.startswith("\ufeff")
     lines = rtext.lstrip("\ufeff").splitlines()
     head = lines[0].split(";")
-    assert head[:4] == ["début", "fin", "fonctionnalité", "commande"] and "≈ % de la fenêtre 5 h" in head
+    assert head[:5] == ["début", "fin", "application", "fonctionnalité", "commande"] and "≈ % de la fenêtre 5 h" in head
     rows = [dict(zip(head, ln.split(";"))) for ln in lines[1:]]
     assert [r["commande"] for r in rows] == ["/1_lexique f", "/4_grille f"]
     assert rows[0]["tokens écrits"] == "500" and rows[1]["tokens écrits"] == "inconnu"
@@ -237,7 +237,7 @@ def test_stats_routes(tmp_path, store):
         assert ids(d) == ["r3", "r4"]
         r = await c.get("/api/stats/csv?kind=passes&feature=f&period=7j")
         assert r.status == 200 and r.content_type == "text/csv"
-        assert "cockpit-passages-f-7j" in r.headers["Content-Disposition"]
+        assert "cockpit-passages-app-f-7j" in r.headers["Content-Disposition"]      # 1.6: the application named
         assert (await r.text()).count("\r\n") == 5
     serve(tmp_path, store, body)
 

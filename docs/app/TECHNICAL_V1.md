@@ -7,7 +7,9 @@ her the most time: **answering questions and blocking files**, and
 
 *1.6 — the cockpit lives in the chain's own repository and installs the
 chain into an application (§20); the ignored folders are kept per
-application (§4).*
+application (§4). Several applications: a list, one active, « Tout mettre
+à jour », one run at a time across them, the statistics and the
+diagnostic per application (§21).*
 
 *1.5 — the server outlives the page and has no console (§16); « Code », /8_code
 lot by lot (§17); which lot an agent pass works on (§18); notifications (§19);
@@ -112,8 +114,10 @@ Browser page  ⇄  local Python server  ⇄  Claude Agent SDK (Python)  ⇄  Cla
   access; it must never be reachable from the network.
 - **Runs belong to the server, not the page.** Closing the tab does not
   stop a run; reopening it shows the current state.
-- **One run at a time per repository.** Commands create worktrees and
-  commit; two concurrent runs would collide. The server holds a lock.
+- **One run at a time, whatever the application (1.6).** Commands create
+  worktrees and commit; two concurrent runs would collide. The server
+  holds a lock — per repository until 1.6, across every application since
+  (§21).
 - **The application lives in `tools/cockpit/` of the chain's own
   repository**, versioned with the chain it drives and with no setup;
   pointed at another project's folder, it serves that project too.
@@ -140,7 +144,7 @@ Browser page  ⇄  local Python server  ⇄  Claude Agent SDK (Python)  ⇄  Cla
   none. A 1.5.1 list, written when the cockpit knew one application, is
   read as that of the application open then.
 - On relaunch, the last pair opens directly. A "change" button returns
-  to the picker.
+  to the picker. *(1.6: the list of applications, §21.)*
 
 ---
 
@@ -688,3 +692,101 @@ repository only, never in an application's copy. `chain.py`.
 - **Before any launch**, a chain not « à jour »: a banner on every screen
   says so, and the launch asks; `POST /api/run` answers 409 with `chain`
   unless the page sends `chain_ok`.
+
+## 21. Several applications (1.6)
+
+What 1.6 found, from its code: the application folder and the feature
+were chosen on the start screen (`index.html:478-500`) through
+`/api/pick-folder`, `/api/app-folder` and `/api/open`
+(`server.py:511-540`), stored as one `app_folder` and one
+`working_folder` with the recent pairs (`state.py:79-87`); the ignored
+folders, the relays and the history were already keyed per application
+(`state.py:57-62`, `:94-111`, `:151-164`), the history capped at 30 across
+all of them. Single-application assumptions: the run lock was per
+repository (`runner.py:217-231`), so a run could go in each application at
+once, its events reaching only a page open on its application
+(`runner.py:647-671`, `server.py:871-898`) — a card in an application not
+open waited unseen; the scan ran on the open pair; the store had no
+application (`stats.py:379-384`) and filtered by feature name alone; one
+diagnostic slot (`state.py:143-149`), skipped when any result was stored
+(`server.py:695`); the title and the notifications named no application.
+
+- **`config.json` holds the list** (`state.py`): `apps`, each with its
+  `name` (the folder's by default, editable), `folder`, `ignored`,
+  `last_feature`, `relays` — the last relay of each feature, the latest
+  being the application's last relay — and `diagnostic`; `active`, the
+  folder every screen works on. A config written before 1.6 is migrated in
+  place at the first load: its application becomes the first entry with
+  its relays, ignored folders, diagnostic and feature; nothing is dropped.
+  `history` stays one list keyed `folder|feature`, 30 entries per
+  application.
+- **Adding** (`POST /api/apps/add`, the folder picker or the path pasted)
+  writes config.json alone, never the folder. Refused, in French, unless
+  the folder is the root of a git repository — what an install needs to
+  commit there — or when it is the chain's repository itself
+  (`apps.check_new_app`). **Renaming** and **removing**
+  (`/api/apps/rename`, `/api/apps/remove`) change the list alone; the page
+  asks before removing; a removal is refused while a run goes there.
+  `/api/open` on a folder not listed still adds it — the 1.5 start screen's
+  path, kept for the tests; the page adds through `/api/apps/add`.
+- **One application is active** (`/api/apps/open`): every screen —
+  dashboard, À répondre, Chaîne, Code, Correction, Statistiques — reads it,
+  as before. The page forgets what it held of the previous one: forms,
+  lots, filters, its drafts (kept per application in the browser).
+- **« Applications »**, a menu entry (`GET /api/apps`, read-only, in a
+  worker thread): one row per application — its name and folder; its chain
+  (chain.py's states); its active feature and the step the scan proposes
+  there (`scan.run_scan` and `decide.proposal_next`, no `Next:` check, no
+  log); its open questions and blocking entries, counted as « À répondre »
+  counts them; its last run, from the history or the run going; its
+  uncommitted changes, `git status --porcelain` counted — information only.
+  Actions: « Ouvrir », « Renommer », « Retirer de la liste », and the
+  application's own install when its chain is not « à jour ». With no
+  feature open it is the only screen, the active application's features
+  above it.
+- **The top bar** shows the active application's name; a click opens the
+  short list to switch.
+- **A git repository where the chain is not installed** is listed, « chaîne
+  absente »: `check_app_folder` now asks `docs/features/` alone — and only
+  to open a feature —, `/api/state` gives the chain of any active folder,
+  and `POST /api/chain/install` takes `folder`, so the install is reachable
+  from its row.
+- **« Tout mettre à jour »** (`POST /api/chain/install-all`,
+  `apps.update_all`): every application, in the list's order. « en
+  retard » → chain.py's `install`, never with `confirm` — its commit and
+  push, its refusals unchanged; one that would ask (an application file the
+  chain now brings) is left, with the files, for its own install. « modifiée
+  sur place » and « absente » are never installed in bulk: listed with their
+  reason and a button opening their own install, which asks before
+  replacing anything. « à jour » is said. One with a run going is left, and
+  said. One line per application — « mise à jour » with the commit,
+  « laissée » with why, « échec » with the error; the last report is kept
+  for the screen. No launch and no other install while it goes.
+- **Runs** — **one at a time, whatever the application**: `Runner.start`
+  refuses while any run goes (`Runner.going`), `POST /api/run` answers 409
+  naming the application where it goes. Not concurrency: 1.6 removes the
+  per-repository allowance rather than build on it. A run belongs to its
+  application: `/api/state`'s `run`, the scan and the decision are the
+  active application's; `busy` is the run going wherever it is.
+  « Arrêter », the permission cards and the idle question
+  (`/api/stop-now`, `/api/permission`, `/api/continue-wait`,
+  `/api/stop-next-lot`) act on the run going, from any screen. The page's
+  stream (`/api/events`) carries every run's events, each with `app`; only
+  the active application's are written in its run panel. The top bar says
+  where the run goes, with « Arrêter »; a banner says it on every screen of
+  another application.
+- **Notifications and the tab's title** name the application: « hyrox —
+  /1_lexique x — terminé », « (2) hyrox — Cockpit ».
+- **Statistics per application**: `runs.app` (the folder), written with
+  every run; the runs stored before are given theirs once, at the server's
+  start (`Store.backfill_apps`): the working directory their log's init
+  names — the application's folder, or a worktree under it —, else their
+  history entry's application, else the first of the list, the only one
+  the cockpit knew. « Statistiques » has an « application » filter, the
+  active one by default, or « toutes » (every feature then, each named with
+  its application). Each application's ignored folders hide its own runs
+  only. « Par lot » reads the active application's passes.
+- **The diagnostic per application**: one result in each entry; it runs on
+  its own once for an application that has none — at the server's start,
+  at the page's opening, when an application becomes active — never again
+  for one that has one. Paramètres → Diagnostic runs the active one's.

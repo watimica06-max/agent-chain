@@ -186,13 +186,14 @@ def test_notifications_only_when_the_tab_is_not_in_front(tmp_path, page):
         s.call(s.rn.start(str(s.app_root), "f", "f", "1_lexique", "f"))
         page.wait_for_function("window.__notes.length >= 1")
         n = page.evaluate("window.__notes.map(n => [n.title, n.body])")
-        assert n[0][0] == "Une autorisation attend" and "Write" in n[0][1]
+        # 1.6: each names its application, and so does the tab's title.
+        assert n[0][0] == "app — une autorisation attend" and "Write" in n[0][1]
         title = page.title()
-        assert title.startswith("(") and title.endswith(") Cockpit")
+        assert title.startswith("(") and title.endswith(") app — Cockpit")
         page.locator("#perm-banner").get_by_role("button", name="Autoriser").click()
         page.wait_for_function("window.__notes.length >= 2")
         n = page.evaluate("window.__notes.map(n => [n.title, n.body])")
-        assert n[1][0] == "/1_lexique f — terminé" and n[1][1].startswith("Ensuite : ")
+        assert n[1][0] == "app — /1_lexique f — terminé" and n[1][1].startswith("Ensuite : ")
         page.evaluate("window.__notes[1].onclick()")
         page.wait_for_function("location.hash === '#chaine'")
         assert page.js_errors == []
@@ -209,11 +210,11 @@ def test_a_lot_that_passes_notifies_and_opens_the_code_tab(tmp_path, page):
         assert page.locator("#lot-main-lot-07").get_attribute("data-state") == "pas commencé"
         page.evaluate("window.__vis = 'hidden'")
         s.call(s.rn.start(str(s.app_root), "f", "f", "8_code", "f"))
-        page.wait_for_function("window.__notes.some(n => n.title === 'lot-07 est passé')")
-        n = page.evaluate("window.__notes.find(n => n.title === 'lot-07 est passé').body")
+        page.wait_for_function("window.__notes.some(n => n.title === 'app — lot-07 est passé')")
+        n = page.evaluate("window.__notes.find(n => n.title === 'app — lot-07 est passé').body")
         assert n.startswith("3 / 10 lots en PASS")
         page.evaluate("location.hash = '#settings'")
-        page.evaluate("window.__notes.find(n => n.title === 'lot-07 est passé').onclick()")
+        page.evaluate("window.__notes.find(n => n.title === 'app — lot-07 est passé').onclick()")
         page.wait_for_selector("#lot-main-lot-07[aria-expanded=true]")
         assert page.locator("#lot-main-lot-07").get_attribute("data-state") == "passé"
         assert page.js_errors == []

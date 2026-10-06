@@ -137,7 +137,9 @@ def test_permission_denied(tmp_path):
     assert isinstance(client.permission_result, PermissionResultDeny)
 
 
-def test_one_run_at_a_time_per_repository(tmp_path):
+def test_one_run_at_a_time_whatever_the_application(tmp_path):
+    # 1.6: one run at a time, whatever the application — a run going in one
+    # repository blocks a launch in every other, and says which run goes.
     other = tmp_path / "other"
     other.mkdir()
 
@@ -148,13 +150,17 @@ def test_one_run_at_a_time_per_repository(tmp_path):
         await next_event(q, "text")
         with pytest.raises(runner_mod.Busy):
             await rn.start(str(tmp_path), "f", "f", "9_controle", "f")
-        # Another repository is not held by this lock.
-        run_b = await rn.start(str(other), "g", "g", "8_code", "g")
+        with pytest.raises(runner_mod.Busy) as busy:
+            await rn.start(str(other), "g", "g", "8_code", "g")
+        assert "autre application" in str(busy.value) and busy.value.run is run
+        assert rn.going() is run and rn.current(str(other)) is None
         await rn.stop_now(str(tmp_path))
         await run.task
         assert made[0].interrupted.is_set()
-        assert run.outcome == "interrompu"
-        await rn.stop_now(str(other))
+        assert run.outcome == "interrompu" and rn.going() is None
+        # Once it ended, the other application launches.
+        rn.client_factory = make_runner(script_quick)[0].client_factory
+        run_b = await rn.start(str(other), "g", "g", "8_code", "g")
         await run_b.task
         rn.client_factory = make_runner(script_quick)[0].client_factory
         again = await rn.start(str(tmp_path), "f", "f", "9_controle", "f")

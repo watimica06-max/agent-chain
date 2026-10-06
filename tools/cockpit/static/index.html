@@ -122,9 +122,46 @@ button.chip:hover { border-color: var(--accent); }
 #shell.nofolder, #shell.menu-closed { grid-template-columns: minmax(0, 1fr); }
 #shell.nofolder #side, #shell.menu-closed #side { display: none; }
 
-/* ---------------------------------------------------------- start */
-#start { max-width: 880px; margin: 0 auto; padding: 28px 24px; display: grid; gap: 20px; }
-#start .card + .card { margin-top: 0; }
+/* ------------------------------------------- applications (1.6) */
+#tb-app-wrap { position: relative; }
+#tb-app { font-weight: 650; }
+#tb-app .caret { color: var(--soft); font-size: 12px; }
+#app-menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 50; min-width: 320px; max-width: 460px;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,.14); padding: 6px; }
+#app-menu button { display: flex; width: 100%; text-align: left; border: none; background: none; min-height: 0; padding: 8px 12px;
+  border-radius: 8px; gap: 10px; align-items: baseline; }
+#app-menu button:hover { background: var(--bg); }
+#app-menu button[aria-current=true] { background: var(--accent-soft); }
+#app-menu .nm { font-weight: 650; } #app-menu .fd { font-family: var(--mono); font-size: 12px; color: var(--soft); }
+#app-menu .ck { width: 14px; color: var(--accent); flex: none; }
+#app-menu hr { border: none; border-top: 1px solid var(--line); margin: 6px 4px; }
+#tb-run-wrap { display: inline-flex; align-items: center; gap: 6px; }
+#tb-run .where { font-weight: 650; }
+#tb-stop { min-height: 0; padding: 4px 12px; font-size: 14px; border-radius: 99px; }
+#busy-banner { border-top: 1px solid var(--warn); background: var(--warn-soft); color: var(--warn); padding: 8px 20px; }
+#busy-banner button { min-height: 32px; padding: 2px 14px; font-size: 15px; margin-left: 8px; }
+#scr-apps .apps-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+#scr-apps .apps-head h2 { margin: 0; }
+.app-row { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; }
+.app-row + .app-row { margin-top: 14px; }
+.app-row.is-active { border-color: var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
+.app-row .top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.app-row .nm { font-size: 19px; font-weight: 650; }
+.app-row .fd { font-family: var(--mono); font-size: 13px; color: var(--soft); margin-top: 2px; word-break: break-all; }
+.app-row .acts { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+.app-row .acts button { min-height: 36px; padding: 4px 14px; font-size: 15px; }
+.app-row .facts { display: grid; grid-template-columns: 1.2fr 1.5fr .8fr 1.3fr .7fr; gap: 6px 18px; margin-top: 12px; font-size: 15px; }
+.app-row .facts .k { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); }
+.app-row .msg { margin-top: 8px; font-size: 14px; }
+.cst { display: inline-block; font-size: 13px; padding: 1px 10px; border-radius: 99px; font-weight: 650; }
+.cst.ok { background: var(--ok-soft); color: var(--ok); } .cst.late { background: var(--warn-soft); color: var(--warn); }
+.cst.mod { background: var(--err-soft); color: var(--err); } .cst.abs { background: var(--idle-soft); color: var(--soft); border: 1px dashed var(--soft); }
+#apps-report .line { display: grid; grid-template-columns: 160px 150px minmax(0, 1fr) auto; gap: 10px; align-items: baseline;
+  padding: 8px 0; border-top: 1px solid var(--line); font-size: 15px; }
+#apps-report h3 + .line { border-top: none; }
+#apps-report .oc { font-weight: 650; } #apps-report .oc.updated { color: var(--ok); } #apps-report .oc.skipped { color: var(--warn); }
+#apps-report .oc.failed { color: var(--err); }
+@media (max-width: 1100px) { .app-row .facts { grid-template-columns: 1fr 1fr; } #apps-report .line { grid-template-columns: 1fr; } }
 .folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; margin-top: 10px; }
 .folders button { text-align: left; }
 .folders button.sel { border: 2px solid var(--accent); background: var(--accent-soft); }
@@ -452,14 +489,19 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
     <button id="tb-menu" class="hidden" aria-controls="side" aria-expanded="true" aria-label="Fermer le menu" title="Fermer le menu">
       <span class="bars"></span><span id="tb-menu-dot" class="hidden"></span></button>
     <h1 title="Cockpit de la chaîne">Cockpit</h1>
+    <span id="tb-app-wrap" class="hidden">
+      <button id="tb-app" class="chip" aria-haspopup="true" aria-expanded="false" aria-controls="app-menu" title="Changer d'application"></button>
+      <div id="app-menu" class="hidden" role="menu" aria-label="Applications"></div>
+    </span>
     <button id="tb-folder" class="chip hidden" title="Dossiers"></button>
     <button id="tb-mode" class="chip hidden" title="Mode de permission"></button>
-    <span id="tb-run" class="chip hidden"></span>
+    <span id="tb-run-wrap"><span id="tb-run" class="chip hidden"></span><button id="tb-stop" class="danger hidden" title="Arrêter maintenant la commande qui tourne">Arrêter</button></span>
     <span class="grow"></span>
     <button id="perm-badge" class="hidden">Autorisation demandée</button>
   </div>
   <div id="perm-banner" class="hidden" role="alert" aria-label="Autorisation demandée"></div>
   <div id="chain-banner" class="hidden" role="status" aria-label="État de la chaîne"></div>
+  <div id="busy-banner" class="hidden" role="status" aria-label="Commande dans une autre application"></div>
 </div>
 
 <div id="shell" class="nofolder">
@@ -469,34 +511,41 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
     <a href="#chaine" id="nav-chaine">Chaîne <span id="nav-run-dot" class="dot hidden" title="Une commande tourne"></span></a>
     <a href="#correction" id="nav-correction">Correction <span id="nav-corr-count" class="count hidden"></span></a>
     <a href="#stats" id="nav-stats">Statistiques</a>
+    <a href="#apps" id="nav-apps">Applications</a>
     <span class="spacer"></span>
     <a href="#settings" id="nav-settings">Paramètres</a>
   </nav>
 
   <div id="main">
-    <!-- ======================= Écran de démarrage ======================= -->
-    <section id="start" class="hidden">
+    <!-- ======================= Applications (1.6) ======================= -->
+    <section id="scr-apps" class="screen hidden">
       <div id="start-error" class="notice err hidden"></div>
-      <div class="card">
-        <h2>Dossier de l'application</h2>
-        <p class="muted small">Le dossier qui contient <span class="mono">.claude/</span> et <span class="mono">docs/features/</span>.</p>
-        <div class="row">
-          <input type="text" id="app-path" class="grow" placeholder="C:\Dev\hyrox_tracker">
-          <button id="btn-browse">Parcourir…</button>
-          <button id="btn-app" class="primary">Valider</button>
-        </div>
-        <p class="muted small">Si la fenêtre de choix ne s'ouvre pas, collez le chemin dans le champ.</p>
-      </div>
-      <div class="card" id="work-card">
-        <h2>Feature</h2>
-        <p class="muted small">Une feature de <span class="mono">docs/features/</span>. Ses corrections <span class="mono">bugfix-NN/</span> sont sous « Correction ».</p>
-        <div class="folders" id="work-list"><span class="muted">Choisissez d'abord le dossier de l'application.</span></div>
+      <div class="card hidden" id="work-card" style="margin-bottom:20px">
+        <h2 id="work-title">Feature</h2>
+        <p class="muted small" id="work-note">Une feature de <span class="mono">docs/features/</span>. Ses corrections <span class="mono">bugfix-NN/</span> sont sous « Correction ».</p>
+        <div class="folders" id="work-list"></div>
         <div class="row" style="margin-top:14px"><button id="btn-open" class="primary" disabled>Ouvrir</button></div>
       </div>
-      <div class="card recent" id="recent-card">
-        <h2>Récents</h2>
-        <div id="recent-list" class="muted">Aucun.</div>
+      <div class="apps-head">
+        <h2>Applications</h2>
+        <span class="muted small" id="apps-count"></span>
+        <span class="grow"></span>
+        <button id="btn-app-add">Ajouter une application</button>
+        <button id="btn-update-all" class="primary" title="Installe la chaîne du dépôt dans chaque application « en retard », l'une après l'autre">Tout mettre à jour</button>
       </div>
+      <div class="card hidden" id="apps-add" style="margin-bottom:16px">
+        <h3>Ajouter une application</h3>
+        <p class="muted small">La racine d'un dépôt git. L'ajouter n'écrit rien dans son dossier : seule la liste du cockpit change. La chaîne s'y installe ensuite depuis sa ligne.</p>
+        <div class="row">
+          <input type="text" id="app-path" class="grow" placeholder="C:\Dev\mon_application" aria-label="Dossier de l'application">
+          <button id="btn-browse">Parcourir…</button>
+          <button id="btn-app" class="primary">Ajouter</button>
+        </div>
+        <p class="muted small" style="margin:8px 0 0">Si la fenêtre de choix ne s'ouvre pas, collez le chemin dans le champ.</p>
+      </div>
+      <div class="card hidden" id="apps-report" style="margin-bottom:16px" aria-label="Tout mettre à jour : le compte rendu"></div>
+      <div id="apps-msg" class="notice warn hidden" role="status"></div>
+      <div id="apps-list" aria-label="Les applications"><p class="muted">Lecture des applications…</p></div>
     </section>
 
     <!-- ========================= Tableau de bord ========================= -->
@@ -614,6 +663,7 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
         <h2>Statistiques</h2>
         <span class="grow"></span>
         <div class="st-filters" role="group" aria-label="Filtres">
+          <label>Application <select id="st-app"></select></label>
           <label>Fonctionnalité <select id="st-feature"></select></label>
           <div class="seg" id="st-period" role="group" aria-label="Période">
             <button data-p="jour">Aujourd'hui</button><button data-p="7j">7 jours</button><button data-p="30j">30 jours</button><button data-p="tout">Tout</button>
@@ -814,9 +864,20 @@ async function api(path, data) {
 }
 
 // Drafts survive a re-render and a reload: long sessions, one person.
-const drafts = {};
-function loadDrafts() { try { Object.assign(drafts, JSON.parse(localStorage.getItem("cockpit-drafts") || "{}")); } catch (e) {} }
-function storeDrafts() { try { localStorage.setItem("cockpit-drafts", JSON.stringify(drafts)); } catch (e) {} }
+// 1.6: kept per application — two may hold entries named alike.
+let drafts = {};
+let allDrafts = {};
+let draftsLoaded = false;
+function draftsKey() { return appKey(S.app_folder) || "-"; }
+function loadDrafts() {
+  try {
+    const v = JSON.parse(localStorage.getItem("cockpit-drafts") || "{}") || {};
+    allDrafts = v.__perApp ? v : {__perApp: true, [draftsKey()]: v};     // a 1.5 store: the application open then
+  } catch (e) { allDrafts = {__perApp: true}; }
+  swapDrafts();
+}
+function swapDrafts() { drafts = allDrafts[draftsKey()] || (allDrafts[draftsKey()] = {}); }
+function storeDrafts() { try { allDrafts[draftsKey()] = drafts; localStorage.setItem("cockpit-drafts", JSON.stringify(allDrafts)); } catch (e) {} }
 
 let S = {};          // /api/state
 let F = null;        // /api/forms
@@ -838,7 +899,7 @@ const STATE_CLASS = {"faite": "st-faite", "t'attend": "st-attend", "en cours": "
                      "bloquée": "st-bloquee", "à faire": "st-afaire", "inconnu": "st-inconnu"};
 
 // ================================================================ routes
-const SCREENS = ["dashboard", "answer", "chaine", "correction", "stats", "settings"];
+const SCREENS = ["dashboard", "answer", "chaine", "correction", "stats", "apps", "settings"];
 function currentRoute() {
   const h = (location.hash || "").replace("#", "");
   return SCREENS.includes(h) ? h : "dashboard";
@@ -847,75 +908,282 @@ function go(name, section) {
   if (location.hash === "#" + name) route(); else location.hash = "#" + name;
   if (section) setTimeout(() => { const s = $(section); if (s) s.scrollIntoView({behavior: "smooth", block: "start"}); }, 30);
 }
+// 1.6: with no feature open, « Applications » is the only screen — the
+// list, the feature to open of the active one, « Ajouter une application ».
 function route() {
   const isOpen = !!S.open;
   $("shell").classList.toggle("nofolder", !isOpen);
-  $("start").classList.toggle("hidden", isOpen);
-  const r = currentRoute();
-  for (const s of SCREENS) $("scr-" + s).classList.toggle("hidden", !isOpen || s !== r);
+  const r = isOpen ? currentRoute() : "apps";
+  for (const s of SCREENS) $("scr-" + s).classList.toggle("hidden", s !== r);
   for (const s of SCREENS) {
     const a = $("nav-" + s);
     if (s === r && isOpen) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   }
+  if (r === "apps") { renderWorkCard(); loadApps(); }
   if (isOpen && r === "answer") hint();
   if (isOpen && (r === "chaine" || r === "correction")) placeRun();
   if (isOpen && r === "stats") loadStats();
 }
 window.addEventListener("hashchange", route);
 
-// ============================================================ démarrage
-let chosenApp = null, chosenWork = null;
+// ===================================================== applications (1.6)
+// The keys the server gives a folder by: case and slashes do not count.
+const appKey = (p) => (p || "").replace(/\//g, "\\").replace(/\\+$/, "").toLowerCase();
+const sameApp = (a, b) => !!a && !!b && appKey(a) === appKey(b);
+function appName(folder) {
+  const a = (S.apps || []).find((x) => sameApp(x.folder, folder));
+  return a ? a.name : baseName(folder);
+}
+// The run going, whatever its application; one at most (§21).
+const anyRun = () => !!(S.busy && S.busy.status !== "ended");
+const elsewhere = () => anyRun() && !S.busy.active;
+const busyNote = () => anyRun() ? `Une commande tourne${S.busy.active ? "" : ` dans « ${S.busy.app_name} »`} : ${S.busy.prompt}. Une seule à la fois, toutes applications confondues.` : "";
 
+let chosenWork = null;
 function showStart(err) {
   S.open = false;
-  route(); renderChrome();
+  route(); renderChrome(); renderChainState(); renderPerms();
   $("start-error").classList.toggle("hidden", !err);
   $("start-error").textContent = err || "";
-  if (S.app_folder && !$("app-path").value) $("app-path").value = S.app_folder;
-  if (S.working_folders) { chosenApp = S.app_folder; renderWorkList(S.working_folders); }
-  const rl = $("recent-list"); rl.replaceChildren();
-  if (!S.recent || !S.recent.length) rl.append("Aucun.");
-  for (const p of S.recent || []) {
-    rl.append(el("button", {onclick: () => openPair(p.app, p.work)},
-      el("b", {text: p.work}), el("span", {class: "muted small", text: "  —  " + p.app})));
-  }
 }
-
+// The active application with no feature open: its features, to open one.
+function renderWorkCard() {
+  const card = $("work-card");
+  const show = !S.open && !!S.app_folder;
+  card.classList.toggle("hidden", !show);
+  if (!show) return;
+  $("work-title").textContent = `« ${S.app_name} » — choisir la feature`;
+  if (S.open_error) {
+    $("work-note").textContent = `${S.open_error}. Elle reste dans la liste ; la chaîne s'y installe depuis sa ligne, plus bas.`;
+    $("work-list").replaceChildren(); $("btn-open").classList.add("hidden");
+    return;
+  }
+  $("btn-open").classList.remove("hidden");
+  $("work-note").replaceChildren("Une feature de ", el("span", {class: "mono", text: "docs/features/"}),
+    ". Ses corrections ", el("span", {class: "mono", text: "bugfix-NN/"}), " sont sous « Correction ».");
+  renderWorkList(S.working_folders || []);
+}
 function renderWorkList(list) {
   const box = $("work-list"); box.replaceChildren();
   if (!list.length) box.append(el("span", {class: "muted", text: "Aucune feature sous docs/features/."}));
   for (const w of list) {
     box.append(el("button", {text: w, class: w === chosenWork ? "sel" : "",
       onclick: () => { chosenWork = w; renderWorkList(list); $("btn-open").disabled = false; },
-      ondblclick: () => openPair(chosenApp, w)}));
+      ondblclick: () => openPair(S.app_folder, w)}));
   }
-  $("btn-open").disabled = !chosenWork;
+  $("btn-open").disabled = !chosenWork || !list.includes(chosenWork);
 }
+$("btn-open").onclick = () => openPair(S.app_folder, chosenWork);
 
-async function validateApp() {
+// « Ajouter une application »: the folder picker, or the path pasted.
+$("btn-app-add").onclick = () => { $("apps-add").classList.toggle("hidden"); if (!$("apps-add").classList.contains("hidden")) $("app-path").focus(); };
+async function addApp() {
   try {
-    const r = await api("/api/app-folder", {path: $("app-path").value});
-    chosenApp = r.path; $("app-path").value = r.path; chosenWork = null;
-    renderWorkList(r.working_folders);
-    $("start-error").classList.add("hidden");
-  } catch (e) { $("start-error").textContent = e.message; $("start-error").classList.remove("hidden"); }
+    const r = await api("/api/apps/add", {path: $("app-path").value});
+    $("app-path").value = ""; $("apps-add").classList.add("hidden");
+    appsMsg(r.added ? `« ${r.app.name} » ajoutée à la liste. Rien n'a été écrit dans son dossier.` : `« ${r.app.name} » est déjà dans la liste.`, "ok");
+    await refreshState();
+  } catch (e) { appsMsg(e.message); }
 }
-
 $("btn-browse").onclick = async () => {
   const b = $("btn-browse"); b.disabled = true; b.textContent = "Fenêtre ouverte…";
   try {
     const r = await api("/api/pick-folder", {initial: $("app-path").value});
-    if (r.path) { $("app-path").value = r.path; await validateApp(); }
-  } catch (e) { $("start-error").textContent = e.message; $("start-error").classList.remove("hidden"); }
+    if (r.path) { $("app-path").value = r.path; await addApp(); }
+  } catch (e) { appsMsg(e.message); }
   finally { b.disabled = false; b.textContent = "Parcourir…"; }
 };
-$("btn-app").onclick = validateApp;
-$("app-path").addEventListener("keydown", (e) => { if (e.key === "Enter") validateApp(); });
-$("btn-open").onclick = () => openPair(chosenApp, chosenWork);
+$("btn-app").onclick = addApp;
+$("app-path").addEventListener("keydown", (e) => { if (e.key === "Enter") addApp(); });
 
-async function changeFolder() { await api("/api/close", {}); savedCount = 0; await refreshState(); }
+function appsMsg(text, kind = "warn") {
+  const m = $("apps-msg");
+  m.className = "notice " + kind + (text ? "" : " hidden");
+  m.textContent = text || "";
+}
+
+let A = null;                 // /api/apps
+let appsToken = 0, bulkBusy = false;
+async function loadApps() {
+  const tok = ++appsToken;
+  let r;
+  try { r = await api("/api/apps"); } catch (e) { if (tok === appsToken) appsMsg(e.message); return; }
+  if (tok !== appsToken) return;
+  A = r;
+  renderApps();
+}
+const CHAIN_CLS = {"à jour": "ok", "en retard": "late", "modifiée sur place": "mod", "absente": "abs"};
+function renderApps() {
+  const box = $("apps-list"); box.replaceChildren();
+  const rows = (A && A.apps) || [];
+  $("apps-count").textContent = rows.length ? plural(rows.length, "application", "applications") : "";
+  if (!rows.length) {
+    box.append(el("div", {class: "card"}, el("p", {style: "margin:0", text: "Aucune application dans la liste. « Ajouter une application » : la racine d'un dépôt git."})));
+    $("apps-add").classList.remove("hidden");
+  }
+  for (const r of rows) box.append(appRow(r));
+  $("btn-update-all").disabled = bulkBusy || !!(A && A.bulk_going) || !rows.length;
+  renderReport();
+}
+function factCell(k, ...v) { return el("div", {}, el("div", {class: "k", text: k}), el("div", {}, ...v)); }
+function appRow(r) {
+  const c = r.chain;
+  const st = c && c.state;
+  const msg = el("div", {class: "msg muted", id: "app-msg-" + appKey(r.folder).replace(/[^a-z0-9]/g, "_")});
+  const acts = el("div", {class: "acts"},
+    el("button", {class: r.active && S.open ? "" : "primary", text: r.active && S.open ? "Ouverte" : "Ouvrir",
+      disabled: (r.active && S.open) || !r.exists || undefined, onclick: () => activateApp(r.folder, true)}),
+    el("button", {text: "Renommer", onclick: () => renameApp(r)}),
+    el("button", {class: "danger", text: "Retirer de la liste", disabled: r.running || undefined,
+      title: r.running ? "Une commande tourne dans cette application" : "Le dossier n'est pas touché", onclick: () => removeApp(r)}));
+  const chainCell = c ? [el("span", {class: "cst " + (CHAIN_CLS[st] || "abs"), text: st || "inconnue"}),
+    el("div", {class: "small muted", text: c.summary})] : [el("span", {class: "muted", text: "—"})];
+  if (c && st && st !== "à jour") chainCell.push(el("div", {style: "margin-top:6px"}, el("button", {class: "small",
+    text: st === "absente" ? "Installer la chaîne" : "Mettre à jour la chaîne", disabled: r.running || anyRunIn(r.folder) || undefined,
+    title: st === "en retard" ? "Son installation, seule" : "Son installation demande avant de remplacer quoi que ce soit",
+    onclick: () => rowInstall(r.folder)})));
+  const feat = r.feature ? [el("b", {class: "mono", text: r.feature}),
+      r.proposal ? el("div", {class: "small", text: r.proposal.french}) : null]
+    : [el("span", {class: "muted", text: r.open_error || "aucune feature ouverte"})];
+  const waits = r.questions === null ? el("span", {class: "muted", text: "—"})
+    : el("span", {class: r.questions + r.blocking ? "" : "muted",
+        text: `${plural(r.questions, "question", "questions")} · ${plural(r.blocking, "blocage", "blocages")}`});
+  const lr = r.last_run;
+  const last = lr ? [el("span", {class: "mono small", text: lr.command || "—"}),
+      el("div", {class: "small muted", text: `${lr.at ? fmtWhen(new Date(lr.at)) : "—"} — ${lr.outcome || "?"}`})]
+    : [el("span", {class: "muted", text: "aucun run mémorisé"})];
+  const unc = r.uncommitted === null ? "—" : r.uncommitted ? plural(r.uncommitted, "fichier", "fichiers") : "aucun";
+  const row = el("div", {class: "app-row" + (r.active ? " is-active" : ""), "data-folder": r.folder},
+    el("div", {class: "top"}, el("span", {class: "nm", text: r.name}),
+      r.active ? el("span", {class: "badge", text: "active"}) : null,
+      r.running ? el("span", {class: "badge warn", text: "une commande tourne"}) : null, acts),
+    el("div", {class: "fd", text: r.folder}),
+    el("div", {class: "facts"},
+      factCell("Chaîne", ...chainCell), factCell("Feature et étape proposée", ...feat),
+      factCell("Vous attend", waits), factCell("Dernier run", ...last),
+      factCell("Non commité", el("span", {class: "muted", title: "Information : le cockpit n'y touche jamais", text: unc}))),
+    msg);
+  if (r.errors && r.errors.length) msg.textContent = r.errors.join(" · ");
+  return row;
+}
+const anyRunIn = (folder) => anyRun() && sameApp(S.busy.app, folder);
+
+async function activateApp(folder, toDashboard) {
+  closeAppMenu();
+  try { await api("/api/apps/open", {folder}); }
+  catch (e) { alert(e.message); return; }
+  resetForApp();
+  if (toDashboard) location.hash = "#dashboard";
+  $("main").scrollTo(0, 0);
+  await refreshState();
+}
+// What the page kept of the application it leaves: nothing carries over.
+function resetForApp() {
+  F = null; savedCount = 0; corrSel = null; stepFilter = null; lotFilter = null; chosenWork = null;
+  for (const o of [CODE, LOTD, LOTSTATE, codeToken]) for (const k of Object.keys(o)) delete o[k];
+  lotOpen.clear(); seenOpen.clear(); formsPrimed = false; ctxCache.clear(); ctxShown = null; focusedId = null; whyOpen.clear();
+  ST = null; stOpen.clear(); stPrefs.feature = ""; stSavePrefs();
+  bug.name = null;
+  swapDrafts();
+  $("stream").replaceChildren(); parkRun();
+  closeEvents(); opened = false;
+}
+async function renameApp(r) {
+  const name = prompt(`Nouveau nom de « ${r.name} » (${r.folder}) :`, r.name);
+  if (name === null) return;
+  try { await api("/api/apps/rename", {folder: r.folder, name}); await refreshState(); }
+  catch (e) { alert(e.message); }
+}
+async function removeApp(r) {
+  if (!confirm(`Retirer « ${r.name} » de la liste ?\n\n${r.folder}\n\nSon dossier n'est pas touché : seule la liste du cockpit change. Son nom, ses dossiers ignorés et ses derniers relais quittent config.json ; l'ajouter de nouveau la remet, sans eux.`)) return;
+  try { await api("/api/apps/remove", {folder: r.folder}); appsMsg(`« ${r.name} » retirée de la liste. Son dossier n'a pas été touché.`, "ok"); await refreshState(); }
+  catch (e) { alert(e.message); }
+}
+
+// An application's own install (§20): it asks before replacing a file the
+// chain did not leave as it is — from its row, or from the bulk's report.
+async function installChain(folder) {
+  const who = folder ? {folder} : {};
+  let r;
+  try { r = await api("/api/chain/install", who); }
+  catch (e) {
+    if (!(e.status === 409 && e.body && e.body.overwrite)) throw e;
+    const f = e.body.overwrite;
+    if (!confirm(`${folder ? `« ${appName(folder)} » — ` : ""}${plural(f.length, "fichier n'est pas", "fichiers ne sont pas")} tel que la chaîne l'a laissé ou ne vient pas d'elle ; l'installation le remplace :\n\n${f.join("\n")}\n\nRemplacer ?`)) return null;
+    r = await api("/api/chain/install", {...who, confirm: true});
+  }
+  return r.result;
+}
+const installText = (x) => `Installée : ${x.commit} du ${x.date}` +
+  (x.app_commit ? ` — commit ${x.app_commit} « ${x.message} »` + (x.pushed ? ", poussé." : x.push_error ? `, non poussé : ${x.push_error}` : ".") : " — rien n'avait changé.");
+async function rowInstall(folder) {
+  const m = document.getElementById("app-msg-" + appKey(folder).replace(/[^a-z0-9]/g, "_"));
+  if (m) m.textContent = "Installation…";
+  try {
+    const x = await installChain(folder);
+    const text = x ? `« ${appName(folder)} » — ${installText(x)}` : `« ${appName(folder)} » — rien n'a été installé.`;
+    appsMsg(text, x ? "ok" : "warn");
+    await refreshState();
+  } catch (e) { if (m) m.textContent = ""; alert(e.message); }
+}
+
+// « Tout mettre à jour » — « en retard » only, one after the other; every
+// other application is said, with why. One line each in the report.
+$("btn-update-all").onclick = async () => {
+  const rows = (A && A.apps) || [];
+  const late = rows.filter((r) => r.chain && r.chain.state === "en retard");
+  if (!confirm((late.length ? `Mettre à jour la chaîne dans ${late.map((r) => `« ${r.name} »`).join(", ")} ?\n\nChacune reçoit un commit « chain: … » de ces fichiers seuls, puis un push.`
+      : "Aucune application n'est « en retard » : rien ne sera installé.") +
+      "\n\nLes autres sont listées avec leur raison : une chaîne « modifiée sur place » ou « absente » ne s'installe que depuis sa ligne, qui demande avant de remplacer quoi que ce soit.")) return;
+  bulkBusy = true; renderApps();
+  try { const rep = await api("/api/chain/install-all", {}); if (A) A.report = rep; appsMsg(""); }
+  catch (e) { appsMsg(e.message); }
+  finally { bulkBusy = false; await refreshState(); }
+};
+const OUTCOME = {"mise à jour": "updated", "laissée": "skipped", "échec": "failed"};
+function renderReport() {
+  const box = $("apps-report");
+  const rep = A && A.report;
+  if (bulkBusy || (A && A.bulk_going)) {
+    box.classList.remove("hidden");
+    box.replaceChildren(el("h3", {text: "Tout mettre à jour — en cours…"}),
+      el("p", {class: "muted small", style: "margin:0", text: "Une application après l'autre : installation, commit, push. Les lancements attendent la fin."}));
+    return;
+  }
+  box.classList.toggle("hidden", !rep);
+  if (!rep) return;
+  box.replaceChildren(el("h3", {text: `Tout mettre à jour — ${fmtWhen(new Date(rep.at))}`}));
+  for (const x of rep.lines) {
+    const cls = OUTCOME[x.outcome] || "skipped";
+    box.append(el("div", {class: "line", "data-folder": x.folder, "data-outcome": cls},
+      el("b", {text: x.name}), el("span", {class: "oc " + cls, text: x.outcome}), el("span", {text: x.text}),
+      x.own_install ? el("button", {class: "small", text: "Ouvrir son installation", onclick: () => rowInstall(x.folder)}) : el("span")));
+  }
+}
+
+// ---------------------------------------------- the top bar's switcher
+function renderAppMenu() {
+  const m = $("app-menu"); m.replaceChildren();
+  for (const a of S.apps || []) m.append(el("button", {role: "menuitem", "aria-current": a.active ? "true" : "false",
+    onclick: () => { closeAppMenu(); if (!a.active) activateApp(a.folder, false); }},
+    el("span", {class: "ck", text: a.active ? "✓" : ""}), el("span", {class: "nm", text: a.name}), el("span", {class: "fd", text: a.folder})));
+  m.append(el("hr"), el("button", {role: "menuitem", onclick: () => { closeAppMenu(); go("apps"); }},
+    el("span", {class: "ck", text: ""}), el("span", {text: "Toutes les applications…"})));
+}
+function closeAppMenu() { $("app-menu").classList.add("hidden"); $("tb-app").setAttribute("aria-expanded", "false"); }
+$("tb-app").onclick = (e) => {
+  e.stopPropagation();
+  const open = $("app-menu").classList.contains("hidden");
+  if (open) { renderAppMenu(); $("app-menu").classList.remove("hidden"); $("tb-app").setAttribute("aria-expanded", "true");
+              const f = $("app-menu").querySelector("button"); if (f) f.focus(); }
+  else closeAppMenu();
+};
+document.addEventListener("click", (e) => { if (!$("tb-app-wrap").contains(e.target)) closeAppMenu(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("app-menu").classList.contains("hidden")) { closeAppMenu(); $("tb-app").focus(); } });
+
+async function changeFolder() { go("apps"); }
 async function openPair(app, work) {
-  try { await api("/api/open", {app, work}); savedCount = 0; corrSel = null; stepFilter = null; opened = false;
+  try { await api("/api/open", {app, work}); resetForApp();
         location.hash = "#dashboard"; await refreshState(); }
   catch (e) { showStart(e.message); }
 }
@@ -931,8 +1199,12 @@ async function refreshState(reason) {
   } else {
     S = await api("/api/state");
   }
-  if (!S.open) { closeEvents(); showStart(S.load_error); return; }
+  // Drafts are the active application's (1.6): read once its folder is known.
+  if (!draftsLoaded) { loadDrafts(); draftsLoaded = true; } else swapDrafts();
+  // 1.6: the stream is every run's, whatever its application — open even
+  // with no feature open, so that a card or an end elsewhere reaches the page.
   openEvents();
+  if (!S.open) { showStart(S.load_error); return; }
   route();
   renderAll();
   await refreshForms();
@@ -961,22 +1233,53 @@ function watchDiagnostic() {
 }
 
 // ---------------------------------------------------------- top bar
+// 1.6: the active application's name opens the switcher; the run going is
+// said with its application, and « Arrêter » acts on it from any screen.
 function renderChrome() {
   const isOpen = !!S.open;
-  for (const id of ["tb-folder", "tb-mode", "tb-run", "tb-menu"]) $(id).classList.toggle("hidden", !isOpen);
+  $("tb-app-wrap").classList.toggle("hidden", !(S.apps || []).length);
+  $("tb-app").replaceChildren(el("span", {text: S.app_name || "Aucune application"}), el("span", {class: "caret", text: " ▾"}));
+  for (const id of ["tb-folder", "tb-mode", "tb-menu"]) $(id).classList.toggle("hidden", !isOpen);
+  const b = S.busy, tb = $("tb-run");
+  tb.classList.toggle("hidden", !isOpen && !anyRun());
+  tb.classList.toggle("running", anyRun());
+  if (anyRun()) tb.replaceChildren(...(b.active ? [] : [el("span", {class: "where", text: b.app_name}), " · "]),
+    `${b.prompt} — depuis ${(b.started_at || "").slice(11, 16)}`);
+  else tb.textContent = "Au repos";
+  tb.title = anyRun() ? busyNote() : "Aucune commande ne tourne";
+  $("tb-stop").classList.toggle("hidden", !anyRun());
+  renderBusyBanner();
+  updateTitle();
   if (!isOpen) return;
-  $("tb-folder").replaceChildren(el("b", {text: S.feature || S.working_folder}),
-    el("span", {class: "muted", text: " · " + baseName(S.app_folder)}));
+  $("tb-folder").replaceChildren(el("b", {text: S.feature || S.working_folder}));
   $("tb-mode").replaceChildren("Mode : ", el("b", {text: S.mode === "manuel" ? "Manuel" : "Auto"}));
-  const tb = $("tb-run");
-  tb.classList.toggle("running", running());
-  tb.textContent = running() ? `${S.run.prompt} — depuis ${S.run.started_at.slice(11, 16)}` : "Au repos";
   $("nav-run-dot").classList.toggle("hidden", !running());
   const nc = (S.bugfixes || []).length;
   $("nav-corr-count").textContent = nc; $("nav-corr-count").classList.toggle("hidden", !nc);
   $("nav-corr-count").classList.add("plain");
   menuDot();
 }
+// A run going in another application: said on every screen, with its idle
+// question when it has one — the launches here wait for its end.
+function renderBusyBanner() {
+  const bb = $("busy-banner");
+  bb.classList.toggle("hidden", !elsewhere());
+  if (!elsewhere()) return;
+  const b = S.busy;
+  bb.replaceChildren(el("b", {text: `Une commande tourne dans « ${b.app_name} » : ${b.prompt}`}),
+    ` — depuis ${(b.started_at || "").slice(11, 16)}. Une seule à la fois : rien ne se lance ici avant sa fin.`,
+    el("button", {class: "small", text: `Ouvrir « ${b.app_name} »`, onclick: () => activateApp(b.app, false)}));
+  if (b.idle) bb.append(el("div", {style: "margin-top:6px"},
+    `Aucun message depuis ${b.idle.minutes} min : elle attend ${(b.idle.agents || []).join(", ") || "un agent"}.`,
+    el("button", {class: "primary small", text: "Continuer d'attendre", onclick: continueWait}),
+    el("button", {class: "danger small", text: "Arrêter maintenant", onclick: stopNow})));
+}
+$("tb-run").onclick = () => { if (elsewhere()) activateApp(S.busy.app, false); };
+$("tb-stop").onclick = async () => {
+  const b = S.busy; if (!b) return;
+  if (!confirm(`Arrêter ${b.prompt}${b.active ? "" : ` dans « ${b.app_name} »`} maintenant ? Le tour en cours s'arrête inachevé.`)) return;
+  await stopNow();
+};
 
 // The side menu opens and closes (1.4.5), remembered. Closed, the button
 // carries a dot when « À répondre » has open entries or a run is going:
@@ -1076,7 +1379,8 @@ function renderDashboard() {
     detail.append(el("button", {class: "primary big", text: "Voir la chaîne", onclick: () => goStep(d.chain, d.step)}));
   } else if (n.kind === "run") {
     detail.append(el("button", {class: "primary big", text: `Lancer /${n.command} ${n.args || ""}`.trim(),
-      onclick: () => launchNext(d)}));
+      disabled: elsewhere() || undefined, title: elsewhere() ? busyNote() : undefined, onclick: () => launchNext(d)}));
+    if (elsewhere()) detail.append(el("span", {class: "muted", text: busyNote()}));
   } else if (n.kind === "answer") {
     // The folder's proposal is one step's answers; a chain's Next: names
     // questions, blocking or both — which may belong to several steps.
@@ -1195,23 +1499,15 @@ function renderChainState() {
   box.append(el("div", {}, el("b", {text: c.summary})),
     el("div", {class: "muted small", text: `Dans le dépôt de la chaîne : ${c.chain_commit || "—"} du ${c.chain_date || "—"}.`}),
     chainDetails(c));
-  $("btn-chain").disabled = running() || !c.state;
+  $("btn-chain").disabled = running() || !c.state || !!S.bulk_going;
 }
 $("btn-chain").onclick = async () => {
   const b = $("btn-chain"), msg = $("chain-msg");
   b.disabled = true; msg.textContent = "Installation…";
   try {
-    let r;
-    try { r = await api("/api/chain/install", {}); }
-    catch (e) {
-      if (!(e.status === 409 && e.body && e.body.overwrite)) throw e;
-      const f = e.body.overwrite;
-      if (!confirm(`${plural(f.length, "fichier n'est pas", "fichiers ne sont pas")} tel que la chaîne l'a laissé ou ne vient pas d'elle ; l'installation le remplace :\n\n${f.join("\n")}\n\nRemplacer ?`)) { msg.textContent = "Rien n'a été installé."; return; }
-      r = await api("/api/chain/install", {confirm: true});
-    }
-    const x = r.result;
-    msg.textContent = `Installée : ${x.commit} du ${x.date}` +
-      (x.app_commit ? ` — commit ${x.app_commit} « ${x.message} »` + (x.pushed ? ", poussé." : x.push_error ? `, non poussé : ${x.push_error}` : ".") : " — rien n'avait changé.");
+    const x = await installChain(null);
+    if (!x) { msg.textContent = "Rien n'a été installé."; return; }
+    msg.textContent = installText(x);
     await refreshState();
   } catch (e) { msg.textContent = ""; alert(e.message); }
   finally { b.disabled = running() || !(S.chain && S.chain.state); }
@@ -1232,7 +1528,7 @@ function argsFor(step, chain) {
   return step.command === "deploie" ? "" : S.feature;
 }
 async function launchStep(step, chain) {
-  if (!step || running()) return;
+  if (!step || anyRun()) { if (elsewhere()) alert(busyNote()); return; }
   const cmd = step.command, args = argsFor(step, chain);
   const reasons = [];
   if (!isNamed(step, chain)) reasons.push("Ce n'est ni l'étape que la chaîne a nommée, ni celle que le dossier propose.");
@@ -1266,7 +1562,7 @@ async function postRun(name, args) {
 }
 
 async function runCommand(name, args, chain, stepId) {
-  if (running()) return;
+  if (anyRun()) return;
   try {
     if (!(await postRun(name, args))) return;
     $("stream").replaceChildren();
@@ -1314,10 +1610,10 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     if (s.state === "t'attend" || waiting) acts.append(el("button", {class: s.state === "t'attend" ? "primary" : "",
       text: `Répondre (${waiting})`, onclick: () => openAnswers(s.id, chain)}));
     if (s.command && s.id !== "test") acts.append(el("button", {class: isNext && d.next && d.next.kind === "run" ? "primary" : "",
-      text: "Lancer", disabled: !launchable || running() || undefined, title: launchable ? `/${s.command}` : offNote,
+      text: "Lancer", disabled: !launchable || anyRun() || undefined, title: elsewhere() ? busyNote() : launchable ? `/${s.command}` : offNote,
       onclick: () => launchStep(s, chain)}));
     if (s.id === "test") acts.append(el("button", {class: isNext ? "primary" : "", text: "Déployer",
-      disabled: running() || undefined, title: "/deploie", onclick: () => launchStep(s, chain)}));
+      disabled: anyRun() || undefined, title: elsewhere() ? busyNote() : "/deploie", onclick: () => launchStep(s, chain)}));
     const key = `${chain}:${s.id}`;
     const wb = whyBox(s);
     wb.classList.toggle("hidden", !whyOpen.has(key));
@@ -1448,7 +1744,7 @@ async function checkForms(notifyNew) {
   else { const n = openCount(); $("nav-answer-count").textContent = n; $("nav-answer-count").classList.toggle("hidden", !n); updateTitle(); }
   if (notifyNew && fresh.length) {
     const nb = fresh.filter((e) => !e.question).length, nq = fresh.length - nb;
-    notify("reponse", fresh.length > 1 ? `${fresh.length} réponses vous attendent` : "Une réponse vous attend",
+    notify("reponse", `${S.app_name} — ` + (fresh.length > 1 ? `${fresh.length} réponses vous attendent` : "une réponse vous attend"),
       [nq ? plural(nq, "question", "questions") : null, nb ? plural(nb, "blocage", "blocages") : null].filter(Boolean).join(" et ") +
       " : " + fresh.map((e) => e.rel).filter((v, i, a) => a.indexOf(v) === i).slice(0, 3).join(", "),
       () => { const x = fresh.map(entryLot).find((y) => y.lot); x ? openAnswersLot(x.lot, x.chain) : openAnswersOfKind("all"); });
@@ -1902,10 +2198,14 @@ function renderRun() {
   if (S.stop_file) sf.append("stop.md est présent : /8_code s'arrêtera après le lot en cours. ",
     el("button", {class: "link", text: "Le retirer", onclick: disarm}));
   renderRunEnd();
+  renderPerms();
+}
+// The cards of the run going, whatever its application (1.6): the
+// snapshot, and those events brought since it was taken — a state fetched
+// just before a request arrived must not take its card away.
+function renderPerms() {
   const pl = $("perm-banner"); pl.replaceChildren();
-  // The snapshot, and the cards events brought since it was taken: a state
-  // fetched just before a request arrived must not take its card away.
-  if (running()) for (const p of [...run.permissions, ...livePerms.values()]) if (!resolvedPerms.has(p.id)) addPermission(p);
+  if (anyRun()) for (const p of [...S.busy.permissions, ...livePerms.values()]) if (!resolvedPerms.has(p.id)) addPermission(p);
   permAlert();
 }
 
@@ -1959,7 +2259,7 @@ function addPermission(p) {
   if ($("perm-" + p.id)) return;
   $("perm-banner").append(el("div", {class: "perm", id: "perm-" + p.id},
     el("div", {class: "title", text: p.title || ("Autoriser " + p.tool + " ?")}),
-    el("div", {class: "muted small", text: `Outil : ${p.tool} · demandé par : ${p.agent}`}),
+    el("div", {class: "muted small", text: `Outil : ${p.tool} · demandé par : ${p.agent}` + (p.app && !sameApp(p.app, S.app_folder) ? ` · dans « ${appName(p.app)} »` : "")}),
     el("pre", {text: p.input}),
     el("div", {class: "row"},
       el("button", {class: "allow", text: "Autoriser", onclick: () => answerPerm(p.id, true)}),
@@ -1978,11 +2278,12 @@ function permAlert() {
 // The tab's title carries the count of what waits on her (1.5): the entries
 // to answer, the permission cards, the idle question — « (2) Cockpit ».
 function waitingCount() {
-  return openCount() + $("perm-banner").children.length + (running() && S.run.idle ? 1 : 0);
+  return openCount() + $("perm-banner").children.length + (anyRun() && S.busy.idle ? 1 : 0);
 }
+// 1.6: the title names the active application — « (2) hyrox_tracker — Cockpit ».
 function updateTitle() {
-  const n = S.open ? waitingCount() : 0;
-  const t = n ? `(${n}) Cockpit` : "Cockpit";
+  const n = S.open ? waitingCount() : $("perm-banner").children.length;
+  const t = (n ? `(${n}) ` : "") + (S.app_name ? `${S.app_name} — Cockpit` : "Cockpit");
   if (document.title !== t) document.title = t;
 }
 
@@ -2051,6 +2352,9 @@ function onEvent(ev) {
   }
   if (ev.seq <= seen) return;
   seen = ev.seq;
+  // 1.6: every run's events arrive; another application's run is not this
+  // one's — its cards, its end and its idle question only, named.
+  if (ev.app && !sameApp(ev.app, S.app_folder)) { otherAppEvent(ev); return; }
   renderEvent(ev);
   switch (ev.type) {
     case "run_started":
@@ -2069,7 +2373,7 @@ function onEvent(ev) {
       break;
     case "idle_wait":
       if (S.run) { S.run.idle = d; renderIdle(d); }
-      notify("attente", "Le run attend un agent depuis " + d.minutes + " min",
+      notify("attente", `${S.app_name} — le run attend un agent depuis ${d.minutes} min`,
         `${(d.agents || []).join(", ") || "un agent"} n'a rien envoyé : continuer d'attendre ou arrêter ?`,
         () => goStep(runChain(), S.run_place && S.run_place.step));
       break;
@@ -2082,7 +2386,7 @@ function onEvent(ev) {
     case "permission":
       livePerms.set(d.id, d);
       addPermission(d);
-      notify("autorisation", "Une autorisation attend", `${d.tool} — demandé par ${d.agent}. Le run attend votre réponse.`,
+      notify("autorisation", `${S.app_name} — une autorisation attend`, `${d.tool} — demandé par ${d.agent}. Le run attend votre réponse.`,
         () => { $("perm-banner").scrollTop = 0; });
       break;
     case "permission_resolved": { livePerms.delete(d.id); resolvedPerms.add(d.id); const c = $("perm-" + d.id); if (c) c.remove(); permAlert(); break; }
@@ -2091,12 +2395,46 @@ function onEvent(ev) {
     case "run_ended": {
       const n = d.next || {kind: "unknown"};
       const where = () => goStep(runChain(), S.run_place && S.run_place.step);
-      if (d.outcome === "erreur") notify("erreur", `${d.prompt} s'est arrêté sur une erreur`, d.error || "Erreur", where);
-      else notify("fin", `${d.prompt} — ${d.outcome}`, n.kind === "unknown" ? "Le relais ne finit pas par une ligne Next:." : "Ensuite : " + n.french, where);
+      if (d.outcome === "erreur") notify("erreur", `${S.app_name} — ${d.prompt} s'est arrêté sur une erreur`, d.error || "Erreur", where);
+      else notify("fin", `${S.app_name} — ${d.prompt} — ${d.outcome}`, n.kind === "unknown" ? "Le relais ne finit pas par une ligne Next:." : "Ensuite : " + n.french, where);
       if (d.command === "8_code") loadCode(runChain(), {notify: true});
       // After every run the scan runs; the run's own Next: is trusted as printed (§2.2).
       refreshState(); break;
     }
+  }
+}
+
+// Another application's run (1.6): its permission cards and its idle
+// question reach every screen; its start and its end change what launches.
+// Each notification names its application; a click opens it.
+function otherAppEvent(ev) {
+  const d = ev.data, name = appName(ev.app);
+  const there = () => activateApp(ev.app, false);
+  switch (ev.type) {
+    case "run_started": case "run_ended":
+      if (ev.type === "run_ended") {
+        const n = d.next || {kind: "unknown"};
+        if (d.outcome === "erreur") notify("erreur", `${name} — ${d.prompt} s'est arrêté sur une erreur`, d.error || "Erreur", there);
+        else notify("fin", `${name} — ${d.prompt} — ${d.outcome}`, n.kind === "unknown" ? "Le relais ne finit pas par une ligne Next:." : "Ensuite : " + n.french, there);
+      }
+      refreshState().catch(() => {}); break;
+    case "permission":
+      livePerms.set(d.id, {...d, app: ev.app});
+      addPermission({...d, app: ev.app});
+      notify("autorisation", `${name} — une autorisation attend`, `${d.tool} — demandé par ${d.agent}. Le run attend votre réponse.`,
+        () => { $("perm-banner").scrollTop = 0; });
+      break;
+    case "permission_resolved": { livePerms.delete(d.id); resolvedPerms.add(d.id); const c = $("perm-" + d.id); if (c) c.remove(); permAlert(); break; }
+    case "idle_wait":
+      if (S.busy) { S.busy.idle = d; renderBusyBanner(); updateTitle(); }
+      notify("attente", `${name} — le run attend un agent depuis ${d.minutes} min`,
+        `${(d.agents || []).join(", ") || "un agent"} n'a rien envoyé : continuer d'attendre ou arrêter ?`, () => {});
+      break;
+    case "status":
+      if (S.busy && d) { S.busy.idle = d.idle || null; renderBusyBanner(); updateTitle(); }
+      break;
+    case "limits":
+      S.limits = {...(S.limits || {}), [d.window]: d}; renderGauges(); break;
   }
 }
 
@@ -2179,7 +2517,7 @@ async function loadCode(chain, opts = {}) {
     for (const l of data.lots || []) {
       const was = before[l.lot], now = l.state;
       if (was === now || !["passé", "échoué", "échoué 3 fois", "annulé"].includes(now)) continue;
-      notify("lot", `${l.lot} ${now === "passé" ? "est passé" : now === "annulé" ? "est annulé (cause sheet)" : now === "échoué 3 fois" ? "a échoué trois fois" : "a échoué"}`,
+      notify("lot", `${S.app_name} — ${l.lot} ${now === "passé" ? "est passé" : now === "annulé" ? "est annulé (cause sheet)" : now === "échoué 3 fois" ? "a échoué trois fois" : "a échoué"}`,
         `${data.passed} / ${data.total} lots en PASS` + (l.title ? ` — ${l.title}` : ""), () => openCode(chain, l.lot));
     }
   }
@@ -2255,7 +2593,7 @@ function renderCode(box, chain) {
   const acts = el("div", {class: "code-actions"});
   if (here) {
     const step = findStep(chain, "8_code");
-    if (!running()) acts.append(el("button", {class: "primary", text: "Lancer /8_code", onclick: () => launchStep(step, chain)}));
+    if (!anyRun()) acts.append(el("button", {class: "primary", text: "Lancer /8_code", onclick: () => launchStep(step, chain)}));
     if (mine) {
       acts.append(el("button", {class: "stopnext", text: S.stop_file ? "stop.md posé : arrêt après ce lot" : "Arrêter au prochain lot",
         disabled: S.stop_file || undefined, onclick: async () => { try { await api("/api/stop-next-lot", {}); await refreshState(); loadCode(chain); } catch (e) { alert(e.message); } }}));
@@ -2460,13 +2798,15 @@ const GROUP_ORDER = ["Amont", "Aval", "Correction", "Fusion", "Outils"];
 function renderSettings() {
   // Dossiers: the application folder, and the feature.
   const f = $("set-folders"); f.replaceChildren(
-    el("div", {}, el("span", {class: "muted", text: "Application : "}), el("span", {class: "mono", text: S.app_folder || "—"})),
+    el("div", {}, el("span", {class: "muted", text: "Application : "}), el("b", {text: S.app_name || "—"}),
+      el("span", {class: "mono muted", text: "  " + (S.app_folder || "")})),
     el("div", {style: "margin-top:4px"}, el("span", {class: "muted", text: "Feature : "}), el("b", {class: "mono", text: S.feature || "—"})));
   const fl = el("div", {class: "folders", id: "feature-list"});
   for (const w of S.working_folders || []) fl.append(el("button", {text: w, class: w === S.feature ? "sel" : "",
     onclick: () => { if (w !== S.feature) openPair(S.app_folder, w); }}));
   f.append(el("div", {class: "muted small", style: "margin-top:12px", text: "Changer de feature :"}), fl,
-    el("div", {class: "row", style: "margin-top:12px"}, el("button", {text: "Changer d'application", onclick: changeFolder})));
+    el("div", {class: "row", style: "margin-top:12px"}, el("button", {text: "Changer d'application", onclick: changeFolder}),
+      el("span", {class: "muted small", text: "La liste des applications, l'ajout, « Tout mettre à jour » : l'écran « Applications »."})));
   // 1.5.1 — the folders never shown: the earlier chain's. Ticked, a folder and
   // its bugfix-NN/ leave the feature list, « Correction », the scan, the
   // Statistics and the Code tab.
@@ -2521,7 +2861,7 @@ function renderSettings() {
       const hl = c.name === nextCmd;
       const input = el("input", {type: "text", value: c.argument_hint ? (hl && d.next.args ? d.next.args : S.feature) : "",
         placeholder: c.argument_hint || "sans argument", "aria-label": "argument de /" + c.name});
-      const btn = el("button", {text: "/" + c.name, title: c.description, disabled: running() || undefined,
+      const btn = el("button", {text: "/" + c.name, title: elsewhere() ? busyNote() : c.description, disabled: anyRun() || undefined,
         onclick: () => runRaw(c.name, input.value, hl)});
       box.append(el("div", {class: "cmd" + (hl ? " hl" : "")}, btn, input));
     }
@@ -2540,7 +2880,7 @@ function renderSettings() {
 }
 
 async function runRaw(name, args, named) {
-  if (running()) return;
+  if (anyRun()) return;
   if (!named && !confirm(`Lancer /${name} ${args || ""} ? Ce n'est pas l'étape que le dernier relais a nommée.`)) return;
   try {
     if (!(await postRun(name, args))) return;
@@ -2587,12 +2927,13 @@ function stSavePrefs() { try { localStorage.setItem("cockpit-stats", JSON.string
 const ST_PERIODS = {jour: "aujourd'hui", "7j": "7 jours", "30j": "30 jours", tout: "depuis le début"};
 const stPeriod = () => ST_PERIODS[stPrefs.period] ? stPrefs.period : "7j";
 const stFeature = () => stPrefs.feature || "";          // "" the feature opened, "*" all of them
+const stApp = () => stPrefs.app === "*" ? "*" : "";      // "" the active application, "*" all of them (1.6)
 
 async function loadStats() {
   const tok = ++stToken;
   renderStFilters();
   let data;
-  try { data = await api("/api/stats?" + new URLSearchParams({feature: stFeature(), period: stPeriod()})); }
+  try { data = await api("/api/stats?" + new URLSearchParams({app: stApp(), feature: stFeature(), period: stPeriod()})); }
   catch (e) { if (tok === stToken) stMsg(e.message); return; }
   if (tok !== stToken) return;
   ST = data;
@@ -2605,7 +2946,14 @@ function stMsg(text, kind = "warn") {
 }
 
 function renderStFilters() {
+  const as = $("st-app"); as.replaceChildren(el("option", {value: "", text: `${S.app_name || "—"} (active)`}),
+    el("option", {value: "*", text: "Toutes"}));
+  as.value = stApp();
   const sel = $("st-feature"); sel.replaceChildren();
+  sel.disabled = stApp() === "*";
+  if (stApp() === "*") { sel.append(el("option", {value: "*", text: "Toutes"})); sel.value = "*";
+    for (const b of $("st-period").querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.p === stPeriod()));
+    return; }
   const others = ((ST && ST.features) || []).filter((f) => f !== S.feature);
   if (stFeature() && stFeature() !== "*" && !others.includes(stFeature()) && stFeature() !== S.feature) others.push(stFeature());
   sel.append(el("option", {value: "", text: `${S.feature || "—"} (ouverte)`}), el("option", {value: "*", text: "Toutes"}),
@@ -2613,6 +2961,7 @@ function renderStFilters() {
   sel.value = stFeature() === S.feature ? "" : stFeature();
   for (const b of $("st-period").querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.p === stPeriod()));
 }
+$("st-app").onchange = () => { stPrefs.app = $("st-app").value; stSavePrefs(); stOpen.clear(); loadStats(); };
 $("st-feature").onchange = () => { stPrefs.feature = $("st-feature").value; stSavePrefs(); stOpen.clear(); loadStats(); };
 for (const b of $("st-period").querySelectorAll("button")) {
   b.onclick = () => { stPrefs.period = b.dataset.p; stSavePrefs(); loadStats(); };
@@ -2620,7 +2969,7 @@ for (const b of $("st-period").querySelectorAll("button")) {
 $("st-export").onclick = async () => {
   const b = $("st-export"); b.disabled = true; b.textContent = "Fenêtre ouverte…";
   try {
-    const r = await api("/api/stats/export", {feature: stFeature(), period: stPeriod()});
+    const r = await api("/api/stats/export", {app: stApp(), feature: stFeature(), period: stPeriod()});
     if (r.cancelled) stMsg("Export annulé : aucun dossier choisi.");
     else stMsg("Écrits : " + r.files.join("  ·  "), "ok");
   } catch (e) { stMsg(e.message); }
@@ -2707,7 +3056,8 @@ function renderStTiles() {
   const dont = (n, one, many) => n ? `dont ${plural(n, one, many)}` : null;
   const share = t.read_tokens ? Math.round(100 * t.cache_read_tokens / t.read_tokens) : null;
   box.append(
-    tile("Runs", String(t.runs), ST_PERIODS[ST.period] + (ST.feature ? ` · ${ST.feature}` : " · toutes les fonctionnalités")),
+    tile("Runs", String(t.runs), ST_PERIODS[ST.period] + (ST.app_name ? ` · ${ST.app_name}` : " · toutes les applications") +
+      (ST.feature ? ` · ${ST.feature}` : " · toutes les fonctionnalités")),
     tile("Temps total", t.runs ? fmtDurC(t.duration_s) : "—", dont(t.duration_unknown, "durée inconnue", "durées inconnues")),
     tile("Tokens lus", t.runs ? fmtTok(t.read_tokens) : "—", share !== null ? `${share} % en cache` : null,
       dont(t.read_unknown, "run inconnu", "runs inconnus")),
@@ -2887,7 +3237,7 @@ function renderStTables() {
 
   $("st-feat").classList.toggle("hidden", !!ST.feature);
   $("st-feat-table").replaceChildren(ST.feature ? "" : stTable("feat", [
-    txt("feature", "Fonctionnalité", (r) => r.feature, (r) => r.feature, "mono"),
+    txt("feature", "Fonctionnalité", (r) => r.label || r.feature, (r) => r.label || r.feature, "mono"),
     num("runs", "Runs", (r) => r.runs, (r) => String(r.runs)),
     num("dur", "Durée totale", (r) => r.duration_s, (r) => durCell(r.duration_s, r.duration_unknown)),
     num("read", "Tokens lus", (r) => r.read_tokens, (r) => sumCell(r.read_tokens, r.read_unknown, "run inconnu", "runs inconnus")),
@@ -2936,7 +3286,8 @@ function renderStHistory() {
   $("st-history-table").replaceChildren(stTable("history", [
     txt("date", "Date", (r) => r.started_at, (r) => fmtDate(r.started_at), "nw"),
     txt("cmd", "Commande", (r) => r.command, (r) => [el("span", {class: "mono", text: r.command || "inconnue"}), " ", odd(r, "sa commande"),
-      r.resumed ? el("span", {class: "badge plain", text: "suite"}) : null]),
+      r.resumed ? el("span", {class: "badge plain", text: "suite"}) : null,
+      !ST.app_name ? el("span", {class: "u", text: r.app_name || "application inconnue"}) : null]),
     num("dur", "Durée", (r) => r.duration_s, (r) => fmtDurC(r.duration_s)),
     num("read", "Tokens lus", (r) => r.read_tokens, (r) => fmtTok(r.read_tokens)),
     num("out", "Tokens écrits", (r) => r.output_tokens, (r) => fmtTok(r.output_tokens)),
@@ -2984,7 +3335,6 @@ window.addEventListener("resize", () => {
 
 window.addEventListener("focus", () => { if (S.open && !running()) refreshForms(); });
 
-loadDrafts();
 applyMenu();
 refreshState().catch((e) => showStart(e.message));
 </script>

@@ -1,8 +1,8 @@
 """The « Statistiques » screen — cockpit 1.4.5 (TECHNICAL_V1 §15).
 
 Reads `stats.sqlite` and nothing else, through a read-only connection: the
-runs, their agent passes and every limit measure, filtered by feature and
-period, then summed, sorted and ranked here.
+runs, their agent passes and every limit measure, filtered by application
+(1.6), feature and period, then summed, sorted and ranked here.
 
 Never a figure the store does not hold:
 - an unknown count (NULL) stays unknown — `None` in the payload — and is
@@ -178,12 +178,17 @@ def _mark_unusual(items, key, all_items):
 
 # ------------------------------------------------------------------- shape
 
-def _run_view(r, limits_of):
-    out = {k: r.get(k) for k in ("id", "feature", "work", "command", "permission_mode", "session_id",
+def app_key(app):
+    return os.path.normcase(os.path.abspath(app)) if app else None
+
+
+def _run_view(r, limits_of, names):
+    out = {k: r.get(k) for k in ("id", "app", "feature", "work", "command", "permission_mode", "session_id",
                                  "started_at", "ended_at", "duration_s", "input_tokens",
                                  "cache_read_tokens", "cache_creation_tokens", "output_tokens",
                                  "next_line", "outcome", "log_path", "resumed", "backfilled")}
     out["cmd"] = command_of(r.get("command"))
+    out["app_name"] = names.get(app_key(r.get("app"))) or (os.path.basename(r["app"]) if r.get("app") else None)
     out["read_tokens"] = _read(r)
     ms = limits_of.get(r["id"], [])
     out["limits"] = {w: limit_delta([m for m in ms if m["window"] == w]) for w in WINDOWS}
@@ -200,27 +205,38 @@ def _pass_view(p, run):
     out["run_cmd"] = run["cmd"] if run else None
     out["run_started_at"] = run["started_at"] if run else None
     out["feature"] = run["feature"] if run else None
+    out["app_name"] = run["app_name"] if run else None
     return out
 
 
-def build(path, feature=None, period="tout", now=None, ignored=()):
+def build(path, feature=None, period="tout", now=None, ignored=(), app=None, ignored_by_app=None, names=None):
     """The whole screen's data for one filter: `feature` None is « toutes ».
     `ignored` (1.5.1): features never shown — their runs are in no filter,
-    no table and no total."""
+    no table and no total. 1.6: `app`, an application's folder, None for
+    « toutes »; `ignored_by_app`, {folder key: names}, each application's
+    own ignored folders, in place of `ignored`; `names`, {folder key: name}."""
     now = now or datetime.now()
     period = period if period in PERIODS else "tout"
     since = period_start(period, now)
     raw_runs, raw_passes, raw_limits, error = read_store(path)
+    names = names or {}
+
+    def is_hidden(r):
+        if ignored_by_app is not None:
+            return r.get("feature") in ignored_by_app.get(app_key(r.get("app")), ())
+        return r.get("feature") in ignored
 
     limits_of = _by(raw_limits, lambda m: m.get("run_id"))
-    all_runs = [_run_view(r, limits_of) for r in raw_runs if r.get("feature") not in ignored]
+    all_runs = [_run_view(r, limits_of, names) for r in raw_runs if not is_hidden(r)]
     by_id = {r["id"]: r for r in all_runs}
-    hidden = {r["id"] for r in raw_runs if r.get("feature") in ignored}
+    hidden = {r["id"] for r in raw_runs if is_hidden(r)}
     all_passes = [_pass_view(p, by_id.get(p["run_id"])) for p in raw_passes if p["run_id"] not in hidden]
     _mark_unusual(all_runs, lambda r: r["cmd"], all_runs)
     _mark_unusual(all_passes, lambda p: p["agent"], all_passes)
 
-    runs = [r for r in all_runs if (feature is None or r["feature"] == feature)
+    akey = app_key(app)
+    in_app = [r for r in all_runs if akey is None or app_key(r.get("app")) == akey]
+    runs = [r for r in in_app if (feature is None or r["feature"] == feature)
             and _in_period(r["started_at"], since)]
     runs.sort(key=lambda r: r["started_at"] or "", reverse=True)
     keep = {r["id"] for r in runs}
@@ -265,8 +281,11 @@ def build(path, feature=None, period="tout", now=None, ignored=()):
     by_lot_unknown = sum(1 for p in passes if not p.get("lot")) if feature is not None else 0
     by_feature = []
     if feature is None:
-        for feat, g in _by(runs, lambda r: r["feature"] or "(inconnue)").items():
-            by_feature.append({**_totals(g), "feature": feat})
+        # « Toutes » the applications: a feature is named with its application's.
+        for (an, feat), g in _by(runs, lambda r: (r["app_name"] if akey is None else None,
+                                                   r["feature"] or "(inconnue)")).items():
+            by_feature.append({**_totals(g), "feature": feat, "app_name": an,
+                               "label": f"{an or '(application inconnue)'} · {feat}" if akey is None else feat})
 
     measures = []
     for m in raw_limits:
@@ -280,8 +299,9 @@ def build(path, feature=None, period="tout", now=None, ignored=()):
                          key=lambda r: r["read_tokens"], reverse=True)[:TOP]
     costly_passes = sorted((p for p in passes if p["read_tokens"] is not None),
                            key=lambda p: p["read_tokens"], reverse=True)[:TOP]
-    features = sorted({r["feature"] for r in all_runs if r["feature"]})
+    features = sorted({r["feature"] for r in in_app if r["feature"]})
     return {
+        "app": app, "app_name": names.get(akey) if akey else None,
         "feature": feature, "period": period, "now": now.isoformat(timespec="seconds"),
         "since": since.isoformat(timespec="seconds") if since else None,
         "range": {"start": (since or first or now).isoformat(timespec="seconds"),
@@ -292,7 +312,7 @@ def build(path, feature=None, period="tout", now=None, ignored=()):
         "passes_unknown_output": sum(1 for p in passes if p["output_tokens"] is None),
         "by_command": sorted(by_command, key=lambda x: x["cmd"]),
         "by_agent": sorted(by_agent, key=lambda x: x["agent"] or ""),
-        "by_feature": sorted(by_feature, key=lambda x: x["feature"]),
+        "by_feature": sorted(by_feature, key=lambda x: x["label"]),
         "by_lot": sorted(by_lot, key=lambda x: (x["folder"], x["lot"])),
         "by_lot_unknown": by_lot_unknown,
         "costly_runs": [r["id"] for r in costly_runs],
@@ -305,8 +325,8 @@ def build(path, feature=None, period="tout", now=None, ignored=()):
 # -------------------------------------------------------------------- CSV
 
 RUN_COLUMNS = [
-    ("début", "started_at"), ("fin", "ended_at"), ("fonctionnalité", "feature"), ("commande", "command"),
-    ("durée (s)", "duration_s"), ("tokens lus", "read_tokens"), ("dont entrée", "input_tokens"),
+    ("début", "started_at"), ("fin", "ended_at"), ("application", "app_name"), ("fonctionnalité", "feature"),
+    ("commande", "command"), ("durée (s)", "duration_s"), ("tokens lus", "read_tokens"), ("dont entrée", "input_tokens"),
     ("dont cache lu", "cache_read_tokens"), ("dont cache créé", "cache_creation_tokens"),
     ("tokens écrits", "output_tokens"),
     ("5 h au début (%)", ("five_hour", "start")), ("5 h à la fin (%)", ("five_hour", "end")),
@@ -318,7 +338,7 @@ RUN_COLUMNS = [
 ]
 PASS_COLUMNS = [
     ("run", "run_id"), ("début du run", "run_started_at"), ("commande", "run_command"),
-    ("fonctionnalité", "feature"), ("agent", "agent"), ("modèle", "model"), ("description", "description"),
+    ("application", "app_name"), ("fonctionnalité", "feature"), ("agent", "agent"), ("modèle", "model"), ("description", "description"),
     ("début", "started_at"), ("fin", "ended_at"), ("durée (s)", "duration_s"), ("tokens lus", "read_tokens"),
     ("dont entrée", "input_tokens"), ("dont cache lu", "cache_read_tokens"),
     ("dont cache créé", "cache_creation_tokens"), ("tokens écrits", "output_tokens"),
@@ -368,6 +388,8 @@ def csv_files(data):
     """The two exports for the current filters: (name, text) for the runs
     and for their agent passes."""
     feat = data["feature"] or "toutes"
+    if data.get("app_name"):
+        feat = f"{data['app_name']}-{feat}"
     stamp = data["now"][:10]
     passes = [p for r in data["runs"] for p in r["passes"]]
     return [(f"cockpit-runs-{feat}-{data['period']}-{stamp}.csv", to_csv(data["runs"], RUN_COLUMNS)),

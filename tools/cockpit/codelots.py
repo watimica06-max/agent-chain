@@ -519,8 +519,10 @@ def commits(repo, work, lot):
 
 # ------------------------------------------------------------ the passes
 
-def store_passes(store_path, feature):
-    """The agent passes of the feature's runs, from stats.sqlite, read-only."""
+def store_passes(store_path, feature, app=None):
+    """The agent passes of the feature's runs, from stats.sqlite, read-only.
+    1.6: of `app`'s runs, when given — two applications may name a feature
+    alike; a run stored with no application counts for any."""
     if not store_path or not os.path.isfile(store_path):
         return []
     try:
@@ -532,9 +534,15 @@ def store_passes(store_path, feature):
         cols = {r["name"] for r in db.execute("PRAGMA table_info(agent_passes)")}
         if "lot" not in cols:
             return []
-        return [dict(r) for r in db.execute(
-            "SELECT a.*, r.command AS run_command FROM agent_passes a JOIN runs r ON r.id = a.run_id"
+        has_app = "app" in {r["name"] for r in db.execute("PRAGMA table_info(runs)")}
+        rows = [dict(r) for r in db.execute(
+            "SELECT a.*, r.command AS run_command" + (", r.app AS run_app" if has_app else "")
+            + " FROM agent_passes a JOIN runs r ON r.id = a.run_id"
             " WHERE r.feature = ? ORDER BY a.started_at, a.id", (feature,))]
+        if app and has_app:
+            k = os.path.normcase(os.path.abspath(app))
+            rows = [r for r in rows if not r.get("run_app") or os.path.normcase(os.path.abspath(r["run_app"])) == k]
+        return rows
     except sqlite3.Error:
         return []
     finally:

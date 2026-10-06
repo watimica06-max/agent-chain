@@ -95,7 +95,7 @@ def test_a_page_opened_during_a_run_shows_its_stream_its_agent_and_the_waiting_c
         # The title counts what waits: the folder's open entries and the card.
         page.wait_for_function("F !== null")
         n = page.evaluate("openCount()") + 1
-        assert page.title() == f"({n}) Cockpit"
+        assert page.title() == f"({n}) app — Cockpit"      # 1.6: the application named
         # Answered from the reopened page: the run goes on, the agent hands back, its badge goes.
         page.locator("#perm-banner").get_by_role("button", name="Autoriser").click()
         page.wait_for_function("document.getElementById('stream').textContent.includes('a rendu la main')")

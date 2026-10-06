@@ -5,7 +5,8 @@
   bare mode — `.claude/commands/`, `.claude/agents/` and `CLAUDE.md` load.
 - `cwd` is the application folder.
 - Every permission request becomes a card in the page; the run waits.
-- One run at a time per repository.
+- One run at a time, whatever the application (1.6): a run going in one
+  application blocks a launch in every other.
 - Stop now = `interrupt()`. Stop at the next lot = `stop.md` in the main
   checkout, `/8_code` only.
 - A run ends only when the orchestrator's turn has ended AND no background
@@ -50,7 +51,9 @@ USAGE_TIMEOUT = 30.0
 
 
 class Busy(Exception):
-    pass
+    def __init__(self, msg, run=None):
+        super().__init__(msg)
+        self.run = run
 
 
 class NotRunning(Exception):
@@ -210,6 +213,8 @@ class Runner:
         self.measure_limits = (client_factory is sdk_client_factory
                                if measure_limits is None else measure_limits)
         self.runs: dict[str, Run] = {}
+        # The page's stream (1.6): every run's events, whatever its application.
+        self.watchers: set = set()
         self._seq = itertools.count(1)
 
     # -------------------------------------------------------------- query
@@ -221,14 +226,21 @@ class Runner:
         r = self.current(repo)
         return bool(r and r.status != "ended")
 
+    def going(self) -> Run | None:
+        """The run going, whatever its application — there is one at most."""
+        return next((r for r in self.runs.values() if r.id and r.status != "ended"), None)
+
     # -------------------------------------------------------------- start
 
     async def start(self, repo: str, work: str, feature: str, command: str, args: str,
                     resume: str | None = None, message: str | None = None) -> Run:
         key = repo_key(repo)
         # Check and claim with no await in between: the lock is this line.
-        if self.is_running(repo):
-            raise Busy("une commande tourne déjà sur ce dépôt")
+        # One run at a time, whatever the application (1.6).
+        other = self.going()
+        if other:
+            raise Busy("une commande tourne déjà sur ce dépôt" if repo_key(other.repo) == key
+                       else f"une commande tourne déjà dans une autre application : {other.prompt}", other)
         run = Run(id=uuid.uuid4().hex[:12], repo=repo, work=work, feature=feature,
                   command=command, args=args,
                   started_at=datetime.now().isoformat(timespec="seconds"),
@@ -481,7 +493,7 @@ class Runner:
                 run_id=run.id, feature=run.feature, work=run.work, command=run.prompt,
                 mode=run.mode, started_at=run.started_at, ended_at=run.ended_at,
                 tally=run.tally, next_line=(run.next or {}).get("raw") or None,
-                outcome=run.outcome, log_path=run.log_path, resumed=bool(run.resume))
+                outcome=run.outcome, log_path=run.log_path, resumed=bool(run.resume), app=run.repo)
         except Exception as e:
             self._emit(run, "error", {"message": f"consommation non enregistrée : {e}"})
 
@@ -610,7 +622,7 @@ class Runner:
             msgs, run.replay_cache = stream_mod.replay(run.log_path, run.replay_cache)
             # Each server event sits after the log lines written when it was
             # emitted (`after`): its place among the log's events is exact.
-            keyed = [((line, 1, k), {"seq": 0, "type": t, "run": run.id, "data": d, "at": at})
+            keyed = [((line, 1, k), {"seq": 0, "type": t, "run": run.id, "app": run.repo, "data": d, "at": at})
                      for k, (line, at, t, d) in enumerate(msgs)]
             keyed += [((e.get("after", 0), 0, e["seq"]), e) for e in run.events if e["type"] in CONTROL_EVENTS]
             keyed.sort(key=lambda x: x[0])
@@ -660,13 +672,23 @@ class Runner:
         if run:
             run.subscribers.discard(q)
 
+    def watch(self) -> asyncio.Queue:
+        """Every run's events, whatever its application (1.6): a card, an
+        end, an idle question reach the page from any screen."""
+        q = asyncio.Queue()
+        self.watchers.add(q)
+        return q
+
+    def unwatch(self, q):
+        self.watchers.discard(q)
+
     def _emit(self, run: Run, kind: str, data: dict, at: str | None = None):
-        ev = {"seq": next(self._seq), "type": kind, "run": run.id, "data": data, "at": at or _now(),
-              "after": run.logged}
+        ev = {"seq": next(self._seq), "type": kind, "run": run.id, "app": run.repo, "data": data,
+              "at": at or _now(), "after": run.logged}
         run.events.append(ev)
         if len(run.events) > MAX_EVENTS:
             del run.events[: len(run.events) - MAX_EVENTS]
-        for q in list(run.subscribers):
+        for q in list(run.subscribers) + [w for w in self.watchers if w not in run.subscribers]:
             q.put_nowait(ev)
 
 

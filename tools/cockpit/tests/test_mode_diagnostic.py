@@ -271,9 +271,9 @@ def _app_counting(tmp_path, table=ALL_GOOD, stored=None):
     app_root = tmp_path / "app"
     build_app_folder(app_root)
     st = State(str(tmp_path / "config.json"))
-    if stored:
-        st.set_diagnostic(stored)
     st.open_pair(str(app_root), "f")
+    if stored:
+        st.set_diagnostic(stored, app=str(app_root))      # 1.6: an application's own
     calls = []
 
     def fake(app):

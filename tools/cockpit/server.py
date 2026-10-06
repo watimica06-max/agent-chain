@@ -16,6 +16,7 @@ from aiohttp import web
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
+import apps as apps_mod  # noqa: E402
 import blocking   # noqa: E402
 import chain as chain_mod  # noqa: E402
 import codelots   # noqa: E402
@@ -67,12 +68,14 @@ def features_dir(app):
 
 
 def check_app_folder(app):
+    """Why the application cannot be opened on a feature — or None. 1.6: a
+    git repository where the chain is not installed yet is in the list all
+    the same, « chaîne absente »; opening it on a feature needs
+    `docs/features/` alone."""
     if not app or not os.path.isdir(app):
         return "dossier introuvable"
-    if not os.path.isdir(os.path.join(app, ".claude")):
-        return "pas de dossier .claude/ : ce n'est pas un dossier d'application de la chaîne"
     if not os.path.isdir(features_dir(app)):
-        return "pas de dossier docs/features/"
+        return "pas de dossier docs/features/ : aucune feature à ouvrir"
     return None
 
 
@@ -415,8 +418,18 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     store = rn.stats
     diag_runner = diag_runner or DIAG_RUNNER
     # The diagnostic run in the background (1.4.5): once, at the opening,
-    # when no result is stored.
-    diag = {"running": False, "auto_done": False, "task": None}
+    # when no result is stored. 1.6: per application — each has its own
+    # stack, its own result, and runs once on its own when it has none.
+    diag = {"running": set(), "auto_done": set(), "tasks": {}}
+    # « Tout mettre à jour » going (1.6): no launch, no other install meanwhile.
+    bulk = {"going": False, "report": None}
+    # 1.6: a run stored with no application is given its own — main()'s
+    # backfill did it already; this covers a store handed over as it is.
+    if store:
+        try:
+            store.backfill_apps(app_resolver(state))
+        except Exception as e:
+            print(f"Consommation : application des anciens runs non retrouvée : {e}", flush=True)
     @web.middleware
     async def guard(request, handler):
         # Only this machine's browser, on this page: a foreign site cannot
@@ -459,21 +472,47 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.FileResponse(os.path.join(HERE, "static", "index.html"),
                                 headers={"Cache-Control": "no-store"})
 
+    def busy_payload():
+        """The run going, whatever its application (1.6): the top bar says
+        where it goes, and « Arrêter », its cards and its idle question act
+        on it from any screen."""
+        x = rn.going()
+        if not x:
+            return None
+        return {"id": x.id, "app": x.repo, "app_name": state.name_of(x.repo), "prompt": x.prompt,
+                "command": x.command, "work": x.work, "started_at": x.started_at, "status": x.status,
+                "active": bool(state.app_folder) and runner_mod.repo_key(x.repo) == runner_mod.repo_key(state.app_folder),
+                "permissions": [p.to_dict() for p in x.permissions.values()], "idle": x.idle,
+                "agents": [x.agents.get(t, "agent") for t in x.active], "stop_next_lot": x.command == runner_mod.STOP_COMMAND}
+
+    def apps_light():
+        active = runner_mod.repo_key(state.app_folder) if state.app_folder else None
+        return [{"name": x["name"], "folder": x["folder"], "last_feature": x["last_feature"],
+                 "active": runner_mod.repo_key(x["folder"]) == active} for x in state.apps()]
+
+    def diag_running(a):
+        return bool(a) and runner_mod.repo_key(a) in diag["running"]
+
     def state_payload(reason=None):
         a, w = pair()
-        out = {"app_folder": state.app_folder, "working_folder": state.working_folder,
+        out = {"app_folder": state.app_folder, "app_name": state.app_name, "working_folder": state.working_folder,
+               "apps": apps_light(), "busy": busy_payload(), "bulk_going": bulk["going"],
                "recent": state.recent(), "load_error": state.load_error,
                "open": bool(a), "mode": state.mode, "diagnostic": state.diagnostic(),
-               "diagnostic_running": diag["running"],
+               "diagnostic_running": diag_running(state.app_folder),
                "logs_dir": rn.log_dir, "groups": GROUPS,
                # The two usage windows, each with when it was measured (§13.3).
                "limits": _limits(store), "now": datetime.now().isoformat(timespec="seconds")}
         out["ignored"] = state.ignored
+        if state.app_folder and os.path.isdir(state.app_folder):
+            # The chain installed in the application (§20) — 1.6: also where
+            # it is not installed yet, and no feature can open.
+            out["chain"] = chain_state(state.app_folder)
         if state.app_folder and not check_app_folder(state.app_folder):
             out["working_folders"] = working_folders(state.app_folder, state.ignored)
             out["all_folders"] = all_folders(state.app_folder)
-            # The chain installed in the application (§20).
-            out["chain"] = chain_state(state.app_folder)
+        elif state.app_folder:
+            out["open_error"] = check_app_folder(state.app_folder)
         if a:
             run = rn.current(a)
             feature = feature_of(w)
@@ -527,6 +566,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.json_response({"path": path, "working_folders": working_folders(path, state.ignored_for(path))})
 
     async def open_pair(request):
+        """Opens a feature of an application. 1.6: the application is the
+        listed one when its folder is; one not listed joins the list (the
+        1.5 start screen's path — the page adds through /api/apps/add)."""
         data = await body(request)
         a = os.path.normpath((data.get("app") or "").strip().strip('"'))
         w = (data.get("work") or "").strip().strip("/")
@@ -536,8 +578,111 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if w not in working_folders(a, state.ignored_for(a)):
             return web.json_response({"error": "dossier ignoré : Paramètres → Dossiers" if state.is_ignored(w, a)
                                       else "dossier de travail inconnu"}, status=400)
-        state.open_pair(a, w)
+        listed = state.app(a)
+        state.open_pair(listed["folder"] if listed else a, w)
         return web.json_response({"ok": True})
+
+    # ---------------------------------------------------- applications (1.6)
+    def listed_folder(data):
+        f = (data.get("folder") or "").strip().strip('"')
+        x = state.app(f) if f else None
+        if not x:
+            raise web.HTTPNotFound(text=json.dumps({"error": "cette application n'est pas dans la liste"}),
+                                   content_type="application/json")
+        return x["folder"]
+
+    def app_row(x):
+        """One row of « Applications »: read-only, from the files and git."""
+        folder = x["folder"]
+        key = runner_mod.repo_key(folder)
+        row = {"name": x["name"], "folder": folder, "exists": os.path.isdir(folder),
+               "active": bool(state.app_folder) and key == runner_mod.repo_key(state.app_folder),
+               "feature": None, "proposal": None, "questions": None, "blocking": None,
+               "chain": None, "uncommitted": None, "last_run": None, "running": False, "errors": []}
+        if not row["exists"]:
+            row["errors"].append("dossier introuvable")
+            return row
+        try:
+            row["chain"] = chain_state(folder)
+        except Exception as e:
+            row["errors"].append(f"état de la chaîne : {e}")
+        row["uncommitted"] = apps_mod.uncommitted(folder)
+        row["open_error"] = check_app_folder(folder)
+        row["features"] = working_folders(folder, state.ignored_for(folder)) if not row["open_error"] else []
+        run = rn.current(folder)
+        snap = run.snapshot() if run and run.id else None
+        row["running"] = bool(snap and snap["status"] != "ended")
+        f = x.get("last_feature")
+        if f and f in row["features"]:
+            row["feature"] = f
+            try:
+                sc = scan_mod.run_scan(folder, f, snap)
+                prop = sc["proposal"]
+                row["proposal"] = {"name": prop.get("name"), "state": prop.get("state"), "chain": prop.get("chain"),
+                                   "french": decide_mod.proposal_next(sc, prop, f)["french"]}
+                qs, _, bs, _, redec, _ = collect_forms(folder, f, rn)
+                row["questions"], row["blocking"] = len(qs), len(bs) + (1 if redec else 0)
+            except Exception as e:
+                row["errors"].append(f"lecture de {f} : {e}")
+        if row["running"]:
+            row["last_run"] = {"command": snap["prompt"], "at": snap["started_at"], "outcome": "en cours",
+                               "feature": (snap.get("work") or "").split("/")[0]}
+        else:
+            h = state.app_history(folder, 1)
+            if h:
+                row["last_run"] = {"command": h[0].get("command"), "at": h[0].get("at"),
+                                   "outcome": h[0].get("outcome"), "feature": h[0].get("feature")}
+        return row
+
+    async def apps_get(request):
+        loop = asyncio.get_running_loop()
+        rows = await loop.run_in_executor(None, lambda: [app_row(x) for x in state.apps()])
+        return web.json_response({"apps": rows, "busy": busy_payload(), "bulk_going": bulk["going"],
+                                  "report": bulk["report"]})
+
+    async def apps_add(request):
+        """« Ajouter une application »: the folder picked or pasted joins the
+        list — config.json alone. Refused, in French, when it is not the
+        root of a git repository."""
+        data = await body(request)
+        path = (data.get("path") or "").strip().strip('"')
+        path = os.path.normpath(path) if path else ""
+        err = apps_mod.check_new_app(path)
+        if err:
+            return web.json_response({"error": err}, status=400)
+        x, added = state.add_app(path, data.get("name"))
+        return web.json_response({"app": x, "added": added, "apps": apps_light()})
+
+    async def apps_rename(request):
+        data = await body(request)
+        folder = listed_folder(data)
+        try:
+            x = state.rename_app(folder, data.get("name"))
+        except ValueError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        return web.json_response({"app": x, "apps": apps_light()})
+
+    async def apps_remove(request):
+        """« Retirer de la liste »: config.json alone, the folder never
+        touched. The page asks first. Refused while a run goes there."""
+        data = await body(request)
+        folder = listed_folder(data)
+        if rn.is_running(folder):
+            return web.json_response({"error": "une commande tourne dans cette application : la retirer après"}, status=409)
+        state.remove_app(folder)
+        return web.json_response({"ok": True, "apps": apps_light()})
+
+    async def apps_open(request):
+        """« Ouvrir », and the top bar's list: the application becomes the
+        active one, on its last feature — every screen works on it. Its
+        diagnostic runs on its own when it has none."""
+        data = await body(request)
+        folder = listed_folder(data)
+        state.activate(folder)
+        a, _ = pair()
+        if os.path.isdir(folder):
+            auto_diagnostic(folder)
+        return web.json_response({"ok": True, "open": bool(a), "open_error": check_app_folder(folder)})
 
     async def set_ignored(request):
         """Paramètres → Dossiers: the folders the cockpit never shows (1.5.1), those
@@ -629,6 +774,12 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": f"commande inconnue : /{cmd}"}, status=400)
         if "\n" in args or "\r" in args:
             return web.json_response({"error": "l'argument tient sur une ligne"}, status=400)
+        if bulk["going"]:
+            return web.json_response({"error": "« Tout mettre à jour » installe la chaîne : lancer après"}, status=409)
+        # One run at a time, whatever the application (1.6): said with where it goes.
+        busy = busy_payload()
+        if busy:
+            return web.json_response({"error": busy_text(busy), "busy": busy}, status=409)
         # A chain not « à jour » (§20): the launch asks first.
         ch = chain_state(a)
         if ch.get("state") != chain_mod.UP_TO_DATE and not data.get("chain_ok"):
@@ -636,11 +787,26 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         try:
             r = await rn.start(a, w, feature_of(w), cmd, args)
         except runner_mod.Busy as e:
-            return web.json_response({"error": str(e)}, status=409)
+            b = busy_payload()
+            return web.json_response({"error": busy_text(b) if b else str(e), "busy": b}, status=409)
         return web.json_response({"run": r.snapshot()})
 
+    def busy_text(b):
+        return (f"une commande tourne déjà : {b['prompt']}" if b["active"]
+                else f"une commande tourne déjà dans « {b['app_name']} » : {b['prompt']} — une seule à la fois, "
+                     "toutes applications confondues")
+
+    def going_repo():
+        """The run going, wherever it goes (1.6) — « Arrêter », a card, the
+        idle question act on it from any screen."""
+        x = rn.going()
+        if not x:
+            raise web.HTTPConflict(text=json.dumps({"error": "aucune commande en cours"}),
+                                   content_type="application/json")
+        return x.repo
+
     async def stop_now(request):
-        a, _ = need_pair()
+        a = going_repo()
         try:
             await rn.stop_now(a)
         except runner_mod.NotRunning as e:
@@ -648,15 +814,19 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.json_response({"ok": True})
 
     async def chain_install(request):
-        """Paramètres → « Installer / mettre à jour la chaîne » (§20). Refused
-        while a run goes; files the chain did not leave as they are: 409 with
-        the list, and the page asks before sending `confirm`."""
+        """Paramètres → « Installer / mettre à jour la chaîne » (§20), and
+        1.6 an application's row: `folder`, the active one by default — also
+        one where no feature opens yet. Refused while a run goes there;
+        files the chain did not leave as they are: 409 with the list, and
+        the page asks before sending `confirm`."""
         data = await body(request)
-        a = state.app_folder
-        if not a or check_app_folder(a):
+        a = listed_folder(data) if data.get("folder") else state.app_folder
+        if not a or not os.path.isdir(a):
             return web.json_response({"error": "aucune application ouverte"}, status=409)
-        if any(x.id and x.status != "ended" for x in rn.runs.values()):
+        if rn.is_running(a):
             return web.json_response({"error": "une commande tourne : pas d'installation maintenant"}, status=409)
+        if bulk["going"]:
+            return web.json_response({"error": "« Tout mettre à jour » est en cours"}, status=409)
         loop = asyncio.get_running_loop()
         try:
             res = await loop.run_in_executor(None, lambda: chain_mod.install(
@@ -672,6 +842,29 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
               + ".", flush=True)
         return web.json_response({"ok": True, "result": res, "chain": chain_state(a)})
 
+    async def chain_install_all(request):
+        """« Tout mettre à jour » (1.6): the chain installed in every
+        application « en retard », one after the other — chain.py's install,
+        its commit and push in each, its refusals unchanged. Never with
+        `confirm`: « modifiée sur place » and « absente » are listed with
+        their reason, for their own install. One with a run going is left,
+        and said. One line per application."""
+        if bulk["going"]:
+            return web.json_response({"error": "« Tout mettre à jour » est déjà en cours"}, status=409)
+        bulk["going"] = True
+        loop = asyncio.get_running_loop()
+        try:
+            lines = await loop.run_in_executor(None, lambda: apps_mod.update_all(
+                state.apps(), chain_state,
+                lambda f: chain_mod.install(f, CHAIN_ROOT, confirm=False, push=CHAIN_PUSH),
+                rn.is_running))
+        finally:
+            bulk["going"] = False
+        bulk["report"] = {"at": datetime.now().isoformat(timespec="seconds"), "lines": lines}
+        for x in lines:
+            print(f"Tout mettre à jour — {x['name']} : {x['outcome']} — {x['text']}", flush=True)
+        return web.json_response(bulk["report"])
+
     async def set_mode(request):
         data = await body(request)
         try:
@@ -681,54 +874,69 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.json_response({"mode": state.mode})
 
     async def diagnose(a):
-        diag["running"] = True
+        key = runner_mod.repo_key(a)
+        diag["running"].add(key)
         try:
             result = await asyncio.get_running_loop().run_in_executor(None, diag_runner, a)
-            state.set_diagnostic(result)
+            state.set_diagnostic(result, app=a)
             return result
         finally:
-            diag["running"] = False
+            diag["running"].discard(key)
 
     def auto_diagnostic(a):
-        """No result stored: the diagnostic runs once, in the background, and
-        its result is kept. Paramètres → Diagnostic still runs it on demand."""
-        if diag["auto_done"] or diag["running"] or state.diagnostic() is not None or not a:
+        """No result stored for this application: its diagnostic runs once,
+        in the background, and its result is kept — one per application, each
+        its own stack (1.6). Paramètres → Diagnostic still runs it on demand."""
+        if not a:
             return
-        diag["auto_done"] = True
+        key = runner_mod.repo_key(a)
+        if key in diag["auto_done"] or key in diag["running"] or state.diagnostic(a) is not None:
+            return
+        diag["auto_done"].add(key)
 
         async def go():
             try:
                 await diagnose(a)
             except Exception as e:      # reported, never raised into the loop
-                print(f"Diagnostic automatique non abouti : {e}", flush=True)
-        diag["task"] = asyncio.get_running_loop().create_task(go())
+                print(f"Diagnostic automatique non abouti ({a}) : {e}", flush=True)
+        diag["tasks"][key] = asyncio.get_running_loop().create_task(go())
 
     async def opening(_app):
-        a, _ = pair()
-        if a:
+        # 1.6: the active application's, a feature open or not.
+        a = state.app_folder
+        if a and os.path.isdir(a):
             auto_diagnostic(a)
 
     async def run_diagnostic(request):
-        a, _ = need_pair()
+        a = state.app_folder
+        if not a or not os.path.isdir(a):
+            return web.json_response({"error": "aucune application active"}, status=409)
         return web.json_response(await diagnose(a))
 
     # ------------------------------------------------ statistics (1.4.5)
     def stats_args(request, data=None):
+        """(feature, period, app). 1.6: `app` — the active application by
+        default (""), or « toutes » ("*"), every feature then."""
         a, w = need_pair()
         q = data if data is not None else request.query
+        app = None if (q.get("app") or "").strip() == "*" else a
         f = (q.get("feature") or "").strip()
-        feature = None if f == "*" else (f or feature_of(w))
+        feature = None if f == "*" or app is None else (f or feature_of(w))
         if feature is not None and state.is_ignored(feature):
             raise web.HTTPBadRequest(text=json.dumps({"error": "fonctionnalité ignorée : Paramètres → Dossiers"}),
                                      content_type="application/json")
-        return feature, q.get("period") or "tout"
+        return feature, q.get("period") or "tout", app
 
-    def stats_data(feature, period):
-        return statsview.build(store.path if store else None, feature, period, ignored=state.ignored)
+    def stats_data(feature, period, app):
+        names = {runner_mod.repo_key(x["folder"]): x["name"] for x in state.apps()}
+        out = statsview.build(store.path if store else None, feature, period, app=app,
+                              ignored_by_app=state.ignored_by_app(), names=names)
+        out["apps"] = [{"name": x["name"], "folder": x["folder"]} for x in state.apps()]
+        return out
 
     async def stats_get(request):
-        feature, period = stats_args(request)
-        data = stats_data(feature, period)
+        feature, period, app = stats_args(request)
+        data = stats_data(feature, period, app)
         # « Par lot »: its attempts are the verdict's (code_rules.md, T-ESSAIS),
         # read from the files — the store does not hold them.
         if feature and data.get("by_lot"):
@@ -756,7 +964,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         wts = rn.live_worktrees(a)
         _, _, bs, _, _, _ = collect_forms(a, feature, rn)
         opens = [{"id": b.id, "rel": b.rel, "lot": b.lot} for b in bs]
-        passes = codelots.store_passes(store.path if store else None, feature) + live_passes(snap, feature)
+        passes = codelots.store_passes(store.path if store else None, feature, a) + live_passes(snap, feature)
         out = codelots.read_lots(a, feature, folder, wts, passes, snap, opens)
         bf = bugfixes(a, feature)
         out["acts_on"] = bf[-1] if bf else ""
@@ -784,7 +992,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         lot = request.query.get("lot", "")
         run = rn.current(a)
         snap = run.snapshot() if run and run.id else None
-        passes = codelots.store_passes(store.path if store else None, feature) + live_passes(snap, feature)
+        passes = codelots.store_passes(store.path if store else None, feature, a) + live_passes(snap, feature)
         loop = asyncio.get_running_loop()
         out = await loop.run_in_executor(None, codelots.lot_detail, a, feature, folder, lot,
                                          rn.live_worktrees(a), passes)
@@ -793,9 +1001,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.json_response(out)
 
     async def stats_csv(request):
-        feature, period = stats_args(request)
+        feature, period, app = stats_args(request)
         kind = request.query.get("kind", "runs")
-        files = statsview.csv_files(stats_data(feature, period))
+        files = statsview.csv_files(stats_data(feature, period, app))
         name, text = files[1] if kind == "passes" else files[0]
         return web.Response(text=text, content_type="text/csv", charset="utf-8",
                             headers={"Content-Disposition": f'attachment; filename="{name}"'})
@@ -804,7 +1012,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         """« Exporter »: the runs and the agent passes of the current filters,
         as two CSV files in the folder the Product Owner picks."""
         data = await body(request)
-        feature, period = stats_args(request, data)
+        feature, period, app = stats_args(request, data)
         loop = asyncio.get_running_loop()
         try:
             folder = await loop.run_in_executor(None, export_picker, default_export_folder())
@@ -814,7 +1022,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"cancelled": True})
         written = []
         try:
-            for name, text in statsview.csv_files(stats_data(feature, period)):
+            for name, text in statsview.csv_files(stats_data(feature, period, app)):
                 path = os.path.join(folder, name)
                 with open(path, "w", encoding="utf-8", newline="") as f:
                     f.write(text)
@@ -824,7 +1032,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.json_response({"files": written})
 
     async def continue_wait(request):
-        a, _ = need_pair()
+        a = going_repo()
         try:
             rn.continue_waiting(a)
         except runner_mod.NotRunning as e:
@@ -842,7 +1050,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.json_response({"run": r.snapshot()})
 
     async def stop_next(request):
-        a, _ = need_pair()
+        a = going_repo()
         try:
             path = rn.stop_at_next_lot(a)
         except runner_mod.NotRunning as e:
@@ -860,7 +1068,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.json_response({"ok": True, "file": target})
 
     async def permission(request):
-        a, _ = need_pair()
+        a = going_repo()
         data = await body(request)
         try:
             rn.answer_permission(a, data.get("id", ""), bool(data.get("allow")))
@@ -869,7 +1077,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.json_response({"ok": True})
 
     async def events(request):
-        a, _ = need_pair()
+        # 1.6: every run's events, whatever its application — each carries
+        # `app`; the stream so far is the active application's run.
+        a = state.app_folder
         resp = web.StreamResponse(headers={"Content-Type": "text/event-stream",
                                            "Cache-Control": "no-cache",
                                            "X-Accel-Buffering": "no"})
@@ -880,8 +1090,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         # has been emitted, what comes next is in the queue.
         # Replayed events carry `replay`, the first of them how many older
         # ones were left out; the page starts afresh on each connection.
-        q = rn.subscribe(a)
-        evs, dropped = rn.replay(a)
+        q = rn.watch()
+        evs, dropped = rn.replay(a) if a else ([], 0)
         try:
             for i, ev in enumerate(evs):
                 await resp.write(_sse({**ev, "replay": True, **({"dropped": dropped} if i == 0 and dropped else {})}))
@@ -894,7 +1104,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         except (ConnectionResetError, asyncio.CancelledError):
             pass
         finally:
-            rn.unsubscribe(a, q)
+            rn.unwatch(q)
         return resp
 
     async def ping(request):
@@ -944,6 +1154,12 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/stop-now", stop_now)
     r.add_post("/api/mode", set_mode)
     r.add_post("/api/chain/install", chain_install)
+    r.add_post("/api/chain/install-all", chain_install_all)
+    r.add_get("/api/apps", apps_get)
+    r.add_post("/api/apps/add", apps_add)
+    r.add_post("/api/apps/rename", apps_rename)
+    r.add_post("/api/apps/remove", apps_remove)
+    r.add_post("/api/apps/open", apps_open)
     r.add_post("/api/ignored", set_ignored)
     r.add_post("/api/diagnostic", run_diagnostic)
     r.add_post("/api/continue-wait", continue_wait)
@@ -1001,7 +1217,34 @@ def backfill(store, state, log_dir):
     done["outputs"] = store.backfill_outputs()
     # The lot of each pass already stored, once (1.5).
     done["lots"] = store.backfill_lots()
+    # The application of each run stored before 1.6.
+    done["apps"] = store.backfill_apps(app_resolver(state))
     return done
+
+
+def app_resolver(state):
+    """Which application a run stored without one belongs to (1.6): the
+    working directory its log names — the application's folder, or a
+    worktree under it —, else the application of its history entry, else
+    the first application of the list, the one the cockpit knew before."""
+    apps = state.apps()
+    by_log = {os.path.normcase(h["log_path"]): h.get("key", "").split("|", 1)[0]
+              for h in state.all_history() if h.get("log_path")}
+
+    def listed(path):
+        if not path:
+            return None
+        k = os.path.normcase(os.path.abspath(path))
+        for x in apps:
+            fk = os.path.normcase(os.path.abspath(x["folder"]))
+            if k == fk or k.startswith(fk + os.sep):
+                return x["folder"]
+        return None
+
+    def resolve(run):
+        return (listed(run.get("cwd")) or listed(by_log.get(os.path.normcase(run.get("log_path") or "")))
+                or (apps[0]["folder"] if apps else None))
+    return resolve
 
 
 def _sse(ev):
@@ -1067,6 +1310,11 @@ def main(argv=None):
     if done["outputs"]["runs"]:
         print(f"Consommation : tokens écrits retrouvés pour {done['outputs']['runs']} run(s) "
               f"({done['outputs']['passes']} passage(s) d'agent), d'après le model_usage des journaux.", flush=True)
+    if done["apps"]:
+        print(f"Consommation : l'application de {done['apps']} run(s) enregistré(s) avant 1.6 retrouvée.", flush=True)
+    if state.migrated:
+        print("config.json : migré en liste d'applications (1.6) — "
+              + ", ".join(x["name"] for x in state.apps()) + ".", flush=True)
     if not done["lots"]["done"]:
         print(f"Consommation : le lot de chaque passage relu dans {done['lots']['runs']} journal(aux) "
               f"({done['lots']['passes']} passage(s) portent un lot).", flush=True)

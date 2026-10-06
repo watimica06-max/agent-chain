@@ -27,10 +27,13 @@ Dans une console, pour voir ce qu'il écrit : `python server.py --ouvrir`
 
 ## Au démarrage
 
-- **Dossier de l'application** : « Parcourir… » ouvre la fenêtre de choix
-  de Windows ; si elle ne s'ouvre pas, coller le chemin dans le champ.
-- **Feature** : une feature de `docs/features/`. Ses corrections
-  `bugfix-NN/` sont sous « Correction », plus ici.
+- **Les applications** (1.6) : le cockpit garde la liste des applications
+  sur lesquelles vous travaillez, et l'une d'elles est **active** : tous
+  les écrans travaillent sur elle. Au lancement, l'application active
+  s'ouvre sur sa dernière feature. Sans application active, ou sans
+  feature ouverte, l'écran « Applications » s'affiche.
+- **Feature** : une feature de `docs/features/` de l'application active.
+  Ses corrections `bugfix-NN/` sont sous « Correction », plus ici.
 - **Dossiers ignorés** (1.5.1) : ceux d'une ancienne chaîne, que rien
   ne doit plus montrer — par application, dans `config.json`
   (`"ignored"`) ; une nouvelle application n'en a aucun. Un dossier ignoré et ses `bugfix-NN/` ne
@@ -38,10 +41,46 @@ Dans une console, pour voir ce qu'il écrit : `python server.py --ouvrir`
   « Correction », ni dans le scan, les Statistiques ou le Code.
   Paramètres → Dossiers montre la liste ; une case par dossier la
   modifie.
-- **Récents** : les dernières paires. Au lancement suivant, la dernière
-  paire s'ouvre directement ; « Changer d'application » revient ici.
+- **Récents** : les dernières paires, sous Paramètres → Dossiers.
+  « Changer d'application » mène à l'écran « Applications ».
 
 ## Les écrans
+
+**Applications** (1.6) — une ligne par application : son nom et son
+dossier ; sa chaîne (**à jour**, **en retard**, **modifiée sur place**,
+**absente**) ; sa feature et l'étape que le relevé du dossier y propose ;
+ce qui vous y attend, en nombre de questions et de blocages ; son dernier
+run (la commande, quand, comment il a fini) ; le nombre de fichiers non
+commités dans son dossier — pour information, le cockpit n'y touche
+jamais. Sur chaque ligne : « Ouvrir » (elle devient l'active),
+« Renommer », « Retirer de la liste » (il demande d'abord ; le dossier
+n'est pas touché, seule la liste change), et, quand sa chaîne n'est pas à
+jour, « Installer » ou « Mettre à jour la chaîne ». En haut :
+- **« Ajouter une application »** : la fenêtre de choix de Windows, ou le
+  chemin collé. Il faut la racine d'un dépôt git ; un autre dossier est
+  refusé, et la page dit pourquoi. Ajouter n'écrit rien dans le dossier.
+  Un dépôt où la chaîne n'est pas encore installée s'ajoute aussi : il
+  montre « chaîne absente », et sa ligne l'installe. L'ouvrir sur une
+  feature demande `docs/features/`.
+- **« Tout mettre à jour »** : installe la chaîne dans chaque application
+  **en retard**, l'une après l'autre — le commit `chain: <id> <date>` et
+  le push dans chacune, les mêmes refus qu'une à une. Seules les
+  applications « en retard » sont mises à jour d'un coup : une chaîne
+  « modifiée sur place » ou « absente » est listée avec sa raison et un
+  bouton qui ouvre sa propre installation, laquelle demande avant de
+  remplacer quoi que ce soit. Une application où une commande tourne est
+  laissée, et c'est dit. À la fin, une ligne par application : mise à jour
+  (avec le commit), laissée (pourquoi), en échec (l'erreur).
+
+**La barre du haut** montre le nom de l'application active ; un clic
+ouvre la liste courte pour en changer, sans passer par l'écran.
+
+**Une commande à la fois** — toutes applications confondues : pendant
+qu'une commande tourne dans une application, rien ne se lance dans aucune
+autre. La barre du haut dit dans quelle application elle tourne, avec
+« Arrêter » ; ailleurs, un bandeau le dit sur tous les écrans, et ses
+demandes d'autorisation y arrivent aussi. Le tableau de bord d'une autre
+application ne la montre pas comme la sienne.
 
 **Le menu** — le bouton à trois traits, à gauche de la barre du haut,
 ferme et rouvre le menu de côté ; l'espace de travail prend alors toute la
@@ -104,7 +143,9 @@ question ou blocage qui arrive pendant un run, erreur, plafond d'attente,
 lot de `/8_code` qui passe ou échoue). Le navigateur demande l'autorisation
 la première fois qu'une case est cochée. Elles ne viennent que quand
 l'onglet du cockpit n'est pas devant ; un clic ramène l'onglet sur l'écran
-concerné. Le titre de l'onglet compte ce qui vous attend : « (2) Cockpit ».
+concerné. Chacune nomme son application (« Belivo — /1_lexique x —
+terminé »). Le titre de l'onglet compte ce qui vous attend et nomme
+l'application active : « (2) Belivo — Cockpit ».
 
 **Usage de l'abonnement** — sur le tableau de bord, deux jauges : la
 fenêtre de 5 heures et la semaine. Pour chacune : le pourcentage utilisé,
@@ -115,6 +156,8 @@ modèle). Une mesure dont la fenêtre s'est réinitialisée depuis le dit :
 ce n'est plus le chiffre du moment.
 
 **Statistiques** — ce que `stats.sqlite` garde, lu en détail : par
+application (l'active, ou toutes — chaque run garde la sienne ; ceux
+d'avant 1.6 ont retrouvé la leur au démarrage), par
 fonctionnalité (celle qui est ouverte, ou toutes) et par période
 (aujourd'hui, 7 jours, 30 jours, tout), deux filtres dont le cockpit se
 souvient. En bref ; l'usage des deux fenêtres dans le temps, les runs
@@ -146,8 +189,9 @@ l'application ; il demande avant de remplacer un fichier changé sur place.
 Les fichiers propres à l'application — son `/deploie` — ne sont jamais
 touchés.
 
-**Le diagnostic** — s'il n'a jamais tourné, le cockpit le lance une fois
-de lui-même à l'ouverture et garde le résultat. Le tableau de bord ne
+**Le diagnostic** — un par application, chacune sa pile (Gradle pour
+l'une, Flutter pour l'autre) : quand l'application active n'en a pas, le
+cockpit le lance une fois de lui-même et garde le résultat. Le tableau de bord ne
 l'affiche que s'il a un échec ; Paramètres → Diagnostic le relance à la
 demande.
 
@@ -216,8 +260,11 @@ avec ce qu'il a vu.
   `## Decision`, `## Décision du Product Owner` dans
   `code/redecoupage.md`, `stop.md`, et le `bug-list.md` d'une nouvelle
   correction — et, quand vous cliquez « Installer / mettre à jour la
-  chaîne », les fichiers de la chaîne dans l'application, leur commit et
-  son push. Tout le reste est en lecture.
+  chaîne » ou « Tout mettre à jour », les fichiers de la chaîne dans
+  l'application, leur commit et son push. Tout le reste est en lecture.
+- Ajouter, renommer ou retirer une application ne change que sa liste,
+  dans `config.json` : rien n'est écrit dans son dossier.
+- Il ne touche jamais au travail non commité d'une application.
 - Après chaque écriture, il relit le fichier avec le test de la commande ;
   si la commande le lirait encore comme sans réponse, il annule l'écriture
   et vous le dit.

@@ -15,7 +15,7 @@ from test_runner import script_until_interrupted  # noqa: E402
 
 SCREENS = [("Tableau de bord", "scr-dashboard"), ("À répondre", "scr-answer"),
            ("Chaîne", "scr-chaine"), ("Correction", "scr-correction"), ("Statistiques", "scr-stats"),
-           ("Paramètres", "scr-settings")]
+           ("Applications", "scr-apps"), ("Paramètres", "scr-settings")]
 
 
 @pytest.fixture(scope="module")
@@ -78,9 +78,10 @@ def test_each_screen_loads_without_js_error(tmp_path, page):
             go(page, name)
             page.wait_for_selector(f"#{scr}", state="visible")
             assert page.locator("#main section:visible").evaluate_all("els => els.map(e => e.id)") == [scr]
-        # Six entries (1.4.5), « Paramètres » last in the menu, the count on « À répondre ».
+        # Seven entries (1.6: « Applications »), « Paramètres » last in the menu, the count on « À répondre ».
         names = [t.split("\n")[0].strip() for t in page.locator("#side a").all_inner_texts()]
-        assert names == ["Tableau de bord", "À répondre", "Chaîne", "Correction", "Statistiques", "Paramètres"]
+        assert names == ["Tableau de bord", "À répondre", "Chaîne", "Correction", "Statistiques", "Applications",
+                         "Paramètres"]
         assert page.locator("#nav-answer-count").inner_text() == "7"
         assert " ".join(page.locator("#tb-mode").inner_text().split()) == "Mode : Auto"
         assert page.locator("#tb-run").inner_text() == "Au repos"
@@ -90,9 +91,11 @@ def test_each_screen_loads_without_js_error(tmp_path, page):
 def test_start_screen_without_a_folder(tmp_path, page):
     with FakeServer(tmp_path, opened=False) as s:
         page.goto(s.url)
-        page.wait_for_selector("#start", state="visible")
+        # 1.6: the start is « Applications », the list empty — adding one is the way in.
+        page.wait_for_selector("#scr-apps", state="visible")
         assert not page.locator("#side").is_visible()
-        assert page.get_by_role("heading", name="Dossier de l'application").is_visible()
+        assert page.get_by_role("heading", name="Applications", exact=True).is_visible()
+        page.wait_for_selector("#apps-add", state="visible")
         assert no_real_errors(page) == []
 
 
