@@ -31,3 +31,13 @@ def _logs_in_tmp(tmp_path_factory, monkeypatch):
     """The raw run logs of a test never land in tools/cockpit/logs/."""
     import runner
     monkeypatch.setattr(runner, "LOG_DIR", str(tmp_path_factory.mktemp("logs")))
+
+
+@pytest.fixture(autouse=True)
+def _no_real_diagnostic(monkeypatch):
+    """1.4.5: the cockpit runs the diagnostic on its own when none is stored.
+    In a test it is always a fake, all ✓, unless the test passes its own."""
+    import diagnostic
+    import server
+    from test_mode_diagnostic import ALL_GOOD, fake_exec
+    monkeypatch.setattr(server, "DIAG_RUNNER", lambda app: diagnostic.run_diagnostic(app, fake_exec(ALL_GOOD)))

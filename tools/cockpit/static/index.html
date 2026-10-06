@@ -15,6 +15,7 @@
   --idle: #6b7280; --idle-soft: #eeeeec;
   --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
   --radius: 10px; --side: 224px;
+  --s5h: #2a78d6; --swk: #eb6834;               /* the 5-hour window, the week: chart series */
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -23,6 +24,7 @@
     --ok: #6cc28f; --ok-soft: #1f3327;
     --err: #ec8a80; --err-soft: #3d2422; --warn: #e3c56b; --warn-soft: #3a3320;
     --idle: #a3a9b1; --idle-soft: #2c2f33;
+    --s5h: #3987e5; --swk: #d95926;
   }
 }
 * { box-sizing: border-box; }
@@ -75,7 +77,18 @@ pre.text { white-space: pre-wrap; word-wrap: break-word; font: inherit; margin: 
 button.chip:hover { border-color: var(--accent); }
 .chip b { font-weight: 650; }
 .chip.running { border-color: var(--accent); background: var(--accent-soft); }
-#tb-where { border-radius: 99px; min-height: 0; padding: 5px 16px; font-weight: 600; border-color: var(--accent); color: var(--accent); }
+#chaine-where { border-radius: 99px; min-height: 0; padding: 5px 16px; font-weight: 600; border-color: var(--accent); color: var(--accent); }
+/* The side menu opens and closes (1.4.5); closed, a dot says when something waits. */
+#tb-menu { position: relative; min-height: 40px; width: 44px; padding: 0; display: grid; place-items: center;
+  border-color: transparent; background: none; margin-left: -8px; }
+#tb-menu:hover { border-color: var(--line); }
+#tb-menu .bars, #tb-menu .bars::before, #tb-menu .bars::after { display: block; width: 20px; height: 2px;
+  border-radius: 2px; background: var(--ink); }
+#tb-menu .bars { position: relative; }
+#tb-menu .bars::before, #tb-menu .bars::after { content: ""; position: absolute; left: 0; }
+#tb-menu .bars::before { top: -6px; } #tb-menu .bars::after { top: 6px; }
+#tb-menu-dot { position: absolute; top: 6px; right: 6px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 2px var(--card); }
 #perm-badge { background: var(--err); border-color: var(--err); color: #fff; font-weight: 650; border-radius: 99px; min-height: 0; padding: 5px 14px; }
 #perm-banner { border-top: 1px solid var(--err); background: var(--err-soft); padding: 10px 20px 12px;
   max-height: 46vh; overflow: auto; }
@@ -100,8 +113,8 @@ button.chip:hover { border-color: var(--accent); }
 @keyframes pulse { 50% { opacity: .35; } }
 #main { overflow: auto; position: relative; }
 .screen { padding: 28px 32px 48px; max-width: 1180px; margin: 0 auto; }
-#shell.nofolder { grid-template-columns: 1fr; }
-#shell.nofolder #side { display: none; }
+#shell.nofolder, #shell.menu-closed { grid-template-columns: minmax(0, 1fr); }
+#shell.nofolder #side, #shell.menu-closed #side { display: none; }
 
 /* ---------------------------------------------------------- start */
 #start { max-width: 880px; margin: 0 auto; padding: 28px 24px; display: grid; gap: 20px; }
@@ -154,7 +167,7 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
 .entry.failed { border-color: var(--warn); }
 .entry .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 6px; }
 .entry .ctx { color: var(--soft); font-size: 15px; }
-.entry .q { margin: 6px 0 12px; font-size: 18px; }
+.entry .q { margin: 6px 0 12px; font-size: 15px; }
 .entry .lbl { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); margin-top: 8px; }
 .opts { display: grid; gap: 8px; margin: 10px 0; }
 .opt { display: flex; gap: 12px; align-items: flex-start; padding: 13px 16px; min-height: 52px; border: 1px solid var(--line);
@@ -166,8 +179,9 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
 .opt.later.chosen { border-color: var(--line); background: none; }
 #answer-foot { position: relative; z-index: 10; box-shadow: 0 -6px 16px rgba(0,0,0,.06); }
 #save-bar { background: var(--card); border-top: 1px solid var(--line);
-  padding: 12px 32px; display: flex; gap: 16px; align-items: center; }
-#save-hint { font-weight: 600; }
+  padding: 3px 32px; display: flex; gap: 16px; align-items: center; }
+#save-hint { font-weight: 600; font-size: 15px; }
+#btn-save { min-height: 34px; padding: 2px 28px; min-width: 168px; font-size: 16px; }
 .sumline { margin: 4px 0; font-size: 15px; }
 .sumline.ok { color: var(--ok); } .sumline.err { color: var(--warn); font-weight: 600; }
 
@@ -179,6 +193,14 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
 #main:has(> #scr-answer:not(.hidden)) { overflow: hidden; }
 #answer-left { grid-row: 1; grid-column: 1; min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; }
 #answer-left > .screen { width: 100%; }
+/* The left pane reads at the right pane's size (1.4.5): questions, options,
+   the free-text field, the default mark. Click targets keep their height. */
+#answer-left { font-size: 15px; line-height: 1.5; }
+#answer-left .entry .ctx { font-size: 14px; }
+#answer-left .entry .lbl { font-size: 12px; }
+#answer-left .badge { font-size: 12px; }
+#answer-left .opt .key { font-size: 11px; }
+#answer-left .notice { font-size: 14px; }
 #answer-foot { grid-row: 2; grid-column: 1 / -1; }
 .entry { cursor: default; scroll-margin: 16px; }
 .entry:focus { outline: none; }
@@ -297,17 +319,83 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
 .diag li { list-style: none; margin: 6px 0; }
 .diag ul { padding: 0; margin: 10px 0; }
 .diag .ok { color: var(--ok); } .diag .fail { color: var(--warn); } .diag .skip { color: var(--soft); }
-@media (max-width: 1100px) { :root { --side: 188px; } .screen { padding: 22px 20px 40px; } #save-bar { padding: 12px 20px; } #keys-legend { padding: 6px 20px; } }
+/* ------------------------------------------------- statistiques (1.4.5) */
+#scr-stats { max-width: 1240px; }
+.st-filters { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.st-filters label { display: flex; gap: 8px; align-items: center; color: var(--soft); font-size: 15px; }
+.st-filters select { font: inherit; font-size: 15px; min-height: 38px; padding: 4px 10px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 99px; overflow: hidden; background: var(--card); }
+.seg button { border: none; border-radius: 0; min-height: 38px; padding: 4px 14px; font-size: 15px; background: none; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed=true] { background: var(--accent-soft); color: var(--accent); font-weight: 650; }
+.st-note { font-size: 14px; color: var(--soft); margin: 4px 0 18px; max-width: 900px; }
+.st-sec { margin-top: 26px; }
+.st-sec > h3 { font-size: 18px; margin-bottom: 10px; }
+.st-sec .sub { color: var(--soft); font-size: 14px; margin: -6px 0 10px; }
+.tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; }
+.tile .tl { color: var(--soft); font-size: 14px; }
+.tile .tv { font-size: 24px; font-weight: 650; line-height: 1.25; margin-top: 2px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tile .ts { color: var(--soft); font-size: 13px; margin-top: 4px; }
+.chart-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px 8px; position: relative; }
+.chart-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 14px; color: var(--soft); margin-bottom: 4px; }
+.chart-legend .sw { display: inline-block; width: 18px; height: 2px; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+.chart-legend .sw.run { height: 8px; width: 14px; background: var(--soft); opacity: .55; border-radius: 2px; }
+#st-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+#st-chart svg text { font: 12px system-ui, "Segoe UI", sans-serif; fill: var(--soft); }
+#st-chart svg .grid { stroke: var(--line); stroke-width: 1; }
+#st-chart svg .s5h { stroke: var(--s5h); } #st-chart svg .swk { stroke: var(--swk); }
+#st-chart svg .p5h { fill: var(--s5h); } #st-chart svg .pwk { fill: var(--swk); }
+#st-chart svg circle { stroke: var(--card); stroke-width: 2; }
+#st-chart svg .band { fill: var(--soft); opacity: .09; }
+#st-chart svg .runmark { fill: var(--soft); opacity: .55; }
+#st-chart svg .cross { stroke: var(--soft); stroke-width: 1; stroke-dasharray: 3 3; }
+#st-chart svg text.dl { font-weight: 650; fill: var(--ink); }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.12); padding: 8px 10px; font-size: 13px; min-width: 160px; z-index: 5; }
+.tip .tt { color: var(--soft); margin-bottom: 4px; }
+.tip .tr { display: flex; gap: 8px; align-items: center; }
+.tip .tr b { font-variant-numeric: tabular-nums; }
+.tip .k { width: 10px; height: 2px; border-radius: 2px; flex: none; }
+.st-table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
+table.st { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.st th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft);
+  font-weight: 600; padding: 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.st th button { all: unset; cursor: pointer; display: block; padding: 10px 12px; }
+table.st th button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+table.st th[aria-sort] button { color: var(--accent); }
+table.st th[aria-sort=ascending] button::after { content: " ▲"; }
+table.st th[aria-sort=descending] button::after { content: " ▼"; }
+table.st th.num, table.st td.num { text-align: right; }
+table.st td { padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+table.st td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.st td.mono { font-family: var(--mono); font-size: 13px; white-space: nowrap; }
+table.st td .mono, table.st td.nw { white-space: nowrap; }
+table.st td .u { display: block; color: var(--soft); font-size: 12px; white-space: nowrap; }
+table.st tr.clickable { cursor: pointer; }
+table.st tr.clickable:hover > td { background: var(--bg); }
+table.st tr.open > td { background: var(--accent-soft); }
+table.st tr.detail > td { background: var(--bg); padding: 12px 16px 16px; cursor: default; }
+.st-detail .st-table-wrap { margin-top: 8px; }
+.st-detail .row + .row { margin-top: 4px; }
+.st-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.st-pair h4 { margin: 0 0 8px; font-size: 15px; }
+.badge.odd { background: var(--warn-soft); color: var(--warn); }
+.st-empty { color: var(--soft); padding: 14px 16px; }
+@media (max-width: 1100px) { .st-pair { grid-template-columns: 1fr; } .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 1100px) { :root { --side: 188px; } .screen { padding: 22px 20px 40px; } #save-bar { padding: 3px 20px; } #keys-legend { padding: 6px 20px; } }
 </style>
 </head>
 <body>
 <div id="chrome">
   <div id="topbar">
+    <button id="tb-menu" class="hidden" aria-controls="side" aria-expanded="true" aria-label="Fermer le menu" title="Fermer le menu">
+      <span class="bars"></span><span id="tb-menu-dot" class="hidden"></span></button>
     <h1>Cockpit</h1>
     <button id="tb-folder" class="chip hidden" title="Dossiers"></button>
     <button id="tb-mode" class="chip hidden" title="Mode de permission"></button>
     <span id="tb-run" class="chip hidden"></span>
-    <button id="tb-where" class="hidden" title="Relire le dossier et revérifier la dernière ligne Next:">Où on en est ?</button>
     <span class="grow"></span>
     <button id="perm-badge" class="hidden">Autorisation demandée</button>
   </div>
@@ -320,6 +408,7 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
     <a href="#answer" id="nav-answer">À répondre <span id="nav-answer-count" class="count hidden"></span></a>
     <a href="#chaine" id="nav-chaine">Chaîne <span id="nav-run-dot" class="dot hidden" title="Une commande tourne"></span></a>
     <a href="#correction" id="nav-correction">Correction <span id="nav-corr-count" class="count hidden"></span></a>
+    <a href="#stats" id="nav-stats">Statistiques</a>
     <span class="spacer"></span>
     <a href="#settings" id="nav-settings">Paramètres</a>
   </nav>
@@ -407,7 +496,7 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
       <div id="save-bar">
         <span id="save-hint">Aucune réponse à écrire pour l'instant.</span>
         <span class="grow"></span>
-        <button id="btn-save" class="primary big">Enregistrer</button>
+        <button id="btn-save" class="primary">Enregistrer</button>
       </div>
       <div id="keys-legend" aria-label="Raccourcis clavier">
         <kbd>1</kbd>–<kbd>6</kbd> option · <kbd>T</kbd> texte libre · <kbd>Échap</kbd> quitter le texte ·
@@ -422,6 +511,7 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
       <div class="flow-head">
         <h2>Chaîne</h2>
         <span class="muted" id="chaine-feature"></span>
+        <button id="chaine-where" title="Relire le dossier et revérifier la dernière ligne Next:">Où on en est ?</button>
         <span class="grow"></span>
         <span class="legend" id="chaine-legend"></span>
       </div>
@@ -441,6 +531,38 @@ details pre { max-height: 360px; overflow: auto; background: var(--bg); padding:
       <div id="corr-note" class="muted small"></div>
       <ol class="flow" id="flow-corr" aria-label="La chaîne de correction"></ol>
       <div class="card" id="buglist-card" style="margin-top:20px"></div>
+    </section>
+
+    <!-- =========================== Statistiques =========================== -->
+    <section id="scr-stats" class="screen hidden">
+      <div class="flow-head">
+        <h2>Statistiques</h2>
+        <span class="grow"></span>
+        <div class="st-filters" role="group" aria-label="Filtres">
+          <label>Fonctionnalité <select id="st-feature"></select></label>
+          <div class="seg" id="st-period" role="group" aria-label="Période">
+            <button data-p="jour">Aujourd'hui</button><button data-p="7j">7 jours</button><button data-p="30j">30 jours</button><button data-p="tout">Tout</button>
+          </div>
+          <button id="st-export" class="small" title="Les runs et les passages d'agent des filtres, en deux fichiers CSV">Exporter</button>
+        </div>
+      </div>
+      <div id="st-msg" class="notice warn hidden" role="status"></div>
+      <p class="st-note">≈ : ce qu'un run a pris aux limites, l'écart entre la mesure de son début et celle de sa fin. Les limites comptent tout ce que le compte a utilisé entre-temps, pas ce run seul, et se lisent au pour cent. « inconnu » : le chiffre n'est pas dans la base — il n'entre dans aucune somme, et la somme le dit.</p>
+      <div class="st-sec" id="st-brief"><h3>En bref</h3><div class="tiles" id="st-tiles"></div></div>
+      <div class="st-sec" id="st-limits"><h3>Les limites dans le temps</h3>
+        <div class="chart-card"><div class="chart-legend" id="st-legend"></div><div id="st-chart"></div></div>
+        <details id="st-measures"><summary>Les mesures, en tableau</summary><div id="st-measures-table" style="margin-top:8px"></div></details>
+      </div>
+      <div class="st-sec" id="st-cmd"><h3>Par commande</h3><div id="st-cmd-table"></div></div>
+      <div class="st-sec" id="st-agent"><h3>Par agent</h3><div id="st-agent-table"></div></div>
+      <div class="st-sec hidden" id="st-feat"><h3>Par fonctionnalité</h3><div id="st-feat-table"></div></div>
+      <div class="st-sec" id="st-costly"><h3>Les plus coûteux</h3>
+        <div class="sub">Par tokens lus. « inhabituel » : plus de deux fois la médiane de sa commande (un run) ou de son agent (un passage), sur toute la base.</div>
+        <div class="st-pair"><div><h4>Runs</h4><div id="st-costly-runs"></div></div><div><h4>Passages d'agent</h4><div id="st-costly-passes"></div></div></div>
+      </div>
+      <div class="st-sec" id="st-history"><h3>Historique des runs</h3>
+        <div class="sub">Le plus récent d'abord. Un clic ouvre ses passages d'agent et le chemin de son journal.</div>
+        <div id="st-history-table"></div></div>
     </section>
 
     <!-- ============================ Paramètres ============================ -->
@@ -617,7 +739,7 @@ const STATE_CLASS = {"faite": "st-faite", "t'attend": "st-attend", "en cours": "
                      "bloquée": "st-bloquee", "à faire": "st-afaire", "inconnu": "st-inconnu"};
 
 // ================================================================ routes
-const SCREENS = ["dashboard", "answer", "chaine", "correction", "settings"];
+const SCREENS = ["dashboard", "answer", "chaine", "correction", "stats", "settings"];
 function currentRoute() {
   const h = (location.hash || "").replace("#", "");
   return SCREENS.includes(h) ? h : "dashboard";
@@ -638,6 +760,7 @@ function route() {
   }
   if (isOpen && r === "answer") hint();
   if (isOpen && (r === "chaine" || r === "correction")) placeRun();
+  if (isOpen && r === "stats") loadStats();
 }
 window.addEventListener("hashchange", route);
 
@@ -719,12 +842,29 @@ async function refreshState(reason) {
 function renderAll() {
   renderChrome(); renderDashboard(); renderChaine(); renderCorrection(); renderRun(); renderSettings();
   placeRun();
+  watchDiagnostic();
+}
+
+// The diagnostic the server runs on its own: its result is picked up when it
+// lands, without re-rendering the forms.
+let diagWatch = null;
+function watchDiagnostic() {
+  if (!S.diagnostic_running || diagWatch) return;
+  diagWatch = setInterval(async () => {
+    try {
+      const st = await api("/api/state");
+      if (st.diagnostic_running) return;
+      S.diagnostic = st.diagnostic; S.diagnostic_running = false;
+      clearInterval(diagWatch); diagWatch = null;
+      renderAlerts(); renderDiag();
+    } catch (e) { /* the next tick tries again */ }
+  }, 2000);
 }
 
 // ---------------------------------------------------------- top bar
 function renderChrome() {
   const isOpen = !!S.open;
-  for (const id of ["tb-folder", "tb-mode", "tb-run", "tb-where"]) $(id).classList.toggle("hidden", !isOpen);
+  for (const id of ["tb-folder", "tb-mode", "tb-run", "tb-menu"]) $(id).classList.toggle("hidden", !isOpen);
   if (!isOpen) return;
   $("tb-folder").replaceChildren(el("b", {text: S.feature || S.working_folder}),
     el("span", {class: "muted", text: " · " + baseName(S.app_folder)}));
@@ -736,13 +876,40 @@ function renderChrome() {
   const nc = (S.bugfixes || []).length;
   $("nav-corr-count").textContent = nc; $("nav-corr-count").classList.toggle("hidden", !nc);
   $("nav-corr-count").classList.add("plain");
+  menuDot();
 }
+
+// The side menu opens and closes (1.4.5), remembered. Closed, the button
+// carries a dot when « À répondre » has open entries or a run is going:
+// nothing that waits on her is hidden.
+let menuClosed = false;
+try { menuClosed = localStorage.getItem("cockpit-menu") === "closed"; } catch (e) {}
+function applyMenu() {
+  $("shell").classList.toggle("menu-closed", menuClosed);
+  const b = $("tb-menu");
+  b.setAttribute("aria-expanded", String(!menuClosed));
+  const label = menuClosed ? "Ouvrir le menu" : "Fermer le menu";
+  b.setAttribute("aria-label", label); b.title = label;
+  menuDot();
+}
+function menuDot() {
+  const waits = openCount() > 0 || running();
+  const dot = $("tb-menu-dot");
+  dot.classList.toggle("hidden", !(menuClosed && waits));
+  dot.title = openCount() ? `${plural(openCount(), "entrée", "entrées")} à répondre` + (running() ? " · une commande tourne" : "")
+    : running() ? "Une commande tourne" : "";
+}
+$("tb-menu").onclick = () => {
+  menuClosed = !menuClosed;
+  try { localStorage.setItem("cockpit-menu", menuClosed ? "closed" : "open"); } catch (e) {}
+  applyMenu();
+};
 function baseName(p) { return (p || "").split(/[\\/]/).filter(Boolean).pop() || ""; }
 $("tb-folder").onclick = () => go("settings", "sec-folders");
 $("tb-mode").onclick = () => go("settings", "sec-mode");
 $("perm-badge").onclick = () => { $("perm-banner").scrollTop = 0; };
-$("tb-where").onclick = async () => {
-  const b = $("tb-where"); b.disabled = true;
+$("chaine-where").onclick = async () => {
+  const b = $("chaine-where"); b.disabled = true;
   try { await refreshState("bouton"); } catch (e) { alert(e.message); }
   finally { b.disabled = false; }
 };
@@ -878,10 +1045,10 @@ function renderAlerts() {
     el("button", {class: "link", text: "Retirer stop.md", onclick: disarm}));
   for (const e of (F && F.errors) || []) add("",
     e.level === "warning" ? "À vérifier : " : "Fichier illisible : ", el("b", {class: "mono", text: e.rel}), " — " + e.message);
+  // No result stored: the server runs it on its own at the opening (1.4.5).
+  // Only a result with a ✗ is an alert.
   const d = S.diagnostic;
-  if (!d) add("", "Le diagnostic n'a jamais été lancé. ",
-    el("button", {class: "link", text: "Le lancer", onclick: () => go("settings", "sec-diag")}));
-  else if (d.results.some((r) => r.status === "fail")) add("",
+  if (d && d.results.some((r) => r.status === "fail")) add("",
     `Le dernier diagnostic (${d.at.replace("T", " ")}) a un échec : ` +
     d.results.filter((r) => r.status === "fail").map((r) => r.label).join(", ") + ". ",
     el("button", {class: "link", text: "Voir", onclick: () => go("settings", "sec-diag")}));
@@ -1169,6 +1336,7 @@ function renderForms() {
   const nAll = F.questions.length + F.blocking.length + (F.redecoupage ? 1 : 0);
   const cnt = $("nav-answer-count");
   cnt.textContent = nAll; cnt.classList.toggle("hidden", !nAll);
+  menuDot();
   const qs = F.questions.filter(inStep), bs = F.blocking.filter(inStep);
   const red = F.redecoupage && inStep(F.redecoupage) ? F.redecoupage : null;
   if (!qs.length && !bs.length && !red) form.append(el("p", {class: "muted", text: stepFilter ? "Rien n'attend de réponse pour cette étape." : "Rien n'attend de réponse dans cette feature."}));
@@ -1740,10 +1908,11 @@ async function runRaw(name, args, named) {
 
 function renderDiag() {
   const box = $("diag-result"); box.replaceChildren();
-  $("btn-diag").disabled = diagBusy;
-  $("diag-wait").classList.toggle("hidden", !diagBusy);
+  const busy = diagBusy || !!S.diagnostic_running;
+  $("btn-diag").disabled = busy;
+  $("diag-wait").classList.toggle("hidden", !busy);
   const d = S.diagnostic;
-  if (!d) { box.append(el("p", {class: "muted", text: "Jamais lancé."})); return; }
+  if (!d) { box.append(el("p", {class: "muted", text: busy ? "Premier diagnostic en cours, lancé à l'ouverture du cockpit." : "Jamais lancé."})); return; }
   box.append(el("div", {class: "muted small", text: "Dernier résultat : " + d.at.replace("T", " ")}));
   const ul = el("ul");
   for (const r of d.results) {
@@ -1761,9 +1930,404 @@ $("btn-diag").onclick = async () => {
   finally { diagBusy = false; renderDiag(); renderAlerts(); }
 };
 
+// ====================================================== statistiques (1.4.5)
+// What stats.sqlite holds, read in depth (TECHNICAL_V1 §15). Never a figure
+// the store does not hold: an unknown count reads « inconnu », is left out of
+// every sum, and the sum says how many it left out.
+let ST = null;                        // /api/stats
+const stSort = {};                    // table -> {key, dir}
+const stOpen = new Set();             // runs opened in the history
+let stToken = 0;
+const stPrefs = (() => { try { return JSON.parse(localStorage.getItem("cockpit-stats") || "{}") || {}; } catch (e) { return {}; } })();
+function stSavePrefs() { try { localStorage.setItem("cockpit-stats", JSON.stringify(stPrefs)); } catch (e) {} }
+const ST_PERIODS = {jour: "aujourd'hui", "7j": "7 jours", "30j": "30 jours", tout: "depuis le début"};
+const stPeriod = () => ST_PERIODS[stPrefs.period] ? stPrefs.period : "7j";
+const stFeature = () => stPrefs.feature || "";          // "" the feature opened, "*" all of them
+
+async function loadStats() {
+  const tok = ++stToken;
+  renderStFilters();
+  let data;
+  try { data = await api("/api/stats?" + new URLSearchParams({feature: stFeature(), period: stPeriod()})); }
+  catch (e) { if (tok === stToken) stMsg(e.message); return; }
+  if (tok !== stToken) return;
+  ST = data;
+  renderStats();
+}
+function stMsg(text, kind = "warn") {
+  const m = $("st-msg");
+  m.className = "notice " + kind + (text ? "" : " hidden");
+  m.textContent = text || "";
+}
+
+function renderStFilters() {
+  const sel = $("st-feature"); sel.replaceChildren();
+  const others = ((ST && ST.features) || []).filter((f) => f !== S.feature);
+  if (stFeature() && stFeature() !== "*" && !others.includes(stFeature()) && stFeature() !== S.feature) others.push(stFeature());
+  sel.append(el("option", {value: "", text: `${S.feature || "—"} (ouverte)`}), el("option", {value: "*", text: "Toutes"}),
+    ...others.map((f) => el("option", {value: f, text: f})));
+  sel.value = stFeature() === S.feature ? "" : stFeature();
+  for (const b of $("st-period").querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.p === stPeriod()));
+}
+$("st-feature").onchange = () => { stPrefs.feature = $("st-feature").value; stSavePrefs(); stOpen.clear(); loadStats(); };
+for (const b of $("st-period").querySelectorAll("button")) {
+  b.onclick = () => { stPrefs.period = b.dataset.p; stSavePrefs(); loadStats(); };
+}
+$("st-export").onclick = async () => {
+  const b = $("st-export"); b.disabled = true; b.textContent = "Fenêtre ouverte…";
+  try {
+    const r = await api("/api/stats/export", {feature: stFeature(), period: stPeriod()});
+    if (r.cancelled) stMsg("Export annulé : aucun dossier choisi.");
+    else stMsg("Écrits : " + r.files.join("  ·  "), "ok");
+  } catch (e) { stMsg(e.message); }
+  finally { b.disabled = false; b.textContent = "Exporter"; }
+};
+
+// ---------------------------------------------------------- formatting
+const fmtPct = (x) => x === null || x === undefined ? "—" : `≈ ${frNum(x, 1)} %`;
+const fmtDurC = (s) => s === null || s === undefined ? "inconnue" : fmtDur(s);
+function fmtDate(iso) {
+  const d = new Date(iso);
+  if (!iso || !isFinite(d)) return "date inconnue";
+  return `${d.toLocaleDateString("fr-FR", {day: "numeric", month: "short"})} ${d.toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit"})}`;
+}
+const shortModel = (m) => (m || "").replace(/^claude-/, "");
+const unknownNote = (n, one, many) => n ? el("span", {class: "u", text: `dont ${plural(n, one, many)}`}) : null;
+const odd = (x, what) => x.unusual ? el("span", {class: "badge odd", title: `plus de deux fois la médiane de ${what} (${fmtTok(x.group_median_read)} lus)`, text: "inhabituel"}) : null;
+function runById(id) { return ST.runs.find((r) => r.id === id) || null; }
+
+// ------------------------------------------------------- sortable tables
+// cols: {key, label, num, sort: row -> value, cell: row -> node(s)}. An
+// unknown value sorts last, whichever the direction.
+function stTable(id, cols, rows, opts = {}) {
+  const st = stSort[id] || opts.sort || null;
+  const list = rows.slice();
+  const c0 = st && cols.find((c) => c.key === st.key);
+  if (c0) list.sort((a, b) => {
+    const x = c0.sort(a), y = c0.sort(b);
+    if (x === null || x === undefined) return y === null || y === undefined ? 0 : 1;
+    if (y === null || y === undefined) return -1;
+    const r = typeof x === "string" ? x.localeCompare(y, "fr") : x - y;
+    return st.dir === "asc" ? r : -r;
+  });
+  const box = el("div", {class: "st-table-wrap", id: "tbl-" + id});
+  const rerender = () => box.replaceWith(stTable(id, cols, rows, opts));
+  const head = el("tr", {}, ...cols.map((c) => {
+    const th = el("th", {class: c.num ? "num" : "", scope: "col"});
+    if (st && st.key === c.key) th.setAttribute("aria-sort", st.dir === "asc" ? "ascending" : "descending");
+    th.append(el("button", {type: "button", text: c.label, title: "Trier", onclick: () => {
+      const same = st && st.key === c.key;
+      stSort[id] = {key: c.key, dir: same ? (st.dir === "asc" ? "desc" : "asc") : (c.num ? "desc" : "asc")};
+      rerender();
+    }}));
+    return th;
+  }));
+  const tb = el("tbody");
+  if (!list.length) tb.append(el("tr", {}, el("td", {class: "st-empty", colspan: String(cols.length), text: opts.empty || "Rien sur cette période."})));
+  for (const r of list) {
+    const tr = el("tr", {}, ...cols.map((c) => el("td", {class: (c.num ? "num " : "") + (c.cls || "")}, c.cell(r))));
+    if (opts.onRow) {
+      const open = opts.isOpen && opts.isOpen(r);
+      tr.className = "clickable" + (open ? " open" : "");
+      tr.tabIndex = 0;
+      if (opts.isOpen) tr.setAttribute("aria-expanded", String(!!open));
+      const act = () => { opts.onRow(r); if (opts.isOpen) rerender(); };
+      tr.addEventListener("click", act);
+      tr.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(); } });
+    }
+    if (opts.dataId) tr.dataset.id = opts.dataId(r);
+    tb.append(tr);
+    if (opts.detail && opts.isOpen && opts.isOpen(r)) tb.append(el("tr", {class: "detail"}, el("td", {colspan: String(cols.length)}, opts.detail(r))));
+  }
+  box.append(el("table", {class: "st"}, el("thead", {}, head), tb));
+  return box;
+}
+const num = (key, label, sort, cell) => ({key, label, num: true, sort, cell});
+const txt = (key, label, sort, cell, cls) => ({key, label, sort, cell, cls});
+
+// ---------------------------------------------------------------- render
+function renderStats() {
+  renderStFilters();
+  stMsg(ST.error ? `${cap(ST.error)} : rien à montrer.` : "");
+  renderStTiles();
+  renderStChart();
+  renderStTables();
+}
+
+function tile(label, value, ...sub) {
+  return el("div", {class: "tile"}, el("div", {class: "tl", text: label}), el("div", {class: "tv", text: value}),
+    ...sub.filter(Boolean).map((t) => el("div", {class: "ts", text: t})));
+}
+function renderStTiles() {
+  const t = ST.totals, box = $("st-tiles"); box.replaceChildren();
+  const dont = (n, one, many) => n ? `dont ${plural(n, one, many)}` : null;
+  const share = t.read_tokens ? Math.round(100 * t.cache_read_tokens / t.read_tokens) : null;
+  box.append(
+    tile("Runs", String(t.runs), ST_PERIODS[ST.period] + (ST.feature ? ` · ${ST.feature}` : " · toutes les fonctionnalités")),
+    tile("Temps total", t.runs ? fmtDurC(t.duration_s) : "—", dont(t.duration_unknown, "durée inconnue", "durées inconnues")),
+    tile("Tokens lus", t.runs ? fmtTok(t.read_tokens) : "—", share !== null ? `${share} % en cache` : null,
+      dont(t.read_unknown, "run inconnu", "runs inconnus")),
+    tile("Tokens écrits", t.runs ? fmtTok(t.output_tokens) : "—", dont(t.output_unknown, "run inconnu", "runs inconnus"),
+      ST.passes_unknown_output ? `${plural(ST.passes_unknown_output, "passe d'agent", "passes d'agent")} sans chiffre propre` : null),
+    tile("Fenêtre de 5 h", fmtPct(t.five_hour), "pris par les runs", dont(t.five_hour_unknown, "run sans mesure", "runs sans mesure")),
+    tile("Semaine", fmtPct(t.seven_day), "pris par les runs", dont(t.seven_day_unknown, "run sans mesure", "runs sans mesure")));
+}
+
+// ---------------------------------------------------------- the chart
+const SVGNS = "http://www.w3.org/2000/svg";
+function sv(tag, attrs = {}, ...kids) {
+  const n = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs)) if (v !== undefined && v !== null) n.setAttribute(k, v);
+  for (const c of kids) if (c !== null && c !== undefined) n.append(c);
+  return n;
+}
+const WIN = [{w: "five_hour", name: "Fenêtre de 5 h", short: "5 h", cls: "5h", span: 5 * 3600e3},
+             {w: "seven_day", name: "Semaine", short: "semaine", cls: "wk", span: 7 * 24 * 3600e3}];
+function timeTicks(t0, t1, width) {
+  const H = 3600e3, D = 24 * H;
+  const steps = [15 * 60e3, 30 * 60e3, H, 2 * H, 3 * H, 6 * H, 12 * H, D, 2 * D, 7 * D, 14 * D, 30 * D];
+  const step = steps.find((s) => (t1 - t0) / s <= Math.max(2, width / 110)) || 30 * D;
+  const start = new Date(t0); start.setHours(0, 0, 0, 0);
+  const out = [];
+  for (let t = start.getTime(); t <= t1; ) {
+    if (t >= t0) out.push(t);
+    if (step < D) t += step;
+    else { const d = new Date(t); d.setDate(d.getDate() + Math.round(step / D)); t = d.getTime(); }
+  }
+  return {ticks: out, step};
+}
+function renderStChart() {
+  const box = $("st-chart"); box.replaceChildren();
+  const card = box.parentNode;
+  for (const old of card.querySelectorAll(".tip")) old.remove();
+  const lg = $("st-legend"); lg.replaceChildren(
+    ...WIN.map((s) => el("span", {}, el("span", {class: "sw", style: `background:var(--s${s.cls})`}), s.name)),
+    el("span", {}, el("span", {class: "sw run"}), "un run"));
+  const ms = ST.limits || [], runs = ST.runs || [];
+  renderStMeasures(ms);
+  if (!ms.length) {
+    box.append(el("div", {class: "st-empty", text: runs.length ? "Aucune mesure d'usage sur cette période : les runs n'en ont pas laissé."
+      : "Aucune mesure d'usage sur cette période."}));
+    return;
+  }
+  const W = Math.max(520, Math.round(box.clientWidth || 900)), H = 270;
+  const m = {l: 46, r: 108, t: 14, b: 50};
+  let t0 = Date.parse(ST.range.start), t1 = Date.parse(ST.range.end);
+  if (!(t1 - t0 > 3600e3)) t0 = t1 - 3600e3;
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const x = (t) => m.l + Math.max(0, Math.min(1, (t - t0) / (t1 - t0))) * pw;
+  const y = (u) => m.t + (1 - Math.max(0, Math.min(1, u))) * ph;
+  const svg = sv("svg", {viewBox: `0 0 ${W} ${H}`, role: "img",
+    "aria-label": "L'utilisation de la fenêtre de 5 heures et de la semaine sur la période, avec les runs sur l'axe du temps"});
+  for (const u of [0, .25, .5, .75, 1]) {
+    svg.append(sv("line", {class: "grid", x1: m.l, x2: m.l + pw, y1: y(u), y2: y(u)}),
+      sv("text", {x: m.l - 8, y: y(u) + 4, "text-anchor": "end"}, `${u * 100} %`));
+  }
+  const {ticks, step} = timeTicks(t0, t1, pw);
+  const span = t1 - t0;
+  for (const t of ticks) {
+    const d = new Date(t);
+    const midnight = d.getHours() === 0 && d.getMinutes() === 0;
+    const label = step >= 24 * 3600e3 || (midnight && span > 6 * 3600e3)
+      ? d.toLocaleDateString("fr-FR", {day: "numeric", month: "short"})
+      : d.toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit"});
+    svg.append(sv("line", {class: "grid", x1: x(t), x2: x(t), y1: m.t + ph, y2: m.t + ph + 4}),
+      sv("text", {x: x(t), y: m.t + ph + 18, "text-anchor": "middle"}, label));
+  }
+  // The runs on the time axis: a mark under the plot, a faint band through it.
+  const spans = [];
+  for (const r of runs) {
+    const a = Date.parse(r.started_at); if (!isFinite(a)) continue;
+    const b = isFinite(Date.parse(r.ended_at)) ? Date.parse(r.ended_at) : a;
+    const xa = x(a), xb = Math.max(x(b), xa + 3);
+    spans.push({a, b, r});
+    const tt = `${r.command || r.cmd} — ${fmtDate(r.started_at)}, ${fmtDurC(r.duration_s)}`;
+    svg.append(sv("rect", {class: "band", x: xa, y: m.t, width: xb - xa, height: ph}),
+      sv("rect", {class: "runmark", x: xa, y: m.t + ph + 26, width: xb - xa, height: 8, rx: 2}, sv("title", {}, tt)));
+  }
+  // One line per window, broken where the window reset; every measure a point.
+  const ends = [];
+  for (const s of WIN) {
+    const pts = ms.filter((p) => p.window === s.w && isFinite(Date.parse(p.measured_at)))
+      .sort((p, q) => p.measured_at < q.measured_at ? -1 : 1);
+    if (!pts.length) continue;
+    let d = "", prev = null;
+    for (const p of pts) {
+      // A new window: its reset moved, the earlier one's reset has passed,
+      // or more time went by than the window lasts.
+      const tp = Date.parse(p.measured_at), tq = prev ? Date.parse(prev.measured_at) : 0;
+      const reset = prev && ((prev.resets_at && p.resets_at && Math.abs(prev.resets_at - p.resets_at) > 60)
+        || (prev.resets_at && prev.resets_at * 1000 <= tp) || tp - tq > s.span);
+      d += `${!prev || reset ? "M" : "L"}${x(Date.parse(p.measured_at)).toFixed(1)},${y(p.utilization).toFixed(1)}`;
+      prev = p;
+    }
+    svg.append(sv("path", {d, class: "s" + s.cls, fill: "none", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round"}));
+    for (const p of pts) svg.append(sv("circle", {class: "p" + s.cls, cx: x(Date.parse(p.measured_at)), cy: y(p.utilization), r: 4}));
+    const last = pts[pts.length - 1];
+    ends.push({s, x: x(Date.parse(last.measured_at)), y: y(last.utilization), u: last.utilization});
+  }
+  // Direct labels at each line's end, pushed apart when they would touch.
+  if (ends.length === 2 && Math.abs(ends[0].y - ends[1].y) < 15) {
+    const [hi, lo] = ends[0].y <= ends[1].y ? ends : [ends[1], ends[0]];
+    const mid = (hi.y + lo.y) / 2; hi.ly = mid - 8; lo.ly = mid + 8;
+  }
+  for (const e of ends) svg.append(sv("text", {class: "dl", x: Math.min(e.x + 9, W - 4), y: (e.ly ?? e.y) + 4},
+    `${e.s.short} · ${Math.round(e.u * 100)} %`));
+  // The crosshair: snaps to the nearest measure, one readout for both windows.
+  const cross = sv("line", {class: "cross", y1: m.t, y2: m.t + ph, visibility: "hidden"});
+  const hit = sv("rect", {x: m.l, y: m.t, width: pw, height: ph + 36, fill: "transparent"});
+  svg.append(cross, hit);
+  box.append(svg);
+  const tip = el("div", {class: "tip hidden", role: "status"});
+  card.append(tip);
+  const times = [...new Set(ms.map((p) => Date.parse(p.measured_at)).filter(isFinite))].sort((a, b) => a - b);
+  const at = (w, t) => { let best = null; for (const p of ms) if (p.window === w && Date.parse(p.measured_at) <= t) best = p; return best; };
+  hit.addEventListener("pointermove", (ev) => {
+    const r = svg.getBoundingClientRect();
+    const px = (ev.clientX - r.left) * (W / r.width);
+    const t = t0 + ((px - m.l) / pw) * (t1 - t0);
+    const near = times.reduce((a, b) => Math.abs(b - t) < Math.abs(a - t) ? b : a, times[0]);
+    const cx = x(near);
+    cross.setAttribute("x1", cx); cross.setAttribute("x2", cx); cross.setAttribute("visibility", "visible");
+    tip.replaceChildren(el("div", {class: "tt", text: fmtDate(new Date(near).toISOString())}),
+      ...WIN.map((s) => { const p = at(s.w, near);
+        return el("div", {class: "tr"}, el("span", {class: "k", style: `background:var(--s${s.cls})`}),
+          el("b", {text: p ? `${Math.round(p.utilization * 100)} %` : "—"}), el("span", {class: "muted", text: s.name})); }),
+      ...spans.filter((sp) => near >= sp.a - 60e3 && near <= sp.b + 60e3).map((sp) =>
+        el("div", {class: "muted", style: "margin-top:4px", text: `Run : ${sp.r.command || sp.r.cmd}`})));
+    tip.classList.remove("hidden");
+    const left = (cx / W) * r.width + (box.offsetLeft || 0);
+    tip.style.left = `${Math.min(left + 12, card.clientWidth - tip.offsetWidth - 8)}px`;
+    tip.style.top = `${box.offsetTop + 8}px`;
+  });
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); tip.classList.add("hidden"); });
+}
+function renderStMeasures(ms) {
+  const box = $("st-measures-table"); box.replaceChildren();
+  const name = {five_hour: "5 heures", seven_day: "semaine"};
+  box.append(stTable("measures", [
+    txt("at", "Mesurée", (p) => p.measured_at, (p) => fmtDate(p.measured_at)),
+    txt("w", "Fenêtre", (p) => p.window, (p) => name[p.window] || p.window),
+    num("u", "Utilisation", (p) => p.utilization, (p) => `${Math.round(p.utilization * 100)} %`),
+    txt("src", "Source", (p) => p.source, (p) => p.source === "usage" ? "fin de run, /usage" : "pendant un run"),
+    txt("reset", "Réinitialisation", (p) => p.resets_at, (p) => p.resets_at ? fmtDate(new Date(p.resets_at * 1000).toISOString()) : "inconnue"),
+    txt("run", "Run", (p) => { const r = runById(p.run_id); return r ? r.command : null; }, (p) => { const r = runById(p.run_id); return r ? r.command : "—"; }, "mono"),
+  ], ms, {sort: {key: "at", dir: "desc"}, empty: "Aucune mesure sur cette période."}));
+}
+
+// ---------------------------------------------------------- the tables
+function renderStTables() {
+  const sumCell = (v, n, one, many) => [fmtTok(v), unknownNote(n, one, many)];
+  const durCell = (v, n) => [fmtDurC(v), unknownNote(n, "durée inconnue", "durées inconnues")];
+  $("st-cmd-table").replaceChildren(stTable("cmd", [
+    txt("cmd", "Commande", (r) => r.cmd, (r) => r.cmd, "mono"),
+    num("runs", "Runs", (r) => r.runs, (r) => String(r.runs)),
+    num("med", "Durée médiane", (r) => r.median_s, (r) => fmtDurC(r.median_s)),
+    num("dur", "Durée totale", (r) => r.duration_s, (r) => durCell(r.duration_s, r.duration_unknown)),
+    num("read", "Tokens lus", (r) => r.read_tokens, (r) => sumCell(r.read_tokens, r.read_unknown, "run inconnu", "runs inconnus")),
+    num("out", "Tokens écrits", (r) => r.output_tokens, (r) => sumCell(r.output_tokens, r.output_unknown, "run inconnu", "runs inconnus")),
+    num("pct", "≈ % 5 h par run (médiane)", (r) => r.five_hour_median, (r) => [fmtPct(r.five_hour_median),
+      r.five_hour_measured < r.runs ? el("span", {class: "u", text: `mesuré sur ${r.five_hour_measured} / ${r.runs}`}) : null]),
+  ], ST.by_command, {sort: {key: "read", dir: "desc"}, empty: "Aucun run sur cette période."}));
+
+  $("st-agent-table").replaceChildren(stTable("agent", [
+    txt("agent", "Agent", (r) => r.agent, (r) => cap(r.agent || "agent")),
+    num("passes", "Passages", (r) => r.passes, (r) => String(r.passes)),
+    txt("model", "Modèle", (r) => r.models.join(", "), (r) => r.models.map(shortModel).join(", ") || "inconnu", "mono"),
+    num("med", "Durée médiane", (r) => r.median_s, (r) => fmtDurC(r.median_s)),
+    num("dur", "Durée totale", (r) => r.duration_s, (r) => durCell(r.duration_s, r.duration_unknown)),
+    num("read", "Tokens lus", (r) => r.read_tokens, (r) => sumCell(r.read_tokens, r.read_unknown, "passe inconnue", "passes inconnues")),
+    num("out", "Tokens écrits", (r) => r.output_tokens, (r) => sumCell(r.output_tokens, r.output_unknown, "passe inconnue", "passes inconnues")),
+    num("calls", "Appels d'outils", (r) => r.tool_calls, (r) => r.tool_calls === null ? "inconnu" : String(r.tool_calls)),
+  ], ST.by_agent, {sort: {key: "read", dir: "desc"}, empty: "Aucun passage d'agent sur cette période."}));
+
+  $("st-feat").classList.toggle("hidden", !!ST.feature);
+  $("st-feat-table").replaceChildren(ST.feature ? "" : stTable("feat", [
+    txt("feature", "Fonctionnalité", (r) => r.feature, (r) => r.feature, "mono"),
+    num("runs", "Runs", (r) => r.runs, (r) => String(r.runs)),
+    num("dur", "Durée totale", (r) => r.duration_s, (r) => durCell(r.duration_s, r.duration_unknown)),
+    num("read", "Tokens lus", (r) => r.read_tokens, (r) => sumCell(r.read_tokens, r.read_unknown, "run inconnu", "runs inconnus")),
+    num("out", "Tokens écrits", (r) => r.output_tokens, (r) => sumCell(r.output_tokens, r.output_unknown, "run inconnu", "runs inconnus")),
+    num("h5", "≈ % 5 h", (r) => r.five_hour, (r) => [fmtPct(r.five_hour), unknownNote(r.five_hour_unknown, "run sans mesure", "runs sans mesure")]),
+    num("wk", "≈ % semaine", (r) => r.seven_day, (r) => [fmtPct(r.seven_day), unknownNote(r.seven_day_unknown, "run sans mesure", "runs sans mesure")]),
+  ], ST.by_feature, {sort: {key: "read", dir: "desc"}}));
+
+  const openRun = (id) => {
+    stOpen.add(id); renderStHistory();
+    setTimeout(() => { const tr = document.querySelector(`#tbl-history tr[data-id="${CSS.escape(id)}"]`); if (tr) tr.scrollIntoView({block: "center"}); }, 30);
+  };
+  const costlyRuns = ST.costly_runs.map(runById).filter(Boolean);
+  $("st-costly-runs").replaceChildren(stTable("costly-runs", [
+    txt("cmd", "Run", (r) => r.command, (r) => [el("span", {class: "mono", text: r.command || r.cmd}), " ", odd(r, "sa commande"),
+      el("span", {class: "u", text: fmtDate(r.started_at)})]),
+    num("read", "Tokens lus", (r) => r.read_tokens, (r) => fmtTok(r.read_tokens)),
+    num("med", "Médiane de sa commande", (r) => r.group_median_read, (r) => fmtTok(r.group_median_read)),
+  ], costlyRuns, {sort: {key: "read", dir: "desc"}, onRow: (r) => openRun(r.id), empty: "Aucun run sur cette période."}));
+  const passOf = (k) => { const r = runById(k.run_id); return r && r.passes.find((p) => p.id === k.id); };
+  const costlyPasses = ST.costly_passes.map(passOf).filter(Boolean);
+  $("st-costly-passes").replaceChildren(stTable("costly-passes", [
+    txt("agent", "Passage", (p) => p.agent, (p) => [el("b", {text: cap(p.agent)}), " ", odd(p, "son agent"),
+      el("span", {class: "u", text: `${p.run_command || ""} · ${fmtDate(p.started_at || p.run_started_at)}`})]),
+    num("read", "Tokens lus", (p) => p.read_tokens, (p) => fmtTok(p.read_tokens)),
+    num("med", "Médiane de l'agent", (p) => p.group_median_read, (p) => fmtTok(p.group_median_read)),
+  ], costlyPasses, {sort: {key: "read", dir: "desc"}, onRow: (p) => openRun(p.run_id), empty: "Aucun passage d'agent sur cette période."}));
+  renderStHistory();
+}
+
+function renderStHistory() {
+  $("st-history-table").replaceChildren(stTable("history", [
+    txt("date", "Date", (r) => r.started_at, (r) => fmtDate(r.started_at), "nw"),
+    txt("cmd", "Commande", (r) => r.command, (r) => [el("span", {class: "mono", text: r.command || "inconnue"}), " ", odd(r, "sa commande"),
+      r.resumed ? el("span", {class: "badge plain", text: "suite"}) : null]),
+    num("dur", "Durée", (r) => r.duration_s, (r) => fmtDurC(r.duration_s)),
+    num("read", "Tokens lus", (r) => r.read_tokens, (r) => fmtTok(r.read_tokens)),
+    num("out", "Tokens écrits", (r) => r.output_tokens, (r) => fmtTok(r.output_tokens)),
+    num("h5", "≈ % 5 h", (r) => r.limits.five_hour.delta, (r) => fmtPct(r.limits.five_hour.delta)),
+    txt("end", "Fin", (r) => r.outcome, (r) => [r.outcome || "inconnue", r.next_line ? el("span", {class: "u", text: r.next_line}) : null]),
+  ], ST.runs, {sort: {key: "date", dir: "desc"}, empty: "Aucun run sur cette période.",
+    dataId: (r) => r.id, isOpen: (r) => stOpen.has(r.id),
+    onRow: (r) => { stOpen.has(r.id) ? stOpen.delete(r.id) : stOpen.add(r.id); },
+    detail: runDetail}));
+}
+
+function runDetail(r) {
+  const lim = (s) => {
+    const l = r.limits[s.w];
+    const range = l.start !== null && l.end !== null ? ` : ${Math.round(l.start * 100)} % → ${Math.round(l.end * 100)} %` : "";
+    return el("div", {class: "row"}, el("b", {text: s.name}),
+      (l.delta !== null ? `${range} · ${fmtPct(l.delta)} de la ${s.w === "five_hour" ? "fenêtre" : "semaine"}` : `${range} — non calculé : ${l.why}`).replace(/^ : /, ""));
+  };
+  const passes = r.passes || [];
+  return el("div", {class: "st-detail"},
+    el("div", {class: "row"}, el("b", {text: "Journal"}), el("span", {class: "mono small", text: r.log_path || "inconnu"})),
+    lim(WIN[0]), lim(WIN[1]),
+    el("div", {class: "row muted small"}, `Fin : ${fmtDate(r.ended_at)} · lus ${fmtTok(r.read_tokens)}` +
+      (r.read_tokens ? ` (dont ${fmtTok(r.cache_read_tokens)} en cache)` : "") +
+      (r.permission_mode ? ` · mode ${r.permission_mode}` : "") + (r.backfilled ? " · rechargé d'un journal" : "") +
+      (r.resumed ? " · suite d'une session" : "")),
+    passes.length ? stTable("passes-" + r.id, [
+      txt("agent", "Agent", (p) => p.agent, (p) => [el("b", {text: cap(p.agent)}), " ", odd(p, "son agent"),
+        p.description ? el("span", {class: "u", text: p.description}) : null]),
+      txt("model", "Modèle", (p) => p.model, (p) => shortModel(p.model) || "inconnu", "mono"),
+      txt("start", "Début", (p) => p.started_at, (p) => p.started_at ? fmtDate(p.started_at) : "inconnu"),
+      num("dur", "Durée", (p) => p.duration_s, (p) => fmtDurC(p.duration_s)),
+      num("read", "Tokens lus", (p) => p.read_tokens, (p) => fmtTok(p.read_tokens)),
+      num("out", "Tokens écrits", (p) => p.output_tokens, (p) => fmtTok(p.output_tokens)),
+      num("calls", "Appels d'outils", (p) => p.tool_calls, (p) => p.tool_calls === null ? "inconnu" : String(p.tool_calls)),
+    ], passes, {sort: {key: "start", dir: "asc"}})
+      : el("div", {class: "muted small", style: "margin-top:8px", text: "Aucun passage d'agent : l'orchestrateur seul."}));
+}
+
+let stResize = null;
+window.addEventListener("resize", () => {
+  clearTimeout(stResize);
+  stResize = setTimeout(() => { if (ST && S.open && currentRoute() === "stats") renderStChart(); }, 150);
+});
+
 window.addEventListener("focus", () => { if (S.open && !running()) refreshForms(); });
 
 loadDrafts();
+applyMenu();
 refreshState().catch((e) => showStart(e.message));
 </script>
 </body>

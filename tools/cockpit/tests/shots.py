@@ -19,13 +19,19 @@ sys.path.insert(0, HERE)
 
 from playwright.sync_api import sync_playwright  # noqa: E402
 
+import diagnostic  # noqa: E402
 import nextline  # noqa: E402
+import server  # noqa: E402
 import stats  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
 from test_page_context import IDEAS, LEX, MODEL, PRODUCT  # noqa: E402
+from test_statistics import fixture_store  # noqa: E402
 from test_stats import two_agents  # noqa: E402
 
 FEATURES = os.path.join(HERE, "fixtures", "features")
+# 1.4.5: the cockpit runs the diagnostic on its own; here, a fake, all ✓.
+from test_mode_diagnostic import ALL_GOOD, fake_exec  # noqa: E402
+server.DIAG_RUNNER = lambda app: diagnostic.run_diagnostic(app, fake_exec(ALL_GOOD))
 
 
 def snap(page, out, name, full=False):
@@ -134,8 +140,10 @@ def main(out_dir):
                 page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
                 line = "Next: run /2_structure f"
                 s.state.set_relay(str(s.app_root), "f", "/1_lexique f", "Fini.\n" + line, nextline.parse(line).to_dict())
+                page.get_by_role("link", name="Chaîne").first.click()
                 page.get_by_role("button", name="Où on en est ?").click()
                 page.wait_for_function("!document.getElementById('next-message').classList.contains('hidden')")
+                page.get_by_role("link", name="Tableau de bord").first.click()
                 page.get_by_role("button", name="Pourquoi ?").first.click()
                 snap(page, out, "06-tableau-contradiction")
             # Real copies: premiere-app (a correction open) and premiere-app-2.
@@ -155,6 +163,29 @@ def main(out_dir):
                 page.wait_for_selector("#flow-main li.step")
                 page.locator("#step-main-4_grille").get_by_role("button", name="Pourquoi ?").click()
                 snap(page, out, "07c-chaine-premiere-app-2", full=True)
+            # 1.4.5: « Statistiques » on a fixture store, a run opened; the menu closed.
+            with FakeServer(Path(t) / "k", stats=fixture_store(str(Path(t) / "stats-k.sqlite"))) as s:
+                page.goto(s.url + "#stats")
+                page.wait_for_selector("#st-tiles .tile")
+                page.locator("#st-period button[data-p='30j']").click()
+                page.wait_for_timeout(400)
+                snap(page, out, "10-statistiques")
+                page.locator("#st-feature").select_option("*")
+                page.locator("#st-period button[data-p='tout']").click()
+                page.wait_for_selector("#st-feat", state="visible")
+                page.locator("#tbl-history tbody tr", has_text="/1_lexique f").click()
+                page.set_viewport_size({"width": 1280, "height": 2300})
+                page.wait_for_timeout(400)
+                page.screenshot(path=str(out / "10b-statistiques-toutes-run-ouvert.png"), full_page=True)
+                page.set_viewport_size({"width": 1280, "height": 800})
+                print("shot 10b-statistiques-toutes-run-ouvert")
+                page.get_by_role("link", name="Tableau de bord").first.click()
+                page.evaluate("document.getElementById('main').scrollTo(0, 0)")
+                page.get_by_role("button", name="Fermer le menu").click()
+                snap(page, out, "11-menu-ferme-point")
+                page.evaluate("location.hash = '#answer'")            # the menu is closed
+                snap(page, out, "11b-repondre-menu-ferme")
+                page.get_by_role("button", name="Ouvrir le menu").click()
         browser.close()
         print("js errors:", errors)
 

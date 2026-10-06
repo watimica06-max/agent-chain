@@ -30,8 +30,13 @@ Sans le `.bat` : `python server.py --ouvrir`.
 
 ## Les écrans
 
-**Où on en est ?** — le bouton de la barre du haut relit le dossier et
-revérifie la dernière ligne `Next:`. Le cockpit le fait aussi tout seul à
+**Le menu** — le bouton à trois traits, à gauche de la barre du haut,
+ferme et rouvre le menu de côté ; l'espace de travail prend alors toute la
+largeur. Le cockpit s'en souvient. Menu fermé, un point sur le bouton
+signale qu'il y a quelque chose à répondre ou qu'une commande tourne.
+
+**Où on en est ?** — le bouton, en haut de l'écran « Chaîne », relit le
+dossier et revérifie la dernière ligne `Next:`. Le cockpit le fait aussi tout seul à
 l'ouverture, après chaque run et après chaque enregistrement de réponses.
 
 **Tableau de bord — Prochaine étape** — d'où elle vient est écrit à côté :
@@ -70,6 +75,26 @@ prise** (« mesuré il y a 12 min »). Elles se mettent à jour à la fin de
 chaque run (le cockpit demande `/usage` à la session, sans appel au
 modèle). Une mesure dont la fenêtre s'est réinitialisée depuis le dit :
 ce n'est plus le chiffre du moment.
+
+**Statistiques** — ce que `stats.sqlite` garde, lu en détail : par
+fonctionnalité (celle qui est ouverte, ou toutes) et par période
+(aujourd'hui, 7 jours, 30 jours, tout), deux filtres dont le cockpit se
+souvient. En bref ; l'usage des deux fenêtres dans le temps, les runs
+marqués sous l'axe ; par commande, par agent, par fonctionnalité ; les
+dix runs et les dix passages d'agent les plus coûteux, « inhabituel »
+au-delà de deux fois la médiane des leurs ; l'historique des runs, un clic
+ouvrant ses passages d'agent et le chemin de son journal. Les tableaux se
+trient sur chaque colonne. « ≈ 4 % de la fenêtre 5 h » : l'écart entre
+la mesure du début du run et celle de sa fin — les limites comptent tout
+ce que le compte a utilisé entre-temps, et se lisent au pour cent. Un
+chiffre absent de la base est « inconnu » et n'entre dans aucune somme,
+qui le dit. « Exporter » écrit les runs et les passages des filtres en
+deux fichiers CSV, dans le dossier choisi.
+
+**Le diagnostic** — s'il n'a jamais tourné, le cockpit le lance une fois
+de lui-même à l'ouverture et garde le résultat. Le tableau de bord ne
+l'affiche que s'il a un échec ; Paramètres → Diagnostic le relance à la
+demande.
 
 **À répondre** — toutes les questions ouvertes et tous les blocages qui
 vous attendent, dans un seul formulaire, **à gauche** ; **à droite**, le

@@ -264,8 +264,11 @@ def test_ou_on_en_est_rechecks_the_stored_next(tmp_path, page):
         page.evaluate("refreshState()")                      # right after its run: trusted
         page.wait_for_function("document.getElementById('next-source').textContent === 'dit par la chaîne'")
         assert page.locator("#next-text").inner_text() == "Lancer /2_structure f."
+        # 1.4.5: the button sits at the top of « Chaîne ».
+        page.get_by_role("link", name="Chaîne").first.click()
         page.get_by_role("button", name="Où on en est ?").click()
         page.wait_for_function("document.getElementById('next-source').textContent === 'déduite du dossier'")
+        page.get_by_role("link", name="Tableau de bord").first.click()
         msg = page.locator("#next-message").inner_text()
         assert msg.startswith("Le dernier relais disait « Next: run /2_structure f » ; les fichiers disent « ")
         page.get_by_role("button", name="Pourquoi ?").first.click()

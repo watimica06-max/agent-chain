@@ -6,6 +6,7 @@ Each check ends as `ok` (the first line of output), `fail` (the error) or
 `skip` (« non concerné »: its file is absent).
 """
 import os
+import re
 import shutil
 import subprocess
 from datetime import datetime
@@ -52,8 +53,10 @@ def plan(app):
 
 
 def first_line(text):
+    """The first line that says something: `gradlew --version` opens on a
+    rule of dashes (1.4.5)."""
     for line in (text or "").splitlines():
-        if line.strip():
+        if line.strip() and not re.fullmatch(r"[-=_*\s]+", line):
             return line.strip()
     return ""
 

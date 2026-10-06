@@ -103,8 +103,7 @@ agent that copies a signature or files a question needs none.
 `opus`** — `arbitre`, `architecte`, `cadreur`, `convertisseur`,
 `decoupeur`, `detailleur`, `lexicographe`, `sondeur`, `verificateur` —
 **the rest are `sonnet`.** ⚠️ **Pass what the frontmatter says**, never
-a model of your own choosing
-judgement.
+a model of your own choosing.
 
 ---
 

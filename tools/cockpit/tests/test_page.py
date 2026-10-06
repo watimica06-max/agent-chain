@@ -14,7 +14,8 @@ from test_mode_diagnostic import ALL_GOOD, fake_exec  # noqa: E402
 from test_runner import script_until_interrupted  # noqa: E402
 
 SCREENS = [("Tableau de bord", "scr-dashboard"), ("À répondre", "scr-answer"),
-           ("Chaîne", "scr-chaine"), ("Correction", "scr-correction"), ("Paramètres", "scr-settings")]
+           ("Chaîne", "scr-chaine"), ("Correction", "scr-correction"), ("Statistiques", "scr-stats"),
+           ("Paramètres", "scr-settings")]
 
 
 @pytest.fixture(scope="module")
@@ -77,9 +78,9 @@ def test_each_screen_loads_without_js_error(tmp_path, page):
             go(page, name)
             page.wait_for_selector(f"#{scr}", state="visible")
             assert page.locator("#main section:visible").evaluate_all("els => els.map(e => e.id)") == [scr]
-        # Five entries, « Paramètres » last in the menu, the count on « À répondre ».
+        # Six entries (1.4.5), « Paramètres » last in the menu, the count on « À répondre ».
         names = [t.split("\n")[0].strip() for t in page.locator("#side a").all_inner_texts()]
-        assert names == ["Tableau de bord", "À répondre", "Chaîne", "Correction", "Paramètres"]
+        assert names == ["Tableau de bord", "À répondre", "Chaîne", "Correction", "Statistiques", "Paramètres"]
         assert page.locator("#nav-answer-count").inner_text() == "7"
         assert " ".join(page.locator("#tb-mode").inner_text().split()) == "Mode : Auto"
         assert page.locator("#tb-run").inner_text() == "Au repos"
@@ -234,7 +235,7 @@ def test_dashboard_counters_alerts_and_history(tmp_path, page):
         assert page.locator("#cnt-b").inner_text() == "3"
         alerts = page.locator("#alerts").inner_text()
         assert "stop.md est présent" in alerts and "Fichier illisible" in alerts       # parser error
-        assert "diagnostic n'a jamais été lancé" in alerts
+        assert "diagnostic" not in alerts          # 1.4.5: run on its own, all ✓ — no alert
         row = page.locator("#history tbody tr").first.inner_text()
         assert "/7_lots f" in row and "09:30" in row and "Next: run /8_code f" in row and "logs/a.jsonl" in row
         page.get_by_role("button", name="Retirer stop.md").first.click()

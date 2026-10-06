@@ -209,3 +209,67 @@ def test_diagnostic_route_keeps_the_last_result_with_its_date(tmp_path):
             await body(c, app_root, feat, rn, st)
 
     asyncio.run(go())
+
+
+# ------------------------------------------- the diagnostic on its own (1.4.5)
+
+def _app_counting(tmp_path, table=ALL_GOOD, stored=None):
+    from test_server import build_app_folder
+    app_root = tmp_path / "app"
+    build_app_folder(app_root)
+    st = State(str(tmp_path / "config.json"))
+    if stored:
+        st.set_diagnostic(stored)
+    st.open_pair(str(app_root), "f")
+    calls = []
+
+    def fake(app):
+        calls.append(app)
+        return diagnostic.run_diagnostic(app, fake_exec(table))
+    rn = runner_mod.Runner(client_factory=lambda cwd, cb, **kw: FakeClient(script_quick, cb),
+                           log_dir=str(tmp_path / "logs"))
+    return server.make_app(st, rn, diag_runner=fake), st, calls
+
+
+async def _settle(c):
+    for _ in range(200):
+        s = await (await c.get("/api/state")).json()
+        if not s["diagnostic_running"]:
+            return s
+        await asyncio.sleep(0.02)
+    raise AssertionError("le diagnostic ne finit pas")
+
+
+def test_no_result_stored_the_diagnostic_runs_once_and_is_kept(tmp_path):
+    app, st, calls = _app_counting(tmp_path)
+
+    async def go():
+        from aiohttp.test_utils import TestClient, TestServer
+        async with TestClient(TestServer(app, host="127.0.0.1")) as c:       # the server's opening
+            s = await _settle(c)
+            for _ in range(3):                                                # the page opened again and again
+                await post(c, "/api/check", {"reason": "ouverture"})
+                s = await _settle(c)
+            assert s["diagnostic"]["ok"]
+            # On demand, unchanged.
+            await post(c, "/api/diagnostic", {})
+    asyncio.run(go())
+    assert len(calls) == 2                       # once on its own, once on demand
+    assert State(st.path).diagnostic()["ok"]     # kept in config.json
+
+
+def test_a_stored_result_is_not_run_again(tmp_path):
+    app, st, calls = _app_counting(tmp_path, stored={"at": "2026-10-01T09:00:00", "results": [], "ok": True})
+
+    async def go():
+        from aiohttp.test_utils import TestClient, TestServer
+        async with TestClient(TestServer(app, host="127.0.0.1")) as c:
+            await post(c, "/api/check", {"reason": "ouverture"})
+            assert not (await _settle(c))["diagnostic_running"]
+    asyncio.run(go())
+    assert calls == []
+
+
+def test_first_line_skips_a_rule_of_dashes():
+    out = "\n------------------------------------------------------------\nGradle 8.7\n----\n"
+    assert diagnostic.first_line(out) == "Gradle 8.7"
