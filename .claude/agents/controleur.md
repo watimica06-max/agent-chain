@@ -248,13 +248,13 @@ no `(carried)` here** — the mark is not a block:
 
     ## Intentions found
 
-    B4 Daily step panel — lot-07, "the panel shows today's count"
+    B4 <a panel> — lot-07, "the panel shows <its value>"
     B5 Tapping the panel — lot-07, "tapping the panel opens the detail"
     B9 Retention window — unchanged, nothing to build
-    B12 Navigation map · list to detail — lot-25, onRaceClicked
-    B53 Correction factor · shown on the race — lot-29, "the factor reads on the race card"
-    B53 Correction factor · kept across a restart — carried, built by a correction cycle
-    B61 Weekly recap — carried, built by a correction cycle
+    B12 Navigation map · list to detail — lot-25, <the click handler>
+    B53 <a value> · shown on <its item> — lot-29, "<the criterion's opening words>"
+    B53 <a value> · kept across a restart — carried, built by a correction cycle
+    B61 <a block's title> — carried, built by a correction cycle
 
 🔴 **A criterion is cited by its text, or its opening words — never by
 a counted position.** ⚠️ **The sheet's list is unnumbered**: "criterion
@@ -262,14 +262,14 @@ a counted position.** ⚠️ **The sheet's list is unnumbered**: "criterion
 
     ## Intentions missing
 
-    B6 Manual step entry — described as a screen with a bounded
+    B6 <a block's title> — described as a screen with a bounded
     field; no sheet carries a signature or a criterion for it
     B12 Navigation map · list to profile — toProfile() exists, no
     sheet observes anything calling it
 
     ## Doubts
 
-    B8 Removal of the macros band — lot-11 observes it on the entry
+    B8 <a block's title> — lot-11 observes it on the entry
        screen, and the summary screen shows it too: unclear whether
        the second is covered
 

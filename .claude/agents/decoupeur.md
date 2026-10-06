@@ -174,7 +174,7 @@ not drop it, and it cannot sit in two blocks.** 📌 **Its `To resume` is
 a rewording upstream, which is not yours.**
 
 ⚠️ **Two events with one identical consequence do not block** — *« when
-heart rate or pace is missing, a dash shows »*. 📌 **They are one
+<one value> or <another> is missing, a dash shows »*. 📌 **They are one
 trigger with two values** — 🔴 **the criterion is the consequence, not
 the count of events or of sentences** — and the sentence sits whole in
 that trigger's block. ⚠️ **Nothing impossible there, and nothing to
@@ -225,10 +225,10 @@ not touch its text, its title or its markers.**
 which keeps the original's marker**, see below. ⚠️ **The example is a
 half of an original that carried a `Global:` line:**
 
-    ### B62 — Closing the current segment    NEW
+    ### B62 — <the half's title>    NEW
     Genre:
     Nature:
-    Global: ## Activity screen
+    Global: ## <a section of the global>
 
     <its sentences, taken from the block you split>
 

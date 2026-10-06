@@ -2,8 +2,9 @@
 
 > Document de pilotage, en français. Il décrit ce qui, dans le dépôt,
 > tourne à côté de la chaîne sans changer aucun artefact qu'elle
-> produit : trois commandes lancées à la main, un script de contrôle des
-> fichiers de la chaîne, un document d'archive. Le critère et le
+> produit : deux commandes lancées à la main, un script de contrôle des
+> fichiers de la chaîne, un document d'archive — et `/deploie`, que
+> chaque application fournit et que la chaîne ne porte pas. Le critère et le
 > périmètre sont énoncés une fois pour les cinq documents
 > → `MECANISMES §Périmètre d'audit` ; ce document ne les redit pas, il
 > applique le critère à chaque candidat, au fichier, et donne le
@@ -14,7 +15,7 @@ périmètre, et rien de ce qu'il décrit n'est franchi par une passation
 que la chaîne vérifie. Il se ferme sur `## Inventaire`.
 
 Les numéros de ligne cités sont ceux des fichiers au `HEAD` local du
-2026-09-21 (`.claude/commands/deploie.md`, `audit_blocages.md`,
+2026-09-21 (`.claude/commands/audit_blocages.md`,
 `audit_conventions.md`, `.claude/scripts/coherence.py`, `grouper.py`,
 `docs/process/GRILLE_CONVENTIONS_RETIREES.md`).
 
@@ -30,7 +31,7 @@ candidat ; les trente derniers messages de commit (`git log --oneline
 | Candidat | Ce qu'il lit | Ce qu'il écrit ou imprime | Qui l'appelle dans la chaîne | Sa sortie façonne-t-elle un document ou un rapport que la chaîne garde ? | Verdict |
 |---|---|---|---|---|---|
 | `.claude/scripts/grouper.py` | `tracabilite-full.md` | Sur la sortie standard : les groupes `G<n>` | `/9_controle`, phase 2 | Oui — l'argument, → `MECANISMES §Périmètre d'audit` | **hors annexe — appartient à `PROCESS_AVAL.md`** §/9_controle |
-| `.claude/commands/deploie.md` | `adb devices -l` (ligne 13) ; rien dans le dépôt | Rien dans le dépôt ; un rapport en message, une ligne par appareil (lignes 61-62) ; deux installations sur deux appareils par `gradlew installDebug` | Personne — `CLAUDE.md` ligne 59 le range « outside the chain, run by hand » ; aucune commande ni aucun agent ne le nomme | Non — il n'écrit aucun fichier, il installe ce que le dépôt contient | **annexe** |
+| `/deploie` | — : chaque application fournit le sien, dans son propre `.claude/commands/deploie.md` ; la chaîne n'en porte aucun | — | Personne — la ligne `/deploie` de `CLAUDE.md` (ligne 59) : « Outside the chain — run by hand; each application provides its own, and the chain carries none » ; aucune commande ni aucun agent de la chaîne ne le nomme | Non — il ne change aucun artefact que la chaîne produit | **annexe** — nommé seulement, jamais décrit au fichier |
 | `.claude/commands/audit_blocages.md` | Les `blocked_*-NN.md` et `blocked_*.md` de cinq lieux du dossier de travail (lignes 26-39) ; `audit-blocages.md` de ses passes antérieures (ligne 44) | `audit-blocages.md` à la racine du dossier de travail, en ajout (ligne 140) | Personne — ligne 9-10 : « No command calls it » ; `/diagnostique` ligne 242 le cite pour dire qu'un fichier non renommé y sera listé « still open », ce n'est pas un appel | Non — voir l'argument ci-dessous | **annexe** |
 | `.claude/commands/audit_conventions.md` | `architecte/*.md`, `docs/TECHNICAL_CONVENTIONS.md` entier, `couverture.md`, les entrées du document technique que `couverture.md` nomme, les lignes `Anchor` de `code/decoupage.md`, ses passes antérieures (lignes 26-63) | `audit-conventions.md` à la racine du dossier de travail, en ajout (ligne 164) | Personne — lignes 9-10 ; `/9_controle` ligne 15 le cite comme exemple de dérivation des dossiers, `architecte.md` ligne 779 le cite pour justifier la ligne de `couverture.md` ; ni l'un ni l'autre n'est un appel | Non — voir l'argument ci-dessous | **annexe** |
 | `.claude/scripts/coherence.py` | `.claude/agents/*.md` et `.claude/commands/*.md`, ou le fichier passé en argument (lignes 165-171) | Sur la sortie standard, les défauts trouvés ; code de sortie 1 s'il en trouve (ligne 184). Il ne modifie aucun fichier | Personne dans la chaîne — aucune commande, aucun agent, pas `CLAUDE.md` ; ses appelants sont les campagnes de correction (`docs/verification2/correction.md` lignes 379 et 412) | Non — il vérifie la forme des fichiers de la chaîne, pas un artefact qu'elle produit | **annexe** |
@@ -85,90 +86,32 @@ pas sur cet hôte.
 
 # Les commandes
 
-Les trois commandes de ce document partagent quatre traits, vérifiés
-au fichier de chacune : elles n'invoquent aucun agent
+Les deux commandes de la chaîne que ce document décrit partagent quatre
+traits, vérifiés au fichier de chacune : elles n'invoquent aucun agent
 (`audit_blocages.md` ligne 7 et 206, `audit_conventions.md` ligne 7 et
-223 ; `deploie.md` n'a pas `Agent` dans `allowed-tools`, ligne 3) ;
-elles sont lancées à la main par le Product Owner, jamais par une autre
-commande ; elles n'ont pas `Bash` (→ `MECANISMES §Frontmatter d'une
+223) ; elles sont lancées à la main par le Product Owner, jamais par une
+autre commande ; elles n'ont pas `Bash` (→ `MECANISMES §Frontmatter d'une
 commande`) et ne commitent donc rien ; elles ne créent pas de worktree.
-Leur place dans la table de `CLAUDE.md` (lignes 58-59) vient de
+Leur place dans la table de `CLAUDE.md` (ligne 58) vient de
 `docs/verification4/plan.md` entrée 23 : avant, la ligne « anything else
 is an ordinary request » les faisait traiter comme une demande sans
 workflow.
 
-### /deploie — installer les deux applications sur le téléphone et la montre, et dire ce qui s'est passé
+### /deploie — fourni par chaque application
 
-Prend : rien — pas d'`argument-hint` (frontmatter, lignes 1-4) ; le
-dépôt tel qu'il est sur le disque.
-Rend : un rapport en message, une ligne par appareil — le module,
-l'identifiant, build passé ou non (lignes 61-62) ; en dernière ligne
-`Next: done`, ou `Next: stop <device> missing` sur un appareil absent
-(`deploie.md`, *1. Find the devices* et *3. Report* — ajoutés après le
-`HEAD` de référence ; → `MECANISMES §Ligne Next:`). Rien dans le dépôt.
+`/deploie` est fourni par chaque application, et la chaîne n'en porte
+aucun : c'est la ligne `/deploie` de `CLAUDE.md` (ligne 59).
+L'application l'écrit dans son propre `.claude/commands/deploie.md` ;
+l'installation de la chaîne dans l'application ne le touche jamais
+(`docs/app/TECHNICAL_V1.md` §20), et `/socle` le range parmi ce que
+l'application fournit elle-même.
 
-**Étapes**
-1. `adb devices -l` ; identifier chaque appareil par son modèle, jamais
-   par sa position dans la liste : le téléphone `model:SM_S928B`, la
-   montre `model:SM_L705F` (lignes 13-21). L'identifiant est la
-   première colonne ; celui de la montre change à chaque redémarrage du
-   débogage sans fil et se relit à chaque run, jamais de mémoire ni
-   d'un rapport antérieur (lignes 23-25).
-2. Un appareil manque : s'arrêter et dire lequel ; ne pas installer
-   l'autre seul (lignes 27-29).
-3. Par l'outil `PowerShell`, jamais `Bash` (lignes 35-36) ; la variable
-   sur sa propre ligne, avant la commande (lignes 38-39) :
-   `$env:ANDROID_SERIAL = "<phone identifier>"` puis
-   `.\gradlew :app-phone:installDebug` ; `$env:ANDROID_SERIAL = "<watch
-   identifier>"` puis `.\gradlew :app-wear:installDebug` ; enfin
-   `Remove-Item Env:\ANDROID_SERIAL` (lignes 41-47). Une commande à la
-   fois, au premier plan, attendue (ligne 49).
-4. Effacer la variable à la fin, quoi qu'il soit arrivé (ligne 54).
-5. Rapporter : nommer toute erreur, n'en corriger aucune ; une
-   installation échouée est un résultat (lignes 64-65).
-
-**Git** : aucun — la commande ne lit ni n'écrit le dépôt, ne commite
-pas, ne crée pas de worktree.
-
-**La Product Owner intervient** : elle lance la commande, à la main ;
-elle branche les deux appareils ; elle lit le rapport. Rien d'autre.
-
-**Décisions**
-- Identifier par le modèle, jamais par la position · écarté : la
-  position dans la liste d'`adb` · raison : l'identifiant de la montre
-  change à chaque redémarrage du débogage sans fil, et la liste n'a pas
-  d'ordre garanti (`deploie.md` lignes 15-16, 23-25) · inconnu.
-- Les deux appareils ou rien · écarté : installer celui qui est là ·
-  raison : un téléphone mis à jour contre une vieille build de montre
-  échoue d'une façon qui se lit comme un défaut de code (lignes
-  27-29) · inconnu.
-- L'outil `PowerShell`, jamais `Bash` · écarté : `allowed-tools: Bash`,
-  ce que le fichier portait · raison : Git Bash rejette `$env:`,
-  `.\gradlew` et `Remove-Item` ; les commandes sont PowerShell par
-  construction, la ligne d'outil était l'erreur
-  (`docs/verification2/plans/commandes.md`, *chemins-aval F15* ;
-  `deploie.md` lignes 35-36) ; `docs/verification3/chemins-aval.md`
-  ligne 26 et `docs/verification4/chemins-aval.md` ligne 25 le lisent
-  « sound » au fichier · inconnu.
-- Une commande à la fois, au premier plan · écarté : lancer en
-  arrière-plan et sonder · raison : deux runs se disputent le même
-  verrou, et un shell que personne n'attend continue après la fin
-  (lignes 49-52) · inconnu.
-- Effacer `ANDROID_SERIAL` à la fin, quoi qu'il arrive · écarté : la
-  laisser · raison : laissée, elle envoie la commande suivante de la
-  session au mauvais appareil (lignes 54-55) · inconnu.
-- Installer, rapporter, ne rien corriger · écarté : corriger une erreur
-  de build · raison : une installation échouée est un résultat, le
-  rapport dit ce qui a échoué et s'arrête (lignes 6-7, 64-65) · inconnu.
-- Aucun agent · écarté : un agent d'installation ·
-  raison : à retrouver · inconnu.
-
-Ce que le fichier ne règle pas, relevé par la première campagne
-(`docs/verification/chemins-aval.md` lignes 679-681) et jamais tranché
-depuis : la montre qui échoue après un téléphone réussi laisse
-exactement l'état que les lignes 27-29 voulaient éviter, et le rapport
-en est la seule trace ; `adb` absent du `PATH` n'a pas d'issue écrite ;
-deux appareils du même modèle n'ont pas de règle.
+Ce document n'en décrit donc ni les étapes ni les décisions : ce qu'il
+installe, où et comment, est propre à chaque application. La chaîne n'en
+attend que ce que `CLAUDE.md` attend de toute commande lancée à la
+main : le Product Owner le lance, aucune commande ni aucun agent de la
+chaîne ne l'appelle, et son relais finit sur une ligne `Next:`
+(→ `MECANISMES §Ligne Next:`).
 
 ### /audit_blocages — lire les fichiers de blocage réglés d'un cycle et rapporter ce qui revient de l'un à l'autre
 
@@ -612,7 +555,8 @@ fichier, et ce changement-là relève de `PROCESS_AMONT.md`
 
 ## Inventaire
 
-Commandes décrites : `/deploie`, `/audit_blocages`, `/audit_conventions`.
+Commandes décrites : `/audit_blocages`, `/audit_conventions` ; `/deploie`,
+fourni par chaque application, est nommé, jamais décrit.
 
 Scripts décrits : `.claude/scripts/coherence.py`.
 

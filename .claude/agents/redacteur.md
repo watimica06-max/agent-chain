@@ -60,7 +60,7 @@ it moved, a marker:**
     ### B7 — Rejecting invalid durations    MODIFIED
     Genre:
     Nature:
-    Global: ## Activity screen
+    Global: ## <a section of the global>
 
 🔴 **You write `Genre:` and `Nature:` empty on every block you
 create** — 📌 **from the idea file, from an answer, from a split, the
@@ -177,9 +177,9 @@ appears in.
 write the word you chose on its `## Tranché` entry in `lexique.md`**,
 as an `en anglais :` line:
 
-    STATION — retenu
-      remplace : atelier
-      en anglais : station
+    <TERME> — retenu
+      remplace : <son rival>
+      en anglais : <the English word>
 
 📌 **On the `## Tranché` entry alone** — ⚠️ **never on a `## Relevé`
 line**: the lexicographe's sweeps rebuild that section.
@@ -192,8 +192,8 @@ for that meaning alone — **carries two concepts**, 🔴 **and each gets
 its own `en anglais :` line.**
 
 ⚠️ **Why**: nothing else keeps the word. 📌 **Two integrations could
-render one settled concept two ways** — *course* as `race`, then as
-`run` — **a second name for one thing, created after the vocabulary was
+render one settled concept two ways** — *<a French term>* as `<one word>`, then as
+`<another>` — **a second name for one thing, created after the vocabulary was
 settled**, and invisible to the lexicographe, which never opens the
 product file.
 
@@ -226,7 +226,7 @@ When a block points at something else — a screen, a piece of data, a
 state, a rule — the destination is **named**, and 🔴 **marked as
 existing when a title of the global's index names it**:
 
-> *"The Steps button leads to the step entry screen — existing."*
+> *"<The element> leads to <the destination> — existing."*
 
 🔴 **That is the whole test.** 📌 **A destination no title names is
 written without the mark** — ⚠️ **and that is not a question to

@@ -390,8 +390,8 @@ Agent(
           The global: docs/PRODUIT_GLOBAL.md.
           Invocation 3 — Existant.
           These blocks, with the global section each names:
-            <B12 → ## Activity screen>
-            <B40 → ## Steps panel>
+            <B12 → ## Section title>
+            <B40 → ## Another section title>
           Write to docs/features/<name>/questions-existant-NN.md.
           Your blocking file, if you cannot produce:
             docs/features/<name>/blocked_existant.md.

@@ -29,7 +29,7 @@
 
 Quatre documents sont audités : `PROCESS_MECANISMES.md`, `PROCESS_ENTREES.md`, `PROCESS_AMONT.md`, `PROCESS_AVAL.md`. Un seul ne l'est pas : `PROCESS_ANNEXES.md`.
 
-Le critère est unique : une annexe change aucun artefact que la chaîne produit. Ce qui y figure est vérifié au fichier, jamais supposé — `/deploie` (installe sur le téléphone, écrit rien dans le dépôt), `/audit_blocages` et `/audit_conventions` (lisent et rapportent dans `audit-blocages.md` et `audit-conventions.md`, que rien dans la chaîne ne relit), `.claude/scripts/coherence.py`, `docs/process/GRILLE_CONVENTIONS_RETIREES.md`. `.claude/scripts/grouper.py` n'est pas une annexe, et voici l'argument, tenu ici seul : `/9_controle` l'appelle en phase 2 (`.claude/commands/9_controle.md`, ligne 232 : `python .claude/scripts/grouper.py docs/features/<name>/tracabilite-full.md --auto`) et prend son regroupement tel qu'imprimé (ligne 238 : « Take the grouping it prints, unchanged. Never regroup by hand, never override the budget ») ; chaque ligne `G<n>` qu'il imprime devient les lignes `Group:`, `Blocks:` et `Sheets:` d'une invocation du Contrôleur (lignes 267-269), dont la sortie est `code/controle/<group>.md` puis, à l'assemblage, `code/rapport-controle.md`. Sa sortie façonne donc un rapport que la chaîne garde ; il appartient à `PROCESS_AVAL.md` §/9_controle — confronter le fichier produit à toutes les fiches, qui décrit ce qu'il fait — son entrée, sa sortie, ce que la commande en prend sans y toucher — et ne redit pas cet argument.
+Le critère est unique : une annexe change aucun artefact que la chaîne produit. Ce qui y figure est vérifié au fichier, jamais supposé — `/deploie` (fourni par chaque application, la chaîne n'en porte aucun), `/audit_blocages` et `/audit_conventions` (lisent et rapportent dans `audit-blocages.md` et `audit-conventions.md`, que rien dans la chaîne ne relit), `.claude/scripts/coherence.py`, `docs/process/GRILLE_CONVENTIONS_RETIREES.md`. `.claude/scripts/grouper.py` n'est pas une annexe, et voici l'argument, tenu ici seul : `/9_controle` l'appelle en phase 2 (`.claude/commands/9_controle.md`, ligne 232 : `python .claude/scripts/grouper.py docs/features/<name>/tracabilite-full.md --auto`) et prend son regroupement tel qu'imprimé (ligne 238 : « Take the grouping it prints, unchanged. Never regroup by hand, never override the budget ») ; chaque ligne `G<n>` qu'il imprime devient les lignes `Group:`, `Blocks:` et `Sheets:` d'une invocation du Contrôleur (lignes 267-269), dont la sortie est `code/controle/<group>.md` puis, à l'assemblage, `code/rapport-controle.md`. Sa sortie façonne donc un rapport que la chaîne garde ; il appartient à `PROCESS_AVAL.md` §/9_controle — confronter le fichier produit à toutes les fiches, qui décrit ce qu'il fait — son entrée, sa sortie, ce que la commande en prend sans y toucher — et ne redit pas cet argument.
 
 Ce périmètre, et cet argument, sont énoncés ici et nulle part ailleurs dans les cinq documents : les autres documents y renvoient par `→ MECANISMES §Périmètre d'audit`.
 
@@ -82,9 +82,9 @@ Coût et écarté : `effort` sur tous les agents · écarté : la règle d'un `e
 
 ### Frontmatter d'une commande
 
-Utilisé par: les vingt commandes.
+Utilisé par: les dix-neuf commandes de la chaîne.
 
-Chaque `.claude/commands/<commande>.md` ouvre sur `description`, `allowed-tools` et, sauf `/socle` et `/deploie`, `argument-hint`. Les quinze commandes qui invoquent un agent portent `allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent` ; `/5_reclasse` : `Read, Grep, Glob, Write, Bash` ; `/socle` : `Read, Grep, Glob, Edit, Write, Bash` ; `/audit_blocages` et `/audit_conventions` : `Read, Grep, Glob, Edit, Write` ; `/deploie` : `PowerShell`. `argument-hint` vaut `"<feature folder name>"` partout sauf `/8_code` (`"<feature folder name> [N]"`) ; `/conventions` lit un second argument nommant un `bugfix-NN` bien que son `argument-hint` n'en dise rien. Le premier argument est obligatoire : sans lui la commande demande et s'arrête ; `$ARGUMENTS` porte les deux quand il y en a deux, et le dossier de feature se dérive du premier seul.
+Chaque `.claude/commands/<commande>.md` ouvre sur `description`, `allowed-tools` et, sauf `/socle`, `argument-hint`. Les quinze commandes qui invoquent un agent portent `allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent` ; `/5_reclasse` : `Read, Grep, Glob, Write, Bash` ; `/socle` : `Read, Grep, Glob, Edit, Write, Bash` ; `/audit_blocages` et `/audit_conventions` : `Read, Grep, Glob, Edit, Write`. `argument-hint` vaut `"<feature folder name>"` partout sauf `/8_code` (`"<feature folder name> [N]"`) ; `/conventions` lit un second argument nommant un `bugfix-NN` bien que son `argument-hint` n'en dise rien. Le premier argument est obligatoire : sans lui la commande demande et s'arrête ; `$ARGUMENTS` porte les deux quand il y en a deux, et le dossier de feature se dérive du premier seul.
 
 Coût et écarté : aucun écart connu · raison : à retrouver · inconnu.
 
@@ -174,7 +174,7 @@ Coût et écarté : un dialogue tenu dans le contexte de l'appelant · écarté 
 
 Utilisé par: les vingt agents ; `CLAUDE.md` ; toutes les commandes créant un worktree.
 
-Tout chemin qu'un agent lit ou écrit est relatif — `docs/features/…`, jamais `C:\…` ni `/…` — parce que l'agent tourne dans un worktree dont la racine n'est pas celle du projet ; un chemin absolu pointe sur le dépôt principal, hors de la session isolée, et l'écriture échoue. Deux racines coexistent : un chemin qui commence par `docs/` ou `.claude/` est relatif à la racine du dépôt (`docs/TECHNICAL_CONVENTIONS.md`, `docs/CURRENT_TECHNICAL_STATE.md`, `docs/PRODUIT_GLOBAL.md`, `.claude/grids/GRILLE_*.md`) ; tout autre chemin est relatif au dossier que le prompt nomme (`Feature folder:`, `Working folder:`, `Bug-fix folder:`). Le Diagnostiqueur ajoute que les emplacements du code (`app-wear/…`, `lib/…`) sont eux aussi relatifs à la racine du dépôt ; le Concepteur, que les fichiers de code qu'il écrit le sont, seuls `code/<lot>/…` étant sous le dossier de travail.
+Tout chemin qu'un agent lit ou écrit est relatif — `docs/features/…`, jamais `C:\…` ni `/…` — parce que l'agent tourne dans un worktree dont la racine n'est pas celle du projet ; un chemin absolu pointe sur le dépôt principal, hors de la session isolée, et l'écriture échoue. Deux racines coexistent : un chemin qui commence par `docs/` ou `.claude/` est relatif à la racine du dépôt (`docs/TECHNICAL_CONVENTIONS.md`, `docs/CURRENT_TECHNICAL_STATE.md`, `docs/PRODUIT_GLOBAL.md`, `.claude/grids/GRILLE_*.md`) ; tout autre chemin est relatif au dossier que le prompt nomme (`Feature folder:`, `Working folder:`, `Bug-fix folder:`). Le Diagnostiqueur ajoute que les emplacements du code — le fichier d'un porteur, un dossier cherché, un manifeste — sont eux aussi relatifs à la racine du dépôt ; le Concepteur, que les fichiers de code qu'il écrit le sont, seuls `code/<lot>/…` étant sous le dossier de travail.
 
 Coût et écarté : deux racines à tenir · écarté : un chemin absolu · raison : l'écriture sort de la session isolée et échoue (`CLAUDE.md`, *Worktrees*) · inconnu.
 
@@ -368,7 +368,7 @@ Coût et écarté : un relais sans lecture · écarté : l'orchestrateur résume
 
 ### Ligne Next:
 
-Utilisé par: les vingt commandes — `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/5_reclasse`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique`, `/audit_blocages`, `/audit_conventions`, `/deploie`, `/socle` ; `CLAUDE.md` (*The `Next:` line*, la grammaire) ; l'application cockpit, lectrice (`docs/app/TECHNICAL_V1.md` §9).
+Utilisé par: les dix-neuf commandes de la chaîne — `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/5_reclasse`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique`, `/audit_blocages`, `/audit_conventions`, `/socle` ; `CLAUDE.md` (*The `Next:` line*, la grammaire) ; l'application cockpit, lectrice (`docs/app/TECHNICAL_V1.md` §9).
 
 Chaque relais finit sur une ligne, et une seule, dans cette grammaire — les arrêts compris, un arrêt étant un relais aussi :
 
@@ -378,7 +378,7 @@ Chaque relais finit sur une ligne, et une seule, dans cette grammaire — les ar
     Next: stop <reason>
     Next: done
 
-C'est la dernière ligne du relais, rien après elle. `run` nomme la commande à lancer ; `answer` dit ce qui attend le Product Owner — les questions, le `## Decision`, ou les deux — et la commande qui suit ; `manual` dit le geste qui est le sien (écrire `idees.md` après `/socle`, une décision sous `## Décision du Product Owner` de `code/redecoupage.md`, lire le rapport de contrôle et décider d'une bug-list) ; `stop` donne la raison (`Next: stop argument missing`, un classement qui a échoué, une valeur hors table) ; `done` dit l'étape finie (`/audit_blocages`, `/audit_conventions`, `/deploie` toujours ; la fusion écrite). Une commande qui ne connaît pas la suite imprime `Next: stop <reason>`, jamais une supposition. `CLAUDE.md` donne la grammaire et rien d'autre ; chaque commande donne ses valeurs, issue par issue — une colonne `Next:` à sa table *What to run next*, ou la ligne écrite à l'arrêt qui la produit. L'application cockpit lit cette ligne, et elle seule, pour désigner la commande suivante ; sans ligne `Next:`, elle dit la suite inconnue et montre le relais entier.
+C'est la dernière ligne du relais, rien après elle. `run` nomme la commande à lancer ; `answer` dit ce qui attend le Product Owner — les questions, le `## Decision`, ou les deux — et la commande qui suit ; `manual` dit le geste qui est le sien (écrire `idees.md` après `/socle`, une décision sous `## Décision du Product Owner` de `code/redecoupage.md`, lire le rapport de contrôle et décider d'une bug-list) ; `stop` donne la raison (`Next: stop argument missing`, un classement qui a échoué, une valeur hors table) ; `done` dit l'étape finie (`/audit_blocages`, `/audit_conventions` toujours ; la fusion écrite). Une commande qui ne connaît pas la suite imprime `Next: stop <reason>`, jamais une supposition. `CLAUDE.md` donne la grammaire et rien d'autre ; chaque commande donne ses valeurs, issue par issue — une colonne `Next:` à sa table *What to run next*, ou la ligne écrite à l'arrêt qui la produit. L'application cockpit lit cette ligne, et elle seule, pour désigner la commande suivante ; sans ligne `Next:`, elle dit la suite inconnue et montre le relais entier.
 
 Coût et écarté : une ligne à grammaire fermée en fin de chaque relais · écarté : laisser l'application lire la table *What to run next* ou deviner la suite · raison : `Next: stop <reason>` est ce que la chaîne imprime quand elle ne sait pas, et l'application ne comble jamais ce manque (`CLAUDE.md`, *The `Next:` line* ; `docs/app/TECHNICAL_V1.md` §9) · inconnu.
 
@@ -525,7 +525,7 @@ Coût et écarté : l'index d'abord · écarté : lire le global entier · raiso
 
 ### Disposition du dossier de feature
 
-Utilisé par: les vingt agents ; les vingt commandes.
+Utilisé par: les vingt agents ; les dix-neuf commandes.
 
 `docs/features/<name>/` — `<name>` est l'argument de chaque commande. Tout ce qui suit est relatif à ce dossier ; un `bugfix-NN/` reprend la partie aval sous lui.
 
@@ -980,7 +980,7 @@ Un seul utilisateur : décrit dans le document de l'agent ou de la commande qui 
 - Les neuf mouvements du Réalisateur, la reprise après FAIL, deux échecs identiques de suite → `PROCESS_AVAL.md` §realisateur — première passe sur un lot : remplir les corps jusqu'à ce que les tests passent, §realisateur, reprise après FAIL — corriger ce que le verdict nomme
 - Les mouvements 1 à 7 de `/8_code`, le compte de trois tentatives (`## Attempts`), la tentative vide, le retour au découpage à trois → `PROCESS_AVAL.md` §/8_code — coder les lots en attente d'un découpage, un par un
 - Les six phases de `/9_controle`, `grouper.py`, le tri par état de `recette-ordonnee.md`, la forme de `decisions-produit.md` (identifiant, deux espaces, une ligne par décision) → `PROCESS_AVAL.md` §/9_controle — confronter le fichier produit à toutes les fiches
-- Les cinq lieux et les cinq trouvailles de `/audit_blocages`, les sept trouvailles de `/audit_conventions`, les modèles `SM_S928B` et `SM_L705F` de `/deploie` → `PROCESS_ANNEXES.md`
+- Les cinq lieux et les cinq trouvailles de `/audit_blocages`, les sept trouvailles de `/audit_conventions` → `PROCESS_ANNEXES.md`
 - `docs/PRODUIT_GLOBAL.md` à `# Application`, `docs/CURRENT_TECHNICAL_STATE.md` à `# Technical state` — ce que `/socle` crée → `PROCESS_ENTREES.md` §/socle
 
 ---

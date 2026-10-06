@@ -128,7 +128,7 @@ vocabulary are read from the product file's headings**, and
 **dependencies are the references a block marks *existing***.
 
 🔴 **The mark is the word, at the end of the reference** — 📌 *« the
-Steps button leads to the step entry screen — existing »*. ⚠️ **The
+<element> leads to <the destination> — existing »*. ⚠️ **The
 Rédacteur writes it; you never add one.**
 
 **Its shape** — 🔴 **one title and four headings, in this order, before
@@ -316,7 +316,7 @@ the headings.
 🔴 **No heading carries that title** — 📌 **write the reference so the
 grep still catches it, with the title and no identifier:**
 
-    [B?: the weigh-in screen]
+    [B?: <the title the product gives>]
 
 📌 **`Block:` on that question names the block you are writing**, the
 one that makes the reference — 🔴 **never `B?`**: the answer changes the
@@ -498,7 +498,7 @@ not replaced at all.
 🔴 **Mark it inline, greppable, carrying the block its answer will
 change:**
 
-    <<ASSUMED B40: rail order taken from the list screen's display order>>
+    <<ASSUMED B40: the order taken from the list screen's display order>>
 
 📌 **The mark says the line is provisional.** It is lifted by writing
 the section again, once the answer is in the product file — ⚠️ **or in
@@ -749,7 +749,7 @@ by an earlier run.
 
     ## Preamble
 
-    B31   Existing: the step entry screen
+    B31   Existing: <the destination, as the global names it>
 
 🔴 **`## Trace`: one line per block of yours**, the entries carrying at
 least one of its rules — 🔴 **a dash when none does**: a dash says you
@@ -896,9 +896,9 @@ is a question.
 **5. Write the traceability file**, `tracabilite.md`, at the feature
 folder's root:
 
-    B1   Race segment structure          §1.1
-    B43  Sending profile to the watch     §6.1, §7.6, §7.9
-    B59  Measured physiological data      —
+    B1   <a block's title>               §1.1
+    B43  <another block's title>         §6.1, §7.6, §7.9
+    B59  <a block no entry carries>      —
 
 🔴 **One line per block, in the product file's order** — the headings
 give it: its identifier, its title, then its entries — 📌 **from the

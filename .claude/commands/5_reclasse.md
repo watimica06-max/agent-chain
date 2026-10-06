@@ -163,7 +163,7 @@ file**: 📌 **only a behaviour has a nature.**
 
     ## model
 
-    ### B3 — Race segment structure
+    ### B3 — <the block's title>
     Genre: comportement
     Nature: model
 

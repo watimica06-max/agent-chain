@@ -47,13 +47,13 @@ do not follow the same rule.
 | **A concept** | Unquoted | 🔴 **English**, from the product file onward |
 
 📌 **The quotes carry what reaches the screen, character for
-character** — ⚠️ **a prefix, a button's label, a station's name.**
+character** — ⚠️ **a prefix, a button's label, an item's name.**
 
 🔴 **The rest is a concept**, whatever language the idea file wrote it
 in, and the chain writes it in English.
 
-⚠️ **One word can be both** — 📌 *"Démarrer"* the button, and starting a
-race the concept. **They are two entries, not one.**
+⚠️ **One word can be both** — 📌 *"Démarrer"* the button, and starting
+<what it starts> the concept. **They are two entries, not one.**
 
 ## What you never do
 
@@ -140,25 +140,25 @@ other rather than from one file to another.
 
     ## Tranché
 
-    STATION — retenu
-      remplace : atelier
+    <TERME> — retenu
+      remplace : <son rival>
 
-    ROX_IN, ROX_OUT — retenus, deux moments distincts
-      Roxzone : la zone qui les contient, retenu aussi
+    <TERME A>, <TERME B> — retenus, deux moments distincts
+      <TERME C> : ce qui les contient, retenu aussi
 
-    Farmers Carry — retenu
-      F. Carry : son abréviation, dans les données collées seulement
+    <Terme> — retenu
+      <son abréviation> : son abréviation, dans les données collées seulement
 
-    "Démarrer" — texte affiché, français
-      le concept : race start
+    "<texte affiché>" — texte affiché, <sa langue>
+      le concept : <the concept, in English>
 
-    segment fermé — retenu
-      en anglais : closed segment
+    <terme> — retenu
+      en anglais : <the English word>
 
-    session — deux sens, tranchés
-      (a) la séance de course : session, retenu
-      (b) l'appli ouverte : ouverture, retenu
-        remplace : session, dans ce sens seulement
+    <terme> — deux sens, tranchés
+      (a) <le premier sens> : <terme>, retenu
+      (b) <le second sens> : <un autre terme>, retenu
+        remplace : <terme>, dans ce sens seulement
 
     ## Non tranché
 
@@ -167,9 +167,9 @@ other rather than from one file to another.
 
     ## Relevé
 
-    course — 113
-    segment — 59
-    allure — 31
+    <terme> — 113
+    <terme> — 59
+    <terme> — 31
 
 🔴 **`## Tranché`** — one entry per answered question. 📌 **The retired
 terms on their own line, under the one that holds.** 🔴 **A term settled
@@ -308,7 +308,7 @@ term is not a decision, and invocation 2 moves it out of
 pair and per doubtful quote:
 
     ### Q1
-    Terms: atelier, STATION
+    Terms: <a term>, <its rival>
     Question: <what you read them as, stated as a question>
     Options:
     - <a proposal, one full sentence, in French>
@@ -334,7 +334,7 @@ every occurrence, each with its sentence, grouped under the meaning you
 read it in, so that the answer can name which side it settles:
 
     ### Q2
-    Terms: session
+    Terms: <a term>
     Question: <the two meanings you read, each with its sentence>
     Options:
     - <keeping the grouping as you read it, one full sentence, in French>
@@ -346,8 +346,8 @@ read it in, so that the answer can name which side it settles:
 grouping.**
 
     Question: two meanings, as I read them.
-      (a) the run itself: §B3 "a session is closed", §B7 "…"
-      (b) the app being open: §B12 "…", §B14 "…"
+      (a) <the first meaning>: §B3 "<its sentence>", §B7 "…"
+      (b) <the second meaning>: §B12 "…", §B14 "…"
       Which of these is which?
 
 ⚠️ **A term appearing thirty times makes a long question** — 📌 **it is
@@ -536,7 +536,7 @@ is written in English.**
 doubt, the same shape as invocation 1's:
 
     ### Q1
-    Terms: sas, PREPARATION
+    Terms: <the answer's word>, <the lexicon's term>
     Question: <what you read them as, stated as a question>
     Options:
     - <a proposal, one full sentence, in French>

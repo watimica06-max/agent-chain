@@ -54,8 +54,8 @@ a worktree; your root is not the project's.**
 **Free form, after the `G<n>` that opens it** — a sentence naming what
 is wrong, and what it should be:
 
-    G03 The correction factor is never computed. It should be, at the
-    end of each kilometre, and its outcome kept on the race.
+    G03 <what the application fails to do>. It should <what it
+    should do instead, and when>.
 
 📌 **No fixed vocabulary.** What matters is that it names a behaviour,
 not a file.
@@ -231,8 +231,8 @@ resources each at a path of their own.** ⚠️ **What the path guards
 against is `docs/` and the build output** — a bare pattern sweeps both.
 
 **1. Turn the gap into search terms.** 🔴 **A gap is written in
-behaviour, not in names** — *"the correction factor is never
-computed"* names nothing that exists. **Derive the terms**: the domain
+behaviour, not in names** — *"<the value> is never computed"*
+names nothing that exists. **Derive the terms**: the domain
 words it uses, the screen it happens on, the value it produces.
 
 📌 **Then search, widening as you go** — the exact term, then its
@@ -442,22 +442,22 @@ stands on its own is a second `## Bearer` block, not a requirement.**
 
     ## Trigger
 
-    Closing a RUN segment, in markSegment — observed
+    <the triggering moment>, in <the symbol it happens in> — observed
 
     ## Today
 
-    markSegment writes the segment's duration and opens the next.
-    CorrectionFactorCalculator.compute is never called.
+    <what that symbol does today, as the code reads>.
+    <what it never does, or does wrong>.
 
     ## Expected
 
-    Closing a RUN segment calls compute with the segment's duration
-    and the profile's expected distance, and writes the outcome into
-    the race's retainedFactors or rejectedCalibrations.
+    <the triggering moment> calls <what should run>, with <the
+    values it needs>, and writes <its outcome> into <what keeps
+    it>.
 
     ## Searched
 
-    correction factor, correctionFactor, compute, retainedFactors —
+    <each term searched — the gap's words, the code's names> —
     in <each folder searched, from the repository root>
 
 **Six headings, always** — 📌 **and, when the gap has several bearers,
@@ -594,15 +594,15 @@ the invocation** — an existing one stopped you there.
     ## §3 Calculation
     ## §4 Transition
 
-    ### §4.1 Correction factor never computed
+    ### §4.1 <what is wrong, as a title>
 
-    Bearer: RaceRecordingRepository
+    Bearer: <the bearer's symbol>
 
-    markSegment writes the segment's duration and opens the next;
-    CorrectionFactorCalculator.compute is never called. Closing a RUN
-    segment calls it with the segment's duration and the profile's
-    expected distance, and writes the outcome into the race's
-    retainedFactors or rejectedCalibrations.
+    <what the bearer does today, as the report's Today says>;
+    <what it never does, or does wrong>. <The triggering
+    moment> calls <what should run>, with <the values it needs>,
+    and writes <its outcome> into <what keeps it>, as the
+    report's Expected says.
 
     ## §5 External exchange
     ...
@@ -639,12 +639,12 @@ several entries** — numbered inside its section — `§4.1`,
 🔴 **A gap `bug-list.md` marks with a `B<n>` — the block a control
 report found unbuilt — hands it to every entry it gives.** 📌 **In
 `bug-list.md` the `B<n>` sits in parentheses at the end of the gap's
-first line, after the `G<n>` that opens it** — `G03 Correction factor
-never computed (B12)` — 🔴 **and that is the form you read it by**: ⚠️
+first line, after the `G<n>` that opens it** — `G03 <what is wrong>
+(B12)` — 🔴 **and that is the form you read it by**: ⚠️
 **a `B<n>` written anywhere else on the gap is not one.** 📌 **The
 `B<n>` closes the entry's title the same way, in parentheses**:
 
-    ### §4.1 Correction factor never computed (B12)
+    ### §4.1 <what is wrong, as a title> (B12)
 
 ⚠️ **The Cadreur copies it beside the citation in the lot's `Anchor:`
 line, and `/9_controle` marks the block `carried` from there** — 🔴
@@ -657,8 +657,8 @@ control.** 📌 **A gap the Product Owner raised from use carries no
 
     ## Gaps set aside
 
-    - Step counter: HomeScreen already renders it, lib/features/home
-    - Weekly total: nothing in lib/ carries the term
+    - <the gap's subject>: <what already bears it, and where>
+    - <the gap's subject>: nothing in <the folders searched> carries the term
 
 🔴 **Write the section even when empty** — its absence would read as
 *"the agent did not run"*.

@@ -182,7 +182,7 @@ in the `Anchor:` lines of every `bugfix-NN/code/decoupage.md` under the
 feature folder**: the Cadreur writes there, on a bug-fix cycle, the
 block identifier the gap came from —
 
-    Anchor: §2.3 — Correction factor kept on the race (B12)
+    Anchor: §2.3 — <the entry's title> (B12)
 
 ⚠️ **Every block found there is marked `carried`**: 🔴 **its missing
 intentions were built, elsewhere**, and none of the feature's sheets
@@ -516,7 +516,7 @@ parentheses, at the end of the gap's first line, after the `G<n>` each
 gap she writes opens on**, as the Diagnostiqueur writes it into
 `desc-bug.md`:
 
-    G03 Correction factor never computed (B12)
+    G03 <what is wrong> (B12)
 
 🔴 **That is the form the Diagnostiqueur greps** — ⚠️ **written anywhere
 else on the gap, the identifier is lost**, and the block reads missing

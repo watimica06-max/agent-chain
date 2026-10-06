@@ -405,7 +405,7 @@ block identifier the Diagnostiqueur carried into `desc-bug.md`**: the
 lot citing that entry carries the `B<n>` beside the entry's citation in
 its `Anchor` line:
 
-    Anchor: §2.3 — Correction factor kept on the race (B12)
+    Anchor: §2.3 — <the entry's title> (B12)
 
 ⚠️ **`/9_controle` finds the block a correction cycle built through
 it.**
@@ -493,7 +493,7 @@ counts is the union: a repository whose creating entry describes four
 writes and whose screens ask three reads carries seven operations.
 
 ⚠️ **A label given in words is a symbol too** — the key that holds it.
-*"Today at 09:02"*, a segment's display name: something has to carry
+*"Today at 09:02"*, an item's display name: something has to carry
 them, and no entry says so.
 
 ⚠️ **So is a piece** — what a rule needs to reach outside the program,
@@ -668,7 +668,7 @@ two**: neither consumes the other's production, so nothing orders them.
 
 🔴 **Name what calls each production.** A lot needing it, or something
 outside the split — a route, the framework, the system. **Say which**,
-in the `Produces` field: `WatchComplicationEntry (mounted by the
+in the `Produces` field: `<the production> (mounted by the
 system)`.
 
 **7. Find the pieces the rules need.** 🔴 **A rule naming an actor
@@ -749,7 +749,7 @@ not listen for the clock. **Something else does, and hands it on.**
 
 🔴 **An entry saying when a rule applies names a trigger too** — a
 system event, or a moment in a flow the code controls. *"At the end of
-each kilometre"*, *"at the end of every race"*, *"as soon as the link
+each <unit of progress>"*, *"at the end of every <flow>"*, *"as soon as the link
 is established"*: **the lot holding that moment declares the rule as a
 need.**
 
@@ -816,18 +816,18 @@ tell them apart.**
 
     ## Symbols
 
-    RaceRepository
-      saveImportedRace(...)      §2.2
-      setAsReference(raceId)     §2.1
-      observeAll()               §7.1, §7.10
-      findById(raceId)           §7.2, §7.14
+    <a repository>
+      <a write>(...)             §2.2
+      <another write>(<its id>)  §2.1
+      <a read>()                 §7.1, §7.10
+      <another read>(<its id>)   §7.2, §7.14
 
-    PhoneStringResources
-      segmentName(index)         §7.2, §7.14
-      relativeDate.today         §7.6
+    <the text resources>
+      <a label key>(<an argument>)  §7.2, §7.14
+      <another label key>        §7.6
 
-    RecordedRaceTransport — piece
-      sends a race to the paired device      §6.2
+    <the piece's symbol> — piece
+      <what it reaches outside the program>      §6.2
 
 📌 **One line per thing asked of it**, with the entries that ask.
 🔴 **A symbol nothing needs and no entry reaches through does not
@@ -839,8 +839,8 @@ needs it — no entry names the piece itself.
 📌 **On a bug-fix cycle, a bearer's line carries its layer** — see *What
 a bug-fix cycle changes*:
 
-    RaceRepository — bearer, what reads and writes storage
-      keeps the correction factor on the race      §2.3
+    <the bearer's symbol> — bearer, what reads and writes storage
+      <what the fix asks of it>      §2.3
 
 **Then five fields per lot, one lot after another** — and, at the end,
 `## Entries with no lot`:
@@ -848,8 +848,8 @@ a bug-fix cycle changes*:
     ## lot-01
 
     Anchor: §3.2 — Reconciling two real entries; §3.5 — Merge order
-    Needs: ActivityEntry (pre-existing), MacroSet (lot-02)
-    Produces: ActivityReconciliationService (called by lot-05)
+    Needs: <Entry> (pre-existing), <ValueType> (lot-02)
+    Produces: <TheService> (called by lot-05)
     Modifies: —
     Touches: —
 

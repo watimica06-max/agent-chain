@@ -233,9 +233,9 @@ fields:
 
     ## Signatures
 
-    created · ActivityReconciliationService.reconcile(
-      ActivityEntry first, ActivityEntry second, Duration window
-    ) → ReconciliationResult
+    created · <TheService>.reconcile(
+      <Entry> first, <Entry> second, Duration window
+    ) → <Result>
       — Merged when they fall inside the window, Separate otherwise;
         never null
 
@@ -248,18 +248,18 @@ fields:
 
     ## Dependencies
 
-    ActivityEntry — pre-existing
-    ReconciliationResult — produced by lot-02
+    <Entry> — pre-existing
+    <Result> — produced by lot-02
 
     ## Files
 
-    activity/ActivityReconciliationServiceTest
-    activity/ActivityScreen
+    <module>/<TheService>Test
+    <module>/<the screen>
 
     ## Conventions
 
-    R14 · the activity module imports nothing from the presentation layer
-    R27 · a value crossing the activity boundary is immutable
+    R14 · the <module> module imports nothing from the presentation layer
+    R27 · a value crossing the <module> boundary is immutable
 
     ## Requests
 
@@ -732,7 +732,7 @@ sheet.** A rule you do not name is a rule he will not apply, and the
 Relecteur will not know to look for.
 
 ⚠️ **Name the rule by its `R<n>`, never restate it** — `R14 · the
-activity module imports nothing from the presentation layer`. **One
+<module> module imports nothing from the presentation layer`. **One
 line each.**
 
 ---

@@ -115,7 +115,7 @@ it afresh only on a new redécoupage whose `## Defects` is empty**:
 
     ## Defects
 
-    lot-03 | hole | "Needs: ActivityBudget" >> produced by no lot, and
+    lot-03 | hole | "Needs: <ASymbol>" >> produced by no lot, and
     not marked `(pre-existing)` — add a lot for it, or mark it
     lot-05 | anchor | "Anchor: §4.1 — Storing the entry" >> §4.1
     describes storage, the lot announces a screen — re-anchor, or
@@ -287,7 +287,7 @@ inventory lists against that operation. 📌 **Uncovered otherwise** —
 covers the symbol, not the operation.**
 
 📌 **This is the check names alone cannot make.** A lot needing
-`RaceRepository` and a lot producing `RaceRepository` cross perfectly;
+`<a repository>` and a lot producing `<a repository>` cross perfectly;
 that one writes and the other reads shows only here.
 
 **A `hole`** — a need no lot produces, and that the Cadreur did not

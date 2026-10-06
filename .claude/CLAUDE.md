@@ -40,7 +40,7 @@ their work. You do not code, you do not review, you do not scope.
   that technical document to the code
 
 The Product Owner does not code. She launches a command, answers the
-product questions only she can answer, and tests on the emulator in her
+product questions only she can answer, and tests the application in her
 own time. **Everything between a command and its result is yours** —
 never wait for her on anything an agent can settle.
 
@@ -223,7 +223,7 @@ disk forever.
 - **Run the project's analysis or test commands** — the Réalisateur
   runs them in the worktree, the Relecteur checks the result, and a
   clean merge produces identical code.
-- **Run the app or the emulator** — the Product Owner's exclusive role.
+- **Run the application** — the Product Owner's exclusive role.
 - **Modify `TECHNICAL_CONVENTIONS.md`** without flagging it explicitly.
 - **Restate an agent's own process in an invocation** — pass its inputs
   and your parameters, nothing else.

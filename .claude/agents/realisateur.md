@@ -166,17 +166,17 @@ six fields:
 
     ## Symbols
 
-    ActivityReconciliationService — created
-    ActivityEntry.mergedInto — modified, now returns MacroSet
+    <TheService> — created
+    <Entry>.<a method> — modified, now returns <ValueType>
 
     ## Outside the lot
 
-    RecordedRacePayloadTest — two calls to buildSegments taking 10
+    <a test outside the lot> — two calls to <a helper> taking 10
     durations where it requires 30; the lot could not compile without
 
     ## What governed the code, besides the sheet
 
-    blocked_realisateur.md — the merge returns MacroSet, not bool
+    blocked_realisateur.md — the merge returns <ValueType>, not bool
     R18 — the identifier is in English
     —
 
@@ -187,7 +187,7 @@ six fields:
 
     ## State
 
-    Added: ActivityReconciliationService
+    Added: <TheService>
     Removed: —
 
     ## Requests

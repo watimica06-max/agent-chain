@@ -305,7 +305,7 @@ the Product Owner's words.
 ⚠️ **Not *« check B12 »*.** 📌 ***« open the list with nothing in it: a
 message says to paste a result »***.
 
-🔴 **Name the state the application has to be in** — 📌 *« with one race
+🔴 **Name the state the application has to be in** — 📌 *« with one <item>
 recorded »*, *« after refusing the permission »*. ⚠️ **Somebody will
 order the list by state later**, and a line that does not say its state
 cannot be placed.

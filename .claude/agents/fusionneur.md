@@ -151,19 +151,19 @@ comparison would be redone from scratch.
 **Its shape** — one heading per section touched, one sub-heading per
 block, one line per sentence:
 
-    ## Activity screen
+    ## <a section>
     - PENDING questions-fusionneur-04 Q3: title
     ### Add button
     - REPLACE: "a button sits at the top" → "a button sits at the
       bottom right"
-    - INSERT: "Tapping it opens the activity entry screen."
+    - INSERT: "Tapping it opens the entry screen."
     - KEEP: "It is hidden while the list is loading."
     - PENDING questions-fusionneur-04 Q2: "A long press duplicates the last entry."
     - DELETE: "It shows a badge when unread." (answer to Q1)
     ### Quick timer                                   [new block]
     - INSERT: "A long press on the button starts a timer."
 
-    ## Steps panel                                    [new section]
+    ## <a new section>                                [new section]
     ### Manual entry
     - INSERT: ...
 
@@ -524,17 +524,17 @@ written from the feature file, and every section is new.
     # Merge report — <feature> — <date>
 
     ## New sections
-    - Steps panel (domain: Activities)
+    - <a section> (domain: <its domain>)
 
     ## Merged sections
-    - Activity screen › Add button — 2 replaced, 1 inserted, 1 kept
+    - <a section> › Add button — 2 replaced, 1 inserted, 1 kept
 
     ## Deleted sections
     - none
 
     ## Unchanged sections
-    - Activity screen › Level selector
-    - Activity screen › Weekly list
+    - <a section> › <a block>
+    - <a section> › <another block>
 
 📌 **One line per item, no prose.**
 
@@ -614,8 +614,8 @@ application does?**
 | The application does something the global describes nowhere | **Merge it** |
 
 ⚠️ **The test is the reader, not the wording.** An entry naming a
-bearer and classes can still settle a behaviour — *"the watch keeps a
-race until the phone confirms it"* is product, whatever symbols
+bearer and classes can still settle a behaviour — *"<one part of the application> keeps <an item>
+until <another part> confirms it"* is product, whatever symbols
 surround it.
 
 📌 **Most entries are technical.** 🔴 **A whole file with nothing to

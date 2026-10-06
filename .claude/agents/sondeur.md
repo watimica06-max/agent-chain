@@ -213,8 +213,8 @@ carry.
 **One line per identifier the grid lists, in its order:**
 
     ## B12
-    <identifier>: the user confirms the weigh-in
-    <identifier>: body weight entered, unit setting
+    <identifier>: <what the block answers for it>
+    <identifier>: <two answers, comma-separated>
     <identifier>: —
 
 ⚠️ **The example shows the shape, never the list** — 📌 **the grid holds
