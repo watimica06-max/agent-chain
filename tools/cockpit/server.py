@@ -25,6 +25,7 @@ import questions  # noqa: E402
 import runner as runner_mod  # noqa: E402
 import scan as scan_mod  # noqa: E402
 import stats as stats_mod  # noqa: E402
+import statsview  # noqa: E402
 import textfile   # noqa: E402
 import writer     # noqa: E402
 from state import State  # noqa: E402
@@ -327,7 +328,7 @@ def recette(app, feature):
 
 # -------------------------------------------------------------- the app
 
-def ask_directory(initial):
+def ask_directory(initial, title="Choisir le dossier de l'application"):
     """The native folder picker, run in a worker thread."""
     import tkinter as tk
     from tkinter import filedialog
@@ -339,13 +340,16 @@ def ask_directory(initial):
         pass
     try:
         path = filedialog.askdirectory(initialdir=initial or None, mustexist=True,
-                                       title="Choisir le dossier de l'application")
+                                       title=title)
     finally:
         root.destroy()
     return path or ""
 
 
 LOCAL_NAMES = {"127.0.0.1", "localhost"}
+# What runs the diagnostic when make_app is given nothing; the tests put a
+# fake here, so that no page test runs the real version commands.
+DIAG_RUNNER = diagnostic.run_diagnostic
 
 
 def _host_name(hostport):
@@ -368,9 +372,25 @@ def make_on_end(state: State):
     return on_end
 
 
+def ask_export_folder(initial):
+    return ask_directory(initial, title="Où enregistrer les deux fichiers CSV ?")
+
+
+def default_export_folder():
+    for name in ("Downloads", "Documents"):
+        p = os.path.join(os.path.expanduser("~"), name)
+        if os.path.isdir(p):
+            return p
+    return os.path.expanduser("~")
+
+
 def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
-             diag_runner=diagnostic.run_diagnostic):
+             diag_runner=None, export_picker=ask_export_folder):
     store = rn.stats
+    diag_runner = diag_runner or DIAG_RUNNER
+    # The diagnostic run in the background (1.4.5): once, at the opening,
+    # when no result is stored.
+    diag = {"running": False, "auto_done": False, "task": None}
     @web.middleware
     async def guard(request, handler):
         # Only this machine's browser, on this page: a foreign site cannot
@@ -418,6 +438,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         out = {"app_folder": state.app_folder, "working_folder": state.working_folder,
                "recent": state.recent(), "load_error": state.load_error,
                "open": bool(a), "mode": state.mode, "diagnostic": state.diagnostic(),
+               "diagnostic_running": diag["running"],
                "logs_dir": rn.log_dir, "groups": GROUPS,
                # The two usage windows, each with when it was measured (§13.3).
                "limits": _limits(store), "now": datetime.now().isoformat(timespec="seconds")}
@@ -452,7 +473,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         """« Où on en est ? » — and the opening of the page: the stored
         `Next:` is checked against the files whatever just happened."""
         data = await body(request)
-        need_pair()
+        a, _ = need_pair()
+        if data.get("reason") == "ouverture":
+            auto_diagnostic(a)
         return web.json_response(state_payload(data.get("reason") or "bouton"))
 
     async def pick_folder(request):
@@ -585,12 +608,83 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": str(e)}, status=400)
         return web.json_response({"mode": state.mode})
 
+    async def diagnose(a):
+        diag["running"] = True
+        try:
+            result = await asyncio.get_running_loop().run_in_executor(None, diag_runner, a)
+            state.set_diagnostic(result)
+            return result
+        finally:
+            diag["running"] = False
+
+    def auto_diagnostic(a):
+        """No result stored: the diagnostic runs once, in the background, and
+        its result is kept. Paramètres → Diagnostic still runs it on demand."""
+        if diag["auto_done"] or diag["running"] or state.diagnostic() is not None or not a:
+            return
+        diag["auto_done"] = True
+
+        async def go():
+            try:
+                await diagnose(a)
+            except Exception as e:      # reported, never raised into the loop
+                print(f"Diagnostic automatique non abouti : {e}", flush=True)
+        diag["task"] = asyncio.get_running_loop().create_task(go())
+
+    async def opening(_app):
+        a, _ = pair()
+        if a:
+            auto_diagnostic(a)
+
     async def run_diagnostic(request):
         a, _ = need_pair()
+        return web.json_response(await diagnose(a))
+
+    # ------------------------------------------------ statistics (1.4.5)
+    def stats_args(request, data=None):
+        a, w = need_pair()
+        q = data if data is not None else request.query
+        f = (q.get("feature") or "").strip()
+        feature = None if f == "*" else (f or feature_of(w))
+        return feature, q.get("period") or "tout"
+
+    def stats_data(feature, period):
+        return statsview.build(store.path if store else None, feature, period)
+
+    async def stats_get(request):
+        feature, period = stats_args(request)
+        return web.json_response(stats_data(feature, period))
+
+    async def stats_csv(request):
+        feature, period = stats_args(request)
+        kind = request.query.get("kind", "runs")
+        files = statsview.csv_files(stats_data(feature, period))
+        name, text = files[1] if kind == "passes" else files[0]
+        return web.Response(text=text, content_type="text/csv", charset="utf-8",
+                            headers={"Content-Disposition": f'attachment; filename="{name}"'})
+
+    async def stats_export(request):
+        """« Exporter »: the runs and the agent passes of the current filters,
+        as two CSV files in the folder the Product Owner picks."""
+        data = await body(request)
+        feature, period = stats_args(request, data)
         loop = asyncio.get_running_loop()
-        result = await loop.run_in_executor(None, diag_runner, a)
-        state.set_diagnostic(result)
-        return web.json_response(result)
+        try:
+            folder = await loop.run_in_executor(None, export_picker, default_export_folder())
+        except Exception as e:
+            return web.json_response({"error": f"le sélecteur n'a pas pu s'ouvrir ({e})"}, status=500)
+        if not folder:
+            return web.json_response({"cancelled": True})
+        written = []
+        try:
+            for name, text in statsview.csv_files(stats_data(feature, period)):
+                path = os.path.join(folder, name)
+                with open(path, "w", encoding="utf-8", newline="") as f:
+                    f.write(text)
+                written.append(path)
+        except OSError as e:
+            return web.json_response({"error": f"fichier non écrit : {e}", "files": written}, status=500)
+        return web.json_response({"files": written})
 
     async def continue_wait(request):
         a, _ = need_pair()
@@ -684,6 +778,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/disarm-stop", disarm)
     r.add_post("/api/permission", permission)
     r.add_get("/api/events", events)
+    r.add_get("/api/stats", stats_get)
+    r.add_get("/api/stats/csv", stats_csv)
+    r.add_post("/api/stats/export", stats_export)
+    app.on_startup.append(opening)
     return app
 
 

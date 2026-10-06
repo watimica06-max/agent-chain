@@ -5,6 +5,10 @@ without editing files by hand. Version 1 covers the two things that cost
 her the most time: **answering questions and blocking files**, and
 **knowing which command comes next**.
 
+*1.4.5 — « Statistiques », what the store holds read in depth (§15); the
+side menu closes; « Où on en est ? » moves to « Chaîne »; the diagnostic
+runs on its own when none is stored (§12).*
+
 *1.4 — each question beside the passage it is about (§14); what every
 run and every agent consumes, and the two usage windows (§13).*
 
@@ -364,8 +368,14 @@ the trigger).
 
 ## 12. The screens (1.3)
 
-Tableau de bord · À répondre · **Chaîne** · **Correction** · Paramètres,
-and « Où on en est ? » in the top bar.
+Tableau de bord · À répondre · **Chaîne** · **Correction** ·
+**Statistiques** (1.4.5) · Paramètres. *1.4.5: « Où on en est ? » sits at
+the top of « Chaîne », no longer in the top bar; the scan still runs on its
+own at the opening, after every run and after every save of answers. A
+button with three lines at the left of the top bar opens and closes the
+side menu, remembered by the browser; closed, the working area takes the
+full width, and the button carries a dot while « À répondre » has an open
+entry or a run is going.*
 
 - **Tableau de bord** — « Prochaine étape » follows §11 and says where it
   comes from; « Pourquoi ? » shows the step's rule, its files and lines.
@@ -385,6 +395,11 @@ and « Où on en est ? » in the top bar.
   written there, and only until `desc-bug.md` exists.
 - **Paramètres** — the application folder and the feature; « Commandes »
   stays the escape hatch.
+- **The diagnostic (1.4.5)** — when `config.json` holds no result, it runs
+  once, in the background, at the cockpit's opening (the server's start
+  with a feature open, or the page's first load), and its result is kept.
+  The dashboard alert shows only when the last result has a ✗.
+  Paramètres → Diagnostic still runs it on demand.
 
 The page writes nothing beyond §2.3's places — the last of them, `bugfix-NN/bug-list.md`, new in 1.3.
 
@@ -508,3 +523,41 @@ tool calls, then `/usage` (Claude Code 2.1.285, `claude-agent-sdk`
   `Entrée` or `↓` next, `↑` previous, `←` `→` the previous and next
   occurrence (1.4.4), `Ctrl+S` save. None but `Ctrl+S`
   fires in a text field.
+
+## 15. « Statistiques » (1.4.5)
+
+`tools/cockpit/statsview.py` reads `stats.sqlite` and nothing else, through
+a read-only connection (`mode=ro`): `runs`, `agent_passes` — read nowhere
+before 1.4.5 — and `rate_limits`. Routes: `GET /api/stats`,
+`GET /api/stats/csv`, and `POST /api/stats/export`, which asks for a folder
+with the Windows picker and writes the two CSV files there.
+
+- **Filters**, remembered by the browser: the feature — the open one by
+  default, « Toutes », or another the store holds — and the period:
+  aujourd'hui (since midnight), 7 jours, 30 jours, tout. A run belongs to a
+  period by its start. The limit measures are the account's: the chart
+  shows every measure of the period, whatever the feature.
+- **Never a figure the store does not hold.** A NULL count is « inconnu »,
+  left out of every sum, and the sum says how many it left out (« dont
+  3 passes inconnues »); a sum with nothing known is unknown, never 0.
+- **What a run took from a window** — its first measure (the
+  `RateLimitEvent` at its session's first response) and its end-of-run
+  `/usage`; the difference, in points, shown « ≈ 4 % de la fenêtre 5 h ».
+  Empty, with the reason, when either is missing or when the window reset
+  during the run: `resets_at` moved by more than 60 s (`/usage` gives the
+  reset to the minute), the start's reset fell before the end, or the
+  figure went down. A continuation run is its own session start. The
+  screen says once that the limits count everything the account used
+  meanwhile, and are read to the percent.
+- **Sections**: En bref (runs, time, tokens read with the share in cache,
+  written, ≈ 5 h and week); the limits over time (inline SVG, two lines
+  broken at a reset, every measure a point, the runs marked on the time
+  axis, a crosshair, the measures as a table); per command; per agent; per
+  feature (« Toutes » only); the ten most expensive runs and agent passes
+  by tokens read; the history of runs, a click opening its agent passes
+  and its log. Every table sorts by any column, an unknown last.
+- **« inhabituel »** — a run above twice the median read of its command,
+  a pass above twice its agent's, the medians taken over the whole store.
+- **Export** — the runs and passes of the current filters, `;`-separated
+  UTF-8 with a BOM, decimal commas: what a French Excel opens as columns.
+  An unknown count is written « inconnu », an empty difference its reason.
