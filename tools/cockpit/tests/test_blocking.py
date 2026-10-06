@@ -102,26 +102,92 @@ def test_shape5_only_last_block_is_live():
     assert cmdtests.a2_empty(path) == [False, True]
 
 
-def test_shape5_waiting_on_architecte_is_not_hers(tmp_path):
+def cadreur_request(tmp_path):
+    """The 1.0 fixtures: a cadreur block whose `## Where` names Request 2,
+    beside `architecte/cadreur.md` (Request 1 granted, Request 2 empty)."""
     work = tmp_path / "w"
     (work / "code").mkdir(parents=True)
     (work / "architecte").mkdir()
     for src, dst in [("hand/cadreur-request/blocked_cadreur.md", "code/blocked_cadreur.md"),
                      ("hand/cadreur-request/architecte-cadreur.md", "architecte/cadreur.md")]:
         (work / dst).write_bytes(open(fixture_path(*src.split("/")), "rb").read())
+    return work
+
+
+def test_shape5_waiting_on_architecte_is_not_hers(tmp_path):
+    work = cadreur_request(tmp_path)
+    # Request 2's verdict is empty: the Architecte answers it (cmd/7_lots.md:210).
     shown, notices, _ = blocking.scan(str(work))
     assert shown == [] and notices == []
     # Without the request file, nothing lifts it: it is hers.
     os.remove(work / "architecte" / "cadreur.md")
     shown, _, _ = blocking.scan(str(work))
-    assert len(shown) == 1
+    assert len(shown) == 1 and shown[0].note == ""
 
 
-def test_relecteur_only_anything_else_is_hers():
+def test_shape5_a_request_with_no_verdict_heading_is_not_hers(tmp_path):
+    work = cadreur_request(tmp_path)
+    req = work / "architecte" / "cadreur.md"
+    req.write_text(req.read_text(encoding="utf-8").replace("## Verdict\n\n\n", "").rstrip()
+                   .removesuffix("## Verdict").rstrip() + "\n", encoding="utf-8")
+    assert "## Verdict" not in req.read_text(encoding="utf-8").split("# Request 2")[1]
+    shown, _, _ = blocking.scan(str(work))
+    assert shown == []                        # read as an empty one (cmd/7_lots.md:244-245)
+
+
+def test_shape5_a_refused_verdict_is_shown(tmp_path):
+    work = cadreur_request(tmp_path)
+    req = work / "architecte" / "cadreur.md"
+    req.write_text(req.read_text(encoding="utf-8").rstrip() +
+                   "\n\nNot a convention: the domain module stays free of persistence. "
+                   "Settle it in the split.\n", encoding="utf-8")
+    shown, notices, _ = blocking.scan(str(work))
+    (e,) = shown
+    assert e.shape == 5 and e.waiting and notices == []
+    # The refusal is hers; nothing on disk tells it from a verdict the Cadreur
+    # has yet to read, so the entry says both.
+    assert "Request 2" in e.note and "verdict refused" in e.note
+    assert e.to_dict()["note"] == e.note
+
+
+def test_shape5_only_the_request_its_where_names_counts(tmp_path):
+    work = cadreur_request(tmp_path)
+    # Request 1 is granted; the block names Request 2, still empty: not hers.
+    shown, _, _ = blocking.scan(str(work))
+    assert shown == []
+    # Named Request 1, the filled one: shown, with the note.
+    b = work / "code" / "blocked_cadreur.md"
+    b.write_text(b.read_text(encoding="utf-8").replace("Request 2\n\n## To resume", "Request 1\n\n## To resume"),
+                 encoding="utf-8")
+    (e,) = blocking.scan(str(work))[0]
+    assert "Request 1" in e.note
+
+
+def test_shape5_once_applied_it_is_gone(tmp_path):
+    work = cadreur_request(tmp_path)
+    os.rename(work / "code" / "blocked_cadreur.md", work / "code" / "blocked_cadreur-01.md")
+    assert blocking.scan(str(work))[0] == []  # renamed by /7_lots on « verdict applied »
+
+
+def test_a_relecteur_entry_is_never_hidden():
     p, _ = parse("hand/blocked_relecteur-autre.md", as_name="blocked_relecteur.md")
-    assert p.entries[0].waiting
+    assert p.entries[0].waiting and p.entries[0].note == ""
+    # The guess fires — an input named, said missing — and the entry stays,
+    # carrying what the guess saw.
     p, _ = parse("hand/blocked_relecteur-acte.md", as_name="blocked_relecteur.md")
-    assert not p.entries[0].waiting
+    (e,) = p.entries
+    assert e.waiting
+    assert "tests.md" in e.note and "missing" in e.note and "8_code.md:748-750" in e.note
+
+
+def test_a_relecteur_entry_is_in_the_scan_whatever_it_says(tmp_path):
+    for name in ("blocked_relecteur-acte.md", "blocked_relecteur-autre.md"):
+        work = tmp_path / name / "w"
+        (work / "code" / "lot-09").mkdir(parents=True)
+        (work / "code" / "lot-09" / "blocked_relecteur.md").write_bytes(
+            open(fixture_path("hand", name), "rb").read())
+        shown, _, _ = blocking.scan(str(work))
+        assert len(shown) == 1 and shown[0].agent == "relecteur"
 
 
 def test_verificateur_never_shown():

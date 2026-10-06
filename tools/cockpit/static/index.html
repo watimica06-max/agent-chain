@@ -1185,6 +1185,8 @@ function renderForms() {
       if (b.worktree) tags.push(el("span", {class: "badge warn", text: "worktree en cours"}));
       tags.push(stepBadge(b));
       put(b.rel, entryCard(b.id, tags, [
+        // What a guess saw (1.4.1): said beside the entry, which stays to decide.
+        b.note ? el("div", {class: "notice warn small", text: b.note}) : null,
         el("div", {class: "lbl", text: "Ce qui bloque"}), el("pre", {class: "text", text: b.what_blocks || "—"}),
         b.where ? el("div", {class: "lbl", text: "Où"}) : null, b.where ? el("pre", {class: "text", text: b.where}) : null,
         el("div", {class: "lbl", text: "Pour reprendre"}), el("pre", {class: "text", text: b.to_resume || "—"}),

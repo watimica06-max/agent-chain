@@ -9,7 +9,9 @@ Five shapes:
      holding `N. <text>` lines (detailleur, realisateur);
   5. one block appended several times, only the last `## Decision` live
      (cadreur).
-What is waiting is decided by the commands' own tests, unchanged.
+What is waiting is decided by the commands' own tests, unchanged. A guess
+the commands do not make never hides an entry (1.4.1): it is shown, with
+what the guess saw in `note`.
 """
 import hashlib
 import os
@@ -29,11 +31,14 @@ OPTIONS = re.compile(r"^Options:\s*$")
 OPTION_ITEM = re.compile(r"^\s*(?:[-*•])\s+(.*)$")
 NUMBERED = re.compile(r"^(\d+)\.")
 REQUEST_IN_WHERE = re.compile(r"architecte/cadreur\.md\s*[—–-]+\s*Request\s+(\d+)")
+REQUEST = re.compile(r"^# Request (\d+)\b")
+VERDICT = re.compile(r"^## Verdict\s*$")
 PO_DECISION = re.compile(r"^## Décision du Product Owner\s*$")
-# What the relecteur's three act rows name missing (cmd/8_code.md:743-745):
-# the act retires them; only « anything else » is hers.
-# The relecteur blocks when one of its four inputs is missing: the act
-# rows are a block naming one of them, and saying it is missing.
+# What the relecteur's three act rows name missing (cmd/8_code.md:748-750):
+# the act retires them; only « anything else » is hers. No line of the
+# command tells the rows apart from the file: this is a guess on the words
+# of `## What blocks` — one of its four inputs named, and said missing. It
+# never hides the entry (1.4.1); it adds a note saying what it saw.
 RELECTEUR_INPUT = re.compile(
     r"compte-rendu|fiche-executable|conception\.md|tests\.md|\breport\b|\bsheet\b",
     re.IGNORECASE)
@@ -62,6 +67,7 @@ class BlockingEntry:
     worktree: str | None = None
     decision_line: int = -1
     base: str = ""             # the working folder it was read against
+    note: str = ""             # shown beside the entry: what a guess saw, never a reason to hide it
 
     def to_dict(self):
         d = asdict(self)
@@ -256,8 +262,19 @@ def parse_lines(lines, path, rel, work_dir=None, worktree=None) -> ParsedBlockin
         d = decisions[-1]
         text, _ = _decision_text(lines, d, heads)
         entry = make(5, a, len(lines), None, None, d, decision_empty_a2(lines, d), text)
-        if entry.waiting and work_dir and _waits_on_architecte(entry.where, work_dir):
-            entry.waiting = False
+        if entry.waiting and work_dir:
+            req, verdict = _request_verdict(entry.where, work_dir)
+            if verdict == "empty":
+                # cmd/7_lots.md:210 — the Architecte answers it: not hers.
+                entry.waiting = False
+            elif verdict == "filled":
+                # cmd/7_lots.md:211 and :213 — read by the Cadreur next, or
+                # refused by it and hers. Nothing on disk tells the two
+                # apart, and a refusal is never hidden.
+                entry.note = (f"Le verdict de l'Architecte sur la « Request {req} » est écrit. "
+                              "Si /7_lots ne l'a pas encore fait lire au Cadreur, c'est au Cadreur de "
+                              "l'appliquer ; s'il l'a refusé (« verdict refused »), la décision est la "
+                              "vôtre. Rien sur le disque ne distingue les deux : l'entrée reste affichée.")
         out.entries.append(entry)
         return out
 
@@ -265,27 +282,46 @@ def parse_lines(lines, path, rel, work_dir=None, worktree=None) -> ParsedBlockin
     text, _ = _decision_text(lines, d, heads)
     shape = 2 if any(INVOCATION.match(l) for l in lines) else 1
     entry = make(shape, 0, len(lines), None, None, d, decision_empty_a2(lines, d), text)
-    if (name == "blocked_relecteur.md" and entry.waiting
-            and RELECTEUR_INPUT.search(entry.what_blocks)
-            and RELECTEUR_MISSING.search(entry.what_blocks)):
-        entry.waiting = False   # retired by an act of /8_code, not by her
+    if name == "blocked_relecteur.md" and entry.waiting:
+        seen = RELECTEUR_INPUT.search(entry.what_blocks)
+        missing = RELECTEUR_MISSING.search(entry.what_blocks)
+        if seen and missing:
+            # Perhaps an act row, retired by /8_code: a guess, so shown all the same.
+            entry.note = (f"« Ce qui bloque » nomme « {seen.group(0)} » et dit « {missing.group(0)} » : "
+                          "peut-être une des lignes que /8_code retire par un acte "
+                          "(8_code.md:748-750), sans décision. Ce n'est qu'une lecture du texte : "
+                          "l'entrée reste à décider.")
     out.entries.append(entry)
     return out
 
 
-def _waits_on_architecte(where, work_dir):
-    """cmd/7_lots.md:209-210 — a block whose `## Where` names a request in
-    `architecte/cadreur.md` is lifted by the Architecte's verdict."""
+def _request_verdict(where, work_dir):
+    """cmd/7_lots.md:224-233 — the `# Request N` a cadreur block's `## Where`
+    names, read alone: (N, "empty" | "filled"), or (N or None, None) when
+    no request is named or none is there — then nothing lifts the block.
+    A request with no `## Verdict` heading reads as an empty one
+    (cmd/7_lots.md:244-245)."""
     m = REQUEST_IN_WHERE.search(where or "")
     if not m:
-        return False
-    req = os.path.join(work_dir, "architecte", "cadreur.md")
+        return None, None
+    n = m.group(1)
     try:
-        lines = textfile.load(req).lines
-    except textfile.UnreadableFile:
-        return False
-    pat = re.compile(rf"^# Request {m.group(1)}\b")
-    return any(pat.match(l) for l in lines)
+        lines = textfile.load(os.path.join(work_dir, "architecte", "cadreur.md")).lines
+    except (textfile.UnreadableFile, OSError):
+        return n, None
+    start = next((i for i, l in enumerate(lines) if (r := REQUEST.match(l)) and r.group(1) == n), None)
+    if start is None:
+        return n, None
+    end = next((i for i in range(start + 1, len(lines)) if REQUEST.match(lines[i])), len(lines))
+    for i in range(start + 1, end):
+        if VERDICT.match(lines[i]):
+            body = []
+            for l in lines[i + 1:end]:
+                if HEADING.match(l):
+                    break
+                body.append(l)
+            return n, "filled" if any(l.strip() for l in body) else "empty"
+    return n, "empty"
 
 
 def parse_file(path, work_dir, worktree=None) -> ParsedBlocking:

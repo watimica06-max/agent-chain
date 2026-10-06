@@ -253,10 +253,19 @@ commands' own tests, unchanged:
 - shape 4: an entry whose number is absent under `## Decision`
   (`cmd/8_code.md:319-340`). The Arbitre answers these first; only what
   it leaves is hers;
-- shape 5: the last `## Decision`, empty — **unless** the block waits on
-  an Architecte verdict (`cmd/7_lots.md:189-190`), which is not hers;
-- the relecteur's file: only its « anything else » case
-  (`cmd/8_code.md:739`);
+- shape 5: the last `## Decision`, empty — **unless** the `# Request N`
+  its `## Where` names has an empty `## Verdict`, or none
+  (`cmd/7_lots.md:210`, `:244-245`): the Architecte answers it, not her.
+  **A filled verdict is shown (1.4.1)**: refused by the Cadreur, it is hers
+  (`cmd/7_lots.md:213`, `agents/cadreur.md:1119`), and nothing on disk
+  tells a refusal from a verdict the Cadreur has yet to read
+  (`cmd/7_lots.md:211`) — the entry says so. Applied, the file is renamed
+  and gone;
+- the relecteur's file: **always shown (1.4.1)**. Its act rows
+  (`cmd/8_code.md:748-750`) differ from « anything else » (`:751`) only
+  by what `## What blocks` says; the application guesses it from the
+  words — an input named, said missing — and when the guess fires, the
+  entry carries what it saw, and stays to decide;
 - the vérificateur's file: never shown — it has no `## Decision`.
 
 **During a live run.** Only shape 4 is answered in a worktree, while the
@@ -397,7 +406,8 @@ tool calls, then `/usage` (Claude Code 2.1.285, `claude-agent-sdk`
   with `forward_subagent_text`**: without it a subagent message holding no
   tool call never reaches the stream — the nested agent of the first
   session was missing whole. The runner turns it on.
-- **Output tokens, per agent: not available — recorded as unknown.**
+- **Output tokens, per agent: not in the stream** — and, since 1.4.1,
+  read from the transcripts below.
   - per-step `output_tokens` is a placeholder (« Per-step `output_tokens`
     is a placeholder », Agent SDK, *Track cost and usage*) — seen: 1, 3, 6
     on messages that wrote 51 to 202;
@@ -409,6 +419,20 @@ tool calls, then `/usage` (Claude Code 2.1.285, `claude-agent-sdk`
     session only: `StreamEvent.parent_tool_use_id` is « Always `None`.
     Stream events are emitted for the main session only » (Python SDK
     reference) — seen: none for either subagent.
+- **Output tokens, per agent, from the transcripts (1.4.1).** Claude
+  Code writes the session under `<config>/projects/<folder>/`:
+  `<session_id>.jsonl`, and `<session_id>/subagents/agent-<id>.jsonl` with
+  `agent-<id>.meta.json`. `<folder>` is the working directory flattened —
+  the worktree's, when the orchestrator entered one — so the session is
+  found by its id in every folder. A message is written once per content
+  block, one `message.id`; its `usage.output_tokens` is the final count on
+  the last line of that id (the outer agent's first message: 3, then 197).
+  A subagent's `meta.json` carries `toolUseId`, the Agent call that
+  started it. On the probe: main 335, outer 421, inner 61 — 817, the
+  result's `model_usage` output exactly. **Kept only when that sum is
+  exact; a transcript missing, or a sum that differs, leaves every
+  output of the run unknown.** Read once the run is over, `/usage`
+  included; read only.
 - **Run totals:** the latest result's `model_usage`, which counts
   subagents (« Use `modelUsage`… for whole-tree token accounting; the
   `usage` field undercounts as soon as nesting occurs »). A resumed
@@ -435,8 +459,11 @@ tool calls, then `/usage` (Claude Code 2.1.285, `claude-agent-sdk`
 
 - Every log line carries `at`, the time the message was received.
 - `tools/cockpit/stats.sqlite` (`sqlite3`, ignored by git): `runs`,
-  `agent_passes`, `rate_limits`. A subagent's `output_tokens` is NULL —
-  unknown —, never the placeholder.
+  `agent_passes`, `rate_limits`. A subagent's `output_tokens` is the
+  transcripts' figure, or NULL — unknown —, never the placeholder.
+- The runs already stored get their agents' output at the server's
+  start, from each run's log and the transcripts still on disk, all or
+  none (1.4.1).
 - The logs written since 1.1 are loaded at the server's start, once each
   (by path), marked `backfilled`. They carry `at` on every line since
   1.1, so their durations are known; a log without it would leave them

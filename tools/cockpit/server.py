@@ -721,7 +721,11 @@ def backfill(store, state, log_dir):
     for h in state.all_history():
         if h.get("log_path"):
             hist[os.path.normcase(h["log_path"])] = {**h, "work": h.get("key", "").split("|", 1)[-1]}
-    return store.backfill(log_dir, hist)
+    done = store.backfill(log_dir, hist)
+    # The runs already stored: their agents' output, from the transcripts
+    # still on disk (1.4.1).
+    done["outputs"] = store.backfill_outputs()
+    return done
 
 
 def _sse(ev):
@@ -743,6 +747,9 @@ def main(argv=None):
     if done["runs"]:
         print(f"Consommation : {done['runs']} journal(aux) ancien(s) chargé(s) dans stats.sqlite "
               f"({done['passes']} passage(s) d'agent, {done['limits']} mesure(s) d'usage).", flush=True)
+    if done["outputs"]["runs"]:
+        print(f"Consommation : tokens écrits retrouvés pour {done['outputs']['runs']} run(s) "
+              f"({done['outputs']['passes']} passage(s) d'agent), d'après les transcriptions.", flush=True)
     app = make_app(state, rn)
     url = f"http://{HOST}:{args.port}/"
 
