@@ -30,7 +30,7 @@ OPTION_ITEM = re.compile(r"^\s*(?:[-*•])\s+(.*)$")
 NUMBERED = re.compile(r"^(\d+)\.")
 REQUEST_IN_WHERE = re.compile(r"architecte/cadreur\.md\s*[—–-]+\s*Request\s+(\d+)")
 PO_DECISION = re.compile(r"^## Décision du Product Owner\s*$")
-# What the relecteur's three act rows name missing (cmd/8_code.md:736-738):
+# What the relecteur's three act rows name missing (cmd/8_code.md:743-745):
 # the act retires them; only « anything else » is hers.
 # The relecteur blocks when one of its four inputs is missing: the act
 # rows are a block naming one of them, and saying it is missing.
@@ -274,7 +274,7 @@ def parse_lines(lines, path, rel, work_dir=None, worktree=None) -> ParsedBlockin
 
 
 def _waits_on_architecte(where, work_dir):
-    """cmd/7_lots.md:189-190 — a block whose `## Where` names a request in
+    """cmd/7_lots.md:209-210 — a block whose `## Where` names a request in
     `architecte/cadreur.md` is lifted by the Architecte's verdict."""
     m = REQUEST_IN_WHERE.search(where or "")
     if not m:
@@ -354,7 +354,7 @@ def _has_po_decision(lines):
 
 
 def redecoupage_count(work_dir: str) -> int:
-    """cmd/8_code.md:627-633 — archived returns numbered above the highest
+    """cmd/8_code.md:634-640 — archived returns numbered above the highest
     one carrying `## Décision du Product Owner`, plus the current one."""
     code = os.path.join(work_dir, "code")
     archived = []

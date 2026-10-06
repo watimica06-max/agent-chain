@@ -59,11 +59,7 @@ nature that blocked in the same run:
 ⚠️ **Read that one heading in each, nothing else** — 📌 the agent reads
 the file.
 
----
-
-## Git, before invoking
-
-🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
+**4.** 🔴 **Grep `^### Q` in each root `questions-*.md` whose prefix is not
 `architecte` before touching it** — 📌 **a file holding questions is
 not yours to file**: ⚠️ **it waits on an answer, or its answers were
 never integrated.** 🔴 **Stop and say which** — `Next: stop <file> waits
@@ -77,7 +73,57 @@ lost for good** — 🔴 **except under `questions/convertisseur/`**, whose
 highest file this command names to a nature in its prompt, see *Which
 natures run*: ⚠️ **the agent reads it, never you.**
 
-🔴 **Then move every root `questions-*.md`:**
+---
+
+## Which natures run
+
+**For each of the eight natures**, take its part of `desc-par-nature.md` —
+the lines under its `## <nature>` heading, up to the next `## `. 📌
+**`<nature>` in a file name takes a hyphen for a space** —
+`convertisseur/external-exchange.md`.
+
+| What you find | The nature |
+|---|---|
+| Its part holds no block | 🔴 **Runs nowhere** — its `<nature>.md`, `<nature>-input.md` and `<nature>-notes.md`, if they are there, are deleted inside the worktree, see *Git, before invoking*; its section is written empty |
+| Its part differs from `convertisseur/<nature>-input.md`, or that file is absent | 🔴 **Runs** |
+| `convertisseur/<nature>.md` is absent, **and its part changed** | 🔴 **Runs** — its last run wrote no section |
+| `convertisseur/<nature>.md` holds `<<ASSUMED`, **and its part changed** | 🔴 **Runs** — ⚠️ **a mark is lifted only by writing its section again** |
+| 🔴 **Its `convertisseur/technique-<nature>.md` is answered** — it holds a `### Q` and no `^Answer:\s*$` line, by grep | 🔴 **Runs** — 📌 **whatever its blocks did**: ⚠️ **a technical answer changes no block**, and without this row it would wait for ever. 📌 **Name the file in its prompt**. |
+| Either of the two, **its part byte-identical, and its `technique-<nature>.md` holds an `^Answer:\s*$` line** | 📌 **Waits** — 🔴 **it does not run.** ⚠️ **It would read the same blocks, meet the same gap and ask the same question**: one opus invocation for a known result |
+| Either of the two, **its part byte-identical, and no `technique-<nature>.md` holding an `^Answer:\s*$` line** | 🔴 **Runs** — 📌 **the product question it waits on is answered, and the answer changed no block**: ⚠️ **the rerun is what lifts the mark, its part unchanged** — one opus invocation. 🔴 **Name in its prompt the highest `questions-convertisseur-NN.md` under `questions/convertisseur/`** — ⚠️ **the block does not carry the answer, that file does**: 📌 **without it the agent meets the same gap and marks again**, run after run |
+| `convertisseur/blocked_<nature>.md` carries a filled `## Decision` | 🔴 **Runs** — ⚠️ **a decision is applied only by the invocation it is named to** |
+| None of the above | 📌 **Kept as it stands** |
+
+📌 **Several *Runs* rows can match one nature** — 🔴 **it runs once,
+and its prompt carries the line of every row that matched**: the
+answered technical file, the `questions-convertisseur-NN.md`, the
+decision. ⚠️ **A line dropped is an answer the invocation never sees**
+— the mark stays, or the decision waits another run.
+
+📌 **A nature that waits is a third state, beside *ran* and *kept*** —
+🔴 **and the document does not stand while one waits.**
+
+🔴 **Compare bytes, never by reading** — `cmp`, or `diff -q`.
+
+📌 **Why the part and not the markers** — ⚠️ **the Rédacteur strips the
+markers only when a grid or a conversion turn consumed them**, and the
+grid has closed by the time this command runs: a block changed two
+turns of the grid ago carries none by now. **The part the last run
+translated is what this one compares against.**
+
+**No nature runs:**
+
+| | What you do |
+|---|---|
+| `spec-technique.md` exists, opens on `# Preamble`, holds no `<<ASSUMED` and no `[B`, `tracabilite.md` is there, no nature that runs nowhere has files to delete, no nature is waiting, `convertisseur/technique-transversal.md` is absent or holds an `^Answer:\s*$` line, and `blocked_transversal.md` carries no filled `## Decision` | 🔴 **Nothing to write** — say the document stands, and go to *What you relay*: ⚠️ **no git step, no worktree** — nothing ran, and nothing is filed |
+| Otherwise | 📌 **Skip to the assembly** — the document has to be built again around what stands. ⚠️ **A waiting nature alone lands on the assembly's *No* row** — nothing is built while one waits. ⚠️ **An answered `technique-transversal.md` takes a nature's route**: 🔴 **it forces the assembly and invocation 2, which its prompt names** |
+
+---
+
+## Git, before invoking
+
+🔴 **Once the root has passed the `### Q` test of *Before anything
+else*, move every root `questions-*.md`:**
 
     git mv docs/features/<name>/questions-<agent>-NN.md \
            docs/features/<name>/questions/<agent>/
@@ -134,54 +180,12 @@ isolated.
 ⚠️ an agent whose target folder is missing searches instead of
 stopping.
 
----
-
-## Which natures run
-
-**For each of the eight natures**, take its part of `desc-par-nature.md` —
-the lines under its `## <nature>` heading, up to the next `## `. 📌
-**`<nature>` in a file name takes a hyphen for a space** —
-`convertisseur/external-exchange.md`.
-
-| What you find | The nature |
-|---|---|
-| Its part holds no block | 🔴 **Runs nowhere** — delete its `<nature>.md`, `<nature>-input.md` and `<nature>-notes.md` if they are there; its section is written empty |
-| Its part differs from `convertisseur/<nature>-input.md`, or that file is absent | 🔴 **Runs** |
-| `convertisseur/<nature>.md` is absent, **and its part changed** | 🔴 **Runs** — its last run wrote no section |
-| `convertisseur/<nature>.md` holds `<<ASSUMED`, **and its part changed** | 🔴 **Runs** — ⚠️ **a mark is lifted only by writing its section again** |
-| 🔴 **Its `convertisseur/technique-<nature>.md` is answered** — it holds a `### Q` and no `^Answer:\s*$` line, by grep | 🔴 **Runs** — 📌 **whatever its blocks did**: ⚠️ **a technical answer changes no block**, and without this row it would wait for ever. 📌 **Name the file in its prompt**. |
-| Either of the two, **its part byte-identical, and its `technique-<nature>.md` holds an `^Answer:\s*$` line** | 📌 **Waits** — 🔴 **it does not run.** ⚠️ **It would read the same blocks, meet the same gap and ask the same question**: one opus invocation for a known result |
-| Either of the two, **its part byte-identical, and no `technique-<nature>.md` holding an `^Answer:\s*$` line** | 🔴 **Runs** — 📌 **the product question it waits on is answered, and the answer changed no block**: ⚠️ **the rerun is what lifts the mark, its part unchanged** — one opus invocation. 🔴 **Name in its prompt the highest `questions-convertisseur-NN.md` under `questions/convertisseur/`** — ⚠️ **the block does not carry the answer, that file does**: 📌 **without it the agent meets the same gap and marks again**, run after run |
-| `convertisseur/blocked_<nature>.md` carries a filled `## Decision` | 🔴 **Runs** — ⚠️ **a decision is applied only by the invocation it is named to** |
-| None of the above | 📌 **Kept as it stands** |
-
-📌 **Several *Runs* rows can match one nature** — 🔴 **it runs once,
-and its prompt carries the line of every row that matched**: the
-answered technical file, the `questions-convertisseur-NN.md`, the
-decision. ⚠️ **A line dropped is an answer the invocation never sees**
-— the mark stays, or the decision waits another run.
-
-📌 **A nature that waits is a third state, beside *ran* and *kept*** —
-🔴 **and the document does not stand while one waits.**
-
-🔴 **Compare bytes, never by reading** — `cmp`, or `diff -q`.
-
-📌 **Why the part and not the markers** — ⚠️ **the Rédacteur strips the
-markers only when a grid or a conversion turn consumed them**, and the
-grid has closed by the time this command runs: a block changed two
-turns of the grid ago carries none by now. **The part the last run
-translated is what this one compares against.**
+🔴 **Then, inside it, delete the files of every nature that runs
+nowhere** — *Which natures run*, its first row.
 
 🔴 **Then, for every nature that runs, copy its part to
 `convertisseur/<nature>-input.md`** — 📌 **it is the agent's input, and
 what the next run compares against.**
-
-**No nature runs:**
-
-| | What you do |
-|---|---|
-| `spec-technique.md` exists, opens on `# Preamble`, holds no `<<ASSUMED` and no `[B`, `tracabilite.md` is there, no nature's files were just deleted, no nature is waiting, `convertisseur/technique-transversal.md` is absent or holds an `^Answer:\s*$` line, and `blocked_transversal.md` carries no filled `## Decision` | 🔴 **Nothing to write** — say the document stands, and go to *Once it has run* |
-| Otherwise | 📌 **Skip to the assembly** — the document has to be built again around what stands. ⚠️ **A waiting nature alone lands on the assembly's *No* row** — nothing is built while one waits. ⚠️ **An answered `technique-transversal.md` takes a nature's route**: 🔴 **it forces the assembly and invocation 2, which its prompt names** |
 
 ---
 

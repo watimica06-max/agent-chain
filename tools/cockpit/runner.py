@@ -585,7 +585,7 @@ class Runner:
 
     @staticmethod
     def stop_file(repo: str, feature: str) -> str:
-        # cmd/8_code.md:437-440 — at the feature folder's root, in the main
+        # cmd/8_code.md:444-447 — at the feature folder's root, in the main
         # checkout, never in the worktree.
         return os.path.join(repo, "docs", "features", feature, "stop.md")
 
@@ -604,7 +604,7 @@ class Runner:
 
     @staticmethod
     def disarm_stop_file(repo: str, feature: str) -> str | None:
-        """`stop1.md` is the disarmed form (cmd/8_code.md:455-457)."""
+        """`stop1.md` is the disarmed form (cmd/8_code.md:462-464)."""
         path = Runner.stop_file(repo, feature)
         if not os.path.exists(path):
             return None

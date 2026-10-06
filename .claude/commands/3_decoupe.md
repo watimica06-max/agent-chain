@@ -44,6 +44,10 @@ Feature folder: `docs/features/$ARGUMENTS/`
 it, and `/2_structure` renames it.** ⚠️ **The decoupeur never sees the
 file** — 🔴 **the prompt never names it.**
 
+🔴 **Then, `desc-produit.md` has to be there.** 📌 **One glob** — ⚠️
+**absent, you stop and name the file**: `/2_structure` has not run —
+`Next: run /2_structure <name>`.
+
 🔴 **Grep `Clarification needed` in `desc-produit.md`.**
 
 ⚠️ **One hit and the command stops.** 📌 **Say which blocks carry
@@ -79,10 +83,6 @@ is a normal outcome.
 ---
 
 ## Which blocks it looks at
-
-🔴 **First, `desc-produit.md` has to be there.** 📌 **One glob** — ⚠️
-**absent, you stop and name the file**: `/2_structure` has not run —
-`Next: run /2_structure <name>`.
 
 **Until the grid has run once — no `questions-sondeur-*.md` anywhere:**
 🔴 **every block.** 📌 **The prompt says *every block*, in those

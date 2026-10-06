@@ -99,6 +99,20 @@ carries no `## Decision`** — nothing in it is the Product Owner's to
 fill; `/7_lots` retires it and runs the step before it again. Run
 `/7_lots` first — `Next: run /7_lots <name>`.
 
+🔴 **`blocked_architecte.md` is the Architecte's, and only invocation 3
+runs here** — 📌 **its `## Invocation` line naming 3, name the file in
+the move-7 prompt**, and rename it at the root once the Architecte
+reports having applied it. ⚠️ **Naming another invocation, it is
+`/conventions`'s**: stop, and say to run it — `Next: run /conventions
+<name>`.
+
+🔴 **Then the two stop rows of 4b, before the commit** — 📌 **on the
+lot found above, or the one *First, a look* runs, on
+`code/blocked_detailleur.md` and on `blocked_architecte.md`**: ⚠️ **a
+block an earlier run left standing stops here**, before anything
+changes. 📌 **The loop runs 4b again on every later lot** — what an
+agent of this run writes is read there.
+
 ---
 
 ## Git, before invoking
@@ -360,13 +374,6 @@ others in their report.** ⚠️ **The
 Détailleur in divergence mode applies only a decision bearing on a lot
 the prompt names, and says which numbers it did not apply** — 🔴 **no
 rename on that report**: the next ordinary run applies the rest.
-
-🔴 **`blocked_architecte.md` is the Architecte's, and only invocation 3
-runs here** — 📌 **its `## Invocation` line naming 3, name the file in
-the move-7 prompt**, and rename it at the root once the Architecte
-reports having applied it. ⚠️ **Naming another invocation, it is
-`/conventions`'s**: stop, and say to run it — `Next: run /conventions
-<name>`.
 
 📌 **`code/<lot>/reprise_realisateur.md` is renamed the same way**,
 🔴 **once the run it was named to has reported** — ⚠️ **the Réalisateur

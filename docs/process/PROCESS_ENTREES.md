@@ -454,13 +454,7 @@ rapport de l'agent relayé, et *What to run next* : `/7_lots`.
    de première ligne (→ MECANISMES §Identifiants, lignes `G<n>` et
    `B<n>`). Un manque qui n'ouvre sur aucun `G<n>` → arrêt avant tout
    envoi, la ligne nommée.
-2. Git avant l'invocation, → MECANISMES §Git, avant l'invocation :
-   `git add docs/features/<name>/ && git commit -m "chore: answers"`
-   — le Product Owner écrit `bug-list.md` hors session, et un worktree
-   branche sur le dernier commit ; `git worktree add
-   .claude/worktrees/<name> HEAD` ; entrée dans le worktree avant
-   d'invoquer.
-3. Trier chaque manque de `bug-list.md` avant d'envoyer quoi que ce
+2. Trier chaque manque de `bug-list.md` avant d'envoyer quoi que ce
    soit, sur ce que `investigation/` tient pour son identifiant — un
    `Glob` sur `investigation/*.md`, un fichier de blocage ouvert pour
    son seul `## Decision` (→ MECANISMES §États de « ## Decision » — ce
@@ -477,7 +471,18 @@ rapport de l'agent relayé, et *What to run next* : `/7_lots`.
    C'est ainsi qu'une seule investigation échouée est rejouée : le
    Product Owner remplit son fichier de blocage, relance la commande,
    et seul ce manque part. Une phase 1 qui n'envoie rien est normale.
-4. Phase 1 — un `Agent()` par manque à envoyer, tous dans un seul
+3. Avant d'envoyer la phase 2, `Glob` `desc-bug.md` dans le dossier —
+   ici, avant le commit et avant la phase 1 : il existe → ni la phase 2
+   ni la phase 1 ne sont envoyées, aucun geste git, le fichier est
+   relayé comme fait, et le pas suivant est `/7_lots`. Les tests des
+   étapes 1 à 3 passent avant tout geste sur le dépôt.
+4. Git avant l'invocation, → MECANISMES §Git, avant l'invocation :
+   `git add docs/features/<name>/ && git commit -m "chore: answers"`
+   — le Product Owner écrit `bug-list.md` hors session, et un worktree
+   branche sur le dernier commit ; `git worktree add
+   .claude/worktrees/<name> HEAD` ; entrée dans le worktree avant
+   d'invoquer.
+5. Phase 1 — un `Agent()` par manque à envoyer, tous dans un seul
    message (→ MECANISMES §Invocation d'un agent) :
    `subagent_type="diagnostiqueur"`, `model="sonnet"`,
    `description="investigate G01 <feature>"`, prompt `Bug-fix folder:
@@ -489,7 +494,7 @@ rapport de l'agent relayé, et *What to run next* : `/7_lots`.
    rapport avant la phase 2 ; un appel qui rend un fichier de blocage
    n'arrête pas les autres. Les appels ne se heurtent pas : chacun écrit
    `investigation/<id>.md`, son fichier et aucun autre.
-5. Porte de la phase 2 — elle ne part que si chaque rapport existe. Un
+6. Porte de la phase 2 — elle ne part que si chaque rapport existe. Un
    blocage de phase 1 la retient : un manque dont l'investigation a
    bloqué n'a pas de rapport, et l'invocation 2 ne ferait que bloquer à
    son tour sur un fichier auquel aucune décision ne peut fournir un
@@ -497,9 +502,11 @@ rapport de l'agent relayé, et *What to run next* : `/7_lots`.
    résultats de la phase 1 — les appels qui ont rendu un fichier de
    blocage, et les manques sautés comme debout — et la commande
    s'arrête là.
-6. Avant d'envoyer la phase 2, `Glob` `desc-bug.md` dans le dossier :
-   il existe → la phase 2 n'est pas envoyée, le fichier est relayé
-   comme fait, et le pas suivant est `/7_lots`.
+   Cette porte vient après le commit et le worktree : elle lit les
+   résultats de la phase 1. Quand la phase 1 n'envoie rien, elle ne
+   repose que sur le tri, et aucune ligne de la commande ne referme
+   alors le worktree — le Git d'après le rapport part du dernier appel
+   envoyé.
 7. Phase 2 — un `Agent()`, une fois que chaque rapport existe et
    qu'aucun `desc-bug.md` n'existe : `subagent_type="diagnostiqueur"`,
    `model="sonnet"`, `description="assemble <feature>"`, prompt
@@ -520,7 +527,7 @@ rapport de l'agent relayé, et *What to run next* : `/7_lots`.
    Une décision remplie laissée au nom non numéroté renvoie le manque
    au run suivant, et `/audit_blocages` la liste comme encore ouverte.
 9. Git une fois le dernier appel envoyé rapporté — celui de la phase 2,
-   ou ceux de la phase 1 quand la phase 2 est retenue ou non envoyée —
+   ou ceux de la phase 1 quand la phase 2 est retenue —
    → MECANISMES §Git, après le rapport — les cinq pas ; jamais de
    `remove` forcé ; un `blocked_*.md` fusionne aussi.
 10. Relayer, → MECANISMES §Forme d'un relais : le rapport de l'agent et
@@ -589,7 +596,7 @@ this cycle »).
 **Ce qu'elle laisse manquant**
 
 - Aucun test de zéro entrée : `/7_lots` greppe `^### §` sur
-  `spec-technique.md` seul (`7_lots.md` L75) ; un `desc-bug.md` dont
+  `spec-technique.md` seul (`7_lots.md` L72) ; un `desc-bug.md` dont
   chaque manque est écarté a neuf sections vides et un `## Gaps set
   aside` plein, et rien dans `/7_lots` ne l'arrête avant le Cadreur.
 - Pas de `couverture.md`, pas de `tracabilite.md`, pas de
@@ -631,8 +638,8 @@ this cycle »).
   raison : un blocage de phase 1 coûtait deux décisions, dont une qui
   ne décidait rien (`docs/verification2/chemins-aval.md` F12 ;
   `docs/verification2/plans/conflits.md` 257) · inconnu
-- `Glob` `desc-bug.md` avant la phase 2 ; existant → non envoyée,
-  relayé comme fait · écartée : laisser l'agent bloquer sur le fichier
+- `Glob` `desc-bug.md` avant le commit et la phase 1 ; existant → rien
+  n'est envoyé, relayé comme fait · écartée : laisser l'agent bloquer sur le fichier
   existant · raison : un blocage qu'aucune décision ne lève — l'agent
   n'a aucun outil qui supprime, rien ne dit à l'orchestration de le
   faire (`docs/verification2/diagnostiqueur.md` F07, F16 ;

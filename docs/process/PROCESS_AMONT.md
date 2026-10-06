@@ -130,8 +130,8 @@ next*.
 
 **Étapes**
 
-1. Un `questions-lexicographe-NN.md` à la racine : `### Q` → arrêt, dire `/1_lexique` ; sans → `git mv` vers `questions/lexicographe/` (→ MECANISMES §Classement des fichiers de questions). La racine seule est gardée, jamais le dossier classé.
-2. `blocked_redacteur.md` : absent → continuer ; `## Invocation` 3 → arrêt, il est à `/fusion` ; 1 ou 2 et `## Decision` vide → arrêt ; 1 ou 2 et rempli → le nommer (→ MECANISMES §Valeurs de « ## Invocation » — qui a écrit ce fichier de blocage).
+1. Un `questions-lexicographe-NN.md` à la racine : `### Q` → arrêt, dire `/1_lexique`. La racine seule est gardée, jamais le dossier classé. Puis `blocked_redacteur.md` : absent → continuer ; `## Invocation` 3 → arrêt, il est à `/fusion` ; 1 ou 2 et `## Decision` vide → arrêt ; 1 ou 2 et rempli → le nommer (→ MECANISMES §Valeurs de « ## Invocation » — qui a écrit ce fichier de blocage). Ces deux tests passent avant tout geste sur le dépôt.
+2. Le fichier du lexicographe sans `### Q` → `git mv` vers `questions/lexicographe/` (→ MECANISMES §Classement des fichiers de questions). C'est le premier geste qui change le dépôt : les étapes 3 à 5 lisent la racine après ce classement, elles restent après lui, et aucune ligne ne défait le `git mv` quand elles s'arrêtent.
 3. Choisir l'invocation, première ligne qui correspond, `questions-architecte-*.md` compté dans aucune :
 
    | La racine tient | Invocation | Ce qu'on nomme |
@@ -146,7 +146,7 @@ next*.
 
 4. Invocation 1 exige un vocabulaire réglé : le plus haut `questions-lexicographe-NN.md`, racine ou classé, sans `### Q` ; aucun nulle part, ou des entrées → arrêt, dire `/1_lexique`.
 5. Une `Answer:` vide sans `Défaut:` → arrêt (→ MECANISMES §Test d'une question sans réponse).
-6. → MECANISMES §Git, avant l'invocation, `chore: answers`.
+6. → MECANISMES §Git, avant l'invocation, `chore: answers` — après tous les tests des étapes 1 à 5.
 7. Invoquer : `subagent_type="redacteur"`, `model="sonnet"`, `description="Structure <name>"` ; prompt `Feature folder: docs/features/<name>/.`, `Invocation <1 — Structuring | 2 — Integrating>.`, `Read: <idees.md | questions-<agent>-NN.md | blocked_<decoupeur|qualifieur|classeur>.md>.`, `<Plus: blocked_redacteur.md, its decision is filled.>`.
 8. Refaire les deux greps de marqueurs : les titres que le second ajoute sont ceux du run.
 9. Tester `code/decoupage.md` :
@@ -191,9 +191,9 @@ next*.
 
 1. Sans argument, demander et s'arrêter.
 2. `blocked_decoupeur.md` : absent → continuer ; `## Decision` vide → arrêt ; rempli → arrêt aussi, `/2_structure` doit tourner d'abord — le decoupeur ne voit jamais ce fichier, le prompt ne le nomme pas.
-3. Grep `Clarification needed` dans `desc-produit.md` : un hit → arrêt, les blocs nommés, `/2_structure` d'abord (→ MECANISMES §Marque Clarification needed).
-4. La garde `### Q` puis le classement de chaque `questions-*.md` de la racine, `questions-architecte-*.md` excepté (→ MECANISMES §Classement des fichiers de questions).
-5. `desc-produit.md` absent → arrêt : `/2_structure` n'a pas tourné.
+3. `desc-produit.md` absent → arrêt : `/2_structure` n'a pas tourné.
+4. Grep `Clarification needed` dans `desc-produit.md` : un hit → arrêt, les blocs nommés, `/2_structure` d'abord (→ MECANISMES §Marque Clarification needed).
+5. La garde `### Q` puis le classement de chaque `questions-*.md` de la racine, `questions-architecte-*.md` excepté (→ MECANISMES §Classement des fichiers de questions). Tous les tests sont passés : le classement est le premier geste qui change le dépôt.
 6. Quels blocs : aucun `questions-sondeur-*.md` nulle part → *every block*, ces mots dans le prompt ; sinon l'union des greps `^### .*NEW` et `^### .*MODIFIED`, jamais le fichier de questions. Aucun → invoquer personne, commiter ce que le classement a déplacé et pousser, sans worktree (→ MECANISMES §Commit sans worktree).
 7. → MECANISMES §Git, avant l'invocation, `chore: answers`.
 8. Invoquer : `subagent_type="decoupeur"`, `model="opus"`, `description="Split <name>"` ; prompt `The product file: docs/features/<name>/desc-produit.md.`, `Look at these blocks: <B7, B28 — ou : every block>.`
@@ -378,12 +378,12 @@ next*.
 
 1. Sans argument, demander et s'arrêter. `code/decoupage.md` existe → arrêt, un changement du produit appartient à un nouveau cycle. `par-genre/` absent, ou `desc-par-nature.md` absent → arrêt, `/5_reclasse`.
 2. Les fichiers de blocage, fichier par fichier : aucun → continuer ; un `## Decision` vide → arrêt, tous nommés ; remplis → chacun nommé dans le prompt de sa nature, `blocked_transversal.md` dans celui de l'invocation 2.
-3. Git avant : garde `### Q` et classement des `questions-*.md` de la racine (`questions-architecte-*.md` excepté) ; chaque `convertisseur/questions-*.md` du dernier run → `convertisseur/closed/questions-<nature>-NN.md`, numéro libre suivant ; jamais un `technique-*.md` ; `chore: answers` ; worktree depuis `HEAD` ; `convertisseur/closed/` créé dans le worktree.
+3. La garde `### Q` sur chaque `questions-*.md` de la racine, `questions-architecte-*.md` excepté : un fichier qui tient des questions → arrêt, le fichier nommé.
 4. Quelles natures tournent — pour chacune des huit, plusieurs lignes peuvent s'appliquer, la nature tourne une fois et son prompt porte la ligne de chaque ligne qui a matché :
 
    | Ce qu'on trouve | La nature |
    |---|---|
-   | sa part ne tient aucun bloc | ne tourne nulle part ; `<nature>.md`, `<nature>-input.md`, `<nature>-notes.md` supprimés ; sa section écrite vide |
+   | sa part ne tient aucun bloc | ne tourne nulle part ; `<nature>.md`, `<nature>-input.md`, `<nature>-notes.md` supprimés dans le worktree, plus bas ; sa section écrite vide |
    | sa part diffère de `convertisseur/<nature>-input.md`, ou ce fichier est absent | tourne |
    | `convertisseur/<nature>.md` absent, et sa part a changé | tourne |
    | `convertisseur/<nature>.md` porte `<<ASSUMED`, et sa part a changé | tourne |
@@ -393,7 +393,9 @@ next*.
    | `convertisseur/blocked_<nature>.md` porte un `## Decision` rempli | tourne |
    | rien de tout cela | gardée telle quelle |
 
-   Pour chaque nature qui tourne, copier sa part dans `convertisseur/<nature>-input.md`. Aucune nature ne tourne : `spec-technique.md` existe, ouvre sur `# Preamble`, sans `<<ASSUMED` ni `[B`, `tracabilite.md` là, aucun fichier de nature supprimé à l'instant, aucune nature en attente, `technique-transversal.md` absent ou avec `^Answer:\s*$`, `blocked_transversal.md` sans décision remplie → le document tient, aller à l'étape 11 ; sinon aller à l'assemblage (étape 6) — un `technique-transversal.md` répondu force l'assemblage et l'invocation 2, qui le nomme.
+   Aucune nature ne tourne : `spec-technique.md` existe, ouvre sur `# Preamble`, sans `<<ASSUMED` ni `[B`, `tracabilite.md` là, aucune nature qui ne tourne nulle part n'a de fichier à supprimer, aucune nature en attente, `technique-transversal.md` absent ou avec `^Answer:\s*$`, `blocked_transversal.md` sans décision remplie → le document tient : rien n'est classé, rien commité, aucun worktree, aller au relais (étape 13). Tous ces tests passent avant le premier geste sur le dépôt.
+
+   Puis Git avant : classement des `questions-*.md` de la racine (`questions-architecte-*.md` excepté) ; chaque `convertisseur/questions-*.md` du dernier run → `convertisseur/closed/questions-<nature>-NN.md`, numéro libre suivant ; jamais un `technique-*.md` ; `chore: answers` ; worktree depuis `HEAD` ; `convertisseur/closed/` créé dans le worktree. Dans le worktree, les fichiers des natures qui ne tournent nulle part sont supprimés, et la part de chaque nature qui tourne est copiée dans `convertisseur/<nature>-input.md`. Aucune nature ne tourne, et le document ne tient pas → l'assemblage (étape 6) — un `technique-transversal.md` répondu force l'assemblage et l'invocation 2, qui le nomme.
 5. Les invocations de nature, dans un seul message : `subagent_type="convertisseur"`, `model="opus"`, `description="Convert <name>, <nature>"`, prompt `Feature folder: docs/features/<name>/.`, `Invocation 1 — Nature: <nature>.`, `<Plus: convertisseur/technique-<nature>.md, its question is answered.>`, `<Plus: questions/convertisseur/questions-convertisseur-NN.md, its answers changed no block — the mark's answer is there.>`, `<Plus: convertisseur/blocked_<nature>.md, its decision is filled.>`. Attendre toutes. Puis un grep des `convertisseur/blocked_*.md` neufs non numérotés : chacun est bloqué, tous rapportés, aller à l'étape 11 — tout arrêt fusionne d'abord. Puis chaque nature a écrit `convertisseur/questions-<nature>.md`, et `<nature>-notes.md` quand elle a écrit sa section ; `technique-<nature>.md` n'est écrit que sur une question technique ; un fichier manquant arrête, la nature nommée.
 6. L'assemblage : chaque nature dont la part tient des blocs a son `convertisseur/<nature>.md`, et aucune n'attend → assembler `spec-technique.md` entier, les neuf sections dans l'ordre `## §1 Model` … `## §8 Access`, `## §9 Text`, chaque `§1`–`§8` copié par script de son fichier, une nature sans bloc et toujours `§9` en `*(empty)*`, jamais une section omise, pas de préambule ; sinon rien assemblé, `spec-technique.md` supprimé, invocation 2 sautée, aller à l'étape 10, la nature sans section ou en attente nommée.
 7. Les références à une cible : dans `spec-technique.md`, jamais dans les fichiers de nature, chaque `[B<n>: …]` dont la ligne `## Trace` du bloc, dans le `*-notes.md` qui la tient, porte une seule entrée → ce numéro à la place des crochets ; plusieurs, un tiret ou pas de ligne → laissé. Un `]` sur une autre ligne → faute du run, arrêt, fusion d'abord (→ MECANISMES §Marques <<ASSUMED et [B).
@@ -504,8 +506,8 @@ next*.
    | 11 | sinon | fusionneur, invocation 1 |
 
    Tout autre `blocked_*.md` à la racine arrête la marche, la commande à qui il est nommée — un `blocked_redacteur.md` à `## Invocation` 1 ou 2 est à `/2_structure`.
-3. La ligne 6 a tiré : `cp docs/features/<name>/desc-produit.md docs/features/<name>/desc-produit-fusion.md`, puis invoquer — dans cet ordre.
-4. Git avant : garde `### Q` sur les `questions-*.md` de la racine dont le préfixe n'est ni `fusionneur` ni `architecte` ; classement de chaque fichier dont le préfixe n'est pas celui de la phase qui va tourner, `questions-architecte-*.md` laissé, et de chaque fichier de ce préfixe sauf le plus haut, qui porte la numérotation ; sur une ligne Fusionneur, le numéro = le plus haut `questions-fusionneur-NN.md`, racine et `questions/fusionneur/` ensemble, plus un ; `chore: answers` ; worktree depuis `HEAD`.
+3. Une ligne qui invoque a tiré (3, ou 6 à 11) : d'abord la garde `### Q` sur les `questions-*.md` de la racine dont le préfixe n'est ni `fusionneur` ni `architecte` → un fichier qui tient des questions arrête, nommé — avant la copie de la ligne 6 et avant tout geste git. Puis, la ligne 6 a tiré : `cp docs/features/<name>/desc-produit.md docs/features/<name>/desc-produit-fusion.md`, puis invoquer — dans cet ordre.
+4. Git avant : classement de chaque fichier dont le préfixe n'est pas celui de la phase qui va tourner, `questions-architecte-*.md` laissé, et de chaque fichier de ce préfixe sauf le plus haut, qui porte la numérotation ; sur une ligne Fusionneur, le numéro = le plus haut `questions-fusionneur-NN.md`, racine et `questions/fusionneur/` ensemble, plus un ; `chore: answers` ; worktree depuis `HEAD`.
 5. Sur `INIT` : l'invocation 2 va tourner (ligne 10, ou 3 la nommant) et `plan-fusion.md` ne tient que le mot `INIT` → `cp docs/features/<name>/desc-produit-fusion.md docs/PRODUIT_GLOBAL.md` dans le worktree, avant d'invoquer ; tout autre plan, pas de copie.
 6. Invoquer : `subagent_type="<redacteur | fusionneur>"`, `model="sonnet"`, `description="<phase> <feature>"`, prompt `Feature folder: docs/features/<name>/. <Which invocation>.` puis `[Questions file number: <NN>.]` sur chaque Fusionneur, `[Decisions files, in cycle order: <path>, <path>.]` sur chaque Rédacteur (omise sans fichier de décisions), `[Blocking file: <folder>/blocked_<agent>.md, its ## Decision filled.]` sur la ligne 3.
 7. Le rapport dit une décision appliquée → `git mv <folder>/blocked_<agent>.md <folder>/blocked_<agent>-NN.md` dans le worktree.
@@ -528,7 +530,7 @@ next*.
 - Les lignes 2 et 3 sur les deux fichiers de blocage que la commande route, tout autre arrête · écartée : router tout `blocked_*.md` · raison : un blocage amont ne se règle jamais d'ici ; la ligne 3 nomme les fichiers de décisions comme la ligne 6 (`docs/verification3/plan.md` entrée 36) · inconnu.
 - Sur une première feature, l'invocation 3 écrit dans la copie, pas dans le global · écartée : sauter la ligne 8 ; réordonner la table · raison : une ligne dans le global ferait ne jamais tirer `INIT`, et la feature serait comparée phrase à phrase à un global presque vide ; sauter la ligne perdrait ce que la copie ne porte pas (`docs/verification3/plan.md` entrée 34, item E, Option 1) · inconnu.
 - Aucun run après la fusion ; s'il en faut un, la Product Owner restaure l'ancien global à la main et met de côté le rapport, le plan et les fichiers de questions · écartée : une relance sur un `bugfix-NN` plus récent que le rapport · raison : la comparaison attend un global que la feature n'a pas encore atteint, et tournerait contre sa propre fusion (`docs/verification3/plan.md` entrée 35, item F, Option 1 ; `/fusion`) · inconnu.
-- La garde `### Q` ouvre le classement, les préfixes `fusionneur` et `architecte` exceptés · écartée : classer sans garde · raison : `docs/verification4/plan.md` entrée 32 · non éprouvée.
+- La garde `### Q` passe avant la copie de la ligne 6 et avant le classement, les préfixes `fusionneur` et `architecte` exceptés · écartée : classer sans garde ; la garde après la copie · raison : `docs/verification4/plan.md` entrée 32 ; un arrêt sur la garde laissait la copie, et la ligne 6, qui teste son absence, ne tirait plus jamais (`tools/cockpit/scan_rules.md` §2) · non éprouvée.
 - Le plus haut `questions-fusionneur-NN.md` reste à la racine · écartée : le classer · raison : il porte la numérotation (`/fusion`) · inconnu.
 
 ## /fusion_compare

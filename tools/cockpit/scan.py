@@ -30,7 +30,7 @@ NATURES = ["model", "persistence", "calculation", "transition", "external exchan
            "synchronisation", "presentation", "access"]
 GENRE_FILES = ["comportements", "transverses", "directives", "references", "hors-perimetre", "recette"]
 # The turn order of the agents that leave their questions file at the root
-# (cmd/3_decoupe.md:62-65, cmd/3a_genre.md:72-75, cmd/3b_nature.md:~67,
+# (cmd/3_decoupe.md:66-69, cmd/3a_genre.md:72-75, cmd/3b_nature.md:~67,
 # cmd/4_grille.md:266-269 each file every root file before writing).
 # The agent's own file, or a later one, at the root: the step ran on this
 # turn. An earlier one: it has not.
@@ -82,22 +82,14 @@ for _s in MAIN + CORRECTION:
 # an agent: clicking them in the wrong state is not harmless, so the flow
 # always asks. The reasons are scan_rules.md's « Préconditions » table.
 CONFIRM = {
-    "2_structure": "elle range le fichier du lexicographe par git mv (2_structure.md:108-112) avant ses tests "
-                   "d'arrêt (:135-203), et sa section Git — commit :68, worktree :80 — est écrite avant ces tests",
-    "3_decoupe": "elle range les fichiers de questions par git mv (3_decoupe.md:62-65) avant de tester "
-                 "desc-produit.md (:83-85)",
-    "6_convertit": "elle commite et crée le worktree (6_convertit.md:114, :124) avant de savoir s'il y a "
-                   "quelque chose à écrire (:179-184)",
-    "7_lots": "elle range et commite (7_lots.md:56-71) avant son seul test (:75-81), et produit un découpage "
-              "dans tous les états sauf un (:111-112)",
-    "8_code": "elle commite et crée le worktree (8_code.md:108, :114) avant de tester les fichiers de blocage "
-              "(:313-320, :367)",
-    "9_controle": "elle commite et crée le worktree (9_controle.md:100, :106) avant de tester tracabilite.md "
-                  "(:123-125) et la carte des lots (:227)",
-    "fusion": "elle copie desc-produit-fusion.md (fusion.md:116-117) avant le test des questions à la racine "
-              "(:141-145) — et la copie empêche ensuite sa ligne 6",
-    "diagnostique": "elle commite et crée le worktree (diagnostique.md:62, :72) avant de trier les écarts "
-                    "(:91-98) et de tester desc-bug.md (:139-140)",
+    "2_structure": "elle range le fichier du lexicographe par git mv (2_structure.md:89-93) avant le tableau qui "
+                   "choisit l'invocation (:110-120), le vocabulaire (:135-139) et les réponses (:167-169) : ils lisent "
+                   "la racine après ce rangement, et aucune ligne ne défait le git mv quand ils arrêtent",
+    "9_controle": "elle commite et crée le worktree (9_controle.md:104, :110) avant le contrôle de la carte des lots "
+                  "(:225-228), qui lit ce que la phase 1 écrit — et sa section Git ne part qu'une fois la phase 6 "
+                  "écrite (:449-450)",
+    "diagnostique": "elle commite et crée le worktree (diagnostique.md:86, :96) avant de retenir la phase 2 "
+                    "(:142-147) — quand la phase 1 n'émet rien, aucune ligne ne referme le worktree (:184-185)",
 }
 
 # Every rule the scan applies, with the lines it comes from. scan_rules.md
@@ -105,7 +97,7 @@ CONFIRM = {
 # and checks that each cited line still says what the rule reads in it.
 RULES = {
     "G-ATT": "« À qui est une réponse » : la commande nommée après « answer …, then run »",
-    "G-AMONT": "6_convertit.md:35-38 · 2_structure.md:244-251",
+    "G-AMONT": "6_convertit.md:35-38 · 2_structure.md:248-255",
     "G-AVAL": "§1.3 de la demande : « nothing upstream changed it since »",
     "G-BUGFIX": "7_lots.md:18-19 · 8_code.md:25-26 · 9_controle.md:20-21 · 9_controle.md:510-511",
     "G-WT": "1_lexique.md:138-140 — git worktree add .claude/worktrees/<name>, dans chaque commande à agent",
@@ -117,23 +109,23 @@ RULES = {
     "X-AMONT": "§2 : une étape avant X t'attend",
     "OWN-Q": "1_lexique.md:77-78",
     "OWN-LEX": "1_lexique.md:41",
-    "OWN-RED1": "2_structure.md:136",
+    "OWN-RED1": "2_structure.md:81",
     "OWN-RE3": "fusion.md:57",
     "OWN-DEC": "3_decoupe.md:39",
     "OWN-GEN": "3a_genre.md:39",
     "OWN-NAT": "3b_nature.md:38",
     "OWN-GRI": "4_grille.md:47-61",
-    "OWN-TEC": "6_convertit.md:463 · 6_convertit.md:465",
+    "OWN-TEC": "6_convertit.md:467 · 6_convertit.md:469",
     "OWN-CNV": "6_convertit.md:56",
     "OWN-ARC": "conventions.md:82",
     "OWN-ARB": "conventions.md:78",
-    "OWN-AR3": "8_code.md:313-319",
-    "OWN-CAD": "7_lots.md:192",
-    "OWN-RED": "7_lots.md:358-359",
-    "OWN-COD": "8_code.md:319-320 · 8_code.md:744",
+    "OWN-AR3": "8_code.md:327-333",
+    "OWN-CAD": "7_lots.md:212",
+    "OWN-RED": "7_lots.md:378-379",
+    "OWN-COD": "8_code.md:333-334 · 8_code.md:751",
     "OWN-FUS": "fusion.md:60",
     "OWN-FUB": "fusion.md:57",
-    "OWN-DIA": "diagnostique.md:226 · diagnostique.md:236",
+    "OWN-DIA": "diagnostique.md:231 · diagnostique.md:241",
     "OWN-?": "aucune commande ne nomme ce fichier",
     "LEX-1": "1_lexique.md:93-104",
     "LEX-2": "1_lexique.md:56",
@@ -144,45 +136,45 @@ RULES = {
     "LEX-7": "1_lexique.md:59",
     "LEX-8": "1_lexique.md:61",
     "LEX-9": "1_lexique.md:62",
-    "STR-1": "2_structure.md:97-106",
-    "STR-2": "2_structure.md:137",
-    "STR-3": "2_structure.md:149",
-    "STR-4": "2_structure.md:148",
-    "STR-5": "2_structure.md:150",
-    "STR-6": "2_structure.md:152",
-    "STR-7": "2_structure.md:153",
-    "STR-8": "2_structure.md:154",
-    "STR-9": "2_structure.md:154",
+    "STR-1": "2_structure.md:63-72",
+    "STR-2": "2_structure.md:82",
+    "STR-3": "2_structure.md:115",
+    "STR-4": "2_structure.md:114",
+    "STR-5": "2_structure.md:116",
+    "STR-6": "2_structure.md:118",
+    "STR-7": "2_structure.md:119",
+    "STR-8": "2_structure.md:120",
+    "STR-9": "2_structure.md:120",
     "DEC-0": "3_decoupe.md:39-40",
-    "DEC-1": "3_decoupe.md:47-51",
-    "DEC-2": "3_decoupe.md:53-57",
-    "DEC-3": "3_decoupe.md:83-85",
+    "DEC-1": "3_decoupe.md:51-55",
+    "DEC-2": "3_decoupe.md:57-61",
+    "DEC-3": "3_decoupe.md:47-49",
     "DEC-4": "3_decoupe.md:87-90 · 3_decoupe.md:113-115",
-    "DEC-5": "3_decoupe.md:62-65 · 3a_genre.md:72-75 · 3b_nature.md:71-75 · 4_grille.md:266-269",
-    "DEC-6": "3_decoupe.md:62-65",
-    "DEC-7": "3_decoupe.md:62-65 · agents/redacteur.md:275",
+    "DEC-5": "3_decoupe.md:66-69 · 3a_genre.md:72-75 · 3b_nature.md:71-75 · 4_grille.md:266-269",
+    "DEC-6": "3_decoupe.md:66-69",
+    "DEC-7": "3_decoupe.md:66-69 · agents/redacteur.md:275",
     "DEC-9": "aucune règle : le fichier d'un agent hors du tour",
     "GEN-1": "3a_genre.md:49-53",
     "GEN-2": "3a_genre.md:55-58",
-    "GEN-3": "3a_genre.md:109-115 · 2_structure.md:153",
+    "GEN-3": "3a_genre.md:109-115 · 2_structure.md:119",
     "GEN-4": "3a_genre.md:127-130",
     "GEN-5": "3b_nature.md:71-75 · 4_grille.md:266-269 · agents/qualifieur.md:3",
-    "GEN-6": "3_decoupe.md:62-65",
-    "GEN-7": "3_decoupe.md:62-65",
+    "GEN-6": "3_decoupe.md:66-69",
+    "GEN-7": "3_decoupe.md:66-69",
     "GEN-8": "3a_genre.md:114",
     "GEN-9": "aucune règle : le fichier d'un agent hors du tour",
     "GEN-10": "3a_genre.md:117-120 · 3a_genre.md:40",
     "NAT-1": "3b_nature.md:48-51",
     "NAT-2": "3b_nature.md:54-57",
-    "NAT-3": "3b_nature.md:113 · 2_structure.md:153",
+    "NAT-3": "3b_nature.md:113 · 2_structure.md:119",
     "NAT-4": "3b_nature.md:129-130",
     "NAT-5": "4_grille.md:266-269 · agents/classeur.md:3",
     "NAT-6": "3a_genre.md:72-75",
-    "NAT-7": "3_decoupe.md:62-65",
+    "NAT-7": "3_decoupe.md:66-69",
     "NAT-8": "3b_nature.md:113-115",
     "NAT-9": "aucune règle : le fichier d'un agent hors du tour",
     "NAT-10": "3b_nature.md:118 · 3b_nature.md:38-40",
-    "GRI-0": "4_grille.md:126-132 · 2_structure.md:153",
+    "GRI-0": "4_grille.md:126-132 · 2_structure.md:119",
     "GRI-1": "4_grille.md:81-85",
     "GRI-2": "4_grille.md:94-98",
     "GRI-4": "5_reclasse.md:50-68 · 4_grille.md:356-357",
@@ -196,10 +188,10 @@ RULES = {
     "REC-6": "5_reclasse.md:136-139 · 5_reclasse.md:149-152",
     "REC-7": "5_reclasse.md:119-139 · 5_reclasse.md:158",
     "CNV-2": "6_convertit.md:41-46",
-    "CNV-3": "6_convertit.md:66-70",
-    "CNV-4": "6_convertit.md:146-156",
-    "CNV-5": "6_convertit.md:179-183",
-    "CNV-6": "6_convertit.md:184",
+    "CNV-3": "6_convertit.md:62-66",
+    "CNV-4": "6_convertit.md:85-95",
+    "CNV-5": "6_convertit.md:114-118",
+    "CNV-6": "6_convertit.md:119",
     "CON-1": "conventions.md:63-64",
     "CON-2": "conventions.md:79",
     "CON-3": "conventions.md:80",
@@ -207,18 +199,18 @@ RULES = {
     "CON-5": "conventions.md:84",
     "CON-6": "conventions.md:85",
     "CON-7": "conventions.md:86-88",
-    "LOT-1": "7_lots.md:22-23",
-    "LOT-2": "7_lots.md:75-81",
-    "LOT-3": "7_lots.md:187",
-    "LOT-4": "7_lots.md:123",
-    "LOT-5": "7_lots.md:120",
-    "LOT-6": "7_lots.md:221-230",
-    "LOT-7": "7_lots.md:188",
-    "LOT-8": "8_code.md:92-93 · 7_lots.md:122",
-    "LOT-9": "7_lots.md:121",
+    "LOT-1": "7_lots.md:22-23 · 7_lots.md:58-66",
+    "LOT-2": "7_lots.md:72-78",
+    "LOT-3": "7_lots.md:207",
+    "LOT-4": "7_lots.md:143",
+    "LOT-5": "7_lots.md:140",
+    "LOT-6": "7_lots.md:241-250",
+    "LOT-7": "7_lots.md:208",
+    "LOT-8": "8_code.md:92-93 · 7_lots.md:142",
+    "LOT-9": "7_lots.md:141",
     "COD-1": "8_code.md:80-83",
     "COD-2": "8_code.md:92-100",
-    "COD-3": "8_code.md:283-285",
+    "COD-3": "8_code.md:297-299",
     "COD-5": "8_code.md:85-87",
     "COD-6": "8_code.md:80-83",
     "CTL-1": "9_controle.md:75-77",
@@ -232,8 +224,8 @@ RULES = {
     "FUS-2": "fusion.md:59",
     "FUS-3": "fusion.md:61-66",
     "DIA-1": "diagnostique.md:21-25",
-    "DIA-2": "diagnostique.md:139-140 · diagnostique.md:221",
-    "DIA-3": "diagnostique.md:91-98",
+    "DIA-2": "diagnostique.md:75-77 · diagnostique.md:226",
+    "DIA-3": "diagnostique.md:60-67",
 }
 
 
@@ -417,7 +409,7 @@ def section(lines, title):
 
 
 def decision_filled(lines):
-    """Every `## Decision` filled, by `grep -A2` (cmd/2_structure.md:185-187)."""
+    """Every `## Decision` filled, by `grep -A2` (cmd/2_structure.md:151-153)."""
     idx = [i for i, l in enumerate(lines) if l == "## Decision"]
     return bool(idx) and not any(blocking.decision_empty_a2(lines, i) for i in idx)
 
@@ -978,7 +970,7 @@ def first_after(lines, heading):
 
 def pending_requests(W: Folder):
     """A request in `architecte/` with an empty `## Verdict`, or none at all
-    (cmd/conventions.md:80, cmd/7_lots.md:209-214). A file holding several
+    (cmd/conventions.md:80, cmd/7_lots.md:229-234). A file holding several
     `# Request N` is read request by request."""
     out = []
     d = W.p("architecte")

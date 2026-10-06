@@ -41,13 +41,45 @@ revient` and `## Ce que j'en fais` sections alone**, to relay them. 📌
 the lots. ⚠️ **Never a lot's content.**
 
 **`spec-technique.md`** — 🔴 **a grep of `^### §` alone**, to count the
-entries — see *Git, before invoking*. ⚠️ **Never an entry's content.**
+entries — see *Before anything else*. ⚠️ **Never an entry's content.**
+📌 **Its existence, or `desc-bug.md`'s in a `bugfix-NN/`**, by glob —
+the same section.
 
 📌 **Each agent declares its own inputs**; you pass the feature folder
 and nothing else.
 
 `CLAUDE.md`'s standing reading rules apply: never open
 `CURRENT_TECHNICAL_STATE.md`.
+
+---
+
+## Before anything else
+
+🔴 **First, the technical document has to be there** — 📌 **the one
+the Cadreur cuts, and the one grep below reads**: `spec-technique.md`
+in the feature folder, `desc-bug.md` in a `bugfix-NN/`. 📌 **One
+glob** — ⚠️ **absent, you stop and name the file**:
+
+| Absent | `Next:` |
+|---|---|
+| `spec-technique.md` | `Next: stop spec-technique.md missing` — as `/conventions` says it |
+| `desc-bug.md` | `/diagnostique` writes it, at its phase 2 — `Next: run /diagnostique <name>` |
+
+📌 **`code/sequence.md`, `code/decoupage.md` and `code/redecoupage.md`
+are not tested** — ⚠️ **their absence is a state the Cadreur reads**, a
+first split among them.
+
+🔴 **Then, when the document is `spec-technique.md`, grep `^### §` in
+it.** 📌 **No hit — every section holds `*(empty)*`** → ⚠️ **the feature
+has nothing to build**: 🔴 **cut no split, create no worktree, invoke
+nothing, name no next command.** 📌 **Say where its content lives** —
+`par-genre/recette.md` at the feature folder's root, and the preamble's
+`## Cross-cutting rules` in the technical document — **then `/fusion`** —
+`Next: run /fusion <name>`.
+⚠️ **Accepted cost: `/9_controle` does not run, so
+`code/recette-ordonnee.md` is never written** — the recette stays
+readable in `par-genre/recette.md`; ordering it against zero lots means
+nothing.
 
 ---
 
@@ -71,18 +103,6 @@ it.**
     git add docs/features/<name>/ && git commit -m "chore: pre-split"
 
 📌 **Nothing to commit is a normal outcome** — carry on.
-
-🔴 **Then, when the document is `spec-technique.md`, grep `^### §` in
-it.** 📌 **No hit — every section holds `*(empty)*`** → ⚠️ **the feature
-has nothing to build**: 🔴 **cut no split, create no worktree, invoke
-nothing, name no next command.** 📌 **Say where its content lives** —
-`par-genre/recette.md` at the feature folder's root, and the preamble's
-`## Cross-cutting rules` in the technical document — **then `/fusion`** —
-`Next: run /fusion <name>`.
-⚠️ **Accepted cost: `/9_controle` does not run, so
-`code/recette-ordonnee.md` is never written** — the recette stays
-readable in `par-genre/recette.md`; ordering it against zero lots means
-nothing.
 
 🔴 **Then create a worktree from local `HEAD`, and register it:**
 

@@ -130,9 +130,13 @@ def test_a_step_off_the_proposal_or_flagged_asks_first(tmp_path, page):
         page.wait_for_timeout(200)
         assert len(asked) == 1 and "ni l'étape que la chaîne a nommée, ni celle que le dossier propose" in asked[0]
         # Flagged by §1.2: always asks, with the reason.
+        page.locator("#step-main-9_controle").get_by_role("button", name="Lancer").click()
+        page.wait_for_timeout(200)
+        assert "demande toujours confirmation" in asked[1] and "9_controle.md:104" in asked[1]
+        # /7_lots now tests before it acts: off the proposal it asks, but not as flagged.
         page.locator("#step-main-7_lots").get_by_role("button", name="Lancer").click()
         page.wait_for_timeout(200)
-        assert "demande toujours confirmation" in asked[1] and "7_lots.md:56-71" in asked[1]
+        assert "demande toujours confirmation" not in asked[2]
         assert s.clients == []
         off()
 
@@ -143,9 +147,24 @@ def test_a_step_off_the_proposal_or_flagged_asks_first(tmp_path, page):
         asked, _ = dialogs(page, accept=True)
         page.locator("#step-main-3_decoupe").get_by_role("button", name="Lancer").click()
         page.wait_for_selector("#slot-main-3_decoupe #run-panel")
-        # …and still asks: its git mv comes before one of its tests.
-        assert len(asked) == 1 and "demande toujours confirmation" in asked[0] and "ni l'étape" not in asked[0]
+        # …and no longer asks: every test of /3_decoupe now comes before its git mv.
+        assert asked == []
         assert s.clients[0].prompts == ["/3_decoupe t"]
+        stop_run(s)
+
+    with FakeServer(tmp_path / "c", script=script_until_interrupted) as s:
+        feat = add_turn_feature(s.app_root, "t")
+        (feat / "blocked_redacteur.md").write_text(
+            "## Invocation\n\n2\n\n## Blocking 1\n\n## What blocks\n\nx\n\n## Decision\n\nRéécrire B1.\n",
+            encoding="utf-8")                                           # /2_structure is the proposal…
+        open_feature(s, page, "t")
+        assert page.locator("li.step.is-next").get_attribute("id") == "step-main-2_structure"
+        asked, _ = dialogs(page, accept=True)
+        page.locator("#step-main-2_structure").get_by_role("button", name="Lancer").click()
+        page.wait_for_selector("#slot-main-2_structure #run-panel")
+        # …and still asks: its root table reads the root after its git mv.
+        assert len(asked) == 1 and "demande toujours confirmation" in asked[0] and "ni l'étape" not in asked[0]
+        assert s.clients[0].prompts == ["/2_structure t"]
         stop_run(s)
 
 
@@ -161,7 +180,8 @@ def test_the_next_lines_own_arguments_are_used(tmp_path, page):
         asked, _ = dialogs(page, accept=True)
         page.locator("#step-bugfix-01-8_code").get_by_role("button", name="Lancer").click()
         page.wait_for_selector("#slot-bugfix-01-8_code #run-panel")
-        assert "Lancer /8_code f 3 ?" in asked[0]
+        # The step the chain named, and /8_code tests before it acts: no question asked.
+        assert asked == []
         assert s.clients[0].prompts == ["/8_code f 3"]
         stop_run(s)
 
