@@ -406,8 +406,8 @@ tool calls, then `/usage` (Claude Code 2.1.285, `claude-agent-sdk`
   with `forward_subagent_text`**: without it a subagent message holding no
   tool call never reaches the stream — the nested agent of the first
   session was missing whole. The runner turns it on.
-- **Output tokens, per agent: not in the stream** — and, since 1.4.1,
-  read from the transcripts below.
+- **Output tokens, per agent: not in the stream** — since 1.4.3, read
+  from `model_usage`, one model per consumer, below.
   - per-step `output_tokens` is a placeholder (« Per-step `output_tokens`
     is a placeholder », Agent SDK, *Track cost and usage*) — seen: 1, 3, 6
     on messages that wrote 51 to 202;
@@ -419,20 +419,30 @@ tool calls, then `/usage` (Claude Code 2.1.285, `claude-agent-sdk`
     session only: `StreamEvent.parent_tool_use_id` is « Always `None`.
     Stream events are emitted for the main session only » (Python SDK
     reference) — seen: none for either subagent.
-- **Output tokens, per agent, from the transcripts (1.4.1).** Claude
-  Code writes the session under `<config>/projects/<folder>/`:
-  `<session_id>.jsonl`, and `<session_id>/subagents/agent-<id>.jsonl` with
-  `agent-<id>.meta.json`. `<folder>` is the working directory flattened —
-  the worktree's, when the orchestrator entered one — so the session is
-  found by its id in every folder. A message is written once per content
-  block, one `message.id`; its `usage.output_tokens` is the final count on
-  the last line of that id (the outer agent's first message: 3, then 197).
-  A subagent's `meta.json` carries `toolUseId`, the Agent call that
-  started it. On the probe: main 335, outer 421, inner 61 — 817, the
-  result's `model_usage` output exactly. **Kept only when that sum is
-  exact; a transcript missing, or a sum that differs, leaves every
-  output of the run unknown.** Read once the run is over, `/usage`
-  included; read only.
+- **Not from the transcripts (removed in 1.4.3).** 1.4.1 read each
+  subagent's output from the transcripts Claude Code keeps, all or none
+  against `model_usage`. On the first real run from the cockpit
+  (`/1_lexique premiere-app-3`, `tools/cockpit/logs/2026-10-06-111521-1_lexique.jsonl`)
+  the check refused the figures, as meant: the subagent's transcript kept
+  the placeholder on the last line of 7 of its 11 messages, and its sum
+  fell 28 689 short. A subagent's transcript is not a reliable source.
+- **Output tokens, per agent, by model (1.4.3).** The final result's
+  `model_usage` gives the exact output per model. A pass's output is its
+  model's `outputTokens` **only if** that model's `inputTokens`,
+  `cacheReadInputTokens` and `cacheCreationInputTokens` equal **exactly**
+  the pass's own deduplicated sums from the stream, and no other pass ran
+  on that model — the proof that nothing else (the orchestrator, another
+  agent, an internal call of Claude Code) used it in the run. Otherwise
+  unknown: no subtraction, no estimate. On that run: Opus in 22, cache
+  read 975 519, cache creation 137 769 — the lexicographe's sums exactly
+  — so its output is Opus's, 58 759. The orchestrator's own sums are
+  Sonnet's (28 · 529 616 · 50 115). Two agents on one model, as the
+  Cadreur and the Vérificateur, are both unknown. `model_usage` is
+  cumulative over the session: that run has two results (the orchestrator
+  waited for its background agent), the first with Sonnet alone
+  (16 · 288 241 · 45 575, 1 566 written), the second with both and
+  Sonnet's grown to the figures above. A resumed session's earlier spend
+  therefore breaks the equality, and its passes stay unknown.
 - **Run totals:** the latest result's `model_usage`, which counts
   subagents (« Use `modelUsage`… for whole-tree token accounting; the
   `usage` field undercounts as soon as nesting occurs »). A resumed
@@ -459,19 +469,24 @@ tool calls, then `/usage` (Claude Code 2.1.285, `claude-agent-sdk`
 
 - Every log line carries `at`, the time the message was received.
 - `tools/cockpit/stats.sqlite` (`sqlite3`, ignored by git): `runs`,
-  `agent_passes`, `rate_limits`. A subagent's `output_tokens` is the
-  transcripts' figure, or NULL — unknown —, never the placeholder.
+  `agent_passes`, `rate_limits`. A subagent's `output_tokens` is its
+  model's figure, or NULL — unknown —, never the placeholder.
 - The runs already stored get their agents' output at the server's
-  start, from each run's log and the transcripts still on disk, all or
-  none (1.4.1).
+  start, from the `model_usage` of each run's log (1.4.3).
 - The logs written since 1.1 are loaded at the server's start, once each
   (by path), marked `backfilled`. They carry `at` on every line since
   1.1, so their durations are known; a log without it would leave them
   unknown.
 - Dashboard: two gauges — percent used, left, the reset, and « mesuré il
   y a … ». A measure whose window has reset since is shown as such, never
-  as current. Under the run: one line per agent that hands back, the
-  run's totals at its end. Tokens and time only.
+  as current. Under the run: one line per agent that hands back —
+  « écrits : à la fin du run », its output being known only then — and,
+  at its end, the run's totals and each agent's line with its figure or
+  « inconnu ». Tokens and time only.
+- `/2_structure` no longer asks for confirmation when proposed (1.4.3):
+  its three stops after the filing leave only the lexicographe's empty
+  file filed, a state the next command reads correctly
+  (`scan_rules.md` §2).
 
 ## 14. « À répondre » beside its document (1.4)
 

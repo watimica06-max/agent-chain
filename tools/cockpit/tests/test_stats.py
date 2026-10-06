@@ -1,5 +1,5 @@
-"""Cockpit 1.4, 1.4.1 — recording consumption (stats.py, transcripts.py,
-runner.py). The SDK client is a fake; no chain command runs."""
+"""Cockpit 1.4, 1.4.1, 1.4.3 — recording consumption (stats.py, runner.py).
+The SDK client is a fake; no chain command runs."""
 import asyncio
 import json
 import os
@@ -13,16 +13,14 @@ from claude_agent_sdk import (AssistantMessage, RateLimitEvent, RateLimitInfo, R
 
 import runner as runner_mod
 import stats
-import transcripts
 from test_runner import FakeClient
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROBE_LOG = os.path.join(HERE, "fixtures", "logs", "2026-10-06-094500-probe.jsonl")
-# The same probe session's transcripts, as Claude Code wrote them, reduced to
-# the assistant lines and the fields the reader uses (no content, no path).
-PROBE_PROJECT = os.path.join(HERE, "fixtures", "transcripts", "projects", "C--Users-po-AppData-Local-Temp-claude-probe")
-PROBE_SESSION = "44f59bf6-f444-4325-9543-4863b5748c86"
-OUTER, INNER = "toolu_01LHw8SencGzgiSxdUFg9Tqw", "toolu_01N3eEBaW6MaxDiDw9LUcBfW"
+# The first real run from the cockpit: /1_lexique premiere-app-3, the
+# lexicographe (Opus) in the background, the orchestrator on Sonnet.
+LEXIQUE_LOG = os.path.join(HERE, "fixtures", "logs", "2026-10-06-111521-1_lexique.jsonl")
+LEXICOGRAPHE = "toolu_014AQLWfFzCFr7tnqkCwpgYf"
 
 # A placeholder output count, as the CLI sends it on every assistant message.
 PLACEHOLDER = 7
@@ -92,7 +90,7 @@ async def two_agents(c):
                                                         "cacheReadInputTokens": 0, "cacheCreationInputTokens": 0}})
 
 
-def run_with(tmp_path, script, measure=False, resume=None, transcripts_root=None):
+def run_with(tmp_path, script, measure=False, resume=None):
     store = stats.Store(str(tmp_path / "stats.sqlite"))
     made = []
 
@@ -102,7 +100,7 @@ def run_with(tmp_path, script, measure=False, resume=None, transcripts_root=None
         return c
 
     rn = runner_mod.Runner(client_factory=factory, log_dir=str(tmp_path / "logs"), stats=store,
-                           measure_limits=measure, transcripts_root=transcripts_root)
+                           measure_limits=measure)
 
     async def go():
         q = rn.subscribe(str(tmp_path))
@@ -133,9 +131,11 @@ def test_per_agent_figures_nested_and_deduplicated(tmp_path):
     assert pong["parent_tool_use_id"] == "A" and lex["parent_tool_use_id"] is None
     assert lex["tool_calls"] == 3 and pong["tool_calls"] == 0        # two Glob + one Agent
     assert pong["model"] == "claude-haiku-x"
-    # The placeholder is never stored: a subagent's output is unknown.
-    assert lex["output_tokens"] is None and pong["output_tokens"] is None
-    assert all(r["output_tokens"] is None for r in rows(store, "SELECT output_tokens FROM agent_passes"))
+    # The placeholder (7) is never stored. Pong alone used Haiku, and its sums
+    # equal Haiku's model_usage: Haiku's output is its own. The lexicographe
+    # shares Opus with the orchestrator: unknown.
+    assert pong["output_tokens"] == 68 and lex["output_tokens"] is None
+    assert {p["agent"]: p["output_tokens"] for p in run.snapshot()["passes"]} == {"lexicographe": None, "pong": 68}
     # Times: from the Agent call to its result (the background one: its notification).
     assert lex["started_at"] and lex["ended_at"] and lex["duration_s"] is not None
     assert pong["ended_at"] <= lex["ended_at"]
@@ -269,6 +269,7 @@ def test_backfill_of_a_real_log(tmp_path):
     assert passes["inner"]["input_tokens"] == 1600 and passes["inner"]["parent_tool_use_id"] == passes["outer"]["tool_use_id"]
     # Input + every pass + the orchestrator's own (28) = the result's input.
     assert passes["outer"]["input_tokens"] + passes["inner"]["input_tokens"] + 28 == r["input_tokens"]
+    # Both agents on Haiku, with the orchestrator: neither gets a figure.
     assert all(p["output_tokens"] is None and p["backfilled"] == 1 for p in passes.values())
     # This log carries a receive time on every line: its durations are known.
     assert passes["inner"]["duration_s"] is not None and r["duration_s"] is not None
@@ -293,18 +294,11 @@ def test_backfill_without_receive_times_leaves_durations_unknown(tmp_path):
     assert all(p["duration_s"] is None for p in rows(store, "SELECT * FROM agent_passes"))
 
 
-# --------------------------------------------- output per agent (1.4.1)
+# ------------------------------------- output per agent, by model (1.4.3)
 
-def probe_config(tmp_path, folder="C--Users-po-AppData-Local-Temp-claude-probe"):
-    """A Claude Code config folder holding the probe session under `folder`."""
-    root = tmp_path / "claude-config"
-    shutil.copytree(PROBE_PROJECT, root / "projects" / folder)
-    return root
-
-
-def probe_tally():
+def log_tally(path):
     t = stats.Tally()
-    with open(PROBE_LOG, encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         for line in f:
             d = json.loads(line)
             if not d.get("probe"):
@@ -312,106 +306,78 @@ def probe_tally():
     return t
 
 
-def test_the_probes_transcripts_add_up_to_its_model_usage(tmp_path):
-    root = probe_config(tmp_path)
-    t = probe_tally()
-    assert t.session_id == PROBE_SESSION and set(t.passes) == {OUTER, INNER}
-    assert stats.apply_transcripts(t, str(root))
-    assert (t.passes[OUTER].output_tokens, t.passes[INNER].output_tokens) == (421, 61)
-    # The orchestrator's own, from the main transcript: 151 + 122 + 62.
-    f = transcripts.find(PROBE_SESSION, str(root))
-    assert sum(transcripts.outputs(f["main"][0], sidechain=False).values()) == 335
-    assert 335 + 421 + 61 == t.totals["output_tokens"] == 817
-    # Each subagent transcript is mapped by the toolUseId its meta.json names.
-    assert set(f["agents"]) == {OUTER, INNER} and f["unnamed"] == []
-    # The last line of a message id: the outer agent's first message is
-    # written 3, then 197 (its thinking, then its tool call).
-    assert transcripts.outputs(f["agents"][OUTER])["msg_011Cfk8uNQABExPYTGcQ3kAe"] == 197
+def test_the_real_runs_lexicographe_gets_its_models_output():
+    t = log_tally(LEXIQUE_LOG)
+    lex = t.passes[LEXICOGRAPHE]
+    assert lex.agent == "lexicographe" and lex.model == "claude-opus-5-5" and len(t.passes) == 1
+    # Its deduplicated sums from the stream equal Opus's in model_usage exactly.
+    opus = t.model_usage["claude-opus-5-5"]
+    assert (lex.input_tokens, lex.cache_read_tokens, lex.cache_creation_tokens) == (22, 975519, 137769) ==         (opus["inputTokens"], opus["cacheReadInputTokens"], opus["cacheCreationInputTokens"])
+    assert stats.apply_model_usage(t) == 1
+    assert lex.output_tokens == 58759
+    # The orchestrator's own sums are Sonnet's, which no pass claims.
+    son = t.model_usage["claude-sonnet-5-5"]
+    assert (t.orchestrator["input_tokens"], t.orchestrator["cache_read_tokens"],
+            t.orchestrator["cache_creation_tokens"]) == (son["inputTokens"], son["cacheReadInputTokens"],
+                                                         son["cacheCreationInputTokens"])
 
 
-def test_a_sum_that_does_not_match_leaves_every_figure_unknown(tmp_path):
-    root = probe_config(tmp_path)
-    t = probe_tally()
-    t.totals["output_tokens"] = 816
-    assert not stats.apply_transcripts(t, str(root))
-    assert all(p.output_tokens is None for p in t.passes.values())
-
-
-def test_a_missing_transcript_leaves_every_figure_unknown(tmp_path):
-    root = probe_config(tmp_path)
-    sub = root / "projects" / "C--Users-po-AppData-Local-Temp-claude-probe" / PROBE_SESSION / "subagents"
-    os.remove(sub / "agent-ad1fea39053d679cc.jsonl")              # the inner agent's
-    t = probe_tally()
-    assert not stats.apply_transcripts(t, str(root))
-    assert t.passes[OUTER].output_tokens is None and t.passes[INNER].output_tokens is None
-    # The main session's missing: the same.
-    root2 = probe_config(tmp_path / "b")
-    os.remove(root2 / "projects" / "C--Users-po-AppData-Local-Temp-claude-probe" / (PROBE_SESSION + ".jsonl"))
-    t = probe_tally()
-    assert not stats.apply_transcripts(t, str(root2))
-    assert all(p.output_tokens is None for p in t.passes.values())
-
-
-def test_a_transcript_under_a_worktrees_project_folder_is_found(tmp_path):
-    # The session ran in a worktree: its folder is the worktree's, beside
-    # the cockpit's own, which holds nothing of it.
-    root = probe_config(tmp_path, folder="C--Dev-app--claude-worktrees-f")
-    (root / "projects" / "C--Dev-app").mkdir()
-    t = probe_tally()
-    assert stats.apply_transcripts(t, str(root))
-    assert t.passes[INNER].output_tokens == 61
-
-
-def test_the_run_stores_its_agents_output_at_its_end(tmp_path):
-    """A live run: the transcripts are read once it is over."""
-    root = tmp_path / "claude-config"
-    proj = root / "projects" / "C--Dev-app--claude-worktrees-f"
-    (proj / "s1" / "subagents").mkdir(parents=True)
-
-    def write(path, *msgs):
-        with open(path, "w", encoding="utf-8") as f:
-            for mid, out in msgs:
-                f.write(json.dumps({"type": "assistant", "message": {"id": mid, "usage": {"output_tokens": out}}}) + "\n")
-    write(proj / "s1.jsonl", ("m1", 2), ("m1", 300), ("m6", 300))
-    for name, tid, msgs in (("agent-a1", "A", [("m2", 40), ("m3", 30), ("m5", 30)]),
-                            ("agent-b1", "B", [("m4", 68)])):
-        write(proj / "s1" / "subagents" / f"{name}.jsonl", *msgs)
-        (proj / "s1" / "subagents" / f"{name}.meta.json").write_text(json.dumps({"toolUseId": tid}), encoding="utf-8")
-    # 600 + 100 + 68 = 768, the run's model_usage output.
-    store, run, _ = run_with(tmp_path, two_agents, transcripts_root=str(root))
-    passes = {p["agent"]: p for p in rows(store, "SELECT * FROM agent_passes WHERE run_id=?", run.id)}
-    assert (passes["lexicographe"]["output_tokens"], passes["pong"]["output_tokens"]) == (100, 68)
-    assert {p["agent"]: p["output_tokens"] for p in run.snapshot()["passes"]} == {"lexicographe": 100, "pong": 68}
-
-
-def test_the_backfill_reads_the_transcripts_too(tmp_path):
-    root = probe_config(tmp_path)
+def test_the_real_run_backfilled_stores_the_lexicographes_output(tmp_path):
     logs = tmp_path / "logs"
     logs.mkdir()
-    shutil.copy(PROBE_LOG, logs)
+    shutil.copy(LEXIQUE_LOG, logs)
     store = stats.Store(str(tmp_path / "stats.sqlite"))
-    store.backfill(str(logs), transcripts_root=str(root))
-    assert {p["agent"]: p["output_tokens"] for p in rows(store, "SELECT * FROM agent_passes")} == \
-        {"outer": 421, "inner": 61}
+    assert store.backfill(str(logs))["passes"] == 1
+    (p,) = rows(store, "SELECT * FROM agent_passes")
+    assert (p["agent"], p["output_tokens"]) == ("lexicographe", 58759)
+    (r,) = rows(store, "SELECT * FROM runs")
+    assert r["output_tokens"] == 3030 + 58759        # the latest result, both models
 
 
-def test_runs_already_stored_are_filled_from_their_transcripts(tmp_path):
+def test_two_agents_on_one_model_are_both_unknown():
+    t = log_tally(LEXIQUE_LOG)
+    lex = t.passes[LEXICOGRAPHE]
+    other = stats.Pass(tool_use_id="X", parent=None, agent="redacteur", description="", started_at=None,
+                       model=lex.model)
+    t.passes["X"] = other
+    # Even sums that add up to the model's leave each pass unknown.
+    other.input_tokens, lex.input_tokens = 2, 20
+    assert stats.apply_model_usage(t) == 0
+    assert lex.output_tokens is None and other.output_tokens is None
+
+
+def test_a_models_input_not_matching_the_pass_leaves_it_unknown():
+    for key in ("inputTokens", "cacheReadInputTokens", "cacheCreationInputTokens"):
+        t = log_tally(LEXIQUE_LOG)
+        t.model_usage["claude-opus-5-5"][key] += 1     # something else used Opus too
+        assert stats.apply_model_usage(t) == 0
+        assert t.passes[LEXICOGRAPHE].output_tokens is None
+    # A model the result does not name, or a pass with no model: unknown.
+    t = log_tally(LEXIQUE_LOG)
+    t.passes[LEXICOGRAPHE].model = "claude-other"
+    assert stats.apply_model_usage(t) == 0 and t.passes[LEXICOGRAPHE].output_tokens is None
+
+
+def test_runs_already_stored_are_filled_from_their_logs(tmp_path):
     logs = tmp_path / "logs"
     logs.mkdir()
-    shutil.copy(PROBE_LOG, logs)
+    shutil.copy(LEXIQUE_LOG, logs)
     store = stats.Store(str(tmp_path / "stats.sqlite"))
-    store.backfill(str(logs))                       # no transcript where it looked: unknown
-    assert all(p["output_tokens"] is None for p in rows(store, "SELECT * FROM agent_passes"))
-    root = probe_config(tmp_path)
-    assert store.backfill_outputs(str(root)) == {"runs": 1, "passes": 2, "unknown": 0}
-    assert {p["agent"]: p["output_tokens"] for p in rows(store, "SELECT * FROM agent_passes")} == \
-        {"outer": 421, "inner": 61}
+    store.backfill(str(logs))
+    # A run stored before 1.4.3: its agents without a figure.
+    db = sqlite3.connect(store.path)
+    with db:
+        db.execute("UPDATE agent_passes SET output_tokens=NULL")
+    db.close()
+    assert store.backfill_outputs() == {"runs": 1, "passes": 1, "unknown": 0}
+    assert [p["output_tokens"] for p in rows(store, "SELECT * FROM agent_passes")] == [58759]
     # Once: a run whose agents have their figure is not read again.
-    assert store.backfill_outputs(str(root))["runs"] == 0
-    # A transcript gone: nothing written.
-    store2 = stats.Store(str(tmp_path / "other.sqlite"))
-    store2.backfill(str(logs))
-    os.remove(root / "projects" / "C--Users-po-AppData-Local-Temp-claude-probe" / PROBE_SESSION / "subagents"
-              / "agent-a037f5d224afd418a.jsonl")
-    assert store2.backfill_outputs(str(root)) == {"runs": 0, "passes": 0, "unknown": 1}
-    assert all(p["output_tokens"] is None for p in rows(store2, "SELECT * FROM agent_passes"))
+    assert store.backfill_outputs()["runs"] == 0
+    # A log gone, or one no pass matches: nothing written.
+    db = sqlite3.connect(store.path)
+    with db:
+        db.execute("UPDATE agent_passes SET output_tokens=NULL")
+    db.close()
+    os.remove(logs / os.path.basename(LEXIQUE_LOG))
+    assert store.backfill_outputs() == {"runs": 0, "passes": 0, "unknown": 1}
+    assert all(p["output_tokens"] is None for p in rows(store, "SELECT * FROM agent_passes"))

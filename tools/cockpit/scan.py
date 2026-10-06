@@ -81,10 +81,11 @@ for _s in MAIN + CORRECTION:
 # §1.2 — commands whose own text puts a test after a git action, a write or
 # an agent: clicking them in the wrong state is not harmless, so the flow
 # always asks. The reasons are scan_rules.md's « Préconditions » table.
+# /2_structure left the list in 1.4.3: its three stops after the filing
+# (2_structure.md:110-120, :135-139, :167-169) leave only the lexicographe's
+# empty questions file filed (:89-93), a state the next command reads
+# correctly — nothing a confirmation would protect.
 CONFIRM = {
-    "2_structure": "elle range le fichier du lexicographe par git mv (2_structure.md:89-93) avant le tableau qui "
-                   "choisit l'invocation (:110-120), le vocabulaire (:135-139) et les réponses (:167-169) : ils lisent "
-                   "la racine après ce rangement, et aucune ligne ne défait le git mv quand ils arrêtent",
     "9_controle": "elle commite et crée le worktree (9_controle.md:104, :110) avant le contrôle de la carte des lots "
                   "(:225-228), qui lit ce que la phase 1 écrit : sur cet arrêt, elle commite, fusionne et pousse "
                   "tracabilite-full.md avant de refermer son worktree (:449-451)",

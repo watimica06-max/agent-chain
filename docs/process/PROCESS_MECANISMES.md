@@ -398,7 +398,7 @@ Coût et écarté : deux fichiers, deux lieux · écarté : un seul lieu pour `s
 
 Utilisé par: `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique` ; `CLAUDE.md`.
 
-Avant ces gestes, et avant le classement, chaque test de précondition de la commande : le premier geste qui change le dépôt (`git mv`, copie, commit, worktree) et le premier agent ne viennent qu'après. Trois commandes gardent un test après ce geste, parce qu'il lit ce que le geste ou une phase produit : `/2_structure` (la racine après le classement), `/9_controle` (la carte que la phase 1 écrit), `/diagnostique` (la porte de la phase 2) — le cockpit demande toujours confirmation pour elles (`tools/cockpit/scan_rules.md` §2).
+Avant ces gestes, et avant le classement, chaque test de précondition de la commande : le premier geste qui change le dépôt (`git mv`, copie, commit, worktree) et le premier agent ne viennent qu'après. Trois commandes gardent un test après ce geste, parce qu'il lit ce que le geste ou une phase produit : `/2_structure` (la racine après le classement), `/9_controle` (la carte que la phase 1 écrit), `/diagnostique` (la porte de la phase 2) — le cockpit demande toujours confirmation pour les deux dernières (`tools/cockpit/scan_rules.md` §2) ; plus pour `/2_structure` depuis la 1.4.3 : ses trois arrêts après le classement ne laissent que le fichier vide du lexicographe classé, un état que la commande suivante lit juste.
 
 Trois gestes, dans cet ordre, une fois le classement des fichiers de questions fait :
 

@@ -162,8 +162,9 @@ def test_a_step_off_the_proposal_or_flagged_asks_first(tmp_path, page):
         asked, _ = dialogs(page, accept=True)
         page.locator("#step-main-2_structure").get_by_role("button", name="Lancer").click()
         page.wait_for_selector("#slot-main-2_structure #run-panel")
-        # …and still asks: its root table reads the root after its git mv.
-        assert len(asked) == 1 and "demande toujours confirmation" in asked[0] and "ni l'étape" not in asked[0]
+        # …and no longer asks (1.4.3): its stops after the git mv leave only the
+        # lexicographe's empty file filed, which the next command reads correctly.
+        assert asked == []
         assert s.clients[0].prompts == ["/2_structure t"]
         stop_run(s)
 

@@ -31,5 +31,3 @@ def _logs_in_tmp(tmp_path_factory, monkeypatch):
     """The raw run logs of a test never land in tools/cockpit/logs/."""
     import runner
     monkeypatch.setattr(runner, "LOG_DIR", str(tmp_path_factory.mktemp("logs")))
-    # Nor do they read the real Claude Code transcripts: an empty config folder.
-    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path_factory.mktemp("claude-config")))

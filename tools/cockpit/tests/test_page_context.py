@@ -258,10 +258,17 @@ def test_a_run_shows_each_hand_back_and_its_totals(tmp_path, page):
         s.call(s.rn.start(str(s.app_root), "f", "f", "1_lexique", "f"))
         page.wait_for_selector("#run-total")
         lines = page.locator("#stream .use").all_inner_texts()
-        assert any(l.startswith("Pong — ") and "1,6 k lus (dont 0 en cache), écrits : inconnu" in l for l in lines), lines
-        assert any(l.startswith("Lexicographe — ") and "écrits : inconnu" in l for l in lines), lines
+        # Mid-run, no agent's output is known yet: it comes with the run's end.
+        assert any(l.startswith("Pong — ") and "1,6 k lus (dont 0 en cache), écrits : à la fin du run" in l
+                   for l in lines), lines
+        assert any(l.startswith("Lexicographe — ") and "écrits : à la fin du run" in l for l in lines), lines
         total = page.locator("#run-total").inner_text()
         assert "Total du run" in total and "18 k lus (dont 12 k en cache), 768 écrits" in total
+        # At the end: Pong alone used Haiku, its figure; the lexicographe shares
+        # Opus with the orchestrator, unknown.
+        end = page.locator("#run-end .muted.small").all_inner_texts()
+        assert any(l.startswith("Pong — ") and l.endswith("68 écrits") for l in end), end
+        assert any(l.startswith("Lexicographe — ") and l.endswith("écrits : inconnu") for l in end), end
         # The gauges took the end-of-run measure.
         page.get_by_role("link", name="Tableau de bord").first.click()
         page.wait_for_function("document.getElementById('gauge-five_hour').textContent.includes('5 %')")
