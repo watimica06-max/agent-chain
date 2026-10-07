@@ -79,9 +79,9 @@ wrong recollection is read by every lot of every feature.**
 requests about tooling, and nothing else needs them.**
 
 🔴 **The conventions file names the build files** — 📌 **the ones the
-build tool and the analysers read to configure themselves**, the
-dependency manifest among them. ⚠️ **That class, and nothing beyond
-it.**
+build system and the analysers read to configure themselves**, the
+dependency manifest among them, in G12.6's version table. ⚠️ **That
+class, and nothing beyond it.**
 
 ⚠️ **It names none** — 🔴 **that is a rule to add**, and until it is
 there you answer the request without them and say so. 📌 **You never
@@ -152,11 +152,39 @@ it**, and nobody downstream can work it out from the rule's wording.
 🔴 **Three kinds are always `permanente`** — 📌 **where a kind of symbol
 lives, the commands that compile, analyse and test, and the states a lot
 may be delivered in.** ⚠️ **Every lot needs them and no sheet names
-them**: marked otherwise, they are read by nobody.
+them**: marked otherwise, they are read by nobody. 📌 **The grid fires
+the last two always** — G2.1's commands, and the deliverable state they
+define — **and G4.4's table says where each module's code goes.**
 
 🔴 **The mark is what lets an agent read the permanent rules whole and
 the specific ones its sheet names** — 📌 **what each of them does with
 it is written in its own file**, not here.
+
+**The project's structure — C2, C4, C12**
+
+🔴 **Three rules declare what the project is built from, each in the
+section that owns its kind** — 📌 **G2.1's commands in C2, G4.4's module
+table in C4, G12.6's version table in C12.** ⚠️ **Each fact once**: a
+command, a module, a version written in one of them is named, never
+written again, in another.
+
+🔴 **A rule whose form is a table carries it under its line** — 📌 **its
+number holds every row.**
+
+🔴 **What each module runs on is the product's** — read from the
+corpus, never chosen. ⚠️ **A corpus that names nothing the application
+runs on leaves G4.4 unwritten**, and every hole that follows from it —
+🔴 **a `coverage` question**, the grid's `R2`, its `Block:` naming
+`G4.4`.
+
+📌 **Everything else in them is your call** — see *What you settle, and
+what you ask*. 🔴 **A directive naming one of them settles it** — 📌
+**move 6b places it**, and what follows from it is written to follow
+it.
+
+📌 **These three name commands, folders and build files** — 🔴 **the
+one place you do**: they are what the project is built from, not what a
+lot writes.
 
 **Prose** — the shape every file of this chain uses:
 
@@ -308,7 +336,8 @@ what every lot would then read.** 📌 **Its `## To resume` is: run
   agent names, by their path, and nothing you found by looking. ⚠️
   **Invocation 3 lists `architecte/`**, and nothing else
 - 🔴 **Name a file, a class or a method** — you say how they are named,
-  never which ones exist
+  never which ones exist. 📌 **G2.1, G4.4 and G12.6 alone name
+  commands, folders and build files** — see *The project's structure*
 - 🔴 **Decide what gets built** — that is the technical document, and
   the split after it
 - 🔴 **Open a source file, a build file or a generated schema** —

@@ -33,9 +33,9 @@ candidat ; les trente derniers messages de commit (`git log --oneline
 | `.claude/scripts/grouper.py` | `tracabilite-full.md` | Sur la sortie standard : les groupes `G<n>` | `/9_controle`, phase 2 | Oui — l'argument, → `MECANISMES §Périmètre d'audit` | **hors annexe — appartient à `PROCESS_AVAL.md`** §/9_controle |
 | `/deploie` | — : chaque application fournit le sien, dans son propre `.claude/commands/deploie.md` ; la chaîne n'en porte aucun | — | Personne — la ligne `/deploie` de `CLAUDE.md` (ligne 59) : « Outside the chain — run by hand; each application provides its own, and the chain carries none » ; aucune commande ni aucun agent de la chaîne ne le nomme | Non — il ne change aucun artefact que la chaîne produit | **annexe** — nommé seulement, jamais décrit au fichier |
 | `.claude/commands/audit_blocages.md` | Les `blocked_*-NN.md` et `blocked_*.md` de cinq lieux du dossier de travail (lignes 26-39) ; `audit-blocages.md` de ses passes antérieures (ligne 44) | `audit-blocages.md` à la racine du dossier de travail, en ajout (ligne 140) | Personne — ligne 9-10 : « No command calls it » ; `/diagnostique` ligne 242 le cite pour dire qu'un fichier non renommé y sera listé « still open », ce n'est pas un appel | Non — voir l'argument ci-dessous | **annexe** |
-| `.claude/commands/audit_conventions.md` | `architecte/*.md`, `docs/TECHNICAL_CONVENTIONS.md` entier, `couverture.md`, les entrées du document technique que `couverture.md` nomme, les lignes `Anchor` de `code/decoupage.md`, ses passes antérieures (lignes 26-63) | `audit-conventions.md` à la racine du dossier de travail, en ajout (ligne 164) | Personne — lignes 9-10 ; `/9_controle` ligne 15 le cite comme exemple de dérivation des dossiers, `architecte.md` ligne 779 le cite pour justifier la ligne de `couverture.md` ; ni l'un ni l'autre n'est un appel | Non — voir l'argument ci-dessous | **annexe** |
+| `.claude/commands/audit_conventions.md` | `architecte/*.md`, `docs/TECHNICAL_CONVENTIONS.md` entier, `couverture.md`, les entrées du document technique que `couverture.md` nomme, les lignes `Anchor` de `code/decoupage.md`, ses passes antérieures (lignes 26-63) | `audit-conventions.md` à la racine du dossier de travail, en ajout (ligne 164) | Personne — lignes 9-10 ; `/9_controle` ligne 15 le cite comme exemple de dérivation des dossiers, `architecte.md` ligne 846 le cite pour justifier la ligne de `couverture.md` ; ni l'un ni l'autre n'est un appel | Non — voir l'argument ci-dessous | **annexe** |
 | `.claude/scripts/coherence.py` | `.claude/agents/*.md` et `.claude/commands/*.md`, ou le fichier passé en argument (lignes 165-171) | Sur la sortie standard, les défauts trouvés ; code de sortie 1 s'il en trouve (ligne 184). Il ne modifie aucun fichier | Personne dans la chaîne — aucune commande, aucun agent, pas `CLAUDE.md` ; ses appelants sont les campagnes de correction (`docs/verification2/correction.md` lignes 379 et 412) | Non — il vérifie la forme des fichiers de la chaîne, pas un artefact qu'elle produit | **annexe** |
-| `docs/process/GRILLE_CONVENTIONS_RETIREES.md` | — (un document) | — | Personne — aucun agent, aucune commande ; nommé une fois, par `.claude/grids/GRILLE_CONVENTIONS.md` lignes 580-582 | Non — l'Architecte ne le lit pas, et rien n'en dérive une règle | **annexe** |
+| `docs/process/GRILLE_CONVENTIONS_RETIREES.md` | — (un document) | — | Personne — aucun agent, aucune commande ; nommé une fois, par `.claude/grids/GRILLE_CONVENTIONS.md` lignes 668-670 | Non — l'Architecte ne le lit pas, et rien n'en dérive une règle | **annexe** |
 
 **L'argument sur les deux rapports d'audit.** `audit-blocages.md` et
 `audit-conventions.md` sont écrits dans le dossier de feature, sous le
@@ -511,16 +511,19 @@ que les G4 sont classés sous le titre C3 et les G6, G7 sous le titre C5
 aurait réglé, et le décide mal — c'est le signal, jamais une lecture
 qui trouve l'entrée sensée : chacune l'est, c'est ce qui en a fait une
 porte ouverte (lignes 26-29). On remet le texte tel qu'il est, dans sa
-section (ligne 31). `GRILLE_CONVENTIONS.md` lignes 587-590 dit la même
+section (ligne 31). `GRILLE_CONVENTIONS.md` lignes 681-684 dit la même
 chose de son côté : « A rule the file no longer produces is not a gap to
 fill … Put an entry back only when a lot decides wrong what it would
 have settled — see the archive ».
+G12.1 ne se remet pas : G12.6, venue après le retrait, porte ce qu'elle
+tenait — le langage et les versions — et davantage, et la grille dit
+qu'elle reste retirée (`GRILLE_CONVENTIONS.md` lignes 676-679).
 
 **Qui le lit.** Personne dans la chaîne : aucun agent, aucune commande
 ne le nomme ; l'Architecte, seul lecteur de `GRILLE_CONVENTIONS.md`,
 n'a pas ce fichier dans sa liste de lecture ; `/conventions` et
 `/audit_conventions` ne le nomment pas. Il est nommé une fois, par
-`GRILLE_CONVENTIONS.md` lignes 580-582 (« The grid held seventy entries
+`GRILLE_CONVENTIONS.md` lignes 668-670 (« The grid held seventy entries
 until thirty-four were withdrawn — `GRILLE_CONVENTIONS_RETIREES.md`
 holds them, with their text and the reason »). La première campagne
 l'a établi (`docs/verification/fichiers.md` lignes 198-200, A4 : « no

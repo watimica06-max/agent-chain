@@ -806,7 +806,7 @@ Les valeurs :
 Écrit par: architecte (troisième champ de chaque ligne `R<n> · <règle> · <déclencheur> · <vérification>`)
 Lu par: concepteur, testeur, realisateur, relecteur (les `permanente` entières), detailleur (nomme les `spécifique` sous `## Conventions`)
 Les valeurs :
-- `permanente` — un acte ordinaire d'écriture ou de livraison de code la déclenche, dans tout lot ; trois sortes le sont toujours : où vit une sorte de symbole, les commandes qui compilent, analysent et testent, les états dans lesquels un lot peut être livré ; lue entière par chaque agent de lot
+- `permanente` — un acte ordinaire d'écriture ou de livraison de code la déclenche, dans tout lot ; trois sortes le sont toujours : où vit une sorte de symbole, les commandes qui compilent, analysent et testent, les états dans lesquels un lot peut être livré — la grille tire les deux dernières toujours, par la table des commandes de G2.1 en C2 ; lue entière par chaque agent de lot
 - `spécifique` — ce que ce lot fait en particulier la déclenche (un module, une frontière, une technologie) ; nommée d'avance dans la fiche par le Détailleur, ou tenue par personne
 
 Le quatrième champ (`mechanical` · `review`) et le cinquième (`off-grid`) n'ont qu'un scripteur et aucun lecteur qui les énumère → renvoyés.

@@ -263,7 +263,7 @@ Answer:
 **What the parser accepts.** The writers' templates, and what a current
 template produces besides: a `Question:` running over several lines
 (agt/lexicographe.md:348-350), a title on the `Block:` line
-(agt/architecte.md:547), the file's own title above the first `### Q`
+(agt/architecte.md:576), the file's own title above the first `### Q`
 (the lexicographe's, premiere-app-3). Since 1.5.1 nothing else: a line
 above `Question:` that is not `Key: value`, an entry with no
 `Question:`, an option that does not open on `- `, a `Défaut:` over two

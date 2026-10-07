@@ -25,11 +25,11 @@ relative to `.claude/`.
 | `hand/questions-classeur-01.md` | agents/classeur.md:147-153 |
 | `hand/questions-redacteur-01.md` | agents/redacteur.md:288-294 — Q1 answered over several lines, as the writer writes it |
 | `hand/questions-sondeur-02.md` | agents/sondeur.md:394-421 — `Options:`, `Défaut:` |
-| `hand/questions-architecte-02.md` | agents/architecte.md:546-553 — a title on `Block:`, `Kind:` |
+| `hand/questions-architecte-02.md` | agents/architecte.md:575-582 — a title on `Block:`, `Kind:` |
 | `hand/questions-lexicographe-02.md` | agents/lexicographe.md:538-544, and :336-350 for Q2's two meanings; the file's title as premiere-app-3's |
 | `hand/convertisseur/technique-model.md`, `technique-transversal.md` | agents/convertisseur.md:389-395 |
 | `hand/blocked_lexicographe.md` | agents/lexicographe.md:76-83 |
-| `hand/blocked_architecte.md` | agents/architecte.md:250-256 — `## Invocation` first |
+| `hand/blocked_architecte.md` | agents/architecte.md:278-284 — `## Invocation` first |
 | `hand/blocked_redacteur.md` | agents/redacteur.md:373-392 and :404-410 — invocation 3, one `## Blocking N` and one `## Decision` per entry |
 | `hand/blocked_qualifieur.md` | agents/qualifieur.md:267-286 |
 | `hand/blocked_cadreur.md`, `hand/cadreur-request/blocked_cadreur.md` | agents/cadreur.md:192-211 — the first appended twice, its last `## Decision` live |

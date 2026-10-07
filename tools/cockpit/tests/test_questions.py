@@ -52,7 +52,7 @@ def test_the_files_own_title_before_the_first_question_is_not_an_entry():
 
 
 def test_title_on_the_block_line_and_kind():
-    # agents/architecte.md:546-553: `Block: §3.2 — Reconciling two real entries`, `Kind:`.
+    # agents/architecte.md:575-582: `Block: §3.2 — Reconciling two real entries`, `Kind:`.
     parsed, _ = parse("hand/questions-architecte-02.md")
     assert parsed.entries[0].context == ["Block: §3.2 — Reconciling two real entries", "Kind: replacement"]
 

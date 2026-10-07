@@ -29,7 +29,7 @@ the root, or `convertisseur/technique-<nature>.md`.
 | `CTX-EXI` | `questions-existant-NN.md` | sondeur, invocation 3 | `Block:` | the feature's block — never one of the global | `desc-produit.md` | agents/sondeur.md:276 · agents/sondeur.md:277 · commands/4_grille.md:388 · commands/4_grille.md:395 |
 | `CTX-CNV` | `questions-convertisseur-NN.md` | convertisseur, product questions, merged by `/6_convertit` | `Block:` | the same | `desc-produit.md` | agents/convertisseur.md:439 · agents/convertisseur.md:450 · agents/convertisseur.md:57 · commands/6_convertit.md:355 · commands/6_convertit.md:367 |
 | `CTX-TEC` | `convertisseur/technique-<nature>.md` | convertisseur, technical questions | `Entries:` | the `§n.m` heading of each entry named | `convertisseur/<nature>.md` — its own section; `spec-technique.md` for `technique-transversal.md` | agents/convertisseur.md:390 · agents/convertisseur.md:399 · agents/convertisseur.md:401 · agents/convertisseur.md:59 · agents/convertisseur.md:65 · agents/convertisseur.md:299 |
-| `CTX-ARC` | `questions-architecte-NN.md` | architecte | `Block:` | the `§n.m` heading of each entry named | `spec-technique.md` | agents/architecte.md:547 · agents/architecte.md:337 · agents/architecte.md:582 |
+| `CTX-ARC` | `questions-architecte-NN.md` | architecte | `Block:` | the `§n.m` heading of each entry named | `spec-technique.md` | agents/architecte.md:576 · agents/architecte.md:366 · agents/architecte.md:611 |
 | `CTX-FUS` | `questions-fusionneur-NN.md` | fusionneur | `Block:` | the `### B<n>` section of each block named | `desc-produit-fusion.md` — 🔴 never `desc-produit.md` | agents/fusionneur.md:116 · agents/fusionneur.md:47 |
 
 The writers are the eleven of `docs/app/analyse-v1.md` §A: the
@@ -44,7 +44,7 @@ the convertisseur's — one row each above.
 |---|---|---|
 | `Block: -` (any `Block:` writer) | « the question is about the feature and not about a block » — nothing to point at | agents/redacteur.md:318 · agents/sondeur.md:461 · agents/assembleur.md:142 |
 | A lexicographe file beside **two** other agents' files | `/1_lexique` stops there — which file was swept is not said | commands/1_lexique.md:63 |
-| An architecte `forme` question naming a grid entry, no `§` | « its `Block:` names the grid entry » — the grid is the Product Owner's, outside the feature | agents/architecte.md:582 |
+| An architecte question naming a grid entry, no `§` — a `forme` question, or the `coverage` question G4.4 raises when the corpus names nothing the application runs on | « its `Block:` names the grid entry », « its `Block:` naming `G4.4` » — the grid is the Product Owner's, outside the feature | agents/architecte.md:611 · agents/architecte.md:177 |
 | A technical question whose `Entries:` holds only bracket references, or names the nature | « or the nature, when no entry exists yet »; a bracket is « outside » the section | agents/convertisseur.md:399 · agents/convertisseur.md:300 |
 | A fusionneur title question | its `Block:` shape is the block's (agents/fusionneur.md:116); a title is a section of the global, and no rule names how the entry points to it | agents/fusionneur.md:174 |
 | A file of an agent no row names (`questions-<agent>-NN.md` of an agent the chain does not have) | no instruction gives its target | — |

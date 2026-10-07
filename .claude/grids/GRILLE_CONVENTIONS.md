@@ -124,17 +124,19 @@ not a target.*
     [1 to 3]
 
     ## 2. Verification
-    The one command attesting a lot is deliverable, and what is left to
-    the formatter.
-    [3]
+    The commands that compile, test, analyse and assemble the project,
+    each run from the repository's root, and what is left to the
+    formatter.
+    [a table, plus 1 to 2]
 
     ## 3. Boundaries
     The files a lot does not touch, and those that need asking first.
     [3 to 4]
 
     ## 4. Structure and dependency direction
-    Where a new file goes, and which module may depend on which.
-    [5 to 8]
+    The modules — what each is, what it runs on, where its code and its
+    tests go — and which module may depend on which.
+    [a table, plus 4 to 7]
 
     ## 5. Interface contracts
     The shape of what crosses a public boundary — what ties the agent
@@ -169,9 +171,10 @@ not a target.*
     [2 to 3]
 
     ## 12. Dependencies and versions
-    The non-negotiable versions, the tools the rules need, and the
+    What the project is built with, at its non-negotiable versions, the
+    files that configure the build, the tools the rules need, and the
     right to add one.
-    [a table, plus 1 to 2]
+    [two tables, plus 1 to 2]
 
 🔴 **What never appears in it**: where a rule came from · the reasoning
 behind a rule that is not counter-intuitive · any rule a formatter or a
@@ -203,12 +206,32 @@ with its holes in `< >`, and **test**.*
 
 ## C2 — Verification
 
-**G2.1** · *Question*: which single command attests a lot is
-deliverable? · *Trigger*: always — the hole is filled from platform
-knowledge, not from the documents
-- **Form**: "A lot is deliverable only when `<cmd verify>` exits 0. No
-  other definition of done."
-- **Test**: the command exists and runs on a clean checkout.
+**G2.1** · *Question*: which commands compile, test and analyse the
+project, and which assembles each application? · *Trigger*: always —
+the holes are filled from the platform's practice and from the build
+system G12.6 names, never from the documents
+- **Form**: "A lot is deliverable only when every command of this table
+  exits 0, run as written from the repository's root. No other
+  definition of done." — then the table, one line per command, its name
+  and the command itself:
+
+  | Name | Command |
+  |---|---|
+  | `compile` | `<cmd compile>` |
+  | `test` | `<cmd test>` |
+  | `analyse` | `<cmd analyse>` |
+  | `assemble <module>` | `<cmd assemble>` — 🔴 **one line per application module of G4.4's table** |
+
+- **Test**: each command runs, as written, from the repository's root
+  of a clean checkout.
+
+🔴 **`compile`, `test` and `analyse` always, and one `assemble` line
+per application module.** ⚠️ **One command doing two jobs is written on
+both lines** — 📌 a reader looks a command up by its name, and a name
+missing reads as a step the project skips.
+
+📌 **Every other entry that wires a check into verification wires it
+into one of these commands, by its name.**
 
 ## C3 — Boundaries
 
@@ -237,19 +260,46 @@ V2 is acyclic
   subset of the `Consumes:` adjacency aggregated by nature. A
   dependency outside that graph is an amendment proposed before
   writing."
-- **Test**: mechanical — `<the dependency check>` wired into
-  `<cmd verify>`.
+- **Test**: mechanical — `<the dependency check>` wired into G2.1's
+  `analyse`.
 
-**G4.4** · *Question*: what is a module's grain? · *Trigger*: always —
-the hole is the Architecte's own call, informed by V1 and V3
-- **Form**: "One top-level module per `<nature | group of entries>`,
-  named: `<the list, in full>`. Every entry of the technical document
-  is realised in one of them."
-- **Test**: mechanical — every top-level module appears in the list,
-  and the reverse.
+**G4.4** · *Question*: which modules does the project hold, and what is
+each? · *Trigger*: always — 🔴 **the `Runs on` column is the product's,
+read from the corpus and never chosen**; the grain is the Architecte's
+own call, informed by V1 and V3; the other holes are the Architecte's
+call too, from the platform's practice
+- **Form**: "One top-level module per `<nature | group of entries>`.
+  Every entry of the technical document is realised in one of them, and
+  no module exists outside this table." — then the table, one line per
+  module:
 
-🔴 **The list is written out in the rule.** A convention that points at
+  | Module | Builds as | Runs on | Depends on | Namespace | Code folder | Test folder | Application id |
+  |---|---|---|---|---|---|---|---|
+  | `<name>` | `<application \| library \| plain code>` | `<what the corpus names it runs on \| shared>` | `<modules of this table, or none>` | `<namespace \| package>` | `<path>` | `<path>` | `<id \| —>` |
+
+- **Test**: mechanical — every top-level module appears in the table,
+  and the reverse; every folder it names exists.
+
+🔴 **R2 applies**: a corpus naming nothing the application runs on
+leaves the `Runs on` column with no source — 📌 **the table is not
+written**, nor any hole that follows from it, and the entry raises a
+question instead.
+
+🔴 **`Runs on` takes the names the corpus gives what the application
+runs on** — a phone, a watch, whatever it names. 📌 **`shared` is a
+module more than one of them uses.**
+
+🔴 **The table is written out in the rule.** A convention that points at
 a file the four agents do not read is a convention they cannot follow.
+
+🔴 **An `application` module is one an application is assembled from**
+— 📌 **it alone carries an application id**, and G2.1 gives it its
+`assemble` line. ⚠️ **`—` on every other module.**
+
+📌 **`Depends on` names modules of this table, and only those** — ⚠️
+**where G4.1 fires, it stays inside G4.1's graph.**
+
+📌 **Every path is relative to the repository's root.**
 
 ## C5 — Interface contracts
 
@@ -508,6 +558,40 @@ which of them has an interruption test? · *Trigger*: V10 non-empty
 
 ## C12 — Dependencies and versions
 
+**G12.6** · *Question*: in which language, with which build system and
+which toolchain, at which versions, is the project built, and where are
+the files that configure it? · *Trigger*: always — the holes are the
+Architecte's call, from the platform's practice, and every version is
+looked up, never recalled
+- **Form**: "The project is built with what this table names, at these
+  versions. Non-negotiable within a lot." — then the version table, one
+  line per fact:
+
+  | Fact | Value |
+  |---|---|
+  | Language | `<language X.Y>` |
+  | Build system | `<build system A.B>`, obtained through `<a wrapper \| an official tool>` |
+  | Toolchain | `<toolchain C.D>` |
+  | Platform levels | `<compile · minimum · target>` |
+  | Test framework | `<test framework E.F>` |
+  | Build files | `<path>`, one per file — the dependency manifest among them |
+
+- **Test**: mechanical — every build file named exists, and declares
+  the versions and levels this table gives.
+
+🔴 **The build files are those the build system and the analysers read
+to configure themselves** — the dependency manifest among them — ⚠️
+**that class, and nothing beyond it.** 📌 **Every one of them is named**:
+the list is your decision, not a reading of the corpus, so R5 does not
+narrow it.
+
+📌 **Platform levels are written where the platform has them**, and the
+line is dropped where it has none. ⚠️ **A floor G12.5 names is met by
+the minimum level here**, never written twice.
+
+📌 **The test framework is named here whatever the corpus** — 🔴 **G10.1
+fires always**, and a test needs a framework to be written in.
+
 **G12.2** · *Question*: none, fixed entry · *Trigger*: always
 - **Form**: "No new dependency inside a lot. An addition is an
   amendment proposed before writing, and delivered on its own."
@@ -526,8 +610,8 @@ which of them has an interruption test? · *Trigger*: V10 non-empty
 
 🔴 **A rule that demands tests, on a project naming no test framework,
 is a rule the first lot cannot follow.** ⚠️ **And G12.2 forbids adding
-one inside a lot** — the tool is named here, or the rule is not
-written.
+one inside a lot** — 📌 **G12.6's version table names it**, and this
+table names only what runs and reports.
 
 🔴 **A tool named here carries the rules it is named for, and no
 others.** ⚠️ **A rule whose exact check no named tool performs is a
@@ -560,6 +644,10 @@ as a whole, before the corpus can work at all? · *Trigger*: always —
   capability — **is declared here, with what demands it.**"
 - **Test**: mechanical — the build declares each of them.
 
+🔴 **A value another entry writes is named here, never written again**
+— 📌 **a level is G12.6's, an application id is G4.4's**: this rule
+says what demands it, and the value stays where it is.
+
 ⚠️ **What one lot declares for itself is not this** — a permission in
 the manifest of the lot that needs it belongs to that lot. 🔴 **This is
 what no single lot can declare**, because it holds for every module at
@@ -574,7 +662,7 @@ states the behaviour; the platform states its price.**
 
 ## What the volume should be
 
-**Thirty-six entries, of which a few do not fire on a given project.**
+**Thirty-seven entries, of which a few do not fire on a given project.**
 📌 **Around thirty rules written**, plus whatever R3 allows off-grid.
 
 🔴 **The grid held seventy entries until thirty-four were withdrawn** —
@@ -584,6 +672,11 @@ the reason.
 ⚠️ **The remaining thirty-six are the corrections and the
 arbitrations** — 📌 **each one either catches a mistake a cold reading
 would make, or settles a choice two lots would make differently.**
+
+📌 **G12.6 came after**, and carries what the archive's G12.1 held —
+🔴 **that one stays withdrawn.** ⚠️ **It declares what the project is
+built from**: a conventions file that names modules nobody builds and a
+command that does not exist is what a lot met without it.
 
 🔴 **A rule the file no longer produces is not a gap to fill.** ⚠️ **It
 is the point of the withdrawal**: what a competent writer would do
