@@ -17,7 +17,7 @@ def say(text, code=0):
 
 
 def hyrox_targets(fa, build_fails=False):
-    """Hyrox's profile (docs/app/DEPLOY_PROFILE.md), its Gradle commands
+    """Hyrox's profile (docs/app/TECHNICAL_V1.md §23.1), its Gradle commands
     replaced by commands that only print, its install by the fake adb's."""
     return [
         {"name": "Téléphone", "type": "android",

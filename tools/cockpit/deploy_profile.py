@@ -1,7 +1,7 @@
 """The deploy profile — `.claude/deploy.json` of an application (1.8).
 
-The contract is docs/app/DEPLOY_PROFILE.md: what a target holds, adapter by
-adapter. It belongs to the application: the chain's install never touches it
+The contract is .claude/formats/deploy-profile.md: what a target holds,
+adapter by adapter. It belongs to the application: the chain's install never touches it
 (chain.PATHS does not hold it). The Product Owner writes it in Paramètres →
 Déploiement; saving it writes the file, commits it alone in the application
 (`deploy: profil`) and pushes.

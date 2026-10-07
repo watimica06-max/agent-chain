@@ -16,7 +16,7 @@ relative to `.claude/`.
 | `context/premiere-app-3/idees.md`, `questions-lexicographe-02.md` | the settling pass (agents/lexicographe.md:538-544) and the idea file it points to |
 | `logs/2026-10-06-111521-1_lexique.jsonl` | the cockpit's own log of `/1_lexique premiere-app-3` |
 | `logs/2026-10-06-094500-probe.jsonl` | a probe run of the SDK in a scratch folder, an agent calling a nested one (`outer`, `inner`) |
-| `hyrox/deploie.md` | hyrox_tracker's `.claude/commands/deploie.md` at its commit 1305da0 — the command 1.8's profile replaces, its lines cited by docs/app/DEPLOY_PROFILE.md §5 |
+| `hyrox/deploie.md` | hyrox_tracker's `.claude/commands/deploie.md` at its commit 1305da0 — the command 1.8's profile replaces, its lines cited by docs/app/TECHNICAL_V1.md §23.1 |
 
 ## Hand-written, after a template
 

@@ -26,8 +26,10 @@ would lose every domain in it. Then it commits those files alone —
 does, and says when it fails.
 
 Last, it prints what the application still has to provide, one line
-each: `PROVIDE`, read by the cockpit too. Neither blocks the upstream
-chain; both are needed from `/7_lots` onward.
+each: `PROVIDE`, read by the cockpit too. Nothing there blocks the
+upstream chain; it is needed from `/7_lots` onward. The
+`technical-state-format` skill is not there: the chain's install brings
+it.
 
 Exit code 0 when done, 2 when it refuses, 1 when git fails.
 """
@@ -52,9 +54,6 @@ PROVIDE = (
     ("docs/TECHNICAL_CONVENTIONS.md",
      "les conventions techniques — écrites par /conventions, jamais à la main ; "
      "/conventions se lance après /6_convertit, avant /7_lots"),
-    (".claude/skills/technical-state-format/SKILL.md",
-     "la compétence technical-state-format — le Réalisateur et l'Arbitre la chargent "
-     "avant d'écrire dans docs/CURRENT_TECHNICAL_STATE.md"),
 )
 
 

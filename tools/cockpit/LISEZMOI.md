@@ -150,7 +150,7 @@ construire et où l'installer est le **profil de déploiement** de
 l'application, `.claude/deploy.json` : une liste de **cibles** —
 « Téléphone », « Montre », « Site » —, chacune avec son type, la commande
 qui la construit, et ce que son type demande. Le contrat de ce fichier est
-`docs/app/DEPLOY_PROFILE.md`, un exemple par type. Deux types aujourd'hui :
+`.claude/formats/deploy-profile.md`, un exemple par type. Deux types aujourd'hui :
 **android** (des appareils par adb : en USB, en Wi-Fi, des émulateurs) et
 **commande** (une commande lancée sur cet ordinateur : un serveur web, un
 programme, un script). Un autre type viendra en ajoutant un adaptateur :
@@ -212,10 +212,11 @@ qu'on n'en a pas écrit un.
 
 **À fournir avant le code** (1.7) — sur le tableau de bord, ce que
 l'application apporte elle-même, d'après `socle.py` : ses conventions
-techniques, `docs/TECHNICAL_CONVENTIONS.md`, écrites par `/conventions` ;
-la compétence `technical-state-format`. Chaque ligne ✓ ou ✗, lue dans ses
-fichiers. Rien ne bloque l'amont : il les faut à partir de `/7_lots`. La
-carte disparaît quand tout est ✓.
+techniques, `docs/TECHNICAL_CONVENTIONS.md`, écrites par `/conventions`.
+La compétence `technical-state-format` n'y est plus : l'installation de la
+chaîne l'apporte. Chaque ligne ✓ ou ✗, lue dans ses fichiers. Rien ne
+bloque l'amont : il les faut à partir de `/7_lots`. La carte disparaît
+quand tout est ✓.
 
 **Chaîne → Code** — `/8_code` lot par lot : les lots passés sur le total,
 en barre ; pendant un run, le lot en cours et l'agent qui y travaille, le
@@ -276,9 +277,12 @@ chiffre absent de la base est « inconnu » et n'entre dans aucune somme,
 qui le dit. « Exporter » écrit les runs et les passages des filtres en
 deux fichiers CSV, dans le dossier choisi.
 
-**La chaîne de l'application** — les agents, les commandes, les scripts
-et les grilles qu'une application lit viennent du dépôt de la chaîne, ce
-dépôt-ci, à son dernier commit : on ne les change que là. Le tableau de
+**La chaîne de l'application** — les agents, les commandes, les scripts,
+les grilles, les formats et la compétence `technical-state-format`
+qu'une application lit viennent du dépôt de la chaîne, ce dépôt-ci, à son
+dernier commit : on ne les change que là. Une application qui avait sa
+propre copie de la compétence : l'installation demande avant de la
+remplacer. Le tableau de
 bord dit leur état en une ligne : **à jour** ; **en retard** (combien de
 commits de la chaîne depuis l'installation, et lesquels) ; **modifiée sur
 place** (les fichiers changés dans l'application) ; **absente** (jamais

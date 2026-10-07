@@ -1,13 +1,16 @@
 """The chain, installed into an application — TECHNICAL_V1 §20.
 
 The chain is exactly the files under `.claude/CLAUDE.md`, `.claude/agents/`,
-`.claude/commands/`, `.claude/scripts/` and `.claude/grids/` of this
-repository, read at its `HEAD` — never its working tree. An install copies
+`.claude/commands/`, `.claude/scripts/`, `.claude/grids/`, `.claude/formats/`
+and `.claude/skills/technical-state-format/` of this repository, read at its
+`HEAD` — never its working tree. An install copies
 them into an application, removes those the previous install wrote and the
 chain no longer has, and writes `.claude/chain-version.json`: the chain's
 commit, its date, and every installed file with its hash. Nothing else is
 ever written in the application; its own files in those folders — its
-`commands/deploie.md` — are never touched.
+`commands/deploie.md`, its other skills — are never touched. A file of the
+chain the application already holds, differing, is replaced only once asked:
+its own copy of the skill, from before the chain shipped it, is one.
 
 The chain's commit is the last commit of `HEAD` that changed one of its
 files: a commit of the cockpit alone leaves every application « à jour ».
@@ -23,7 +26,8 @@ import subprocess
 import gitref
 
 CHAIN_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
-PATHS = (".claude/CLAUDE.md", ".claude/agents", ".claude/commands", ".claude/scripts", ".claude/grids")
+PATHS = (".claude/CLAUDE.md", ".claude/agents", ".claude/commands", ".claude/scripts", ".claude/grids",
+         ".claude/formats", ".claude/skills/technical-state-format")
 VERSION_FILE = ".claude/chain-version.json"
 GIT_TIMEOUT = 60
 PUSH_TIMEOUT = 180

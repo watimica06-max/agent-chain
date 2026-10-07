@@ -3741,7 +3741,7 @@ function renderDeploySettings() {
   const out = [];
   out.push(el("p", {class: "muted small", style: "margin-top:0"}, "Le profil de l'application : ", el("span", {class: "mono", text: prof.path}),
     ". Il lui appartient — la chaîne ne le touche jamais. Enregistrer l'écrit, le commite seul dans l'application (« deploy: profil ») et pousse. ",
-    "Le contrat : docs/app/DEPLOY_PROFILE.md du dépôt de la chaîne."));
+    "Le contrat : .claude/formats/deploy-profile.md, que la chaîne installe."));
   if (!prof.exists && !DP.edit.length) out.push(el("div", {class: "muted", id: "dp-set-empty", text: "Aucun profil : rien ne se déploie encore. Ajoutez une cible."}));
   for (const g of errs.general || []) out.push(el("div", {class: "notice warn", text: g}));
   DP.edit.forEach((t, i) => {

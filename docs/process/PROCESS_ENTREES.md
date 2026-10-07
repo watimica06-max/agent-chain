@@ -237,10 +237,10 @@ encore fournir. Code de sortie 0, 2 sur le refus, 1 quand git échoue.
    `PROVIDE` dans le script, que la carte « À fournir avant le code » du
    cockpit lit au script même, jamais une copie :
    `docs/TECHNICAL_CONVENTIONS.md`, par `/conventions` et non à la
-   main ; la compétence `technical-state-format`
-   (`.claude/skills/technical-state-format/SKILL.md`), chargée par le
-   Réalisateur et l'Arbitre avant d'écrire dans l'état technique. Ni
-   l'un ni l'autre ne bloque l'amont — seulement `/7_lots` et la suite.
+   main ; il ne bloque pas l'amont — seulement `/7_lots` et la suite.
+   La compétence `technical-state-format` n'est plus dans la liste :
+   la chaîne la livre (`.claude/skills/technical-state-format/SKILL.md`),
+   et l'installation l'apporte avant que le script ne tourne.
    `/deploie` n'est plus dans la liste : le déploiement passe dans le
    cockpit (1.8), et une application neuve n'a pas de `/deploie`. Aucune
    ligne `Next:` : ce n'est pas un relais ; le cockpit, après avoir
@@ -290,14 +290,12 @@ blocage.
 
 - `docs/TECHNICAL_CONVENTIONS.md` — l'Architecte, invocation 1, à
   `/conventions` (`PROCESS_AMONT.md` §architecte, invocation 1 — Deriving : la première dérivation du dépôt, §/conventions).
-- La compétence `technical-state-format` : le script la rapporte comme
-  à fournir par l'application ; sur ce projet elle est livrée avec
-  `.claude/skills/`.
 - `docs/features/<name>/` et `idees.md` — hors du script : le cockpit
   les écrit pour la première fonctionnalité ; le Product Owner, pour les
   suivantes (entrée 1).
-- Les grilles de `.claude/grids/`, `.claude/` entier — hors du script :
-  c'est la chaîne, que le cockpit installe avant de le lancer.
+- Les grilles de `.claude/grids/`, les formats de `.claude/formats/`,
+  la compétence `technical-state-format`, `.claude/` entier — hors du
+  script : c'est la chaîne, que le cockpit installe avant de le lancer.
 - `docs/features/` vide n'entre dans aucun commit : git ne suit pas un
   dossier vide. Le commit `chore: scaffolding for the chain` porte
   trois fichiers ; `docs/features/` y entre avec `idees.md`, au commit

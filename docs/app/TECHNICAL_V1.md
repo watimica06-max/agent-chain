@@ -8,7 +8,7 @@ her the most time: **answering questions and blocking files**, and
 *1.8 — « Déploiement »: build the active application and put it where it
 runs, without Claude, then watch it run — a generic frame, one adapter per
 kind of target (`android`, `commande`), the profile `.claude/deploy.json`
-whose contract is `docs/app/DEPLOY_PROFILE.md`; the test step's « Déployer »
+whose contract is `.claude/formats/deploy-profile.md`; the test step's « Déployer »
 opens it; the diagnostic says whether scrcpy and the emulator are here
 (§23).*
 
@@ -674,11 +674,15 @@ the screen concerned. The tab's title carries the count of what waits:
 
 The cockpit lives in the chain's repository, `agent-chain`. **The chain,
 for an application, is exactly the files under `.claude/CLAUDE.md`,
-`.claude/agents/`, `.claude/commands/`, `.claude/scripts/` and
-`.claude/grids/` of this repository, at its `HEAD`** — read from git,
-never from the working tree. Nothing else is ever written in the
-application; its own files in those folders — its `commands/deploie.md`,
-its skills, its settings — are never touched. The chain is changed in its
+`.claude/agents/`, `.claude/commands/`, `.claude/scripts/`,
+`.claude/grids/`, `.claude/formats/` and
+`.claude/skills/technical-state-format/` of this repository, at its
+`HEAD`** — read from git, never from the working tree. Nothing else is
+ever written in the application; its own files in those folders — its
+`commands/deploie.md`, its other skills, its settings — are never touched.
+A file of the chain the application already holds, differing — its own
+copy of the skill, from before the chain shipped it — is replaced only
+once asked, as any file the install did not leave as it is. The chain is changed in its
 repository only, never in an application's copy. `chain.py`.
 
 - **`.claude/chain-version.json`**, written at each install: the chain's
@@ -835,8 +839,9 @@ chain.py's install had never made a repository's first commit: it ran there
   2), asks git who commits before writing anything, commits those files
   alone (`--only`) as `chore: scaffolding for the chain`, and does not push.
   It prints, one per line, what the application still provides — its
-  `PROVIDE`: the conventions, written at `/conventions`, and the
-  `technical-state-format` skill. `/deploie` is not in it: deploying moves
+  `PROVIDE`: the conventions, written at `/conventions`. The
+  `technical-state-format` skill is not in it: the chain's install brings
+  it. `/deploie` is not in it either: deploying moves
   into the cockpit (1.8). `--list` prints that alone. Standard library only.
 - **chain.py** — `push_branch`: a branch with no upstream is pushed with
   `-u origin HEAD`, so that every later push, the chain's commands' too, is a
@@ -901,14 +906,67 @@ tests a type's name, it shows what the adapter declares.
 ### 23.1 The profile
 
 `.claude/deploy.json` of the application, its contract written once in
-**`docs/app/DEPLOY_PROFILE.md`**: `format` (1) and `targets`, each the
-frame's `name`, `type`, `build`, then its adapter's fields. A key nobody
+**`.claude/formats/deploy-profile.md`** — the chain's, so the install
+brings it to every application, where the agent that builds a skeleton
+reads it: `format` (1) and `targets`, each the frame's `name`, `type`,
+`build`, then its adapter's fields. A key nobody
 declares is refused. `deploy_profile.py` checks, loads and saves it; saving
 writes it in the contract's order, commits it alone — `deploy: profil`,
 `--only` — and pushes (chain.py's `push_branch`). The chain's install never
-touches it (`chain.PATHS`). Hyrox's profile is DEPLOY_PROFILE.md §5, each
-value with its line, written into the application from Paramètres →
-Déploiement; Belivo and a new application have none until one is written.
+touches it (`chain.PATHS`). Hyrox's profile is below, each value with its
+line, written into the application from Paramètres → Déploiement; Belivo
+and a new application have none until one is written.
+
+#### Hyrox's profile, derived
+
+Written into hyrox_tracker from Paramètres → Déploiement. The contract's
+own examples are tied to no application.
+
+```json
+{
+  "format": 1,
+  "targets": [
+    {
+      "name": "Téléphone",
+      "type": "android",
+      "build": ".\\gradlew.bat :app-phone:assembleDebug",
+      "kind": "phone",
+      "install": ".\\gradlew.bat :app-phone:installDebug",
+      "app_id": "com.mgilli.hyroxtracker"
+    },
+    {
+      "name": "Montre",
+      "type": "android",
+      "build": ".\\gradlew.bat :app-wear:assembleDebug",
+      "kind": "watch",
+      "install": ".\\gradlew.bat :app-wear:installDebug",
+      "app_id": "com.mgilli.hyroxtracker"
+    }
+  ]
+}
+```
+
+From `C:\Dev\hyrox_tracker\.claude\commands\deploie.md` — the command the
+profile replaces — and, where that file says nothing, from the modules'
+Gradle files.
+
+| Target · key | Value | From |
+|---|---|---|
+| Téléphone · `kind` | `phone` | deploie.md:20 — « Phone \| `model:SM_S928B` » |
+| Téléphone · `install` | `.\gradlew.bat :app-phone:installDebug`, device in `ANDROID_SERIAL` | deploie.md:42-43 |
+| Téléphone · `build` | `.\gradlew.bat :app-phone:assembleDebug` | not in deploie.md: `installDebug` builds before it installs. `assembleDebug` is the build `installDebug` depends on, run once so that a build failure is told apart from an install failure; `installDebug` then finds it up to date on each device |
+| Téléphone · `app_id` | `com.mgilli.hyroxtracker` | not in deploie.md: `app-phone/build.gradle.kts:15` |
+| Montre · `kind` | `watch` | deploie.md:21 — « Watch \| `model:SM_L705F` » |
+| Montre · `install` | `.\gradlew.bat :app-wear:installDebug`, device in `ANDROID_SERIAL` | deploie.md:45-46 |
+| Montre · `build` | `.\gradlew.bat :app-wear:assembleDebug` | as the phone's |
+| Montre · `app_id` | `com.mgilli.hyroxtracker` | not in deploie.md: `app-wear/build.gradle.kts:15` — the same id as the phone's |
+
+`.\gradlew` (deploie.md:43) becomes `.\gradlew.bat`: the command runs in
+`cmd.exe`, not PowerShell. Three rules of deploie.md are not in the profile:
+the model of each device (:18-21) — a target names a kind, and the page
+shows each device's model; « never install one alone » (:28-30) — the
+Product Owner chooses the devices; clearing `ANDROID_SERIAL` (:48, :55-56) —
+the cockpit sets it on the install's process alone, never on its own.
 
 ### 23.2 The adapters
 

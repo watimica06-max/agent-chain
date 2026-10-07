@@ -1,7 +1,8 @@
 """1.8 — the deploy profile: the contract's examples load, Hyrox's profile is
-the one derived from its /deploie with the lines it cites, what is refused,
-and the save — written, committed alone, pushed. Every repository is a
-scratch one; nothing reaches GitHub."""
+the one derived from its /deploie with the lines it cites (TECHNICAL_V1
+§23.1 — the contract, shipped to every application, names none), what is
+refused, and the save — written, committed alone, pushed. Every repository
+is a scratch one; nothing reaches GitHub."""
 import json
 import os
 import re
@@ -12,17 +13,31 @@ import deploy_profile
 from conftest import fixture_path
 from test_chain import commit, git, init, write
 
-DOC = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
-                   "docs", "app", "DEPLOY_PROFILE.md")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+DOC = os.path.join(ROOT, ".claude", "formats", "deploy-profile.md")
+TECHNICAL = os.path.join(ROOT, "docs", "app", "TECHNICAL_V1.md")
 
 
-def doc():
-    with open(DOC, encoding="utf-8") as f:
+def doc(path=DOC):
+    with open(path, encoding="utf-8") as f:
         return f.read()
 
 
-def examples():
-    return [json.loads(m) for m in re.findall(r"```json\n(.*?)\n```", doc(), re.S) if '"targets"' in m]
+def examples(path=DOC):
+    return [json.loads(m) for m in re.findall(r"```json\n(.*?)\n```", doc(path), re.S) if '"targets"' in m]
+
+
+def hyrox_profile():
+    """Hyrox's profile — TECHNICAL_V1 §23.1, the one JSON block there."""
+    (p,) = [e for e in examples(TECHNICAL) if any(t.get("app_id") == "com.mgilli.hyroxtracker" for t in e["targets"])]
+    return p
+
+
+def test_the_old_place_points_to_the_one_source():
+    with open(os.path.join(ROOT, "docs", "app", "DEPLOY_PROFILE.md"), encoding="utf-8") as f:
+        text = f.read()
+    assert text.count("\n") == 1 and ".claude/formats/deploy-profile.md" in text
+    assert "hyrox" not in doc().lower()            # the contract is tied to no application
 
 
 def test_every_example_of_the_contract_loads():
@@ -36,7 +51,7 @@ def test_every_example_of_the_contract_loads():
 
 
 def test_hyrox_profile_is_the_one_derived_from_its_deploie():
-    hyrox = examples()[0]
+    hyrox = hyrox_profile()
     t = {x["name"]: x for x in hyrox["targets"]}
     assert set(t) == {"Téléphone", "Montre"}
     assert t["Téléphone"]["kind"] == "phone" and t["Montre"]["kind"] == "watch"
@@ -48,7 +63,7 @@ def test_hyrox_profile_is_the_one_derived_from_its_deploie():
     assert {x["app_id"] for x in t.values()} == {"com.mgilli.hyroxtracker"}
 
 
-def test_the_lines_section_5_cites_say_what_it_reads():
+def test_the_lines_the_derivation_cites_say_what_it_reads():
     with open(fixture_path("hyrox", "deploie.md"), encoding="utf-8") as f:
         lines = f.read().splitlines()
     at = lambda n: lines[n - 1]
@@ -58,7 +73,7 @@ def test_the_lines_section_5_cites_say_what_it_reads():
     assert "ANDROID_SERIAL" in at(45) and ":app-wear:installDebug" in at(46)
     assert "Remove-Item Env:\\ANDROID_SERIAL" in at(48)
     assert "Do not" in at(28) and "install the other one alone" in at(29)
-    text = doc()
+    text = doc(TECHNICAL)
     for cite in ("deploie.md:20", "deploie.md:21", "deploie.md:42-43", "deploie.md:45-46", "(:28-30)"):
         assert cite in text
 
@@ -111,7 +126,7 @@ def test_save_writes_commits_alone_and_pushes(app_repo):
     # What she staged stays out of the profile's commit.
     write(app, "notes.md", "à moi\n")
     git(app, "add", "notes.md")
-    hyrox = examples()[0]["targets"]
+    hyrox = hyrox_profile()["targets"]
     res = deploy_profile.save(str(app), hyrox)
     assert res["commit"] and res["pushed"] and res["push_error"] is None
     assert git(app, "log", "-1", "--format=%s").strip() == "deploy: profil"

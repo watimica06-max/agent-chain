@@ -97,9 +97,9 @@ def test_progress_failure_reprendre_then_lexique(tmp_path, page, chain_root, ide
         page.wait_for_function("location.hash === '#dashboard'", timeout=10000)
         page.wait_for_function("document.getElementById('next-text').textContent.includes('/1_lexique premiere-app')")
         assert page.locator("#tb-app").inner_text().startswith("Mon Appli Été")
-        # À fournir avant le code: both ✗, read from the files.
+        # À fournir avant le code: the conventions ✗, read from the files.
         prov = page.locator("#provide-card")
-        assert prov.is_visible() and prov.locator("li.ko").count() == 2
+        assert prov.is_visible() and prov.locator("li.ko").count() == 1
         # 1.8: « Déployer » opens « Déploiement », which says there is no
         # profile yet — a new application has none.
         page.get_by_role("link", name="Chaîne").first.click()
@@ -116,13 +116,9 @@ def test_the_provide_card_each_line_both_ways(tmp_path, page, chain_root):
         page.goto(s.url + "#dashboard")
         page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
         prov = page.locator("#provide-card")
-        assert prov.is_visible() and prov.locator("li.ko").count() == 2
+        assert prov.is_visible() and prov.locator("li.ko").count() == 1
+        assert prov.locator("li.ko .mono").inner_text() == "docs/TECHNICAL_CONVENTIONS.md"
         write(s.app_root, "docs/TECHNICAL_CONVENTIONS.md", "# Conventions\n")
-        page.reload()
-        page.wait_for_function("document.querySelectorAll('#provide-list li').length === 2")
-        assert prov.locator("li.ok").count() == 1 and prov.locator("li.ok .mono").inner_text() == "docs/TECHNICAL_CONVENTIONS.md"
-        assert prov.locator("li.ko .mono").inner_text() == ".claude/skills/technical-state-format/SKILL.md"
-        write(s.app_root, ".claude/skills/technical-state-format/SKILL.md", "---\n---\n")
         page.reload()
         page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
         assert prov.is_hidden()

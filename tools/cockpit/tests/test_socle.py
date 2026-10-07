@@ -57,9 +57,9 @@ def test_a_new_application(repo, tmp_path):
                           capture_output=True).returncode != 0
     # What the application still provides, one line each — never /deploie.
     lines = [l for l in out.splitlines() if l.startswith("À fournir : ")]
-    assert [l.split(" — ")[0] for l in lines] == ["À fournir : docs/TECHNICAL_CONVENTIONS.md",
-                                                  "À fournir : .claude/skills/technical-state-format/SKILL.md"]
-    assert "/conventions" in lines[0] and "deploie" not in out
+    # The technical-state-format skill is not there: the chain's install brings it.
+    assert [l.split(" — ")[0] for l in lines] == ["À fournir : docs/TECHNICAL_CONVENTIONS.md"]
+    assert "/conventions" in lines[0] and "deploie" not in out and "technical-state-format" not in out
 
 
 def test_refused_when_the_global_exists(repo):
@@ -91,12 +91,9 @@ def test_what_the_owner_staged_stays_out(repo):
 
 def test_the_list_alone_writes_nothing(repo):
     rc, out, _ = run(repo, "--list")
-    assert rc == 0 and out.count("À fournir : ") == 2
+    assert rc == 0 and out.count("À fournir : ") == 1
     assert not (repo / "docs").exists()
     write(repo, "docs/TECHNICAL_CONVENTIONS.md", "# Conventions\n")
-    rc, out, _ = run(repo, "--list")
-    assert out.count("À fournir : ") == 1 and "technical-state-format" in out
-    write(repo, ".claude/skills/technical-state-format/SKILL.md", "---\nname: technical-state-format\n---\n")
     assert run(repo, "--list")[1] == ""
 
 
@@ -119,7 +116,7 @@ def test_the_module_reads_the_same_list():
     spec = importlib.util.spec_from_file_location("socle", SCRIPT)
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
-    assert [p for p, _ in m.PROVIDE] == ["docs/TECHNICAL_CONVENTIONS.md", ".claude/skills/technical-state-format/SKILL.md"]
+    assert [p for p, _ in m.PROVIDE] == ["docs/TECHNICAL_CONVENTIONS.md"]
 
 
 def test_a_technical_state_already_there_is_kept(repo):

@@ -47,11 +47,20 @@ CHAIN_FILES = {
     ".claude/commands/1_x.md": "---\ndescription: x\n---\nbody\n",
     ".claude/scripts/s.py": "print('s')\n",
     ".claude/grids/GRILLE_G.md": "grid\n",
+    ".claude/formats/deploy-profile.md": "format\n",
+    ".claude/skills/technical-state-format/SKILL.md": "---\nname: technical-state-format\n---\nskill\n",
     # Not the chain: never installed.
+    ".claude/skills/other/SKILL.md": "another skill\n",
     "tools/cockpit/x.py": "cockpit\n",
     "docs/process/PROCESS_X.md": "process\n",
     ".claude/settings.local.json": "{}\n",
 }
+
+
+# What an install writes: the chain's files, nothing else.
+INSTALLED = [".claude/CLAUDE.md", ".claude/agents/a.md", ".claude/agents/b.md", ".claude/commands/1_x.md",
+             ".claude/scripts/s.py", ".claude/grids/GRILLE_G.md", ".claude/formats/deploy-profile.md",
+             ".claude/skills/technical-state-format/SKILL.md"]
 
 
 @pytest.fixture
@@ -90,11 +99,10 @@ def test_absent_then_up_to_date(repos):
     assert res["message"] == f"chain: {head[0]} {head[1]}"
     assert res["pushed"] and git(app, "rev-parse", "HEAD") == git(remote, "rev-parse", "master")
     # The chain's files and chain-version.json, nothing else.
-    assert files_of(app) == sorted([".claude/CLAUDE.md", ".claude/agents/a.md", ".claude/agents/b.md",
-                                    ".claude/commands/1_x.md", ".claude/scripts/s.py",
-                                    ".claude/grids/GRILLE_G.md", ".claude/chain-version.json"])
+    assert files_of(app) == sorted(INSTALLED + [".claude/chain-version.json"])
     assert not (app / "tools").exists() and not (app / "docs" / "process").exists()
     assert not (app / ".claude" / "settings.local.json").exists()
+    assert not (app / ".claude" / "skills" / "other").exists()
     assert (app / ".claude/commands/deploie.md").read_text(encoding="utf-8") == "the application's own\n"
     v = json.loads((app / ".claude/chain-version.json").read_text(encoding="utf-8"))
     assert v["commit"] == git(root, "rev-parse", "HEAD").strip()
@@ -226,6 +234,41 @@ def test_a_first_install_asks_before_replacing_what_is_there(repos):
     assert chain.state(str(app), str(root))["state"] == chain.UP_TO_DATE
 
 
+def test_an_applications_own_copy_of_the_skill_is_replaced_only_once_asked(repos):
+    """An application installed before the chain shipped the skill holds its
+    own copy: the install asks before replacing it, as any differing file
+    already there, and never touches the application's other skills."""
+    root, app, _ = repos
+    skill = ".claude/skills/technical-state-format/SKILL.md"
+    git(root, "rm", "-q", "--", skill)
+    commit(root, "chain without the skill")
+    chain.install(str(app), str(root))
+    write(app, skill, "---\nname: technical-state-format\n---\nthe application's own\n")
+    write(app, ".claude/skills/mine/SKILL.md", "mine\n")
+    commit(app, "own skills")
+    write(root, skill, CHAIN_FILES[skill])
+    commit(root, "chain ships the skill")
+    assert chain.plan(str(app), str(root))["ask"] == [skill]
+    with pytest.raises(chain.NeedsConfirm) as e:
+        chain.install(str(app), str(root))
+    assert e.value.files == [skill]
+    assert "the application's own" in (app / skill).read_text(encoding="utf-8")
+    chain.install(str(app), str(root), confirm=True)
+    assert (app / skill).read_text(encoding="utf-8") == CHAIN_FILES[skill]
+    assert (app / ".claude/skills/mine/SKILL.md").read_text(encoding="utf-8") == "mine\n"
+    assert chain.state(str(app), str(root))["state"] == chain.UP_TO_DATE
+
+
+def test_an_applications_copy_identical_to_the_chains_is_not_asked(repos):
+    root, app, _ = repos
+    skill = ".claude/skills/technical-state-format/SKILL.md"
+    write(app, skill, CHAIN_FILES[skill].replace("\n", "\r\n"))     # CRLF reads as LF
+    commit(app, "same skill")
+    assert chain.plan(str(app), str(root))["ask"] == []
+    chain.install(str(app), str(root))
+    assert chain.state(str(app), str(root))["state"] == chain.UP_TO_DATE
+
+
 # ----------------------------------------------------------------- refusals
 
 def test_refused_while_a_managed_file_is_not_committed(repos):
@@ -347,9 +390,7 @@ def test_first_install_on_an_empty_repository_is_its_first_commit(tmp_path, repo
     res = chain.install(str(app), str(root), push=True)
     assert res["app_commit"] and git(app, "rev-list", "--count", "HEAD").strip() == "1"
     assert git(app, "log", "-1", "--format=%s").strip() == res["message"]
-    assert files_of(app) == sorted([".claude/CLAUDE.md", ".claude/agents/a.md", ".claude/agents/b.md",
-                                    ".claude/commands/1_x.md", ".claude/scripts/s.py",
-                                    ".claude/grids/GRILLE_G.md", ".claude/chain-version.json"])
+    assert files_of(app) == sorted(INSTALLED + [".claude/chain-version.json"])
     # No remote: the commit stands, the push says why.
     assert not res["pushed"] and "push" in res["push_error"]
     assert chain.state(str(app), str(root))["state"] == chain.UP_TO_DATE
