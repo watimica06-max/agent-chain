@@ -27,7 +27,7 @@ does, and says when it fails.
 
 Last, it prints what the application still has to provide, one line
 each: `PROVIDE`, read by the cockpit too. Nothing there blocks the
-upstream chain; it is needed from `/7_lots` onward. The
+upstream chain; it is needed from `/batir` onward. The
 `technical-state-format` skill is not there: the chain's install brings
 it.
 
@@ -53,7 +53,7 @@ MESSAGE = "chore: scaffolding for the chain"
 PROVIDE = (
     ("docs/TECHNICAL_CONVENTIONS.md",
      "les conventions techniques — écrites par /conventions, jamais à la main ; "
-     "/conventions se lance après /6_convertit, avant /7_lots"),
+     "/conventions se lance après /6_convertit, avant /batir"),
 )
 
 

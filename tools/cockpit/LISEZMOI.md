@@ -215,7 +215,7 @@ l'application apporte elle-même, d'après `socle.py` : ses conventions
 techniques, `docs/TECHNICAL_CONVENTIONS.md`, écrites par `/conventions`.
 La compétence `technical-state-format` n'y est plus : l'installation de la
 chaîne l'apporte. Chaque ligne ✓ ou ✗, lue dans ses fichiers. Rien ne
-bloque l'amont : il les faut à partir de `/7_lots`. La carte disparaît
+bloque l'amont : il les faut à partir de `/batir`. La carte disparaît
 quand tout est ✓.
 
 **Chaîne → Code** — `/8_code` lot par lot : les lots passés sur le total,

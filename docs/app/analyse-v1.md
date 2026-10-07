@@ -42,7 +42,7 @@ checked; agt/cadreur.md:294 and :454 say it opens none).
 | `/2_structure` | Same test (cmd/2_structure.md:39-41, :199-205) | Yes |
 | `/4_grille` | Same test, on « the latest questions file at the root » (cmd/4_grille.md:102-111) | Yes |
 | `/6_convertit` | On `technique-*.md` only: « holds a `### Q` and no `^Answer:$` line, by grep » (cmd/6_convertit.md:149-151, :180, :393) | Yes. ⚠️ `^Answer:$` has no `\s*`: a lone trailing space reads as **answered** here and as **empty** under the three tests above |
-| `/conventions` | « `Answer:` lines with nothing after them » (cmd/conventions.md:35-36, :81) | Yes |
+| `/conventions` | « `Answer:` lines with nothing after them » (cmd/conventions.md:35-36, :89) | Yes |
 | `/fusion` | Row 5: « A root questions file with an empty `Answer:` » (cmd/fusion.md:60) — no pattern quoted | Yes |
 | `/fusion_applique` | « one grep for an empty `Answer:` » (cmd/fusion_applique.md:28, :41-42) — no pattern quoted | Yes |
 | `lexicographe` inv. 2, 4 | Reads its own answers and applies them term by term (agt/lexicographe.md:365-407, :551-580) | Yes — an option names a reading; `<option> — <remark>` is read whole |
@@ -131,8 +131,8 @@ nothing in the chain needs it after the answer is written.
 | `architecte` — `blocked_architecte.md` | One block + `## Invocation` (agt/architecte.md:247-256) | Main checkout, working-folder root / worktree | None — a directive decision takes « reworded » or « the rule in full » (:375-381) | Same, in `## To resume` |
 | `fusionneur` — `blocked_fusionneur.md` | One block + `## Invocation` (agt/fusionneur.md:223-255) | Main checkout / worktree | None | Same (:249-251) |
 | `diagnostiqueur` — `investigation/blocked_<id>.md`, `blocked_diagnostiqueur.md` | One block (agt/diagnostiqueur.md:76-111) | Main checkout, bug-fix folder / worktree | None | Same (:105-107) |
-| `cadreur` — `code/blocked_cadreur.md` | **One block, appended**: « append the new block below, as a fresh set of the four headings »; read on its **last** `## Decision` (agt/cadreur.md:138-143; cmd/7_lots.md:124-127) | Main checkout / worktree | None | Same, in each appended block's `## To resume` (:200-202) |
-| `verificateur` — `code/blocked_verificateur.md` | **No `## Decision`** — « three headings, no more » (agt/verificateur.md:198-213) | — | — | **None** — never a form (§8.2 agrees; cmd/7_lots.md:186) |
+| `cadreur` — `code/blocked_cadreur.md` | **One block, appended**: « append the new block below, as a fresh set of the four headings »; read on its **last** `## Decision` (agt/cadreur.md:138-143; cmd/7_lots.md:139-142) | Main checkout / worktree | None | Same, in each appended block's `## To resume` (:200-202) |
+| `verificateur` — `code/blocked_verificateur.md` | **No `## Decision`** — « three headings, no more » (agt/verificateur.md:198-213) | — | — | **None** — never a form (§8.2 agrees; cmd/7_lots.md:201) |
 | `detailleur` — `code/blocked_detailleur.md` | **Numbered**, `## Blocking N — lot-NN`, `###` sub-headings, **one** `## Decision` at the end holding numbered answers (agt/detailleur.md:328-353, :543-559) | Main checkout, split root / **worktree during `/8_code`**, where the Arbitre polls it (cmd/8_code.md:440-446; agt/arbitre.md:506-536) | None | `Options:` at the end of each entry's `### To resume` (:344-346, :551) |
 | `realisateur` — `code/<lot>/blocked_realisateur.md` | **Numbered**, one `## Decision` at the end (agt/realisateur.md:306-325) | Main checkout / **worktree during `/8_code`**, same poll | None | Same (:313-314) |
 | `concepteur` — `code/<lot>/blocked_concepteur.md` | One block (agt/concepteur.md:146-162) | Main checkout / worktree, committed by the agent (:137-141) | None | Same (:156-158) |
@@ -152,7 +152,7 @@ chain has five:
 1. One block — 11 writers.
 2. One block plus `## Invocation`, which routes the file between
    commands — redacteur, architecte, fusionneur (cmd/2_structure.md:134-141,
-   cmd/fusion.md:57-58, cmd/conventions.md:77-78).
+   cmd/fusion.md:57-58, cmd/conventions.md:85-86).
 3. Numbered, one `## Decision` **per entry** — qualifieur, classeur,
    redacteur inv. 3.
 4. Numbered, **one** `## Decision` for all entries, answered `N.` by
@@ -180,7 +180,7 @@ Two exceptions:
   agt/realisateur.md:560) **is** numbered text, so the test reads it as
   filled. Not found: any command row that shows it to the Product Owner.
 - The cadreur's conventions block lifts by the Architecte's
-  `## Verdict`, not by a decision: cmd/7_lots.md:189-190 and
+  `## Verdict`, not by a decision: cmd/7_lots.md:204-205 and
   agt/cadreur.md:326, :1097-1108. An empty last `## Decision` whose
   request has an empty verdict waits on the Architecte, not on her.
 
@@ -196,7 +196,7 @@ looks:
 | 1, 2 | Under the single `## Decision`, on the line after the blank line | « Grep `-A2 '^## Decision$'` — nothing under the heading is empty » (cmd/8_code.md:339-340); the same `-A2` in cmd/2_structure.md:183-185 |
 | 3 | Under **each** entry's `## Decision` | `grep -A2 '^## Decision$'`, « a heading followed by nothing but a blank line and the next heading, or the end of the file, is empty » (cmd/3a_genre.md:42-47; cmd/3b_nature.md:41-46) |
 | 4 | Under the single `## Decision`, as `N. <text>`, `N` matching its `## Blocking N` (agt/arbitre.md:154-161, :526-528) | The count above (cmd/8_code.md:330-335) |
-| 5 | Under the **last** `## Decision` of the file | « read on its last `## Decision` » (cmd/7_lots.md:118-119, :124-127) |
+| 5 | Under the **last** `## Decision` of the file | « read on its last `## Decision` » (cmd/7_lots.md:133-134, :139-142) |
 
 What that means for §8.3:
 
@@ -231,7 +231,7 @@ found.
 
 **A fourth place the Product Owner writes.** `## Décision du Product
 Owner` in `code/redecoupage.md`, after a third return
-(cmd/8_code.md:606-611, cmd/7_lots.md:348-352). TECHNICAL_V1 §2.3 lists
+(cmd/8_code.md:606-611, cmd/7_lots.md:363-367). TECHNICAL_V1 §2.3 lists
 three places; this is not one of them.
 
 ---

@@ -13,7 +13,7 @@
 | `PROCESS_MECANISMES.md` | Ce document. Le fichier de blocage, le fichier de questions, `stop.md`, la forme d'un relais et sa ligne `Next:`, le renommage `-NN` et l'archivage, l'invocation d'un agent et son frontmatter, les sections Git et worktree, les protocoles de lecture, la disposition du dossier de feature, les ensembles de valeurs fermés. Il énonce aussi, une fois pour les cinq, le périmètre d'audit. |
 | `PROCESS_ENTREES.md` | Les trois entrées de la chaîne — `idees.md`, `socle.py` (le script que le cockpit lance à la création d'une application, `/socle` jusqu'au cockpit 1.7), `/diagnostique` — ce que chacune garantit à ce qui suit, et ce qu'elle laisse manquant. Une quatrième, `/extrait`, n'existe pas : ni commande, ni agent, absente de `CLAUDE.md` — la carte ne la nomme pas comme entrée, parce qu'une carte qui nomme une commande que personne ne peut lancer trompe son lecteur ; mais le fait qu'elle a été retirée, et comment le global naît à sa place (`INIT` du Fusionneur sur la première feature fusionnée), est ce que la section enregistre → `PROCESS_ENTREES.md` §/extrait. |
 | `PROCESS_AMONT.md` | De l'idée à `spec-technique.md` : `/1_lexique` à `/6_convertit`, plus `/conventions` et la fusion (`/fusion`, `/fusion_compare`, `/fusion_applique`). Les agents lexicographe, redacteur, decoupeur, qualifieur, classeur, sondeur, assembleur, convertisseur, fusionneur, architecte. |
-| `PROCESS_AVAL.md` | De `spec-technique.md` au code fusionné : `/7_lots`, `/8_code`, `/9_controle`. Les agents cadreur, verificateur, detailleur, arbitre, concepteur, testeur, realisateur, relecteur, controleur. |
+| `PROCESS_AVAL.md` | De `spec-technique.md` au code fusionné : `/batir`, `/7_lots`, `/8_code`, `/9_controle`. Les agents batisseur, cadreur, verificateur, detailleur, arbitre, concepteur, testeur, realisateur, relecteur, controleur. |
 | `PROCESS_ANNEXES.md` | Hors périmètre d'audit : ce qui ne change aucun artefact que la chaîne produit. |
 
 **Les trois marques de lien**, chacune réservée à un seul usage :
@@ -47,7 +47,7 @@ Une section dont le titre porte `— divergence` décrit un mécanisme que deux 
 
 ### Frontmatter d'un agent
 
-Utilisé par: les vingt agents ; `CLAUDE.md` ; toutes les commandes qui invoquent (`/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique`) ; les quatre agents qui en invoquent un autre (cadreur, detailleur, realisateur, arbitre).
+Utilisé par: les vingt et un agents ; `CLAUDE.md` ; toutes les commandes qui invoquent (`/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/batir`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique`) ; les quatre agents qui en invoquent un autre (cadreur, detailleur, realisateur, arbitre).
 
 Chaque fichier `.claude/agents/<agent>.md` ouvre sur un frontmatter YAML à cinq clés au plus : `name`, `description`, `tools`, `model`, `effort`. `tools` est la liste des outils que le harnais donne à l'agent — un agent sans `Bash` ne commite rien, un agent sans `Glob` ne liste aucun dossier, un agent sans `Agent` n'invoque personne. `model` vaut `opus` ou `sonnet` et c'est cette valeur, jamais une autre, que le `model=` de l'appel reprend. `effort` est facultatif ; son absence sur un agent qui copie ou classe est voulue.
 
@@ -64,6 +64,7 @@ Chaque fichier `.claude/agents/<agent>.md` ouvre sur un frontmatter YAML à cinq
 | fusionneur | Read, Grep, Glob, Edit, Write | sonnet | high |
 | diagnostiqueur | Read, Grep, Glob, Write | sonnet | medium |
 | architecte | Read, Grep, Glob, WebSearch, WebFetch, Edit, Write | opus | high |
+| batisseur | Read, Grep, Glob, Edit, Write, Bash | sonnet | aucun |
 | cadreur | Read, Grep, Glob, Edit, Write, Agent | opus | high |
 | verificateur | Read, Grep, Glob, Write | opus | high |
 | detailleur | Read, Grep, Glob, Edit, Write, Agent | opus | high |
@@ -74,7 +75,7 @@ Chaque fichier `.claude/agents/<agent>.md` ouvre sur un frontmatter YAML à cinq
 | relecteur | Read, Grep, Glob, Write | sonnet | medium |
 | controleur | Read, Grep, Glob, Write | sonnet | high |
 
-Ce que la table établit : neuf agents sur `opus` (arbitre, architecte, cadreur, convertisseur, decoupeur, detailleur, lexicographe, sondeur, verificateur — la liste de `CLAUDE.md` concorde) ; quatre agents portent `Bash` (arbitre, concepteur, testeur, realisateur) et eux seuls commitent ou lancent une commande ; quatre portent `Agent` (cadreur, detailleur, arbitre, realisateur) ; deux portent `Skill` (arbitre, realisateur — la compétence `technical-state-format`, chargée avant toute écriture dans `docs/CURRENT_TECHNICAL_STATE.md`) ; un seul lit le web (architecte). Aucun agent n'a d'outil qui renomme ou supprime un fichier hors du `Bash` des quatre, et le shell de ces quatre est borné (→ `### Bash des agents — divergence`).
+Ce que la table établit : neuf agents sur `opus` (arbitre, architecte, cadreur, convertisseur, decoupeur, detailleur, lexicographe, sondeur, verificateur — la liste de `CLAUDE.md` concorde) ; cinq agents portent `Bash` (arbitre, batisseur, concepteur, testeur, realisateur) et eux seuls commitent ou lancent une commande ; quatre portent `Agent` (cadreur, detailleur, arbitre, realisateur) ; deux portent `Skill` (arbitre, realisateur — la compétence `technical-state-format`, chargée avant toute écriture dans `docs/CURRENT_TECHNICAL_STATE.md`) ; un seul lit le web (architecte). Aucun agent n'a d'outil qui renomme ou supprime un fichier hors du `Bash` des cinq, et le shell de ces cinq est borné (→ `### Bash des agents — divergence`).
 
 Le registre des agents est figé à l'ouverture de session : un fichier ajouté ou renommé sous `.claude/agents/` est invisible jusqu'au redémarrage (`CLAUDE.md`).
 
@@ -82,21 +83,21 @@ Coût et écarté : `effort` sur tous les agents · écarté : la règle d'un `e
 
 ### Frontmatter d'une commande
 
-Utilisé par: les dix-huit commandes de la chaîne.
+Utilisé par: les dix-neuf commandes de la chaîne.
 
-Chaque `.claude/commands/<commande>.md` ouvre sur `description`, `allowed-tools` et `argument-hint`. Les quinze commandes qui invoquent un agent portent `allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent` ; `/5_reclasse` : `Read, Grep, Glob, Write, Bash` ; `/audit_blocages` et `/audit_conventions` : `Read, Grep, Glob, Edit, Write`. `argument-hint` vaut `"<feature folder name>"` partout sauf `/8_code` (`"<feature folder name> [N]"`) ; `/conventions` lit un second argument nommant un `bugfix-NN` bien que son `argument-hint` n'en dise rien. Le premier argument est obligatoire : sans lui la commande demande et s'arrête ; `$ARGUMENTS` porte les deux quand il y en a deux, et le dossier de feature se dérive du premier seul.
+Chaque `.claude/commands/<commande>.md` ouvre sur `description`, `allowed-tools` et `argument-hint`. Les seize commandes qui invoquent un agent portent `allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent` ; `/5_reclasse` : `Read, Grep, Glob, Write, Bash` ; `/audit_blocages` et `/audit_conventions` : `Read, Grep, Glob, Edit, Write`. `argument-hint` vaut `"<feature folder name>"` partout sauf `/8_code` (`"<feature folder name> [N]"`) ; `/conventions` lit un second argument nommant un `bugfix-NN` bien que son `argument-hint` n'en dise rien. Le premier argument est obligatoire : sans lui la commande demande et s'arrête ; `$ARGUMENTS` porte les deux quand il y en a deux, et le dossier de feature se dérive du premier seul.
 
 Coût et écarté : aucun écart connu · raison : à retrouver · inconnu.
 
 ### Invocation d'un agent
 
-Utilisé par: `CLAUDE.md` ; `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique` ; cadreur, detailleur, realisateur, arbitre.
+Utilisé par: `CLAUDE.md` ; `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/batir`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique` ; cadreur, detailleur, realisateur, arbitre.
 
 L'outil est `Agent`, au schéma strict — une clé inconnue est rejetée. Quatre paramètres sont passés, jamais d'autre :
 
 | Paramètre | Valeur |
 |---|---|
-| `subagent_type` | Le nom du fichier d'agent : `lexicographe` · `redacteur` · `decoupeur` · `qualifieur` · `classeur` · `sondeur` · `assembleur` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `cadreur` · `verificateur` · `detailleur` · `concepteur` · `testeur` · `realisateur` · `relecteur` · `arbitre` · `controleur` |
+| `subagent_type` | Le nom du fichier d'agent : `lexicographe` · `redacteur` · `decoupeur` · `qualifieur` · `classeur` · `sondeur` · `assembleur` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `batisseur` · `cadreur` · `verificateur` · `detailleur` · `concepteur` · `testeur` · `realisateur` · `relecteur` · `arbitre` · `controleur` |
 | `model` | Ce que le frontmatter de l'agent dit, `opus` ou `sonnet`. Une exception : le troisième realisateur d'un lot dont `## Causes so far` porte deux fois `reasoning` est passé en `opus` (`/8_code`) |
 | `description` | Trois à cinq mots, pour le suivi de contexte — `"Sweep <name>'s vocabulary"`, `"Detail block-2 sheets"`, `"Requests <the working folder>"` |
 | `prompt` | Les entrées de l'agent et les paramètres de l'appel, rien d'autre — jamais une paraphrase du processus de l'agent, de ses entrées, de ses vérifications, de son format de sortie |
@@ -108,7 +109,8 @@ Le prompt est fait de lignes à forme fixe, que l'agent lit et sur lesquelles il
 | Ligne | Qui la porte |
 |---|---|
 | `Feature folder: docs/features/<name>/.` | redacteur, convertisseur, controleur, fusionneur, architecte (invocations 1, 2, 4) |
-| `Working folder: <the working folder>.` | cadreur, verificateur, detailleur, arbitre, architecte (invocation 3), concepteur, testeur, realisateur, relecteur |
+| `Working folder: <the working folder>.` | batisseur, cadreur, verificateur, detailleur, arbitre, architecte (invocation 3), concepteur, testeur, realisateur, relecteur |
+| `Conventions: <commit>.` · `Blocking file: blocked_batisseur.md.` | batisseur |
 | `Bug-fix folder: docs/features/<name>/bugfix-NN/.` | diagnostiqueur |
 | `The product file: docs/features/<name>/desc-produit.md.` | decoupeur, qualifieur, classeur, sondeur |
 | `The idea file:` · `The lexicon:` · `The grid:` · `The global:` | lexicographe ; sondeur |
@@ -180,7 +182,7 @@ Coût et écarté : deux racines à tenir · écarté : un chemin absolu · rais
 
 ### Dossier de travail
 
-Utilisé par: `/7_lots`, `/8_code`, `/9_controle`, `/audit_blocages`, `/audit_conventions`, `/conventions` (invocation 3), `/diagnostique` ; cadreur, verificateur, detailleur, arbitre, architecte, concepteur, testeur, realisateur, relecteur, diagnostiqueur.
+Utilisé par: `/7_lots`, `/8_code`, `/9_controle`, `/audit_blocages`, `/audit_conventions`, `/conventions` (invocation 3), `/diagnostique` ; `/batir` (l'exception : le dossier de feature, toujours) ; batisseur, cadreur, verificateur, detailleur, arbitre, architecte, concepteur, testeur, realisateur, relecteur, diagnostiqueur.
 
 Le dossier de travail est le `bugfix-NN/` de numéro le plus haut dans `docs/features/<name>/` s'il en existe un, le dossier de feature lui-même sinon. Un cycle de correction garde tout ce qu'il produit dans son propre dossier, à la même structure : le document technique à la racine — `spec-technique.md` pour une feature, `desc-bug.md` pour une correction, jamais les deux — et `code/` à côté, plus `architecte/`. Les commandes aval dérivent le dossier du nom de feature et passent le dossier de travail dans le prompt, jamais le dossier de feature ; l'agent reconnaît le cycle au document qu'il y trouve. Deux fichiers restent à la racine du dossier de feature quel que soit le dossier de travail : `par-genre/recette.md` et `registre-questions.md` ; `couverture.md` aussi, que l'Architecte écrit sur la feature et que `/audit_conventions` cherche un niveau au-dessus. `/9_controle` lit les phases 1 à 3 sur le dossier de feature et 4 à 6 sur le dossier de travail. `/diagnostique` exige le `bugfix-NN/` et son `bug-list.md`, créés à la main par le Product Owner, et n'en crée jamais.
 
@@ -192,13 +194,13 @@ Coût et écarté : deux dossiers à distinguer sur un cycle de correction · é
 
 ### Fichier de blocage — divergence
 
-Utilisé par: lexicographe, redacteur, decoupeur, qualifieur, classeur, sondeur, assembleur, convertisseur, fusionneur, architecte, diagnostiqueur, cadreur, verificateur, detailleur, concepteur, testeur, realisateur, relecteur (dix-huit scripteurs ; l'arbitre en remplit le `## Decision`, le controleur n'en écrit jamais) ; toutes les commandes qui invoquent.
+Utilisé par: lexicographe, redacteur, decoupeur, qualifieur, classeur, sondeur, assembleur, convertisseur, fusionneur, architecte, diagnostiqueur, batisseur, cadreur, verificateur, detailleur, concepteur, testeur, realisateur, relecteur (dix-neuf scripteurs ; l'arbitre en remplit le `## Decision`, le controleur n'en écrit jamais) ; toutes les commandes qui invoquent.
 
 Le noyau commun : quand produire est impossible — une entrée manquante, un fichier nommé absent, une prémisse fausse, une signature inécrivable — l'agent écrit un fichier `blocked_<nom>.md` à un emplacement fixé d'avance (→ `### Emplacement des fichiers de blocage`), au lieu de seulement le dire : un message de réponse se perd, un fichier non. Bloquer n'est pas signaler : un doute, une lacune, une contradiction vont dans le fichier de questions et le cycle continue ; on ne bloque jamais par prudence. Le titre `## Decision` est écrit vide et jamais omis — c'est là que le Product Owner répond à la main, et c'est ce que les commandes greppent (`grep -A2 '^## Decision$'`). L'agent ne renomme jamais son fichier ; la commande le fait une fois que l'agent a rapporté avoir appliqué la décision (→ `### Renommage -NN — divergence`). Le fichier de blocage est fusionné et poussé comme le reste : le Product Owner doit le voir.
 
 Cinq formes coexistent, et un lecteur qui les confond se trompe :
 
-**Forme 1 — quatre titres, un bloc par fichier.** `## What blocks` (le fait, en une phrase), `## Where` (le bloc, la section, le fichier, le symbole), `## To resume` (la décision ou la correction attendue), `## Decision` (vide). Scripteurs : decoupeur, sondeur, assembleur, convertisseur, diagnostiqueur, cadreur, concepteur, testeur, relecteur. Le lexicographe énonce les quatre mêmes champs (`What blocks`, `Where`, `To resume`, `Decision`) sous forme de table, sans montrer le `##` — `/1_lexique` greppe pourtant `## Decision` ; c'est le défaut que `docs/verification3/plan.md` entrée 63 a corrigé chez le decoupeur, et que le fichier du lexicographe présente encore. Le Cadreur, quand son fichier existe déjà avec un `## Decision` rempli, n'écrit pas par-dessus : il ajoute un jeu neuf des quatre titres en dessous, et la commande lit le dernier `## Decision` du fichier.
+**Forme 1 — quatre titres, un bloc par fichier.** `## What blocks` (le fait, en une phrase), `## Where` (le bloc, la section, le fichier, le symbole), `## To resume` (la décision ou la correction attendue), `## Decision` (vide). Scripteurs : decoupeur, sondeur, assembleur, convertisseur, diagnostiqueur, batisseur, cadreur, concepteur, testeur, relecteur — le batisseur sans `Options:`, et sur un outil de build introuvable son `## To resume` est un tutoriel en français, pas à pas, qui finit sur ce qu'il faut écrire sous `## Decision`. Le lexicographe énonce les quatre mêmes champs (`What blocks`, `Where`, `To resume`, `Decision`) sous forme de table, sans montrer le `##` — `/1_lexique` greppe pourtant `## Decision` ; c'est le défaut que `docs/verification3/plan.md` entrée 63 a corrigé chez le decoupeur, et que le fichier du lexicographe présente encore. Le Cadreur, quand son fichier existe déjà avec un `## Decision` rempli, n'écrit pas par-dessus : il ajoute un jeu neuf des quatre titres en dessous, et la commande lit le dernier `## Decision` du fichier.
 
 **Forme 2 — cinq titres, `## Invocation` en tête.** `## Invocation` (1, 2 ou 3 ; 1 à 4 pour l'architecte), puis les quatre de la forme 1. Scripteurs : redacteur, fusionneur, architecte. La ligne route le fichier : le redacteur a trois invocations et un seul nom de fichier, et `/2_structure` lit 1 ou 2, `/fusion` lit 3 ; `/fusion_compare` et `/fusion_applique` lisent celle du fusionneur ; `/conventions` et `/8_code` celle de l'architecte. Le redacteur, à l'invocation 3, ajoute des `## Blocking N` sous l'unique `## Invocation`, les quatre titres répétés sous chacun, un `## Decision` par entrée.
 
@@ -216,7 +218,7 @@ Cinq formes coexistent, et un lecteur qui les confond se trompe :
     - <une proposition, une phrase entière, en français>
     - <une autre>
 
-De deux à six propositions, en français — une option choisie devient la décision du Product Owner mot pour mot ; aucune n'ouvre sur un numéro suivi d'un point (`1.`, `2.`), qu'en forme 4 on compterait comme une réponse sous `## Decision`. Facultative, et absente quand la correction est une entrée manquante. Scripteurs : les dix-sept des formes 1 à 4 — jamais le verificateur, dont la forme 5 n'a ni `## Decision` ni `To resume`. Ce qui diverge : le lexicographe et l'architecte la disent dans la ligne `To resume` de leur table de champs ; en forme 3 et chez le redacteur à l'invocation 3, une liste par entrée, au bout de chaque `## To resume` ; en forme 4, chaque `### To resume` peut porter la sienne ; le Cadreur en met une à chaque jeu de titres ajouté sous un `## Decision` rempli, et aucune sur un blocage de conventions, que le verdict de l'Architecte lève ; le Relecteur, aucune sur un blocage qui nomme manquant le rapport, la fiche, `conception.md` ou `tests.md` — l'acte de `/8_code` y répond ; le qualifieur et le classeur y écrivent les formes que prend la décision — un genre parmi les six, ou le bloc réécrit ou retiré ; une nature parmi les huit, une réécriture ou un retrait, une nature hors des huit.
+De deux à six propositions, en français — une option choisie devient la décision du Product Owner mot pour mot ; aucune n'ouvre sur un numéro suivi d'un point (`1.`, `2.`), qu'en forme 4 on compterait comme une réponse sous `## Decision`. Facultative, et absente quand la correction est une entrée manquante. Scripteurs : les dix-huit des formes 1 à 4 — jamais le verificateur, dont la forme 5 n'a ni `## Decision` ni `To resume`. Ce qui diverge : le lexicographe et l'architecte la disent dans la ligne `To resume` de leur table de champs ; en forme 3 et chez le redacteur à l'invocation 3, une liste par entrée, au bout de chaque `## To resume` ; en forme 4, chaque `### To resume` peut porter la sienne ; le Cadreur en met une à chaque jeu de titres ajouté sous un `## Decision` rempli, et aucune sur un blocage de conventions, que le verdict de l'Architecte lève ; le Relecteur, aucune sur un blocage qui nomme manquant le rapport, la fiche, `conception.md` ou `tests.md` — l'acte de `/8_code` y répond ; le qualifieur et le classeur y écrivent les formes que prend la décision — un genre parmi les six, ou le bloc réécrit ou retiré ; une nature parmi les huit, une réécriture ou un retrait, une nature hors des huit.
 
 Ce que le fichier de blocage entraîne diverge aussi : un run bloqué n'écrit rien d'autre — ni fichier de questions, ni section, ni plan — chez le lexicographe, le sondeur, l'assembleur, le convertisseur, le fusionneur ; le qualifieur et le classeur écrivent leur fichier de questions quand même ; le concepteur et le testeur écrivent d'abord leur rapport (`## Declared` et `## Compile`, `## Tests` et `## Red`), puis le fichier, puis commitent le tout ; le realisateur écrit son rapport (`## Build` disant que rien n'a passé) et commite ce qui compile ; le redacteur, à l'invocation 3, continue le pliage ; le cadreur écrit le fichier dans chacun de ses cas de blocage, un arrêt sans fichier étant invisible à la commande. L'assembleur distingue le blocage de l'arrêt sur fichier manquant, qui n'écrit rien ; le diagnostiqueur, l'arrêt sur `desc-bug.md` existant ; le controleur ne bloque jamais et met tout dans son rapport.
 
@@ -226,7 +228,7 @@ Coût et écarté : cinq formes pour un même mécanisme · écarté : une forme
 
 ### Emplacement des fichiers de blocage
 
-Utilisé par: les dix-huit agents qui bloquent ; `/audit_blocages` ; chaque commande qui teste un fichier de blocage avant d'invoquer.
+Utilisé par: les dix-neuf agents qui bloquent ; `/audit_blocages` ; chaque commande qui teste un fichier de blocage avant d'invoquer.
 
 | Scripteur | Chemin, relatif au dossier de feature ou de travail | Forme |
 |---|---|---|
@@ -243,6 +245,7 @@ Utilisé par: les dix-huit agents qui bloquent ; `/audit_blocages` ; chaque comm
 | fusionneur | `blocked_fusionneur.md` | 2 |
 | architecte | `blocked_architecte.md`, à la racine du dossier de travail — jamais quand l'Arbitre l'appelle : le refus va dans `## Verdict` | 2 |
 | diagnostiqueur | `investigation/blocked_<id>.md` (invocation 1, `<id>` le `G<n>` du manque) · `blocked_diagnostiqueur.md` (invocation 2) | 1 |
+| batisseur | `blocked_batisseur.md`, à la racine du dossier de feature | 1 |
 | cadreur | `code/blocked_cadreur.md` | 1, empilé |
 | verificateur | `code/blocked_verificateur.md` | 5 |
 | detailleur | `code/blocked_detailleur.md`, à la racine du découpage, jamais sous un lot | 4 |
@@ -268,7 +271,7 @@ Coût et écarté : la reprise portée par le prompt (A) ou par le disque (B) ·
 
 ### Renommage -NN — divergence
 
-Utilisé par: `/1_lexique`, `/2_structure`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/7_lots`, `/8_code`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique` ; `/audit_blocages` (lit les `-NN`) ; tout agent de variante B (lit les `-NN`).
+Utilisé par: `/1_lexique`, `/2_structure`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/batir`, `/7_lots`, `/8_code`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique` ; `/audit_blocages` (lit les `-NN`) ; tout agent de variante B (lit les `-NN`).
 
 **Forme standard.** Une fois que l'agent a rapporté avoir appliqué la décision, la commande fait `git mv <dossier>/blocked_<x>.md <dossier>/blocked_<x>-NN.md`, dans le worktree, avant les cinq pas Git ; `NN` est le plus haut `blocked_<x>-NN.md` du même dossier plus un, `01` quand il n'y en a pas, compté par nom de fichier et par dossier. Un fichier laissé au nom non numéroté se lit comme un blocage encore debout, et le run suivant s'y arrête — ce qu'un blocage neuf doit précisément faire. Le même geste sert à `code/<lot>/reprise_realisateur.md` (`/8_code`, une fois que le Réalisateur dit l'avoir consommé) et à `code/redecoupage.md` (`/7_lots`, sur la ligne `## Redécoupage: archivable` de `code/sequence.md`, lue au fichier et retirée après l'archive).
 
@@ -368,7 +371,7 @@ Coût et écarté : un relais sans lecture · écarté : l'orchestrateur résume
 
 ### Ligne Next:
 
-Utilisé par: les dix-huit commandes de la chaîne — `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/5_reclasse`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique`, `/audit_blocages`, `/audit_conventions` ; `CLAUDE.md` (*The `Next:` line*, la grammaire) ; l'application cockpit, lectrice (`docs/app/TECHNICAL_V1.md` §9).
+Utilisé par: les dix-neuf commandes de la chaîne — `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/5_reclasse`, `/6_convertit`, `/batir`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique`, `/audit_blocages`, `/audit_conventions` ; `CLAUDE.md` (*The `Next:` line*, la grammaire) ; l'application cockpit, lectrice (`docs/app/TECHNICAL_V1.md` §9).
 
 Chaque relais finit sur une ligne, et une seule, dans cette grammaire — les arrêts compris, un arrêt étant un relais aussi :
 
@@ -396,13 +399,13 @@ Coût et écarté : deux fichiers, deux lieux · écarté : un seul lieu pour `s
 
 ### Git, avant l'invocation
 
-Utilisé par: `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique` ; `CLAUDE.md`.
+Utilisé par: `/1_lexique`, `/2_structure`, `/3_decoupe`, `/3a_genre`, `/3b_nature`, `/4_grille`, `/6_convertit`, `/batir`, `/7_lots`, `/8_code`, `/9_controle`, `/conventions`, `/diagnostique`, `/fusion`, `/fusion_compare`, `/fusion_applique` ; `CLAUDE.md`.
 
 Avant ces gestes, et avant le classement, chaque test de précondition de la commande : le premier geste qui change le dépôt (`git mv`, copie, commit, worktree) et le premier agent ne viennent qu'après. Trois commandes gardent un test après ce geste, parce qu'il lit ce que le geste ou une phase produit : `/2_structure` (la racine après le classement), `/9_controle` (la carte que la phase 1 écrit), `/diagnostique` (la porte de la phase 2) — le cockpit demande toujours confirmation pour les deux dernières (`tools/cockpit/scan_rules.md` §2) ; plus pour `/2_structure` depuis la 1.4.3 : ses trois arrêts après le classement ne laissent que le fichier vide du lexicographe classé, un état que la commande suivante lit juste.
 
 Trois gestes, dans cet ordre, une fois le classement des fichiers de questions fait :
 
-1. Commit du dossier de feature : `git add docs/features/<name>/ && git commit -m "chore: answers"` — le Product Owner remplit `Answer:`, `## Decision` et `bug-list.md` à la main hors session, et un worktree branche sur le dernier commit : une réponse non commitée y est invisible. Rien à commiter est l'issue normale. Le message diverge par commande : `chore: answers` (amont, `/conventions`, `/diagnostique`, `/fusion*`), `chore: pre-split` (`/7_lots`), `chore: pre-code` (`/8_code`), `chore: pre-control` (`/9_controle`).
+1. Commit du dossier de feature : `git add docs/features/<name>/ && git commit -m "chore: answers"` — le Product Owner remplit `Answer:`, `## Decision` et `bug-list.md` à la main hors session, et un worktree branche sur le dernier commit : une réponse non commitée y est invisible. Rien à commiter est l'issue normale. Le message diverge par commande : `chore: answers` (amont, `/conventions`, `/diagnostique`, `/fusion*`), `chore: pre-build` (`/batir`), `chore: pre-split` (`/7_lots`), `chore: pre-code` (`/8_code`), `chore: pre-control` (`/9_controle`).
 2. Création du worktree depuis le `HEAD` local, et enregistrement : `git worktree add .claude/worktrees/<name> HEAD` — jamais l'outillage ne choisit la base, dont le défaut est `origin/master`, qui peut être plusieurs commits derrière le local. Un seul worktree par run (`/8_code`), pas un par lot.
 3. Entrée dans le worktree avant d'invoquer, pas après un échec d'écriture : le harnais bloque les écritures d'un sous-agent tant que la session n'est pas isolée. Dans le worktree, la commande crée les dossiers cibles qui manquent (`cadrage-produit/closed`, `convertisseur/closed`) — un agent dont le dossier cible manque cherche au lieu de s'arrêter.
 
@@ -438,9 +441,9 @@ Coût et écarté : pas de worktree sans agent · écarté : un worktree systém
 
 ### Bash des agents — divergence
 
-Utilisé par: concepteur, testeur, realisateur, arbitre ; `/8_code` (lit leurs commits).
+Utilisé par: batisseur, concepteur, testeur, realisateur, arbitre ; `/8_code` (lit leurs commits), `/batir`.
 
-Quatre agents portent `Bash`, chacun sur une liste blanche, et rien d'autre — pas de recherche, pas de listing, pas d'attente, pas de fusion, pas de branche, pas de push, pas de worktree ; pour trouver quelque chose, `Grep` et `Glob`, bornés au dépôt, jamais une recherche shell qui parcourt la machine :
+Cinq agents portent `Bash`, chacun sur une liste blanche, et rien d'autre — pas de recherche, pas de listing, pas d'attente, pas de fusion, pas de branche, pas de push, pas de worktree ; pour trouver quelque chose, `Grep` et `Glob`, bornés au dépôt, jamais une recherche shell qui parcourt la machine :
 
 | Agent | Ce que son `Bash` lance |
 |---|---|
@@ -448,6 +451,7 @@ Quatre agents portent `Bash`, chacun sur une liste blanche, et rien d'autre — 
 | testeur | `git add`, `git commit`, `git status`, et la commande de test que les conventions nomment — ou la tâche de test par défaut de l'outil de build sur le module |
 | realisateur | `git add`, `git commit`, `git status`, `git restore`, et les commandes d'analyse statique et de test que les conventions nomment — ou leurs tâches par défaut ; une commande à la fois, au premier plan, jamais en arrière-plan avec sondage |
 | arbitre | `sleep` entre deux lectures du fichier de blocage, pendant l'attente du Product Owner — rien d'autre |
+| batisseur | `git add`, `git commit`, `git status`, chaque commande de la table de G2.1 telle qu'écrite, précédée de `time` ; et pour obtenir les outils de build : la commande qui obtient le système de build comme G12.6 le dit, un téléchargement depuis la source officielle d'un outil de build, l'extraction d'une archive dans le cache de ces outils, l'outil officiel de la plateforme pour ses composants — jamais un installeur système, des droits élevés, une licence acceptée à la place du Product Owner |
 
 Le repli est le même pour les trois agents de lot : la tâche par défaut de l'outil de build dont `## Compile` du rapport de conception montre la commande, et le rapport nomme la commande qui a tourné, celle des conventions ou le repli.
 
@@ -635,12 +639,13 @@ Coût et écarté : une marque en ligne · écarté : une note en fin de documen
 
 ### Requête de conventions — divergence
 
-Utilisé par: cadreur, detailleur, concepteur, realisateur, arbitre (scripteurs) ; architecte (invocation 3, écrit `## Verdict`) ; `/7_lots`, `/8_code` (glob sur `## Verdict` vide) ; `/audit_conventions` ; cadreur (lit le verdict que son `## Where` nomme).
+Utilisé par: batisseur, cadreur, detailleur, concepteur, realisateur, arbitre (scripteurs) ; architecte (invocation 3, écrit `## Verdict`) ; `/batir`, `/7_lots`, `/8_code` (glob sur `## Verdict` vide) ; `/audit_conventions` ; cadreur (lit le verdict que son `## Where` nomme).
 
 Un agent qui manque d'une règle écrit une requête dans `architecte/` du dossier de travail, dossier créé s'il manque, avec cinq titres — `## What I need`, `## Why the lot cannot proceed`, `## Where I met it`, `## What I think it is` (add · update · remove), `## Verdict` laissé vide — décrivant ce qui manque, jamais la règle : l'Architecte seul sait si c'est une convention. Les formes divergent :
 
 | Scripteur | Fichier | Particularités |
 |---|---|---|
+| batisseur | `architecte/batisseur.md`, à la racine du dossier de feature | Requêtes empilées, chacune ouvrant sur `# Request N`, comme le cadreur ; un trou ou une contradiction dans les tables de G2.1, G4.4, G12.6, ou deux versions qu'elles imposent et qui ne vont pas ensemble ; sous `## Why the lot cannot proceed`, le lot est le build ; jamais de fichier de blocage à côté — `/batir` invoque l'Architecte et réinvoque le Bâtisseur, qui ne relève jamais un besoin qu'un bloc répondu porte déjà ; la requête n'est jamais dans le commit du Bâtisseur |
 | cadreur | `architecte/cadreur.md` | Requêtes empilées, chacune ouvrant sur `# Request N` (`1` puis le numéro libre suivant) ; une requête peut s'accompagner d'un `code/blocked_cadreur.md` dont `## Where` vaut `architecte/cadreur.md — Request N`, et c'est le `## Verdict` de cette requête qui lève le blocage |
 | detailleur | `architecte/detailleur-<lot>.md`, suffixe `-2` pour une seconde sur le même lot ; une requête de la marche est classée sous le premier lot du bloc | Ne bloque jamais dessus — sauf l'absence de dossiers de code dans les conventions ; la fiche nomme la requête sous `## Requests` |
 | concepteur | `architecte/concepteur-<lot>.md`, suffixe `-2` | Un placement que les conventions ne règlent pas ; ne bloque jamais, place en attendant dans le module de la dépendance la plus forte et le dit sous `## Where I met it` |
@@ -887,6 +892,16 @@ Les valeurs :
 - `verdict refused` — la requête refusée ; le blocage tient, `/7_lots` relaie au Product Owner et ne réinvoque pas
 - `block standing` — un `## Decision` vide que rien ne lève ; relayé
 
+### built / blocked — l'issue d'un squelette
+
+Écrit par: batisseur (ligne `## Status:` de `batisseur.md`, à la racine du dossier de feature, réécrit entier à chaque run)
+Lu par: `/batir` (à chaque retour du Bâtisseur) ; `/7_lots` (avant de couper, avec le commit de `## Conventions`)
+Les valeurs :
+- `built` — chaque commande de G2.1 est sortie à 0, chaque paquet `assemble` a été trouvé, chaque dossier de G4.4 et chaque fichier de build de G12.6 existent et déclarent ce que les tables disent ; `/batir` → `/7_lots` ; `/7_lots` coupe, si le commit de `## Conventions` est celui que `git log -1 --format=%H -- docs/TECHNICAL_CONVENTIONS.md` donne
+- `blocked` — tout le reste, une requête en attente comprise ; `/batir` aiguille sur ce qui est à côté (fichier de blocage, requête) ; `/7_lots` renvoie à `/batir`, comme sur un rapport absent ou un autre commit
+
+Divergence : aucune — les deux lecteurs énumèrent les deux valeurs.
+
 ### Les verbes du plan de fusion — ce qu'une phrase devient
 
 Écrit par: fusionneur (invocation 1, `plan-fusion.md` ; invocation 2 résout `PENDING`)
@@ -1037,10 +1052,10 @@ Traverse: lexicographe, redacteur, qualifieur, classeur, sondeur, assembleur, co
 ### Requête → verdict → règle
 
 Ouverte par: un agent qui écrit une requête sous `architecte/` à `## Verdict` vide (→ `### Requête de conventions — divergence`)
-Fermée par: l'Architecte (invocation 3) écrit le `## Verdict` sous la requête, et la règle éventuelle dans `docs/TECHNICAL_CONVENTIONS.md` avec sa ligne de `couverture.md` ; le test : aucun bloc de requête à `## Verdict` vide ou absent dans `architecte/` (glob par `/7_lots`, `/8_code`)
-Plafond: une requête par invocation pour l'Arbitre, jamais deux fois sous une autre formulation ; aucun pour les autres
+Fermée par: l'Architecte (invocation 3) écrit le `## Verdict` sous la requête, et la règle éventuelle dans `docs/TECHNICAL_CONVENTIONS.md` avec sa ligne de `couverture.md` ; le test : aucun bloc de requête à `## Verdict` vide ou absent dans `architecte/` (glob par `/batir`, `/7_lots`, `/8_code`)
+Plafond: une requête par invocation pour l'Arbitre, jamais deux fois sous une autre formulation ; trois invocations de l'Architecte par run pour `/batir` ; aucun pour les autres
 Au plafond: l'Arbitre attend le Product Owner ou tranche depuis ce que le refus nomme
-Traverse: cadreur, detailleur, concepteur, realisateur, arbitre, architecte ; `/7_lots`, `/8_code`, `/conventions` (invocation 3 par le second argument), `/audit_conventions` — `PROCESS_AVAL.md`, `PROCESS_AMONT.md`
+Traverse: batisseur, cadreur, detailleur, concepteur, realisateur, arbitre, architecte ; `/batir`, `/7_lots`, `/8_code`, `/conventions` (invocation 3 par le second argument), `/audit_conventions` — `PROCESS_AVAL.md`, `PROCESS_AMONT.md`
 
 ## Inventaire
 

@@ -297,11 +297,11 @@ commands' own tests, unchanged:
   it leaves is hers;
 - shape 5: the last `## Decision`, empty — **unless** the `# Request N`
   its `## Where` names has an empty `## Verdict`, or none
-  (`cmd/7_lots.md:210`, `:244-245`): the Architecte answers it, not her.
+  (`cmd/7_lots.md:225`, `:244-245`): the Architecte answers it, not her.
   **A filled verdict is shown (1.4.1)**: refused by the Cadreur, it is hers
-  (`cmd/7_lots.md:213`, `agents/cadreur.md:1119`), and nothing on disk
+  (`cmd/7_lots.md:228`, `agents/cadreur.md:1119`), and nothing on disk
   tells a refusal from a verdict the Cadreur has yet to read
-  (`cmd/7_lots.md:211`) — the entry says so. Applied, the file is renamed
+  (`cmd/7_lots.md:226`) — the entry says so. Applied, the file is renamed
   and gone;
 - the relecteur's file: **always shown (1.4.1)**. Its act rows
   (`cmd/8_code.md:748-750`) differ from « anything else » (`:751`) only
@@ -318,7 +318,7 @@ in the main checkout before the command hands back.
 
 After a third redécoupage, the Product Owner writes under
 `## Décision du Product Owner` (`cmd/8_code.md:606-611`,
-`cmd/7_lots.md:348-352`). Free text only.
+`cmd/7_lots.md:363-367`). Free text only.
 
 ### 8.4 Answers are tested the way the commands test them
 
@@ -907,8 +907,8 @@ tests a type's name, it shows what the adapter declares.
 
 `.claude/deploy.json` of the application, its contract written once in
 **`.claude/formats/deploy-profile.md`** — the chain's, so the install
-brings it to every application, where the agent that builds a skeleton
-reads it: `format` (1) and `targets`, each the frame's `name`, `type`,
+brings it to every application, where the Bâtisseur (`/batir`) reads it
+when it builds a skeleton: `format` (1) and `targets`, each the frame's `name`, `type`,
 `build`, then its adapter's fields. A key nobody
 declares is refused. `deploy_profile.py` checks, loads and saves it; saving
 writes it in the contract's order, commits it alone — `deploy: profil`,

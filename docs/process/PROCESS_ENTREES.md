@@ -228,7 +228,7 @@ encore fournir. Code de sortie 0, 2 sur le refus, 1 quand git échoue.
    réécrit, ses fins de ligne gardées (→ MECANISMES §stop.md).
 7. Ne pas créer `docs/TECHNICAL_CONVENTIONS.md` : l'Architecte l'écrit
    à `/conventions`, lancé à la main après `/6_convertit` et avant
-   `/7_lots`.
+   `/batir`.
 8. Commiter ces fichiers seuls (`--only`), `chore: scaffolding for the
    chain` ; ce que le Product Owner a indexé reste hors du commit. Ne
    pas pousser : le cockpit pousse quand l'application a un dépôt
@@ -237,7 +237,7 @@ encore fournir. Code de sortie 0, 2 sur le refus, 1 quand git échoue.
    `PROVIDE` dans le script, que la carte « À fournir avant le code » du
    cockpit lit au script même, jamais une copie :
    `docs/TECHNICAL_CONVENTIONS.md`, par `/conventions` et non à la
-   main ; il ne bloque pas l'amont — seulement `/7_lots` et la suite.
+   main ; il ne bloque pas l'amont — seulement `/batir` et la suite.
    La compétence `technical-state-format` n'est plus dans la liste :
    la chaîne la livre (`.claude/skills/technical-state-format/SKILL.md`),
    et l'installation l'apporte avant que le script ne tourne.

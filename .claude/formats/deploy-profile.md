@@ -3,8 +3,9 @@
 The contract between an application and the cockpit's « Déploiement »
 screen (cockpit 1.8, `docs/app/TECHNICAL_V1.md` §23 of the chain's
 repository). Whoever writes a profile reads this file: the Product Owner in
-Paramètres → Déploiement today, an agent of the chain later, when it builds
-a new application's skeleton.
+Paramètres → Déploiement, and the Bâtisseur, when `/batir` builds the
+application's skeleton — one target per application module, added to a
+profile already there, never rewriting it.
 
 - **Where**: `.claude/deploy.json`, at the application's root. It belongs
   to the application: the chain's install never writes, removes or reads it
@@ -14,7 +15,8 @@ a new application's skeleton.
   field below; its adapters, in `adapters/`.
 - **Saved from the cockpit**: written as UTF-8 JSON, two-space indented, its
   keys in the order below; committed alone in the application —
-  `deploy: profil` — and pushed. A file written by hand is read the same way.
+  `deploy: profil` — and pushed. Written by the Bâtisseur: in its own commit,
+  with the skeleton. A file written by hand is read the same way.
 - **Refused, said in French**: a key this contract does not name (a typo is
   never ignored), a required field empty, a value not offered, two targets
   of one name, a `format` other than 1.
