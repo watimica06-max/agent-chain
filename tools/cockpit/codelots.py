@@ -49,7 +49,7 @@ RULES = {
     "E-TROIS": "8_code.md:318-320",
     "E-ANNULE": "8_code.md:163-165 · agents/relecteur.md:183-186",
     "E-BLOQUE": "8_code.md:348-355 · 8_code.md:748-758",
-    "E-REDEC": "agents/arbitre.md:392-396 · agents/cadreur.md:1054-1061 · 7_lots.md:150-152 · 7_lots.md:209 · 7_lots.md:212",
+    "E-REDEC": "agents/arbitre.md:392-396 · agents/cadreur.md:1054-1061 · 7_lots.md:165-167 · 7_lots.md:224 · 7_lots.md:227",
     "E-ENTAME": "8_code.md:158-159 · 8_code.md:174-176",
     "E-AFAIRE": "8_code.md:158-159",
     "E-ENCOURS": "8_code.md:605-606 · 8_code.md:80-82",
@@ -145,7 +145,7 @@ def redecoupage_lots(W):
     (agents/arbitre.md:392-396), one set per return, appended. Once the
     Cadreur has cut the split again it writes `## Ce qui revient` and `## Ce
     que j'en fais` at the end (agents/cadreur.md:1054-1061); the file stays
-    unnumbered when that split does not hold (cmd/7_lots.md:150-160, :209,
+    unnumbered when that split does not hold (cmd/7_lots.md:165-175, :224,
     :212). So: the lots named under `## Ce qui ne l'est pas` in the Arbitre's
     sections after the Cadreur's last one — none when the Cadreur's come
     last: the lots in `code/` are then the new split's, read by the other

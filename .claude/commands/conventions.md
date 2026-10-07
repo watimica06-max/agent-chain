@@ -35,6 +35,11 @@ folder, or a `bugfix-NN/` inside it. **A second argument names it.**
 `questions-architecte-*.md` at the root — 🔴 **plus two greps on that
 last one**: `Answer:` lines with nothing after them, and `^### Q`.
 
+**Three greps on `docs/TECHNICAL_CONVENTIONS.md`**, when it is there —
+🔴 **one per table that declares the project's structure**:
+`^\| *Name *\| *Command *\|` for G2.1's, `^\| *Module *\| *Builds as *\|`
+for G4.4's, `^\| *Fact *\| *Value *\|` for G12.6's.
+
 **Two things of `blocked_architecte.md`, when the working folder holds
 one, and nothing more of it** — 🔴 **whether its `## Decision` is
 filled, and its `## Invocation` line.** 📌 **The walk below keys on
@@ -54,11 +59,14 @@ named above.**
 
 ## When it runs
 
-📌 **After `/6_convertit`, before `/7_lots`.** The Cadreur reads the
-conventions in full; they have to exist when it does.
+📌 **After `/6_convertit`, before `/batir`.** The Bâtisseur builds what
+they declare, and the Cadreur reads them in full; they have to exist
+when either does.
 
 ⚠️ **Run by hand** — 🔴 **no command chains it**: 📌 **it sits between
-`/6_convertit` and `/7_lots`**, and the Product Owner runs it there.
+`/6_convertit` and `/batir`**, and the Product Owner runs it there.
+⚠️ **`/batir` sends here** when the conventions lack the project's
+structure.
 
 🔴 **Stop if `spec-technique.md` is absent** — say so: `Next: stop
 spec-technique.md missing`. The agent derives
@@ -83,9 +91,10 @@ matches.**
 | A `questions-architecte-NN.md` at the root, **answered** | **Invocation 2 — Integrating** — 🔴 **name the file in the prompt** |
 | 🔴 **No `docs/TECHNICAL_CONVENTIONS.md`** | **Invocation 1 — Deriving** — 📌 **the first derivation this repository ever had** |
 | **It exists, and no `couverture.md` at the feature folder's root** | 🔴 **Invocation 4 — Completing** |
-| A `questions-architecte-NN.md` at the root with **no `### Q`** | 🔴 **Nothing** — the derivation asked nothing. 📌 **File it and commit — the filing steps of *Git, before invoking*, no worktree — then say `/7_lots`** — `Next: run /7_lots <name>` |
-| **It exists, and a `couverture.md` is there** | 📌 **Nothing to do** — say `/7_lots` — `Next: run /7_lots <name>` |
-| Nothing of the sort | 📌 **Nothing to do** — say `/7_lots` — `Next: run /7_lots <name>` |
+| 🔴 **It exists, a `couverture.md` is there, and one of the three greps on it finds nothing** | 🔴 **Invocation 4 — Completing** — ⚠️ **conventions written before the grid declared the project's structure**: 📌 **the walk writes what the file lacks**, and `/batir` waits on it |
+| A `questions-architecte-NN.md` at the root with **no `### Q`** | 🔴 **Nothing** — the derivation asked nothing. 📌 **File it and commit — the filing steps of *Git, before invoking*, no worktree — then say `/batir`** — `Next: run /batir <name>` |
+| **It exists, and a `couverture.md` is there** | 📌 **Nothing to do** — say `/batir` — `Next: run /batir <name>` |
+| Nothing of the sort | 📌 **Nothing to do** — say `/batir` — `Next: run /batir <name>` |
 
 🔴 **The last rows are what stops a silent rewrite.** ⚠️ **Invocation 1
 opens no existing conventions file and writes it afresh** — 📌 **every
@@ -305,7 +314,7 @@ Owner would otherwise learn of it from a file listing, at best.**
 | It raised a **`forme`** question | 🔴 **The framing grid lacks a form, or one keeps producing a useless rule** — ⚠️ **the Product Owner amends the grid herself**, the grid's `R4`: 📌 **no rule is written for it**, `couverture.md` says what became of it | `Next: manual amender la grille (R4)` |
 | It raised a **`replacement`** question | 🔴 **A rule in force says the opposite of what this feature needs, and lots already coded follow it** — 📌 **replacing a rule in force is the Product Owner's**: ⚠️ **answer it — change the rule, or conform to it — then `/conventions`**. 🔴 **The lots the question names as coded under the old rule are hers to re-enter through `/diagnostique`**, a `bug-list.md` in a `bugfix-NN/` — ⚠️ **the chain has no other way back into coded lots** | `Next: answer questions, then run /conventions <name>` |
 | It wrote a blocking file | 📌 **Fill its `## Decision`, then `/conventions`** | `Next: answer blocking, then run /conventions <name>` |
-| It asked nothing, or everything is integrated | 📌 `/7_lots` | `Next: run /7_lots <name>` |
+| It asked nothing, or everything is integrated | 📌 `/batir` — 🔴 **the Bâtisseur builds what the conventions declare before any split** | `Next: run /batir <name>` |
 
 📌 **A run raising product questions, one of them on `G4.4`, takes the
 `G4.4` row's `Next:`** — ⚠️ **the structure waits on that answer**, and

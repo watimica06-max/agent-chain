@@ -162,7 +162,7 @@ def test_why_names_the_rule_and_the_files_for_each_state(tmp_path):
            "prompt": "/1_lexique premiere-app-3", "started_at": "2026-10-05T10:00:00"}
     r4 = scan.run_scan(str(app), "premiere-app-3", run)
     cases = [
-        (step(r1["main"], "conventions"), F, "CON-7", ["couverture.md"], "conventions.md:86-88"),
+        (step(r1["main"], "conventions"), F, "CON-7", ["couverture.md"], "conventions.md:95-97"),
         (step(r1["main"], "1_lexique"), A, "G-ATT", ["questions-sondeur-03.md"], "« À qui est une réponse »"),
         (step(r4["main"], "1_lexique"), EC, "G-RUN", [], "le run en cours"),
         (step(r2["main"], "4_grille"), BL, "GRI-5", ["desc-produit.md"], "4_grille.md:134-140"),
@@ -375,7 +375,7 @@ ANCHORS = {
     "CNV-2": ["par-genre/` absent"], "CNV-3": ["waits"], "CNV-4": ["Runs nowhere"], "CNV-5": ["Nothing to write"],
     "CNV-6": ["Skip to the assembly"],
     "CON-1": ["spec-technique.md` is absent"], "CON-2": ["filled"], "CON-3": ["Requests"], "CON-4": ["Integrating"],
-    "CON-5": ["Deriving"], "CON-6": ["Completing"], "CON-7": ["/7_lots"],
+    "CON-5": ["Deriving"], "CON-6": ["Completing"], "CON-7": ["/batir"],
     "LOT-1": ["spec-technique.md` or `desc-bug.md`", "the technical document has to be there"], "LOT-2": ["/fusion"], "LOT-3": ["blocked_verificateur.md"],
     "LOT-4": ["redecoupage.md"], "LOT-5": ["filled"], "LOT-6": ["Once the split holds"], "LOT-7": ["The split holds"],
     "LOT-8": ["/7_lots", "carries lines"], "LOT-9": ["first split"],

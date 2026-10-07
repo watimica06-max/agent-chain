@@ -469,7 +469,7 @@ row that matched above it, and never fires alone.
 | **Product questions, alone or with technical ones** | 📌 **Answer them, then `/1_lexique`** — 🔴 **the long loop.** ⚠️ **Answer the technical ones too**: the agent integrates both when its turn comes round | `Next: answer questions, then run /1_lexique <name>` |
 | **A nature is waiting** on an unanswered technical question | 🔴 **Answer it, then `/6_convertit`** — 📌 **the document does not stand while one waits** | `Next: answer questions, then run /6_convertit <name>` |
 | **Invocation 2's *No*** — `tracabilite.md` missing beside a question | 🔴 **The row its question's kind takes, above, already fired** — 📌 **add that the document does not stand without its preamble**: ⚠️ **never the row below** | — the row above prints it |
-| Wrote an empty questions file, or found the document standing — ⚠️ **never a document without `# Preamble` or without `tracabilite.md`** | 📌 `/conventions`, then `/7_lots` — 🔴 the Cadreur reads the conventions in full. 📌 The merge, `/fusion_compare`, branches off here whenever you choose | `Next: run /conventions <name>` |
+| Wrote an empty questions file, or found the document standing — ⚠️ **never a document without `# Preamble` or without `tracabilite.md`** | 📌 `/conventions`, then `/batir` and `/7_lots` — 🔴 the Bâtisseur builds what they declare, the Cadreur reads them in full. 📌 The merge, `/fusion_compare`, branches off here whenever you choose | `Next: run /conventions <name>` |
 
 ⚠️ **The short loop is an exception to the standing rule that every
 answer goes back through `/1_lexique`** — 📌 **a technical answer brings

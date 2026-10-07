@@ -926,6 +926,11 @@ not a licence to write anything.**
 one derived it** — ⚠️ **and every rule invocation 3 added, lot after
 lot, is in it.**
 
+📌 **Or this feature did, before the grid declared the project's
+structure** — 🔴 **the command sends you here when the file lacks one of
+G2.1's, G4.4's or G12.6's tables.** ⚠️ **This feature's `couverture.md`
+is then already there**: 📌 **amend it, never rewrite it.**
+
 🔴 **You never derive it afresh.** ⚠️ **Rewriting it would lose every
 amendment since** — 📌 **the cross-feature inconsistency this agent
 exists to prevent.**

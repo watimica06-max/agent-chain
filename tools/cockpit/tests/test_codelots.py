@@ -180,7 +180,7 @@ def test_a_redecoupage_marks_the_lots_of_the_split_that_came_back(tmp_path):
 
 def test_a_re_split_that_does_not_hold_leaves_its_lots_to_the_other_rules(tmp_path):
     # /7_lots ran, the Cadreur wrote its sections, the split did not hold: the
-    # file stays unnumbered (7_lots.md:150-160, :209, :212), the lots in code/
+    # file stays unnumbered (7_lots.md:165-175, :224, :227), the lots in code/
     # are the new split's.
     app, f = hand_folder(tmp_path)
     (f / "code" / "redecoupage.md").write_text(ARBITRE_REDEC + CADREUR_REDEC, encoding="utf-8")

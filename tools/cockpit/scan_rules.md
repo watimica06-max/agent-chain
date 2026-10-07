@@ -25,7 +25,7 @@ with `agents/`.
 
 **Main chain** — `/1_lexique` → `/2_structure` → `/3_decoupe` →
 `/3a_genre` → `/3b_nature` → `/4_grille` → `/5_reclasse` → `/6_convertit`
-→ `/conventions` → `/7_lots` → `/8_code` → `/9_controle` → test on the
+→ `/conventions` → `/batir` → `/7_lots` → `/8_code` → `/9_controle` → test on the
 emulator (`/deploie`) → `/fusion`.
 
 | Link | Where the command says it |
@@ -38,8 +38,9 @@ emulator (`/deploie`) → `/fusion`.
 | 4_grille → 4_grille (second time) → 5_reclasse | 4_grille.md:639, :641 |
 | 5_reclasse → 6_convertit | 5_reclasse.md:227 |
 | 6_convertit → conventions | 6_convertit.md:472 |
-| conventions → 7_lots | conventions.md:308 |
-| 7_lots → 8_code | 7_lots.md:208, :250 |
+| conventions → batir | conventions.md:317 |
+| batir → 7_lots | batir.md:130 |
+| 7_lots → 8_code | 7_lots.md:223, :265 |
 | 8_code → 8_code (lots left) → 9_controle | 8_code.md:551, :519 |
 | 9_controle → *manual* | 9_controle.md:509-510 — `Next: manual lire le rapport de contrôle et la recette, décider d'une bug-list` |
 | /deploie → *done* | deploie.md:68-70 |
@@ -49,7 +50,7 @@ emulator (`/deploie`) → `/fusion`.
   `/deploie`.** /9_controle ends on a `manual` line — read, test, decide on
   a bug-list (9_controle.md:509-513); /deploie ends on `done`
   (deploie.md:68-70). /fusion is named by `Next: run` in two places only:
-  `/7_lots` when the technical document holds no `### §` (7_lots.md:72-78)
+  `/7_lots` when the technical document holds no `### §` (7_lots.md:75-81)
   and `/2_structure` on a Rédacteur block of invocation 3
   (2_structure.md:80). 6_convertit.md:472 says `/fusion_compare`
   « branches off here whenever you choose ». **The test and /fusion are
@@ -58,11 +59,19 @@ emulator (`/deploie`) → `/fusion`.
 - **Every answer loops back to `/1_lexique`**, not to the step that asked
   (2_structure.md:404, 3a_genre.md:294, 3b_nature.md:306, 4_grille.md:638,
   :640, 6_convertit.md:469) — except technical answers (6_convertit.md:468)
-  and the architecte's (conventions.md:300).
+  and the architecte's (conventions.md:309).
 - **`/4_grille` runs twice**: a first time, then a second time against the
   global (4_grille.md:639 then :641).
+- **`/batir` is not a step of this scan yet** — the commands draw it
+  between `/conventions` and `/7_lots` (conventions.md:95-97, :317,
+  batir.md:130), and `/7_lots` sends back to it when the skeleton was not
+  built from the conventions in force (7_lots.md:87-97). The scan still
+  reads `/conventions` → `/7_lots`, and `CON-7` says « faite » on
+  conventions that lack G2.1's, G4.4's or G12.6's table, which /conventions
+  now sends to invocation 4 (conventions.md:94): drawing the flow anew is
+  a later change.
 - **`/conventions` is run by hand** — « no command chains it »
-  (conventions.md:60-61) — though `/6_convertit` names it (6_convertit.md:472).
+  (conventions.md:66-67) — though `/6_convertit` names it (6_convertit.md:472).
 
 **Correction chain**, in a `bugfix-NN/` — `/diagnostique` → `/7_lots` →
 `/8_code` → `/9_controle` (diagnostique.md:13, :228). Every command
@@ -125,11 +134,11 @@ to the command named after it in « `answer …, then run X` »: that step is
 | `OWN-GRI` | `cadrage-produit/blocked_*.md`, `blocked_existant.md`, `blocked_assembleur.md` | 4_grille | 4_grille.md:47-61 |
 | `OWN-TEC` | `convertisseur/technique-*.md` | 6_convertit | 6_convertit.md:468 · 6_convertit.md:470 |
 | `OWN-CNV` | `convertisseur/blocked_*.md` | 6_convertit | 6_convertit.md:56 |
-| `OWN-ARC` | a root `questions-architecte-NN.md` | conventions | conventions.md:82 |
-| `OWN-ARB` | `blocked_architecte.md`, invocation other than 3 | conventions | conventions.md:78 |
+| `OWN-ARC` | a root `questions-architecte-NN.md` | conventions | conventions.md:90 |
+| `OWN-ARB` | `blocked_architecte.md`, invocation other than 3 | conventions | conventions.md:86 |
 | `OWN-AR3` | `blocked_architecte.md`, invocation 3 | 8_code | 8_code.md:348-354 |
-| `OWN-CAD` | `code/blocked_cadreur.md` | 7_lots | 7_lots.md:212 |
-| `OWN-RED` | `code/redecoupage.md`, third return | 7_lots | 7_lots.md:379-380 |
+| `OWN-CAD` | `code/blocked_cadreur.md` | 7_lots | 7_lots.md:227 |
+| `OWN-RED` | `code/redecoupage.md`, third return | 7_lots | 7_lots.md:394-395 |
 | `OWN-COD` | `code/blocked_detailleur.md`, `code/<lot>/blocked_*.md` | 8_code | 8_code.md:354-355 · 8_code.md:773 |
 | `OWN-FUS` | a root `questions-fusionneur-NN.md` | fusion | fusion.md:60 |
 | `OWN-FUB` | `blocked_fusionneur.md` | fusion | fusion.md:57 |
@@ -177,11 +186,11 @@ Rédacteur's.
 | `OWN-GRI` | 4_grille | t'attend | see §3 | 4_grille.md:47-61 |
 | `OWN-TEC` | 6_convertit | t'attend | see §3 | 6_convertit.md:468 · 6_convertit.md:470 |
 | `OWN-CNV` | 6_convertit | t'attend | see §3 | 6_convertit.md:56 |
-| `OWN-ARC` | conventions | t'attend | see §3 | conventions.md:82 |
-| `OWN-ARB` | conventions | t'attend | see §3 | conventions.md:78 |
+| `OWN-ARC` | conventions | t'attend | see §3 | conventions.md:90 |
+| `OWN-ARB` | conventions | t'attend | see §3 | conventions.md:86 |
 | `OWN-AR3` | 8_code | t'attend | see §3 | 8_code.md:348-354 |
-| `OWN-CAD` | 7_lots | t'attend | see §3 | 7_lots.md:212 |
-| `OWN-RED` | 7_lots | t'attend | see §3 | 7_lots.md:379-380 |
+| `OWN-CAD` | 7_lots | t'attend | see §3 | 7_lots.md:227 |
+| `OWN-RED` | 7_lots | t'attend | see §3 | 7_lots.md:394-395 |
 | `OWN-COD` | 8_code | t'attend | see §3 | 8_code.md:354-355 · 8_code.md:773 |
 | `OWN-FUS` | fusion | t'attend | see §3 | fusion.md:60 |
 | `OWN-FUB` | fusion | t'attend | see §3 | fusion.md:57 |
@@ -252,22 +261,22 @@ Rédacteur's.
 | `CNV-4` | 6_convertit | à faire | a nature runs: its part differs from `<nature>-input.md`, its technical file is answered, its section is missing or `<<ASSUMED` with nothing waiting, its blocking file is filled, or its files stand with no block | 6_convertit.md:85-95 |
 | `CNV-5` | 6_convertit | faite | no nature runs, and the document stands: `# Preamble`, no `<<ASSUMED`, no `[B`, `tracabilite.md`, nothing waiting | 6_convertit.md:114-118 |
 | `CNV-6` | 6_convertit | à faire | no nature runs, the document does not stand: the assembly again | 6_convertit.md:119 |
-| `CON-1` | conventions | à faire | no `spec-technique.md` | conventions.md:63-64 |
-| `CON-2` | conventions | à faire | `blocked_architecte.md`, decision filled | conventions.md:79 |
-| `CON-3` | conventions | à faire | a request in `architecte/` with no verdict: invocation 3 | conventions.md:80 |
-| `CON-4` | conventions | à faire | an answered `questions-architecte-NN.md`: invocation 2 | conventions.md:83 |
-| `CON-5` | conventions | à faire | no `docs/TECHNICAL_CONVENTIONS.md`: invocation 1 | conventions.md:84 |
-| `CON-6` | conventions | à faire | no `couverture.md`: invocation 4 | conventions.md:85 |
-| `CON-7` | conventions | faite | conventions and `couverture.md` there: nothing to do | conventions.md:86-88 |
-| `LOT-1` | 7_lots | à faire | no technical document (`spec-technique.md`, or `desc-bug.md` in a correction): it stops | 7_lots.md:22-23 · 7_lots.md:58-66 |
-| `LOT-2` | 7_lots | faite | no `^### §`: nothing to build, /fusion next | 7_lots.md:72-78 |
-| `LOT-3` | 7_lots | bloquée | `code/blocked_verificateur.md`: the step before has to run again | 7_lots.md:207 |
-| `LOT-4` | 7_lots | à faire | `code/redecoupage.md`: coding sent the split back | 7_lots.md:143 |
-| `LOT-5` | 7_lots | à faire | `code/blocked_cadreur.md`, last decision filled | 7_lots.md:140 |
-| `LOT-6` | 7_lots | à faire | the split holds, a request waits on its verdict | 7_lots.md:241-250 |
-| `LOT-7` | 7_lots | faite | `code/sequence.md`, `## Defects` carries no line | 7_lots.md:208 |
-| `LOT-8` | 7_lots | à faire | `## Defects` carries lines | 8_code.md:92-93 · 7_lots.md:142 |
-| `LOT-9` | 7_lots | à faire | no split yet | 7_lots.md:141 |
+| `CON-1` | conventions | à faire | no `spec-technique.md` | conventions.md:71-72 |
+| `CON-2` | conventions | à faire | `blocked_architecte.md`, decision filled | conventions.md:87 |
+| `CON-3` | conventions | à faire | a request in `architecte/` with no verdict: invocation 3 | conventions.md:88 |
+| `CON-4` | conventions | à faire | an answered `questions-architecte-NN.md`: invocation 2 | conventions.md:91 |
+| `CON-5` | conventions | à faire | no `docs/TECHNICAL_CONVENTIONS.md`: invocation 1 | conventions.md:92 |
+| `CON-6` | conventions | à faire | no `couverture.md`: invocation 4 | conventions.md:93 |
+| `CON-7` | conventions | faite | conventions and `couverture.md` there: nothing to do | conventions.md:95-97 |
+| `LOT-1` | 7_lots | à faire | no technical document (`spec-technique.md`, or `desc-bug.md` in a correction): it stops | 7_lots.md:22-23 · 7_lots.md:61-69 |
+| `LOT-2` | 7_lots | faite | no `^### §`: nothing to build, /fusion next | 7_lots.md:75-81 |
+| `LOT-3` | 7_lots | bloquée | `code/blocked_verificateur.md`: the step before has to run again | 7_lots.md:222 |
+| `LOT-4` | 7_lots | à faire | `code/redecoupage.md`: coding sent the split back | 7_lots.md:158 |
+| `LOT-5` | 7_lots | à faire | `code/blocked_cadreur.md`, last decision filled | 7_lots.md:155 |
+| `LOT-6` | 7_lots | à faire | the split holds, a request waits on its verdict | 7_lots.md:256-265 |
+| `LOT-7` | 7_lots | faite | `code/sequence.md`, `## Defects` carries no line | 7_lots.md:223 |
+| `LOT-8` | 7_lots | à faire | `## Defects` carries lines | 8_code.md:92-93 · 7_lots.md:157 |
+| `LOT-9` | 7_lots | à faire | no split yet | 7_lots.md:156 |
 | `COD-1` | 8_code | à faire | no `code/sequence.md` | 8_code.md:80-83 |
 | `COD-2` | 8_code | à faire | defects, or `blocked_verificateur.md`: /7_lots first | 8_code.md:92-100 |
 | `COD-3` | 8_code | bloquée | a lot not PASS with `## Attempts` at 3 | 8_code.md:318-320 |

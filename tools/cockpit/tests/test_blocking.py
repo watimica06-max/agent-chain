@@ -111,7 +111,7 @@ def cadreur_request(tmp_path):
 
 def test_shape5_waiting_on_architecte_is_not_hers(tmp_path):
     work = cadreur_request(tmp_path)
-    # Request 2's verdict is empty: the Architecte answers it (cmd/7_lots.md:210).
+    # Request 2's verdict is empty: the Architecte answers it (cmd/7_lots.md:225).
     shown, notices, _ = blocking.scan(str(work))
     assert shown == [] and notices == []
     # Without the request file, nothing lifts it: it is hers.
@@ -127,7 +127,7 @@ def test_shape5_a_request_with_no_verdict_heading_is_not_hers(tmp_path):
                    .removesuffix("## Verdict").rstrip() + "\n", encoding="utf-8")
     assert "## Verdict" not in req.read_text(encoding="utf-8").split("# Request 2")[1]
     shown, _, _ = blocking.scan(str(work))
-    assert shown == []                        # read as an empty one (cmd/7_lots.md:244-245)
+    assert shown == []                        # read as an empty one (cmd/7_lots.md:259-260)
 
 
 def test_shape5_a_refused_verdict_is_shown(tmp_path):

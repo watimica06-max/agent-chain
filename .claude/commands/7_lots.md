@@ -45,6 +45,9 @@ entries — see *Before anything else*. ⚠️ **Never an entry's content.**
 📌 **Its existence, or `desc-bug.md`'s in a `bugfix-NN/`**, by glob —
 the same section.
 
+**The feature folder's `batisseur.md`** — 🔴 **its `## Status:` line
+and its `## Conventions` commit alone** — see *Before anything else*.
+
 📌 **Each agent declares its own inputs**; you pass the feature folder
 and nothing else.
 
@@ -80,6 +83,18 @@ nothing, name no next command.** 📌 **Say where its content lives** —
 `code/recette-ordonnee.md` is never written** — the recette stays
 readable in `par-genre/recette.md`; ordering it against zero lots means
 nothing.
+
+🔴 **Then, the project has to be built from the conventions in force**
+— 📌 **the feature folder's `batisseur.md`, on a `bugfix-NN/` too**:
+its `## Status:` line, and the commit under its `## Conventions`,
+against
+
+    git log -1 --format=%H -- docs/TECHNICAL_CONVENTIONS.md
+
+| What you find | What you do |
+|---|---|
+| `## Status: built`, and the same commit | 📌 **Carry on** |
+| No `batisseur.md`, `## Status: blocked`, or another commit | 🔴 **Stop** — ⚠️ **the conventions changed since the skeleton was built, or it never was**: cut no split, create no worktree — `Next: run /batir <name>` |
 
 ---
 

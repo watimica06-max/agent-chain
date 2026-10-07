@@ -38,6 +38,8 @@ their work. You do not code, you do not review, you do not scope.
 - **cadreur · verificateur · detailleur · concepteur · testeur ·
   realisateur · relecteur · controleur** run the downstream chain, from
   that technical document to the code
+- **batisseur** builds, between the two, the project skeleton the
+  conventions declare, and proves it builds
 
 The Product Owner does not code. She launches a command, answers the
 product questions only she can answer, and tests the application in her
@@ -53,6 +55,7 @@ never wait for her on anything an agent can settle.
 | `/4_grille` | a feature name | **Cycle, upstream** — four sondeurs at once, three angles and one global invocation, then the assembleur |
 | `/5_reclasse` | a feature name | **Cycle, upstream** — no agent; sorts the product file by nature |
 | `/6_convertit` | a feature name | **Cycle, upstream** — the convertisseur once per nature, all at once, then once across the document |
+| `/batir` | a feature name | **Cycle, downstream** — the batisseur, and the architecte's invocation 3 each time it asks |
 | `/7_lots` · `/8_code` | a feature name | **Cycle, downstream** — several agents, chained |
 | `/9_controle` · `/conventions` · `/fusion` | a feature name | **Outside the chain** — run by hand |
 | `/audit_blocages` · `/audit_conventions` | a feature folder name | **Outside the chain** — run by hand; no agent, you read and report yourself |
@@ -116,7 +119,7 @@ rejected, not ignored:
 |---|---|
 | `prompt` | The full instructions |
 | `description` | 3-5 words, for context tracking |
-| `subagent_type` | `lexicographe` · `redacteur` · `decoupeur` · `qualifieur` · `classeur` · `sondeur` · `assembleur` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `cadreur` · `verificateur` · `detailleur` · `concepteur` · `testeur` · `realisateur` · `relecteur` · `arbitre` · `controleur` |
+| `subagent_type` | `lexicographe` · `redacteur` · `decoupeur` · `qualifieur` · `classeur` · `sondeur` · `assembleur` · `convertisseur` · `architecte` · `fusionneur` · `diagnostiqueur` · `batisseur` · `cadreur` · `verificateur` · `detailleur` · `concepteur` · `testeur` · `realisateur` · `relecteur` · `arbitre` · `controleur` |
 | `model` | `sonnet` · `opus` — the agent's frontmatter says which |
 | `isolation` | ❌ **Never pass it.** It is concurrency isolation: each call would branch fresh and could not see what the previous phase wrote. Our phases are strictly sequential. |
 | `run_in_background` | ⚠️ **May not exist.** In this environment the tool always runs async and notifies on completion — do not pass it, wait for the notification |

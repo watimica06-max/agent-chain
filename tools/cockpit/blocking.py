@@ -268,10 +268,10 @@ def parse_lines(lines, path, rel, work_dir=None, worktree=None) -> ParsedBlockin
         if entry.waiting and work_dir:
             req, verdict = _request_verdict(entry.where, work_dir)
             if verdict == "empty":
-                # cmd/7_lots.md:210 — the Architecte answers it: not hers.
+                # cmd/7_lots.md:225 — the Architecte answers it: not hers.
                 entry.waiting = False
             elif verdict == "filled":
-                # cmd/7_lots.md:211 and :213 — read by the Cadreur next, or
+                # cmd/7_lots.md:226 and :228 — read by the Cadreur next, or
                 # refused by it and hers. Nothing on disk tells the two
                 # apart, and a refusal is never hidden.
                 entry.note = (f"Le verdict de l'Architecte sur la « Request {req} » est écrit. "
@@ -299,11 +299,11 @@ def parse_lines(lines, path, rel, work_dir=None, worktree=None) -> ParsedBlockin
 
 
 def _request_verdict(where, work_dir):
-    """cmd/7_lots.md:224-233 — the `# Request N` a cadreur block's `## Where`
+    """cmd/7_lots.md:239-248 — the `# Request N` a cadreur block's `## Where`
     names, read alone: (N, "empty" | "filled"), or (N or None, None) when
     no request is named or none is there — then nothing lifts the block.
     A request with no `## Verdict` heading reads as an empty one
-    (cmd/7_lots.md:244-245)."""
+    (cmd/7_lots.md:259-260)."""
     m = REQUEST_IN_WHERE.search(where or "")
     if not m:
         return None, None
