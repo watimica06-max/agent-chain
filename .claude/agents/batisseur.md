@@ -375,7 +375,9 @@ it.**
 
 🔴 **The message reads `<working folder>/batisseur: <what the commit
 carries>`** — 📌 **`<working folder>` is the folder the prompt gives,
-as its path under `docs/features/`.**
+as its path under `docs/features/`**: `premiere-app-3`, ⚠️ **never
+`docs/features/premiere-app-3`**. 📌 **On every commit you make, a
+blocked run's included.**
 
 🔴 **The tree you leave is clean** — 📌 **what the build wrote is in the
 ignore file**, and `git status` shows nothing of yours unstaged. ⚠️ **A
