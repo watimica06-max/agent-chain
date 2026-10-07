@@ -177,7 +177,7 @@ def test_architecte_points_to_entries_of_the_technical_document(feat):
 
 
 def test_architecte_question_naming_a_grid_entry_has_no_context(feat):
-    # agents/architecte.md:177 — the coverage question G4.4 raises names the grid entry, no `§`.
+    # agents/architecte.md:178 — the coverage question G4.4 raises names the grid entry, no `§`.
     p = feat / "questions-architecte-01.md"
     p.write_text("### Q1\nBlock: G4.4\nKind: coverage\nQuestion: what does the application run on?\nAnswer:\n",
                  encoding="utf-8")
@@ -258,8 +258,8 @@ SAYS = {
     "agents/convertisseur.md:59": "`convertisseur/<nature>.md`", "agents/convertisseur.md:65": "`spec-technique.md`",
     "agents/convertisseur.md:299": "A reference inside your section is its number",
     "agents/convertisseur.md:300": "outside it is the block",
-    "agents/architecte.md:576": "Block: §3.2", "agents/architecte.md:366": "`spec-technique.md`",
-    "agents/architecte.md:611": "its `Block:`", "agents/architecte.md:177": "its `Block:` naming", "agents/fusionneur.md:116": "Block: B7",
+    "agents/architecte.md:579": "Block: §3.2", "agents/architecte.md:367": "`spec-technique.md`",
+    "agents/architecte.md:614": "its `Block:`", "agents/architecte.md:178": "its `Block:` naming", "agents/fusionneur.md:116": "Block: B7",
     "agents/fusionneur.md:47": "`desc-produit-fusion.md`", "agents/fusionneur.md:174": "The title line",
 }
 

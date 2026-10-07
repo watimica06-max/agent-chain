@@ -858,7 +858,7 @@ Divergence : aucune — le cadreur énumère les onze, une ligne par type avec s
 Écrit par: architecte (ligne `Kind:` de `questions-architecte-NN.md`)
 Lu par: architecte (invocation 2) ; `/conventions` (table *What to run next*)
 Les valeurs :
-- `coverage` — une question de comportement que le corpus ne répond nulle part ; une question produit ; sa réponse n'est jamais une règle, le Product Owner corrige le fichier produit à la main
+- `coverage` — une question de comportement que le corpus ne répond nulle part ; une question produit ; sa réponse n'est jamais une règle, le Product Owner corrige le fichier produit à la main — sauf celle dont le `Block:` nomme `G4.4`, ce sur quoi tourne l'application : l'invocation 2 en écrit la structure du projet
 - `conjunction` — la question naît entre deux entrées complètes, le long d'une arête de `Consumes:` ; sa réponse devient une règle
 - `inconsistency` — le corpus se contredit (un tiret de traçabilité sur un `comportement` ou une `référence`, une entrée que nulle ligne ne nomme, deux nombres) ; sa réponse corrige le document technique, `couverture.md` note `corrigé` ou `question ouverte`
 - `replacement` — invocation 4 : une règle en vigueur dit le contraire de ce que la feature exige, et des lots codés suivent l'ancienne ; la question demande le choix — changer la règle, ou s'y conformer — et nomme les lots codés sous l'ancienne ; sa réponse n'est jamais une règle nouvelle : la règle en vigueur est changée en place (numéro gardé) et sa ligne de `couverture.md` porte son numéro, ou rien n'est écrit et `couverture.md` note `corrigé` ou `question ouverte` comme pour une `inconsistency` ; les lots nommés reviennent par `/diagnostique`

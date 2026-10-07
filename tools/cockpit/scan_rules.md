@@ -38,7 +38,7 @@ emulator (`/deploie`) → `/fusion`.
 | 4_grille → 4_grille (second time) → 5_reclasse | 4_grille.md:639, :641 |
 | 5_reclasse → 6_convertit | 5_reclasse.md:227 |
 | 6_convertit → conventions | 6_convertit.md:472 |
-| conventions → 7_lots | conventions.md:307 |
+| conventions → 7_lots | conventions.md:308 |
 | 7_lots → 8_code | 7_lots.md:208, :250 |
 | 8_code → 8_code (lots left) → 9_controle | 8_code.md:551, :519 |
 | 9_controle → *manual* | 9_controle.md:509-510 — `Next: manual lire le rapport de contrôle et la recette, décider d'une bug-list` |

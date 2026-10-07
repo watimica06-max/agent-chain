@@ -71,8 +71,9 @@ name the tools, you do not find them.
 📌 **The build files are the one exception**, at invocation 3 — see
 below.
 
-📌 **Invocations 1, 3 and 4 may read the web** — 🔴 **a fact about the
-platform is looked up, never recalled.** ⚠️ **A rule written from a
+📌 **Invocations 1, 3 and 4 may read the web**, and invocation 2 on
+G4.4's answer — 🔴 **a fact about the platform is looked up, never
+recalled.** ⚠️ **A rule written from a
 wrong recollection is read by every lot of every feature.**
 
 📌 **The build files are invocation 3's alone** — 🔴 **it answers
@@ -175,7 +176,7 @@ number holds every row.**
 corpus, never chosen. ⚠️ **A corpus that names nothing the application
 runs on leaves G4.4 unwritten**, and every hole that follows from it —
 🔴 **a `coverage` question**, the grid's `R2`, its `Block:` naming
-`G4.4`.
+`G4.4`. 📌 **Invocation 2 writes them from its answer.**
 
 📌 **Everything else in them is your call** — see *What you settle, and
 what you ask*. 🔴 **A directive naming one of them settles it** — 📌
@@ -364,7 +365,7 @@ what every lot would then read.** 📌 **Its `## To resume` is: run
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
 | 1 | Deriving | `desc-produit.md` **whole** · `spec-technique.md` **whole**, preamble included · `tracabilite.md`, **for move 2 alone** · **`par-genre/directives.md`** · **the web** · the grid | `TECHNICAL_CONVENTIONS.md` · `couverture.md` · a questions file |
-| 2 | Integrating | The answered `questions-architecte-NN.md` **the prompt names** · `TECHNICAL_CONVENTIONS.md` · `couverture.md` · the grid | The conventions file, updated · `couverture.md`, updated · 🔴 **a new questions file, when an answer leaves the choice open** |
+| 2 | Integrating | The answered `questions-architecte-NN.md` **the prompt names** · `TECHNICAL_CONVENTIONS.md` · `couverture.md` · the grid · 📌 **on an answer to G4.4's `coverage` question alone**: `spec-technique.md` · **the web** · `desc-produit.md` on *voir produit* | The conventions file, updated · `couverture.md`, updated · 🔴 **a new questions file, when an answer leaves the choice open** |
 | 3 | Requests | The requests in `architecte/` · `TECHNICAL_CONVENTIONS.md` · `couverture.md` — ⚠️ **the feature folder's, one level up on a `bugfix-NN/`** · **the web** · **the build files** · the grid | The conventions file, updated · `couverture.md`, **a line per rule it added** · each request's verdict |
 | 4 | **Completing** | 🔴 **`TECHNICAL_CONVENTIONS.md`, whole** · `desc-produit.md` · `spec-technique.md` · `tracabilite.md` · **`par-genre/directives.md`** · **the web** · the grid | The conventions file, **added to** · `couverture.md`, **for this feature** · a questions file |
 
@@ -373,7 +374,8 @@ then.
 
 🔴 **Invocation 2 does not reopen the two documents.** ⚠️ **An answer
 is turned into a rule, not derived again** — 📌 what it needed from
-them, invocation 1 already asked.
+them, invocation 1 already asked. ⚠️ **Except on G4.4's answer** — see
+*Invocation 2*.
 
 🔴 **Invocation 3 opens neither** — 📌 **a request carries what it met**,
 and a rule that needs a feature's documentation to be written is a rule
@@ -525,8 +527,7 @@ threading model, which module layout, which naming: the product file
 says what the application does, the technical document says what has to
 exist, and the choice follows from both plus the platform's own
 practice. ⚠️ **A fact about the platform is looked up, never recalled** — 📌
-**at invocations 1, 3 and 4, the ones that read the web** — see *What
-you read*.
+**at the invocations that read the web** — see *What you read*.
 
 **Four kinds of gap, and only three leave this agent.**
 
@@ -543,7 +544,9 @@ you read*.
 close the product** — 📌 **and a behaviour is not settled here.**
 
 🔴 **Its `Kind:` line says `coverage`** — 📌 **that is the mark**, and
-⚠️ **you never turn its answer into a rule, at any invocation.**
+⚠️ **you never turn its answer into a rule, at any invocation** — 📌
+**but one: what the application runs on, G4.4's `Runs on`**, which
+invocation 2 turns into the project's structure.
 
 📌 **A behaviour decided in the conventions file reaches no product
 file and no global** — 🔴 **and the product would then describe an
@@ -712,6 +715,23 @@ product file herself.**
 🔴 **Either way you write no rule for it**, and 📌 **you name it in your
 report**: the question, and that its answer is a behaviour. ⚠️ **That
 line is the only thing that carries it out of this file.**
+
+🔴 **One `coverage` answer is the exception: the one whose `Block:`
+names `G4.4`.** 📌 **It says what the application runs on** — ⚠️ **the
+one product fact the structure is built from**, and nothing builds the
+project while it is missing.
+
+🔴 **Write what invocation 1 left unwritten for want of it** — 📌
+**G4.4's table, its `Runs on` column in the answer's words; G2.1's
+`assemble` lines, one per `application` module; G12.6's platform
+levels.** ⚠️ **Every other hole is filled as invocation 1 fills it** —
+the grain from `spec-technique.md`'s V1 and V3, every level looked up on
+the web. 📌 ***voir produit* sends you to `desc-produit.md`**, for that
+fact alone.
+
+🔴 **You still name it in your report**, as any `coverage` answer — 📌
+**the product file carries it too**, and the Product Owner puts it
+there.
 
 ⚠️ **An answer to a `forme` question is not a rule either** — 📌 **it
 amends the grid**, and the Product Owner makes that amendment herself —

@@ -187,6 +187,12 @@ linter already enforces · any product policy.
 *Each entry carries four fields: **question**, **trigger**, **form**
 with its holes in `< >`, and **test**.*
 
+🔴 **A test is what the rule's last field becomes** — `mechanical` or
+`review` — 📌 **and it is checked at every lot, on what the lot
+touched.** ⚠️ **Nothing checks it when the file is written**: 🔴 **a
+test holds from the derivation on**, or it is the Bâtisseur's proof
+once it builds the project, never a rule's.
+
 ---
 
 ## C1 — Governance
@@ -222,8 +228,11 @@ system G12.6 names, never from the documents
   | `analyse` | `<cmd analyse>` |
   | `assemble <module>` | `<cmd assemble>` — 🔴 **one line per application module of G4.4's table** |
 
-- **Test**: each command runs, as written, from the repository's root
-  of a clean checkout.
+- **Test**: review — `compile`, `test` and `analyse` each have their
+  line, every application module of G4.4's table its `assemble` line,
+  and every command is one of the build system G12.6 names. 📌 **That
+  each exits 0 from the repository's root is the Bâtisseur's proof,
+  then every lot's.**
 
 🔴 **`compile`, `test` and `analyse` always, and one `assemble` line
 per application module.** ⚠️ **One command doing two jobs is written on
@@ -277,13 +286,17 @@ call too, from the platform's practice
   |---|---|---|---|---|---|---|---|
   | `<name>` | `<application \| library \| plain code>` | `<what the corpus names it runs on \| shared>` | `<modules of this table, or none>` | `<namespace \| package>` | `<path>` | `<path>` | `<id \| —>` |
 
-- **Test**: mechanical — every top-level module appears in the table,
-  and the reverse; every folder it names exists.
+- **Test**: review — every column of every line filled; `Depends on`
+  inside G4.1's graph where G4.1 fires; every `application` module with
+  its `assemble` line in G2.1. 📌 **That every folder it names exists,
+  and every top-level module of the repository is in the table, is the
+  Bâtisseur's proof.**
 
 🔴 **R2 applies**: a corpus naming nothing the application runs on
 leaves the `Runs on` column with no source — 📌 **the table is not
 written**, nor any hole that follows from it, and the entry raises a
-question instead.
+question instead. 🔴 **Its answer is the one product answer turned into
+rules** — the table, G2.1's `assemble` lines, G12.6's levels.
 
 🔴 **`Runs on` takes the names the corpus gives what the application
 runs on** — a phone, a watch, whatever it names. 📌 **`shared` is a
@@ -576,8 +589,10 @@ looked up, never recalled
   | Test framework | `<test framework E.F>` |
   | Build files | `<path>`, one per file — the dependency manifest among them |
 
-- **Test**: mechanical — every build file named exists, and declares
-  the versions and levels this table gives.
+- **Test**: review — every fact has its line, every version is a
+  number looked up, and the build files are listed. 📌 **That each build
+  file exists and declares these versions and levels is the Bâtisseur's
+  proof.**
 
 🔴 **The build files are those the build system and the analysers read
 to configure themselves** — the dependency manifest among them — ⚠️

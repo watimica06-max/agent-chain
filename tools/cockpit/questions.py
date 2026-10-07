@@ -6,7 +6,7 @@ in the shape the writers' templates give: `### Q<n>`, `Key: value` lines
 `Options:` list of `- ` items, an optional `Défaut:`, `Answer:`. What a
 current template produces besides, and is read: a `Question:` over several
 lines (agents/lexicographe.md:348-350), a title on the `Block:` line
-(agents/architecte.md:576), and the file's own title above the first `### Q`
+(agents/architecte.md:579), and the file's own title above the first `### Q`
 (the lexicographe's, premiere-app-3). Anything else is an error, and a file
 it cannot read is an error, never a file with no questions.
 """
