@@ -365,7 +365,7 @@ def test_gauges_show_the_measure_and_its_age(tmp_path, page):
     store.record_limit("r0", {"measured_at": at, "source": "event", "window": "seven_day",
                               "utilization": 0.11, "resets_at": past, "status": "allowed"})
     with FakeServer(tmp_path, stats=store) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_selector("#gauge-five_hour .gp")
         g5 = page.locator("#gauge-five_hour").inner_text()
         assert "4 %" in g5 and "Reste 96 %" in g5 and "mesuré il y a 12 min" in g5 and "/usage" in g5

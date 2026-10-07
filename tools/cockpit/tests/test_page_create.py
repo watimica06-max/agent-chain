@@ -19,10 +19,11 @@ pytestmark = pytest.mark.real_chain
 
 
 def open_form(page, s):
-    page.goto(s.url + "#apps")
-    page.wait_for_selector(".app-row")
+    # 1.9: from the home screen, a page of its own.
+    page.goto(s.url)
+    page.wait_for_selector(".home-card")
     page.get_by_role("button", name="Nouvelle application").click()
-    page.wait_for_selector("#new-app:not(.hidden)")
+    page.wait_for_selector("#scr-nouvelle:not(.hidden) #new-app:not(.hidden)")
 
 
 def fill(page, tmp_path, name="Mon Appli Été", feature="premiere-app"):
@@ -96,7 +97,7 @@ def test_progress_failure_reprendre_then_lexique(tmp_path, page, chain_root, ide
         assert "Lancer /1_lexique premiere-app" in done.inner_text()
         page.wait_for_function("location.hash === '#dashboard'", timeout=10000)
         page.wait_for_function("document.getElementById('next-text').textContent.includes('/1_lexique premiere-app')")
-        assert page.locator("#tb-app").inner_text().startswith("Mon Appli Été")
+        assert page.locator("#tb-app").inner_text() == "Mon Appli Été"
         # « À fournir avant le code » went: /conventions writes the conventions.
         assert page.locator("#provide-card").count() == 0
         # 1.8: « Déployer » opens « Déploiement », which says there is no

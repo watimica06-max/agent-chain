@@ -259,9 +259,9 @@ class Deployer:
             raise DeployError(f"un déploiement est en cours ({self.job.app_name}) : un seul à la fois")
         prof = deploy_profile.load(app)
         if not prof["exists"]:
-            raise DeployError("cette application n'a pas de profil de déploiement : Paramètres → Déploiement")
+            raise DeployError("cette application n'a pas de profil de déploiement : Déploiement → Profil")
         if deploy_profile.has_errors(prof["errors"]):
-            raise DeployError("le profil de déploiement a des erreurs : Paramètres → Déploiement")
+            raise DeployError("le profil de déploiement a des erreurs : Déploiement → Profil")
         by_name = {t["name"]: t for t in prof["targets"]}
         plan = []
         for name, ids in (choice or {}).items():

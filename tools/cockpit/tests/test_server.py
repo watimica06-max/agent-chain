@@ -236,7 +236,7 @@ def test_permission_route(tmp_path):
 
 def test_an_ignored_folder_is_never_shown(tmp_path):
     # 1.5.1 — config.json « ignored »: no feature list, no opening, no
-    # statistics filter; Paramètres → Dossiers edits it.
+    # statistics filter; Paramètres → Dossiers ignorés edits it.
     async def body(c, app_root, feat, rn):
         old = app_root / "docs" / "features" / "premiere-app"
         (old / "bugfix-06").mkdir(parents=True)

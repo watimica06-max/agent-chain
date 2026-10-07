@@ -217,7 +217,7 @@ def test_a_run_ended_without_next_offers_to_continue_under_its_step(tmp_path, pa
 
 def test_the_test_step_opens_deploiement_and_says_what_to_test(tmp_path, page):
     # 1.8: « Déployer » opens « Déploiement » on its « Déployer » tab — it no
-    # longer runs /deploie, which stays under Paramètres → Commandes.
+    # longer runs /deploie — 1.9: « Déploiement → Déployer » carries the application's own.
     with FakeServer(tmp_path, script=script_until_interrupted) as s:
         (s.feat / "bugfix-01" / "code").mkdir(parents=True)
         (s.feat / "bugfix-01" / "code" / "recette-ordonnee.md").write_text(
@@ -259,7 +259,7 @@ def test_correction_lists_newest_first_and_starts_a_cycle(tmp_path, page):
 
 def test_ou_on_en_est_rechecks_the_stored_next(tmp_path, page):
     with FakeServer(tmp_path) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
         line = "Next: run /2_structure f"
         s.state.set_relay(str(s.app_root), "f", "/1_lexique f", line, nextline.parse(line).to_dict())
@@ -279,11 +279,13 @@ def test_ou_on_en_est_rechecks_the_stored_next(tmp_path, page):
 
 
 def test_settings_pick_a_feature_not_a_bugfix(tmp_path, page):
+    # 1.9: the top bar's feature menu — Paramètres → Dossiers until 1.8.
     with FakeServer(tmp_path) as s:
         add_turn_feature(s.app_root, "t")
         page.goto(s.url + "#settings")
-        page.wait_for_selector("#feature-list button")
-        assert page.locator("#feature-list button").all_inner_texts() == ["f", "t"]
-        page.locator("#feature-list").get_by_role("button", name="t").click()
+        page.wait_for_selector("#tb-folder")
+        page.locator("#tb-folder").click()
+        assert [t.split()[-1] for t in page.locator("#feat-menu button").all_inner_texts()] == ["f", "t"]
+        page.locator("#feat-menu button", has_text="t").click()
         page.wait_for_function("document.getElementById('tb-folder').textContent.startsWith('t')")
         assert s.state.working_folder == "t"

@@ -196,11 +196,13 @@ def test_a_crash_in_the_journal(tmp_path, page, fa):
 
 
 def test_parametres_deploiement(tmp_path, page, fa):
+    # 1.9: « Déploiement → Profil », Paramètres → Déploiement in 1.8 — the same.
     with FakeServer(tmp_path / "s") as s:
         init(s.app_root)
         commit(s.app_root, "first")
-        page.goto(s.url + "#settings")
-        page.wait_for_selector("#dp-set-empty")
+        page.goto(s.url + "#deploy")
+        page.get_by_role("tab", name="Profil").click()
+        page.wait_for_selector("#dp-profil:not(.hidden) #dp-set-empty")
         page.locator("#dps-new-type").select_option("commande")
         page.get_by_role("button", name="Ajouter une cible").click()
         tgt = page.locator(".dp-tgt").first

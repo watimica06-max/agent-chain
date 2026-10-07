@@ -122,37 +122,71 @@ button.chip:hover { border-color: var(--accent); }
 #shell.nofolder, #shell.menu-closed { grid-template-columns: minmax(0, 1fr); }
 #shell.nofolder #side, #shell.menu-closed #side { display: none; }
 
-/* ------------------------------------------- applications (1.6) */
-#tb-app-wrap { position: relative; }
-#tb-app { font-weight: 650; }
-#tb-app .caret { color: var(--soft); font-size: 12px; }
-#app-menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 50; min-width: 320px; max-width: 460px;
+/* ------------------------------------------- applications (1.6, 1.9) */
+/* The top bar inside an application (1.9): its name, the feature's menu,
+   « Applications » at the right — back to the home screen. */
+#tb-app { font-weight: 650; font-size: 16px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#tb-folder-wrap { position: relative; }
+#tb-folder .caret { color: var(--soft); font-size: 12px; }
+.pop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 50; min-width: 260px; max-width: 460px; max-height: 60vh; overflow: auto;
   background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,.14); padding: 6px; }
-#app-menu button { display: flex; width: 100%; text-align: left; border: none; background: none; min-height: 0; padding: 8px 12px;
+.pop .pop-h { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); padding: 6px 12px 4px; }
+.pop button { display: flex; width: 100%; text-align: left; border: none; background: none; min-height: 0; padding: 8px 12px;
   border-radius: 8px; gap: 10px; align-items: baseline; }
-#app-menu button:hover { background: var(--bg); }
-#app-menu button[aria-current=true] { background: var(--accent-soft); }
-#app-menu .nm { font-weight: 650; } #app-menu .fd { font-family: var(--mono); font-size: 12px; color: var(--soft); }
-#app-menu .ck { width: 14px; color: var(--accent); flex: none; }
-#app-menu hr { border: none; border-top: 1px solid var(--line); margin: 6px 4px; }
+.pop button:hover:not(:disabled) { background: var(--bg); }
+.pop button[aria-current=true] { background: var(--accent-soft); }
+.pop .ck { width: 14px; color: var(--accent); flex: none; }
+.pop button.danger { color: var(--err); }
+#tb-home { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 16px; border-radius: 99px; font-weight: 600; }
+#tb-home .grid4 { display: grid; grid-template-columns: 6px 6px; gap: 2px; }
+#tb-home .grid4 i { width: 6px; height: 6px; border-radius: 1.5px; background: currentColor; opacity: .75; }
 #tb-run-wrap { display: inline-flex; align-items: center; gap: 6px; }
 #tb-run .where { font-weight: 650; }
 #tb-stop { min-height: 0; padding: 4px 12px; font-size: 14px; border-radius: 99px; }
 #busy-banner { border-top: 1px solid var(--warn); background: var(--warn-soft); color: var(--warn); padding: 8px 20px; }
 #busy-banner button { min-height: 32px; padding: 2px 14px; font-size: 15px; margin-left: 8px; }
-#scr-apps .apps-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
-#scr-apps .apps-head h2 { margin: 0; }
-.app-row { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; }
-.app-row + .app-row { margin-top: 14px; }
-.app-row.is-active { border-color: var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
-.app-row .top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.app-row .nm { font-size: 19px; font-weight: 650; }
-.app-row .fd { font-family: var(--mono); font-size: 13px; color: var(--soft); margin-top: 2px; word-break: break-all; }
-.app-row .acts { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
-.app-row .acts button { min-height: 36px; padding: 4px 14px; font-size: 15px; }
-.app-row .facts { display: grid; grid-template-columns: 1.2fr 1.5fr .8fr 1.3fr .7fr; gap: 6px 18px; margin-top: 12px; font-size: 15px; }
-.app-row .facts .k { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); }
-.app-row .msg { margin-top: 8px; font-size: 14px; }
+/* The home screen (1.9): one card per application, no side menu. */
+.home-head { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 18px; }
+.home-head h2 { margin: 0; font-size: 28px; letter-spacing: -.01em; }
+.home-head .sub { color: var(--soft); font-size: 15px; margin-top: 2px; }
+#home-notice { display: flex; gap: 12px; align-items: center; border: 1px solid var(--accent); background: var(--accent-soft);
+  color: var(--ink); border-radius: var(--radius); padding: 12px 16px; margin: 0 0 16px; }
+#home-notice .ic { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); animation: pulse 1.6s ease-in-out infinite; }
+#home-notice button { margin-left: auto; min-height: 32px; padding: 2px 12px; font-size: 14px; }
+.home-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); gap: 16px; }
+.home-card { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px 14px;
+  display: flex; flex-direction: column; gap: 12px; cursor: pointer; transition: border-color .12s, box-shadow .12s, transform .12s; }
+.home-card:hover, .home-card:focus-visible { border-color: var(--accent); box-shadow: 0 6px 20px rgba(0,0,0,.08); outline: none; }
+.home-card:hover .hc-open { color: var(--accent); }
+.home-card.missing { cursor: default; opacity: .7; border-style: dashed; }
+.home-card.going { border-color: var(--accent); box-shadow: inset 0 3px 0 var(--accent); }
+.hc-top { display: flex; gap: 10px; align-items: flex-start; }
+.hc-id { min-width: 0; flex: 1; }
+.hc-name { font-size: 21px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.hc-folder { font-family: var(--mono); font-size: 12px; color: var(--soft); margin-top: 3px; word-break: break-all; }
+.hc-menu-wrap { position: relative; flex: none; }
+.hc-menu-btn { min-height: 36px; width: 40px; padding: 0; border-color: transparent; background: none; font-size: 20px; line-height: 1; color: var(--soft); }
+.hc-menu-btn:hover { border-color: var(--line) !important; color: var(--ink); }
+.hc-menu { left: auto; right: 0; min-width: 210px; }
+.hc-next { background: var(--bg); border-radius: 10px; padding: 10px 14px; }
+.hc-next .k, .hc-facts .k { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); }
+.hc-next .feat { font-family: var(--mono); font-weight: 650; font-size: 14px; margin-left: 6px; text-transform: none; letter-spacing: 0; color: var(--ink); }
+.hc-next .what { font-weight: 600; margin-top: 2px; line-height: 1.35; }
+.hc-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 16px; font-size: 14px; }
+.hc-facts .v { margin-top: 1px; }
+.hc-waits.has { color: var(--warn); font-weight: 650; }
+.hc-chain { min-width: 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--soft); }
+.hc-chain button { min-height: 30px; padding: 1px 12px; font-size: 14px; }
+.hc-running { display: flex; gap: 10px; align-items: center; background: var(--accent-soft); color: var(--accent); border-radius: 10px; padding: 8px 12px; font-size: 14px; }
+.hc-running b { font-weight: 700; }
+.hc-running .dot { margin-left: 0; flex: none; }
+.hc-running button { margin-left: auto; min-height: 32px; padding: 2px 12px; font-size: 14px; }
+.hc-foot { display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--line); padding-top: 10px; margin-top: auto; font-size: 14px; }
+.hc-open { margin-left: auto; color: var(--soft); font-weight: 600; white-space: nowrap; align-self: flex-end; }
+.hc-msg { font-size: 13px; color: var(--warn); }
+.hc-msg:empty { display: none; }
+#scr-nouvelle .back { margin-bottom: 14px; }
+#scr-pick .back { margin-bottom: 14px; }
 .cst { display: inline-block; font-size: 13px; padding: 1px 10px; border-radius: 99px; font-weight: 650; }
 .cst.ok { background: var(--ok-soft); color: var(--ok); } .cst.late { background: var(--warn-soft); color: var(--warn); }
 .cst.mod { background: var(--err-soft); color: var(--err); } .cst.abs { background: var(--idle-soft); color: var(--soft); border: 1px dashed var(--soft); }
@@ -161,7 +195,17 @@ button.chip:hover { border-color: var(--accent); }
 #apps-report h3 + .line { border-top: none; }
 #apps-report .oc { font-weight: 650; } #apps-report .oc.updated { color: var(--ok); } #apps-report .oc.skipped { color: var(--warn); }
 #apps-report .oc.failed { color: var(--err); }
-@media (max-width: 1100px) { .app-row .facts { grid-template-columns: 1fr 1fr; } #apps-report .line { grid-template-columns: 1fr; } }
+/* The commands no step launches (1.9): « Audits », at the foot of « Amont ». */
+#audits { margin-top: 24px; }
+#audits h3 { margin-bottom: 2px; }
+.aud { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 4px 14px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.aud:first-of-type { border-top: none; }
+.aud button { font-family: var(--mono); font-size: 15px; text-align: left; }
+.aud .d { font-size: 14px; color: var(--soft); }
+.step .subcmds { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 6px; font-size: 14px; color: var(--soft); }
+.step .subcmds button { min-height: 30px; padding: 1px 12px; font-family: var(--mono); font-size: 14px; }
+.sec .lead { margin: -8px 0 12px; color: var(--soft); font-size: 15px; }
+@media (max-width: 1100px) { .home-cards { grid-template-columns: 1fr; } #apps-report .line { grid-template-columns: 1fr; } .aud { grid-template-columns: 1fr; } }
 /* « Nouvelle application » (1.7) */
 .nf { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 16px 18px; align-items: start; margin-top: 12px; }
 .nf > label { font-weight: 600; padding-top: 9px; }
@@ -616,15 +660,16 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     <button id="tb-menu" class="hidden" aria-controls="side" aria-expanded="true" aria-label="Fermer le menu" title="Fermer le menu">
       <span class="bars"></span><span id="tb-menu-dot" class="hidden"></span></button>
     <h1 title="Cockpit de la chaîne">Cockpit</h1>
-    <span id="tb-app-wrap" class="hidden">
-      <button id="tb-app" class="chip" aria-haspopup="true" aria-expanded="false" aria-controls="app-menu" title="Changer d'application"></button>
-      <div id="app-menu" class="hidden" role="menu" aria-label="Applications"></div>
+    <span id="tb-app" class="hidden" title="L'application ouverte"></span>
+    <span id="tb-folder-wrap" class="hidden">
+      <button id="tb-folder" class="chip" aria-haspopup="true" aria-expanded="false" aria-controls="feat-menu" title="Changer de feature"></button>
+      <div id="feat-menu" class="pop hidden" role="menu" aria-label="Features"></div>
     </span>
-    <button id="tb-folder" class="chip hidden" title="Dossiers"></button>
-    <button id="tb-mode" class="chip hidden" title="Mode de permission"></button>
+    <button id="tb-mode" class="chip hidden" title="Mode de permission">Mode</button>
     <span id="tb-run-wrap"><span id="tb-run" class="chip hidden"></span><button id="tb-stop" class="danger hidden" title="Arrêter maintenant la commande qui tourne">Arrêter</button></span>
     <span class="grow"></span>
     <button id="perm-badge" class="hidden">Autorisation demandée</button>
+    <button id="tb-home" class="hidden" title="Retour à l'écran d'accueil : toutes les applications"><span class="grid4" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Applications</button>
   </div>
   <div id="perm-banner" class="hidden" role="alert" aria-label="Autorisation demandée"></div>
   <div id="chain-banner" class="hidden" role="status" aria-label="État de la chaîne"></div>
@@ -639,24 +684,19 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     <a href="#correction" id="nav-correction">Correction <span id="nav-corr-count" class="count hidden"></span></a>
     <a href="#deploy" id="nav-deploy">Déploiement</a>
     <a href="#stats" id="nav-stats">Statistiques</a>
-    <a href="#apps" id="nav-apps">Applications</a>
     <span class="spacer"></span>
     <a href="#settings" id="nav-settings">Paramètres</a>
   </nav>
 
   <div id="main">
-    <!-- ======================= Applications (1.6) ======================= -->
-    <section id="scr-apps" class="screen hidden">
+    <!-- ==================== L'écran d'accueil (1.9) ==================== -->
+    <!-- The cockpit opens here: one card per application. No side menu: it
+         belongs to an open application. -->
+    <section id="scr-accueil" class="screen hidden">
       <div id="start-error" class="notice err hidden"></div>
-      <div class="card hidden" id="work-card" style="margin-bottom:20px">
-        <h2 id="work-title">Feature</h2>
-        <p class="muted small" id="work-note">Une feature de <span class="mono">docs/features/</span>. Ses corrections <span class="mono">bugfix-NN/</span> sont sous « Correction ».</p>
-        <div class="folders" id="work-list"></div>
-        <div class="row" style="margin-top:14px"><button id="btn-open" class="primary" disabled>Ouvrir</button></div>
-      </div>
-      <div class="apps-head">
-        <h2>Applications</h2>
-        <span class="muted small" id="apps-count"></span>
+      <div id="home-notice" class="hidden" role="status"></div>
+      <div class="home-head">
+        <div><h2>Applications</h2><div class="sub" id="apps-count"></div></div>
         <span class="grow"></span>
         <button id="btn-app-new" class="primary">Nouvelle application</button>
         <button id="btn-app-add">Ajouter une application</button>
@@ -664,7 +704,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       </div>
       <div class="card hidden" id="apps-add" style="margin-bottom:16px">
         <h3>Ajouter une application</h3>
-        <p class="muted small">La racine d'un dépôt git. L'ajouter n'écrit rien dans son dossier : seule la liste du cockpit change. La chaîne s'y installe ensuite depuis sa ligne.</p>
+        <p class="muted small">La racine d'un dépôt git. L'ajouter n'écrit rien dans son dossier : seule la liste du cockpit change. La chaîne s'y installe ensuite depuis sa carte.</p>
         <div class="row">
           <input type="text" id="app-path" class="grow" placeholder="C:\Dev\mon_application" aria-label="Dossier de l'application">
           <button id="btn-browse">Parcourir…</button>
@@ -672,9 +712,18 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         </div>
         <p class="muted small" style="margin:8px 0 0">Si la fenêtre de choix ne s'ouvre pas, collez le chemin dans le champ.</p>
       </div>
-      <div class="card hidden" id="new-app" style="margin-bottom:16px" aria-label="Nouvelle application">
-        <h3>Nouvelle application</h3>
-        <p class="muted small" style="margin:0">Un dossier neuf, son dépôt git, la chaîne installée, le socle de l'application, votre fichier d'idées — et la feature s'ouvre sur /1_lexique. Rien ne passe par Claude : chaque étape est écrite d'avance.</p>
+      <div id="home-creations" aria-label="Les créations en cours ou arrêtées"></div>
+      <div class="card hidden" id="apps-report" style="margin-bottom:16px" aria-label="Tout mettre à jour : le compte rendu"></div>
+      <div id="apps-msg" class="notice warn hidden" role="status"></div>
+      <div id="apps-list" class="home-cards" aria-label="Les applications"><p class="muted">Lecture des applications…</p></div>
+    </section>
+
+    <!-- ================= « Nouvelle application » (1.7, 1.9) ================= -->
+    <section id="scr-nouvelle" class="screen hidden">
+      <button class="back small" id="nf-back">‹ Retour</button>
+      <div class="card" id="new-app" style="margin-bottom:16px" aria-label="Nouvelle application">
+        <h2>Nouvelle application</h2>
+        <p class="muted small" style="margin:-6px 0 0">Un dossier neuf, son dépôt git, la chaîne installée, le socle de l'application, votre fichier d'idées — et la feature s'ouvre sur /1_lexique. Rien ne passe par Claude : chaque étape est écrite d'avance.</p>
         <div class="nf">
           <label for="nf-name">Le nom de l'application</label>
           <div><input type="text" id="nf-name" placeholder="Mon application" maxlength="60" autocomplete="off">
@@ -705,12 +754,19 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         </div>
         <div id="nf-summary" aria-label="Ce qui sera créé"></div>
         <div class="row" style="margin-top:14px"><button id="nf-create" class="primary" disabled>Créer</button>
-          <button id="nf-cancel">Fermer</button><span class="small" id="nf-msg"></span></div>
+          <span class="small" id="nf-msg"></span></div>
       </div>
       <div id="new-runs" aria-label="Les créations"></div>
-      <div class="card hidden" id="apps-report" style="margin-bottom:16px" aria-label="Tout mettre à jour : le compte rendu"></div>
-      <div id="apps-msg" class="notice warn hidden" role="status"></div>
-      <div id="apps-list" aria-label="Les applications"><p class="muted">Lecture des applications…</p></div>
+    </section>
+
+    <!-- ========== Une application sans feature ouverte (1.6, 1.9) ========== -->
+    <section id="scr-pick" class="screen hidden">
+      <div class="card" id="work-card">
+        <h2 id="work-title">Feature</h2>
+        <p class="muted small" id="work-note">Une feature de <span class="mono">docs/features/</span>. Ses corrections <span class="mono">bugfix-NN/</span> sont sous « Correction ».</p>
+        <div class="folders" id="work-list"></div>
+        <div class="row" style="margin-top:14px"><button id="btn-open" class="primary" disabled>Ouvrir</button></div>
+      </div>
     </section>
 
     <!-- ========================= Tableau de bord ========================= -->
@@ -793,13 +849,24 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       <div class="tabs" role="tablist" aria-label="Chaîne" id="chaine-tabs">
         <button role="tab" id="tab-main-amont" data-chain="main" data-tab="amont" aria-controls="chaine-amont">Amont</button>
         <button role="tab" id="tab-main-code" data-chain="main" data-tab="code" aria-controls="chaine-code">Code <span class="count plain hidden" id="tab-main-code-n"></span></button>
+        <button role="tab" id="tab-main-version" data-chain="main" data-tab="version" aria-controls="chaine-version">Version</button>
       </div>
       <div id="chaine-amont" role="tabpanel" aria-labelledby="tab-main-amont">
         <div id="chaine-alerts"></div>
         <ol class="flow" id="flow-main" aria-label="La chaîne principale"></ol>
         <div id="run-fallback" class="flow-note"></div>
+        <div id="audits" class="card hidden" aria-label="Audits"></div>
       </div>
       <div id="chaine-code" role="tabpanel" aria-labelledby="tab-main-code" class="hidden"></div>
+      <!-- 1.9: the chain's version, its install and update — Paramètres → Chaîne until 1.8. -->
+      <div id="chaine-version" role="tabpanel" aria-labelledby="tab-main-version" class="hidden">
+        <div class="card" id="sec-chain">
+          <h3>La chaîne de l'application</h3>
+          <p class="muted small">Les agents, les commandes, les scripts et les grilles de l'application viennent du dépôt de la chaîne, à son dernier commit. On ne les change que là-bas ; ici, on les installe. Les fichiers propres à l'application — son <span class="mono">/deploie</span> — ne sont jamais touchés.</p>
+          <div id="set-chain"></div>
+          <div class="row" style="margin-top:12px"><button id="btn-chain" class="primary">Installer / mettre à jour la chaîne</button><span id="chain-msg" class="muted small"></span></div>
+        </div>
+      </div>
     </section>
 
     <!-- ============================ Correction ============================ -->
@@ -834,6 +901,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <button role="tab" id="dp-tab-destinations" data-tab="destinations" aria-controls="dp-destinations">Destinations</button>
         <button role="tab" id="dp-tab-deployer" data-tab="deployer" aria-controls="dp-deployer">Déployer</button>
         <button role="tab" id="dp-tab-journal" data-tab="journal" aria-controls="dp-journal">Journal <span class="count hidden" id="dp-crash-n"></span></button>
+        <button role="tab" id="dp-tab-profil" data-tab="profil" aria-controls="dp-profil">Profil</button>
       </div>
       <div id="dp-msg" class="notice warn hidden" role="status"></div>
       <div id="dp-destinations" role="tabpanel" aria-labelledby="dp-tab-destinations"><p class="muted">Lecture des destinations…</p></div>
@@ -852,6 +920,10 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <div id="dp-j-note" class="muted small"></div>
         <div class="dp-crashes" id="dp-j-crashes" aria-label="Les crashs"></div>
         <div class="dp-log" id="dp-j-log" aria-label="Le journal"></div>
+      </div>
+      <!-- 1.9: the deploy profile — Paramètres → Déploiement in 1.8. -->
+      <div id="dp-profil" role="tabpanel" aria-labelledby="dp-tab-profil" class="hidden">
+        <div class="card" id="sec-deploy"><div id="set-deploy"><p class="muted">Lecture du profil…</p></div></div>
       </div>
     </section>
 
@@ -892,51 +964,35 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     </section>
 
     <!-- ============================ Paramètres ============================ -->
+    <!-- 1.9: what belongs to the cockpit itself. The chain's version is under
+         « Chaîne → Version », the deploy profile under « Déploiement → Profil ». -->
     <section id="scr-settings" class="screen hidden">
-      <div class="card sec" id="sec-folders">
-        <h2>Dossiers</h2>
-        <div id="set-folders"></div>
-        <h3 style="margin-top:16px">Paires récentes</h3>
-        <div id="set-recent" class="recent"></div>
-      </div>
       <div class="card sec" id="sec-mode">
-        <h2>Mode</h2>
+        <h2>Mode de permission</h2>
+        <p class="lead">Ce que Claude fait sans vous demander pendant une commande, et ce qui arrive en bandeau pour que vous l'autorisiez.</p>
         <div class="modes" id="set-mode"></div>
         <p class="muted small" id="mode-note"></p>
       </div>
+      <div class="card sec" id="sec-notes">
+        <h2>Notifications</h2>
+        <p class="lead">Quand l'onglet du cockpit n'est pas devant : le navigateur montre une notification ; un clic ramène l'onglet sur l'écran concerné. Devant, la page le montre déjà.</p>
+        <div id="set-notes" class="notes"></div>
+      </div>
+      <div class="card sec" id="sec-folders">
+        <h2>Dossiers ignorés</h2>
+        <p class="lead">Les dossiers de <span class="mono">docs/features/</span> que rien ne doit montrer — ceux d'une ancienne chaîne : ni la liste des features, ni « Correction », ni les Statistiques, ni le Code.</p>
+        <div id="set-folders"></div>
+      </div>
       <div class="card sec" id="sec-diag">
-        <h2>Diagnostic</h2>
-        <div class="row"><button id="btn-diag" class="primary">Lancer le diagnostic</button>
+        <h2>Outils sur cet ordinateur</h2>
+        <p class="lead">Vérifie que les outils dont les builds et les commandes de l'application ont besoin — Java, Gradle ou Flutter, adb, Claude Code, git — sont installés et répondent. Lancé une fois de lui-même ; le tableau de bord n'alerte que sur un ✗.</p>
+        <div class="row"><button id="btn-diag" class="primary">Vérifier les outils</button>
           <span id="diag-wait" class="muted small hidden">En cours… jusqu'à 120 secondes : le premier appel de Gradle peut télécharger Gradle.</span></div>
         <div id="diag-result" class="diag"></div>
       </div>
-      <div class="card sec" id="sec-chain">
-        <h2>Chaîne</h2>
-        <p class="muted small">Les agents, les commandes, les scripts et les grilles de l'application viennent du dépôt de la chaîne, à son dernier commit. On ne les change que là-bas ; ici, on les installe. Les fichiers propres à l'application — son <span class="mono">/deploie</span> — ne sont jamais touchés.</p>
-        <div id="set-chain"></div>
-        <div class="row" style="margin-top:12px"><button id="btn-chain" class="primary">Installer / mettre à jour la chaîne</button><span id="chain-msg" class="muted small"></span></div>
-      </div>
-      <div class="card sec" id="sec-deploy">
-        <h2>Déploiement</h2>
-        <div id="set-deploy"><p class="muted">Lecture du profil…</p></div>
-      </div>
-      <div class="card sec" id="sec-commands">
-        <h2>Commandes</h2>
-        <p class="muted small">La sortie de secours : le chemin normal est la chaîne. Une commande que le dernier relais n'a pas nommée demande confirmation.</p>
-        <div id="set-commands"></div>
-      </div>
-      <div class="card sec" id="sec-notes">
-        <h2>Notifications</h2>
-        <p class="muted small">Quand l'onglet du cockpit n'est pas devant : le navigateur montre une notification ; un clic ramène l'onglet sur l'écran concerné. Devant, la page le montre déjà.</p>
-        <div id="set-notes" class="notes"></div>
-      </div>
-      <div class="card sec" id="sec-maint">
-        <h2>Maintenance</h2>
-        <div id="set-maint"></div>
-      </div>
       <div class="card sec" id="sec-quit">
-        <h2>Cockpit</h2>
-        <p class="muted small">Fermer l'onglet ou le navigateur n'arrête rien : un run continue, et la page rouverte le reprend où il en est. Ceci arrête le serveur du cockpit lui-même ; le raccourci du bureau le relance.</p>
+        <h2>Arrêter le cockpit</h2>
+        <p class="lead">Fermer l'onglet ou le navigateur n'arrête rien : un run continue, et la page rouverte le reprend où il en est. Ceci arrête le serveur du cockpit lui-même ; le raccourci du bureau le relance.</p>
         <div class="row"><button id="btn-quit" class="danger">Arrêter le cockpit</button><span id="quit-msg" class="muted small"></span></div>
       </div>
     </section>
@@ -1114,33 +1170,48 @@ const STATE_CLASS = {"faite": "st-faite", "t'attend": "st-attend", "en cours": "
                      "bloquée": "st-bloquee", "à faire": "st-afaire", "inconnu": "st-inconnu"};
 
 // ================================================================ routes
-const SCREENS = ["dashboard", "answer", "chaine", "correction", "deploy", "stats", "apps", "settings"];
+// 1.9: the cockpit opens on the home screen — « accueil » — and never
+// straight on a dashboard. « nouvelle » is the creation form, a page of its
+// own. Every other screen is an open application's, with the side menu.
+const SCREENS = ["dashboard", "answer", "chaine", "correction", "deploy", "stats", "settings"];
+const HOME = ["accueil", "nouvelle"];
 function currentRoute() {
   const h = (location.hash || "").replace("#", "");
-  return SCREENS.includes(h) ? h : "dashboard";
+  return SCREENS.includes(h) || HOME.includes(h) ? h : "accueil";
 }
+const atHome = () => HOME.includes(currentRoute()) || !S.app_folder;
 function go(name, section) {
   if (location.hash === "#" + name) route(); else location.hash = "#" + name;
   if (section) setTimeout(() => { const s = $(section); if (s) s.scrollIntoView({behavior: "smooth", block: "start"}); }, 30);
 }
-// 1.6: with no feature open, « Applications » is the only screen — the
-// list, the feature to open of the active one, « Ajouter une application ».
+let shownRoute = null;
 function route() {
-  const isOpen = !!S.open;
-  $("shell").classList.toggle("nofolder", !isOpen);
-  const r = isOpen ? currentRoute() : "apps";
-  for (const s of SCREENS) $("scr-" + s).classList.toggle("hidden", s !== r);
+  const home = atHome();
+  const r = home ? (currentRoute() === "nouvelle" ? "nouvelle" : "accueil") : currentRoute();
+  const entering = r !== shownRoute;
+  shownRoute = r;
+  // An application open with no feature: its features, to open one (1.6).
+  const pick = !home && !S.open;
+  const inApp = !home && !!S.open;
+  $("shell").classList.toggle("nofolder", !inApp);
+  document.body.classList.toggle("at-home", home);
+  for (const s of HOME) $("scr-" + s).classList.toggle("hidden", s !== r);
+  $("scr-pick").classList.toggle("hidden", !pick);
+  for (const s of SCREENS) $("scr-" + s).classList.toggle("hidden", !(inApp && s === r));
   for (const s of SCREENS) {
     const a = $("nav-" + s);
-    if (s === r && isOpen) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    if (s === r && inApp) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   }
-  if (r === "apps") { renderWorkCard(); loadApps(); loadCreations(); }
-  if (isOpen && r === "answer") hint();
-  if (isOpen && (r === "chaine" || r === "correction")) placeRun();
-  if (isOpen && r === "stats") loadStats();
+  if (r === "accueil") { loadApps(); loadCreations(); renderHomeNotice(); }
+  if (r === "nouvelle" && entering) { openNewApp(); loadCreations(); }
+  if (pick) renderWorkCard();
+  if (inApp && r === "answer") hint();
+  if (inApp && (r === "chaine" || r === "correction")) placeRun();
+  if (inApp && r === "stats") loadStats();
   // 1.8: « Déploiement » polls its destinations while it is shown, and only then.
-  if (isOpen && r === "deploy") enterDeploy(); else leaveDeploy();
-  if (isOpen && r === "settings") loadDeploySettings();
+  if (inApp && r === "deploy") enterDeploy(); else leaveDeploy();
+  renderChrome();
+  if (S.app_folder !== undefined) renderChainState();
 }
 window.addEventListener("hashchange", route);
 
@@ -1172,7 +1243,7 @@ function renderWorkCard() {
   if (!show) return;
   $("work-title").textContent = `« ${S.app_name} » — choisir la feature`;
   if (S.open_error) {
-    $("work-note").textContent = `${S.open_error}. Elle reste dans la liste ; la chaîne s'y installe depuis sa ligne, plus bas.`;
+    $("work-note").textContent = `${S.open_error}. Elle reste dans la liste ; la chaîne s'y installe depuis sa carte, sur l'écran d'accueil (« Applications », en haut à droite).`;
     $("work-list").replaceChildren(); $("btn-open").classList.add("hidden");
     return;
   }
@@ -1224,16 +1295,18 @@ let MK = null, mkPoll = null, mkWasGoing = false;
 const slugify = (t) => (t || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
   .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 function nfForm() { const f = {}; for (const k of NF_FIELDS) f[k] = $("nf-" + k).value; return f; }
+// 1.9: a page of its own, full width; « Retour » goes back to the home screen.
 async function openNewApp() {
   $("new-app").classList.remove("hidden"); $("apps-add").classList.add("hidden");
+  $("main").scrollTo(0, 0);
   if (!$("nf-parent").value) {
     try { const r = await api("/api/create"); $("nf-parent").value = r.default_parent || ""; } catch (e) { /* typed by hand */ }
   }
   $("nf-name").focus();
   nfCheck();
 }
-$("btn-app-new").onclick = () => $("new-app").classList.contains("hidden") ? openNewApp() : $("new-app").classList.add("hidden");
-$("nf-cancel").onclick = () => $("new-app").classList.add("hidden");
+$("btn-app-new").onclick = () => go("nouvelle");
+$("nf-back").onclick = () => go("accueil");
 function nfLater() { clearTimeout(NF.timer); NF.timer = setTimeout(nfCheck, 250); }
 for (const k of NF_FIELDS) $("nf-" + k).addEventListener("input", () => { NF.touched.add(k); nfLater(); });
 $("nf-name").addEventListener("input", () => { if (!NF.folderTouched) $("nf-folder").value = slugify($("nf-name").value); });
@@ -1319,8 +1392,11 @@ async function loadCreations() {
     if (r.last && r.last.status === "fait") setTimeout(() => { resetForApp(); location.hash = "#dashboard"; refreshState(); }, 1200);
   }
 }
+// On the creation page, every one; on the home screen, the one going and
+// those stopped — « Reprendre » is never out of reach (1.9).
 function renderCreations() {
-  const box = $("new-runs"); box.replaceChildren();
+  const box = $("new-runs"), home = $("home-creations");
+  box.replaceChildren(); home.replaceChildren();
   if (!MK) return;
   const seen = new Set();
   const recs = [];
@@ -1328,7 +1404,11 @@ function renderCreations() {
     if (!x || seen.has(appKey(x.values.path))) continue;
     seen.add(appKey(x.values.path)); recs.push(x);
   }
-  for (const x of recs) box.append(creationCard(x));
+  const onHome = currentRoute() === "accueil";
+  for (const x of recs) {
+    if (!onHome) box.append(creationCard(x));
+    else if (x.status !== "fait") home.append(creationCard(x));
+  }
   if (NF.check) renderNf();
 }
 function creationCard(rec) {
@@ -1393,66 +1473,128 @@ const CHAIN_CLS = {"à jour": "ok", "en retard": "late", "modifiée sur place": 
 function renderApps() {
   const box = $("apps-list"); box.replaceChildren();
   const rows = (A && A.apps) || [];
-  $("apps-count").textContent = rows.length ? plural(rows.length, "application", "applications") : "";
+  $("apps-count").textContent = rows.length ? `${plural(rows.length, "application", "applications")} — un clic sur une carte l'ouvre sur son tableau de bord.` : "";
   if (!rows.length) {
     box.append(el("div", {class: "card"}, el("p", {style: "margin:0", text: "Aucune application dans la liste. « Nouvelle application » en crée une, du dossier vide à /1_lexique ; « Ajouter une application » en ajoute une qui existe : la racine d'un dépôt git."})));
     $("apps-add").classList.remove("hidden");
   }
-  for (const r of rows) box.append(appRow(r));
+  for (const r of rows) box.append(homeCard(r));
   $("btn-update-all").disabled = bulkBusy || !!(A && A.bulk_going) || !rows.length;
   renderReport();
 }
-function factCell(k, ...v) { return el("div", {}, el("div", {class: "k", text: k}), el("div", {}, ...v)); }
-function appRow(r) {
-  const c = r.chain;
-  const st = c && c.state;
-  const msg = el("div", {class: "msg muted", id: "app-msg-" + appKey(r.folder).replace(/[^a-z0-9]/g, "_")});
-  const acts = el("div", {class: "acts"},
-    el("button", {class: r.active && S.open ? "" : "primary", text: r.active && S.open ? "Ouverte" : "Ouvrir",
-      disabled: (r.active && S.open) || !r.exists || undefined, onclick: () => activateApp(r.folder, true)}),
-    el("button", {text: "Renommer", onclick: () => renameApp(r)}),
-    el("button", {class: "danger", text: "Retirer de la liste", disabled: r.running || undefined,
-      title: r.running ? "Une commande tourne dans cette application" : "Le dossier n'est pas touché", onclick: () => removeApp(r)}));
-  const chainCell = c ? [el("span", {class: "cst " + (CHAIN_CLS[st] || "abs"), text: st || "inconnue"}),
-    el("div", {class: "small muted", text: c.summary})] : [el("span", {class: "muted", text: "—"})];
-  if (c && st && st !== "à jour") chainCell.push(el("div", {style: "margin-top:6px"}, el("button", {class: "small",
-    text: st === "absente" ? "Installer la chaîne" : "Mettre à jour la chaîne", disabled: r.running || anyRunIn(r.folder) || undefined,
-    title: st === "en retard" ? "Son installation, seule" : "Son installation demande avant de remplacer quoi que ce soit",
-    onclick: () => rowInstall(r.folder)})));
-  const feat = r.feature ? [el("b", {class: "mono", text: r.feature}),
-      r.proposal ? el("div", {class: "small", text: r.proposal.french}) : null]
-    : [el("span", {class: "muted", text: r.open_error || "aucune feature ouverte"})];
+const msgId = (folder) => "app-msg-" + appKey(folder).replace(/[^a-z0-9]/g, "_");
+// One card per application (1.9) — what « Applications » showed (1.6): its
+// name and folder, its chain, its feature and the step the scan proposes,
+// what waits on her there, its last run, a run going. A click opens it on
+// its dashboard; « ⋯ » renames it or takes it off the list.
+function homeCard(r) {
+  const c = r.chain, st = c && c.state;
+  const going = r.running || anyRunIn(r.folder);
+  const stop = (e) => e.stopPropagation();
+  // The small menu: « Renommer », « Retirer de la liste ».
+  const menu = el("div", {class: "pop hc-menu hidden", role: "menu", "aria-label": `Actions — ${r.name}`},
+    el("button", {role: "menuitem", text: "Renommer", onclick: (e) => { stop(e); closeCardMenus(); renameApp(r); }}),
+    el("button", {role: "menuitem", class: "danger", text: "Retirer de la liste", disabled: going || undefined,
+      title: going ? "Une commande tourne dans cette application" : "Le dossier n'est pas touché",
+      onclick: (e) => { stop(e); closeCardMenus(); removeApp(r); }}));
+  const menuBtn = el("button", {class: "hc-menu-btn", "aria-haspopup": "true", "aria-expanded": "false",
+    "aria-label": `Actions — ${r.name}`, title: "Renommer, retirer de la liste", text: "⋯",
+    onclick: (e) => {
+      stop(e);
+      const open = menu.classList.contains("hidden");
+      closeCardMenus();
+      if (open) { menu.classList.remove("hidden"); menuBtn.setAttribute("aria-expanded", "true"); menu.querySelector("button").focus(); }
+    }});
+  const next = r.feature
+    ? el("div", {class: "hc-next"}, el("div", {class: "k"}, "Feature", el("span", {class: "feat", text: r.feature})),
+        el("div", {class: "what", text: r.proposal ? r.proposal.french : "—"}))
+    : el("div", {class: "hc-next"}, el("div", {class: "k", text: "Feature"}),
+        el("div", {class: "what muted", text: r.open_error || "aucune feature ouverte — l'ouvrir propose de la choisir"}));
   const waits = r.questions === null ? el("span", {class: "muted", text: "—"})
-    : el("span", {class: r.questions + r.blocking ? "" : "muted",
+    : el("span", {class: "hc-waits" + (r.questions + r.blocking ? " has" : " muted"),
         text: `${plural(r.questions, "question", "questions")} · ${plural(r.blocking, "blocage", "blocages")}`});
   const lr = r.last_run;
-  const last = lr ? [el("span", {class: "mono small", text: lr.command || "—"}),
-      el("div", {class: "small muted", text: `${lr.at ? fmtWhen(new Date(lr.at)) : "—"} — ${lr.outcome || "?"}`})]
-    : [el("span", {class: "muted", text: "aucun run mémorisé"})];
+  const last = !lr ? [el("span", {class: "muted", text: "aucun run mémorisé"})]
+    : [el("span", {class: "mono", text: lr.command || "—"}),
+       el("div", {class: "muted small", text: going ? "en cours" : `${lr.at ? fmtWhen(new Date(lr.at)) : "—"} — ${lr.outcome || "?"}`})];
   const unc = r.uncommitted === null ? "—" : r.uncommitted ? plural(r.uncommitted, "fichier", "fichiers") : "aucun";
-  const row = el("div", {class: "app-row" + (r.active ? " is-active" : ""), "data-folder": r.folder},
-    el("div", {class: "top"}, el("span", {class: "nm", text: r.name}),
-      r.active ? el("span", {class: "badge", text: "active"}) : null,
-      r.running ? el("span", {class: "badge warn", text: "une commande tourne"}) : null, acts),
-    el("div", {class: "fd", text: r.folder}),
-    el("div", {class: "facts"},
-      factCell("Chaîne", ...chainCell), factCell("Feature et étape proposée", ...feat),
-      factCell("Vous attend", waits), factCell("Dernier run", ...last),
-      factCell("Non commité", el("span", {class: "muted", title: "Information : le cockpit n'y touche jamais", text: unc}))),
-    msg);
-  if (r.errors && r.errors.length) msg.textContent = r.errors.join(" · ");
-  return row;
+  const fact = (k, ...v) => el("div", {}, el("div", {class: "k", text: k}), el("div", {class: "v"}, ...v));
+  const chainLine = el("div", {class: "hc-chain"},
+    c ? el("span", {class: "cst " + (CHAIN_CLS[st] || "abs"), text: `chaîne ${st || "inconnue"}`}) : el("span", {class: "muted", text: "chaîne —"}),
+    c ? el("span", {text: c.summary.replace(/^Chaîne (à jour|en retard|modifiée sur place|absente) ?(— )?/, "")}) : null,
+    c && st && st !== "à jour" ? el("button", {class: "small",
+      text: st === "absente" ? "Installer la chaîne" : "Mettre à jour la chaîne", disabled: going || anyRun() || undefined,
+      title: st === "en retard" ? "Son installation, seule" : "Son installation demande avant de remplacer quoi que ce soit",
+      onclick: (e) => { stop(e); rowInstall(r.folder); }}) : null);
+  const running = going ? el("div", {class: "hc-running"}, el("span", {class: "dot"}),
+      el("span", {}, el("b", {text: "en cours"}), " — ",
+        el("span", {class: "mono", text: anyRunIn(r.folder) ? S.busy.prompt : (lr ? lr.command : "")}),
+        anyRunIn(r.folder) && S.busy.started_at ? ` depuis ${S.busy.started_at.slice(11, 16)}` : ""),
+      el("button", {class: "danger", text: "Arrêter", title: "Arrêter maintenant la commande qui tourne",
+        onclick: (e) => { stop(e); $("tb-stop").click(); }})) : null;
+  const card = el("div", {class: "home-card" + (r.exists ? "" : " missing") + (going ? " going" : ""),
+    "data-folder": r.folder, "data-name": r.name, tabindex: r.exists ? "0" : undefined,
+    "aria-label": r.exists ? `${r.name} — l'ouvrir` : undefined},
+    el("div", {class: "hc-top"},
+      el("div", {class: "hc-id"}, el("div", {class: "hc-name", text: r.name}), el("div", {class: "hc-folder", text: r.folder})),
+      el("div", {class: "hc-menu-wrap"}, menuBtn, menu)),
+    running, next,
+    el("div", {class: "hc-facts"}, fact("Vous attend", waits), fact("Dernier run", ...last),
+      fact("Non commité", el("span", {class: "muted", title: "Information : le cockpit n'y touche jamais", text: unc}))),
+    el("div", {class: "hc-foot"}, chainLine, el("span", {class: "hc-open", text: r.exists ? "Ouvrir →" : "dossier introuvable"})),
+    el("div", {class: "hc-msg", id: msgId(r.folder), text: (r.errors || []).join(" · ")}));
+  if (r.exists) {
+    card.addEventListener("click", (e) => { if (!e.target.closest("button, .pop")) openApp(r.folder); });
+    card.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target === card) { e.preventDefault(); openApp(r.folder); } });
+  }
+  return card;
+}
+function closeCardMenus() {
+  for (const m of document.querySelectorAll(".hc-menu")) m.classList.add("hidden");
+  for (const b of document.querySelectorAll(".hc-menu-btn")) b.setAttribute("aria-expanded", "false");
 }
 const anyRunIn = (folder) => anyRun() && sameApp(S.busy.app, folder);
 
+// A card opens its application on its dashboard. The one already open keeps
+// what the page holds of it; any other is opened afresh.
+async function openApp(folder) {
+  leftNotice = null;
+  if (sameApp(folder, S.app_folder) && S.open) { go("dashboard"); $("main").scrollTo(0, 0); return; }
+  await activateApp(folder, true);
+}
 async function activateApp(folder, toDashboard) {
-  closeAppMenu();
+  closeFeatMenu();
   try { await api("/api/apps/open", {folder}); }
   catch (e) { alert(e.message); return; }
   resetForApp();
-  if (toDashboard) location.hash = "#dashboard";
+  leftNotice = null;
+  if (toDashboard || atHome()) location.hash = "#dashboard";
   $("main").scrollTo(0, 0);
   await refreshState();
+}
+
+// « Applications », at the right of the top bar: back to the home screen.
+// A run going keeps going — it lives in the server, not in the page (1.5).
+// Leaving says so, once per run.
+let leftNotice = null;
+const noticeSeen = new Set();
+$("tb-home").onclick = () => {
+  closeFeatMenu();
+  if (anyRun()) {
+    const key = S.busy.id || `${S.busy.app}|${S.busy.started_at}`;
+    if (!noticeSeen.has(key)) { noticeSeen.add(key); leftNotice = {name: S.busy.app_name}; }
+  }
+  go("accueil");
+  $("main").scrollTo(0, 0);
+};
+function renderHomeNotice() {
+  const n = $("home-notice");
+  n.classList.toggle("hidden", !leftNotice);
+  if (!leftNotice) return;
+  const a = leftNotice.name;
+  n.replaceChildren(el("span", {class: "ic"}),
+    el("span", {text: `Une commande tourne dans ${a} : elle continue. Tu la retrouves en rouvrant ${a}.`}),
+    el("button", {text: "Compris", onclick: () => { leftNotice = null; renderHomeNotice(); }}));
 }
 // What the page kept of the application it leaves: nothing carries over.
 function resetForApp() {
@@ -1512,7 +1654,7 @@ $("btn-update-all").onclick = async () => {
   const late = rows.filter((r) => r.chain && r.chain.state === "en retard");
   if (!confirm((late.length ? `Mettre à jour la chaîne dans ${late.map((r) => `« ${r.name} »`).join(", ")} ?\n\nChacune reçoit un commit « chain: … » de ces fichiers seuls, puis un push.`
       : "Aucune application n'est « en retard » : rien ne sera installé.") +
-      "\n\nLes autres sont listées avec leur raison : une chaîne « modifiée sur place » ou « absente » ne s'installe que depuis sa ligne, qui demande avant de remplacer quoi que ce soit.")) return;
+      "\n\nLes autres sont listées avec leur raison : une chaîne « modifiée sur place » ou « absente » ne s'installe que depuis sa carte, qui demande avant de remplacer quoi que ce soit.")) return;
   bulkBusy = true; renderApps();
   try { const rep = await api("/api/chain/install-all", {}); if (A) A.report = rep; appsMsg(""); }
   catch (e) { appsMsg(e.message); }
@@ -1539,27 +1681,35 @@ function renderReport() {
   }
 }
 
-// ---------------------------------------------- the top bar's switcher
-function renderAppMenu() {
-  const m = $("app-menu"); m.replaceChildren();
-  for (const a of S.apps || []) m.append(el("button", {role: "menuitem", "aria-current": a.active ? "true" : "false",
-    onclick: () => { closeAppMenu(); if (!a.active) activateApp(a.folder, false); }},
-    el("span", {class: "ck", text: a.active ? "✓" : ""}), el("span", {class: "nm", text: a.name}), el("span", {class: "fd", text: a.folder})));
-  m.append(el("hr"), el("button", {role: "menuitem", onclick: () => { closeAppMenu(); go("apps"); }},
-    el("span", {class: "ck", text: ""}), el("span", {text: "Toutes les applications…"})));
+// ---------------------------------------------- the top bar's feature menu
+// 1.9: the application is chosen on the home screen; the feature, here —
+// what « Paramètres → Dossiers » held until 1.8.
+function renderFeatMenu() {
+  const m = $("feat-menu"); m.replaceChildren(el("div", {class: "pop-h", text: `Features de ${S.app_name || "l'application"}`}));
+  for (const w of S.working_folders || []) m.append(el("button", {role: "menuitem", "aria-current": w === S.feature ? "true" : "false",
+    onclick: () => { closeFeatMenu(); if (w !== S.feature) openPair(S.app_folder, w); }},
+    el("span", {class: "ck", text: w === S.feature ? "✓" : ""}), el("span", {class: "mono", text: w})));
+  if (!(S.working_folders || []).length) m.append(el("div", {class: "muted small", style: "padding:6px 12px", text: "Aucune feature sous docs/features/."}));
 }
-function closeAppMenu() { $("app-menu").classList.add("hidden"); $("tb-app").setAttribute("aria-expanded", "false"); }
-$("tb-app").onclick = (e) => {
+function closeFeatMenu() { $("feat-menu").classList.add("hidden"); $("tb-folder").setAttribute("aria-expanded", "false"); }
+$("tb-folder").onclick = (e) => {
   e.stopPropagation();
-  const open = $("app-menu").classList.contains("hidden");
-  if (open) { renderAppMenu(); $("app-menu").classList.remove("hidden"); $("tb-app").setAttribute("aria-expanded", "true");
-              const f = $("app-menu").querySelector("button"); if (f) f.focus(); }
-  else closeAppMenu();
+  const open = $("feat-menu").classList.contains("hidden");
+  if (open) { renderFeatMenu(); $("feat-menu").classList.remove("hidden"); $("tb-folder").setAttribute("aria-expanded", "true");
+              const f = $("feat-menu").querySelector("button"); if (f) f.focus(); }
+  else closeFeatMenu();
 };
-document.addEventListener("click", (e) => { if (!$("tb-app-wrap").contains(e.target)) closeAppMenu(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("app-menu").classList.contains("hidden")) { closeAppMenu(); $("tb-app").focus(); } });
+document.addEventListener("click", (e) => {
+  if (!$("tb-folder-wrap").contains(e.target)) closeFeatMenu();
+  if (!e.target.closest(".hc-menu-wrap")) closeCardMenus();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!$("feat-menu").classList.contains("hidden")) { closeFeatMenu(); $("tb-folder").focus(); }
+  const open = document.querySelector(".hc-menu:not(.hidden)");
+  if (open) { const b = open.parentNode.querySelector(".hc-menu-btn"); closeCardMenus(); if (b) b.focus(); }
+});
 
-async function changeFolder() { go("apps"); }
 async function openPair(app, work) {
   try { await api("/api/open", {app, work}); resetForApp();
         location.hash = "#dashboard"; await refreshState(); }
@@ -1611,17 +1761,21 @@ function watchDiagnostic() {
 }
 
 // ---------------------------------------------------------- top bar
-// 1.6: the active application's name opens the switcher; the run going is
-// said with its application, and « Arrêter » acts on it from any screen.
+// 1.9: inside an application, its name, the feature's menu, the mode, and
+// « Applications » at the right — back to the home screen, on every one of
+// its screens. The home screen has none of them. The run going is said with
+// its application, and « Arrêter » acts on it from any screen (1.6).
 function renderChrome() {
-  const isOpen = !!S.open;
-  $("tb-app-wrap").classList.toggle("hidden", !(S.apps || []).length);
-  $("tb-app").replaceChildren(el("span", {text: S.app_name || "Aucune application"}), el("span", {class: "caret", text: " ▾"}));
-  for (const id of ["tb-folder", "tb-mode", "tb-menu"]) $(id).classList.toggle("hidden", !isOpen);
+  const home = atHome();
+  const isOpen = !!S.open && !home;
+  $("tb-app").classList.toggle("hidden", home);
+  $("tb-app").textContent = S.app_name || "";
+  $("tb-home").classList.toggle("hidden", home);
+  for (const id of ["tb-folder-wrap", "tb-mode", "tb-menu"]) $(id).classList.toggle("hidden", !isOpen);
   const b = S.busy, tb = $("tb-run");
   tb.classList.toggle("hidden", !isOpen && !anyRun());
   tb.classList.toggle("running", anyRun());
-  if (anyRun()) tb.replaceChildren(...(b.active ? [] : [el("span", {class: "where", text: b.app_name}), " · "]),
+  if (anyRun()) tb.replaceChildren(...(b.active && !home ? [] : [el("span", {class: "where", text: b.app_name}), " · "]),
     `${b.prompt} — depuis ${(b.started_at || "").slice(11, 16)}`);
   else tb.textContent = "Au repos";
   tb.title = anyRun() ? busyNote() : "Aucune commande ne tourne";
@@ -1629,7 +1783,7 @@ function renderChrome() {
   renderBusyBanner();
   updateTitle();
   if (!isOpen) return;
-  $("tb-folder").replaceChildren(el("b", {text: S.feature || S.working_folder}));
+  $("tb-folder").replaceChildren(el("b", {text: S.feature || S.working_folder}), el("span", {class: "caret", text: " ▾"}));
   $("tb-mode").replaceChildren("Mode : ", el("b", {text: S.mode === "manuel" ? "Manuel" : "Auto"}));
   $("nav-run-dot").classList.toggle("hidden", !running());
   const nc = (S.bugfixes || []).length;
@@ -1641,8 +1795,9 @@ function renderChrome() {
 // question when it has one — the launches here wait for its end.
 function renderBusyBanner() {
   const bb = $("busy-banner");
-  bb.classList.toggle("hidden", !elsewhere());
-  if (!elsewhere()) return;
+  const show = elsewhere() && !atHome();          // the home screen's card says it (1.9)
+  bb.classList.toggle("hidden", !show);
+  if (!show) return;
   const b = S.busy;
   bb.replaceChildren(el("b", {text: `Une commande tourne dans « ${b.app_name} » : ${b.prompt}`}),
     ` — depuis ${(b.started_at || "").slice(11, 16)}. Une seule à la fois : rien ne se lance ici avant sa fin.`,
@@ -1652,7 +1807,7 @@ function renderBusyBanner() {
     el("button", {class: "primary small", text: "Continuer d'attendre", onclick: continueWait}),
     el("button", {class: "danger small", text: "Arrêter maintenant", onclick: stopNow})));
 }
-$("tb-run").onclick = () => { if (elsewhere()) activateApp(S.busy.app, false); };
+$("tb-run").onclick = () => { if (anyRun() && (elsewhere() || atHome())) activateApp(S.busy.app, true); };
 $("tb-stop").onclick = async () => {
   const b = S.busy; if (!b) return;
   if (!confirm(`Arrêter ${b.prompt}${b.active ? "" : ` dans « ${b.app_name} »`} maintenant ? Le tour en cours s'arrête inachevé.`)) return;
@@ -1685,7 +1840,6 @@ $("tb-menu").onclick = () => {
   applyMenu();
 };
 function baseName(p) { return (p || "").split(/[\\/]/).filter(Boolean).pop() || ""; }
-$("tb-folder").onclick = () => go("settings", "sec-folders");
 $("tb-mode").onclick = () => go("settings", "sec-mode");
 $("perm-badge").onclick = () => { $("perm-banner").scrollTop = 0; };
 $("chaine-where").onclick = async () => {
@@ -1816,8 +1970,8 @@ function renderDashboard() {
   renderAlerts();
   renderHistory();
 }
-// The test step's « Déployer » opens « Déploiement » (1.8) — /deploie stays
-// under Paramètres → Commandes until a real deploy has worked from here.
+// The test step's « Déployer » opens « Déploiement » (1.8) — 1.9: the
+// application's own /deploie is at the foot of its « Déployer » tab.
 
 function renderAlerts() {
   const box = $("alerts"); box.replaceChildren();
@@ -1868,9 +2022,9 @@ function chainDetails(c) {
 function renderChainState() {
   const c = S.chain;
   const b = $("chain-banner");
-  b.classList.toggle("hidden", !S.open || !chainOff(c));
+  b.classList.toggle("hidden", !S.open || atHome() || !chainOff(c));
   if (chainOff(c)) b.replaceChildren(el("b", {text: c.summary}), " — une commande lancée maintenant demande d'abord. ",
-    el("button", {class: "link", text: "Paramètres → Chaîne", onclick: () => go("settings", "sec-chain")}));
+    el("button", {class: "link", text: "Chaîne → Version", onclick: openVersion}));
   const line = $("chain-line");
   line.textContent = c ? c.summary : "";
   line.className = "small" + (chainOff(c) ? " off" : " muted");
@@ -1927,7 +2081,7 @@ function launchNext(d) {
 // first. The server asks too (409 with `chain`) when the page knew older.
 const chainOff = (c) => !!(c && c.state !== "à jour");
 function chainQuestion(c) {
-  return `${c.summary}.\n\nLa commande tournerait avec la chaîne telle qu'elle est installée dans l'application, pas avec celle du dépôt de la chaîne. Paramètres → Chaîne l'installe.\n\nLancer quand même ?`;
+  return `${c.summary}.\n\nLa commande tournerait avec la chaîne telle qu'elle est installée dans l'application, pas avec celle du dépôt de la chaîne. Chaîne → Version l'installe.\n\nLancer quand même ?`;
 }
 async function postRun(name, args) {
   if (chainOff(S.chain) && !confirm(chainQuestion(S.chain))) return false;
@@ -2008,6 +2162,12 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     const cmdText = s.id === "test" ? "« Déploiement », puis à la main" : `/${s.command} ${S.feature}`;
     const main = el("div", {}, line1, el("div", {class: "scmd", text: cmdText + (s.note && chain === "main" ? " — " + s.note : "")}));
     if (s.report) main.append(builtView(s.report));
+    // 1.9: the fusion step's two halves, launched alone — Paramètres →
+    // Commandes until 1.8. /fusion runs both, and is the step's button.
+    const subs = s.id === "fusion" && chain === "main" ? (S.commands || []).filter((c) => ["fusion_compare", "fusion_applique"].includes(c.name)) : [];
+    if (subs.length) main.append(el("div", {class: "subcmds"}, "Seulement une moitié :",
+      ...subs.map((c) => el("button", {text: "/" + c.name, disabled: anyRun() || undefined,
+        title: anyRun() ? busyNote() : c.description, onclick: () => launchCommand(c)}))));
     if (s.id === "test") main.append(el("div", {class: "extra", text: S.recette
       ? `À tester : ${S.recette.rel} — ${S.recette.count} points${S.recette.first.length ? " : " + S.recette.first[0] : ""}`
       : "code/recette-ordonnee.md n'existe pas encore : /9_controle l'écrit."}));
@@ -2053,6 +2213,7 @@ function renderChaine() {
   if ((S.bugfixes || []).length) al.append(el("div", {class: "notice warn small",
     text: `Une correction est ouverte (${S.bugfixes[S.bugfixes.length - 1]}) : /7_lots, /8_code et /9_controle agissent sur elle. Sa chaîne est sous « Correction ».`}));
   renderFlow($("flow-main"), S.scan.main, "main", true);
+  renderAudits();
   renderTabs("main");
   if (TABS.main === "code") { if (!CODE.main) loadCode("main"); else renderCode($("chaine-code"), "main"); }
 }
@@ -2737,8 +2898,9 @@ function waitingCount() {
 }
 // 1.6: the title names the active application — « (2) hyrox_tracker — Cockpit ».
 function updateTitle() {
-  const n = S.open ? waitingCount() : $("perm-banner").children.length;
-  const t = (n ? `(${n}) ` : "") + (S.app_name ? `${S.app_name} — Cockpit` : "Cockpit");
+  const home = atHome();
+  const n = S.open && !home ? waitingCount() : $("perm-banner").children.length;
+  const t = (n ? `(${n}) ` : "") + (home ? "Applications — Cockpit" : S.app_name ? `${S.app_name} — Cockpit` : "Cockpit");
   if (document.title !== t) document.title = t;
 }
 
@@ -2931,6 +3093,9 @@ const codeToken = {};
 const folderOf = (chain) => chain === "main" ? "" : chain;
 const shownChain = (which) => which === "main" ? "main" : corrSel;
 
+// 1.9: « Chaîne » has a third tab, « Version » — the chain installed in the
+// application, its install and update; « Correction » keeps two.
+const TAB_LIST = {main: ["amont", "code", "version"], corr: ["amont", "code"]};
 function setTab(which, tab) {
   TABS[which] = tab;
   try { localStorage.setItem("cockpit-tabs", JSON.stringify(TABS)); } catch (e) {}
@@ -2939,11 +3104,15 @@ function setTab(which, tab) {
 }
 function renderTabs(which) {
   const pre = which === "main" ? "chaine" : "corr";
-  const tab = TABS[which] === "code" ? "code" : "amont";
-  $(`${pre}-amont`).classList.toggle("hidden", tab !== "amont");
-  $(`${pre}-code`).classList.toggle("hidden", tab !== "code");
-  if (which === "main") $("chaine-legend").classList.toggle("hidden", tab === "code");   // the steps' states, not the lots
-  for (const t of ["amont", "code"]) $(`tab-${which}-${t}`).setAttribute("aria-selected", String(t === tab));
+  const tab = TAB_LIST[which].includes(TABS[which]) ? TABS[which] : "amont";
+  for (const t of TAB_LIST[which]) {
+    $(`${pre}-${t}`).classList.toggle("hidden", t !== tab);
+    $(`tab-${which}-${t}`).setAttribute("aria-selected", String(t === tab));
+  }
+  if (which === "main") {
+    $("chaine-legend").classList.toggle("hidden", tab !== "amont");     // the steps' states, not the lots
+    $("chaine-where").classList.toggle("hidden", tab === "version");
+  }
   const c = CODE[shownChain(which)];
   const n = $(`tab-${which}-code-n`);
   n.classList.toggle("hidden", !(c && c.exists));
@@ -2951,6 +3120,7 @@ function renderTabs(which) {
 }
 for (const b of document.querySelectorAll(".tabs button[role=tab]")) b.onclick = () => setTab(b.dataset.chain, b.dataset.tab);
 
+function openVersion() { go("chaine"); setTab("main", "version"); }
 function openCode(chain, lot) {
   if (chain && chain !== "main") { corrSel = chain; renderCorrection(); go("correction"); setTab("corr", "code"); }
   else { go("chaine"); setTab("main", "code"); }
@@ -3252,23 +3422,31 @@ $("btn-quit").onclick = async () => {
 };
 
 // ============================================================ paramètres
-const GROUP_ORDER = ["Amont", "Aval", "Correction", "Fusion", "Outils"];
-
+// 1.9: five sections, in this order — the permission mode, the
+// notifications, the ignored folders, « Outils sur cet ordinateur », «
+// Arrêter le cockpit ». The feature changes in the top bar; the chain's
+// version is « Chaîne → Version », the deploy profile « Déploiement → Profil ».
 function renderSettings() {
-  // Dossiers: the application folder, and the feature.
-  const f = $("set-folders"); f.replaceChildren(
-    el("div", {}, el("span", {class: "muted", text: "Application : "}), el("b", {text: S.app_name || "—"}),
-      el("span", {class: "mono muted", text: "  " + (S.app_folder || "")})),
-    el("div", {style: "margin-top:4px"}, el("span", {class: "muted", text: "Feature : "}), el("b", {class: "mono", text: S.feature || "—"})));
-  const fl = el("div", {class: "folders", id: "feature-list"});
-  for (const w of S.working_folders || []) fl.append(el("button", {text: w, class: w === S.feature ? "sel" : "",
-    onclick: () => { if (w !== S.feature) openPair(S.app_folder, w); }}));
-  f.append(el("div", {class: "muted small", style: "margin-top:12px", text: "Changer de feature :"}), fl,
-    el("div", {class: "row", style: "margin-top:12px"}, el("button", {text: "Changer d'application", onclick: changeFolder}),
-      el("span", {class: "muted small", text: "La liste des applications, l'ajout, « Tout mettre à jour » : l'écran « Applications »."})));
+  // Mode
+  const m = $("set-mode"); m.replaceChildren();
+  for (const [k, title, text] of [
+    ["auto", "Auto", "Claude traite lui-même les demandes sans risque ; seules celles qu'il renvoie vers toi arrivent en bandeau."],
+    ["manuel", "Manuel", "Chaque modification et chaque commande que les règles ne permettent pas d'avance arrive en bandeau."]]) {
+    const input = el("input", {type: "radio", name: "mode", value: k, checked: S.mode === k || undefined});
+    input.addEventListener("change", async () => {
+      try { const r = await api("/api/mode", {mode: k}); S.mode = r.mode; renderChrome(); renderSettings(); }
+      catch (e) { alert(e.message); }
+    });
+    m.append(el("label", {class: S.mode === k ? "on" : ""}, el("div", {class: "row"}, input, el("b", {text: title})), el("div", {class: "muted small", text: text})));
+  }
+  $("mode-note").textContent = "Le mode choisi vaut pour le prochain run ; un run en cours garde le sien. Même en Auto, une demande renvoyée vers toi devient un bandeau.";
+
+  renderNotes();
+
   // 1.5.1 — the folders never shown: the earlier chain's. Ticked, a folder and
   // its bugfix-NN/ leave the feature list, « Correction », the scan, the
   // Statistics and the Code tab.
+  const f = $("set-folders"); f.replaceChildren();
   const ignored = S.ignored || [];
   const names = [...new Set([...(S.all_folders || []), ...ignored])].sort();
   const ig = el("div", {class: "folders", id: "ignored-list"});
@@ -3284,60 +3462,20 @@ function renderSettings() {
       absent ? el("span", {class: "muted small", text: "  —  absent de docs/features/"}) : ""));
   }
   if (!names.length) ig.append(el("span", {class: "muted", text: "Aucun dossier."}));
-  f.append(el("div", {class: "muted small", style: "margin-top:12px",
-    text: "Dossiers ignorés : jamais montrés — ni dans la liste, ni sous « Correction », ni dans les Statistiques, ni dans le Code."}), ig);
-  const rc = $("set-recent"); rc.replaceChildren();
-  if (!(S.recent || []).length) rc.append(el("span", {class: "muted", text: "Aucune."}));
-  for (const p of S.recent || []) rc.append(el("button", {onclick: () => openPair(p.app, p.work)},
-    el("b", {text: p.work}), el("span", {class: "muted small", text: "  —  " + p.app})));
-
-  // Mode
-  const m = $("set-mode"); m.replaceChildren();
-  for (const [k, title, text] of [
-    ["auto", "Auto", "Claude traite lui-même les demandes sans risque ; seules celles qu'il renvoie vers toi arrivent en bandeau."],
-    ["manuel", "Manuel", "Chaque modification et chaque commande que les règles ne permettent pas d'avance arrive en bandeau."]]) {
-    const input = el("input", {type: "radio", name: "mode", value: k, checked: S.mode === k || undefined});
-    input.addEventListener("change", async () => {
-      try { const r = await api("/api/mode", {mode: k}); S.mode = r.mode; renderChrome(); renderSettings(); }
-      catch (e) { alert(e.message); }
-    });
-    m.append(el("label", {class: S.mode === k ? "on" : ""}, el("div", {class: "row"}, input, el("b", {text: title})), el("div", {class: "muted small", text: text})));
-  }
-  $("mode-note").textContent = "Le mode choisi vaut pour le prochain run ; un run en cours garde le sien. Même en Auto, une demande renvoyée vers toi devient un bandeau.";
+  f.append(el("div", {class: "muted small", text: `Dans « ${S.app_name || "—"} » — une case cochée : le dossier est ignoré.`}), ig);
 
   renderDiag();
-  renderNotes();
-
-  // Commandes — the escape hatch, unchanged.
-  const cm = $("set-commands"); cm.replaceChildren();
-  const d = S.decision || {};
-  const nextCmd = d.source !== "run" && d.next ? d.next.command : null;
-  for (const g of GROUP_ORDER) {
-    const list = (S.commands || []).filter((c) => (c.group || "Outils") === g);
-    if (!list.length) continue;
-    const box = el("div", {class: "cmds"});
-    for (const c of list) {
-      const hl = c.name === nextCmd;
-      const input = el("input", {type: "text", value: c.argument_hint ? (hl && d.next.args ? d.next.args : S.feature) : "",
-        placeholder: c.argument_hint || "sans argument", "aria-label": "argument de /" + c.name});
-      const btn = el("button", {text: "/" + c.name, title: elsewhere() ? busyNote() : c.description, disabled: anyRun() || undefined,
-        onclick: () => runRaw(c.name, input.value, hl)});
-      box.append(el("div", {class: "cmd" + (hl ? " hl" : "")}, btn, input));
-    }
-    cm.append(el("div", {class: "cmd-group"}, el("h3", {text: g}), box));
-  }
-
-  // Maintenance
-  const mt = $("set-maint"); mt.replaceChildren();
-  mt.append(el("div", {}, S.stop_file ? el("button", {text: "Retirer stop.md", onclick: disarm}) : el("span", {class: "muted", text: "Pas de stop.md."})));
-  const wts = S.worktrees || [];
-  mt.append(el("h3", {style: "margin-top:16px", text: "Worktrees restés"}));
-  if (!wts.length) mt.append(el("div", {class: "muted", text: "Aucun."}));
-  for (const w of wts) mt.append(el("div", {class: "mono", text: w}));
-  mt.append(el("h3", {style: "margin-top:16px", text: "Dossier des journaux bruts"}), el("div", {class: "mono", text: S.logs_dir || "—"}));
-  mt.append(el("div", {class: "muted small", style: "margin-top:6px", text: `Scan du dossier : ${S.scan ? S.scan.took_ms : "—"} ms.`}));
 }
 
+// A command launched from outside a flow — « Audits », the fusion step's own
+// commands, /deploie. It takes the feature when its frontmatter says it takes
+// an argument; one the last relay did not name asks first.
+function launchCommand(c) {
+  const d = S.decision || {};
+  const named = d.source !== "run" && d.next && d.next.command === c.name;
+  const args = c.argument_hint ? (named && d.next.args ? d.next.args : S.feature) : "";
+  runRaw(c.name, args, named);
+}
 async function runRaw(name, args, named) {
   if (anyRun()) return;
   if (!named && !confirm(`Lancer /${name} ${args || ""} ? Ce n'est pas l'étape que le dernier relais a nommée.`)) return;
@@ -3347,6 +3485,30 @@ async function runRaw(name, args, named) {
     await refreshState();
     goStep((S.run_place && S.run_place.chain) || "main", S.run_place && S.run_place.step);
   } catch (e) { alert(e.message); }
+}
+
+// 1.9: « Paramètres → Commandes » is gone. The commands of the application
+// that no step launches — the audits, and any of its own — are here, at the
+// foot of « Amont »; the fusion step carries its two halves, « Déploiement →
+// Déployer » the application's /deploie.
+const ELSEWHERE = new Set(["deploie", "fusion_compare", "fusion_applique"]);
+function renderAudits() {
+  const box = $("audits");
+  const stepCmds = new Set([...(S.scan ? [...S.scan.main, ...S.scan.corrections.flatMap((c) => c.steps)] : [])]
+    .filter((s) => s.id !== "test").map((s) => s.command));
+  const left = (S.commands || []).filter((c) => !stepCmds.has(c.name) && !ELSEWHERE.has(c.name));
+  box.classList.toggle("hidden", !left.length);
+  if (!left.length) { box.replaceChildren(); return; }
+  const audits = left.filter((c) => c.name.startsWith("audit_")), others = left.filter((c) => !c.name.startsWith("audit_"));
+  const row = (c) => el("div", {class: "aud", "data-command": c.name},
+    el("button", {text: "/" + c.name, disabled: anyRun() || undefined, title: anyRun() ? busyNote() : `/${c.name} ${c.argument_hint ? S.feature : ""}`.trim(),
+      onclick: () => launchCommand(c)}),
+    el("span", {class: "d", text: c.description || "—"}));
+  box.replaceChildren(el("h3", {text: "Audits"}),
+    el("p", {class: "muted small", style: "margin:0 0 6px", text: "Hors de la chaîne : lancés à la main, sur la feature ouverte. Ils lisent et rendent compte ; ils ne changent rien."}));
+  if (audits.length) box.append(...audits.map(row));
+  else box.append(el("div", {class: "muted small", text: "Aucun audit dans les commandes de l'application."}));
+  if (others.length) box.append(el("h4", {style: "margin:14px 0 2px;font-size:15px", text: "Les autres commandes de l'application, hors des étapes"}), ...others.map(row));
 }
 
 function renderDiag() {
@@ -3388,7 +3550,9 @@ const DP = {data: null, dests: null, tab: "destinations", poll: null, jpoll: nul
             vals: {}, shown: "", choice: null, edit: null, editErr: null, editMsg: null, settingsFor: null,
             j: {sel: null, after: 0, lines: [], crashes: [], paused: false, filter: "", floor: 0, live: false, ended: "",
                 key: null, busy: false, crashSeen: 0}};
-try { const t = localStorage.getItem("cockpit-deploy-tab"); if (["destinations", "deployer", "journal"].includes(t)) DP.tab = t; } catch (e) {}
+// 1.9: a fourth tab, « Profil » — the deploy profile, Paramètres → Déploiement in 1.8.
+const DP_TABS = ["destinations", "deployer", "journal", "profil"];
+try { const t = localStorage.getItem("cockpit-deploy-tab"); if (DP_TABS.includes(t)) DP.tab = t; } catch (e) {}
 const DP_STEP = {"fait": ["✓", "done"], "échec": ["✗", "failed"], "en cours": ["…", "going"], "sans objet": ["—", "skip"], "à faire": ["·", "todo"]};
 const DP_STATE = {device: ["connecté", "on"], unauthorized: ["non autorisé", "ko"], offline: ["hors ligne", "ko"], "déconnecté": ["déconnecté", "gone"]};
 const dpAdapter = (type) => ((DP.data && DP.data.describe.adapters) || []).find((a) => a.type === type) || null;
@@ -3404,8 +3568,9 @@ async function enterDeploy() {
   await loadDeploy();
   await loadDests(true);
   if (DP.tab === "journal") startJournal();
+  if (DP.tab === "profil") loadDeploySettings();
   clearInterval(DP.poll);
-  DP.poll = setInterval(() => { if (DP.tab !== "journal") loadDests(); }, 4000);
+  DP.poll = setInterval(() => { if (DP.tab !== "journal" && DP.tab !== "profil") loadDests(); }, 4000);
 }
 function leaveDeploy() {
   clearInterval(DP.poll); DP.poll = null;
@@ -3421,16 +3586,17 @@ function resetDeploy() {
 function setDeployTab(tab, quiet) {
   DP.tab = tab;
   try { localStorage.setItem("cockpit-deploy-tab", tab); } catch (e) {}
-  for (const t of ["destinations", "deployer", "journal"]) {
+  for (const t of DP_TABS) {
     $("dp-tab-" + t).setAttribute("aria-selected", String(t === tab));
     $("dp-" + t).classList.toggle("hidden", t !== tab);
   }
   clearInterval(DP.jpoll); DP.jpoll = null;
   if (quiet) return;
   if (tab === "journal") { renderJournalBar(); startJournal(); }
+  else if (tab === "profil") loadDeploySettings();
   else { renderDeployTab(); loadDests(); }
 }
-for (const t of ["destinations", "deployer", "journal"]) $("dp-tab-" + t).onclick = () => setDeployTab(t);
+for (const t of DP_TABS) $("dp-tab-" + t).onclick = () => setDeployTab(t);
 $("dp-refresh").onclick = async () => { await loadDeploy(); await loadDests(true); };
 
 async function loadDeploy() {
@@ -3455,7 +3621,7 @@ function renderDeployTab(force) {
   dpMsg("");
   if (DP.tab === "destinations") renderDests(force);
   else if (DP.tab === "deployer") renderDeployer();
-  else renderJournalBar();
+  else if (DP.tab === "journal") renderJournalBar();
 }
 
 // ------------------------------------------------------------ Destinations
@@ -3586,9 +3752,9 @@ function renderDeployer() {
   if (!prof.exists) {
     out.push(el("div", {class: "card", id: "dp-no-profile"}, el("h3", {text: "Aucun profil de déploiement"}),
       el("p", {class: "muted", text: `Cette application n'a pas de ${prof.path} : rien ne dit encore quoi construire, ni où l'installer.`}),
-      el("button", {class: "primary", text: "Paramètres → Déploiement", onclick: () => go("settings", "sec-deploy")})));
+      el("button", {class: "primary", text: "Écrire le profil", onclick: () => setDeployTab("profil")})));
   } else if (general.length || Object.keys(prof.errors.targets || {}).length) {
-    out.push(el("div", {class: "notice warn"}, `${prof.path} a des erreurs — Paramètres → Déploiement : `,
+    out.push(el("div", {class: "notice warn"}, `${prof.path} a des erreurs — onglet « Profil » : `,
       [...general, ...Object.entries(prof.errors.targets || {}).map(([i, e]) => `cible ${+i + 1} : ` + Object.entries(e).map(([k, v]) => `${k} ${v}`).join(", "))].join(" · ")));
   }
   const targets = prof.targets || [];
@@ -3631,6 +3797,15 @@ function renderDeployer() {
     el("span", {class: "muted small", text: dpGoing() ? "Un déploiement est en cours." : n ? "Par cible : son build une fois, puis sur chaque destination son installation, puis son lancement."
       : "Choisissez au moins une cible et une destination."})));
   if (D.job) out.push(jobCard(D.job));
+  // 1.9: the application's own /deploie — under Paramètres → Commandes until
+  // 1.8 — when it has one: Claude runs it, as any command of the chain.
+  const own = (S.commands || []).find((c) => c.name === "deploie");
+  if (own) out.push(el("div", {class: "card", id: "dp-own", style: "margin-top:20px"},
+    el("h3", {text: "La commande /deploie de l'application"}),
+    el("p", {class: "muted small", style: "margin:0 0 10px"}, (own.description ? own.description + " — " : ""),
+      "son fichier à elle, que la chaîne n'apporte pas. Elle passe par Claude, comme une commande de la chaîne ; « Construire et installer » n'en a pas besoin."),
+    el("button", {text: "Lancer /deploie", disabled: anyRun() || undefined, title: anyRun() ? busyNote() : own.description,
+      onclick: () => launchCommand(own)})));
   box.replaceChildren(...out);
 }
 async function startDeploy() {
@@ -3804,16 +3979,19 @@ function onDeployEvent(ev) {
   }
 }
 
-// ------------------------------------------------- Paramètres → Déploiement
+// ------------------------------------------- Déploiement → Profil (1.9)
+// 1.9: the tab is « Déploiement »'s, which every state refresh enters again:
+// the form is rendered when it is built, never again under her fingers.
 async function loadDeploySettings() {
   if (!S.app_folder) return;
+  let fresh = false;
   if (!DP.data || DP.settingsFor !== S.app_folder) {
     try { DP.data = await api("/api/deploy"); } catch (e) { $("set-deploy").replaceChildren(el("div", {class: "notice warn", text: e.message})); return; }
     if (DP.choice === null) DP.choice = DP.data.choice || {};
     DP.settingsFor = S.app_folder; DP.edit = null;
   }
-  if (!DP.edit) DP.edit = JSON.parse(JSON.stringify(DP.data.profile.targets || []));
-  renderDeploySettings();
+  if (!DP.edit) { DP.edit = JSON.parse(JSON.stringify(DP.data.profile.targets || [])); fresh = true; }
+  if (fresh || !$("set-deploy").querySelector(".dp-set")) renderDeploySettings();
 }
 function dpFields(t) {
   const a = dpAdapter(t.type);

@@ -1,5 +1,6 @@
 """§20 on the page: the dashboard's line, the banner, a launch that asks
-first, and Paramètres → « Installer / mettre à jour la chaîne ». The chain's
+first, and « Installer / mettre à jour la chaîne » — 1.9: « Chaîne →
+Version », Paramètres → Chaîne until 1.8. The chain's
 state and the install are stubs here; test_chain.py runs the real ones."""
 import pytest
 
@@ -25,10 +26,10 @@ def test_not_up_to_date_shows_and_asks(tmp_path, page, monkeypatch):
         page.wait_for_selector("#chain-banner", state="visible")
         assert BEHIND["summary"] in page.locator("#chain-banner").inner_text()
         assert page.locator("#chain-line").inner_text() == BEHIND["summary"]
-        page.goto(s.url + "#settings")
-        page.reload()
-        page.wait_for_selector("#set-chain li")
+        page.locator("#chain-banner").get_by_role("button", name="Chaîne → Version").click()
+        page.wait_for_selector("#chaine-version:not(.hidden) #set-chain li")
         assert page.locator("#set-chain li").all_inner_texts() == BEHIND["subjects"]
+        page.get_by_role("tab", name="Amont").click()
 
         # A launch asks first: dismissed, nothing runs; accepted, it runs.
         asked = []
@@ -37,11 +38,11 @@ def test_not_up_to_date_shows_and_asks(tmp_path, page, monkeypatch):
             asked.append(d.message)
             d.accept() if "Lancer quand même" not in d.message or len(asked) > 2 else d.dismiss()
         page.on("dialog", answer)
-        page.locator("#set-commands button", has_text="/1_lexique").click()
+        page.locator("#audits button", has_text="/10_x").click()
         page.wait_for_timeout(500)
         assert any(BEHIND["summary"] in m for m in asked)
         assert not s.rn.is_running(str(s.app_root))
-        page.locator("#set-commands button", has_text="/1_lexique").click()
+        page.locator("#audits button", has_text="/10_x").click()
         page.wait_for_function("document.querySelector('#tb-run').classList.contains('running')", timeout=8000)
         assert s.rn.is_running(str(s.app_root))
         s.call(s.rn.stop_now(str(s.app_root)))
@@ -62,7 +63,8 @@ def test_the_install_button_asks_before_overwriting(tmp_path, page, monkeypatch)
                 "app_commit": "9a9a9a9", "message": "chain: def5678 2026-10-06", "pushed": True, "push_error": None}
     monkeypatch.setattr(server.chain_mod, "install", fake_install)
     with FakeServer(tmp_path) as s:
-        page.goto(s.url + "#settings")
+        page.goto(s.url + "#chaine")
+        page.get_by_role("tab", name="Version").click()
         page.wait_for_selector("#set-chain li")
         assert page.locator("#set-chain li").all_inner_texts() == [".claude/agents/a.md"]
         asked = []

@@ -44,7 +44,7 @@ def test_the_frame_without_a_profile(tmp_path, fa):
         st, r = await get(c, "/api/deploy/destinations")
         assert [g["type"] for g in r["groups"]] == ["android", "commande"]
         r = await post(c, "/api/deploy/start", {"choice": {"Téléphone": ["android:R5CT10AB1234"]}})
-        assert r.status == 409 and "Paramètres → Déploiement" in (await r.json())["error"]
+        assert r.status == 409 and "Déploiement → Profil" in (await r.json())["error"]
     with_client(tmp_path, body)
 
 

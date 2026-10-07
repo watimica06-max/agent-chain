@@ -15,8 +15,7 @@ from test_runner import script_until_interrupted  # noqa: E402
 
 SCREENS = [("Tableau de bord", "scr-dashboard"), ("À répondre", "scr-answer"),
            ("Chaîne", "scr-chaine"), ("Correction", "scr-correction"), ("Déploiement", "scr-deploy"),
-           ("Statistiques", "scr-stats"),
-           ("Applications", "scr-apps"), ("Paramètres", "scr-settings")]
+           ("Statistiques", "scr-stats"), ("Paramètres", "scr-settings")]
 
 
 @pytest.fixture(scope="module")
@@ -73,17 +72,18 @@ def no_real_errors(page):
 def test_each_screen_loads_without_js_error(tmp_path, page):
     with FakeServer(tmp_path) as s:
         set_relay(s, "Fini.\nNext: answer questions, then run /4_grille f")
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_selector("#side")
         for name, scr in SCREENS:
             go(page, name)
             page.wait_for_selector(f"#{scr}", state="visible")
             assert page.locator("#main section:visible").evaluate_all("els => els.map(e => e.id)") == [scr]
-        # Eight entries (1.6: « Applications », 1.8: « Déploiement »), « Paramètres » last in the menu,
-        # the count on « À répondre ».
+        # Seven entries (1.8: « Déploiement »; 1.9: « Applications » left for the home screen),
+        # « Paramètres » last in the menu, the count on « À répondre ».
         names = [t.split("\n")[0].strip() for t in page.locator("#side a").all_inner_texts()]
         assert names == ["Tableau de bord", "À répondre", "Chaîne", "Correction", "Déploiement", "Statistiques",
-                         "Applications", "Paramètres"]
+                         "Paramètres"]
+        assert page.locator("#tb-home").is_visible()
         assert page.locator("#nav-answer-count").inner_text() == "7"
         assert " ".join(page.locator("#tb-mode").inner_text().split()) == "Mode : Auto"
         assert page.locator("#tb-run").inner_text() == "Au repos"
@@ -92,9 +92,9 @@ def test_each_screen_loads_without_js_error(tmp_path, page):
 
 def test_start_screen_without_a_folder(tmp_path, page):
     with FakeServer(tmp_path, opened=False) as s:
-        page.goto(s.url)
-        # 1.6: the start is « Applications », the list empty — adding one is the way in.
-        page.wait_for_selector("#scr-apps", state="visible")
+        page.goto(s.url + "#dashboard")
+        # 1.9: the start is the home screen, the list empty — adding one is the way in.
+        page.wait_for_selector("#scr-accueil", state="visible")
         assert not page.locator("#side").is_visible()
         assert page.get_by_role("heading", name="Applications", exact=True).is_visible()
         page.wait_for_selector("#apps-add", state="visible")
@@ -103,7 +103,7 @@ def test_start_screen_without_a_folder(tmp_path, page):
 
 def test_permission_card_is_a_banner_on_every_screen(tmp_path, page):
     with FakeServer(tmp_path) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_selector("#side")
         start_run(s, page)
         for name, scr in SCREENS:
@@ -130,7 +130,7 @@ def test_permission_card_is_a_banner_on_every_screen(tmp_path, page):
 
 def test_save_bar_stays_visible_while_the_form_scrolls(tmp_path, page):
     with FakeServer(tmp_path) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         go(page, "À répondre")
         page.wait_for_selector(".entry")
         # 1.4: the questions scroll in their own pane, beside the document.
@@ -153,7 +153,7 @@ def test_save_bar_stays_visible_while_the_form_scrolls(tmp_path, page):
 
 def test_answer_screen_groups_options_and_marks_the_default(tmp_path, page):
     with FakeServer(tmp_path) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         go(page, "À répondre")
         page.wait_for_selector(".entry")
         groups = page.locator("details.grp")
@@ -187,7 +187,7 @@ def test_dashboard_button_for_each_next_form(tmp_path, page, relay, kind, button
     with FakeServer(tmp_path) as s:
         set_relay(s, relay)
         assert relay_of(relay)["kind"] == kind
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_selector("#next-text")
         page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
         card = page.locator("#next-card")
@@ -217,7 +217,7 @@ def test_dashboard_with_no_relay_shows_the_folders_proposal(tmp_path, page):
     # 1.3: no stored Next: → the scan's proposal, labelled. « f » holds an
     # empty bugfix-01/: the highest correction, its bug-list still to write.
     with FakeServer(tmp_path) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
         assert page.locator("#next-source").inner_text() == "déduite du dossier"
         assert page.locator("#next-text").inner_text() == (
@@ -234,7 +234,7 @@ def test_dashboard_counters_alerts_and_history(tmp_path, page):
         s.state.add_history(str(s.app_root), "f", {"command": "/7_lots f", "outcome": "terminé",
                             "next": relay_of("x\nNext: run /8_code f"), "log_path": "logs/a.jsonl", "at": "2026-10-05T09:30:00"})
         (s.feat / "stop.md").write_text("stop")
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_selector("#cnt-q")
         page.wait_for_function("document.getElementById('cnt-q').textContent === '4'")
         assert page.locator("#cnt-b").inner_text() == "3"
@@ -260,7 +260,7 @@ def test_settings_mode_diagnostic_commands(tmp_path, page):
     (tmp_path / "app").mkdir()
     (tmp_path / "app" / "gradlew.bat").write_text("@echo off")          # a Gradle wrapper: the hint applies
     with FakeServer(tmp_path, diag_runner=fake_diag) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         go(page, "Paramètres")
         page.wait_for_selector("#scr-settings", state="visible")
         # Mode: Auto by default; Manuel is remembered by the server and shown in the top bar.
@@ -268,13 +268,15 @@ def test_settings_mode_diagnostic_commands(tmp_path, page):
         page.locator("#set-mode label", has_text="Manuel").click()
         page.wait_for_function("document.getElementById('tb-mode').textContent.includes('Manuel')")
         assert s.state.mode == "manuel"
-        # Commands under five headings, in order, each with an editable argument.
-        heads = page.locator("#set-commands h3").all_inner_texts()
-        assert heads == ["Amont", "Aval", "Correction", "Fusion", "Outils"]
-        arg = page.get_by_label("argument de /1_lexique")
-        assert arg.input_value() == "f"
-        # Diagnostic: ✓ / ✗ / non concerné, the Java hint, kept with its date.
-        page.get_by_role("button", name="Lancer le diagnostic").click()
+        # 1.9: five sections, in this order, each with its line; « Commandes » is gone.
+        heads = page.locator("#scr-settings .sec > h2").all_inner_texts()
+        assert heads == ["Mode de permission", "Notifications", "Dossiers ignorés", "Outils sur cet ordinateur",
+                         "Arrêter le cockpit"]
+        leads = page.locator("#scr-settings .sec > .lead").all_inner_texts()
+        assert len(leads) == 5 and all(t.strip() for t in leads)
+        assert "Java, Gradle ou Flutter, adb, Claude Code, git" in leads[3]
+        # « Outils sur cet ordinateur » — the diagnostic: ✓ / ✗ / non concerné, the Java hint, kept with its date.
+        page.get_by_role("button", name="Vérifier les outils").click()
         page.wait_for_selector("#diag-result li")
         txt = page.locator("#diag-result").inner_text()
         assert "✗ Java" in txt and "✗ adb" in txt and "✓ Git" in txt and "— Flutter" in txt and "non concerné" in txt
@@ -287,10 +289,12 @@ def test_settings_mode_diagnostic_commands(tmp_path, page):
 
 
 def test_a_command_the_relay_did_not_name_asks_for_confirmation(tmp_path, page):
+    # 1.9: a command no step launches is at the foot of « Amont » (Paramètres → Commandes until 1.8).
     with FakeServer(tmp_path, script=script_until_interrupted) as s:
         set_relay(s, "Fini.\nNext: run /7_lots f")
-        page.goto(s.url)
-        go(page, "Paramètres")
+        page.goto(s.url + "#chaine")
+        page.get_by_role("tab", name="Amont").click()
+        page.wait_for_selector("#audits:not(.hidden)")
         asked = []
 
         def on_dialog(d):
@@ -298,11 +302,10 @@ def test_a_command_the_relay_did_not_name_asks_for_confirmation(tmp_path, page):
             d.dismiss()
 
         page.on("dialog", on_dialog)
-        page.get_by_role("button", name="/1_lexique").click()
+        page.locator("#audits").get_by_role("button", name="/10_x").click()
         page.wait_for_timeout(300)
-        assert len(asked) == 1 and "n'est pas l'étape" in asked[0]
+        assert len(asked) == 1 and "n'est pas l'étape" in asked[0] and "/10_x f" in asked[0]
         assert s.clients == []                                         # dismissed: nothing ran
-        assert page.locator(".cmd.hl").count() == 1                    # the named one is highlighted
 
 
 def test_a_guessed_entry_is_shown_with_what_the_guess_saw(tmp_path, page):
@@ -313,7 +316,7 @@ def test_a_guessed_entry_is_shown_with_what_the_guess_saw(tmp_path, page):
         (lot / "blocked_relecteur.md").write_text(
             "## What blocks\n\n`code/lot-09/tests.md` is missing.\n\n## Where\n\ncode/lot-09\n\n"
             "## To resume\n\nRun the testeur.\n\n## Decision\n\n", encoding="utf-8")
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         go(page, "À répondre")
         card = page.locator(".entry", has_text="is missing")
         card.wait_for()
@@ -322,19 +325,24 @@ def test_a_guessed_entry_is_shown_with_what_the_guess_saw(tmp_path, page):
 
 
 def test_settings_lists_the_ignored_folders_and_edits_them(tmp_path, page):
-    # 1.5.1: Paramètres → Dossiers, one box per folder of docs/features/.
+    # 1.5.1: Paramètres → Dossiers ignorés, one box per folder of docs/features/;
+    # 1.9: the features themselves are the top bar's menu.
     with FakeServer(tmp_path) as s:
         (s.app_root / "docs" / "features" / "premiere-app" / "bugfix-06").mkdir(parents=True)
         (s.app_root / "docs" / "features" / "g").mkdir()
         s.state.set_ignored(["premiere-app", "premiere-app-2"])        # 1.6: per application
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         go(page, "Paramètres")
         page.wait_for_selector("#ignored-list input")
         boxes = {b.get_attribute("value"): b.is_checked() for b in page.locator("#ignored-list input").all()}
         assert boxes == {"f": False, "g": False, "premiere-app": True, "premiere-app-2": True}
         assert "absent de docs/features/" in page.locator("#ignored-list label", has_text="premiere-app-2").inner_text()
-        assert page.locator("#feature-list button").all_inner_texts() == ["f", "g"]
+        page.locator("#tb-folder").click()
+        assert [t.split()[-1] for t in page.locator("#feat-menu button").all_inner_texts()] == ["f", "g"]
+        page.keyboard.press("Escape")
         page.locator("#ignored-list input[value=g]").check()
-        page.wait_for_function("document.querySelectorAll('#feature-list button').length === 1")
+        page.wait_for_function("S.working_folders.length === 1")
+        page.locator("#tb-folder").click()
+        assert page.locator("#feat-menu button").count() == 1
         assert s.state.ignored == ["g", "premiere-app", "premiere-app-2"]
         assert no_real_errors(page) == []

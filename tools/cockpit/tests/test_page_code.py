@@ -170,7 +170,7 @@ def enable_notes(page):
 
 def test_notifications_only_when_the_tab_is_not_in_front(tmp_path, page):
     with FakeServer(tmp_path) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_selector("#side")
         enable_notes(page)
         # In front: the page shows it, no notification.
@@ -203,7 +203,7 @@ def test_a_lot_that_passes_notifies_and_opens_the_code_tab(tmp_path, page):
     with FakeServer(tmp_path) as s:
         with_lots(s, tmp_path)
         s.script = relecteur_passes(s.feat / "code" / "lot-07")
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_selector("#side")
         enable_notes(page)
         open_code(page, s.url)

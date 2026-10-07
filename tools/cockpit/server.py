@@ -658,7 +658,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if err:
             return web.json_response({"error": err}, status=400)
         if w not in working_folders(a, state.ignored_for(a)):
-            return web.json_response({"error": "dossier ignoré : Paramètres → Dossiers" if state.is_ignored(w, a)
+            return web.json_response({"error": "dossier ignoré : Paramètres → Dossiers ignorés" if state.is_ignored(w, a)
                                       else "dossier de travail inconnu"}, status=400)
         listed = state.app(a)
         state.open_pair(listed["folder"] if listed else a, w)
@@ -910,7 +910,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                                   "default_parent": create_mod.default_parent()})
 
     async def set_ignored(request):
-        """Paramètres → Dossiers: the folders the cockpit never shows (1.5.1), those
+        """Paramètres → Dossiers ignorés: the folders the cockpit never shows (1.5.1), those
         of the application open (1.6)."""
         data = await body(request)
         names = data.get("ignored")
@@ -1116,7 +1116,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     def auto_diagnostic(a):
         """No result stored for this application: its diagnostic runs once,
         in the background, and its result is kept — one per application, each
-        its own stack (1.6). Paramètres → Diagnostic still runs it on demand."""
+        its own stack (1.6). Paramètres → Outils sur cet ordinateur (1.9) still runs it on demand."""
         if not a:
             return
         key = runner_mod.repo_key(a)
@@ -1154,7 +1154,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         f = (q.get("feature") or "").strip()
         feature = None if f == "*" or app is None else (f or feature_of(w))
         if feature is not None and state.is_ignored(feature):
-            raise web.HTTPBadRequest(text=json.dumps({"error": "fonctionnalité ignorée : Paramètres → Dossiers"}),
+            raise web.HTTPBadRequest(text=json.dumps({"error": "fonctionnalité ignorée : Paramètres → Dossiers ignorés"}),
                                      content_type="application/json")
         return feature, q.get("period") or "tout", app
 
@@ -1455,7 +1455,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.json_response({"path": path})
 
     async def deploy_profile_save(request):
-        """Paramètres → Déploiement: the targets written to deploy.json,
+        """Déploiement → Profil (1.9; Paramètres → Déploiement in 1.8): the targets written to deploy.json,
         committed alone in the application and pushed. Refused while a run
         or a deploy goes there."""
         a = deploy_app()

@@ -31,8 +31,8 @@ def test_statistics_screen_every_section(tmp_path, page):
         open_stats(page, s)
         # Six in « Statistiques », between Correction and Paramètres.
         assert page.locator("#side a").evaluate_all("as => as.map(a => a.id)") == [
-            "nav-dashboard", "nav-answer", "nav-chaine", "nav-correction", "nav-deploy", "nav-stats", "nav-apps",
-            "nav-settings"]   # 1.6: « Applications », 1.8: « Déploiement »
+            "nav-dashboard", "nav-answer", "nav-chaine", "nav-correction", "nav-deploy", "nav-stats",
+            "nav-settings"]   # 1.8: « Déploiement »; 1.9: « Applications » is the home screen
         tiles = page.locator("#st-tiles .tile").all_inner_texts()
         assert len(tiles) == 6
         assert tiles[0].startswith("Runs\n2")
@@ -98,7 +98,7 @@ def test_the_side_menu_closes_and_its_dot(tmp_path, page):
     with FakeServer(tmp_path) as s:
         empty = s.app_root / "docs" / "features" / "vide"
         empty.mkdir(parents=True)
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_function("document.getElementById('nav-answer-count').textContent === '7'")
         menu = page.get_by_role("button", name="Fermer le menu")
         before = page.locator("#main").bounding_box()["width"]
@@ -127,7 +127,7 @@ def test_the_menu_dot_while_a_run_goes(tmp_path, page):
     with FakeServer(tmp_path) as s:
         (s.app_root / "docs" / "features" / "vide").mkdir(parents=True)
         s.state.open_pair(str(s.app_root), "vide")
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_selector("#tb-menu", state="visible")
         page.get_by_role("button", name="Fermer le menu").click()
         page.wait_for_timeout(200)
@@ -140,7 +140,7 @@ def test_the_menu_dot_while_a_run_goes(tmp_path, page):
 
 def test_where_button_sits_on_chaine(tmp_path, page):
     with FakeServer(tmp_path) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_selector("#tb-folder", state="visible")
         assert page.locator("#topbar").get_by_role("button", name="Où on en est ?").count() == 0
         go(page, "Chaîne")
@@ -160,7 +160,7 @@ def test_no_diagnostic_stored_it_runs_once_and_the_alert_waits_for_a_failure(tmp
         return diagnostic.run_diagnostic(app, fake_exec(ALL_GOOD))
 
     with FakeServer(tmp_path, diag_runner=ok) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_selector("#alerts", state="attached")
         for _ in range(100):
             if s.state.diagnostic():
@@ -182,7 +182,7 @@ def test_a_failed_diagnostic_run_on_its_own_raises_the_alert(tmp_path, page):
         return diagnostic.run_diagnostic(app, fake_exec(dict(ALL_GOOD, adb=(1, "adb: boom"))))
 
     with FakeServer(tmp_path, diag_runner=bad) as s:
-        page.goto(s.url)
+        page.goto(s.url + "#dashboard")
         page.wait_for_function("document.getElementById('alerts').textContent.includes('a un échec')", timeout=8000)
         assert "adb" in page.locator("#alerts").inner_text()
         assert no_real_errors(page) == []

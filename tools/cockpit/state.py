@@ -7,7 +7,7 @@ under « Correction ». A 1.2 value `feature/bugfix-NN` reads as `feature`.
 
 1.5.1: `ignored`, the folders of `docs/features/` the cockpit never shows —
 the earlier chain's, whose files no current command produces. The Product
-Owner edits it in Paramètres → Dossiers.
+Owner edits it in Paramètres → Dossiers ignorés.
 
 1.6 — several applications (TECHNICAL_V1 §21). `apps` is the list, each
 entry with:
