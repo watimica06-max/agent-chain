@@ -4,6 +4,7 @@
 """
 import argparse
 import asyncio
+import base64
 import json
 import os
 import re
@@ -27,6 +28,7 @@ import decide as decide_mod  # noqa: E402
 import deploy as deploy_mod  # noqa: E402
 import deploy_profile  # noqa: E402
 import diagnostic  # noqa: E402
+import donnees as donnees_mod  # noqa: E402
 import gitref     # noqa: E402
 import questions  # noqa: E402
 import runner as runner_mod  # noqa: E402
@@ -42,7 +44,7 @@ HOST = "127.0.0.1"
 STATE_KEY = web.AppKey("state", State)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.9.1"
+VERSION = "1.10"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -52,6 +54,10 @@ CHAIN_ROOT = chain_mod.CHAIN_ROOT
 CHAIN_PUSH = True
 # Whether saving a deploy profile pushes (1.8); the tests put False here.
 PROFILE_PUSH = True
+# Whether « Données » pushes its commit (1.10); the tests put False here.
+DONNEES_PUSH = True
+# A joined file comes in the request, base64 in JSON: what one may weigh.
+MAX_REQUEST = 256 * 1024 * 1024
 # What opens the browser; the tests put a fake here.
 OPEN_BROWSER = webbrowser.open
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
@@ -225,6 +231,7 @@ def forms_payload(app, work, rn):
         d.update(step=_owner(e.rel, e.kind, e.file), chain=_chain(e.rel))
         t = context_mod.target(e, work_dir(app, feature_of(work)))
         d["ctx"] = {k: t.get(k) for k in ("status", "rule", "reason", "kind")}
+        d["folder"] = folder_of_question(app, e)
         out_q.append(d)
     for e in bs:
         d = e.to_dict()
@@ -241,6 +248,23 @@ def forms_payload(app, work, rn):
         "errors": [e.to_dict() for e in qerr] + [n.to_dict() for n in notices],
         "worktrees": wts,
     }
+
+
+def folder_marker(e):
+    """The value of a question's `Folder:` line, or None (§5)."""
+    return next((c.split(":", 1)[1].strip() for c in e.context if c.startswith("Folder:")), None)
+
+
+def folder_of_question(app, e):
+    """What « Joindre un fichier » needs on a question with the marker: the
+    folder, or why it is refused. None on a question whose answer is text."""
+    marker = folder_marker(e)
+    if marker is None:
+        return None
+    try:
+        return {"folder": donnees_mod.folder_of_marker(app, marker) + "/", "error": None}
+    except donnees_mod.DataError as err:
+        return {"folder": None, "error": str(err)}
 
 
 def question_context(app, work, rn, qid):
@@ -522,7 +546,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                 return web.json_response({"error": "JSON attendu"}, status=415)
         return await handler(request)
 
-    app = web.Application(middlewares=[guard])
+    app = web.Application(middlewares=[guard], client_max_size=MAX_REQUEST)
     app[STATE_KEY] = state
 
     # « Déploiement » (1.8): its jobs and journals run in worker threads; what
@@ -1501,6 +1525,149 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     async def deploy_cleanup(_app):
         dep.stop_all()
 
+    # ------------------------------------------------------ Données (1.10)
+    # `.claude/formats/donnees.md`: the two folders, their index, the
+    # private section of `.gitignore`. The files are joined at once; the
+    # index, `.gitignore`, the removals and the commit wait for « Enregistrer »,
+    # which a run going in the application refuses.
+    def data_where(q):
+        a, w = need_pair()
+        try:
+            return a, donnees_mod.folder_of(q.get("tab", ""), feature_of(w)), feature_of(w)
+        except donnees_mod.DataError as e:
+            raise web.HTTPBadRequest(text=json.dumps({"error": str(e)}), content_type="application/json")
+
+    def data_bytes(data):
+        try:
+            return base64.b64decode(data.get("data") or "", validate=True)
+        except ValueError:
+            raise web.HTTPBadRequest(text=json.dumps({"error": "contenu du fichier illisible"}),
+                                     content_type="application/json")
+
+    async def data_get(request):
+        a, _, feature = data_where(request.query)
+        loop = asyncio.get_running_loop()
+        out = await loop.run_in_executor(None, donnees_mod.listing, a, request.query.get("tab"), feature)
+        out["running"] = bool(run_here(a))
+        return web.json_response(out)
+
+    async def data_preview(request):
+        a, _, feature = data_where(request.query)
+        try:
+            out = donnees_mod.preview(a, request.query.get("tab"), feature, request.query.get("name", ""))
+        except donnees_mod.DataError as e:
+            return web.json_response({"error": str(e)}, status=404)
+        return web.json_response(out)
+
+    async def data_file(request):
+        """The file itself, for an image's preview."""
+        a, _, feature = data_where(request.query)
+        try:
+            p = donnees_mod.file_path(a, request.query.get("tab"), feature, request.query.get("name", ""))
+        except donnees_mod.DataError as e:
+            return web.json_response({"error": str(e)}, status=404)
+        ctype = donnees_mod.IMAGE_TYPES.get(os.path.splitext(p)[1].lower(), "application/octet-stream")
+        return web.Response(body=textfile.read_bytes(p), content_type=ctype,
+                            headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",
+                                     "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'"})
+
+    async def data_join(request):
+        """« Joindre des fichiers »: one file, copied into the folder as it
+        came. Its entry is the page's to fill, until « Enregistrer »."""
+        data = await body(request)
+        a, folder, _ = data_where(data)
+        raw = data_bytes(data)
+        try:
+            name = donnees_mod.join(a, folder, data.get("name", ""), raw, replace=bool(data.get("replace")))
+        except donnees_mod.DataError as e:
+            exists = "déjà dans" in str(e)
+            return web.json_response({"error": str(e), "exists": exists}, status=409 if exists else 400)
+        except OSError as e:
+            return web.json_response({"error": f"fichier non copié : {e}"}, status=500)
+        print(f"Données : {name} joint dans {folder}/ ({len(raw)} octets).", flush=True)
+        return web.json_response({"name": name, "folder": folder + "/"})
+
+    def data_said(res, folder):
+        print(f"Données {folder}/ : "
+              + ((f"commit {res['commit']} « {res['message']} »" + (" et poussé" if res["pushed"] else
+                  f" — push : {res['push_error']}" if res["push_error"] else ""))
+                 if res["commit"] else "rien n'avait changé") + ".", flush=True)
+
+    async def data_save(request):
+        """« Enregistrer »: the index in the format, `.gitignore`'s private
+        section, the removed files with their entries, one commit
+        `donnees: <what changed>`, the push. Refused while a run goes here."""
+        data = await body(request)
+        a, folder, feature = data_where(data)
+        refused = run_refusal(a, "les données s'enregistrent après sa fin")
+        if refused:
+            return refused
+        entries, removed = data.get("entries"), data.get("removed") or []
+        if not isinstance(entries, list) or not isinstance(removed, list):
+            return web.json_response({"error": "entrées attendues"}, status=400)
+        loop = asyncio.get_running_loop()
+        try:
+            res = await loop.run_in_executor(None, lambda: donnees_mod.save(
+                a, folder, entries, [str(r) for r in removed], push=DONNEES_PUSH))
+        except (donnees_mod.DataError, TypeError) as e:
+            return web.json_response({"error": str(e)}, status=400)
+        except OSError as e:
+            return web.json_response({"error": f"non écrit : {e}"}, status=500)
+        data_said(res, folder)
+        listing = await loop.run_in_executor(None, donnees_mod.listing, a, data.get("tab"), feature)
+        return web.json_response({**res, "listing": listing})
+
+    async def data_answer(request):
+        """« À répondre » → « Joindre un fichier », on a question whose
+        `Folder:` line names a folder (§5): the file saved there, its entry
+        written in the index, the commit and the push — then the file's name
+        written in `Answer:`, as the index names it."""
+        a, w = need_pair()
+        data = await body(request)
+        refused = run_refusal(a, "le fichier se joint après sa fin")
+        if refused:
+            return refused
+        qs = collect_forms(a, w, rn)[0]
+        entry = next((q for q in qs if q.id == data.get("id")), None)
+        if entry is None:
+            return web.json_response({"error": "cette question n'attend plus de réponse — rechargez"}, status=404)
+        if data.get("fingerprint") != entry.fingerprint:
+            return web.json_response({"error": "la question a changé depuis l'affichage — rechargez"}, status=409)
+        marker = folder_marker(entry)
+        if marker is None:
+            return web.json_response({"error": "cette question ne demande pas de fichier"}, status=400)
+        raw = data_bytes(data)
+        meta = data.get("entry") or {}
+        try:
+            folder = donnees_mod.folder_of_marker(a, marker)
+            name = donnees_mod.check_name(data.get("name", ""))
+            ent = donnees_mod.Entry(name=name, what=str(meta.get("what", "")).strip(),
+                                    source=str(meta.get("source", "")).strip(),
+                                    date=str(meta.get("date", "")).strip(), private=str(meta.get("private", "")))
+            bad = donnees_mod.check_entry(ent)
+            if bad:
+                raise donnees_mod.DataError(f"{name} : {', '.join(bad)}")
+        except donnees_mod.DataError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        if os.path.exists(os.path.join(a, *folder.split("/"), name)) and not data.get("replace"):
+            return web.json_response({"error": f"« {name} » est déjà dans {folder}/", "exists": True}, status=409)
+        loop = asyncio.get_running_loop()
+
+        def go():
+            donnees_mod.join(a, folder, name, raw, replace=True)
+            return donnees_mod.add_entry(a, folder, ent, push=DONNEES_PUSH,
+                                         answer_for=f"{os.path.basename(entry.file)} Q{entry.number}")
+        try:
+            res = await loop.run_in_executor(None, go)
+        except donnees_mod.DataError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        except OSError as e:
+            return web.json_response({"error": f"non écrit : {e}"}, status=500)
+        data_said(res, folder)
+        written = writer.write_question(entry, writer.Choice(kind="free", text=name))
+        state.clear_fresh(a, feature_of(w))
+        return web.json_response({**res, "name": name, "folder": folder + "/", "answer": written.to_dict()})
+
     async def reveal_log(request):
         """1.9.1: a log's path is a link — its folder opens on this computer,
         the file selected. A log only: an existing .jsonl or .log file."""
@@ -1611,6 +1778,12 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_get("/api/deploy/journal", deploy_journal)
     r.add_post("/api/deploy/journal/save", deploy_journal_save)
     r.add_post("/api/deploy/profile", deploy_profile_save)
+    r.add_get("/api/donnees", data_get)
+    r.add_get("/api/donnees/preview", data_preview)
+    r.add_get("/api/donnees/file", data_file)
+    r.add_post("/api/donnees/join", data_join)
+    r.add_post("/api/donnees/save", data_save)
+    r.add_post("/api/donnees/answer", data_answer)
     app.on_startup.append(opening)
     app.on_cleanup.append(deploy_cleanup)
     return app

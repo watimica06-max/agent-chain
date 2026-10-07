@@ -186,6 +186,28 @@ part — et « fait » y est déjà choisi : il reste à le suivre, puis à
 enregistrer. Les demandes du Bâtisseur à l'Architecte (`architecte/`) ne
 sont jamais là : l'Architecte y répond.
 
+**Données** (1.10) — les fichiers que la chaîne ne peut pas inventer
+(`.claude/formats/donnees.md`). Deux onglets : **« De l'application »**,
+`docs/donnees/` — ce que l'application embarque et livre ; **« De la
+fonctionnalité »**, le `donnees/` de la feature active — des instances
+réelles de ce qu'elle lit, dont la spécification et les tests partent,
+jamais livrées. Chaque onglet liste les entrées de l'index — le fichier, ce
+que c'est, d'où il vient, sa date, privé ou non — et « Aperçu » montre les
+premières lignes d'un fichier texte, ou l'image. **« Joindre des
+fichiers »** ouvre la fenêtre de choix, plusieurs fichiers à la fois : chacun
+est copié tel quel dans le dossier, et son entrée s'ouvre à remplir (la date
+du jour par défaut). « Modifier » une entrée ; « Retirer » demande, et le
+fichier part avec son entrée. **« Enregistrer »** écrit l'index au format,
+commite le dossier (`donnees: …`) et pousse ; refusé pendant qu'une commande
+tourne dans l'application. **Privé** : le fichier va dans `.gitignore` et
+n'est jamais commité — ni lui, ni les copies que les lots en feront ; un
+fichier déjà commité sort de l'index de git, et la page dit qu'il reste dans
+l'historique, comme les copies déjà commitées. Dans « À répondre », une
+question qui demande un fichier (sa ligne `Folder:`) offre **« Joindre un
+fichier »** : le fichier va dans le dossier qu'elle nomme, son entrée
+s'ouvre à remplir, et la réponse nomme le fichier ; ses autres options
+restent.
+
 **Déploiement** (1.8) — construire l'application active et l'installer là
 où elle tourne, sans Claude, puis la regarder tourner. Ce qu'il faut
 construire et où l'installer est le **profil de déploiement** de

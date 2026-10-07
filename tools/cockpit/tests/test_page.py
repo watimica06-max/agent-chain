@@ -14,7 +14,8 @@ from test_mode_diagnostic import ALL_GOOD, fake_exec  # noqa: E402
 from test_runner import script_until_interrupted  # noqa: E402
 
 SCREENS = [("Tableau de bord", "scr-dashboard"), ("À répondre", "scr-answer"),
-           ("Chaîne", "scr-chaine"), ("Correction", "scr-correction"), ("Déploiement", "scr-deploy"),
+           ("Chaîne", "scr-chaine"), ("Correction", "scr-correction"), ("Données", "scr-donnees"),
+           ("Déploiement", "scr-deploy"),
            ("Statistiques", "scr-stats"), ("Paramètres", "scr-settings")]
 
 
@@ -78,11 +79,11 @@ def test_each_screen_loads_without_js_error(tmp_path, page):
             go(page, name)
             page.wait_for_selector(f"#{scr}", state="visible")
             assert page.locator("#main section:visible").evaluate_all("els => els.map(e => e.id)") == [scr]
-        # Seven entries (1.8: « Déploiement »; 1.9: « Applications » left for the home screen),
-        # « Paramètres » last in the menu, the count on « À répondre ».
+        # Eight entries (1.8: « Déploiement »; 1.9: « Applications » left for the home screen;
+        # 1.10: « Données »), « Paramètres » last in the menu, the count on « À répondre ».
         names = [t.split("\n")[0].strip() for t in page.locator("#side a").all_inner_texts()]
-        assert names == ["Tableau de bord", "À répondre", "Chaîne", "Correction", "Déploiement", "Statistiques",
-                         "Paramètres"]
+        assert names == ["Tableau de bord", "À répondre", "Chaîne", "Correction", "Données", "Déploiement",
+                         "Statistiques", "Paramètres"]
         assert page.locator("#tb-home").is_visible()
         assert page.locator("#nav-answer-count").inner_text() == "7"
         assert " ".join(page.locator("#tb-mode").inner_text().split()) == "Mode : Auto"

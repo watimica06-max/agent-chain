@@ -583,6 +583,33 @@ table.lots .ag .u { display: inline; margin-left: 4px; }
 .dp-card .top { display: flex; gap: 8px; align-items: center; }
 .dp-card .nm { font-size: 18px; font-weight: 650; }
 .dp-card .kind { color: var(--soft); font-size: 14px; }
+/* Données (1.10) */
+#dn-list td { font-size: 14px; }
+#dn-list tr.editing > td { background: var(--accent-soft); }
+#dn-list td.dn-act { width: 1%; }
+#dn-list .dn-acts { display: flex; gap: 6px; justify-content: flex-end; }
+#dn-list .c-name { width: 220px; } #dn-list .c-date { width: 110px; } #dn-list .c-priv { width: 70px; }
+#dn-list .dn-tags { margin-top: 4px; display: flex; gap: 4px; flex-wrap: wrap; }
+#dn-preview { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px;
+  margin-top: 16px; }
+#dn-preview img { max-width: 100%; max-height: 420px; display: block; margin-top: 10px; border-radius: 6px;
+  background: repeating-conic-gradient(var(--line) 0 25%, transparent 0 50%) 50% / 16px 16px; }
+.dn-ph { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+pre.dn-text { margin: 10px 0 6px; max-height: 420px; overflow: auto; background: var(--bg); padding: 10px 12px;
+  border-radius: 8px; font-family: var(--mono); font-size: 12.5px; white-space: pre; }
+.dn-form { display: flex; flex-direction: column; gap: 8px; }
+.dn-field { display: flex; flex-direction: column; gap: 2px; }
+.dn-field .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); }
+.dn-line { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+.dn-line .dn-field { width: 180px; }
+.dn-priv { display: flex; align-items: center; gap: 6px; min-height: 44px; font-size: 15px; cursor: pointer; }
+.dn-priv input { width: 20px; height: 20px; }
+.dn-notes .notice { margin: 4px 0; }
+.dn-bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 14px 0 0; }
+.q-join { margin-top: 12px; padding: 12px 14px; border: 1px dashed var(--line); border-radius: 8px; background: var(--bg); }
+.q-join-top { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.q-join-file { margin: 10px 0 6px; }
+.q-join-acts { display: flex; gap: 10px; margin-top: 8px; }
 .dp-st { margin-left: auto; font-size: 12px; font-weight: 650; padding: 1px 10px; border-radius: 99px; white-space: nowrap; }
 .dp-st.on { background: var(--ok-soft); color: var(--ok); } .dp-st.ko { background: var(--warn-soft); color: var(--warn); }
 .dp-st.gone { background: var(--idle-soft); color: var(--soft); }
@@ -686,6 +713,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     <a href="#answer" id="nav-answer">À répondre <span id="nav-answer-count" class="count hidden"></span></a>
     <a href="#chaine" id="nav-chaine">Chaîne <span id="nav-run-dot" class="dot hidden" title="Une commande tourne"></span></a>
     <a href="#correction" id="nav-correction">Correction <span id="nav-corr-count" class="count hidden"></span></a>
+    <a href="#donnees" id="nav-donnees">Données</a>
     <a href="#deploy" id="nav-deploy">Déploiement</a>
     <a href="#stats" id="nav-stats">Statistiques</a>
     <span class="spacer"></span>
@@ -928,6 +956,38 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       <!-- 1.9: the deploy profile — Paramètres → Déploiement in 1.8. -->
       <div id="dp-profil" role="tabpanel" aria-labelledby="dp-tab-profil" class="hidden">
         <div class="card" id="sec-deploy"><div id="set-deploy"><p class="muted">Lecture du profil…</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============================ Données (1.10) ============================ -->
+    <!-- .claude/formats/donnees.md: the two folders, their index, a file's
+         preview, « Joindre des fichiers », « Enregistrer ». -->
+    <section id="scr-donnees" class="screen hidden">
+      <div class="dp-head">
+        <h2>Données</h2>
+        <span class="muted mono" id="dn-folder"></span>
+        <span class="grow"></span>
+        <button id="dn-join" title="Un ou plusieurs fichiers, copiés tels quels dans le dossier">Joindre des fichiers</button>
+        <input type="file" id="dn-input" multiple hidden aria-label="Fichiers à joindre">
+      </div>
+      <div class="tabs" role="tablist" aria-label="Données" id="dn-tabs">
+        <button role="tab" id="dn-tab-app" data-tab="app" aria-controls="dn-panel">De l'application</button>
+        <button role="tab" id="dn-tab-feature" data-tab="feature" aria-controls="dn-panel">De la fonctionnalité</button>
+      </div>
+      <p class="muted small" id="dn-what" style="margin-top:0"></p>
+      <div id="dn-msg" class="notice hidden" role="status"></div>
+      <div id="dn-errors"></div>
+      <div id="dn-panel" role="tabpanel" class="dn-body">
+        <div>
+          <div class="card" style="padding:8px 12px" id="dn-list-box"></div>
+          <aside id="dn-preview" aria-label="Aperçu du fichier"></aside>
+          <div class="dn-bar">
+            <button id="dn-save" class="primary">Enregistrer</button>
+            <span class="muted small" id="dn-dirty"></span>
+            <span class="notice warn small hidden" id="dn-run-note" style="margin:0">Une commande tourne dans cette application : les données s'enregistrent après sa fin.</span>
+          </div>
+          <p class="muted small">« Enregistrer » écrit l'index, garde hors de git chaque fichier privé — une ligne dans .gitignore —, commite le dossier (« donnees: … ») et pousse.</p>
+        </div>
       </div>
     </section>
 
@@ -1188,7 +1248,7 @@ const STATE_CLASS = {"faite": "st-faite", "t'attend": "st-attend", "en cours": "
 // 1.9: the cockpit opens on the home screen — « accueil » — and never
 // straight on a dashboard. « nouvelle » is the creation form, a page of its
 // own. Every other screen is an open application's, with the side menu.
-const SCREENS = ["dashboard", "answer", "chaine", "correction", "deploy", "stats", "settings"];
+const SCREENS = ["dashboard", "answer", "chaine", "correction", "donnees", "deploy", "stats", "settings"];
 const HOME = ["accueil", "nouvelle"];
 function currentRoute() {
   const h = (location.hash || "").replace("#", "");
@@ -1223,6 +1283,7 @@ function route() {
   if (inApp && r === "answer") hint();
   if (inApp && (r === "chaine" || r === "correction")) placeRun();
   if (inApp && r === "stats") loadStats();
+  if (inApp && r === "donnees" && entering) enterDonnees();
   // 1.8: « Déploiement » polls its destinations while it is shown, and only then.
   if (inApp && r === "deploy") enterDeploy(); else leaveDeploy();
   renderChrome();
@@ -1813,6 +1874,7 @@ function renderChrome() {
   $("nav-corr-count").textContent = nc; $("nav-corr-count").classList.toggle("hidden", !nc);
   $("nav-corr-count").classList.add("plain");
   menuDot();
+  if (currentRoute() === "donnees") renderDnBar();
 }
 // A run going in another application: said on every screen, with its idle
 // question when it has one — the launches here wait for its end.
@@ -2551,6 +2613,8 @@ function renderForms() {
       const body = [el("pre", {class: "text q", text: q.question})];
       if (q.default_source) body.push(el("div", {class: "muted small", text: "Source du défaut : " + q.default_source}));
       if (q.answer) body.push(el("div", {class: "notice warn small", text: "Texte déjà présent sous Answer:, hors de la ligne — il sera remplacé : " + q.answer}));
+      const join = questionJoin(q);
+      if (join) body.push(join);
       if (!files.has(q.rel)) files.set(q.rel, []);
       files.get(q.rel).push(entryCard(q.id, head, body, choiceBlock(q.id, q.options, q.default)));
     }
@@ -4544,6 +4608,305 @@ window.addEventListener("resize", () => {
 window.addEventListener("focus", () => { if (S.open && !running()) refreshForms(); });
 
 applyMenu();
+// ================================================================ Données (1.10)
+// .claude/formats/donnees.md: « De l'application » is docs/donnees/,
+// embedded data; « De la fonctionnalité » the feature's donnees/, reference
+// data. A file joined is copied into the folder at once; its entry, an edit,
+// a removal wait for « Enregistrer », which writes the index in the format,
+// keeps a private file out of git, commits the folder and pushes.
+const DN_TABS = ["app", "feature"];
+const DN = {tab: "feature", data: null, entries: [], removed: [], dirty: false, shown: null, token: 0, msg: null};
+try { const t = localStorage.getItem("cockpit-donnees-tab"); if (DN_TABS.includes(t)) DN.tab = t; } catch (e) {}
+const dnToday = () => (DN.data && DN.data.today) || new Date().toISOString().slice(0, 10);
+const dnRunning = () => !!((DN.data && DN.data.running) || (anyRun() && S.busy && S.busy.active));
+const DN_HISTORY = "Ce fichier est déjà commité. À l'enregistrement, il sort de l'index de git (git rm --cached) et n'est plus commité — mais il reste dans l'historique du dépôt, et les copies que des lots en ont déjà commitées aussi.";
+const DN_PRIVATE = "Privé : le fichier et chaque copie qu'un lot en fera restent hors de git — une ligne dans .gitignore. Aucune de ses valeurs n'entre dans un document de la chaîne.";
+
+function fileBase64(file) {
+  return new Promise((ok, ko) => {
+    const r = new FileReader();
+    r.onload = () => ok(String(r.result).split(",", 2)[1] || "");
+    r.onerror = () => ko(new Error(`« ${file.name} » ne se lit pas`));
+    r.readAsDataURL(file);
+  });
+}
+function fmtSize(n) {
+  if (n === null || n === undefined) return "";
+  if (n < 1024) return `${n} o`;
+  if (n < 1024 * 1024) return `${frNum(n / 1024, 1)} Ko`;
+  return `${frNum(n / 1024 / 1024, 1)} Mo`;
+}
+function dnMsg(text, kind) {
+  DN.msg = text ? {text, kind: kind || "warn"} : null;
+  const m = $("dn-msg");
+  m.className = "notice " + (DN.msg ? DN.msg.kind : "") + (DN.msg ? "" : " hidden");
+  m.replaceChildren(...(DN.msg ? [].concat(DN.msg.text) : []));
+}
+function dnSetDirty(v) { DN.dirty = v; renderDnBar(); }
+
+async function enterDonnees() { setDnTab(DN.tab, true); await loadDonnees(); }
+function setDnTab(tab, quiet) {
+  if (!quiet && tab !== DN.tab && DN.dirty && !confirm("Des changements ne sont pas enregistrés dans cet onglet. Les abandonner ?\n\nUn fichier déjà joint reste dans le dossier : il y paraît « pas dans l'index »."))
+    return;
+  DN.tab = tab;
+  try { localStorage.setItem("cockpit-donnees-tab", tab); } catch (e) {}
+  for (const t of DN_TABS) $("dn-tab-" + t).setAttribute("aria-selected", String(t === tab));
+  if (!quiet) { dnMsg(""); loadDonnees(); }
+}
+for (const t of DN_TABS) $("dn-tab-" + t).onclick = () => setDnTab(t);
+
+async function loadDonnees() {
+  const token = ++DN.token;
+  let data;
+  try { data = await api("/api/donnees?tab=" + DN.tab); }
+  catch (e) { if (token === DN.token) { DN.data = null; dnMsg(e.message, "err"); renderDonnees(); } return; }
+  if (token !== DN.token) return;
+  DN.data = data;
+  DN.removed = []; DN.dirty = false;
+  // A file the folder holds and the index does not name — joined and never
+  // saved, or put there by hand — comes with its entry open, to fill.
+  DN.entries = data.entries.map((e) => ({...e, _edit: false}))
+    .concat(data.loose.map((f) => ({...f, what: "", source: "", date: dnToday(), private: "no", on_disk: true, _loose: true, _edit: true})));
+  if (DN.shown && !DN.entries.some((e) => e.name === DN.shown)) DN.shown = null;
+  renderDonnees();
+}
+
+function renderDnBar() {
+  const run = dnRunning();
+  const save = $("dn-save");
+  save.disabled = run || !DN.data;
+  save.title = run ? "Une commande tourne dans cette application : les données s'enregistrent après sa fin" : "";
+  $("dn-run-note").classList.toggle("hidden", !run);
+  $("dn-dirty").textContent = DN.dirty ? "Changements non enregistrés" : "";
+}
+
+function renderDonnees() {
+  const d = DN.data;
+  $("dn-folder").textContent = d ? d.folder : "";
+  $("dn-what").textContent = DN.tab === "app"
+    ? "Les fichiers que l'application elle-même utilise quand elle tourne — un jeu d'images, une table. Le Réalisateur les copie dans le module qui s'en sert : ils sont livrés."
+    : "Des instances réelles de ce que la fonctionnalité doit lire — un export, ce qu'un appareil envoie, copiés sans retouche. La spécification et les tests s'écrivent à partir d'eux ; jamais livrés.";
+  const errs = $("dn-errors"); errs.replaceChildren();
+  if (d) for (const e of d.errors) errs.append(el("div", {class: "notice err"}, el("b", {text: "donnees.md"}), " — " + e));
+  renderDnBar();
+  const box = $("dn-list-box");
+  if (!d) { box.replaceChildren(el("p", {class: "muted", text: "Lecture du dossier…"})); renderDnPreview(); return; }
+  if (!DN.entries.length) {
+    box.replaceChildren(el("p", {class: "muted", id: "dn-empty",
+      text: d.index_exists ? "L'index ne nomme aucun fichier." : `Aucun index dans ${d.folder} : rien que la chaîne connaisse. « Joindre des fichiers » en ajoute.`}));
+    renderDnPreview(); return;
+  }
+  const table = el("table", {class: "st", id: "dn-list"},
+    el("thead", {}, el("tr", {}, ...[["Fichier", "c-name"], ["Ce que c'est"], ["Source"], ["Date", "c-date"], ["Privé", "c-priv"], [""]]
+      .map(([h, c]) => el("th", {class: c}, el("span", {style: "display:block;padding:10px 12px", text: h}))))));
+  const tb = el("tbody");
+  for (const e of DN.entries) tb.append(dnRow(e));
+  table.append(tb);
+  box.replaceChildren(table);
+  renderDnPreview();
+}
+
+function dnRow(e) {
+  const tr = el("tr", {"data-name": e.name, class: DN.shown === e.name ? "open" : ""});
+  const tags = [];
+  if (e._loose) tags.push(el("span", {class: "badge warn", text: "pas dans l'index"}));
+  if (e._new) tags.push(el("span", {class: "badge", text: "joint"}));
+  if (!e.on_disk) tags.push(el("span", {class: "badge err", text: "fichier absent"}));
+  const nameCell = el("td", {}, el("span", {class: "mono", text: e.name}), e.size !== null && e.size !== undefined ? el("span", {class: "u", text: fmtSize(e.size)}) : null,
+    tags.length ? el("div", {class: "dn-tags"}, ...tags) : null);
+  const actions = el("td", {class: "dn-act"}, el("div", {class: "dn-acts"},
+    e.on_disk ? el("button", {class: "small dn-show", text: "Aperçu", onclick: () => { DN.shown = e.name; renderDonnees();
+      setTimeout(() => $("dn-preview").scrollIntoView({behavior: "smooth", block: "nearest"}), 50); }}) : null,
+    el("button", {class: "small dn-edit", text: e._edit ? "Fermer" : "Modifier", onclick: () => { e._edit = !e._edit; renderDonnees(); }}),
+    el("button", {class: "small danger dn-remove", text: "Retirer", onclick: () => dnRemove(e)})));
+  if (!e._edit) {
+    tr.append(nameCell, el("td", {text: e.what || "—"}), el("td", {text: e.source || "—"}), el("td", {class: "mono", text: e.date || "—"}),
+      el("td", {}, e.private === "yes" ? el("span", {class: "badge warn", text: "privé"}) : el("span", {class: "muted", text: e.private === "no" ? "non" : (e.private || "—")})),
+      actions);
+    return tr;
+  }
+  tr.classList.add("editing");
+  tr.append(nameCell, el("td", {colspan: "4"}, dnForm(e, () => dnSetDirty(true))), actions);
+  return tr;
+}
+
+// The entry's four lines, as the format writes them (§2).
+function dnForm(e, changed) {
+  const field = (name, label, attrs) => {
+    const input = el("input", {type: "text", name, "aria-label": label, value: e[name] || "", ...attrs});
+    input.addEventListener("input", () => { e[name] = input.value; changed(); dnFormNotes(form, e); });
+    return el("label", {class: "dn-field"}, el("span", {class: "lbl", text: label}), input);
+  };
+  const priv = el("input", {type: "checkbox", name: "private", checked: e.private === "yes" || undefined});
+  priv.addEventListener("change", () => { e.private = priv.checked ? "yes" : "no"; changed(); dnFormNotes(form, e); });
+  const form = el("div", {class: "dn-form"},
+    field("what", "Ce que c'est (What)", {placeholder: "en une ligne, en anglais : a statement of operations, as the bank exports it"}),
+    field("source", "D'où il vient (Source)", {placeholder: "le service, le site, l'appareil, la personne"}),
+    el("div", {class: "dn-line"},
+      field("date", "Date de l'instance", {placeholder: "AAAA-MM-JJ", class: "dn-date"}),
+      el("label", {class: "dn-priv"}, priv, el("span", {text: " Privé — données personnelles ou confidentielles"}))),
+    el("div", {class: "dn-notes"}));
+  dnFormNotes(form, e);
+  return form;
+}
+function dnFormNotes(form, e) {
+  const box = form.querySelector(".dn-notes"); box.replaceChildren();
+  const miss = [];
+  if (!(e.what || "").trim()) miss.push("ce que c'est");
+  if (!(e.source || "").trim()) miss.push("la source");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test((e.date || "").trim())) miss.push("la date, AAAA-MM-JJ");
+  if (miss.length) box.append(el("div", {class: "muted small", text: "À remplir : " + miss.join(", ") + " — chaque ligne de l'entrée est écrite."}));
+  if (e.private === "yes") {
+    box.append(el("div", {class: "notice warn small", text: DN_PRIVATE}));
+    if (e.tracked) box.append(el("div", {class: "notice warn small dn-history", text: DN_HISTORY}));
+  } else if (e.ignored && e.private === "no") {
+    box.append(el("div", {class: "muted small", text: "Plus privé : sa ligne quitte .gitignore et le fichier est commité. Les lignes des copies qu'un lot en a faites restent."}));
+  }
+}
+
+function dnRemove(e) {
+  const what = e.on_disk ? `Retirer « ${e.name} » ?\n\nLe fichier et son entrée partent ensemble, à « Enregistrer » : le fichier est supprimé du dossier ${DN.data.folder}.`
+    : `Retirer l'entrée « ${e.name} » de l'index ?`;
+  if (!confirm(what + (e.tracked ? "\n\nIl reste dans l'historique du dépôt." : ""))) return;
+  DN.entries = DN.entries.filter((x) => x !== e);
+  DN.removed.push(e.name);
+  if (DN.shown === e.name) DN.shown = null;
+  dnSetDirty(true);
+  renderDonnees();
+}
+
+async function renderDnPreview() {
+  const box = $("dn-preview");
+  const e = DN.shown && DN.entries.find((x) => x.name === DN.shown);
+  if (!e) { box.replaceChildren(el("p", {class: "muted", text: "« Aperçu » montre ici les premières lignes d'un fichier texte, ou l'image."})); return; }
+  const head = el("div", {class: "dn-ph"}, el("b", {class: "mono", text: e.name}), el("span", {class: "muted small", text: fmtSize(e.size)}));
+  const q = `tab=${DN.tab}&name=${encodeURIComponent(e.name)}`;
+  if (e.kind === "image") {
+    box.replaceChildren(head, el("img", {src: "/api/donnees/file?" + q + "&t=" + Date.now(), alt: e.what || e.name}));
+    return;
+  }
+  if (e.kind !== "text") { box.replaceChildren(head, el("p", {class: "muted", text: "Ni du texte ni une image : pas d'aperçu."})); return; }
+  box.replaceChildren(head, el("p", {class: "muted", text: "Lecture…"}));
+  try {
+    const p = await api("/api/donnees/preview?" + q);
+    if (DN.shown !== e.name) return;
+    box.replaceChildren(head, el("pre", {class: "dn-text", text: p.lines.join("\n")}),
+      ...(p.truncated ? [el("div", {class: "muted small", text: `Les ${p.lines.length} premières lignes.`})] : []));
+  } catch (err) { box.replaceChildren(head, el("div", {class: "notice err", text: err.message})); }
+}
+
+$("dn-join").onclick = () => $("dn-input").click();
+$("dn-input").onchange = async () => {
+  const files = [...$("dn-input").files];
+  $("dn-input").value = "";
+  if (!files.length || !DN.data) return;
+  const done = [], failed = [];
+  for (const f of files) {
+    try {
+      const data = await fileBase64(f);
+      let r;
+      try { r = await api("/api/donnees/join", {tab: DN.tab, name: f.name, data}); }
+      catch (err) {
+        if (!(err.body && err.body.exists) || !confirm(`« ${f.name} » est déjà dans ${DN.data.folder}. Le remplacer par celui-ci ?`)) throw err;
+        r = await api("/api/donnees/join", {tab: DN.tab, name: f.name, data, replace: true});
+      }
+      let e = DN.entries.find((x) => x.name === r.name);
+      if (!e) {
+        e = {name: r.name, what: "", source: "", date: dnToday(), private: "no", on_disk: true, tracked: false, ignored: false, _new: true};
+        DN.entries.push(e);
+      }
+      Object.assign(e, {size: f.size, kind: f.type.startsWith("image/") ? "image" : (e.kind || "text"), _edit: true, on_disk: true});
+      DN.removed = DN.removed.filter((n) => n !== r.name);
+      done.push(r.name);
+    } catch (err) { failed.push(`${f.name} : ${err.message}`); }
+  }
+  if (done.length) { DN.shown = done[done.length - 1]; dnSetDirty(true); }
+  dnMsg(failed.length ? [`${plural(failed.length, "fichier non joint", "fichiers non joints")} : `, failed.join(" · ")]
+    : `${plural(done.length, "fichier copié", "fichiers copiés")} dans ${DN.data.folder} — remplissez ${done.length > 1 ? "leurs entrées" : "son entrée"}, puis « Enregistrer ».`, failed.length ? "err" : "ok");
+  renderDonnees();
+  // Kinds come from the folder, not from the browser's guess.
+  try { const fresh = await api("/api/donnees?tab=" + DN.tab); for (const e of DN.entries) { const x = fresh.entries.concat(fresh.loose).find((y) => y.name === e.name); if (x) { e.kind = x.kind; e.size = x.size; } } renderDonnees(); } catch (e) {}
+};
+
+$("dn-save").onclick = async () => {
+  if (!DN.data) return;
+  const btn = $("dn-save"); btn.disabled = true;
+  try {
+    const r = await api("/api/donnees/save", {tab: DN.tab, removed: DN.removed,
+      entries: DN.entries.map((e) => ({name: e.name, what: e.what || "", source: e.source || "", date: e.date || "", private: e.private || ""}))});
+    const parts = [r.commit ? `Enregistré — commit ${r.commit} « ${r.message} »` : "Rien n'avait changé : aucun commit."];
+    if (r.commit) parts.push(r.pushed ? ", poussé." : r.push_error ? ` — le push a échoué : ${r.push_error}` : ".");
+    if (r.history.length) parts.push(` ${r.history.join(", ")} : sorti de l'index de git, il reste dans l'historique — et les copies déjà commitées par des lots aussi.`);
+    DN.data = r.listing; DN.data.running = false;
+    DN.entries = r.listing.entries.map((e) => ({...e, _edit: false}))
+      .concat(r.listing.loose.map((f) => ({...f, what: "", source: "", date: dnToday(), private: "no", on_disk: true, _loose: true, _edit: true})));
+    DN.removed = []; DN.dirty = false;
+    dnMsg(parts.join(""), r.push_error ? "warn" : "ok");
+    renderDonnees();
+  } catch (e) {
+    dnMsg(e.message, "err");
+    if (e.body && e.body.run) { DN.data.running = true; }
+  } finally { renderDnBar(); }
+};
+
+// « À répondre » (1.10): a question whose `Folder:` line names a folder offers
+// « Joindre un fichier » (§5). The file goes into that folder, its entry into
+// the index, the commit and the push as « Données » makes them; `Answer:`
+// then names the file as the index names it. Its other options stay.
+const qJoin = {};                 // question id -> {file, name, what, source, date, private}
+function questionJoin(q) {
+  if (!q.folder) return null;
+  if (q.folder.error) return el("div", {class: "notice warn small", text: "« Joindre un fichier » indisponible : " + q.folder.error});
+  const j = qJoin[q.id];
+  const input = el("input", {type: "file", class: "q-join-input", hidden: true, "aria-label": "Fichier à joindre"});
+  input.addEventListener("change", () => {
+    const f = input.files[0]; if (!f) return;
+    qJoin[q.id] = {file: f, name: f.name, what: "", source: "", date: (DN.data && DN.data.today) || new Date().toISOString().slice(0, 10), private: "no", tracked: false};
+    renderForms(); setFocus(q.id);
+  });
+  const box = el("div", {class: "q-join"},
+    el("div", {class: "q-join-top"},
+      el("button", {class: "small q-join-btn", text: j ? "Choisir un autre fichier" : "Joindre un fichier", onclick: (ev) => { ev.stopPropagation(); input.click(); }}),
+      el("span", {class: "muted small", text: `Le fichier va dans ${q.folder.folder}, son entrée dans l'index ; la réponse le nomme.`}), input));
+  if (!j) return box;
+  const busy = anyRun() && S.busy && S.busy.active;
+  box.append(el("div", {class: "q-join-file"}, el("b", {class: "mono", text: j.name}), el("span", {class: "muted small", text: " " + fmtSize(j.file.size)})),
+    dnForm(j, () => {}),
+    el("div", {class: "q-join-acts"},
+      el("button", {class: "primary small q-join-save", text: "Joindre et répondre", disabled: busy || undefined,
+        title: busy ? "Une commande tourne dans cette application : le fichier se joint après sa fin" : "",
+        onclick: (ev) => { ev.stopPropagation(); joinAnswer(q, ev.target); }}),
+      el("button", {class: "small", text: "Annuler", onclick: (ev) => { ev.stopPropagation(); delete qJoin[q.id]; renderForms(); }})));
+  return box;
+}
+async function joinAnswer(q, btn) {
+  const j = qJoin[q.id]; if (!j) return;
+  btn.disabled = true;
+  const sum = $("save-summary");
+  try {
+    const data = await fileBase64(j.file);
+    const payload = {id: q.id, fingerprint: q.fingerprint, name: j.name, data,
+      entry: {what: j.what || "", source: j.source || "", date: j.date || "", private: j.private || "no"}};
+    let r;
+    try { r = await api("/api/donnees/answer", payload); }
+    catch (err) {
+      if (!(err.body && err.body.exists) || !confirm(`« ${j.name} » est déjà dans ${q.folder.folder}. Le remplacer par celui-ci ?`)) throw err;
+      r = await api("/api/donnees/answer", {...payload, replace: true});
+    }
+    delete qJoin[q.id]; delete drafts[q.id]; storeDrafts();
+    savedCount += r.answer.status === "saved" ? 1 : 0;
+    sum.replaceChildren(el("div", {class: "notice ok q-joined"},
+      `✓ ${q.rel} · Q${q.number} — « ${r.name} » joint dans ${r.folder}, son entrée écrite dans l'index`,
+      r.commit ? ` (commit ${r.commit}${r.pushed ? ", poussé" : r.push_error ? ` — push en échec : ${r.push_error}` : ""})` : "",
+      `. Answer: ${r.name}`, r.answer.status === "saved" ? " — relue comme répondue." : ` — ${r.answer.message}`));
+    await refreshState("enregistrement");
+    await refreshForms();
+  } catch (err) {
+    sum.replaceChildren(el("div", {class: "sumline err", text: `✗ ${q.rel} · Q${q.number} — fichier non joint : ${err.message}`}));
+    btn.disabled = false;
+  }
+}
+
 refreshState().catch((e) => showStart(e.message));
 </script>
 </body>

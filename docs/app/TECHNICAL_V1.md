@@ -249,7 +249,7 @@ Answer:
   folder the file goes to, `docs/features/<name>/donnees/` or
   `docs/donnees/` (`.claude/formats/donnees.md` §5). The parser reads it
   as a context line, like the others; « Joindre un fichier » on it is
-  not built yet.
+  built in 1.10 (§24).
 - **`Défaut:` keeps its present form.** Its text before ` — ` repeats
   one option verbatim; what follows ` — ` is its source, unchanged.
 
@@ -1063,3 +1063,67 @@ alert.
 
 **At the server's stop** — the journals followed and the commands it started
 are stopped.
+
+## 24. « Données » (1.10)
+
+The external data of `.claude/formats/donnees.md`: the Product Owner brings a
+file the chain cannot invent, the cockpit puts it where the agents find it
+and writes its index entry as she would. `donnees.py`; the routes under
+`/api/donnees`.
+
+**Two tabs, two folders** — « De l'application », `docs/donnees/`, the
+embedded data; « De la fonctionnalité », the active feature's `donnees/`, the
+reference data (the feature of a `bugfix-NN/` is its parent's). The kind is
+the folder's (§1): no field says it.
+
+- **The list** — `GET /api/donnees?tab=`: the index's entries — name,
+  `What:`, `Source:`, `Date:`, `Private:` — each with its file's state (on
+  disk, kind, size, tracked by git, in the private section); the files the
+  folder holds that no entry names, « pas dans l'index », their entry open to
+  fill; the index's own errors, said, never guessed around.
+- **The preview** — a text file's first twenty lines
+  (`GET /api/donnees/preview`), an image shown (`GET /api/donnees/file`,
+  served `nosniff`, no script). Neither: « pas d'aperçu ».
+- **« Joindre des fichiers »** — the browser's own file input, several at
+  once; each file goes, base64 in JSON (`client_max_size` 256 MB), to
+  `POST /api/donnees/join`, copied into the folder as it came. A name already
+  there asks before replacing. A name that is not one file — a folder, a
+  character Windows refuses, one `.gitignore` would read as a pattern or a
+  comment, `donnees.md` — is refused. Its entry opens, the date today.
+- **Edit, remove** — in the page, until « Enregistrer »; a removal asks, and
+  the file goes with its entry.
+- **« Enregistrer »** — `POST /api/donnees/save`: every entry complete (§2:
+  each line written, the date `YYYY-MM-DD`, `yes` or `no`), or nothing is
+  written; the removed files deleted; the index written in the format, its
+  title then five lines per file, the repository's line endings kept; the
+  private section of `.gitignore` (§6) — a private file's path added, a file
+  no longer private taken out; a private file git held is taken out of its
+  index (`git rm --cached`) and the page says it stays in the history, and so
+  do the copies lots committed before. Then one commit of the folder and
+  `.gitignore`, `donnees: <what changed>` — « x joint », « x retiré »,
+  « x modifié », « x privé », « x n'est plus privé » —, and the push, said
+  when it fails. Nothing changed: no commit. 🔴 Refused while a chain run
+  goes in the application, the button disabled and the reason said.
+- **The commit's own index** — it goes through a temporary `GIT_INDEX_FILE`
+  read from `HEAD`: what the Product Owner staged stays staged and out of it,
+  and `git commit --only`, measured, puts back a file `git rm --cached` took
+  out. The real index then catches up on those paths alone (`git reset`).
+
+**« À répondre » → « Joindre un fichier »** — on a question whose `Folder:`
+line (§5) names one of the two folders, the feature written out
+(`/api/forms` gives `folder`; a marker naming anything else says why it
+cannot). The question's other options stay. The file picked, its entry to
+fill; « Joindre et répondre » — `POST /api/donnees/answer`: the file saved in
+that folder, the index on disk with this entry added (or replacing the one of
+that name), `.gitignore` and the commit as « Enregistrer » makes them, the
+subject naming the question (`… — questions-sondeur-02.md Q4`), the push; then
+`Answer: <name>` written in the questions file, as the index names the file —
+the command's own test reads the entry as answered. The questions file is not
+committed here: the next command's `chore: answers` does it. Refused while a
+run goes in the application.
+
+**The tests** — `test_donnees.py` (the format, the section, the routes, git
+after each), `test_page_donnees.py` (Edge headless: both tabs, both previews,
+the real file input, the join from « À répondre »), `test_private_data.py`
+(the chain's part, played by hand); the screens before and after:
+`tests/shots_donnees.py`, in `screens/donnees/`.
