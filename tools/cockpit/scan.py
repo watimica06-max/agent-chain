@@ -123,9 +123,9 @@ RULES = {
     "OWN-CNV": "6_convertit.md:56",
     "OWN-ARC": "conventions.md:90",
     "OWN-ARB": "conventions.md:86",
-    "OWN-BAT": "batir.md:71 · batir.md:128",
+    "OWN-BAT": "batir.md:76 · batir.md:133",
     "OWN-AR3": "8_code.md:348-354",
-    "OWN-BA3": "batir.md:142-146",
+    "OWN-BA3": "batir.md:147-151",
     "OWN-CAD": "7_lots.md:227",
     "OWN-RED": "7_lots.md:394-395",
     "OWN-COD": "8_code.md:354-355 · 8_code.md:773",
@@ -206,14 +206,14 @@ RULES = {
     "CON-6": "conventions.md:93",
     "CON-7": "conventions.md:95-97",
     "CON-8": "conventions.md:94",
-    "BAT-1": "batir.md:69",
-    "BAT-2": "batir.md:70",
-    "BAT-3": "batir.md:74-75",
-    "BAT-4": "batir.md:77-79",
+    "BAT-1": "batir.md:74",
+    "BAT-2": "batir.md:75",
+    "BAT-3": "batir.md:79-80",
+    "BAT-4": "batir.md:82-84",
     "BAT-5": "7_lots.md:97",
-    "BAT-6": "7_lots.md:87-96 · batir.md:130",
+    "BAT-6": "7_lots.md:87-96 · batir.md:135",
     "BAT-7": "7_lots.md:97",
-    "BAT-8": "batir.md:131 · 7_lots.md:97",
+    "BAT-8": "batir.md:136 · 7_lots.md:97",
     "BAT-9": "aucune règle : le rapport du Bâtisseur ou le dernier commit des conventions ne se lit pas",
     "LOT-1": "7_lots.md:22-23 · 7_lots.md:61-69",
     "LOT-2": "7_lots.md:75-81",
@@ -488,7 +488,7 @@ def owner(rel, kind, lines, cut=True):
         if invocation_of(lines) != 3:
             return "conventions", "OWN-ARB"
         # Invocation 3 runs under /8_code (cmd/8_code.md:348-354) and under
-        # /batir (cmd/batir.md:142-146); before the split, only /batir.
+        # /batir (cmd/batir.md:147-151); before the split, only /batir.
         return ("8_code", "OWN-AR3") if cut else ("batir", "OWN-BA3")
     if agent == "fusionneur":
         return "fusion", "OWN-FUB"
@@ -875,12 +875,12 @@ class Scan:
 
     def missing_tables(self):
         """G2.1's, G4.4's and G12.6's tables, by the three greps on their
-        header line (cmd/batir.md:70, cmd/conventions.md:94)."""
+        header line (cmd/batir.md:75, cmd/conventions.md:94)."""
         lines = self.F.lines(self.conventions_path())
         return [n for n, rx in TABLES if not any(rx.match(l) for l in lines)]
 
     def m_batir(self, s):
-        """cmd/batir.md's four tests (:65-72), then the one /7_lots runs on
+        """cmd/batir.md's four tests (:70-77), then the one /7_lots runs on
         the report (cmd/7_lots.md:87-97)."""
         F = self.F
         if not os.path.isfile(self.conventions_path()):
@@ -897,28 +897,28 @@ class Scan:
         if req:
             return self.set(s, A_FAIRE, "BAT-4", "Une demande du Bâtisseur attend le verdict de l'Architecte : "
                             "le run s'ouvre sur lui.", req)
-        rep = batir_report(F, self.app)
+        rep = batir_report(self.app)
         if rep is None:
-            return self.set(s, A_FAIRE, "BAT-5", "Pas de batisseur.md : le projet n'a jamais été construit.", [])
-        said = (f"batisseur.md : « ## Status: {rep['status']} »" if rep["status"]
-                else "batisseur.md : aucune ligne « ## Status: »")
+            return self.set(s, A_FAIRE, "BAT-5", f"Pas de {REPORT} : le projet n'a jamais été construit.", [])
+        said = (f"{REPORT} : « ## Status: {rep['status']} »" if rep["status"]
+                else f"{REPORT} : aucune ligne « ## Status: »")
         said += f", construit sur le commit {rep['commit'][:7]}" if rep["commit"] else ", sans commit sous « ## Conventions »"
         if rep["status"] == "built":
             s.report = rep
         if rep["status"] not in ("built", "blocked") or not rep["commit"]:
-            return self.set(s, INCONNU, "BAT-9", said + " : rien ne dit sur quoi il a été construit.", ["batisseur.md"])
+            return self.set(s, INCONNU, "BAT-9", said + " : rien ne dit sur quoi il a été construit.", [REPORT])
         if rep["status"] == "blocked":
             return self.set(s, A_FAIRE, "BAT-8", said + " — et rien n'attend, ni blocage ni demande : "
-                            "le Bâtisseur repasse.", ["batisseur.md"])
+                            "le Bâtisseur repasse.", [REPORT])
         conv = (self.conventions_commit or "").strip().lower()
         if not conv:
             return self.set(s, INCONNU, "BAT-9", said + " — le commit qui a changé les conventions en dernier "
-                            "ne se lit pas.", ["batisseur.md"])
+                            "ne se lit pas.", [REPORT])
         if rep["commit"].lower() == conv:
             return self.set(s, FAITE, "BAT-6", said + " — le commit qui a changé les conventions en dernier : "
-                            "le projet est construit sur les conventions en vigueur.", ["batisseur.md"])
+                            "le projet est construit sur les conventions en vigueur.", [REPORT])
         return self.set(s, A_FAIRE, "BAT-7", said + f" — mais les conventions ont changé depuis, en dernier au "
-                        f"commit {conv[:7]} : le projet est à reconstruire.", ["batisseur.md"])
+                        f"commit {conv[:7]} : le projet est à reconstruire.", [REPORT])
 
     def m_7_lots(self, s, W=None, doc="spec-technique.md"):
         W = W or self.F
@@ -1061,17 +1061,27 @@ def _table_rows(lines):
     return out
 
 
-def batir_report(F: Folder, app):
-    """What the cockpit reads of the feature's `batisseur.md`: its
-    `## Status:` line and its `## Conventions` commit, as /7_lots reads
+# The Bâtisseur's report: the application's, one for every feature and
+# every correction (agents/batisseur.md « Where you work »).
+REPORT = "docs/BUILD_REPORT.md"
+
+
+def batir_report(app):
+    """What the cockpit reads of the application's `docs/BUILD_REPORT.md`:
+    its `## Status:` line and its `## Conventions` commit, as /7_lots reads
     them (cmd/7_lots.md:48-49); for « Bâtir » once built, its `## Commands`
     table and the deploy profile's targets (`.claude/deploy.json`). None
     when there is no report."""
-    path = F.p("batisseur.md")
+    path = os.path.join(app, *REPORT.split("/"))
     if not os.path.isfile(path):
         return None
-    lines = F.lines(path)
+    try:
+        lines = textfile.load(path).lines
+    except textfile.UnreadableFile:
+        lines = []
     status = next((m.group(1) for l in lines if (m := REPORT_STATUS.match(l))), "")
+    # « # Bâtisseur — <working folder> »: the feature whose run wrote it.
+    by = next((l.split("—", 1)[1].strip() for l in lines if l.startswith("# ") and "—" in l), "")
     commit = next((l.strip().strip("`") for l in section(lines, "Conventions") if l.strip()), "")
     commands = [{"name": c[0], "command": c[1] if len(c) > 1 else "", "result": c[2] if len(c) > 2 else "",
                  "duration": c[3] if len(c) > 3 else ""}
@@ -1088,6 +1098,7 @@ def batir_report(F: Folder, app):
         except (OSError, ValueError, AttributeError) as e:
             profile_error = f".claude/deploy.json ne se lit pas : {e}"
     return {"status": status, "commit": commit, "commands": commands, "targets": targets,
+            "path": REPORT, "by": by,
             "profile_error": profile_error,
             "packages": [l.strip() for l in section(lines, "Packages") if l.strip() and l.strip() not in ("—", "-")]}
 

@@ -349,8 +349,8 @@ def test_the_chain_order_conventions_batir_7_lots():
     md = open(RULES_MD, encoding="utf-8").read()
     base = os.path.join(REPO, ".claude", "commands")
     for f, line, anchor in [("conventions.md", 317, "Next: run /batir <name>"),
-                            ("batir.md", 130, "Next: run /7_lots <name>"),
-                            ("batir.md", 268, "Next: run /7_lots <name>"),
+                            ("batir.md", 135, "Next: run /7_lots <name>"),
+                            ("batir.md", 273, "Next: run /7_lots <name>"),
                             ("7_lots.md", 97, "Next: run /batir <name>")]:
         with open(os.path.join(base, f), encoding="utf-8") as fh:
             assert anchor in fh.read().splitlines()[line - 1], (f, line)
@@ -375,7 +375,7 @@ def test_batir_the_four_states(tmp_path):
     assert st["state"] == F and why(st)["rule"] == "BAT-6"
     # « Pourquoi ? »: the report's status line and its commit.
     assert "« ## Status: built »" in why(st)["text"] and bw.COMMIT[:7] in why(st)["text"]
-    assert why(st)["files"] == ["batisseur.md"] and "7_lots.md:87-96" in why(st)["cite"]
+    assert why(st)["files"] == ["docs/BUILD_REPORT.md"] and "7_lots.md:87-96" in why(st)["cite"]
     assert r["proposal"]["step"] == "7_lots"
     # Once built, the report's commands and the profile's targets.
     assert [(c["name"], c["result"], c["duration"]) for c in st["report"]["commands"]] == [
@@ -396,8 +396,8 @@ def test_batir_the_four_states(tmp_path):
     assert st["state"] == IN and why(st)["rule"] == "BAT-9"
     assert r["proposal"]["step"] == "batir" and not r["proposal"]["proposable"]
     # inconnu: a report with no status line.
-    text = (feat / "batisseur.md").read_text(encoding="utf-8").replace("## Status: built", "")
-    (feat / "batisseur.md").write_text(text, encoding="utf-8")
+    text = (app / "docs" / "BUILD_REPORT.md").read_text(encoding="utf-8").replace("## Status: built", "")
+    (app / "docs" / "BUILD_REPORT.md").write_text(text, encoding="utf-8")
     st = step(run_scan(str(app), "premiere")["main"], "batir")
     assert st["state"] == IN and why(st)["rule"] == "BAT-9"
 
@@ -429,7 +429,7 @@ def test_batir_a_filled_decision_is_applied(tmp_path):
 def test_conventions_without_the_three_tables(tmp_path):
     """Conventions written before the grid declared the structure:
     /conventions walks them again (conventions.md:94), /batir sends there
-    (batir.md:70)."""
+    (batir.md:75)."""
     app, feat = batir_app(tmp_path, conventions=bw.CONVENTIONS_OLD)
     r = run_scan(str(app), "premiere")
     con, bat = step(r["main"], "conventions"), step(r["main"], "batir")
@@ -438,7 +438,7 @@ def test_conventions_without_the_three_tables(tmp_path):
     assert r["proposal"]["step"] == "conventions"
 
 
-# One folder per `Next:` line of batir.md (:266-273 and the stops above
+# One folder per `Next:` line of batir.md (:271-278 and the stops above
 # them), as the run leaves it — what the scan reads there. `Next: stop
 # argument missing` leaves no folder to read.
 def test_next_run_conventions_no_conventions(tmp_path):
@@ -449,7 +449,7 @@ def test_next_run_conventions_no_conventions(tmp_path):
 
 
 def test_next_run_conventions_the_architecte_blocked(tmp_path):
-    """batir.md:143-146: the Architecte blocks on the Bâtisseur's request."""
+    """batir.md:148-151: the Architecte blocks on the Bâtisseur's request."""
     app, feat = batir_app(tmp_path)
     bw.report(feat, status="blocked")
     bw.request(feat)
@@ -503,7 +503,7 @@ ARCHITECTE_BLOCKED_3 = ("## Invocation\n\n3\n\n## What blocks\n\nNo conventions.
 
 
 def test_blocked_architecte_3_is_batir_before_the_split_8_code_after(tmp_path):
-    """batir.md:142-146 and 8_code.md:348-354 both run invocation 3; before
+    """batir.md:147-151 and 8_code.md:348-354 both run invocation 3; before
     `code/decoupage.md`, /8_code cannot have run (`OWN-BA3`)."""
     app, feat = batir_app(tmp_path)
     bw.report(feat)
@@ -523,6 +523,40 @@ def test_blocked_architecte_3_is_batir_before_the_split_8_code_after(tmp_path):
     assert r["proposal"]["step"] == "8_code"
 
 
+def test_one_build_report_for_the_application(tmp_path):
+    """The Bâtisseur's report is the application's (agents/batisseur.md
+    « Where you work »), and /7_lots reads that one in a feature and in a
+    `bugfix-NN/` alike (7_lots.md:87-97): no detour through /batir while
+    the conventions hold."""
+    import decide
+    app = chain_app(tmp_path)                               # built by f's run
+    assert (app / "docs" / "BUILD_REPORT.md").is_file()
+    assert not (app / "docs" / "features" / "f" / "batisseur.md").exists()
+    # A new feature: built already, straight to /7_lots.
+    bw.upstream_done(app, "g")
+    r = run_scan(str(app), "g")
+    st = step(r["main"], "batir")
+    assert st["state"] == F and why(st)["rule"] == "BAT-6" and why(st)["files"] == ["docs/BUILD_REPORT.md"]
+    assert r["proposal"]["step"] == "7_lots"
+    # A correction cycle, the conventions unchanged: /diagnostique → /7_lots.
+    r = run_scan(str(app), "f")
+    assert r["proposal"]["chain"] == "bugfix-02" and r["proposal"]["command"] == "7_lots"
+    assert decide.decide(r, "f")["next"]["command"] == "7_lots"
+    # The conventions changed since the last build: the new feature goes
+    # back to /batir (BAT-7); the correction's /7_lots names it, and that
+    # stored line holds against « Bâtir » closed by the split (G-AMONT).
+    r = run_scan(str(app), "g", conventions_commit=bw.OLDER)
+    assert why(step(r["main"], "batir"))["rule"] == "BAT-7" and r["proposal"]["step"] == "batir"
+    (app / "docs" / "features" / "f" / "questions-sondeur-03.md").unlink()   # else X-AMONT, on 1_lexique
+    r = run_scan(str(app), "f", conventions_commit=bw.OLDER)
+    assert why(step(r["main"], "batir"))["rule"] == "G-AMONT"
+    line = "Next: run /batir f"
+    import nextline
+    d = decide.decide(r, "f", stored={"command": "/7_lots f", "relay": line, "next": nextline.parse(line).to_dict(),
+                                      "at": "2026-10-07T10:00:00", "head": None})
+    assert d["source"] == "chaine" and d["dropped"] is None and d["next"]["command"] == "batir", d["dropped"]
+
+
 def test_next_stop_blocked_with_nothing_waiting(tmp_path):
     app, feat = batir_app(tmp_path)
     bw.report(feat, status="blocked")
@@ -531,7 +565,7 @@ def test_next_stop_blocked_with_nothing_waiting(tmp_path):
 
 
 def test_next_stop_requests_did_not_converge(tmp_path):
-    """batir.md:153-156: a fourth request, the Architecte not invoked on it."""
+    """batir.md:158-161: a fourth request, the Architecte not invoked on it."""
     app, feat = batir_app(tmp_path)
     bw.report(feat, status="blocked")
     write(feat / "architecte" / "batisseur.md", "".join(
@@ -544,8 +578,8 @@ def test_next_stop_requests_did_not_converge(tmp_path):
 
 @pytest.mark.parametrize("built", [False, True], ids=["deja-la", "sale"])
 def test_next_stop_worktree(tmp_path, built):
-    """`stop worktree already there` (batir.md:72) and `stop worktree dirty`
-    (:230-232): the worktree stays, and blocks the first step not done."""
+    """`stop worktree already there` (batir.md:77) and `stop worktree dirty`
+    (:235-237): the worktree stays, and blocks the first step not done."""
     app, feat = batir_app(tmp_path)
     if built:
         bw.report(feat)            # merged and pushed before the remove refused
@@ -619,7 +653,7 @@ ANCHORS = {
     "CON-1": ["spec-technique.md` is absent"], "CON-2": ["filled"], "CON-3": ["Requests"], "CON-4": ["Integrating"],
     "CON-5": ["Deriving"], "CON-6": ["Completing"], "CON-7": ["/batir"], "CON-8": ["one of the three greps"],
     "BAT-1": ["No `docs/TECHNICAL_CONVENTIONS.md`"], "BAT-2": ["It lacks G2.1's, G4.4's or G12.6's table"],
-    "BAT-3": ["is filled"], "BAT-4": ["opens the run on the Architecte"], "BAT-5": ["No `batisseur.md`"],
+    "BAT-3": ["is filled"], "BAT-4": ["opens the run on the Architecte"], "BAT-5": ["No `docs/BUILD_REPORT.md`"],
     "BAT-6": ["`## Status: built`, and the same commit", "The skeleton holds"], "BAT-7": ["another commit"],
     "BAT-8": ["nothing above", "`## Status: blocked`"],
     "LOT-1": ["spec-technique.md` or `desc-bug.md`", "the technical document has to be there"], "LOT-2": ["/fusion"], "LOT-3": ["blocked_verificateur.md"],

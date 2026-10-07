@@ -13,7 +13,7 @@ NATURES = ["model", "persistence", "calculation", "transition", "external exchan
            "synchronisation", "presentation", "access"]
 GENRES = ["comportements", "transverses", "directives", "references", "hors-perimetre", "recette"]
 
-# G2.1, G4.4 and G12.6: the three tables /batir greps (batir.md:70).
+# G2.1, G4.4 and G12.6: the three tables /batir greps (batir.md:75).
 CONVENTIONS = """# Technical conventions
 
 ## G2.1 — Commands
@@ -72,7 +72,8 @@ def upstream_done(app, name="premiere", conventions=CONVENTIONS):
 
 
 def report(feat, commit=COMMIT, status="built", created=None):
-    """`batisseur.md`, whole (agents/batisseur.md « What you write »)."""
+    """`docs/BUILD_REPORT.md`, the application's, whole (agents/batisseur.md
+    « What you write »), as the run of feature `feat` writes it."""
     created = created or ["settings.gradle.kts", "build.gradle.kts", "gradle/libs.versions.toml",
                           "app/build.gradle.kts", "app/src/main/AndroidManifest.xml",
                           "app/src/main/kotlin/com/exemple/seances/MainActivity.kt",
@@ -81,7 +82,7 @@ def report(feat, commit=COMMIT, status="built", created=None):
     rows = [("build", ".\\gradlew.bat build", "0" if ok else "1", "84"),
             ("test", ".\\gradlew.bat test", "0" if ok else "not run", "31" if ok else "—"),
             ("assemble app", ".\\gradlew.bat :app:assembleDebug", "0" if ok else "not run", "12" if ok else "—")]
-    write(feat / "batisseur.md", "\n".join([
+    write(feat.parent.parent / "BUILD_REPORT.md", "\n".join([
         f"# Bâtisseur — {feat.name}", "", "## Conventions", "", commit, "",
         "## Created", "", *created, "",
         "## Commands", "", "| Name | Command | Result | Duration |", "|---|---|---|---|",

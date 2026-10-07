@@ -57,6 +57,9 @@ def test_its_report_once_built(tmp_path, page):
         page.wait_for_selector("#step-main-batir .built")
         st = page.locator("#step-main-batir")
         assert st.get_attribute("data-state") == "faite"
+        # The application's report, one for every feature, and whose run wrote it.
+        assert st.locator(".built > .muted").inner_text() == \
+            "docs/BUILD_REPORT.md — le rapport de l'application, écrit par le run de « premiere »"
         rows = st.locator(".built tbody tr").all_inner_texts()
         assert len(rows) == 3
         assert "build" in rows[0] and ".\\gradlew.bat build" in rows[0] and "✓ code 0" in rows[0] and "84 s" in rows[0]

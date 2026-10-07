@@ -18,6 +18,10 @@ Feature folder: `docs/features/$ARGUMENTS/`
 `bugfix-NN/`**: 📌 **the project's structure is the repository's**, and
 a correction cycle builds nothing a feature did not declare.
 
+📌 **The argument names the worktree and the commit subject** — ⚠️
+**the skeleton and its report are the application's**: one
+`docs/BUILD_REPORT.md`, whichever feature built it last.
+
 📌 **Every path below is relative to the working folder**, except one
 starting with `docs/` or `.claude/`, relative to the repository's root.
 
@@ -50,8 +54,9 @@ no `## Verdict` heading at all reads as one with an empty one.** 📌
 **Once the Architecte has answered, each block's `## What I need` and
 `## Verdict`**, which you relay.
 
-**`batisseur.md`** — 🔴 **its `## Status:` line and its
-`## Decision applied` section**, once the Bâtisseur has handed back.
+**`docs/BUILD_REPORT.md`**, the Bâtisseur's report — 🔴 **its
+`## Status:` line and its `## Decision applied` section**, once the
+Bâtisseur has handed back.
 
 **`blocked_architecte.md`**, when the Architecte leaves one — 🔴 **its
 existence alone.**
@@ -127,8 +132,8 @@ that matches:**
 |---|---|
 | 🔴 **`blocked_batisseur.md` whose `## Decision` is empty** | 🔴 **Stop** — relay its `## To resume` whole — `Next: answer blocking, then run /batir <name>` |
 | 🔴 **A `# Request N` of `architecte/batisseur.md` whose `## Verdict` is empty** | 📌 **The Architecte's step**, below |
-| 🔴 **`batisseur.md` saying `## Status: built`** | 📌 **The skeleton holds** — `Next: run /7_lots <name>` |
-| ⚠️ **`batisseur.md` saying `## Status: blocked`, and nothing above** | 🔴 **Stop** — ⚠️ **a blocked run leaves a request or a blocking file**, and this one left neither: say so — `Next: stop the Bâtisseur ended blocked with nothing waiting` |
+| 🔴 **`docs/BUILD_REPORT.md` saying `## Status: built`** | 📌 **The skeleton holds** — `Next: run /7_lots <name>` |
+| ⚠️ **`docs/BUILD_REPORT.md` saying `## Status: blocked`, and nothing above** | 🔴 **Stop** — ⚠️ **a blocked run leaves a request or a blocking file**, and this one left neither: say so — `Next: stop the Bâtisseur ended blocked with nothing waiting` |
 
 📌 **The report read is the one this run's Bâtisseur wrote** — ⚠️ **a
 `built` left by an earlier run says nothing of the conventions in

@@ -147,9 +147,12 @@ jusqu'à ce qu'un vrai déploiement ait marché depuis le cockpit.
 **Construire le projet** — l'étape de `/batir`, entre « Établir les
 conventions » et « Découper en lots » : le Bâtisseur construit le squelette
 que les conventions déclarent (les tables de G2.1, G4.4 et G12.6) et prouve
-qu'il se construit. Faite quand `batisseur.md` dit `## Status: built` depuis
-le commit qui a changé les conventions en dernier — le test même de
-`/7_lots` ; à faire de nouveau dès que les conventions changent ; t'attend
+qu'il se construit. Son rapport est celui de l'application,
+`docs/BUILD_REPORT.md`, un pour toutes les features et toutes les
+corrections. Faite quand il dit `## Status: built` depuis le commit qui a
+changé les conventions en dernier — le test même de `/7_lots` ; à faire
+de nouveau dès que les conventions changent, tant que le découpage n'est
+pas coupé — ensuite `/8_code` ne le teste plus, et elle reste faite ; t'attend
 quand le Bâtisseur a laissé un `blocked_batisseur.md` sans décision.
 « Pourquoi ? » montre la ligne de statut du rapport et son commit. Une fois
 construit, les commandes du rapport s'affichent sous l'étape, chacune avec

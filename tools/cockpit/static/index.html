@@ -2017,10 +2017,13 @@ function renderFlow(box, steps, chain, launchable, offNote) {
   });
 }
 
-// « Bâtir », once built: each command of the Bâtisseur's report with its
-// result and its duration, then the deploy profile's targets.
+// « Bâtir », once built: the application's report — one for every
+// feature — each of its commands with its result and its duration, then
+// the deploy profile's targets.
 function builtView(r) {
   const box = el("div", {class: "built", "aria-label": "Le projet construit"});
+  box.append(el("div", {class: "muted small", text: `${r.path || "docs/BUILD_REPORT.md"} — le rapport de l'application`
+    + (r.by ? `, écrit par le run de « ${r.by} »` : "")}));
   const ok = (x) => /^0$/.test((x || "").trim());
   const secs = (x) => /^\d+(?:[.,]\d+)?$/.test((x || "").trim()) ? `${x.trim()} s` : (x || "—");
   if ((r.commands || []).length) {

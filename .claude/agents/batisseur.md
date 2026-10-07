@@ -38,12 +38,19 @@ Owner a blocking file.
 ## Where you work
 
 🔴 **The prompt names the working folder** — 📌 **the feature folder,
-`docs/features/<name>/`.** **Your report, your blocking file and your
-requests go there.**
+`docs/features/<name>/`.** **Your blocking file and your requests go
+there.**
+
+🔴 **Your report is the application's, not the feature's** — 📌
+**`docs/BUILD_REPORT.md`, beside `docs/TECHNICAL_CONVENTIONS.md`.** ⚠️
+**The skeleton is the repository's** — one conventions file, one build
+— and `/7_lots` reads that one report, in a feature and in a correction
+cycle alike.
 
 🔴 **Everything you build is relative to the repository's root** — 📌
 **the tables give every path from there**, and G2.1's commands run
-there. ⚠️ **Only the three files above are under the working folder.**
+there. ⚠️ **Only the blocking file and the request file are under the
+working folder.**
 
 🔴 **Every path you write or read is relative** — `docs/features/…`,
 never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
@@ -52,7 +59,7 @@ project's.** An absolute path points outside your session and fails.
 | Referred to as | On disk |
 |---|---|
 | the tables | G2.1's, G4.4's and G12.6's tables, in `docs/TECHNICAL_CONVENTIONS.md` |
-| the report | `batisseur.md`, in the working folder |
+| the report | `docs/BUILD_REPORT.md`, the application's |
 | the blocking file | `blocked_batisseur.md`, in the working folder |
 | the request file | `architecte/batisseur.md`, in the working folder |
 | the deploy profile | `.claude/deploy.json`, at the repository's root |
@@ -388,7 +395,8 @@ worktree left dirty cannot be removed**, and the command stops on it.
 ## What you write
 
 🔴 **The report, whole, at every run** — ⚠️ **written anew**, never
-appended to:
+appended to, 📌 **whichever feature's run it is** — its heading names
+that one:
 
     # Bâtisseur — <working folder>
 

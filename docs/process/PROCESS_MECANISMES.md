@@ -894,7 +894,7 @@ Les valeurs :
 
 ### built / blocked — l'issue d'un squelette
 
-Écrit par: batisseur (ligne `## Status:` de `batisseur.md`, à la racine du dossier de feature, réécrit entier à chaque run)
+Écrit par: batisseur (ligne `## Status:` de `docs/BUILD_REPORT.md`, le rapport de l'application, réécrit entier à chaque run)
 Lu par: `/batir` (à chaque retour du Bâtisseur) ; `/7_lots` (avant de couper, avec le commit de `## Conventions`)
 Les valeurs :
 - `built` — chaque commande de G2.1 est sortie à 0, chaque paquet `assemble` a été trouvé, chaque dossier de G4.4 et chaque fichier de build de G12.6 existent et déclarent ce que les tables disent ; `/batir` → `/7_lots` ; `/7_lots` coupe, si le commit de `## Conventions` est celui que `git log -1 --format=%H -- docs/TECHNICAL_CONVENTIONS.md` donne
