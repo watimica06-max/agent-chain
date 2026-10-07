@@ -94,7 +94,10 @@ def _contradiction(sc, nxt, stored, head_now):
     for s in steps:
         if s["id"] == sid:
             last = s["why"][-1] if s["why"] else {"rule": "", "text": ""}
-            if s["state"] == scan_mod.FAITE:
+            # `G-AMONT` says no command tests the step past the split; the
+            # command that named it just did — /7_lots on /batir
+            # (cmd/7_lots.md:87-97), a correction's included.
+            if s["state"] == scan_mod.FAITE and last["rule"] != "G-AMONT":
                 return ("X-FAITE", f"« {s['name']} » a déjà tourné — {last['text']} ({last['rule']})")
             if s["state"] == scan_mod.BLOQUEE:
                 return ("X-BLOQUEE", f"« {s['name']} » est bloquée — {last['text']} ({last['rule']})")

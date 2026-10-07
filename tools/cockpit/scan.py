@@ -101,7 +101,7 @@ CONFIRM = {
 # and checks that each cited line still says what the rule reads in it.
 RULES = {
     "G-ATT": "« À qui est une réponse » : la commande nommée après « answer …, then run »",
-    "G-AMONT": "6_convertit.md:35-38 · 2_structure.md:248-255",
+    "G-AMONT": "6_convertit.md:35-38 · 2_structure.md:248-255 · 7_lots.md:87-97",
     "G-AVAL": "§1.3 de la demande : « nothing upstream changed it since »",
     "G-BUGFIX": "7_lots.md:18-19 · 8_code.md:25-26 · 9_controle.md:20-21 · 9_controle.md:512-513",
     "G-WT": "1_lexique.md:138-140 — git worktree add .claude/worktrees/<name>, dans chaque commande à agent",
@@ -125,6 +125,7 @@ RULES = {
     "OWN-ARB": "conventions.md:86",
     "OWN-BAT": "batir.md:71 · batir.md:128",
     "OWN-AR3": "8_code.md:348-354",
+    "OWN-BA3": "batir.md:142-146",
     "OWN-CAD": "7_lots.md:227",
     "OWN-RED": "7_lots.md:394-395",
     "OWN-COD": "8_code.md:354-355 · 8_code.md:773",
@@ -442,9 +443,11 @@ def invocation_of(lines):
 
 # --------------------------------------------------------- open entries
 
-def owner(rel, kind, lines):
+def owner(rel, kind, lines, cut=True):
     """The step an open entry belongs to: the command named after it in
-    « answer …, then run X » (scan_rules.md, « À qui est une réponse »)."""
+    « answer …, then run X » (scan_rules.md, « À qui est une réponse »).
+    `cut`: the working folder holds `code/decoupage.md` — false only on the
+    feature folder before its split, where /8_code cannot have run."""
     name = rel.split("/")[-1]
     parts = rel.split("/")
     if kind == "technique":
@@ -482,7 +485,11 @@ def owner(rel, kind, lines):
     if agent == "classeur":
         return "3b_nature", "OWN-NAT"
     if agent == "architecte":
-        return ("8_code", "OWN-AR3") if invocation_of(lines) == 3 else ("conventions", "OWN-ARB")
+        if invocation_of(lines) != 3:
+            return "conventions", "OWN-ARB"
+        # Invocation 3 runs under /8_code (cmd/8_code.md:348-354) and under
+        # /batir (cmd/batir.md:142-146); before the split, only /batir.
+        return ("8_code", "OWN-AR3") if cut else ("batir", "OWN-BA3")
     if agent == "fusionneur":
         return "fusion", "OWN-FUB"
     if agent == "batisseur":
@@ -505,6 +512,8 @@ def open_entries(folder: Folder, work_dir: str, prefix: str = ""):
     own tests, and the files that could not be read. The same parsers as the
     « À répondre » form."""
     out, errors = [], []
+    # /batir works on the feature folder alone; a correction has no « Bâtir ».
+    cut = bool(prefix) or os.path.isfile(os.path.join(work_dir, "code", "decoupage.md"))
     qs, qerr = questions.scan(work_dir)
     for q in qs:
         if not q.open:
@@ -516,7 +525,7 @@ def open_entries(folder: Folder, work_dir: str, prefix: str = ""):
     bs, notices, redec = blocking.scan(work_dir)
     for b in bs:
         rel = prefix + b.rel
-        step, rule = owner(b.rel, "blocking", folder.lines(b.file))
+        step, rule = owner(b.rel, "blocking", folder.lines(b.file), cut)
         out.append(Open(b.id if not prefix else b.id.replace("b:", "b:" + prefix, 1),
                         rel, "blocking", step, rule,
                         rel + (f" · Blocking {b.number}" if b.number is not None else "")))
@@ -528,7 +537,7 @@ def open_entries(folder: Folder, work_dir: str, prefix: str = ""):
         rel = e.rel
         kind = "technique" if rel.startswith("convertisseur/technique-") else (
             "questions" if rel.split("/")[-1].startswith("questions-") else "blocking")
-        step, rule = owner(rel, kind, folder.lines(e.file))
+        step, rule = owner(rel, kind, folder.lines(e.file), cut)
         errors.append({"rel": prefix + rel, "message": e.message, "step": step})
     return out, errors
 
@@ -597,6 +606,12 @@ class Scan:
                 s.state = FAITE
                 s.why.append(Why("G-AMONT", "Le découpage en lots existe : un changement du produit appartient "
                                  "désormais à un nouveau cycle.", ["code/decoupage.md"]))
+            elif cut and d.id == "batir":
+                # /7_lots tests the build before it cuts the split
+                # (cmd/7_lots.md:87-97); /8_code never tests it again.
+                s.state = FAITE
+                s.why.append(Why("G-AMONT", "Le découpage en lots existe : /7_lots a testé la construction avant "
+                                 "de le découper, et /8_code ne la teste plus.", ["code/decoupage.md"]))
             else:
                 getattr(self, "m_" + d.id)(s)
             if d.id == "8_code" and s.lots is None:

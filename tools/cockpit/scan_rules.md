@@ -67,7 +67,9 @@ emulator (`/deploie`) → `/fusion`.
 - **`/7_lots` sends back to `/batir`** when the skeleton was not built
   from the conventions in force (7_lots.md:87-97): « Bâtir » is « faite »
   by that very test (`BAT-6`), and « à faire » again once the conventions
-  change (`BAT-7`).
+  change (`BAT-7`) — **until the split is cut**: the test runs before it
+  (« cut no split », 7_lots.md:97), /8_code never runs it, and « Bâtir »
+  is then « faite » (`G-AMONT`).
 - **`/conventions` is run by hand** — « no command chains it »
   (conventions.md:66-67) — though `/6_convertit` names it (6_convertit.md:472).
 
@@ -135,7 +137,8 @@ to the command named after it in « `answer …, then run X` »: that step is
 | `OWN-CNV` | `convertisseur/blocked_*.md` | 6_convertit | 6_convertit.md:56 |
 | `OWN-ARC` | a root `questions-architecte-NN.md` | conventions | conventions.md:90 |
 | `OWN-ARB` | `blocked_architecte.md`, invocation other than 3 | conventions | conventions.md:86 |
-| `OWN-AR3` | `blocked_architecte.md`, invocation 3 | 8_code | 8_code.md:348-354 |
+| `OWN-AR3` | `blocked_architecte.md`, invocation 3, `code/decoupage.md` there (or in a `bugfix-NN/`) | 8_code | 8_code.md:348-354 |
+| `OWN-BA3` | `blocked_architecte.md`, invocation 3, no `code/decoupage.md` in the feature folder | batir | batir.md:142-146 |
 | `OWN-BAT` | `blocked_batisseur.md` | batir | batir.md:71 · batir.md:128 |
 | `OWN-CAD` | `code/blocked_cadreur.md` | 7_lots | 7_lots.md:227 |
 | `OWN-RED` | `code/redecoupage.md`, third return | 7_lots | 7_lots.md:394-395 |
@@ -168,7 +171,7 @@ Rédacteur's.
 | Rule | Step | State | Test | Lines |
 |---|---|---|---|---|
 | `G-ATT` | any | t'attend | an open entry belongs to the step (§3) | « À qui est une réponse » : la commande nommée après « answer …, then run » |
-| `G-AMONT` | 1_lexique → 6_convertit | faite | `code/decoupage.md` exists: a change to the product belongs to a new cycle | 6_convertit.md:35-38 · 2_structure.md:248-255 |
+| `G-AMONT` | 1_lexique → 6_convertit, batir | faite | `code/decoupage.md` exists: a change to the product belongs to a new cycle; and /7_lots tested the build before cutting it, /8_code never tests it again | 6_convertit.md:35-38 · 2_structure.md:248-255 · 7_lots.md:87-97 |
 | `G-AVAL` | any | à faire | its output exists, but a step before it is not done — not applied past the split to steps `G-AMONT` closed | §1.3 de la demande : « nothing upstream changed it since » |
 | `G-BUGFIX` | main 7_lots, 8_code, 9_controle | faite | a `bugfix-NN/` exists: these commands now act on it, and a bug-list follows a control | 7_lots.md:18-19 · 8_code.md:25-26 · 9_controle.md:20-21 · 9_controle.md:512-513 |
 | `G-WT` | first step not done | bloquée | `.claude/worktrees/<feature>/` exists and no run goes: the command would fail to create it | 1_lexique.md:138-140 — git worktree add .claude/worktrees/<name>, dans chaque commande à agent |
@@ -191,6 +194,7 @@ Rédacteur's.
 | `OWN-ARC` | conventions | t'attend | see §3 | conventions.md:90 |
 | `OWN-ARB` | conventions | t'attend | see §3 | conventions.md:86 |
 | `OWN-AR3` | 8_code | t'attend | see §3 | 8_code.md:348-354 |
+| `OWN-BA3` | batir | t'attend | see §3 | batir.md:142-146 |
 | `OWN-BAT` | batir | t'attend | see §3 | batir.md:71 · batir.md:128 |
 | `OWN-CAD` | 7_lots | t'attend | see §3 | 7_lots.md:227 |
 | `OWN-RED` | 7_lots | t'attend | see §3 | 7_lots.md:394-395 |
@@ -333,24 +337,28 @@ proposes the correction chain: the commands act on it.
   repository, or no commit holds the file. The scan runs no git command:
   the server reads that commit with the one /7_lots runs (7_lots.md:92),
   once per `HEAD`, and gives it to the scan.
-- **« Bâtir » after the split**: /7_lots alone tests the report
-  (7_lots.md:87-97); /8_code does not. A conventions change made while
-  coding — the Architecte's verdict on a request — turns « Bâtir » « à
-  faire » again, and the steps after it with it (`G-AVAL`): the flow
-  proposes /batir, which creates only what is missing (batir.md:32-33).
+- **« Bâtir » after the split**: /7_lots alone tests the report, before
+  it cuts (7_lots.md:87-97); /8_code does not. The scan follows the chain,
+  never more: once `code/decoupage.md` exists, « Bâtir » is « faite »
+  (`G-AMONT`), and a conventions change made while coding — the
+  Architecte's verdict on a request — proposes /8_code, not /batir.
 - **The correction chain has no « Bâtir »**: its /7_lots tests the feature
   folder's `batisseur.md` too (7_lots.md:88) and stops on `Next: run /batir`,
   which the flow then follows; the correction's own step stays « à faire ».
+  A stored `Next: run X` is never contradicted by `G-AMONT` (`X-FAITE`
+  skips it): that rule says no command tests X any more, and the command
+  that named X just did.
 - **A request of `architecte/batisseur.md` waiting**: /conventions takes it
   first (`CON-3`, conventions.md:88), /batir too (`BAT-4`, batir.md:77-79).
   The scan follows the chain order and proposes /conventions.
-- **A `blocked_architecte.md` left by /batir's invocation 3**: the file
-  carries `## Invocation` 3 and reads as /8_code's (`OWN-AR3`,
-  8_code.md:102-107), while /batir names /conventions on it
-  (batir.md:143-146). Nothing in the file tells the two apart; that
-  invocation blocks only on a missing conventions file (agents/architecte.md
-  « You block in two cases »), which /batir's first test already rules
-  out.
+- **A `blocked_architecte.md` of invocation 3**: /batir invokes the
+  Architecte's invocation 3 and stops on the file it leaves (batir.md:142-146),
+  as /8_code does (8_code.md:348-354). Nothing in the file tells the two
+  apart; the split does. Before `code/decoupage.md` exists, /8_code cannot
+  have run, and the file is /batir's (`OWN-BA3`); after it, /8_code's
+  (`OWN-AR3`). A correction has no « Bâtir »: there it is /8_code's.
+  /batir names /conventions on it (batir.md:146); the scan shows it under
+  « Bâtir », the step it stopped.
 - **The test on the emulator** has no file of its own. It is read from
   what follows it — a `bugfix-NN/` (`TST-3`), `rapport-fusion.md`
   (`TST-1`) — and is otherwise « à faire » once a control is written,

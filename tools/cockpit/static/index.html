@@ -1000,6 +1000,19 @@ function fmtDur(s) {
   return `${r} s`;
 }
 const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+// The agents' names as the page shows them, accents included. The store,
+// the events and the CSV export keep the file names (.claude/agents/<name>.md);
+// every place the page names an agent goes through agentName.
+const AGENT_NAMES = {
+  lexicographe: "Lexicographe", redacteur: "Rédacteur", decoupeur: "Découpeur", qualifieur: "Qualifieur",
+  classeur: "Classeur", sondeur: "Sondeur", assembleur: "Assembleur", convertisseur: "Convertisseur",
+  architecte: "Architecte", fusionneur: "Fusionneur", diagnostiqueur: "Diagnostiqueur", batisseur: "Bâtisseur",
+  cadreur: "Cadreur", verificateur: "Vérificateur", detailleur: "Détailleur", concepteur: "Concepteur",
+  testeur: "Testeur", realisateur: "Réalisateur", relecteur: "Relecteur", arbitre: "Arbitre",
+  controleur: "Contrôleur", orchestrateur: "Orchestrateur",
+};
+const agentName = (a) => AGENT_NAMES[a] || cap(a);
+const agentNames = (list) => (list || []).map(agentName).join(", ");
 // « 182 k lus (dont 160 k en cache), 9 k écrits » — or « écrits : inconnu »,
 // or, when an agent hands back mid-run, « écrits : à la fin du run ».
 function usageText(u, missing = "inconnu") {
@@ -1635,7 +1648,7 @@ function renderBusyBanner() {
     ` — depuis ${(b.started_at || "").slice(11, 16)}. Une seule à la fois : rien ne se lance ici avant sa fin.`,
     el("button", {class: "small", text: `Ouvrir « ${b.app_name} »`, onclick: () => activateApp(b.app, false)}));
   if (b.idle) bb.append(el("div", {style: "margin-top:6px"},
-    `Aucun message depuis ${b.idle.minutes} min : elle attend ${(b.idle.agents || []).join(", ") || "un agent"}.`,
+    `Aucun message depuis ${b.idle.minutes} min : elle attend ${agentNames(b.idle.agents) || "un agent"}.`,
     el("button", {class: "primary small", text: "Continuer d'attendre", onclick: continueWait}),
     el("button", {class: "danger small", text: "Arrêter maintenant", onclick: stopNow})));
 }
@@ -2300,7 +2313,7 @@ function renderForms() {
          el("div", {class: "lbl", text: "Décision du Product Owner"})], [ta]));
     }
     for (const b of bs) {
-      const tags = [el("span", {class: "badge", text: b.agent})];
+      const tags = [el("span", {class: "badge", text: agentName(b.agent)})];
       if (b.number !== null) tags.push(el("span", {class: "badge", text: "Blocking " + b.number}));
       if (b.lot) tags.push(el("span", {class: "badge", text: b.lot}));
       if (b.worktree) tags.push(el("span", {class: "badge warn", text: "worktree en cours"}));
@@ -2658,7 +2671,7 @@ function renderRunEnd() {
     el("div", {style: "font-size:18px;font-weight:600;margin:4px 0 8px", text: n.kind === "unknown" ? "Aucune ligne Next: dans le relais." : n.french}));
   if (run.usage) b.append(el("div", {class: "run-total", id: "run-total"}, el("b", {text: "Total du run — "}), usageText(run.usage)));
   else b.append(el("div", {class: "run-total muted", id: "run-total", text: "Total du run : aucun message de résultat, la consommation n'est pas connue."}));
-  for (const p of run.passes || []) b.append(el("div", {class: "muted small", text: `${cap(p.agent)} — ${usageText(p)}`}));
+  for (const p of run.passes || []) b.append(el("div", {class: "muted small", text: `${agentName(p.agent)} — ${usageText(p)}`}));
   if (run.log_path) b.append(el("div", {class: "muted small", text: "Journal brut : " + run.log_path}));
   const wts = run.worktrees_left || [];
   if (wts.length) b.append(el("div", {class: "notice warn"}, el("div", {text: `Worktree${wts.length > 1 ? "s" : ""} resté${wts.length > 1 ? "s" : ""} en place :`}),
@@ -2673,7 +2686,7 @@ function renderIdle(idle) {
   b.classList.toggle("hidden", !idle);
   updateTitle();
   if (!idle) return;
-  b.append(el("div", {text: `Aucun message depuis ${idle.minutes} min : la commande attend toujours ${(idle.agents || []).join(", ") || "un agent"}.`}),
+  b.append(el("div", {text: `Aucun message depuis ${idle.minutes} min : la commande attend toujours ${agentNames(idle.agents) || "un agent"}.`}),
     el("div", {class: "row", style: "margin-top:8px"},
       el("button", {class: "primary", text: "Continuer d'attendre", onclick: continueWait}),
       el("button", {class: "danger", text: "Arrêter maintenant", onclick: stopNow})));
@@ -2690,7 +2703,7 @@ async function stopNow() { try { await api("/api/stop-now", {}); } catch (e) { a
 function renderAgents(list) {
   const a = $("agents"); a.replaceChildren();
   const names = [...new Set(list || [])];
-  if (names.length) a.append(el("span", {class: "muted small", text: "Agent : "}), ...names.map((n) => el("span", {class: "badge", text: n})));
+  if (names.length) a.append(el("span", {class: "muted small", text: "Agent : "}), ...names.map((n) => el("span", {class: "badge", text: agentName(n)})));
 }
 
 // A permission card is a banner at the top of every screen: a run waits on it.
@@ -2698,7 +2711,7 @@ function addPermission(p) {
   if ($("perm-" + p.id)) return;
   $("perm-banner").append(el("div", {class: "perm", id: "perm-" + p.id},
     el("div", {class: "title", text: p.title || ("Autoriser " + p.tool + " ?")}),
-    el("div", {class: "muted small", text: `Outil : ${p.tool} · demandé par : ${p.agent}` + (p.app && !sameApp(p.app, S.app_folder) ? ` · dans « ${appName(p.app)} »` : "")}),
+    el("div", {class: "muted small", text: `Outil : ${p.tool} · demandé par : ${agentName(p.agent)}` + (p.app && !sameApp(p.app, S.app_folder) ? ` · dans « ${appName(p.app)} »` : "")}),
     el("pre", {text: p.input}),
     el("div", {class: "row"},
       el("button", {class: "allow", text: "Autoriser", onclick: () => answerPerm(p.id, true)}),
@@ -2759,17 +2772,17 @@ function renderEvent(ev) {
   switch (ev.type) {
     case "run_started":
       streamAppend(el("div", {class: "sys", text: d.continued ? `▶ suite de ${d.prompt} (même session)` : `▶ ${d.prompt}`})); break;
-    case "text": streamAppend(el("div", {class: "ev"}, el("span", {class: "who", text: d.agent}), el("pre", {class: "text", text: d.text}))); break;
-    case "tool": streamAppend(el("div", {class: "tool", text: `${d.agent} · ${d.tool}  ${d.summary || ""}`})); break;
+    case "text": streamAppend(el("div", {class: "ev"}, el("span", {class: "who", text: agentName(d.agent)}), el("pre", {class: "text", text: d.text}))); break;
+    case "tool": streamAppend(el("div", {class: "tool", text: `${agentName(d.agent)} · ${d.tool}  ${d.summary || ""}`})); break;
     case "agent_started":
-      streamAppend(el("div", {class: "sys", text: `→ ${d.agent}${d.description ? " — " + d.description : ""}`})); break;
+      streamAppend(el("div", {class: "sys", text: `→ ${agentName(d.agent)}${d.description ? " — " + d.description : ""}`})); break;
     case "agent_background":
-      streamAppend(el("div", {class: "sys", text: `… ${d.agent} tourne en arrière-plan`})); break;
+      streamAppend(el("div", {class: "sys", text: `… ${agentName(d.agent)} tourne en arrière-plan`})); break;
     case "agent_ended":
-      streamAppend(el("div", {class: "sys", text: `← ${d.agent} ${d.late ? "a fini (" + d.status + ")" : "a rendu la main"}`}));
+      streamAppend(el("div", {class: "sys", text: `← ${agentName(d.agent)} ${d.late ? "a fini (" + d.status + ")" : "a rendu la main"}`}));
       // « Lexicographe — 4 min 12 s — 182 k lus (dont 160 k en cache), écrits : à la fin du run »:
       // its output is known, if at all, from the run's model_usage once it is over.
-      if (d.usage) streamAppend(el("div", {class: "use", text: `${cap(d.usage.agent || d.agent)} — ${usageText(d.usage, "à la fin du run")}`}));
+      if (d.usage) streamAppend(el("div", {class: "use", text: `${agentName(d.usage.agent || d.agent)} — ${usageText(d.usage, "à la fin du run")}`}));
       break;
     case "stopping": streamAppend(el("div", {class: "sys", text: d.how === "maintenant" ? "■ Arrêt demandé" : "■ Arrêt au prochain lot demandé (stop.md écrit)"})); break;
     case "error": streamAppend(el("div", {class: "sys", text: "⚠ " + d.message})); break;
@@ -2815,7 +2828,7 @@ function onEvent(ev) {
     case "idle_wait":
       if (S.run) { S.run.idle = d; renderIdle(d); }
       notify("attente", `${S.app_name} — le run attend un agent depuis ${d.minutes} min`,
-        `${(d.agents || []).join(", ") || "un agent"} n'a rien envoyé : continuer d'attendre ou arrêter ?`,
+        `${agentNames(d.agents) || "un agent"} n'a rien envoyé : continuer d'attendre ou arrêter ?`,
         () => goStep(runChain(), S.run_place && S.run_place.step));
       break;
     case "agent_ended":
@@ -2827,7 +2840,7 @@ function onEvent(ev) {
     case "permission":
       livePerms.set(d.id, d);
       addPermission(d);
-      notify("autorisation", `${S.app_name} — une autorisation attend`, `${d.tool} — demandé par ${d.agent}. Le run attend votre réponse.`,
+      notify("autorisation", `${S.app_name} — une autorisation attend`, `${d.tool} — demandé par ${agentName(d.agent)}. Le run attend votre réponse.`,
         () => { $("perm-banner").scrollTop = 0; });
       break;
     case "permission_resolved": { livePerms.delete(d.id); resolvedPerms.add(d.id); const c = $("perm-" + d.id); if (c) c.remove(); permAlert(); break; }
@@ -2862,14 +2875,14 @@ function otherAppEvent(ev) {
     case "permission":
       livePerms.set(d.id, {...d, app: ev.app});
       addPermission({...d, app: ev.app});
-      notify("autorisation", `${name} — une autorisation attend`, `${d.tool} — demandé par ${d.agent}. Le run attend votre réponse.`,
+      notify("autorisation", `${name} — une autorisation attend`, `${d.tool} — demandé par ${agentName(d.agent)}. Le run attend votre réponse.`,
         () => { $("perm-banner").scrollTop = 0; });
       break;
     case "permission_resolved": { livePerms.delete(d.id); resolvedPerms.add(d.id); const c = $("perm-" + d.id); if (c) c.remove(); permAlert(); break; }
     case "idle_wait":
       if (S.busy) { S.busy.idle = d; renderBusyBanner(); updateTitle(); }
       notify("attente", `${name} — le run attend un agent depuis ${d.minutes} min`,
-        `${(d.agents || []).join(", ") || "un agent"} n'a rien envoyé : continuer d'attendre ou arrêter ?`, () => {});
+        `${agentNames(d.agents) || "un agent"} n'a rien envoyé : continuer d'attendre ou arrêter ?`, () => {});
       break;
     case "status":
       if (S.busy && d) { S.busy.idle = d.idle || null; renderBusyBanner(); updateTitle(); }
@@ -2994,7 +3007,7 @@ function agentsCell(passes) {
     const sum = (k) => g.some((p) => p[k] === null || p[k] === undefined) ? null : g.reduce((a, p) => a + p[k], 0);
     const live = g.some((p) => p.live);
     const dur = sum("duration_s"), read = sum("read_tokens"), wrote = sum("output_tokens");
-    out.push(el("div", {class: "ag"}, el("b", {text: cap(agent)}), g.length > 1 ? ` ×${g.length}` : "",
+    out.push(el("div", {class: "ag"}, el("b", {text: agentName(agent)}), g.length > 1 ? ` ×${g.length}` : "",
       el("span", {class: "u", text: `${dur === null ? "durée inconnue" : fmtDur(dur)} · ${fmtTok(read)} lus · ` +
         (wrote === null ? (live ? "écrits : à la fin du run" : "écrits : inconnu") : `${fmtTok(wrote)} écrits`)})));
   }
@@ -3024,7 +3037,7 @@ function renderCode(box, chain) {
   // ---- the top: the bar, the lot in progress, the time, the buttons
   const live = [];
   if (mine && c.current) live.push(el("div", {class: "code-live", id: "code-current"}, "En cours : ", el("b", {text: c.current.lot}),
-    ` — ${c.current.agent || "l'orchestrateur"}`, el("span", {class: "muted small", text: c.current.from === "flux" ? "  (le lot que nomme l'agent qui tourne)" : "  (le prochain lot sans PASS, 8_code.md:80-82)"})));
+    ` — ${c.current.agent ? agentName(c.current.agent) : "l'orchestrateur"}`, el("span", {class: "muted small", text: c.current.from === "flux" ? "  (le lot que nomme l'agent qui tourne)" : "  (le prochain lot sans PASS, 8_code.md:80-82)"})));
   else if (mine) live.push(el("div", {class: "code-live muted", text: "Le run est entre deux lots."}));
   if (mine) live.push(el("div", {class: "muted"}, "Depuis le début du run : ", el("b", {"data-since": S.run.started_at, text: sinceText(S.run.started_at)})));
   const est = c.estimate || {};
@@ -3151,9 +3164,9 @@ function timeline(passes) {
   const rows = ps.map((p) => {
     const a = (t(p.started_at) - t0) / span, b = ((p.ended_at ? t(p.ended_at) : t1) - t0) / span;
     return el("div", {class: "tl-row"},
-      el("div", {}, el("b", {text: cap(p.agent)}), el("span", {class: "muted small", text: " " + fmtDate(p.started_at).split(" ").pop()})),
+      el("div", {}, el("b", {text: agentName(p.agent)}), el("span", {class: "muted small", text: " " + fmtDate(p.started_at).split(" ").pop()})),
       el("div", {class: "tl-track"}, el("span", {class: "tl-bar" + (p.parent ? " nested" : "") + (p.live ? " live" : ""),
-        style: `left:${(100 * a).toFixed(2)}%;width:${Math.max(0.6, 100 * (b - a)).toFixed(2)}%`, title: p.description || p.agent})),
+        style: `left:${(100 * a).toFixed(2)}%;width:${Math.max(0.6, 100 * (b - a)).toFixed(2)}%`, title: p.description || agentName(p.agent)})),
       el("div", {class: "muted small", text: `${fmtDurC(p.duration_s)} · ${fmtTok(p.read_tokens)} lus · ${p.output_tokens === null || p.output_tokens === undefined ? (p.live ? "écrits : à la fin du run" : "écrits : inconnu") : fmtTok(p.output_tokens) + " écrits"}`}));
   });
   return el("div", {class: "timeline"}, el("div", {class: "tl-axis"}, el("span", {text: fmtDate(new Date(t0).toISOString())}), el("span", {text: fmtDate(new Date(t1).toISOString())})), ...rows);
@@ -4178,7 +4191,7 @@ function renderStTables() {
   ], ST.by_command, {sort: {key: "read", dir: "desc"}, empty: "Aucun run sur cette période."}));
 
   $("st-agent-table").replaceChildren(stTable("agent", [
-    txt("agent", "Agent", (r) => r.agent, (r) => cap(r.agent || "agent")),
+    txt("agent", "Agent", (r) => r.agent, (r) => agentName(r.agent || "agent")),
     num("passes", "Passages", (r) => r.passes, (r) => String(r.passes)),
     txt("model", "Modèle", (r) => r.models.join(", "), (r) => r.models.map(shortModel).join(", ") || "inconnu", "mono"),
     num("med", "Durée médiane", (r) => r.median_s, (r) => fmtDurC(r.median_s)),
@@ -4204,7 +4217,7 @@ function renderStTables() {
   $("st-lot-table").replaceChildren(!ST.feature ? "" : stTable("lot", [
     txt("lot", "Lot", (r) => (r.folder ? r.folder + "/" : "") + r.lot, (r) => [el("span", {class: "mono", text: r.lot}),
       r.folder ? el("span", {class: "u", text: r.folder}) : null, r.status ? el("span", {class: "u", text: r.status}) : null], "nw"),
-    num("passes", "Passages", (r) => r.passes, (r) => [String(r.passes), el("span", {class: "u", text: r.agents.join(", ")})]),
+    num("passes", "Passages", (r) => r.passes, (r) => [String(r.passes), el("span", {class: "u", text: agentNames(r.agents)})]),
     num("dur", "Durée", (r) => r.duration_s, (r) => durCell(r.duration_s, r.duration_unknown)),
     num("read", "Tokens lus", (r) => r.read_tokens, (r) => sumCell(r.read_tokens, r.read_unknown, "passe inconnue", "passes inconnues")),
     num("out", "Tokens écrits", (r) => r.output_tokens, (r) => sumCell(r.output_tokens, r.output_unknown, "passe inconnue", "passes inconnues")),
@@ -4227,7 +4240,7 @@ function renderStTables() {
   const passOf = (k) => { const r = runById(k.run_id); return r && r.passes.find((p) => p.id === k.id); };
   const costlyPasses = ST.costly_passes.map(passOf).filter(Boolean);
   $("st-costly-passes").replaceChildren(stTable("costly-passes", [
-    txt("agent", "Passage", (p) => p.agent, (p) => [el("b", {text: cap(p.agent)}), " ", odd(p, "son agent"),
+    txt("agent", "Passage", (p) => p.agent, (p) => [el("b", {text: agentName(p.agent)}), " ", odd(p, "son agent"),
       el("span", {class: "u", text: `${p.run_command || ""} · ${fmtDate(p.started_at || p.run_started_at)}`})]),
     num("read", "Tokens lus", (p) => p.read_tokens, (p) => fmtTok(p.read_tokens)),
     num("med", "Médiane de l'agent", (p) => p.group_median_read, (p) => fmtTok(p.group_median_read)),
@@ -4268,7 +4281,7 @@ function runDetail(r) {
       (r.permission_mode ? ` · mode ${r.permission_mode}` : "") + (r.backfilled ? " · rechargé d'un journal" : "") +
       (r.resumed ? " · suite d'une session" : "")),
     passes.length ? stTable("passes-" + r.id, [
-      txt("agent", "Agent", (p) => p.agent, (p) => [el("b", {text: cap(p.agent)}), " ", odd(p, "son agent"),
+      txt("agent", "Agent", (p) => p.agent, (p) => [el("b", {text: agentName(p.agent)}), " ", odd(p, "son agent"),
         p.description ? el("span", {class: "u", text: p.description}) : null]),
       txt("model", "Modèle", (p) => p.model, (p) => shortModel(p.model) || "inconnu", "mono"),
       txt("start", "Début", (p) => p.started_at, (p) => p.started_at ? fmtDate(p.started_at) : "inconnu"),

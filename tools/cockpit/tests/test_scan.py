@@ -457,7 +457,7 @@ def test_next_run_conventions_the_architecte_blocked(tmp_path):
                                           "## Where\n\nG4.4\n\n## To resume\n\nRun /conventions.\n\n## Decision\n\n")
     r = run_scan(str(app), "premiere")
     assert why(step(r["main"], "conventions"))["rule"] == "CON-3"
-    assert why(step(r["main"], "batir"))["rule"] == "BAT-4"
+    assert why(step(r["main"], "batir"))["rule"] == "G-ATT"     # its blocking file: OWN-BA3
     assert r["proposal"]["step"] == "conventions"
     # The request is the Architecte's: never an entry of the form.
     assert not any(o["rel"].startswith("architecte/") for o in r["opens"])
@@ -479,6 +479,48 @@ def test_next_run_7_lots(tmp_path):
     r = run_scan(str(app), "premiere")
     assert step(r["main"], "batir")["state"] == F
     assert r["proposal"]["step"] == "7_lots" and r["proposal"]["proposable"]
+
+
+def test_batir_stays_done_once_the_split_is_cut(tmp_path):
+    """/7_lots tests the build before it cuts (7_lots.md:87-97); /8_code
+    never does. The conventions changed after the split: « Bâtir » faite
+    (`G-AMONT`), /8_code proposed — not /batir."""
+    app, feat = batir_app(tmp_path)
+    bw.report(feat, commit=bw.OLDER)                      # the conventions changed since
+    assert why(step(run_scan(str(app), "premiere")["main"], "batir"))["rule"] == "BAT-7"
+    split(feat / "code", ["lot-01", "lot-02"])
+    (feat / "code" / "lot-02" / "verdict.md").unlink()    # one lot left to code
+    r = run_scan(str(app), "premiere")
+    st = step(r["main"], "batir")
+    assert st["state"] == F and why(st)["rule"] == "G-AMONT" and why(st)["files"] == ["code/decoupage.md"]
+    assert "7_lots.md:87-97" in why(st)["cite"]
+    assert step(r["main"], "7_lots")["state"] == F and step(r["main"], "8_code")["state"] == AF
+    assert r["proposal"]["step"] == "8_code" and r["proposal"]["proposable"]
+
+
+ARCHITECTE_BLOCKED_3 = ("## Invocation\n\n3\n\n## What blocks\n\nNo conventions.\n\n## Where\n\nG4.4\n\n"
+                        "## To resume\n\nRun /conventions.\n\n## Decision\n\n")
+
+
+def test_blocked_architecte_3_is_batir_before_the_split_8_code_after(tmp_path):
+    """batir.md:142-146 and 8_code.md:348-354 both run invocation 3; before
+    `code/decoupage.md`, /8_code cannot have run (`OWN-BA3`)."""
+    app, feat = batir_app(tmp_path)
+    bw.report(feat)
+    write(feat / "blocked_architecte.md", ARCHITECTE_BLOCKED_3)
+    r = run_scan(str(app), "premiere")
+    assert [(o["rel"], o["step"], o["rule"]) for o in r["opens"]] == [("blocked_architecte.md", "batir", "OWN-BA3")]
+    st = step(r["main"], "batir")
+    assert st["state"] == A and why(st)["rule"] == "G-ATT" and why(st)["files"] == ["blocked_architecte.md"]
+    assert step(r["main"], "8_code")["state"] == AF and r["unknown_owner"] == []
+    assert r["proposal"]["step"] == "batir"
+    # The split cut: /8_code's.
+    split(feat / "code", ["lot-01", "lot-02"])
+    (feat / "code" / "lot-02" / "verdict.md").unlink()
+    r = run_scan(str(app), "premiere")
+    assert [(o["rel"], o["step"], o["rule"]) for o in r["opens"]] == [("blocked_architecte.md", "8_code", "OWN-AR3")]
+    assert step(r["main"], "batir")["state"] == F and step(r["main"], "8_code")["state"] == A
+    assert r["proposal"]["step"] == "8_code"
 
 
 def test_next_stop_blocked_with_nothing_waiting(tmp_path):
@@ -540,7 +582,7 @@ def test_every_rule_is_in_scan_rules_md_and_the_reverse():
 # What each cited line must still say. When a command is edited, this fails
 # on the rule to derive again — the scan never silently drifts from it.
 ANCHORS = {
-    "G-AMONT": ["code/decoupage.md` exists → stop", "does `code/decoupage.md` exist"],
+    "G-AMONT": ["code/decoupage.md` exists → stop", "does `code/decoupage.md` exist", "cut no split"],
     "G-BUGFIX": ["highest `bugfix-NN/`", "highest `bugfix-NN/`", "highest `bugfix-NN/`", "bug-list.md"],
     "G-WT": ["git worktree add .claude/worktrees/<name> HEAD"],
     "OWN-Q": ["then run /1_lexique"], "OWN-LEX": ["then run /1_lexique"], "OWN-RED1": ["then run /2_structure"],
@@ -548,6 +590,7 @@ ANCHORS = {
     "OWN-NAT": ["then run /3b_nature"], "OWN-GRI": ["then run /4_grille"],
     "OWN-TEC": ["then run /6_convertit", "then run /6_convertit"], "OWN-CNV": ["then run /6_convertit"],
     "OWN-ARC": ["then run /conventions"], "OWN-ARB": ["then run /conventions"], "OWN-AR3": ["blocked_architecte.md"],
+    "OWN-BA3": ["`blocked_architecte.md` at the working folder's root → stop"],
     "OWN-BAT": ["then run /batir", "then run /batir"],
     "OWN-CAD": ["then run /7_lots"], "OWN-RED": ["then run /7_lots"],
     "OWN-COD": ["then run /8_code", "then run /8_code"], "OWN-FUS": ["then run /fusion"], "OWN-FUB": ["blocked_fusionneur.md"],

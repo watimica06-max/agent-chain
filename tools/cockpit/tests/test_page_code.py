@@ -104,7 +104,7 @@ def test_both_tabs_the_lots_and_a_lot_opened(tmp_path, page):
         assert "Entry 3" in page.locator("#lot-main-lot-03").inner_text()
         assert "Arbitre" in page.locator("#lot-main-lot-09").inner_text()
         assert "Architecte · en attente" in page.locator("#lot-main-lot-09").inner_text()
-        assert "Realisateur" in page.locator("#lot-main-lot-01").inner_text()          # its pass, its time
+        assert "Réalisateur" in page.locator("#lot-main-lot-01").inner_text()          # its pass, its time
         # The estimate waits for two passed lots with a time: one so far.
         assert "Pas encore d'estimation" in page.locator("#code-estimate").inner_text()
         # A lot opened: its sheet rendered read-only, its verdict and the Relecteur's findings, its commits, its passes.

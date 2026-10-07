@@ -90,8 +90,8 @@ def test_a_page_opened_during_a_run_shows_its_stream_its_agent_and_the_waiting_c
         page.wait_for_selector("#perm-banner .perm", timeout=8000)
         page.wait_for_function("document.getElementById('stream').textContent.includes('Je balaie idees.md.')")
         stream = page.locator("#stream").inner_text()
-        assert "▶ /1_lexique f" in stream and "→ lexicographe" in stream and "Je lance le lexicographe." in stream
-        assert page.locator("#agents .badge").all_inner_texts() == ["lexicographe"]
+        assert "▶ /1_lexique f" in stream and "→ Lexicographe" in stream and "Je lance le lexicographe." in stream
+        assert page.locator("#agents .badge").all_inner_texts() == ["Lexicographe"]
         # The title counts what waits: the folder's open entries and the card.
         page.wait_for_function("F !== null")
         n = page.evaluate("openCount()") + 1

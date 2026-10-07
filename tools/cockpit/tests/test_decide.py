@@ -95,6 +95,18 @@ def test_each_contradiction_drops_the_stored_next(tmp_path):
                                 f"les fichiers disent « {d['next']['french']} ».")
 
 
+def test_a_stored_run_batir_past_the_split_holds(tmp_path):
+    """« Bâtir » is faite past the split by `G-AMONT` alone: /7_lots, which
+    tests it (7_lots.md:87-97), naming /batir is not contradicted."""
+    app = code_folder(tmp_path, {"lot-01": "PASS"})
+    sc = scan.run_scan(str(app), "c", None, bw.OLDER)
+    b = next(s for s in sc["main"] if s["id"] == "batir")
+    assert b["state"] == scan.FAITE and b["why"][-1]["rule"] == "G-AMONT"
+    d = decide.decide(sc, "c", stored=stored("Next: run /batir c"))
+    assert d["source"] == "chaine" and d["dropped"] is None
+    assert d["next"]["command"] == "batir" and d["step"] == "batir"
+
+
 def test_no_stored_next_is_the_scan_labelled(tmp_path):
     _, sc = sc_of(tmp_path, "premiere-app-3")
     d = decide.decide(sc, "premiere-app-3", stored=None)

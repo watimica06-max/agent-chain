@@ -206,3 +206,43 @@ def test_answer_screen_one_text_size_and_a_lower_save_bar(tmp_path, page):
         assert bar <= 42, bar                    # 77 px before 1.4.5
         assert btn["height"] >= 34 and btn["width"] >= 160
         assert no_real_errors(page) == []
+
+
+ACCENTED = {"lexicographe": "Lexicographe", "redacteur": "Rédacteur", "decoupeur": "Découpeur",
+            "qualifieur": "Qualifieur", "classeur": "Classeur", "sondeur": "Sondeur", "assembleur": "Assembleur",
+            "convertisseur": "Convertisseur", "architecte": "Architecte", "fusionneur": "Fusionneur",
+            "diagnostiqueur": "Diagnostiqueur", "batisseur": "Bâtisseur", "cadreur": "Cadreur",
+            "verificateur": "Vérificateur", "detailleur": "Détailleur", "concepteur": "Concepteur",
+            "testeur": "Testeur", "realisateur": "Réalisateur", "relecteur": "Relecteur", "arbitre": "Arbitre",
+            "controleur": "Contrôleur"}
+
+
+def test_agent_names_with_their_accents_the_store_keeps_the_file_names(tmp_path, page):
+    """One map in the page (agentName): every agent of the chain, accents
+    included; Statistiques shows it, the store keeps the file name."""
+    import os
+    import sqlite3
+    agents_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", ".claude", "agents")
+    chain = {f[:-3] for f in os.listdir(agents_dir) if f.endswith(".md")} - {"ping", "pong"}
+    assert chain == set(ACCENTED)
+    path = str(tmp_path / "stats.sqlite")
+    fixture_store(path)
+    db = sqlite3.connect(path)
+    with db:
+        db.execute("INSERT INTO agent_passes (run_id, tool_use_id, agent, description, model, started_at, ended_at,"
+                   " duration_s, input_tokens, cache_read_tokens, cache_creation_tokens, output_tokens, tool_calls)"
+                   " SELECT run_id, 'tu-v', 'verificateur', 'x', model, started_at, ended_at, duration_s,"
+                   " input_tokens, cache_read_tokens, cache_creation_tokens, output_tokens, tool_calls"
+                   " FROM agent_passes WHERE agent = 'lexicographe' LIMIT 1")
+    db.close()
+    with FakeServer(tmp_path, stats=stats.Store(path)) as s:
+        open_stats(page, s)
+        assert page.evaluate("Object.fromEntries(Object.keys(AGENT_NAMES).filter(k => k !== 'orchestrateur')"
+                             ".map(k => [k, agentName(k)]))") == ACCENTED
+        rows = page.locator("#tbl-agent tbody tr").all_inner_texts()
+        assert any(r.startswith("Vérificateur") for r in rows), rows
+        assert not any("verificateur" in r for r in rows), rows
+        assert no_real_errors(page) == []
+    db = sqlite3.connect(path)
+    assert db.execute("SELECT count(*) FROM agent_passes WHERE agent = 'verificateur'").fetchone()[0] == 1
+    db.close()
