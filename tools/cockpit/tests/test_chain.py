@@ -179,6 +179,45 @@ def test_update_writes_removes_and_leaves_the_application_alone(repos):
     assert chain.state(str(app), str(root))["state"] == chain.UP_TO_DATE
 
 
+def _longpaths(repo):
+    p = subprocess.run(["git", "-C", str(repo), "config", "--local", "--get", "core.longpaths"],
+                       capture_output=True, text=True)
+    return p.stdout.strip() or None
+
+
+def test_an_install_sets_long_paths_on_windows(repos, monkeypatch):
+    """A build in a worktree writes paths deeper than Windows' limit: the
+    install sets core.longpaths in the application's own config, so that
+    `git worktree remove` holds in every command."""
+    root, app, _ = repos
+    monkeypatch.setattr(chain, "WINDOWS", True)
+    assert _longpaths(app) is None
+    chain.install(str(app), str(root))
+    assert _longpaths(app) == "true"
+
+
+def test_an_update_sets_long_paths_on_a_repository_without_it(repos, monkeypatch):
+    root, app, _ = repos
+    monkeypatch.setattr(chain, "WINDOWS", True)
+    chain.install(str(app), str(root))
+    git(app, "config", "--local", "--unset", "core.longpaths")
+    write(root, ".claude/agents/a.md", "agent a, two\n")
+    commit(root, "chain two")
+    chain.install(str(app), str(root))
+    assert _longpaths(app) == "true"
+    # Nothing of the chain changed: the update still sets it.
+    git(app, "config", "--local", "--unset", "core.longpaths")
+    assert chain.install(str(app), str(root))["app_commit"] is None
+    assert _longpaths(app) == "true"
+
+
+def test_long_paths_left_alone_outside_windows(repos, monkeypatch):
+    root, app, _ = repos
+    monkeypatch.setattr(chain, "WINDOWS", False)
+    chain.install(str(app), str(root))
+    assert _longpaths(app) is None
+
+
 def test_nothing_changed_commits_nothing(repos):
     root, app, _ = repos
     chain.install(str(app), str(root))

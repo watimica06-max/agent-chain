@@ -18,7 +18,11 @@ It writes what the chain reads and nothing else:
 - in `.gitignore`, the lines below, appended when absent: `stop.md` and
   `stop1.md` are the Product Owner's halt and its disarmed form, never
   committed though the commands `git add` the feature folder; the
-  worktrees and the local settings are the session's own.
+  worktrees and the local settings are the session's own;
+- on Windows, `core.longpaths=true` in the repository's own config: a
+  build in a worktree writes paths deeper than Windows' limit, and
+  `git worktree remove` fails on them half done. The chain's install
+  sets it too, at every install and update.
 
 It refuses when `docs/PRODUIT_GLOBAL.md` exists: overwriting the global
 would lose every domain in it. Then it commits those files alone —
@@ -47,6 +51,7 @@ FILES = {GLOBAL: "# Application\n", STATE: "# Technical state\n"}
 IGNORE = ("docs/features/*/stop.md", "docs/features/*/stop1.md",
           ".claude/worktrees/", ".claude/settings.local.json")
 MESSAGE = "chore: scaffolding for the chain"
+WINDOWS = os.name == "nt"
 
 # What the application provides itself: (the path that says it is there,
 # what it is and who writes it).
@@ -99,6 +104,8 @@ def scaffold(root=ROOT):
     # Who commits, asked before anything is written: a commit that fails
     # would leave the global written, and the next run refused.
     _git(root, "var", "GIT_COMMITTER_IDENT")
+    if WINDOWS:
+        _git(root, "config", "--local", "core.longpaths", "true")
     written = []
     for rel, text in FILES.items():
         # A technical state already there, with no global, is kept as it is.

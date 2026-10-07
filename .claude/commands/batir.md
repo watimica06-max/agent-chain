@@ -225,9 +225,7 @@ Architecte just wrote**, and branching would cut it from it.
 3. `git merge --no-ff -m "Merge /batir <name>" <commit id>` from the
    main checkout root
 4. `git push`
-5. `git -c core.longpaths=true worktree remove <path>` — ⚠️ **the
-   build wrote paths deeper than Windows' limit**, and a plain remove
-   fails on them, half done
+5. `git worktree remove <path>`
 
 ⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
 **never force it**: 📌 **say what is left there, and stop** —

@@ -293,6 +293,11 @@ une commande demande d'abord. Paramètres → Chaîne → « Installer / mettre
 l'application (`chain: <id> <date>`) et pousse. Il refuse pendant un run,
 et tant qu'un fichier de la chaîne a des modifications non commitées dans
 l'application ; il demande avant de remplacer un fichier changé sur place.
+Sous Windows, chaque installation et chaque mise à jour règle aussi
+`core.longpaths=true` dans le dépôt de l'application (le sien, jamais le
+réglage global) : un build dans un worktree écrit des chemins plus profonds
+que la limite de Windows, et le retrait du worktree échouerait dessus à
+moitié fait. `socle.py` le règle aussi à la création.
 Les fichiers propres à l'application — son `/deploie` — ne sont jamais
 touchés.
 

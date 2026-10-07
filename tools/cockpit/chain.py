@@ -17,6 +17,11 @@ files: a commit of the cockpit alone leaves every application « à jour ».
 
 A file's hash is the SHA-256 of its bytes, CRLF read as LF: git's autocrlf
 rewrites line ends at checkout, and that is not a change.
+
+On Windows, every install and update also sets `core.longpaths=true` in the
+application's repository config — its own, never the global one: a build in
+a worktree writes paths deeper than Windows' limit, and `git worktree remove`
+then fails on them half done. The commands rely on it, and say none of it.
 """
 import hashlib
 import json
@@ -31,6 +36,7 @@ PATHS = (".claude/CLAUDE.md", ".claude/agents", ".claude/commands", ".claude/scr
 VERSION_FILE = ".claude/chain-version.json"
 GIT_TIMEOUT = 60
 PUSH_TIMEOUT = 180
+WINDOWS = os.name == "nt"
 
 UP_TO_DATE, BEHIND, MODIFIED, ABSENT = "à jour", "en retard", "modifiée sur place", "absente"
 
@@ -212,6 +218,12 @@ def _crlf(app):
         return False
 
 
+def long_paths(app):
+    """`core.longpaths=true` in the application's own config, on Windows."""
+    if WINDOWS:
+        _git(app, "config", "--local", "core.longpaths", "true")
+
+
 def _dirty(app, paths):
     """The paths, among `paths`, that git sees changed and not committed."""
     if not paths:
@@ -295,6 +307,7 @@ def install(app, root=CHAIN_ROOT, confirm=False, push=True):
     if pl["ask"] and not confirm:
         raise NeedsConfirm(pl["ask"])
     info, crlf = pl["info"], _crlf(app)
+    long_paths(app)
     for p in pl["write"]:
         data = pl["contents"][p]
         if crlf:

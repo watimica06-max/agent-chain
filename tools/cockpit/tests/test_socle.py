@@ -125,3 +125,16 @@ def test_a_technical_state_already_there_is_kept(repo):
     assert run(repo)[0] == 0
     assert "Traps" in (repo / "docs" / "CURRENT_TECHNICAL_STATE.md").read_text(encoding="utf-8")
     assert sorted(git(repo, "show", "--name-only", "--format=", "HEAD").split()) == [".gitignore", "docs/PRODUIT_GLOBAL.md"]
+
+
+def test_long_paths_set_on_windows(repo, monkeypatch):
+    """socle.py sets core.longpaths in the new application's own config, on
+    Windows — the install does too, at every install and update."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("socle_placed", str(repo / ".claude" / "scripts" / "socle.py"))
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    monkeypatch.setattr(m, "WINDOWS", True)
+    m.scaffold(str(repo))
+    assert git(repo, "config", "--local", "--get", "core.longpaths").strip() == "true"
+    assert "core.longpaths" not in git(repo, "show", "--name-only", "--format=", "HEAD")
