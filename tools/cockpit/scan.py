@@ -10,7 +10,6 @@ States: faite · t'attend · en cours · bloquée · à faire · inconnu.
 import json
 import os
 import re
-import time
 from dataclasses import dataclass, field, asdict
 
 import blocking
@@ -1186,7 +1185,6 @@ def run_scan(app, feature, run=None, conventions_commit=None):
     chain, the open entries, the alerts. `run` is the runner's snapshot of
     the run going, if any; `conventions_commit` the commit that last changed
     the conventions, which « Bâtir » compares with its report's."""
-    t0 = time.perf_counter()
     sc = Scan(app, feature, conventions_commit)
     opens, errors = open_entries(sc.F, sc.fpath)
     hb = sc.bugfixes[-1] if sc.bugfixes else None
@@ -1246,7 +1244,6 @@ def run_scan(app, feature, run=None, conventions_commit=None):
     main_prop = proposal(main, "main")
     corr = corrections[0] if corrections else None
     corr_prop = proposal(corr["steps"], corr["name"]) if corr else None
-    took = (time.perf_counter() - t0) * 1000
     unknown_owner = [o.rel for o in opens if o.step is None]
     return {
         "feature": feature,
@@ -1259,7 +1256,6 @@ def run_scan(app, feature, run=None, conventions_commit=None):
         "opens": [asdict(o) for o in opens],
         "alerts": alerts,
         "unknown_owner": unknown_owner,
-        "took_ms": round(took, 1),
     }
 
 

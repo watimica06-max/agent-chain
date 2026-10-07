@@ -1,6 +1,8 @@
 """Cockpit 1.5 — the « Code » tab, the notifications and the title count,
 in a headless Edge, against the real server over a fake application folder
 and a fake SDK client. No chain command runs."""
+import asyncio
+import os
 import shutil
 import sqlite3
 
@@ -13,7 +15,7 @@ from playwright.sync_api import sync_playwright  # noqa: E402
 import stats  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
 from test_codelots import hand_folder, verdict  # noqa: E402
-from test_runner import result, script_with_permission  # noqa: E402
+from test_runner import result, script_quick, script_with_permission  # noqa: E402
 
 FAKE_NOTIFICATION = """
 window.__notes = []; window.__vis = "visible"; window.__asked = 0;
@@ -245,7 +247,144 @@ def test_stopping_the_cockpit_during_a_run_asks_first(tmp_path, page):
         page.wait_for_timeout(500)
         assert "/8_code f" in asked[0] and "l'arrête maintenant" in asked[0]
         assert s.rn.is_running(str(s.app_root))               # dismissed: nothing stopped
+        # 1.9.1: the order that made the screen vanish, forced — the refresh
+        # the run's end starts is answered only once the stop screen shows.
+        held, holding = [], {"on": True}
+
+        def hold(route):
+            held.append(route) if holding["on"] else route.continue_()
+        page.route("**/api/state*", hold)
+        page.route("**/api/check*", hold)
         page.locator("#btn-quit").click()
         page.wait_for_selector("#stopped", state="visible", timeout=10000)
         assert not s.rn.is_running(str(s.app_root))
         assert "/8_code f" in page.locator("#stopped-text").inner_text()
+        holding["on"] = False
+        for r in held:
+            r.continue_()
+        page.wait_for_timeout(1000)
+        assert page.locator("#stopped").is_visible()
+        assert page.locator("#stopped-title").inner_text() == "Le cockpit est arrêté"
+        assert "arrêté" in page.locator("#stopped").inner_text()
+
+
+def coder(feat, coded):
+    """/8_code as its file says (8_code.md:19-20, :465): N lots from the
+    second argument, one by default; `stop.md` looked for after each lot.
+    Each lot waits until the test lets it end (`go`)."""
+    go = asyncio.Event()
+
+    async def script(c):
+        words = c.prompts[0].split()
+        n = int(words[2]) if len(words) > 2 else 1
+        for lot in ("lot-07", "lot-08", "lot-10")[:n]:
+            yield AssistantMessage(content=[ToolUseBlock(id="r-" + lot, name="Agent", input={
+                "subagent_type": "realisateur", "description": f"Code {lot}",
+                "prompt": f"Working folder: docs/features/f. Your lot: {lot}."})], model="m")
+            await go.wait()
+            go.clear()
+            (feat / "code" / lot / "verdict.md").write_text(verdict("PASS"), encoding="utf-8")
+            coded.append(lot)
+            yield UserMessage(content=[ToolResultBlock(tool_use_id="r-" + lot, content="PASS")])
+            if (feat / "stop.md").exists():
+                text = f"Arrêté sur stop.md : {len(coded)} lot sur {n}.\nNext: run /8_code f"
+                yield AssistantMessage(content=[TextBlock(text)], model="m")
+                yield result(text)
+                return
+        yield AssistantMessage(content=[TextBlock("Fini.\nNext: run /8_code f")], model="m")
+        yield result("Fini.\nNext: run /8_code f")
+    return script, go
+
+
+def launched(s):
+    """The lines sent, every run since the server started."""
+    return [p for c in s.clients for p in c.prompts]
+
+
+def wait_until(page, cond):
+    for _ in range(200):
+        if cond():
+            return True
+        page.wait_for_timeout(50)
+    return cond()
+
+
+def test_lots_a_coder_beside_the_step_and_in_the_code_tab(tmp_path, page):
+    """1.9.1: « Lots à coder », 1 by default, at most the lots not yet done;
+    1 launches the line as it was, above 1 adds the second argument."""
+    with FakeServer(tmp_path, script=script_quick) as s:
+        with_lots(s, tmp_path)
+        page.on("dialog", lambda d: d.accept())
+        page.goto(s.url + "#chaine")
+        page.wait_for_selector("#step-main-8_code")
+        f = page.locator("#lots-n-main")
+        assert f.input_value() == "1" and f.get_attribute("min") == "1"
+        assert f.get_attribute("max") == "8"                  # 2 / 10 in PASS
+        assert page.locator("#step-main-8_code .lots-n").inner_text().startswith("Lots à coder")
+        # No other step has one.
+        assert page.locator(".lots-n").count() == 1
+        page.locator("#step-main-8_code").get_by_role("button", name="Lancer").click()
+        page.wait_for_function("document.getElementById('stream').textContent.includes('■ Fin')")
+        assert launched(s) == ["/8_code f"]
+        # Above the lots left: brought back to them; 0: brought back to 1.
+        page.goto(s.url + "#chaine")
+        page.wait_for_selector("#lots-n-main:not([disabled])")
+        page.locator("#lots-n-main").fill("20")
+        page.locator("#lots-n-main").press("Tab")
+        assert page.locator("#lots-n-main").input_value() == "8"
+        page.locator("#lots-n-main").fill("0")
+        page.locator("#lots-n-main").press("Tab")
+        assert page.locator("#lots-n-main").input_value() == "1"
+        # The « Code » tab carries the same number.
+        page.locator("#lots-n-main").fill("3")
+        page.locator("#lots-n-main").press("Tab")
+        page.locator("#tab-main-code").click()
+        page.wait_for_selector("#code-lots-n-main")
+        assert page.locator("#code-lots-n-main").input_value() == "3"
+        page.get_by_role("button", name="Lancer /8_code").click()
+        assert wait_until(page, lambda: len(launched(s)) == 2)
+        assert launched(s) == ["/8_code f", "/8_code f 3"]
+        assert page.js_errors == []
+
+
+def test_stop_at_the_next_lot_with_three_lots_stops_after_the_current_one(tmp_path, page):
+    coded = []
+    with FakeServer(tmp_path) as s:
+        with_lots(s, tmp_path)
+        s.script, go = coder(s.feat, coded)
+        page.on("dialog", lambda d: d.accept())
+        page.goto(s.url + "#chaine")
+        page.wait_for_selector("#lots-n-main")
+        page.locator("#lots-n-main").fill("3")
+        page.locator("#step-main-8_code").get_by_role("button", name="Lancer").click()
+        page.wait_for_selector("#btn-stop-next:not([disabled])")
+        assert launched(s) == ["/8_code f 3"]
+        page.locator("#btn-stop-next").click()
+        page.wait_for_function("document.getElementById('stream').textContent.includes('Arrêt au prochain lot demandé')")
+        assert (s.feat / "stop.md").exists()
+        s.loop.call_soon_threadsafe(go.set)                      # the current lot ends
+        page.wait_for_function("document.getElementById('stream').textContent.includes('■ Fin')")
+        assert coded == ["lot-07"]                                # not lot-08, nor lot-10
+        assert "1 lot sur 3" in page.locator("#stream").inner_text()
+        assert page.js_errors == []
+
+
+def test_a_log_path_is_a_link_to_its_folder(tmp_path, page, revealed):
+    """1.9.1: the stream's end, « Fin du run » and « Derniers runs » — a
+    click opens the log's folder, the file selected."""
+    with FakeServer(tmp_path, script=script_quick) as s:
+        page.goto(s.url + "#chaine")
+        page.wait_for_selector("#flow-main li.step")
+        s.call(s.rn.start(str(s.app_root), "f", "f", "1_lexique", "f"))
+        page.wait_for_selector("#run-end a.loglink")
+        log = s.rn.current(str(s.app_root)).log_path
+        assert page.locator("#stream a.loglink").inner_text() == log
+        page.locator("#stream a.loglink").click()
+        page.locator("#run-end a.loglink").click()
+        page.evaluate("location.hash = '#dashboard'")
+        page.wait_for_selector("#history a.loglink")
+        assert page.locator("#history a.loglink").inner_text() == log
+        page.locator("#history a.loglink").click()
+        assert wait_until(page, lambda: len(revealed) == 3)
+        assert revealed == [(os.path.normpath(log), True)] * 3
+        assert page.js_errors == []

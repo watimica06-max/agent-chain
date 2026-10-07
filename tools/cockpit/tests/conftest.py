@@ -58,6 +58,44 @@ def _chain_up_to_date(request, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def revealed(monkeypatch):
+    """1.9.1: a log link opens its folder on this computer. In a test it
+    is recorded here, never opened: [(path, select)]."""
+    import server
+    calls = []
+    monkeypatch.setattr(server, "REVEAL", lambda path, select=False: calls.append((path, select)))
+    return calls
+
+
+@pytest.fixture(autouse=True)
+def _creations_in_tmp(tmp_path_factory, monkeypatch):
+    """1.9.1: a test never creates an application outside its temporary
+    folder, whatever the timing. The default parent of « Nouvelle
+    application » is a temporary folder; a creation aimed anywhere else is
+    refused before its first step, and fails the test."""
+    import create
+    base = os.path.normcase(os.path.abspath(str(tmp_path_factory.getbasetemp())))
+    parent = tmp_path_factory.mktemp("parent-par-defaut")
+    monkeypatch.setattr(create, "default_parent", lambda: str(parent))
+    outside = []
+    real = create.Creation.run
+
+    def run(self):
+        p = os.path.normcase(os.path.abspath(self.path))
+        try:
+            inside = os.path.commonpath([p, base]) == base
+        except ValueError:                          # another drive
+            inside = False
+        if not inside:
+            outside.append(self.path)
+            raise AssertionError(f"création hors du dossier temporaire du test : {self.path}")
+        return real(self)
+    monkeypatch.setattr(create.Creation, "run", run)
+    yield
+    assert not outside, f"une création visait un dossier hors du dossier temporaire : {outside}"
+
+
+@pytest.fixture(autouse=True)
 def _no_real_diagnostic(monkeypatch):
     """1.4.5: the cockpit runs the diagnostic on its own when none is stored.
     In a test it is always a fake, all ✓, unless the test passes its own."""

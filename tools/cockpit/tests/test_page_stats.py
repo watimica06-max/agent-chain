@@ -2,6 +2,8 @@
 Playwright): the « Statistiques » screen on a fixture store, the side menu
 that closes, « Où on en est ? » on « Chaîne », the diagnostic run on its own,
 one text size and a lower save bar in « À répondre ». No chain command runs."""
+import os
+
 import pytest
 
 pytest.importorskip("playwright")
@@ -22,8 +24,10 @@ def open_stats(page, s, period="tout"):
     page.goto(s.url + "#stats")
     page.wait_for_selector("#st-tiles .tile")
     page.locator(f"#st-period button[data-p='{period}']").click()
-    page.wait_for_function(f"document.querySelector('#st-period button[data-p=\"{period}\"]').getAttribute('aria-pressed') === 'true'"
-                           " && document.querySelectorAll('#tbl-history tbody tr').length > 0")
+    # 1.9.1: the button is pressed before the period's data comes back — wait
+    # for the tiles of that period, not for the button.
+    page.wait_for_selector(f"#st-tiles[data-period='{period}'] .tile")
+    page.wait_for_function("document.querySelectorAll('#tbl-history tbody tr').length > 0")
 
 
 def test_statistics_screen_every_section(tmp_path, page):
@@ -246,3 +250,34 @@ def test_agent_names_with_their_accents_the_store_keeps_the_file_names(tmp_path,
     db = sqlite3.connect(path)
     assert db.execute("SELECT count(*) FROM agent_passes WHERE agent = 'verificateur'").fetchone()[0] == 1
     db.close()
+
+
+def test_raw_logs_at_the_foot_and_a_runs_log_a_link(tmp_path, page, revealed):
+    """1.9.1: « Journaux bruts » at the foot of « Statistiques » opens the
+    logs folder; a run's log is a link — gone from the disk, it says so."""
+    with stats_server(tmp_path) as s:
+        open_stats(page, s)
+        foot = page.locator("#st-logs")
+        assert foot.locator("b").inner_text() == "Journaux bruts"
+        assert foot.locator("#st-logs-dir").inner_text() == s.rn.log_dir
+        foot.get_by_role("button", name="Ouvrir le dossier").click()
+        for _ in range(100):
+            if revealed:
+                break
+            page.wait_for_timeout(50)
+        assert revealed == [(os.path.normpath(s.rn.log_dir), False)]
+        # The fixture's log is not on this disk: the page says so, nothing opens.
+        page.locator("#tbl-history tbody tr", has_text="/1_lexique f").click()
+        link = page.locator("#tbl-history tr.detail a.loglink")
+        assert link.inner_text() == R1_LOG
+        said = []
+        page.on("dialog", lambda d: (said.append(d.message), d.accept()))
+        link.click()
+        for _ in range(100):
+            if said:
+                break
+            page.wait_for_timeout(50)
+        assert said and "n'existe plus" in said[0]
+        assert page.locator("#tbl-history tr[aria-expanded=true]").count() == 1   # the click stayed on the link
+        assert len(revealed) == 1
+        assert [e for e in no_real_errors(page) if "404" not in e] == []      # the 404 asked for above

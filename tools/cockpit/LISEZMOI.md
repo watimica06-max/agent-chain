@@ -20,7 +20,7 @@ Ce qu'il écrivait dans la fenêtre noire va dans `logs/server.log`.
 
 - **Fermer la page** (l'onglet ou le navigateur) n'arrête rien : un run continue.
 - **La rouvrir** (le raccourci, ou l'adresse) la remet où en sont les choses : le run, son flux depuis le début, l'agent qui travaille, une autorisation qui attend.
-- **Arrêter le cockpit** : Paramètres → « Arrêter le cockpit » ; si un run tourne, il demande d'abord, et le run est arrêté.
+- **Arrêter le cockpit** : Paramètres → « Arrêter le cockpit » ; si un run tourne, il demande d'abord, et le run est arrêté. L'écran « Le cockpit est arrêté » reste ensuite (1.9.1) : la page ne se reconnecte plus d'elle-même.
 
 Dans une console, pour voir ce qu'il écrit : `python server.py --ouvrir`
 (`Ctrl+C` l'arrête).
@@ -260,8 +260,8 @@ et « Construire le projet » dit, dans « Chaîne », ce qui manque encore.
 **Chaîne → Code** — `/8_code` lot par lot : les lots passés sur le total,
 en barre ; pendant un run, le lot en cours et l'agent qui y travaille, le
 temps depuis le début et, dès que deux lots sont passés, ce qui reste
-« ≈ 40 min » ; « Lancer /8_code », « Arrêter au prochain lot »,
-« Arrêter maintenant ». Puis chaque lot, dans l'ordre de la séquence, par
+« ≈ 40 min » ; « Lots à coder » et « Lancer /8_code », « Arrêter au
+prochain lot », « Arrêter maintenant ». Puis chaque lot, dans l'ordre de la séquence, par
 bloc : son titre (l'`Anchor` de `code/decoupage.md`), son état — pas
 commencé · entamé · en cours · passé · échoué · échoué 3 fois · annulé ·
 bloqué · redécoupé · inconnu —, ses essais sur 3, les agents qui y ont
@@ -314,7 +314,9 @@ souvient. En bref ; l'usage des deux fenêtres dans le temps, les runs
 marqués sous l'axe ; par commande, par agent, par fonctionnalité ; les
 dix runs et les dix passages d'agent les plus coûteux, « inhabituel »
 au-delà de deux fois la médiane des leurs ; l'historique des runs, un clic
-ouvrant ses passages d'agent et le chemin de son journal ; une feature
+ouvrant ses passages d'agent et le chemin de son journal ; en bas,
+« Journaux bruts » et « Ouvrir le dossier » (1.9.1) : le dossier des
+journaux — runs, déploiements, `server.log`, `next-ecarte.jsonl` ; une feature
 choisie, « Par lot » : passages, temps, tokens et essais de chaque lot. Les tableaux se
 trient sur chaque colonne. « ≈ 4 % de la fenêtre 5 h » : l'écart entre
 la mesure du début du run et celle de sa fin — les limites comptent tout
@@ -387,6 +389,18 @@ d'autorisation apparaît en bandeau sur tous les écrans : « Autoriser » ou
 « Refuser » ; la commande attend votre clic. « Arrêter maintenant »
 interrompt le tour en cours. « Arrêter au prochain lot » (sur `/8_code`
 seulement) écrit `stop.md` ; « Retirer stop.md » le renomme `stop1.md`.
+
+**Lots à coder** (1.9.1) — à côté du bouton de l'étape « Coder les lots »,
+et dans « Chaîne → Code » : combien de lots `/8_code` code d'affilée, 1 par
+défaut, au plus les lots pas encore faits quand le cockpit les connaît. À
+1, la commande part telle quelle (`/8_code <feature>`) ; au-dessus, avec
+le nombre (`/8_code <feature> 3`). « Arrêter au prochain lot » arrête
+alors après le lot en cours.
+
+**Les journaux** (1.9.1) — partout où le chemin du journal d'un run ou
+d'un déploiement s'affiche (le flux, « Fin du run », « Derniers runs »,
+un run ouvert dans « Statistiques », « Sortie complète »), c'est un lien :
+il ouvre son dossier sur cet ordinateur, le fichier sélectionné.
 
 Quand un agent rend la main, une ligne dit ce qu'il a consommé :
 « Lexicographe — 4 min 12 s — 182 k lus (dont 160 k en cache), écrits :

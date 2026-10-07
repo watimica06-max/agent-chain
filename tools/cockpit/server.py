@@ -42,7 +42,7 @@ HOST = "127.0.0.1"
 STATE_KEY = web.AppKey("state", State)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.8"
+VERSION = "1.9.1"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -456,6 +456,24 @@ def ask_idea_file(initial):
     finally:
         root.destroy()
     return os.path.normpath(path) if path else ""
+
+
+def reveal(path, select=False):
+    """The file explorer of this computer on `path` — its folder, the file
+    selected, when `select`. Never runs the file."""
+    if sys.platform == "win32":
+        cmd = f'explorer /select,"{path}"' if select else f'explorer "{path}"'
+    elif sys.platform == "darwin":
+        cmd = ["open", "-R", path] if select else ["open", path]
+    else:
+        cmd = ["xdg-open", os.path.dirname(path) if select else path]
+    subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+# What opens a folder; the tests put a recorder here, so that no test opens
+# a window on this computer.
+REVEAL = reveal
+LOG_EXTENSIONS = (".jsonl", ".log")
 
 
 def ask_export_folder(initial):
@@ -1371,7 +1389,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             "head": head, "run": {"prompt": x.prompt, "started_at": x.started_at} if x else None,
             "job": dep.job_for(a),
             "elsewhere": {"app_name": j.app_name} if j and deploy_mod.app_key(j.app) != deploy_mod.app_key(a) else None,
-            "choice": state.deploy_choice(a), "logs_dir": rn.log_dir})
+            "choice": state.deploy_choice(a)})
 
     async def deploy_destinations(request):
         a = deploy_app()
@@ -1483,6 +1501,32 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     async def deploy_cleanup(_app):
         dep.stop_all()
 
+    async def reveal_log(request):
+        """1.9.1: a log's path is a link — its folder opens on this computer,
+        the file selected. A log only: an existing .jsonl or .log file."""
+        data = await body(request)
+        given = str(data.get("path") or "")
+        p = os.path.normpath(given) if given else ""
+        if not p.lower().endswith(LOG_EXTENSIONS):
+            return web.json_response({"error": f"ce n'est pas un journal : {given or '(vide)'}"}, status=400)
+        if not os.path.isfile(p):
+            return web.json_response({"error": f"le journal n'existe plus : {p}"}, status=404)
+        try:
+            REVEAL(p, True)
+        except OSError as e:
+            return web.json_response({"error": f"le dossier n'a pas pu s'ouvrir ({e})"}, status=500)
+        return web.json_response({"ok": True})
+
+    async def open_logs(request):
+        """« Statistiques » → « Journaux bruts »: the logs folder — the runs',
+        the deploys', server.log and next-ecarte.jsonl are all there."""
+        try:
+            os.makedirs(rn.log_dir, exist_ok=True)
+            REVEAL(os.path.normpath(rn.log_dir), False)
+        except OSError as e:
+            return web.json_response({"error": f"le dossier n'a pas pu s'ouvrir ({e})"}, status=500)
+        return web.json_response({"ok": True, "path": rn.log_dir})
+
     async def ping(request):
         """What a second start asks before starting a server of its own."""
         return web.json_response({"cockpit": True, "version": VERSION, "pid": os.getpid()})
@@ -1513,6 +1557,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r = app.router
     r.add_get("/", index)
     r.add_get("/api/ping", ping)
+    r.add_post("/api/reveal-log", reveal_log)
+    r.add_post("/api/open-logs", open_logs)
     r.add_post("/api/shutdown", shutdown)
     r.add_get("/api/state", get_state)
     r.add_post("/api/check", check)

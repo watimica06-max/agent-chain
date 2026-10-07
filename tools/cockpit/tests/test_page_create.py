@@ -125,3 +125,39 @@ def test_no_provide_card_without_conventions(tmp_path, page, chain_root):
         page.wait_for_selector("#step-main-test")
         assert page.locator("#step-main-test").get_by_role("button", name="Déployer").count() == 1
         assert no_real_errors(page) == []
+
+
+def test_a_typed_parent_is_kept_when_the_default_comes_back(tmp_path, page, chain_root, idea):
+    """1.9.1: the default parent goes only into a field still empty and
+    untouched. Its request held back until a folder is typed: the typed
+    folder stays. Untouched, the field gets the default — in a test, a
+    temporary folder (conftest), never the real one."""
+    held, holding = [], {"on": True}
+
+    def hold(route):
+        if holding["on"] and route.request.method == "GET":
+            held.append(route)
+        else:
+            route.continue_()
+    with FakeServer(tmp_path / "s", file_picker=lambda initial: str(idea)) as s:
+        page.route("**/api/create", hold)
+        open_form(page, s)
+        typed = str(tmp_path / "dev")
+        page.locator("#nf-parent").fill(typed)
+        for _ in range(100):
+            if held:
+                break
+            page.wait_for_timeout(50)
+        assert held
+        holding["on"] = False
+        for r in held:
+            r.continue_()
+        page.wait_for_timeout(500)
+        assert page.locator("#nf-parent").input_value() == typed
+        # A fresh page, the field untouched: the default.
+        page.goto("about:blank")
+        open_form(page, s)
+        page.wait_for_function("document.getElementById('nf-parent').value !== ''")
+        assert page.locator("#nf-parent").input_value() == create.default_parent()
+        assert str(tmp_path.parent) in create.default_parent() or "parent-par-defaut" in create.default_parent()
+        assert no_real_errors(page) == []

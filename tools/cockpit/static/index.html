@@ -272,6 +272,10 @@ button.chip:hover { border-color: var(--accent); }
 .runs td { padding: 10px 10px 10px 0; border-top: 1px solid var(--line); vertical-align: top; }
 .runs td.cmd { font-family: var(--mono); font-size: 14px; white-space: nowrap; }
 .runs td.log { font-family: var(--mono); font-size: 12px; color: var(--soft); word-break: break-all; }
+a.loglink { color: var(--accent); text-decoration: underline; word-break: break-all; cursor: pointer; }
+#st-logs { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding-bottom: 8px; }
+.lots-n { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--soft); white-space: nowrap; }
+.lots-n input { width: 64px; min-height: 36px; padding: 2px 6px; font-size: 15px; }
 details summary { cursor: pointer; color: var(--accent); margin-top: 10px; }
 details pre { max-height: 360px; overflow: auto; background: var(--bg); padding: 12px; border-radius: 8px; }
 .whybox { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 10px; font-size: 15px; }
@@ -961,6 +965,9 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       <div class="st-sec" id="st-history"><h3>Historique des runs</h3>
         <div class="sub">Le plus récent d'abord. Un clic ouvre ses passages d'agent et le chemin de son journal.</div>
         <div id="st-history-table"></div></div>
+      <!-- 1.9.1: the raw logs — the runs', the deploys', server.log and next-ecarte.jsonl share one folder. -->
+      <div class="st-sec" id="st-logs"><b>Journaux bruts</b><span class="mono small muted" id="st-logs-dir"></span>
+        <button id="st-logs-open" class="small" title="Les runs, les déploiements, server.log et next-ecarte.jsonl">Ouvrir le dossier</button></div>
     </section>
 
     <!-- ============================ Paramètres ============================ -->
@@ -1037,6 +1044,13 @@ const el = (tag, attrs = {}, ...kids) => {
   return n;
 };
 const plural = (n, one, many) => `${n} ${n > 1 ? many : one}`;
+// 1.9.1: a log's path is a link — its folder opens on this computer, the
+// file selected.
+function logLink(path, cls) {
+  return el("a", {href: "#", class: "loglink" + (cls ? " " + cls : ""), text: path, title: "Ouvrir son dossier, le fichier sélectionné",
+    onclick: async (e) => { e.preventDefault(); e.stopPropagation();
+      try { await api("/api/reveal-log", {path}); } catch (err) { alert(err.message); } }});
+}
 
 // ------------------------------------------------ consumption (1.4)
 const frNum = (x, d) => x.toLocaleString("fr-FR", {maximumFractionDigits: d, minimumFractionDigits: 0});
@@ -1154,6 +1168,7 @@ let S = {};          // /api/state
 let F = null;        // /api/forms
 let seen = 0;        // last event seq
 let es = null;
+let quitting = false;         // 1.9.1: « Arrêter le cockpit » asked — the page never reconnects nor refreshes
 let answerFilter = "all";     // all | questions | blocking
 let stepFilter = null;        // {step, chain, name} — « À répondre » filtered on one step
 let savedCount = 0;           // entries saved since the page opened
@@ -1299,8 +1314,11 @@ function nfForm() { const f = {}; for (const k of NF_FIELDS) f[k] = $("nf-" + k)
 async function openNewApp() {
   $("new-app").classList.remove("hidden"); $("apps-add").classList.add("hidden");
   $("main").scrollTo(0, 0);
-  if (!$("nf-parent").value) {
-    try { const r = await api("/api/create"); $("nf-parent").value = r.default_parent || ""; } catch (e) { /* typed by hand */ }
+  // 1.9.1: the default goes only into a field still empty and never touched
+  // — the request may come back after she typed or picked one.
+  const untouched = () => !$("nf-parent").value && !NF.touched.has("parent");
+  if (untouched()) {
+    try { const r = await api("/api/create"); if (untouched()) $("nf-parent").value = r.default_parent || ""; } catch (e) { /* typed by hand */ }
   }
   $("nf-name").focus();
   nfCheck();
@@ -1720,13 +1738,18 @@ async function openPair(app, work) {
 // The first state of the page, the button and a save of answers are scan
 // triggers: the server re-checks the stored Next: against the files (§2.3).
 async function refreshState(reason) {
+  if (quitting) return;
   if (!opened || reason) {
     const probe = await api("/api/state");
+    if (quitting) return;
     if (probe.open) { S = await api("/api/check", {reason: reason || "ouverture"}); opened = true; }
     else S = probe;
   } else {
     S = await api("/api/state");
   }
+  // A refresh that comes back once the stop was asked changes nothing: it
+  // would reopen the stream, and the stop screen would go.
+  if (quitting) return;
   // Drafts are the active application's (1.6): read once its folder is known.
   if (!draftsLoaded) { loadDrafts(); draftsLoaded = true; } else swapDrafts();
   // 1.6: the stream is every run's, whatever its application — open even
@@ -2002,7 +2025,7 @@ function renderHistory() {
       el("td", {class: "small", text: (r.at || "").slice(11, 16) || "—"}),
       el("td", {class: "small", text: (r.next && r.next.raw) || (r.next && r.next.french) || "pas de ligne Next:"}),
       el("td", {class: "small", text: r.usage ? usageText(r.usage) : "—"}),
-      el("td", {class: "log", text: r.log_path || "—"})));
+      el("td", {class: "log"}, r.log_path ? logLink(r.log_path) : "—")));
   }
   box.append(el("table", {class: "runs"},
     el("thead", {}, el("tr", {}, el("th", {text: "Commande"}), el("th", {text: "Fin"}), el("th", {text: "Next"}),
@@ -2058,8 +2081,35 @@ function isNamed(step, chain) {
 }
 function argsFor(step, chain) {
   const d = S.decision;
-  if (d && d.next && d.next.command === step.command && (d.chain || "main") === chain && d.next.args) return d.next.args;
-  return step.command === "deploie" ? "" : S.feature;
+  let args = d && d.next && d.next.command === step.command && (d.chain || "main") === chain && d.next.args ? d.next.args
+    : step.command === "deploie" ? "" : S.feature;
+  // 1.9.1: « Lots à coder » — /8_code's second argument, only above 1; with 1 the line is as it was.
+  const n = step.command === "8_code" ? lotsToCode(chain) : 1;
+  if (n > 1) args = `${args.trim().split(/\s+/)[0]} ${n}`;
+  return args;
+}
+
+// « Lots à coder » (1.9.1): how many lots /8_code codes (8_code.md:19-20),
+// one by default, at most the lots not yet done when the cockpit knows them.
+const LOTS_N = {};          // chain -> the number typed
+function lotsLeft(chain) {
+  const c = CODE[chain];
+  if (c && c.exists && c.total) return c.total - c.passed;
+  const s = findStep(chain, "8_code");
+  return s && s.lots ? s.lots.total - s.lots.pass : null;
+}
+function lotsToCode(chain) {
+  const n = Math.max(1, parseInt(LOTS_N[chain], 10) || 1), left = lotsLeft(chain);
+  return left > 0 ? Math.min(n, left) : n;
+}
+function lotsField(chain, id, disabled) {
+  const left = lotsLeft(chain);
+  const input = el("input", {type: "number", id, min: 1, max: left > 0 ? left : undefined, step: 1, value: lotsToCode(chain),
+    disabled: disabled || undefined, "aria-label": "Lots à coder",
+    oninput: () => { LOTS_N[chain] = input.value; },
+    onchange: () => { LOTS_N[chain] = input.value; input.value = lotsToCode(chain); }});
+  return el("label", {class: "lots-n", title: left > 0 ? `Au plus ${plural(left, "lot", "lots")} pas encore fait${left > 1 ? "s" : ""}` : "Un lot par défaut"},
+    "Lots à coder", input);
 }
 async function launchStep(step, chain) {
   if (!step || anyRun()) { if (elsewhere()) alert(busyNote()); return; }
@@ -2143,6 +2193,7 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     const waiting = openCountFor(s.id, chain === "main" ? "main" : chain);
     if (s.state === "t'attend" || waiting) acts.append(el("button", {class: s.state === "t'attend" ? "primary" : "",
       text: `Répondre (${waiting})`, onclick: () => openAnswers(s.id, chain)}));
+    if (s.command === "8_code") acts.append(lotsField(chain, `lots-n-${chain}`, !launchable || anyRun()));
     if (s.command && s.id !== "test") acts.append(el("button", {class: isNext && d.next && d.next.kind === "run" ? "primary" : "",
       text: "Lancer", disabled: !launchable || anyRun() || undefined, title: elsewhere() ? busyNote() : launchable ? `/${s.command}` : offNote,
       onclick: () => launchStep(s, chain)}));
@@ -2836,7 +2887,7 @@ function renderRunEnd() {
   if (run.usage) b.append(el("div", {class: "run-total", id: "run-total"}, el("b", {text: "Total du run — "}), usageText(run.usage)));
   else b.append(el("div", {class: "run-total muted", id: "run-total", text: "Total du run : aucun message de résultat, la consommation n'est pas connue."}));
   for (const p of run.passes || []) b.append(el("div", {class: "muted small", text: `${agentName(p.agent)} — ${usageText(p)}`}));
-  if (run.log_path) b.append(el("div", {class: "muted small", text: "Journal brut : " + run.log_path}));
+  if (run.log_path) b.append(el("div", {class: "muted small"}, "Journal brut : ", logLink(run.log_path)));
   const wts = run.worktrees_left || [];
   if (wts.length) b.append(el("div", {class: "notice warn"}, el("div", {text: `Worktree${wts.length > 1 ? "s" : ""} resté${wts.length > 1 ? "s" : ""} en place :`}),
     ...wts.map((p) => el("div", {class: "small mono", text: p}))));
@@ -2954,7 +3005,8 @@ function renderEvent(ev) {
     case "limits_unavailable":
       streamAppend(el("div", {class: "sys", text: `Usage non remesuré en fin de run : ${d.reason}. Les jauges gardent leur dernière mesure, avec son âge.`})); break;
     case "run_ended":
-      streamAppend(el("div", {class: "sys", text: `■ Fin : ${d.outcome}${d.error ? " — " + d.error : ""}${d.log_path ? " — journal : " + d.log_path : ""}`})); break;
+      streamAppend(el("div", {class: "sys"}, `■ Fin : ${d.outcome}${d.error ? " — " + d.error : ""}`,
+        d.log_path ? [" — journal : ", logLink(d.log_path)] : null)); break;
   }
 }
 
@@ -3059,13 +3111,14 @@ function otherAppEvent(ev) {
 
 let offline = false;
 function openEvents() {
-  if (es) return;
+  if (es || quitting) return;
   es = new EventSource("/api/events");
   es.onmessage = (m) => { try { onEvent(JSON.parse(m.data)); } catch (e) { console.error(e); } };
   // Each connection starts with the run's stream so far, rebuilt from its
   // log (1.5): the page starts afresh, and the server's sequence with it.
-  es.onopen = () => { seen = 0; $("stream").replaceChildren(); if (offline) { offline = false; $("stopped").classList.add("hidden"); refreshState().catch(() => {}); } };
+  es.onopen = () => { if (quitting) return; seen = 0; $("stream").replaceChildren(); if (offline) { offline = false; $("stopped").classList.add("hidden"); refreshState().catch(() => {}); } };
   es.onerror = async () => {
+    if (quitting) return;
     // The server gone: the stopped page; EventSource keeps trying, and the
     // page comes back by itself when the cockpit is started again.
     try { await fetch("/api/ping"); } catch (e) { showStopped(false); }
@@ -3220,7 +3273,8 @@ function renderCode(box, chain) {
   const acts = el("div", {class: "code-actions"});
   if (here) {
     const step = findStep(chain, "8_code");
-    if (!anyRun()) acts.append(el("button", {class: "primary", text: "Lancer /8_code", onclick: () => launchStep(step, chain)}));
+    if (!anyRun()) acts.append(lotsField(chain, `code-lots-n-${chain}`),
+      el("button", {class: "primary", text: "Lancer /8_code", onclick: () => launchStep(step, chain)}));
     if (mine) {
       acts.append(el("button", {class: "stopnext", text: S.stop_file ? "stop.md posé : arrêt après ce lot" : "Arrêter au prochain lot",
         disabled: S.stop_file || undefined, onclick: async () => { try { await api("/api/stop-next-lot", {}); await refreshState(); loadCode(chain); } catch (e) { alert(e.message); } }}));
@@ -3405,11 +3459,14 @@ $("btn-quit").onclick = async () => {
     return {status: x.status, body};
   };
   try {
+    quitting = true;
     let r = await post({});
     if (r.status === 409 && r.body.running) {
       // A run goes: it asks, and says the run will be stopped.
+      quitting = false;
       if (!confirm(`Une commande tourne : ${r.body.prompt}.\n\nArrêter le cockpit l'arrête maintenant, comme « Arrêter maintenant » : son tour s'arrête inachevé, et son worktree peut rester.\n\nArrêter le cockpit ?`)) { b.disabled = false; return; }
       $("quit-msg").textContent = "Arrêt du run, puis du cockpit… (jusqu'à 30 s)";
+      quitting = true;
       r = await post({confirm: true});
     }
     if (r.status !== 200) throw new Error(r.body.error || `erreur ${r.status}`);
@@ -3418,7 +3475,7 @@ $("btn-quit").onclick = async () => {
     showStopped(true);
     $("stopped-text").textContent = (r.stopped && r.stopped.length ? `Le run ${r.stopped.map((x) => x.prompt).join(", ")} a été arrêté. ` : "") +
       "Pour le rouvrir : le raccourci du bureau (lancer.bat), puis rechargez cette page.";
-  } catch (e) { alert(e.message); b.disabled = false; }
+  } catch (e) { quitting = false; alert(e.message); b.disabled = false; }
 };
 
 // ============================================================ paramètres
@@ -3846,7 +3903,7 @@ function jobCard(j) {
     if (s.status === "échec" && (s.tail || []).length) li.append(el("pre", {text: s.tail.join("\n")}));
     return li;
   })));
-  card.append(el("div", {class: "muted small", style: "margin-top:8px"}, "Sortie complète : ", el("span", {class: "mono", text: j.log_path})));
+  card.append(el("div", {class: "muted small", style: "margin-top:8px"}, "Sortie complète : ", logLink(j.log_path, "mono")));
   return card;
 }
 
@@ -4192,7 +4249,9 @@ function renderStats() {
   renderStTiles();
   renderStChart();
   renderStTables();
+  $("st-logs-dir").textContent = S.logs_dir || "";
 }
+$("st-logs-open").onclick = async () => { try { await api("/api/open-logs", {}); } catch (e) { alert(e.message); } };
 
 function tile(label, value, ...sub) {
   return el("div", {class: "tile"}, el("div", {class: "tl", text: label}), el("div", {class: "tv", text: value}),
@@ -4200,6 +4259,7 @@ function tile(label, value, ...sub) {
 }
 function renderStTiles() {
   const t = ST.totals, box = $("st-tiles"); box.replaceChildren();
+  box.dataset.period = ST.period;           // the period of the data shown, not of the button pressed
   const dont = (n, one, many) => n ? `dont ${plural(n, one, many)}` : null;
   const share = t.read_tokens ? Math.round(100 * t.cache_read_tokens / t.read_tokens) : null;
   box.append(
@@ -4455,7 +4515,8 @@ function runDetail(r) {
   };
   const passes = r.passes || [];
   return el("div", {class: "st-detail"},
-    el("div", {class: "row"}, el("b", {text: "Journal"}), el("span", {class: "mono small", text: r.log_path || "inconnu"})),
+    el("div", {class: "row"}, el("b", {text: "Journal"}),
+      r.log_path ? logLink(r.log_path, "mono small") : el("span", {class: "mono small", text: "inconnu"})),
     lim(WIN[0]), lim(WIN[1]),
     el("div", {class: "row muted small"}, `Fin : ${fmtDate(r.ended_at)} · lus ${fmtTok(r.read_tokens)}` +
       (r.read_tokens ? ` (dont ${fmtTok(r.cache_read_tokens)} en cache)` : "") +

@@ -263,3 +263,40 @@ def test_an_ignored_folder_is_never_shown(tmp_path):
         r = await post(c, "/api/ignored", {"ignored": "f"})
         assert r.status == 400
     with_client(tmp_path, body)
+
+
+def test_a_log_opens_its_folder_and_the_logs_folder(tmp_path, revealed):
+    """1.9.1: a log's path opens its folder, the file selected; « Journaux
+    bruts » opens the logs folder. Only an existing log: never another file,
+    and nothing is run. The window is a recorder here."""
+    log = tmp_path / "w" / "2026-10-07-101010-1_lexique.jsonl"
+    log.parent.mkdir()
+    log.write_text("{}\n", encoding="utf-8")
+    (tmp_path / "w" / "lancer.bat").write_text("echo\n", encoding="utf-8")
+
+    async def body(c, app_root, feat, rn):
+        r = await post(c, "/api/reveal-log", {"path": str(log)})
+        assert r.status == 200
+        assert revealed == [(os.path.normpath(str(log)), True)]
+        r = await post(c, "/api/reveal-log", {"path": str(tmp_path / "w" / "lancer.bat")})
+        assert r.status == 400 and "pas un journal" in (await r.json())["error"]
+        r = await post(c, "/api/reveal-log", {"path": str(tmp_path / "w" / "parti.jsonl")})
+        assert r.status == 404 and "n'existe plus" in (await r.json())["error"]
+        r = await post(c, "/api/reveal-log", {})
+        assert r.status == 400
+        assert len(revealed) == 1
+        r = await post(c, "/api/open-logs", {})
+        assert r.status == 200
+        assert revealed[1] == (os.path.normpath(rn.log_dir), False)
+        s = await (await c.get("/api/state")).json()
+        assert s["logs_dir"] == rn.log_dir
+    with_client(tmp_path, body)
+
+
+def test_the_scan_no_longer_times_itself(tmp_path):
+    """1.9.1: the scan's duration was read by nothing — gone."""
+    async def body(c, app_root, feat, rn):
+        await open_pair(c, app_root)
+        s = await (await c.get("/api/state")).json()
+        assert s["scan"] and "took_ms" not in s["scan"]
+    with_client(tmp_path, body)

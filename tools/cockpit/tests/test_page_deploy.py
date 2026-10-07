@@ -3,6 +3,7 @@ Playwright): the three tabs, a device renamed, the Wi-Fi form, a deploy's
 progress, a crash in the journal, only the declared actions, Paramètres →
 Déploiement. adb is a fake (tests/fakeadb.py); no real device is touched and
 no chain command runs. Skipped when Playwright or Edge is missing."""
+import os
 import sys
 
 import pytest
@@ -112,7 +113,7 @@ def test_the_wifi_form(tmp_path, page, fa):
         assert [e for e in no_real_errors(page) if "status of 409" not in e] == []
 
 
-def test_a_deploys_progress(tmp_path, page, fa):
+def test_a_deploys_progress(tmp_path, page, fa, revealed):
     with FakeServer(tmp_path / "s") as s:
         t = hyrox_targets(fa)
         t[0]["build"] = f'{PY} -c "import time; print(\'BUILD\'); time.sleep(2)"'
@@ -138,6 +139,11 @@ def test_a_deploys_progress(tmp_path, page, fa):
         assert job.locator("li.done").count() == 3
         assert "Téléphone — Installer sur SM-S928B" in job.inner_text()
         assert "réussi" in job.inner_text() and "deploy-" in job.inner_text()
+        # 1.9.1: « Sortie complète » is a link — its folder opens, the file selected.
+        out = job.locator("a.loglink")
+        out.click()
+        page.wait_for_timeout(300)
+        assert revealed == [(os.path.normpath(out.inner_text()), True)]
         # A failure shows the end of its output.
         fa.update(lambda st: st.update(install_fails=[HYROX_PHONE]))
         page.get_by_role("button", name="Construire et installer").click()
