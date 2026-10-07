@@ -204,7 +204,7 @@ def turn_folder(tmp_path, root_files=(), markers=True, filed_sondeur=True):
 
 
 @pytest.mark.parametrize("root,expect", [
-    # After /2_structure: the Rédacteur's file at the root (agents/redacteur.md:275).
+    # After /2_structure: the Rédacteur's file at the root (agents/redacteur.md:301).
     (["questions-redacteur-02.md"], {"2_structure": F, "3_decoupe": AF, "3a_genre": AF, "3b_nature": AF}),
     # After /3_decoupe: it filed that file (3_decoupe.md:66-69) — the root is empty.
     ([], {"2_structure": F, "3_decoupe": F, "3a_genre": AF, "3b_nature": AF}),

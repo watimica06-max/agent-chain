@@ -184,6 +184,24 @@ Product Owner writes by hand what a sondeur had already founded.**
 kept question keeps its own `Options:` block, or has none.** ⚠️ **Never
 moved or merged between questions.**
 
+🔴 **A question may also carry a `Folder:` line**, between `Block:` and
+`Question:` — 📌 **it asks for a file, and names the folder the file
+goes to** (`.claude/formats/donnees.md` §5):
+
+    ### Q4
+    Block: B9
+    Folder: docs/features/<feature>/donnees/
+    Question: <what is missing, stated directly>
+    Answer:
+
+📌 **Part of the shape too** — ⚠️ **you copy it as you copy the rest**:
+🔴 **you never write one, never remove one, never judge one.**
+
+🔴 **It travels like `Défaut:`** — 📌 **the kept question keeps its own
+`Folder:` line, or has none**, ⚠️ **and a `Folder:` on the one you would
+drop keeps both**: 🔴 **dropped, the file would be asked for in text**,
+and nothing would offer to join it.
+
 📌 **An empty file is a file with no `### Q` and no prose** — 🔴 **that
 one test, and nothing more**: ⚠️ **the zero-byte file a sondeur writes
 when it found nothing passes it.**
@@ -298,7 +316,8 @@ in the feature folder.
     Answer:
 
 📌 **The `Défaut:` line travels with its question**, copied like the
-rest — 📌 **and so does the `Options:` block**, word for word.
+rest — 📌 **and so do the `Options:` block and the `Folder:` line**,
+word for word.
 
 🔴 **Numbering restarts at `Q1`**, in the order of the `Block:` lines —
 📌 **identifier order**, and for a multi-block question its first

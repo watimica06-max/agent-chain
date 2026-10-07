@@ -118,6 +118,36 @@ outside its own output?**
 🔴 **A block that says nothing rules nothing out** — silence answers
 it, and is never a gap. 📌 **It feeds `B1.8`.**
 
+## What it takes from files
+
+🔴 **Both asked of every block, whatever its nature.** 📌 **The two
+indexes are `.claude/formats/donnees.md`'s** — ⚠️ **an index is not
+another block**, and reading one leaves the block standing alone.
+
+🔴 **A question either raises asks for a file** — 📌 **it carries the
+`Folder:` line of `.claude/formats/donnees.md` §5**, naming the folder
+below.
+
+**`A1.10` Does it consume data whose structure is decided outside the
+application?**
+Another service, a site, a device, a file or a text the user brings.
+
+📌 **If so — one real instance of it, copied unaltered, as a file in
+the feature's `donnees/`.** 🔴 **Settled when the block names a file
+the feature's index holds**; ⚠️ **anything else is open** — a file the
+block names and the index does not, a format described in prose alone.
+
+**`A1.11` Does it use files the application ships?**
+A set of images, a table the application carries with it.
+
+📌 **If so — the files themselves, in the application's
+`docs/donnees/`.** 🔴 **Settled when the block names each of them, and
+the application's index holds each one.**
+
+⚠️ **A table whose values the block writes out is `A3.1`'s, not this
+one's** — 📌 **one fact, one place**: the values live in the block, or
+in a file, never both.
+
 ---
 
 # A2 — Make the block codable
@@ -132,7 +162,7 @@ it, and is never a gap. 📌 **It feeds `B1.8`.**
 | persistence | **1** Stored or recomputed? · **2** 🔴 If something can be stored incomplete: what does it hold then — the absence, or an empty value? · **3** How long does it live, and what becomes of it after? |
 | calculation | **1** Inputs, output, rule for each case? · **2** And when an input is missing? · **3** What values can its output take, and which are acceptable? 🔴 See below |
 | transition | **1** What event triggers it? · **2** What states exist, reachable from which? 🔴 See exhaustiveness below |
-| external exchange | **1** What if it fails, is unavailable, returns invalid data — on the way in or out? · **2** 🔴 What makes two incoming things the same one — and what happens to the second? · **3** When it reads data whose structure another system decides: one real instance of it, copied unaltered? |
+| external exchange | **1** What if it fails, is unavailable, returns invalid data — on the way in or out? · **2** 🔴 What makes two incoming things the same one — and what happens to the second? 📌 Its real instance is `A1.10`'s |
 | synchronisation | **1** Rule when two versions diverge? · **2** What the user sees during, and on failure? · **3** 🔴 What identifies one same thing seen from both sides? And to which changes does a mirrored copy update — the list being closed |
 | presentation | **1** What is shown or told, where, what each action does? · **2** What is shown with no data, loading, on failure? · **3** 🔴 What the user has in progress on this view is kept when they leave and come back, or lost — say which, for each thing they can have in progress · **4** Conditions for moving on to the next view? · **5** What if the user goes back, or abandons? |
 | access | **1** Who sees, who changes? · **2** What does someone who cannot? |
@@ -170,6 +200,9 @@ line** — ⚠️ **a section skipped in silence and a section that does not
 apply read the same.**
 
 **`A3.1` What values, exactly?** 🔴 All of them, not a sample.
+📌 **Written in the block** — ⚠️ **a block whose values are a file the
+application ships is `A1.11`'s**, and this question asks nothing more
+of it.
 
 **`A3.2` Who consults them?**
 

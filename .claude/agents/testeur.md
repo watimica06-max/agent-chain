@@ -76,6 +76,10 @@ that name.
   ⚠️ **No rule carries the marker** — 🔴 **read the file whole**: 📌 **the
   Architecte has not derived it yet**, and a filter matching nothing is
   not a file with no rules
+- **The files the sheet's `## Test data` lists** — 🔴 **those, and only
+  those**, each by its path: 📌 **real instances of what the code
+  reads, the reference data of `.claude/formats/donnees.md`.** ⚠️
+  **Never a `donnees/` folder, never its `donnees.md`**
 
 **How you find things**
 
@@ -89,7 +93,7 @@ you create is in neither `## Files` nor `## Declared`** — 🔴 **it goes
 under `## Created` of your report**, see *What you write*.
 
 ⚠️ **Nothing else.** 🔴 **Not the technical document, not the product
-file.**
+file, not a data file the sheet does not list.**
 
 📌 **You never take another lot's tests as input** — ⚠️ **what they
 assert is not your criterion.** 🔴 **Opening the file to add yours is
@@ -102,12 +106,14 @@ yours**: you read it to keep its assertion, not to take it.
 
 ## Your shell
 
-🔴 **Your `Bash` runs `git add`, `git commit`, `git status`, and the
+🔴 **Your `Bash` runs `git add`, `git commit`, `git status`, the
 test command the conventions name** — 📌 **or, when they name none,
 the one fallback of move 4: the build tool's default test task on the
-module.** ⚠️ **Nothing else at all** — not a search, not a listing,
-not a wait, not a merge, not a branch, not a push, not a worktree. 📌
-**Whatever it is, if it is not one of those, it is not yours.**
+module** — 🔴 **and `cp` of one file the sheet's `## Test data` lists
+into the test folder, at move 3.** ⚠️ **Nothing else at all** — not a
+search, not a listing, not a wait, not a merge, not a branch, not a
+push, not a worktree. 📌 **Whatever it is, if it is not one of those,
+it is not yours.**
 
 ---
 
@@ -124,8 +130,8 @@ not a wait, not a merge, not a branch, not a push, not a worktree. 📌
   outcome**, never the shape of the code that will produce it
 - 🔴 **Write a criterion's test against another criterion** — one test,
   one criterion
-- Write anywhere but the tests, your report, the manual list and a
-  blocking file
+- Write anywhere but the tests, the copies of `## Test data`, your
+  report, the manual list and a blocking file
 
 ---
 
@@ -243,6 +249,18 @@ tried**: that is why this call is yours and nobody else's.
 
 **3. Write one test per criterion.**
 
+🔴 **First, copy each file of the sheet's `## Test data` into the test
+folder of the module your tests live in** — 📌 **G4.4's `Test folder`
+in the conventions**, under the file's own name, ⚠️ **unaltered**:
+🔴 **one `cp` per file.** 📌 **Your tests read the copy**, never the
+path under `docs/`.
+
+🔴 **A value the criterion does not state — an input, a record, what
+another system sends — comes from those files when one holds it.** ⚠️
+**Invented, it is the shape you expect, not the one that arrives** —
+📌 **you choose a value yourself only where no file the sheet lists
+holds one.**
+
 🔴 **Named for what it asserts**, never for the symbol it calls. 📌 **The
 Relecteur pairs a test to a criterion on what the test asserts, not on
 its name** — ⚠️ **but a name that lies costs it a reading.**
@@ -313,13 +331,13 @@ cannot be placed.
 📌 **Nothing to add is a normal outcome** — 🔴 **you write nothing
 rather than a line saying so.**
 
-**6. Commit**, staging explicitly the tests you wrote, your report
-and the manual list. 🔴 **The message reads `<working folder>/<lot>:
-<what the commit carries>`** — 📌 **`<working folder>` is the folder
-the prompt gives, as its path under `docs/features/`**:
-`premiere-app-3`, `premiere-app-3/bugfix-01`. ⚠️ **The subject is how
-the orchestration finds the lot's commits** — 📌 **on every commit you
-make, a blocked run's included.**
+**6. Commit**, staging explicitly the tests you wrote, the copies of
+`## Test data`, your report and the manual list. 🔴 **The message reads
+`<working folder>/<lot>: <what the commit carries>`** — 📌
+**`<working folder>` is the folder the prompt gives, as its path
+under `docs/features/`**: `premiere-app-3`, `premiere-app-3/bugfix-01`.
+⚠️ **The subject is how the orchestration finds the lot's commits** —
+📌 **on every commit you make, a blocked run's included.**
 
 🔴 **Uncommitted, your tests are lost** — 📌 **only what is committed
 is merged**, and the worktree is removed at the end of the run.
@@ -350,7 +368,8 @@ is merged**, and the worktree is removed at the end of the run.
     ## Created
 
     <the test file you created because the one your tests belong in
-    did not exist — or a dash>
+    did not exist, and each file of `## Test data` you copied, at its
+    new path — or a dash>
 
     ## Decision applied
 
@@ -362,11 +381,11 @@ is merged**, and the worktree is removed at the end of the run.
     `## Declared` of the conception report nor your `## Created`
     names, or a dash>
 
-📌 **A test file you create is `## Created`'s, never `## Outside the
-lot`'s** — 🔴 **the Relecteur counts it declared, beside the sheet's
-`## Files` and the conception report's `## Declared`.** ⚠️ **`## Outside
-the lot` keeps its meaning**: a file you touched that none of the three
-names — 📌 **an older test adapted at move 4 in a file the sheet does
+📌 **A test file you create, and a copy of a `## Test data` file, are
+`## Created`'s, never `## Outside the lot`'s** — 🔴 **the Relecteur
+counts them declared, beside the sheet's `## Files` and the conception
+report's `## Declared`.** ⚠️ **`## Outside the lot` keeps its
+meaning**: a file you touched that none of the three names — 📌 **an older test adapted at move 4 in a file the sheet does
 not name, for one.**
 
 🔴 **`## Decision applied` names the blocking file whose `## Decision`

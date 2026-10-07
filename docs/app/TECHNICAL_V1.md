@@ -228,7 +228,7 @@ nothing about how the chain reads the Product Owner's answers.
 
 ```
 ### Q<n>
-<Key>: <value>              ← as today (Block:, Terms:, Entries:, Kind:)
+<Key>: <value>              ← as today (Block:, Terms:, Entries:, Kind:, Folder:)
 Question: <text, in English, may run over several lines>
 Options:
 - <first proposal, a full sentence, in French>
@@ -244,6 +244,12 @@ Answer:
   rule. The question stays in English.
 - **No option opens on a number and a dot** (`1.`, `2.`): see §8.2,
   shape 4.
+- **`Folder:`** (the chain, 2026-10-07) — a `Key: value` line between
+  `Block:` and `Question:`, on a question whose answer is a file: the
+  folder the file goes to, `docs/features/<name>/donnees/` or
+  `docs/donnees/` (`.claude/formats/donnees.md` §5). The parser reads it
+  as a context line, like the others; « Joindre un fichier » on it is
+  not built yet.
 - **`Défaut:` keeps its present form.** Its text before ` — ` repeats
   one option verbatim; what follows ` — ` is its source, unchanged.
 

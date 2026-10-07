@@ -23,22 +23,22 @@ relative to `.claude/`.
 | Fixture | Template |
 |---|---|
 | `hand/questions-classeur-01.md` | agents/classeur.md:147-153 |
-| `hand/questions-redacteur-01.md` | agents/redacteur.md:288-294 — Q1 answered over several lines, as the writer writes it |
-| `hand/questions-sondeur-02.md` | agents/sondeur.md:394-421 — `Options:`, `Défaut:` |
+| `hand/questions-redacteur-01.md` | agents/redacteur.md:314-320 — Q1 answered over several lines, as the writer writes it |
+| `hand/questions-sondeur-02.md` | agents/sondeur.md:398-426 — `Options:`, `Défaut:` |
 | `hand/questions-architecte-02.md` | agents/architecte.md:578-585 — a title on `Block:`, `Kind:` |
 | `hand/questions-lexicographe-02.md` | agents/lexicographe.md:538-544, and :336-350 for Q2's two meanings; the file's title as premiere-app-3's |
-| `hand/convertisseur/technique-model.md`, `technique-transversal.md` | agents/convertisseur.md:389-395 |
+| `hand/convertisseur/technique-model.md`, `technique-transversal.md` | agents/convertisseur.md:426-432 |
 | `hand/blocked_lexicographe.md` | agents/lexicographe.md:76-83 |
 | `hand/blocked_architecte.md` | agents/architecte.md:279-285 — `## Invocation` first |
-| `hand/blocked_redacteur.md` | agents/redacteur.md:373-392 and :404-410 — invocation 3, one `## Blocking N` and one `## Decision` per entry |
+| `hand/blocked_redacteur.md` | agents/redacteur.md:399-418 and :430-436 — invocation 3, one `## Blocking N` and one `## Decision` per entry |
 | `hand/blocked_qualifieur.md` | agents/qualifieur.md:267-286 |
 | `hand/blocked_cadreur.md`, `hand/cadreur-request/blocked_cadreur.md` | agents/cadreur.md:192-211 — the first appended twice, its last `## Decision` live |
 | `hand/cadreur-request/architecte-cadreur.md` | agents/cadreur.md:242-248 — two `# Request N`, the first with its verdict |
 | `hand/blocked_verificateur.md` | agents/verificateur.md:200-211 — three headings, no `## Decision` |
 | `hand/blocked_concepteur-01.md` | agents/concepteur.md:149-166 — `## Decision` filled |
 | `hand/blocked_relecteur-acte.md`, `blocked_relecteur-autre.md` | agents/relecteur.md:279-297 |
-| `hand/blocked_detailleur.md` | agents/detailleur.md:334-354 — `## Blocking N — lot-NN`, one `## Decision` at the end |
-| `hand/blocked_realisateur.md` | agents/realisateur.md:310-321 |
+| `hand/blocked_detailleur.md` | agents/detailleur.md:361-381 — `## Blocking N — lot-NN`, one `## Decision` at the end |
+| `hand/blocked_realisateur.md` | agents/realisateur.md:325-336 |
 | `hand/redecoupage/redecoupage.md`, `redecoupage-01.md`, `redecoupage-02.md` | agents/cadreur.md:1054-1061 — the Cadreur's two sections |
 | `hand/questions-hors-gabarit.md` | **none, on purpose**: a `## Q1` heading no template writes — the file the parser reports as an error |
 

@@ -33,8 +33,13 @@ project's.** An absolute path points outside your session and fails.
 | the idea file | `idees.md` |
 | the product file | `desc-produit.md` |
 | a questions file | `questions-<agent>-NN.md` at the root, `questions/<agent>/` once filed |
+| the feature's `donnees.md` | `donnees/donnees.md` — the files of reference data the Product Owner brought |
 
-**The global** is `docs/PRODUIT_GLOBAL.md`, outside the feature folder.
+**The global** is `docs/PRODUIT_GLOBAL.md`, outside the feature folder —
+📌 **and so is the application's `donnees.md`, `docs/donnees/donnees.md`**,
+its files of embedded data. 🔴 **Both are shaped by
+`.claude/formats/donnees.md`** — 📌 **one entry per file.** ⚠️ **Never
+called an index here**: that word is the global's.
 
 ## What the product file looks like
 
@@ -241,6 +246,27 @@ leaves out a dependency the lots rest on.
 ⚠️ A reference to something existing does not prevent revising it in
 the same file. The two coexist.
 
+**Data a file holds is named by that file**
+
+🔴 **A block that consumes data whose instance a `donnees.md` names —
+what another system sends, a file the application ships — names that
+file, in the block.** 📌 **By its path from the repository's root**,
+the folder of that `donnees.md` then the entry's name —
+`.claude/formats/donnees.md` §4:
+
+> *"<The element> reads <what it reads>, in the shape of
+> `docs/features/<feature>/donnees/<file>`."*
+
+🔴 **A file a `donnees.md` names, and only that** — ⚠️ **you read the
+two `donnees.md`, never a `donnees/` folder, never the file itself**:
+📌 **its format is the Convertisseur's to describe**, from the file. 🔴
+**The block names it, and never restates its format** — ⚠️ **two
+descriptions of one format are two sources**, and the prose would be
+read in place of the file.
+
+📌 **A file the block needs and no `donnees.md` names** — ⚠️ **not
+yours to raise**: 📌 **the sondeurs ask for it**, `A1.10` and `A1.11`.
+
 **What has no place in the file**
 
 🔴 **What is inherited and unchanged is not rewritten.** Retention,
@@ -432,8 +458,8 @@ this block ever lifts.
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Structuring | `idees.md` · `lexique.md` · the global | The product file · `lexique.md`, its `en anglais` lines · your questions file |
-| 2 | Integrating | 🔴 **The questions file the prompt names** · `lexique.md` · the global | The product file, updated · `lexique.md`, its `en anglais` lines · your questions file |
+| 1 | Structuring | `idees.md` · `lexique.md` · the global · the two `donnees.md` | The product file · `lexique.md`, its `en anglais` lines · your questions file |
+| 2 | Integrating | 🔴 **The questions file the prompt names** · `lexique.md` · the global · the two `donnees.md` | The product file, updated · `lexique.md`, its `en anglais` lines · your questions file |
 | 3 | Merging | `desc-produit-fusion.md` · **every decisions file the prompt names**, in cycle order · `lexique.md` · the global, by its index | `desc-produit-fusion.md`, edited in place · `lexique.md`, its `en anglais` lines |
 
 🔴 **The prompt says which one, and names the file.** ⚠️ **None of the
@@ -461,8 +487,9 @@ agent wrote it, your own included. **Same work whoever asked.**
 **Inputs** — 📌 **`idees.md`**, free-form and in French, that is the
 point · **`lexique.md`** — the term that holds for each thing, and which
 strings are displayed texts, kept as written, with the concept each
-carries · **the global** · 🔴 **a blocking file, when
-the prompt names one.**
+carries · **the global** · 📌 **the two `donnees.md`, each whole** — ⚠️
+**one not on disk names no file** · 🔴 **a blocking file, when the prompt
+names one.**
 
 🔴 **Grep the global's `^#` index, never read it whole** — 📌 **it is
 the whole product**, and you need a handful of sections. 🔴 **Do not
@@ -569,8 +596,8 @@ do.
 
 **Inputs** — 🔴 **the questions file the prompt names**, and it alone ·
 **`lexique.md`** — the same use as at invocation 1 · **the global**, by
-its index · 🔴 **a blocking file,
-when the prompt names one.**
+its index · 📌 **the two `donnees.md`, each whole** — the same use as at
+invocation 1 · 🔴 **a blocking file, when the prompt names one.**
 
 ⚠️ **Never `idees.md`** — 📌 **it is transcribed; the answers revise
 what came of it.**
@@ -639,6 +666,12 @@ written means the Product Owner
 accepted it** — ⚠️ **you integrate the proposed answer as if he had
 written it.** 🔴 **An `Answer:` written overrides it**, and is
 integrated instead.
+
+🔴 **An entry carrying a `Folder:` line asked for a file** — 📌 **its
+`Answer:` names it, as its `donnees.md` names it.** 🔴 **The block
+names that file by its path, the `Folder:` value then that name** — see
+*Data a file holds is named by that file*. ⚠️ **An answer that is
+text — there is no such file — is integrated as any other.**
 
 🔴 **Whatever row it lands in, an answer strips the
 `**Clarification needed:**` line whose wording matches its question.**

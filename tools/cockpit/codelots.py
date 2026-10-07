@@ -57,22 +57,22 @@ RULES = {
     "T-ESSAIS": "8_code.md:318-320 · 8_code.md:322-323 · 8_code.md:331-336 · agents/relecteur.md:173-175",
     "P-ORDRE": "8_code.md:158-159 · 8_code.md:174-176 · 8_code.md:190",
     "P-ECRIT": "agents/detailleur.md:55-56 · agents/relecteur.md:140 · agents/concepteur.md:301-304 · "
-               "agents/realisateur.md:715",
-    "P-ARBITRE": "8_code.md:760-763 · agents/realisateur.md:342-349 · agents/detailleur.md:381-388 · 8_code.md:751-754",
+               "agents/realisateur.md:738",
+    "P-ARBITRE": "8_code.md:760-763 · agents/realisateur.md:357-364 · agents/detailleur.md:408-415 · 8_code.md:751-754",
     "P-ARCHITECTE": "8_code.md:488-492 · agents/arbitre.md:476-486",
-    "P-DEMANDES": "agents/concepteur.md:227-230 · agents/realisateur.md:466 · agents/detailleur.md:421 · "
-                  "agents/detailleur.md:439-440 · agents/arbitre.md:451-460",
-    "B-OU": "8_code.md:748-758 · agents/detailleur.md:328-331",
+    "P-DEMANDES": "agents/concepteur.md:227-230 · agents/realisateur.md:481 · agents/detailleur.md:448 · "
+                  "agents/detailleur.md:466-467 · agents/arbitre.md:451-460",
+    "B-OU": "8_code.md:748-758 · agents/detailleur.md:355-358",
     "C-GREP": "8_code.md:198-201 · 8_code.md:206-208 · 8_code.md:217-223",
     "C-DOSSIER": "8_code.md:202-203 · 8_code.md:210-215 · 8_code.md:225-229 · agents/concepteur.md:309-312 · "
-                 "agents/testeur.md:317-320 · agents/realisateur.md:720-726",
+                 "agents/testeur.md:334-337 · agents/realisateur.md:743-749",
     "W-LIVE": "8_code.md:126-128 · 8_code.md:135-136 · 8_code.md:470-475",
     "A-LOT": "8_code.md:605-606 · 8_code.md:564 · 8_code.md:573 · 8_code.md:582 · 8_code.md:597 · 8_code.md:442",
-    "A-DESC": "8_code.md:563 · 8_code.md:572 · 8_code.md:581 · 8_code.md:596 · agents/realisateur.md:346-348",
-    "A-BLOC": "8_code.md:418-419 · 8_code.md:440-441 · agents/detailleur.md:385-387",
+    "A-DESC": "8_code.md:563 · 8_code.md:572 · 8_code.md:581 · 8_code.md:596 · agents/realisateur.md:361-363",
+    "A-BLOC": "8_code.md:418-419 · 8_code.md:440-441 · agents/detailleur.md:412-414",
     "A-DOSSIER": "8_code.md:608-609",
     "A-AUCUN": "8_code.md:509-510",
-    "A-IMBRIQUE": "agents/realisateur.md:342-349 · agents/arbitre.md:476-486",
+    "A-IMBRIQUE": "agents/realisateur.md:357-364 · agents/arbitre.md:476-486",
     "D-ESTIME": "demande 1.5, §4 : la médiane des lots passés de la feature",
 }
 

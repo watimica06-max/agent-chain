@@ -276,10 +276,10 @@ request, and stop**: see *When the conventions fall short*. 📌
 
 **2. Inventory what exists** — 📌 **by `Glob` and `Grep`, against the
 tables, line by line:** the build files G12.6 names, the modules
-registered where modules register, each module's build file, its code
-and test folders, its manifest where the platform requires one, each
-`application` module's entry point, and the build system's wrapper
-where G12.6 obtains it through one.
+registered where modules register, each module's build file, its code,
+test and resource folders, its manifest where the platform requires
+one, each `application` module's entry point, and the build system's
+wrapper where G12.6 obtains it through one.
 
 🔴 **What exists is never built again.** 📌 **Everything there is
 listed — this move's output is the list of what is missing.** ⚠️
@@ -318,10 +318,10 @@ Then, **in this order**:
   gives — 📌 **the wrapper with them**, where G12.6 obtains the build
   system through one
 - 🔴 **Each module of G4.4** — 📌 **its build file, building as its
-  `Builds as` says; its namespace; its code folder and its test folder;
-  a manifest where the platform requires one.** ⚠️ **`Depends on`
-  becomes its dependencies on the other modules, and nothing else
-  does.** 📌 **The test framework G12.6 names is declared on every
+  `Builds as` says; its namespace; its code folder, its test folder and
+  its resource folder; a manifest where the platform requires one.**
+  ⚠️ **`Depends on` becomes its dependencies on the other modules, and
+  nothing else does.** 📌 **The test framework G12.6 names is declared on every
   module, for its test folder**
 - 🔴 **Each `application` module's entry point** — 📌 **it launches and
   shows one empty screen**, written with the UI framework the

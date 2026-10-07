@@ -57,6 +57,18 @@ def test_title_on_the_block_line_and_kind():
     assert parsed.entries[0].context == ["Block: §3.2 — Reconciling two real entries", "Kind: replacement"]
 
 
+def test_a_question_asking_for_a_file_carries_its_folder():
+    # agents/sondeur.md:450-454, agents/assembleur.md:191-195: `Folder:` between
+    # `Block:` and `Question:` — the folder a joined file goes to
+    # (.claude/formats/donnees.md §5).
+    lines = ["### Q1", "Block: B9", "Folder: docs/features/f/donnees/",
+             "Question: One real instance of what the import reads?", "Answer:"]
+    parsed = questions.parse_lines(lines, "q.md", "q.md", "questions")
+    assert not parsed.errors
+    assert parsed.entries[0].context == ["Block: B9", "Folder: docs/features/f/donnees/"]
+    assert parsed.entries[0].open
+
+
 def test_multiline_answers_are_kept_whole():
     parsed, _ = parse("hand/questions-redacteur-01.md")
     q1 = parsed.entries[0]
@@ -75,10 +87,10 @@ def test_unreadable_shape_is_an_error_never_no_questions():
     (["### Q1", "Race segment structure", "Block: B1", "Question: x", "Answer:"], "hors gabarit"),
     # Every template has a `Question:` line.
     (["### Q1", "Block: B1", "Answer:"], "Question:"),
-    # `Options:` holds `- ` items (agents/redacteur.md:291-293 and the others).
+    # `Options:` holds `- ` items (agents/redacteur.md:317-319 and the others).
     (["### Q1", "Block: B1", "Question: x", "Options:", "* une", "Answer:"], "Options:"),
     (["### Q1", "Block: B1", "Question: x", "Options:", "1. une", "Answer:"], "Options:"),
-    # `Défaut:` is one line (agents/sondeur.md:420).
+    # `Défaut:` is one line (agents/sondeur.md:425).
     (["### Q1", "Block: B1", "Question: x", "Défaut: a — B2", "suite", "Answer:"], "Défaut:"),
 ])
 def test_what_no_template_writes_is_an_error(lines, where):

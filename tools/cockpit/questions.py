@@ -2,7 +2,7 @@
 
 Reads the root `questions-<agent>-NN.md` and `convertisseur/technique-*.md`,
 in the shape the writers' templates give: `### Q<n>`, `Key: value` lines
-(`Block:`, `Terms:`, `Entries:`, `Kind:`), `Question:`, an optional
+(`Block:`, `Terms:`, `Entries:`, `Kind:`, `Folder:`), `Question:`, an optional
 `Options:` list of `- ` items, an optional `Défaut:`, `Answer:`. What a
 current template produces besides, and is read: a `Question:` over several
 lines (agents/lexicographe.md:348-350), a title on the `Block:` line
@@ -30,7 +30,7 @@ QUESTION = re.compile(r"^Question:(.*)$")
 OPTIONS = re.compile(r"^Options:\s*$")
 DEFAUT = re.compile(r"^Défaut:(.*)$")
 OPTION_ITEM = re.compile(r"^- (.*)$")                 # `- <a proposal…>`, every template
-CONTEXT_KEY = re.compile(r"^[A-Z][A-Za-z]*:\s")       # `Block:`, `Terms:`, `Entries:`, `Kind:`
+CONTEXT_KEY = re.compile(r"^[A-Z][A-Za-z]*:\s")       # `Block:`, `Terms:`, `Entries:`, `Kind:`, `Folder:`
 
 
 @dataclass

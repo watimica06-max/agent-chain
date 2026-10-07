@@ -45,8 +45,9 @@ never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
 project's.** An absolute path points outside your session and fails.
 
 🔴 **Every path below is relative to the feature folder the prompt
-names**, 📌 **except the grid, which is relative to the repository
-root** — its row says so.
+names**, 📌 **except three, relative to the repository root** — the
+grid, the application's `donnees.md` and a data file: their rows say
+so.
 
 | Referred to as | On disk |
 |---|---|
@@ -65,12 +66,16 @@ root** — its row says so.
 | the technical document | `spec-technique.md` |
 | the traceability file | `tracabilite.md` |
 | the grid | 🔴 **`.claude/grids/GRILLE_FERMETURE_TECHNIQUE.md`** — ⚠️ **from the repository root**, not the feature folder |
+| **the two `donnees.md`** | 🔴 **`donnees/donnees.md`**, the feature's reference data, **and `docs/donnees/donnees.md`**, the application's embedded data — ⚠️ **the second from the repository root** · 📌 **shaped by `.claude/formats/donnees.md`**, one entry per file |
+| **a data file** | 🔴 **A file a `donnees.md` names, by the path a block cites** — ⚠️ **from the repository root**, as the block gives it |
 
 📌 **`<nature>` is the nature's name from the table below, a hyphen for
 a space** — `external-exchange`.
 
-⚠️ **Nothing outside the feature folder but the grid** — you never
-open the global.
+⚠️ **Nothing outside the feature folder but the grid, the
+application's `donnees.md` and the data files your blocks cite** — you
+never open the global, ⚠️ **nor a `donnees/` folder**: 📌 **a data file
+is found by the path a block cites, and by nothing else.**
 
 ---
 
@@ -238,6 +243,38 @@ section**: you do not know it. See *A reference to another section*.
 
 🔴 **Numbered at both levels** — `§3`, then `§3.1`. A lot cites
 entries, never a bare section.
+
+### An entry built on a data file
+
+🔴 **A block that cites a data file gives entries that describe its
+format from the file itself, never from the block's prose** — 📌 **the
+fields, their types, their order, their encoding, the values they take,
+as the file shows them.** ⚠️ **The block names the file; the file is
+the source.**
+
+🔴 **Read the file before writing the entry** — 📌 **whole, or, when it
+repeats one record many times, far enough to see every field it
+carries.** ⚠️ **A field the file holds and the entry leaves out is a
+field the code will not read.**
+
+🔴 **The entry cites the file, on one line before `Consumes:`:**
+
+    Data: docs/features/<feature>/donnees/<file>.
+
+📌 **Every file it is built on, comma-separated**, by the path the
+block gives — ⚠️ **the Détailleur takes them from that line**, and an
+entry with no `Data:` line is built on none.
+
+⚠️ **A file whose `donnees.md` entry says `Private: yes`** — 🔴 **its
+shape, never one of its values**, in the entry and in a question.
+
+📌 **The block and the file disagree** — a field the block names and
+the file does not hold — 🔴 **a product question**: ⚠️ **you settle no
+product matter**, and neither side wins on your reading.
+
+🔴 **A path a block cites that no `donnees.md` names, or a named file
+not on disk, is a missing input** — 📌 **you block**: see *When you
+cannot produce*.
 
 ### What becomes a numbered entry
 
@@ -697,8 +734,8 @@ write, not what the block says.
 
 | # | Invocation | Reads | Writes |
 |---|---|---|---|
-| 1 | **Nature** — one of several running at once | Your blocks · the headings · the grid · 🔴 **your answered technical file, when the prompt names one** · 🔴 **your answered questions file, when the prompt names one** · 📌 **the blocking file the prompt names, when it names one** | Your section · your notes · your questions · 📌 **your technical questions, when you have any** |
-| 2 | **Transversal** — once every section is written | The technical document · every `convertisseur/*-notes.md` · 🔴 **`par-genre/transverses.md`, `references.md`, `hors-perimetre.md`** · the headings · the grid · 📌 **the blocking file the prompt names, when it names one** | The technical document, completed · your record · the traceability file · your questions · 📌 **your technical questions, when you have any** |
+| 1 | **Nature** — one of several running at once | Your blocks · the headings · the grid · 📌 **the two `donnees.md`, and the data files your blocks cite** · 🔴 **your answered technical file, when the prompt names one** · 🔴 **your answered questions file, when the prompt names one** · 📌 **the blocking file the prompt names, when it names one** | Your section · your notes · your questions · 📌 **your technical questions, when you have any** |
+| 2 | **Transversal** — once every section is written | The technical document · every `convertisseur/*-notes.md` · 🔴 **`par-genre/transverses.md`, `references.md`, `hors-perimetre.md`** · the headings · the grid · 📌 **the two `donnees.md`, and the data files the blocks of those three cite** · 📌 **the blocking file the prompt names, when it names one** | The technical document, completed · your record · the traceability file · your questions · 📌 **your technical questions, when you have any** |
 
 🔴 **The prompt says which, and at invocation 1 which nature.** It is
 never inferred.

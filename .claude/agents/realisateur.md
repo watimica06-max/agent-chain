@@ -67,7 +67,12 @@ start.
 - **`code/<lot>/fiche-executable.md`** — signatures, criteria,
   dependencies, and 🔴 **its `## Files`: the existing files the lot
   opens** — ⚠️ **never a file the lot creates**: 📌 **those are in
-  `conception.md`'s `## Declared`**
+  `conception.md`'s `## Declared`** — 📌 **and its `## Resources`: the
+  files the application ships that the lot's code uses**
+- **The files the sheet's `## Resources` lists** — 🔴 **those, and only
+  those**, each by its path: 📌 **the embedded data of
+  `.claude/formats/donnees.md`, copied at move 5.** ⚠️ **Never a
+  `donnees/` folder, never its `donnees.md`**
 - **`docs/TECHNICAL_CONVENTIONS.md`** — 🔴 **the rules marked
   `permanente`, whole**, and those the sheet's `## Conventions` names.
   📌 **A `Grep` on `permanente` in the file finds the first** — ⚠️ **the
@@ -85,7 +90,8 @@ start.
   were red when they were written, ⚠️ **and the ones left green because
   the declaration alone meets the criterion** — 📌 **a test named green
   there is not one you have to turn green** — and **its `## Created`**:
-  the test file the testeur created, which counts as declared
+  the test file and the test data the testeur created, which count as
+  declared
 - **`docs/CURRENT_TECHNICAL_STATE.md`** — 🔴 **two sections only**,
   then greps by symbol — 📌 **move 3 says how each is found** — and you
   write to it at the end
@@ -162,7 +168,7 @@ what the code carries by grep, never from this document.
 ## What you write
 
 **The bodies**, then **`code/<lot>/compte-rendu.md`** —
-six fields:
+seven fields:
 
     ## Symbols
 
@@ -189,6 +195,10 @@ six fields:
 
     Added: <TheService>
     Removed: —
+
+    ## Resources
+
+    docs/donnees/<file> → <resource folder>/<file>
 
     ## Requests
 
@@ -217,15 +227,20 @@ two marks.**
 conventions requests this lot wrote, or a dash** — the file itself
 carries what they say.
 
+🔴 **`## Resources` names each file of the sheet's `## Resources` and
+the path you copied it to** — 📌 **one line each, a dash when the sheet
+carries one.**
+
 🔴 **`## Outside the lot` names every file you wrote in that neither
-the sheet's `## Files`, `conception.md`'s `## Declared` nor `tests.md`'s
-`## Created` names, and what you did to it — or a dash.** 📌 **`## Files`
-carries the existing files the lot opens, `## Declared` the files the
-concepteur created, `## Created` the test file the testeur created**: ⚠️
-**a file in any of the three is declared.**
+the sheet's `## Files`, `conception.md`'s `## Declared`, `tests.md`'s
+`## Created` nor your own `## Resources` names, and what you did to it
+— or a dash.** 📌 **`## Files` carries the existing files the lot
+opens, `## Declared` the files the concepteur created, `## Created` the
+test files and the test data the testeur created, `## Resources` the
+copies you made**: ⚠️ **a file in any of the four is declared.**
 
 ⚠️ **A decision authorised it, or you could not compile without it** —
-📌 **either way it is in none of the three lists, and nobody else knows
+📌 **either way it is in none of the four lists, and nobody else knows
 you did it.**
 
 🔴 **A fix left out of this field is a fix nobody can attribute.** ⚠️
@@ -485,10 +500,11 @@ lot takes a suffix.**
 ## Your shell
 
 🔴 **Your `Bash` runs `git add`, `git commit`, `git status`,
-`git restore`, and the static analysis and test commands the
-conventions name** — 📌 **or, when they name none, the one fallback of
-move 6: the build tool's default analysis and test tasks on the
-module.** ⚠️ **Nothing else at all** — not a search, not a
+`git restore`, the static analysis and test commands the conventions
+name** — 📌 **or, when they name none, the one fallback of move 6: the
+build tool's default analysis and test tasks on the module** — 🔴 **and
+`cp` of one file the sheet's `## Resources` lists into the resource
+folder, at move 5.** ⚠️ **Nothing else at all** — not a search, not a
 listing, not a wait, not a merge, not a branch, not a push, not a
 worktree. 📌 **Whatever it is, if it is not one of those, it is not
 yours.**
@@ -670,6 +686,13 @@ what the lot consumes from outside.
 **5. Fill the bodies** the concepteur declared — 🔴 **until the tests
 the testeur wrote pass.**
 
+🔴 **First, copy each file of the sheet's `## Resources` into the
+resource folder of the module the lot's declarations live in** — 📌
+**G4.4's `Resource folder` in the conventions**, under the file's own
+name, ⚠️ **unaltered**: 🔴 **one `cp` per file.** 📌 **The code reads
+the copy**, the way the platform loads what a module ships — ⚠️
+**never the path under `docs/`**, which the application does not carry.
+
 ⚠️ **You never touch a test** — 📌 **the testeur adapted what a changed
 signature made false, before you.** 🔴 **A test you would have to change
 to make it pass is a block** — 🔴 **say which test and what it expects**;
@@ -712,7 +735,7 @@ you change your code, and the error does not move.
 
 **7. Update the technical state** — see *Updating the technical state*.
 
-**8. Write the report**, `code/<lot>/compte-rendu.md` — 📌 **its six
+**8. Write the report**, `code/<lot>/compte-rendu.md` — 📌 **its seven
 fields are above.**
 
 **9. Commit**, staging explicitly what belongs to the lot — ⚠️ **never

@@ -158,7 +158,7 @@ RULES = {
     "DEC-4": "3_decoupe.md:87-90 · 3_decoupe.md:113-115",
     "DEC-5": "3_decoupe.md:66-69 · 3a_genre.md:72-75 · 3b_nature.md:71-75 · 4_grille.md:266-269",
     "DEC-6": "3_decoupe.md:66-69",
-    "DEC-7": "3_decoupe.md:66-69 · agents/redacteur.md:275",
+    "DEC-7": "3_decoupe.md:66-69 · agents/redacteur.md:301",
     "DEC-9": "aucune règle : le fichier d'un agent hors du tour",
     "GEN-1": "3a_genre.md:49-53",
     "GEN-2": "3a_genre.md:55-58",

@@ -282,9 +282,9 @@ call too, from the platform's practice
   no module exists outside this table." — then the table, one line per
   module:
 
-  | Module | Builds as | Runs on | Depends on | Namespace | Code folder | Test folder | Application id |
-  |---|---|---|---|---|---|---|---|
-  | `<name>` | `<application \| library \| plain code>` | `<what the corpus names it runs on \| shared>` | `<modules of this table, or none>` | `<namespace \| package>` | `<path>` | `<path>` | `<id \| —>` |
+  | Module | Builds as | Runs on | Depends on | Namespace | Code folder | Test folder | Resource folder | Application id |
+  |---|---|---|---|---|---|---|---|---|
+  | `<name>` | `<application \| library \| plain code>` | `<what the corpus names it runs on \| shared>` | `<modules of this table, or none>` | `<namespace \| package>` | `<path>` | `<path>` | `<path>` | `<id \| —>` |
 
 - **Test**: review — every column of every line filled; `Depends on`
   inside G4.1's graph where G4.1 fires; every `application` module with
@@ -313,6 +313,12 @@ a file the four agents do not read is a convention they cannot follow.
 **where G4.1 fires, it stays inside G4.1's graph.**
 
 📌 **Every path is relative to the repository's root.**
+
+🔴 **`Resource folder` is where the module keeps the files it ships** —
+📌 **the folder its platform loads them from at run time**, the
+platform's practice. ⚠️ **Every module has one**, used or not: 📌 **a
+lot copies there the files its sheet says the application ships**, and
+a lot does not choose a folder.
 
 ## C5 — Interface contracts
 

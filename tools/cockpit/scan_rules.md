@@ -162,7 +162,7 @@ markers stay until the grid strips them. Each of them files every root
 questions file before its agent writes (3_decoupe.md:66-69,
 3a_genre.md:72-75, 3b_nature.md:71-75, 4_grille.md:266-269), and the
 Rédacteur, the qualifieur and the classeur write one on every run, empty
-or not (agents/redacteur.md:275, agents/qualifieur.md:3,
+or not (agents/redacteur.md:301, agents/qualifieur.md:3,
 agents/classeur.md:3). **The one file left at the root therefore says
 where the turn stands**: a file of the step's own agent or of a later one
 — it ran; an earlier one — it has not; none — /3_decoupe filed the
@@ -228,7 +228,7 @@ Rédacteur's.
 | `DEC-4` | 3_decoupe | faite | the grid ran once and no heading carries `NEW` or `MODIFIED`: invoke nothing | 3_decoupe.md:87-90 · 3_decoupe.md:113-115 |
 | `DEC-5` | 3_decoupe | faite | turn: a later agent's file is at the root | 3_decoupe.md:66-69 · 3a_genre.md:72-75 · 3b_nature.md:71-75 · 4_grille.md:266-269 |
 | `DEC-6` | 3_decoupe | à faire | turn: the lexicographe's or the Rédacteur's file is at the root, still to file | 3_decoupe.md:66-69 |
-| `DEC-7` | 3_decoupe | faite | turn: the root is empty — it filed the Rédacteur's | 3_decoupe.md:66-69 · agents/redacteur.md:275 |
+| `DEC-7` | 3_decoupe | faite | turn: the root is empty — it filed the Rédacteur's | 3_decoupe.md:66-69 · agents/redacteur.md:301 |
 | `DEC-9` | 3_decoupe | inconnu | turn: the root holds an agent's file out of the turn | aucune règle : le fichier d'un agent hors du tour |
 | `GEN-1` | 3a_genre | à faire | `Clarification needed` | 3a_genre.md:49-53 |
 | `GEN-2` | 3a_genre | à faire | a root file holds `### Q` | 3a_genre.md:55-58 |

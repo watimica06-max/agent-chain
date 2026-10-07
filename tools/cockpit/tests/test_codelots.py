@@ -3,7 +3,7 @@
 Hand-written folders following the templates of the command and its agents:
 the sequence (verificateur.md:107-115), the lot list (cadreur.md:848-854),
 the verdict (relecteur.md:140-170), the Détailleur's blocking file at the
-split's root (detailleur.md:328-352), the Réalisateur's (realisateur.md:306-321),
+split's root (detailleur.md:355-379), the Réalisateur's (realisateur.md:321-336),
 the requests (arbitre.md:451-460), `code/redecoupage.md` (arbitre.md:379-399,
 cadreur.md:1054-1061) and the lot's commits (8_code.md:198-229). No real
 folder of the current chain has a `code/` yet. No command runs."""

@@ -71,7 +71,10 @@ block. 📌 **Its shape is below**; read it before you start.
 - **The spec entries their lots cite** — 📌 **those, not the whole
   document.** The Cadreur read it all; you read a few. ⚠️ **Plus any
   entry one of them points at** for what a trigger it names reaches —
-  see *Writing an acceptance criterion*
+  see *Writing an acceptance criterion*. 📌 **Their `Data:` lines name
+  the data files they are built on** — 🔴 **the path is all you take**:
+  ⚠️ **never the file, never its `donnees.md`, never a `donnees/`
+  folder** — see *What you write*
 - **`docs/CURRENT_TECHNICAL_STATE.md`** — what exists
 - **The reports of this cycle's coded lots** — 🔴 **never opened, only
   grepped**, when a symbol needs placing. See below
@@ -228,7 +231,7 @@ report.
 
 ## What you write
 
-**`code/<lot>/fiche-executable.md`**, one per lot of the block — six
+**`code/<lot>/fiche-executable.md`**, one per lot of the block — eight
 fields:
 
     ## Signatures
@@ -255,6 +258,14 @@ fields:
 
     <module>/<TheService>Test
     <module>/<the screen>
+
+    ## Test data
+
+    docs/features/<feature>/donnees/<file>
+
+    ## Resources
+
+    docs/donnees/<file>
 
     ## Conventions
 
@@ -286,6 +297,22 @@ this field, every existing file the lot opens is *outside the lot* for
 the Réalisateur**, and the checks keyed on `## Files` never fire.
 
 📌 **A dash when `Touches` is one** — the lot opens no existing file.
+
+🔴 **`## Test data` and `## Resources` carry the data files the lot is
+built on** — 📌 **every path a `Data:` line of a cited entry names,
+copied as it stands, one per line**, ⚠️ **each in one of the two by
+where it points, never by your judgement** (`.claude/formats/donnees.md`
+§4):
+
+| The path starts with | The field | Who copies it, and where |
+|---|---|---|
+| `docs/features/` — reference data | `## Test data` | 📌 **The Testeur**, into the test folder of the lot's module — 🔴 **its tests run against it** |
+| `docs/donnees/` — embedded data | `## Resources` | 📌 **The Réalisateur**, into the resource folder of the lot's module — 🔴 **the application ships it** |
+
+📌 **A dash in a field no path goes to.** ⚠️
+**Without these two fields no downstream agent sees the file** — 🔴
+**they read the sheet, never the technical document**, and a test
+would be written on values nobody saw.
 
 🔴 **`## Conventions` cites each rule by its `R<n>`** — 📌 **the number
 the Architecte gave it**, followed by the rule's own words. ⚠️ **The

@@ -36,7 +36,8 @@ never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
 project's.**
 
 **Two files always, and a third only when the prompt names it** — 📌
-**at every invocation; invocation 3 adds a fourth, named there:**
+**at every invocation; invocation 1 adds the two indexes, invocation 3
+the global, each named in its row:**
 
 | What | How |
 |---|---|
@@ -44,6 +45,7 @@ project's.**
 | **The grid** — 📌 `.claude/grids/GRILLE_CADRAGE_PRODUIT_V2.md` at invocations 1 and 2, `.claude/grids/GRILLE_EXISTANT.md` at invocation 3 | 🔴 **Whole** |
 | **A blocking file** | 📌 **Only when the prompt names one** |
 | **The global**, `docs/PRODUIT_GLOBAL.md` | 🔴 **Invocation 3 only** — 📌 **the sections your blocks name, never the file whole** |
+| **The two indexes** — 📌 **the feature's, `docs/features/<feature>/donnees/donnees.md`, and the application's, `docs/donnees/donnees.md`**, shaped by `.claude/formats/donnees.md` | 🔴 **Invocation 1 only, each whole** — 📌 **for `A1.10` and `A1.11`**, nothing else. ⚠️ **Never a file an index names, never the folder** |
 
 🔴 **The prompt names lists of blocks, and they are not read the same
 way** — 📌 **and which lists it carries depends on the invocation:**
@@ -85,7 +87,9 @@ truncation the tool signals, a text ending mid-block, a heading with no
 body after it** — 🔴 **or nothing at all.** 📌 **Say what you asked for
 and what you got.**
 
-⚠️ **A short block that reads whole is not a stop.**
+⚠️ **A short block that reads whole is not a stop.** 📌 **Nor is an
+index not on disk** — 🔴 **it names no file**, as an index with no
+entry does.
 
 🔴 **2. An identifier the prompt listed that the product file does not
 hold** — 📌 **name it.** ⚠️ **The list is the only authority**, and one
@@ -400,8 +404,9 @@ a divergence, it is an exception.
     Answer:
 
 🔴 **Four lines per question, `Answer:` written empty** — it is where
-the Product Owner answers, by hand. 📌 **The `Options:` block is the
-only addition the count allows**, between `Question:` and `Answer:`.
+the Product Owner answers, by hand. 📌 **Three additions the count
+allows, and no other**: 🔴 **the `Options:` block**, between `Question:`
+and `Answer:` — 📌 **and the `Défaut:` and `Folder:` lines, below.**
 
 📌 **`Options:` — two to six proposals, in French**: 🔴 **an option
 chosen becomes the answer word for word.** ⚠️ **None opens on a number
@@ -436,6 +441,22 @@ Owner accepts the proposal** — ⚠️ **written, it replaces it.**
 ⚠️ **A *défaut* is not a lighter question** — 📌 **it is a question whose
 answer the corpus already carries somewhere else**, and it spares the
 Product Owner writing what she has written before.
+
+### A question that asks for a file
+
+🔴 **One more line, `Folder:`, between `Block:` and `Question:`** — 📌
+**on every question `A1.10` or `A1.11` raises, and on no other:**
+
+    ### Q3
+    Block: B9
+    Folder: docs/features/<feature>/donnees/
+    Question: <what is missing, stated directly>
+    Answer:
+
+🔴 **Its value, `.claude/formats/donnees.md` §5 gives** — 📌 **the
+feature's folder for `A1.10`, `docs/donnees/` for `A1.11`**, the
+feature's name written out. ⚠️ **One question, one folder**: a block
+missing both is two questions.
 
 ### The `Block:` line
 

@@ -222,7 +222,7 @@ def target(entry, work_dir):
         outside = BRACKET.findall(value)
         nature = TECHNIQUE.match(os.path.basename(entry.file)).group("nature")
         # Invocation 1: its own section, its own numbers; invocation 2,
-        # « transversal », any number of the document (convertisseur.md:399-402).
+        # « transversal », any number of the document (convertisseur.md:436-439).
         doc = (os.path.join(folder, TECHNICAL) if nature == "transversal"
                else os.path.join(folder, "convertisseur", nature + ".md"))
         if not ids:

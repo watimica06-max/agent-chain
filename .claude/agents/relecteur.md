@@ -440,8 +440,10 @@ re-check it.**
 🔴 **`## Build` says the static analysis and the tests passed** ·
 **`## State` names what went into the state document** ·
 **`## What governed the code, besides the sheet` names the decisions
-and conventions that bore on it** · **`## Requests` names the
-conventions requests the lot wrote, or a dash.**
+and conventions that bore on it** · **`## Resources` names a copy of
+each file the sheet's `## Resources` lists, or a dash when it lists
+none** · **`## Requests` names the conventions requests the lot wrote,
+or a dash.**
 
 ⚠️ **A missing field is a finding of this point** — 📌 **the report is
 the only trace the orchestration keeps of the lot.**
@@ -461,15 +463,17 @@ demonstrated nothing, and a targeted fix would demonstrate nothing
 either.
 
 🔴 **`## Outside the lot` names every file the lot touched that neither
-its sheet's `## Files`, `conception.md`'s `## Declared` nor `tests.md`'s
-`## Created` names, or a dash** — 📌 **`## Files` carries the existing
-files the lot opens, `## Declared` the files the Concepteur created,
-`## Created` the test file the Testeur created**: ⚠️ **a file in any of
-the three is declared.** 🔴 **Check the three `## Outside the lot`
-fields together against the file list the prompt names** — 📌
-**`conception.md`, `tests.md` and the report each declare their own**,
-and the diff starts at the concepteur's commit: a file changed and
-named in none of the six places is a change nobody can attribute.
+its sheet's `## Files`, `conception.md`'s `## Declared`, `tests.md`'s
+`## Created` nor the report's `## Resources` names, or a dash** — 📌
+**`## Files` carries the existing files the lot opens, `## Declared`
+the files the Concepteur created, `## Created` the test files and the
+test data the Testeur created, `## Resources` the copies the
+Réalisateur made**: ⚠️ **a file in any of the four is declared.** 🔴
+**Check the three `## Outside the lot` fields together against the file
+list the prompt names** — 📌 **`conception.md`, `tests.md` and the
+report each declare their own**, and the diff starts at the
+concepteur's commit: a file changed and named in none of the seven
+places is a change nobody can attribute.
 
 📌 **You do not judge whether the lot was right to touch it** — a
 decision may have authorised it, or it could not compile otherwise.

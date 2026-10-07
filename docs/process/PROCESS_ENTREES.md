@@ -296,6 +296,12 @@ blocage.
 - Les grilles de `.claude/grids/`, les formats de `.claude/formats/`,
   la compétence `technical-state-format`, `.claude/` entier — hors du
   script : c'est la chaîne, que le cockpit installe avant de le lancer.
+- `docs/donnees/` et son index `donnees.md` — hors du script : le
+  Product Owner les crée quand l'application embarque des fichiers,
+  comme `docs/features/<name>/donnees/` quand une feature lit des
+  données dont la structure se décide ailleurs ; la grille les demande
+  (`A1.10`, `A1.11`) et un index absent ne nomme aucun fichier (→
+  MECANISMES §Lecture des données externes).
 - `docs/features/` vide n'entre dans aucun commit : git ne suit pas un
   dossier vide. Le commit `chore: scaffolding for the chain` porte
   trois fichiers ; `docs/features/` y entre avec `idees.md`, au commit
