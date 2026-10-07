@@ -884,6 +884,10 @@ chain.py's install had never made a repository's first commit: it ran there
   `/api/state`: `PROVIDE` read from the chain's own `socle.py` (loaded as a
   module, never a copy), each line ✓ or ✗ from the application's files.
   Hidden once every line is ✓, and when the chain has no `socle.py`.
+  *Removed with « Bâtir »*: the chain ships the skill and the format,
+  /conventions writes the conventions; `PROVIDE`, `--list` and `provide`
+  went with the card, its two readers being the card and the creation's
+  summary.
 - **« Déployer »** — shown only where `.claude/commands/deploie.md` exists;
   elsewhere the test step says deploying comes with a later version.
 

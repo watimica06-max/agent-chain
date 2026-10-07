@@ -55,11 +55,9 @@ def test_a_new_application(repo, tmp_path):
     assert git(repo, "status", "--porcelain").strip() == ""
     assert subprocess.run(["git", "-C", str(remote), "rev-parse", "-q", "--verify", "master"],
                           capture_output=True).returncode != 0
-    # What the application still provides, one line each — never /deploie.
-    lines = [l for l in out.splitlines() if l.startswith("À fournir : ")]
-    # The technical-state-format skill is not there: the chain's install brings it.
-    assert [l.split(" — ")[0] for l in lines] == ["À fournir : docs/TECHNICAL_CONVENTIONS.md"]
-    assert "/conventions" in lines[0] and "deploie" not in out and "technical-state-format" not in out
+    # Nothing left to provide: the chain ships the skill and the format,
+    # /conventions writes the conventions.
+    assert "À fournir" not in out and out.startswith("Commité « chore: scaffolding for the chain »")
 
 
 def test_refused_when_the_global_exists(repo):
@@ -89,12 +87,11 @@ def test_what_the_owner_staged_stays_out(repo):
     assert git(repo, "diff", "--cached", "--name-only").split() == ["notes.md"]
 
 
-def test_the_list_alone_writes_nothing(repo):
-    rc, out, _ = run(repo, "--list")
-    assert rc == 0 and out.count("À fournir : ") == 1
+def test_an_argument_is_refused_and_writes_nothing(repo):
+    """`--list` went with PROVIDE: any argument is refused."""
+    rc, out, err = run(repo, "--list")
+    assert rc == 1 and "usage" in err
     assert not (repo / "docs").exists()
-    write(repo, "docs/TECHNICAL_CONVENTIONS.md", "# Conventions\n")
-    assert run(repo, "--list")[1] == ""
 
 
 def test_no_identity_writes_nothing(repo, monkeypatch, tmp_path):
@@ -110,13 +107,14 @@ def test_no_identity_writes_nothing(repo, monkeypatch, tmp_path):
     assert not (repo / "docs").exists()
 
 
-def test_the_module_reads_the_same_list():
-    """The cockpit's « À fournir » card reads PROVIDE from the script itself."""
+def test_no_provide_list_any_more():
+    """PROVIDE went: its two readers were the cockpit's « À fournir avant le
+    code » card and the creation's summary, which went with it."""
     import importlib.util
     spec = importlib.util.spec_from_file_location("socle", SCRIPT)
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
-    assert [p for p, _ in m.PROVIDE] == ["docs/TECHNICAL_CONVENTIONS.md"]
+    assert not hasattr(m, "PROVIDE") and not hasattr(m, "missing")
 
 
 def test_a_technical_state_already_there_is_kept(repo):

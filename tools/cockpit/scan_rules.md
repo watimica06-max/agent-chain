@@ -38,8 +38,9 @@ emulator (`/deploie`) → `/fusion`.
 | 4_grille → 4_grille (second time) → 5_reclasse | 4_grille.md:639, :641 |
 | 5_reclasse → 6_convertit | 5_reclasse.md:227 |
 | 6_convertit → conventions | 6_convertit.md:472 |
-| conventions → batir | conventions.md:317 |
-| batir → 7_lots | batir.md:130 |
+| conventions → batir | conventions.md:317, :95-97 |
+| batir → 7_lots | batir.md:130, :268 |
+| 7_lots → batir, back | 7_lots.md:97 — the skeleton not built from the conventions in force |
 | 7_lots → 8_code | 7_lots.md:223, :265 |
 | 8_code → 8_code (lots left) → 9_controle | 8_code.md:551, :519 |
 | 9_controle → *manual* | 9_controle.md:509-510 — `Next: manual lire le rapport de contrôle et la recette, décider d'une bug-list` |
@@ -58,18 +59,15 @@ emulator (`/deploie`) → `/fusion`.
   control is written, and /fusion is one click with a confirmation.
 - **Every answer loops back to `/1_lexique`**, not to the step that asked
   (2_structure.md:404, 3a_genre.md:294, 3b_nature.md:306, 4_grille.md:638,
-  :640, 6_convertit.md:469) — except technical answers (6_convertit.md:468)
-  and the architecte's (conventions.md:309).
+  :640, 6_convertit.md:469) — except technical answers (6_convertit.md:468),
+  the architecte's (conventions.md:309) and the Bâtisseur's
+  (batir.md:71, :128).
 - **`/4_grille` runs twice**: a first time, then a second time against the
   global (4_grille.md:639 then :641).
-- **`/batir` is not a step of this scan yet** — the commands draw it
-  between `/conventions` and `/7_lots` (conventions.md:95-97, :317,
-  batir.md:130), and `/7_lots` sends back to it when the skeleton was not
-  built from the conventions in force (7_lots.md:87-97). The scan still
-  reads `/conventions` → `/7_lots`, and `CON-7` says « faite » on
-  conventions that lack G2.1's, G4.4's or G12.6's table, which /conventions
-  now sends to invocation 4 (conventions.md:94): drawing the flow anew is
-  a later change.
+- **`/7_lots` sends back to `/batir`** when the skeleton was not built
+  from the conventions in force (7_lots.md:87-97): « Bâtir » is « faite »
+  by that very test (`BAT-6`), and « à faire » again once the conventions
+  change (`BAT-7`).
 - **`/conventions` is run by hand** — « no command chains it »
   (conventions.md:66-67) — though `/6_convertit` names it (6_convertit.md:472).
 
@@ -103,6 +101,7 @@ even when it is the step proposed** (`scan.CONFIRM`).
 | `/5_reclasse` | ✓ | Tests :50-90 — then `git mv` :100. No agent, no worktree; its count stops :149-152, :199-202 come after writing the views but before the commit :210. |
 | `/6_convertit` | ✓ | Tests :35-60, the `### Q` guard :62-66, which natures run :85-95 and « nothing to write » :114-118 — then `git mv` :128, commit :160, worktree :170; the walk's deletions and copies :183-188 are made inside the worktree. |
 | `/conventions` | ✓ | Table :76-88 walked first (its last rows invoke nothing; :86 files and commits as its outcome), guard :123-126 — then `git mv` :133, commit :158, worktree :168. |
+| `/batir` | ✓ | Tests :65-72 — the conventions, their three tables, an unanswered `blocked_batisseur.md`, the worktree — then commit :87, worktree :97. A request waiting on its verdict :77-79 is no stop: it opens the run on the Architecte (:118-121). What the Bâtisseur and the Architecte leave is read once they hand back (:123-131, :143-146, :153-156), not before acting. |
 | `/7_lots` | ✓ | Tests :58-66 (the technical document exists) and :72-78 (`^### §`) — then `git mv` :91, commit :103, worktree :109. What the Cadreur and the Vérificateur leave is read once the Cadreur hands back (:205-214), not before acting; « the command is the trigger, never the state of the folder » (:131-132). |
 | `/8_code` | ✓ | Tests :74-100, `blocked_architecte.md` :102-107 and the two stop rows of 4b on the lot found :109-114 — then commit :122, worktree :128. 4b runs again on every later lot (:327-334): what it reads there, an agent of this run wrote; a stop there ends the run through « When the run ends » (:795). |
 | `/9_controle` | ⚠️ | Tests :75-77, :79-81 (`tracabilite.md`), :83-87 — then commit :104, worktree :110 — **then** the map's crossing :225-228, which stays: it reads `tracabilite-full.md`, which phase 1 writes in the worktree (:192-193). Its git section runs at every end once the worktree exists, that stop included (:449-451): the run commits, merges and pushes `tracabilite-full.md`, and closes its worktree. |
@@ -137,6 +136,7 @@ to the command named after it in « `answer …, then run X` »: that step is
 | `OWN-ARC` | a root `questions-architecte-NN.md` | conventions | conventions.md:90 |
 | `OWN-ARB` | `blocked_architecte.md`, invocation other than 3 | conventions | conventions.md:86 |
 | `OWN-AR3` | `blocked_architecte.md`, invocation 3 | 8_code | 8_code.md:348-354 |
+| `OWN-BAT` | `blocked_batisseur.md` | batir | batir.md:71 · batir.md:128 |
 | `OWN-CAD` | `code/blocked_cadreur.md` | 7_lots | 7_lots.md:227 |
 | `OWN-RED` | `code/redecoupage.md`, third return | 7_lots | 7_lots.md:394-395 |
 | `OWN-COD` | `code/blocked_detailleur.md`, `code/<lot>/blocked_*.md` | 8_code | 8_code.md:354-355 · 8_code.md:773 |
@@ -145,7 +145,9 @@ to the command named after it in « `answer …, then run X` »: that step is
 | `OWN-DIA` | `investigation/blocked_*.md`, `blocked_diagnostiqueur.md` | diagnostique | diagnostique.md:233 · diagnostique.md:243 |
 | `OWN-?` | any other | none — listed under « unknown owner » | aucune commande ne nomme ce fichier |
 
-The form reads the feature folder and its highest `bugfix-NN/`.
+The form reads the feature folder and its highest `bugfix-NN/`. A request
+in `architecte/` — the Bâtisseur's among them — is the Architecte's to
+answer, never hers: it is no entry of the form.
 
 ---
 
@@ -189,6 +191,7 @@ Rédacteur's.
 | `OWN-ARC` | conventions | t'attend | see §3 | conventions.md:90 |
 | `OWN-ARB` | conventions | t'attend | see §3 | conventions.md:86 |
 | `OWN-AR3` | 8_code | t'attend | see §3 | 8_code.md:348-354 |
+| `OWN-BAT` | batir | t'attend | see §3 | batir.md:71 · batir.md:128 |
 | `OWN-CAD` | 7_lots | t'attend | see §3 | 7_lots.md:227 |
 | `OWN-RED` | 7_lots | t'attend | see §3 | 7_lots.md:394-395 |
 | `OWN-COD` | 8_code | t'attend | see §3 | 8_code.md:354-355 · 8_code.md:773 |
@@ -267,7 +270,17 @@ Rédacteur's.
 | `CON-4` | conventions | à faire | an answered `questions-architecte-NN.md`: invocation 2 | conventions.md:91 |
 | `CON-5` | conventions | à faire | no `docs/TECHNICAL_CONVENTIONS.md`: invocation 1 | conventions.md:92 |
 | `CON-6` | conventions | à faire | no `couverture.md`: invocation 4 | conventions.md:93 |
-| `CON-7` | conventions | faite | conventions and `couverture.md` there: nothing to do | conventions.md:95-97 |
+| `CON-7` | conventions | faite | conventions, with G2.1's, G4.4's and G12.6's tables, and `couverture.md` there: nothing to do | conventions.md:95-97 |
+| `CON-8` | conventions | à faire | conventions and `couverture.md` there, one of the three tables missing: invocation 4 | conventions.md:94 |
+| `BAT-1` | batir | à faire | no `docs/TECHNICAL_CONVENTIONS.md`: /conventions first | batir.md:69 |
+| `BAT-2` | batir | à faire | the conventions lack G2.1's, G4.4's or G12.6's table, by its three greps: /conventions first | batir.md:70 |
+| `BAT-3` | batir | à faire | `blocked_batisseur.md`, decision filled: the Bâtisseur applies it | batir.md:74-75 |
+| `BAT-4` | batir | à faire | a `# Request N` of `architecte/batisseur.md` with no verdict: the run opens on the Architecte | batir.md:77-79 |
+| `BAT-5` | batir | à faire | no `batisseur.md`: never built | 7_lots.md:97 |
+| `BAT-6` | batir | faite | `batisseur.md` says `## Status: built`, its `## Conventions` the commit that last changed the conventions | 7_lots.md:87-96 · batir.md:130 |
+| `BAT-7` | batir | à faire | `## Status: built` on another commit: the conventions changed since | 7_lots.md:97 |
+| `BAT-8` | batir | à faire | `## Status: blocked`, nothing waiting: the run opens on the Bâtisseur again | batir.md:131 · 7_lots.md:97 |
+| `BAT-9` | batir | inconnu | the report has no `## Status:` line or no commit, or the conventions' last commit cannot be read | aucune règle : le rapport du Bâtisseur ou le dernier commit des conventions ne se lit pas |
 | `LOT-1` | 7_lots | à faire | no technical document (`spec-technique.md`, or `desc-bug.md` in a correction): it stops | 7_lots.md:22-23 · 7_lots.md:61-69 |
 | `LOT-2` | 7_lots | faite | no `^### §`: nothing to build, /fusion next | 7_lots.md:75-81 |
 | `LOT-3` | 7_lots | bloquée | `code/blocked_verificateur.md`: the step before has to run again | 7_lots.md:222 |
@@ -314,6 +327,30 @@ proposes the correction chain: the commands act on it.
   `NAT-9`) when the root holds a file of an agent outside the upstream
   turn (`convertisseur`, `architecte`…) beside markers or before the grid:
   nothing says whether the step ran.
+- **`inconnu`: « Bâtir »** (`BAT-9`) when `batisseur.md` has no
+  `## Status:` line or no commit under `## Conventions`, or when the
+  commit that last changed the conventions cannot be read — no
+  repository, or no commit holds the file. The scan runs no git command:
+  the server reads that commit with the one /7_lots runs (7_lots.md:92),
+  once per `HEAD`, and gives it to the scan.
+- **« Bâtir » after the split**: /7_lots alone tests the report
+  (7_lots.md:87-97); /8_code does not. A conventions change made while
+  coding — the Architecte's verdict on a request — turns « Bâtir » « à
+  faire » again, and the steps after it with it (`G-AVAL`): the flow
+  proposes /batir, which creates only what is missing (batir.md:32-33).
+- **The correction chain has no « Bâtir »**: its /7_lots tests the feature
+  folder's `batisseur.md` too (7_lots.md:88) and stops on `Next: run /batir`,
+  which the flow then follows; the correction's own step stays « à faire ».
+- **A request of `architecte/batisseur.md` waiting**: /conventions takes it
+  first (`CON-3`, conventions.md:88), /batir too (`BAT-4`, batir.md:77-79).
+  The scan follows the chain order and proposes /conventions.
+- **A `blocked_architecte.md` left by /batir's invocation 3**: the file
+  carries `## Invocation` 3 and reads as /8_code's (`OWN-AR3`,
+  8_code.md:102-107), while /batir names /conventions on it
+  (batir.md:143-146). Nothing in the file tells the two apart; that
+  invocation blocks only on a missing conventions file (agents/architecte.md
+  « You block in two cases »), which /batir's first test already rules
+  out.
 - **The test on the emulator** has no file of its own. It is read from
   what follows it — a `bugfix-NN/` (`TST-3`), `rapport-fusion.md`
   (`TST-1`) — and is otherwise « à faire » once a control is written,

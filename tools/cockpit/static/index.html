@@ -181,10 +181,26 @@ button.chip:hover { border-color: var(--accent); }
 .mk-steps li.going .lb { font-weight: 650; }
 .mk-steps .dt { font-size: 14px; color: var(--soft); word-break: break-word; }
 .mk-steps li.failed .dt { color: var(--err); }
-.provide { list-style: none; padding: 0; margin: 4px 0 0; }
-.provide li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
-.provide .ic { font-weight: 700; text-align: center; font-size: 18px; }
-.provide li.ok .ic { color: var(--ok); } .provide li.ko .ic { color: var(--err); }
+/* « Bâtir », once built: the report's commands and the profile's targets. */
+.built { margin-top: 8px; font-size: 14px; }
+.built table { border-collapse: collapse; width: 100%; }
+.built th { text-align: left; font-weight: 600; color: var(--soft); font-size: 13px; padding: 2px 10px 4px 0; }
+.built td { padding: 3px 10px 3px 0; border-top: 1px solid var(--line); vertical-align: top; }
+.built td.mono { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
+.built td.ok { color: var(--ok); font-weight: 650; white-space: nowrap; }
+.built td.ko { color: var(--err); font-weight: 650; white-space: nowrap; }
+.built td.dur { white-space: nowrap; text-align: right; }
+.built .targets { margin-top: 6px; }
+/* « À répondre »: the Bâtisseur's tutorial, step by step. */
+.tuto { background: var(--bg); border-radius: 8px; padding: 10px 14px; line-height: 1.5; }
+.tuto ol { margin: 0; padding-left: 26px; }
+.tuto li { padding: 3px 0; }
+.tuto li::marker { font-weight: 700; }
+.tuto p { margin: 0 0 6px; }
+.tuto code { font-family: var(--mono); font-size: 0.9em; background: var(--card); border: 1px solid var(--line);
+  border-radius: 4px; padding: 0 4px; overflow-wrap: anywhere; }
+.tuto pre.cmd { font-family: var(--mono); font-size: 14px; background: var(--card); border: 1px solid var(--line);
+  border-left: 3px solid var(--accent); border-radius: 4px; padding: 6px 10px; margin: 6px 0; white-space: pre-wrap; }
 @media (max-width: 1100px) { .nf { grid-template-columns: 1fr; } .nf > label { padding-top: 0; }
   .mk-steps li { grid-template-columns: 28px minmax(0, 1fr); } .mk-steps .dt { grid-column: 2; } }
 .folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; margin-top: 10px; }
@@ -714,11 +730,6 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <a class="counter" href="#answer" id="cnt-blocking"><div class="muted">Blocages ouverts</div><div class="n" id="cnt-b">0</div></a>
       </div>
       <div id="chain-line" class="small" aria-label="La chaîne de l'application"></div>
-      <div class="card hidden" id="provide-card" style="margin-top:16px" aria-label="À fournir avant le code">
-        <h2 style="margin-bottom:4px">À fournir avant le code</h2>
-        <p class="muted small" style="margin:0 0 6px">Ce que l'application apporte elle-même, d'après socle.py. Rien ne bloque l'amont : il les faut à partir de /batir.</p>
-        <ul class="provide" id="provide-list"></ul>
-      </div>
       <div class="gauges" id="gauges" aria-label="Usage de l'abonnement"></div>
       <div class="alerts" id="alerts"></div>
       <div class="card">
@@ -1331,8 +1342,6 @@ function creationCard(rec) {
           title: "La création quitte la liste du cockpit ; le dossier reste tel quel", onclick: () => forgetCreation(rec)})));
   }
   if (st === "fait") {
-    if ((rec.provide || []).length) card.append(el("div", {class: "small", style: "margin-top:10px"},
-      el("b", {text: "À fournir avant le code : "}), rec.provide.join(" · ")));
     card.append(el("div", {class: "row", style: "margin-top:10px"},
       el("button", {class: "primary small", text: "Ouvrir le tableau de bord", onclick: () => activateApp(v.path, true)})));
   }
@@ -1793,19 +1802,6 @@ function renderDashboard() {
   renderGauges();
   renderAlerts();
   renderHistory();
-  renderProvide();
-}
-
-// « À fournir avant le code » (1.7): what socle.py says the application
-// provides itself, ✓ or ✗ read from its files; hidden once all are ✓.
-function renderProvide() {
-  const card = $("provide-card"), p = S.provide;
-  const show = !!(p && p.length && p.some((x) => !x.ok));
-  card.classList.toggle("hidden", !show);
-  if (!show) return;
-  $("provide-list").replaceChildren(...p.map((x) => el("li", {class: x.ok ? "ok" : "ko", "data-path": x.path},
-    el("span", {class: "ic", text: x.ok ? "✓" : "✗", "aria-label": x.ok ? "présent" : "manquant"}),
-    el("div", {}, el("span", {class: "mono", text: x.path}), el("div", {class: "small muted", text: x.text})))));
 }
 // The test step's « Déployer » opens « Déploiement » (1.8) — /deploie stays
 // under Paramètres → Commandes until a real deploy has worked from here.
@@ -1998,6 +1994,7 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     if (isNext && d.source !== "run") line1.append(el("span", {class: "next-tag", text: `Prochaine étape · ${d.label || ""}`}));
     const cmdText = s.id === "test" ? "« Déploiement », puis à la main" : `/${s.command} ${S.feature}`;
     const main = el("div", {}, line1, el("div", {class: "scmd", text: cmdText + (s.note && chain === "main" ? " — " + s.note : "")}));
+    if (s.report) main.append(builtView(s.report));
     if (s.id === "test") main.append(el("div", {class: "extra", text: S.recette
       ? `À tester : ${S.recette.rel} — ${S.recette.count} points${S.recette.first.length ? " : " + S.recette.first[0] : ""}`
       : "code/recette-ordonnee.md n'existe pas encore : /9_controle l'écrit."}));
@@ -2005,6 +2002,29 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     box.append(el("li", {class: cls, id: `step-${chain}-${s.id}`, "data-state": s.state},
       el("div", {class: "num", text: String(i + 1)}), main, acts));
   });
+}
+
+// « Bâtir », once built: each command of the Bâtisseur's report with its
+// result and its duration, then the deploy profile's targets.
+function builtView(r) {
+  const box = el("div", {class: "built", "aria-label": "Le projet construit"});
+  const ok = (x) => /^0$/.test((x || "").trim());
+  const secs = (x) => /^\d+(?:[.,]\d+)?$/.test((x || "").trim()) ? `${x.trim()} s` : (x || "—");
+  if ((r.commands || []).length) {
+    box.append(el("table", {},
+      el("thead", {}, el("tr", {}, ...["Commande", "", "Résultat", "Durée"].map((h) => el("th", {text: h})))),
+      el("tbody", {}, ...r.commands.map((c) => el("tr", {},
+        el("td", {}, el("b", {text: c.name})),
+        el("td", {class: "mono", text: c.command}),
+        el("td", {class: ok(c.result) ? "ok" : "ko", text: ok(c.result) ? "✓ code 0" : (c.result || "—")}),
+        el("td", {class: "dur", text: secs(c.duration)}))))));
+  }
+  const t = r.targets || [];
+  box.append(el("div", {class: "targets"}, el("b", {text: "Profil de déploiement : "}),
+    r.profile_error ? r.profile_error
+      : t.length ? t.map((x) => [x.name, x.type, x.kind].filter(Boolean).join(" · ")).join(" — ")
+      : "aucune cible dans .claude/deploy.json"));
+  return box;
 }
 
 function renderChaine() {
@@ -2122,13 +2142,14 @@ async function checkForms(notifyNew) {
   }
 }
 
-function draftOf(id, def) {
-  if (!drafts[id]) drafts[id] = {kind: def ? "default" : "none", option: def || null, text: ""};
+function draftOf(id, def, pre) {
+  if (!drafts[id]) drafts[id] = pre ? {kind: "option", option: pre, text: ""}
+    : {kind: def ? "default" : "none", option: def || null, text: ""};
   return drafts[id];
 }
 
-function choiceBlock(id, options, def, freeLabel) {
-  const d = draftOf(id, def);
+function choiceBlock(id, options, def, freeLabel, pre) {
+  const d = draftOf(id, def, pre);
   const wrap = el("div", {class: "opts"});
   const name = "c-" + id;
   const mk = (kind, option, label, extra, index) => {
@@ -2159,6 +2180,52 @@ function choiceBlock(id, options, def, freeLabel) {
   ta.value = d.text || "";
   ta.addEventListener("input", () => { d.text = ta.value; storeDrafts(); hint(); });
   return [wrap, ta];
+}
+
+// The Bâtisseur's `## To resume`, on a build tool a tutorial in French
+// (agents/batisseur.md « When you cannot produce »): its numbered lines as
+// steps, a line indented four spaces or fenced as a command to type, set
+// apart, and `code` — a path, a command — in its own font.
+function tutorialView(text) {
+  const box = el("div", {class: "tuto"});
+  const inline = (s) => {
+    const out = [];
+    s.split(/(`[^`]+`)/).forEach((part) => {
+      if (/^`[^`]+`$/.test(part)) out.push(el("code", {text: part.slice(1, -1)}));
+      else part.split(/(\*[^*\s][^*]*\*)/).forEach((x) => {
+        if (/^\*[^*\s][^*]*\*$/.test(x)) out.push(el("em", {}, el("b", {text: x.slice(1, -1)})));
+        // An address to open: set apart like a path, its last dot or comma left out.
+        else if (x) x.split(/(https?:\/\/[^\s«»]*[^\s«».,;:!?)])/).forEach((y) => {
+          if (/^https?:\/\//.test(y)) out.push(el("code", {class: "url", text: y}));
+          else if (y) out.push(y);
+        });
+      });
+    });
+    return out;
+  };
+  let list = null, cur = box, fence = null;
+  const put = (node) => cur.append(node);
+  for (const raw of (text || "—").split("\n")) {
+    if (fence !== null) {
+      if (/^\s*```/.test(raw)) { put(el("pre", {class: "cmd", text: fence.join("\n")})); fence = null; }
+      else fence.push(raw.replace(/^\s{0,8}/, ""));
+      continue;
+    }
+    if (/^\s*```/.test(raw)) { fence = []; continue; }
+    const step = raw.match(/^\s*(\d+)[.)]\s+(.*)$/);
+    if (step) {
+      if (!list) { list = el("ol", {start: step[1]}); box.append(list); }
+      cur = el("li", {}, ...inline(step[2]));
+      list.append(cur);
+      continue;
+    }
+    if (!raw.trim()) continue;
+    if (/^(\s{4,}|\t)/.test(raw)) { put(el("pre", {class: "cmd", text: raw.trim()})); continue; }
+    if (list && cur !== box) { cur.append(" ", ...inline(raw.trim())); continue; }
+    box.append(el("p", {}, ...inline(raw.trim())));
+  }
+  if (fence !== null) put(el("pre", {class: "cmd", text: fence.join("\n")}));
+  return box;
 }
 
 function entryCard(id, head, body, choice) {
@@ -2243,8 +2310,9 @@ function renderForms() {
         b.note ? el("div", {class: "notice warn small", text: b.note}) : null,
         el("div", {class: "lbl", text: "Ce qui bloque"}), el("pre", {class: "text", text: b.what_blocks || "—"}),
         b.where ? el("div", {class: "lbl", text: "Où"}) : null, b.where ? el("pre", {class: "text", text: b.where}) : null,
-        el("div", {class: "lbl", text: "Pour reprendre"}), el("pre", {class: "text", text: b.to_resume || "—"}),
-      ], choiceBlock(b.id, b.options, null, "Décision libre (texte ci-dessous)")));
+        el("div", {class: "lbl", text: "Pour reprendre"}),
+        b.agent === "batisseur" ? tutorialView(b.to_resume) : el("pre", {class: "text", text: b.to_resume || "—"}),
+      ], choiceBlock(b.id, b.options, null, "Décision libre (texte ci-dessous)", b.preselect)));
     }
     for (const [rel, cards] of blocks) form.append(group(rel, cards.length, cards));
   }

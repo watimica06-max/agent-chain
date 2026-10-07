@@ -97,9 +97,8 @@ def test_progress_failure_reprendre_then_lexique(tmp_path, page, chain_root, ide
         page.wait_for_function("location.hash === '#dashboard'", timeout=10000)
         page.wait_for_function("document.getElementById('next-text').textContent.includes('/1_lexique premiere-app')")
         assert page.locator("#tb-app").inner_text().startswith("Mon Appli Été")
-        # À fournir avant le code: the conventions ✗, read from the files.
-        prov = page.locator("#provide-card")
-        assert prov.is_visible() and prov.locator("li.ko").count() == 1
+        # « À fournir avant le code » went: /conventions writes the conventions.
+        assert page.locator("#provide-card").count() == 0
         # 1.8: « Déployer » opens « Déploiement », which says there is no
         # profile yet — a new application has none.
         page.get_by_role("link", name="Chaîne").first.click()
@@ -111,17 +110,15 @@ def test_progress_failure_reprendre_then_lexique(tmp_path, page, chain_root, ide
         assert no_real_errors(page) == []
 
 
-def test_the_provide_card_each_line_both_ways(tmp_path, page, chain_root):
+def test_no_provide_card_without_conventions(tmp_path, page, chain_root):
+    """An application with no conventions yet: no « À fournir avant le
+    code » — « Établir les conventions » and « Construire le projet » say it
+    in « Chaîne »."""
     with FakeServer(tmp_path / "s") as s:
         page.goto(s.url + "#dashboard")
         page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
-        prov = page.locator("#provide-card")
-        assert prov.is_visible() and prov.locator("li.ko").count() == 1
-        assert prov.locator("li.ko .mono").inner_text() == "docs/TECHNICAL_CONVENTIONS.md"
-        write(s.app_root, "docs/TECHNICAL_CONVENTIONS.md", "# Conventions\n")
-        page.reload()
-        page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
-        assert prov.is_hidden()
+        assert page.locator("#provide-card").count() == 0
+        assert "À fournir" not in page.locator("#scr-dashboard").inner_text()
         # « Déployer » stays on the test step (1.8: it opens « Déploiement »).
         page.get_by_role("link", name="Chaîne").first.click()
         page.wait_for_selector("#step-main-test")

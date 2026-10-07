@@ -6,6 +6,7 @@ import json
 import os
 import re
 
+import batirworld as bw
 import decide
 import nextline
 import scan
@@ -81,7 +82,7 @@ def test_each_contradiction_drops_the_stored_next(tmp_path):
     for i, (feature, line, wt, head, rule, says) in enumerate(CONTRADICTIONS):
         if feature == "c":
             app = code_folder(tmp_path / str(i), {"lot-01": "PASS"})
-            sc = scan.run_scan(str(app), "c")
+            sc = scan.run_scan(str(app), "c", None, bw.COMMIT)   # built on the conventions in force
         else:
             _, sc = sc_of(tmp_path / str(i), feature, worktree=wt)
         d = decide.decide(sc, feature, stored=stored(line, head=head), head_now="b" * 40)

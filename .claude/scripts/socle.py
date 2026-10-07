@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """The scaffolding a brand-new application needs before the chain runs.
 
-    python .claude/scripts/socle.py            # writes, commits, reports
-    python .claude/scripts/socle.py --list     # the report alone, nothing written
+    python .claude/scripts/socle.py            # writes, commits, says what
 
 The application is the folder holding the `.claude/` this script ships
 in. It must be the root of a git repository — the chain's install, which
@@ -29,12 +28,6 @@ would lose every domain in it. Then it commits those files alone —
 `chore: scaffolding for the chain` — and does not push: the cockpit
 does, and says when it fails.
 
-Last, it prints what the application still has to provide, one line
-each: `PROVIDE`, read by the cockpit too. Nothing there blocks the
-upstream chain; it is needed from `/batir` onward. The
-`technical-state-format` skill is not there: the chain's install brings
-it.
-
 Exit code 0 when done, 2 when it refuses, 1 when git fails.
 """
 import os
@@ -53,14 +46,6 @@ IGNORE = ("docs/features/*/stop.md", "docs/features/*/stop1.md",
 MESSAGE = "chore: scaffolding for the chain"
 WINDOWS = os.name == "nt"
 
-# What the application provides itself: (the path that says it is there,
-# what it is and who writes it).
-PROVIDE = (
-    ("docs/TECHNICAL_CONVENTIONS.md",
-     "les conventions techniques — écrites par /conventions, jamais à la main ; "
-     "/conventions se lance après /6_convertit, avant /batir"),
-)
-
 
 class Refused(Exception):
     pass
@@ -77,11 +62,6 @@ def _git(root, *args):
         msg = (p.stderr or p.stdout).decode("utf-8", "replace").strip()
         raise RuntimeError(f"git {args[0]} : {msg}")
     return p.stdout.decode("utf-8", "replace")
-
-
-def missing(root=ROOT):
-    """The lines of PROVIDE the application does not have yet."""
-    return [(rel, text) for rel, text in PROVIDE if not os.path.exists(_path(root, rel))]
 
 
 def _ignore_text(root):
@@ -131,23 +111,13 @@ def scaffold(root=ROOT):
     return written
 
 
-def report(root=ROOT):
-    lines = missing(root)
-    for rel, text in lines:
-        print(f"À fournir : {rel} — {text}")
-    return lines
-
-
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
-    if argv == ["--list"]:
-        report()
-        return 0
     if argv:
-        print("usage : python .claude/scripts/socle.py [--list]", file=sys.stderr)
+        print("usage : python .claude/scripts/socle.py", file=sys.stderr)
         return 1
     try:
         written = scaffold()
@@ -158,7 +128,6 @@ def main(argv=None):
         print(f"Échec : {e}", file=sys.stderr)
         return 1
     print(f"Commité « {MESSAGE} » : " + ", ".join(written + [FEATURES + "/"]))
-    report()
     return 0
 
 

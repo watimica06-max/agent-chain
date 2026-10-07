@@ -144,6 +144,22 @@ session ». L'étape de test porte « Déployer », qui ouvre l'écran
 `code/recette-ordonnee.md`. `/deploie` reste sous Paramètres → Commandes,
 jusqu'à ce qu'un vrai déploiement ait marché depuis le cockpit.
 
+**Construire le projet** — l'étape de `/batir`, entre « Établir les
+conventions » et « Découper en lots » : le Bâtisseur construit le squelette
+que les conventions déclarent (les tables de G2.1, G4.4 et G12.6) et prouve
+qu'il se construit. Faite quand `batisseur.md` dit `## Status: built` depuis
+le commit qui a changé les conventions en dernier — le test même de
+`/7_lots` ; à faire de nouveau dès que les conventions changent ; t'attend
+quand le Bâtisseur a laissé un `blocked_batisseur.md` sans décision.
+« Pourquoi ? » montre la ligne de statut du rapport et son commit. Une fois
+construit, les commandes du rapport s'affichent sous l'étape, chacune avec
+son résultat et sa durée, puis les cibles du profil de déploiement. Sur un
+outil de build introuvable, son blocage est un tutoriel : « À répondre »
+le montre étape par étape — les commandes à taper et les chemins mis à
+part — et « fait » y est déjà choisi : il reste à le suivre, puis à
+enregistrer. Les demandes du Bâtisseur à l'Architecte (`architecte/`) ne
+sont jamais là : l'Architecte y répond.
+
 **Déploiement** (1.8) — construire l'application active et l'installer là
 où elle tourne, sans Claude, puis la regarder tourner. Ce qu'il faut
 construire et où l'installer est le **profil de déploiement** de
@@ -210,13 +226,9 @@ type choisi, chacun avec ce qu'il veut dire. « Enregistrer le profil »
 tourne dans l'application. Une application neuve n'a pas de profil tant
 qu'on n'en a pas écrit un.
 
-**À fournir avant le code** (1.7) — sur le tableau de bord, ce que
-l'application apporte elle-même, d'après `socle.py` : ses conventions
-techniques, `docs/TECHNICAL_CONVENTIONS.md`, écrites par `/conventions`.
-La compétence `technical-state-format` n'y est plus : l'installation de la
-chaîne l'apporte. Chaque ligne ✓ ou ✗, lue dans ses fichiers. Rien ne
-bloque l'amont : il les faut à partir de `/batir`. La carte disparaît
-quand tout est ✓.
+**À fournir avant le code** (1.7) n'est plus : la chaîne apporte la
+compétence et le format du profil, `/conventions` écrit les conventions,
+et « Construire le projet » dit, dans « Chaîne », ce qui manque encore.
 
 **Chaîne → Code** — `/8_code` lot par lot : les lots passés sur le total,
 en barre ; pendant un run, le lot en cours et l'agent qui y travaille, le

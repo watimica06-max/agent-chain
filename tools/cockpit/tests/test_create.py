@@ -159,8 +159,9 @@ def test_a_creation_without_a_remote(tmp_path, idea, chain_root):
     assert (app / ".gitignore").read_text(encoding="utf-8").splitlines() == [
         ".claude/worktrees/", ".claude/settings.local.json", "docs/features/*/stop.md", "docs/features/*/stop1.md"]
     assert git(app, "show", "--name-only", "--format=", "HEAD").split() == ["docs/features/premiere-app/idees.md"]
-    # The technical-state-format skill is the chain's: the install brought it.
-    assert [p.split(" — ")[0] for p in out["provide"]] == ["docs/TECHNICAL_CONVENTIONS.md"]
+    # « À fournir avant le code » went: the chain ships the skill and the
+    # format, and /conventions writes the conventions.
+    assert "provide" not in out
     assert rec.finished == [v["path"]]
     assert git(app, "remote").strip() == ""
 
@@ -246,7 +247,6 @@ def test_every_step_checks_what_is_there_and_does_not_redo_it(tmp_path, idea, ch
     assert d[2].startswith("déjà installée") and d[2].endswith("déjà poussé")
     assert d[3] == "déjà là — déjà poussé" and d[4] == "déjà là — déjà poussé"
     assert git(app, "rev-parse", "HEAD") == head
-    assert len(out["provide"]) == 1                  # the conventions; the skill came with the chain
 
 
 def test_a_push_that_fails_stops_and_reprendre_pushes(tmp_path, idea, chain_root, monkeypatch):
@@ -334,7 +334,7 @@ def test_the_routes_create_resume_and_open_on_lexique(tmp_path, idea, chain_root
         assert s["app_name"] == "Atelier Été" and s["feature"] == "premiere-app" and s["open"]
         assert s["decision"]["next"]["command"] == "1_lexique" and s["decision"]["next"]["args"] == "premiere-app"
         assert s["chain"]["state"] == chain.UP_TO_DATE
-        assert [x["ok"] for x in s["provide"]] == [False]
+        assert "provide" not in s                    # « À fournir avant le code » went
         assert "deploie" not in [x["name"] for x in s["commands"]]
         assert (await post(c, "/api/create/resume", {"path": path})).status == 404
     with_client(tmp_path, body)
@@ -357,21 +357,10 @@ def test_abandon_leaves_the_folder(tmp_path, idea, chain_root, monkeypatch):
     with_client(tmp_path, body)
 
 
-def test_the_provide_card_each_line_both_ways(tmp_path, chain_root):
-    app = tmp_path / "app"
-    app.mkdir()
-    lines = server.provide_lines(str(app))
-    assert [(x["path"], x["ok"]) for x in lines] == [("docs/TECHNICAL_CONVENTIONS.md", False)]
-    write(app, "docs/TECHNICAL_CONVENTIONS.md", "# Conventions\n")
-    assert [x["ok"] for x in server.provide_lines(str(app))] == [True]
-    os.remove(app / "docs" / "TECHNICAL_CONVENTIONS.md")
-    assert [x["ok"] for x in server.provide_lines(str(app))] == [False]
-    write(app, "docs/TECHNICAL_CONVENTIONS.md", "# Conventions\n")
-    assert [x["ok"] for x in server.provide_lines(str(app))] == [True]
-    assert "/conventions" in lines[0]["text"]
-    # A chain with no socle.py: no card.
-    os.remove(chain_root / ".claude" / "scripts" / "socle.py")
-    assert server.provide_lines(str(app)) is None
+def test_no_provide_card_any_more():
+    """« À fournir avant le code » went with socle.py's PROVIDE: the chain
+    ships the skill and the format, /conventions writes the conventions."""
+    assert not hasattr(server, "provide_lines") and not hasattr(server, "socle_module")
 
 
 def test_a_creation_the_server_stopped_mid_step_is_offered_reprendre(tmp_path, idea, chain_root):

@@ -381,3 +381,37 @@ def test_runs_already_stored_are_filled_from_their_logs(tmp_path):
     os.remove(logs / os.path.basename(LEXIQUE_LOG))
     assert store.backfill_outputs() == {"runs": 0, "passes": 0, "unknown": 1}
     assert all(p["output_tokens"] is None for p in rows(store, "SELECT * FROM agent_passes"))
+
+
+async def a_batir_run(c):
+    """/batir: the Bâtisseur, the Architecte on its request, the Bâtisseur
+    again — each a foreground agent, prompted as batir.md says."""
+    if c.prompts[-1] == "/usage":
+        yield ResultMessage(subtype="success", duration_ms=1, duration_api_ms=0, is_error=False, num_turns=0,
+                            session_id="s1", result="")
+        return
+    for k, (tid, agent, desc, prompt) in enumerate([
+            ("B1", "batisseur", "Build premiere", "Working folder: docs/features/premiere/. Conventions: 4f7c2a9."),
+            ("A1", "architecte", "Requests premiere",
+             "Working folder: docs/features/premiere/. Invocation 3 — Requests. Called by the orchestration."),
+            ("B2", "batisseur", "Build premiere", "Working folder: docs/features/premiere/. Conventions: 9e8d7c6.")]):
+        yield am([ToolUseBlock(id=tid, name="Agent", input={"subagent_type": agent, "description": desc,
+                                                              "prompt": prompt})], f"o{k}", usage(5, 100, 10))
+        yield am([TextBlock("ok")], f"p{k}", usage(400 + k, 0, 0), parent=tid, model="claude-sonnet-x")
+        yield UserMessage(content=[ToolResultBlock(tool_use_id=tid, content="done")])
+    yield am([TextBlock("Next: run /7_lots premiere")], "end", usage(5, 100, 0))
+    yield ResultMessage(subtype="success", duration_ms=1, duration_api_ms=1, is_error=False, num_turns=1,
+                        session_id="s1", result="Next: run /7_lots premiere")
+
+
+def test_the_batisseurs_passes_under_its_name(tmp_path):
+    """C.5: nothing names the agents — the Bâtisseur's passes are stored and
+    summed like any agent's, under `batisseur`."""
+    import statsview
+    store, run, _ = run_with(tmp_path, a_batir_run)
+    passes = rows(store, "SELECT * FROM agent_passes WHERE run_id=? ORDER BY id", run.id)
+    assert [p["agent"] for p in passes] == ["batisseur", "architecte", "batisseur"]
+    assert [p["input_tokens"] for p in passes] == [400, 401, 402]
+    assert all(p["folder"] == "" and p["lot"] is None for p in passes)
+    by = {a["agent"]: a for a in statsview.build(store.path, None, "tout")["by_agent"]}
+    assert by["batisseur"]["passes"] == 2 and by["architecte"]["passes"] == 1

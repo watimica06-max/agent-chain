@@ -4,10 +4,10 @@
 """
 import argparse
 import asyncio
-import importlib.util
 import json
 import os
 import re
+import subprocess
 import sys
 import webbrowser
 from datetime import datetime
@@ -289,45 +289,37 @@ def chain_state(app):
     return chain_mod.state(app, CHAIN_ROOT)
 
 
-_socle_cache = {}
-
-
-def socle_module(root=None):
-    """The chain's `.claude/scripts/socle.py`, loaded as a module — its
-    PROVIDE is what an application still provides (§22). The chain's copy,
-    so that an application installed before 1.7 is read the same way. None
-    when the chain has no such script."""
-    path = os.path.join(root or CHAIN_ROOT, ".claude", "scripts", "socle.py")
-    try:
-        mtime = os.path.getmtime(path)
-    except OSError:
-        return None
-    hit = _socle_cache.get(path)
-    if hit and hit[0] == mtime:
-        return hit[1]
-    try:
-        spec = importlib.util.spec_from_file_location("socle_of_the_chain", path)
-        m = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(m)
-        m.PROVIDE[0]
-    except Exception as e:
-        print(f"socle.py illisible ({path}) : {e}", flush=True)
-        return None
-    _socle_cache[path] = (mtime, m)
-    return m
-
-
-def provide_lines(app):
-    """« À fournir avant le code » (§22): each thing socle.py says the
-    application provides, ✓ or ✗ read from its files."""
-    m = socle_module()
-    if m is None or not app:
-        return None
-    return [{"path": rel, "text": text, "ok": os.path.exists(os.path.join(app, *rel.split("/")))}
-            for rel, text in m.PROVIDE]
-
-
 # ------------------------------------------------------------- the scan
+
+_conventions_cache = {}
+
+
+def conventions_commit(app):
+    """The commit that last changed `docs/TECHNICAL_CONVENTIONS.md` — the
+    test /7_lots runs on the Bâtisseur's report (cmd/7_lots.md:87-92), which
+    « Bâtir » reads too. The scan runs no git command: it is read here, once
+    per `HEAD` — a commit is what changes it. None when git cannot say: not
+    a repository, or no commit holds the file."""
+    head = gitref.head(app)
+    if not head:
+        return None
+    key = (os.path.normcase(os.path.abspath(app)), head)
+    if key in _conventions_cache:
+        return _conventions_cache[key]
+    try:
+        p = subprocess.run(["git", "-C", app, "log", "-1", "--format=%H", "--", "docs/TECHNICAL_CONVENTIONS.md"],
+                           capture_output=True, timeout=20, stdin=subprocess.DEVNULL,
+                           env=dict(os.environ, GIT_TERMINAL_PROMPT="0"))
+    except (OSError, subprocess.SubprocessError):
+        return None
+    out = p.stdout.decode("utf-8", "replace").strip() if p.returncode == 0 else ""
+    _conventions_cache[key] = out or None
+    return _conventions_cache[key]
+
+
+def scan_of(app, feature, snap=None):
+    """The scan of one feature, with the conventions' last commit."""
+    return scan_mod.run_scan(app, feature, snap, conventions_commit(app))
 
 def where(state: State, rn, app, feature, reason=None):
     """The scan and §2's decision. `reason` names a scan trigger — the
@@ -336,7 +328,7 @@ def where(state: State, rn, app, feature, reason=None):
     the run's log, once."""
     run = rn.current(app)
     snap = run.snapshot() if run and run.id else None
-    sc = scan_mod.run_scan(app, feature, snap)
+    sc = scan_of(app, feature, snap)
     if reason:
         state.clear_fresh(app, feature)
     stored = state.relay(app, feature)
@@ -598,8 +590,6 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             # The chain installed in the application (§20) — 1.6: also where
             # it is not installed yet, and no feature can open.
             out["chain"] = chain_state(state.app_folder)
-            # 1.7: what the application still provides before the code (§22).
-            out["provide"] = provide_lines(state.app_folder)
         if state.app_folder and not check_app_folder(state.app_folder):
             out["working_folders"] = working_folders(state.app_folder, state.ignored)
             out["all_folders"] = all_folders(state.app_folder)
@@ -708,7 +698,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if f and f in row["features"]:
             row["feature"] = f
             try:
-                sc = scan_mod.run_scan(folder, f, snap)
+                sc = scan_of(folder, f, snap)
                 prop = sc["proposal"]
                 row["proposal"] = {"name": prop.get("name"), "state": prop.get("state"), "chain": prop.get("chain"),
                                    "french": decide_mod.proposal_next(sc, prop, f)["french"]}
@@ -823,7 +813,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         state.add_app(v["path"], v["name"])
         folder = state.app(v["path"])["folder"]
         state.open_pair(folder, v["feature"])
-        sc = scan_mod.run_scan(folder, v["feature"])
+        sc = scan_of(folder, v["feature"])
         nxt = decide_mod.proposal_next(sc, sc["proposal"], v["feature"])
         return (f"« {v['name']} » ajoutée à la liste, active, ouverte sur {v['feature']} — "
                 f"le relevé du dossier propose : {nxt['french']}")

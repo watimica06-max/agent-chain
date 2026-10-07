@@ -67,7 +67,7 @@ def test_the_flow_shows_each_state(tmp_path, page):
         assert got["3b_nature"] == "t'attend"           # blocked_classeur.md, decision empty
         assert got["4_grille"] == "à faire"
         assert page.locator("#step-main-3_decoupe .stc").inner_text() == "inconnu"
-        assert len(got) == 14
+        assert len(got) == 15                           # « Construire le projet » between conventions and the split
         # bloquée and en cours, on « f »: a worktree left, then a run going.
         (s.app_root / ".claude" / "worktrees" / "f").mkdir(parents=True)
         open_feature(s, page, "f")

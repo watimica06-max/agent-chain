@@ -46,6 +46,7 @@ RELECTEUR_MISSING = re.compile(
     r"\bmissing\b|\babsent\b|not found|does not exist|no such|introuvable|manquant|manque",
     re.IGNORECASE)
 SKIP_DIRS = {"closed", ".git", "node_modules", "build"}
+BATISSEUR_DONE = "fait"
 
 
 @dataclass
@@ -68,6 +69,7 @@ class BlockingEntry:
     decision_line: int = -1
     base: str = ""             # the working folder it was read against
     note: str = ""             # shown beside the entry: what a guess saw, never a reason to hide it
+    preselect: str | None = None   # the option the form opens on, chosen
 
     def to_dict(self):
         d = asdict(self)
@@ -294,6 +296,14 @@ def parse_lines(lines, path, rel, work_dir=None, worktree=None) -> ParsedBlockin
                           "peut-être une des lignes que /8_code retire par un acte "
                           "(8_code.md:770-772), sans décision. Ce n'est qu'une lecture du texte : "
                           "l'entrée reste à décider.")
+    if name == "blocked_batisseur.md":
+        # agents/batisseur.md « When you cannot produce »: on a build tool,
+        # `## To resume` is her tutorial, and it ends on the step that says
+        # to write *fait* — offered, and chosen when the tutorial says it.
+        if BATISSEUR_DONE not in entry.options:
+            entry.options.append(BATISSEUR_DONE)
+        if re.search(r"\bfait\b", entry.to_resume, re.IGNORECASE):
+            entry.preselect = BATISSEUR_DONE
     out.entries.append(entry)
     return out
 

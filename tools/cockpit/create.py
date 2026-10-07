@@ -231,7 +231,6 @@ class Creation:
         r = record or {}
         self.steps = r.get("steps") or [{"id": i, "label": t, "status": TODO, "detail": ""} for i, t in STEPS]
         self.status = r.get("status") or TODO
-        self.provide = r.get("provide") or []
         self.started_at = r.get("started_at") or datetime.now().isoformat(timespec="seconds")
         self.error = r.get("error")
         self.contents = r.get("contents") or []
@@ -243,7 +242,7 @@ class Creation:
     def record(self):
         v = {k: x for k, x in self.v.items() if k != "idea_text"}
         return {"values": v, "steps": [dict(s) for s in self.steps], "status": self.status,
-                "provide": list(self.provide), "started_at": self.started_at, "error": self.error,
+                "started_at": self.started_at, "error": self.error,
                 "contents": list(self.contents), "failed_at": self.failed_at()}
 
     def failed_at(self):
@@ -399,13 +398,11 @@ class Creation:
         err = p.stderr.decode("utf-8", "replace").strip()
         if p.returncode:
             raise StepError(f"{SOCLE} : " + (err or out.strip() or f"code {p.returncode}"))
-        self.provide = [l[len("À fournir : "):] for l in out.splitlines() if l.startswith("À fournir : ")]
         return out
 
     def step_socle(self):
         rel = "docs/PRODUIT_GLOBAL.md"
         if self.tracked_clean(rel):
-            self._socle("--list")
             detail = "déjà là"
         elif os.path.exists(os.path.join(self.path, *rel.split("/"))):
             raise StepError(f"{rel} existe sans être commité : socle.py refuserait — "
