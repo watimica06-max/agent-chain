@@ -79,7 +79,11 @@ that name.
 - **The files the sheet's `## Test data` lists** — 🔴 **those, and only
   those**, each by its path: 📌 **real instances of what the code
   reads, the reference data of `.claude/formats/donnees.md`.** ⚠️
-  **Never a `donnees/` folder, never its `donnees.md`**
+  **Never a `donnees/` folder**
+- **The entry of each of those files in its index** — 🔴 **the
+  `donnees.md` of the folder the file's path names, by the file's name,
+  that index only** — 📌 **its `Private:` line, read before the copy of
+  move 3.** ⚠️ **Never another entry, never the whole index**
 
 **How you find things**
 
@@ -110,7 +114,8 @@ yours**: you read it to keep its assertion, not to take it.
 test command the conventions name** — 📌 **or, when they name none,
 the one fallback of move 4: the build tool's default test task on the
 module** — 🔴 **and `cp` of one file the sheet's `## Test data` lists
-into the test folder, at move 3.** ⚠️ **Nothing else at all** — not a
+into the test folder, at move 3.** 📌 **`.gitignore` is written with
+`Edit` — `Write` when there is none —, never from the shell.** ⚠️ **Nothing else at all** — not a
 search, not a listing, not a wait, not a merge, not a branch, not a
 push, not a worktree. 📌 **Whatever it is, if it is not one of those,
 it is not yours.**
@@ -131,7 +136,9 @@ it is not yours.**
 - 🔴 **Write a criterion's test against another criterion** — one test,
   one criterion
 - Write anywhere but the tests, the copies of `## Test data`, your
-  report, the manual list and a blocking file
+  report, the manual list, a blocking file and, for a private copy,
+  `.gitignore`
+- 🔴 **Stage a private copy** — 📌 **it stays out of git**, see move 3
 
 ---
 
@@ -255,6 +262,17 @@ in the conventions**, under the file's own name, ⚠️ **unaltered**:
 🔴 **one `cp` per file.** 📌 **Your tests read the copy**, never the
 path under `docs/`.
 
+🔴 **Before each copy, read the file's entry in its index** — 📌 **a
+`Grep` on `^## <name>$` in the `donnees.md` of the folder its path
+names, with the four lines after it.** ⚠️ **`Private: yes`** — 🔴
+**the copy's path goes into the private section of `.gitignore`**
+(`.claude/formats/donnees.md` §6), **in the commit of move 6**, ⚠️ **and
+the copy is never staged**: 📌 **it stays where it is, out of git.** 🔴
+**A test that reads a private copy is skipped where the copy is absent,
+never failed** — 📌 **the test framework's own skip, on the copy's
+existence**: ⚠️ **a clone holds no copy**, and the next worktree holds
+it only because the command carries it there.
+
 🔴 **A value the criterion does not state — an input, a record, what
 another system sends — comes from those files when one holds it.** ⚠️
 **Invented, it is the shape you expect, not the one that arrives** —
@@ -332,7 +350,8 @@ cannot be placed.
 rather than a line saying so.**
 
 **6. Commit**, staging explicitly the tests you wrote, the copies of
-`## Test data`, your report and the manual list. 🔴 **The message reads
+`## Test data`, your report and the manual list — ⚠️ **a private copy
+never: `.gitignore` in its place**, see move 3. 🔴 **The message reads
 `<working folder>/<lot>: <what the commit carries>`** — 📌
 **`<working folder>` is the folder the prompt gives, as its path
 under `docs/features/`**: `premiere-app-3`, `premiere-app-3/bugfix-01`.
@@ -369,7 +388,8 @@ is merged**, and the worktree is removed at the end of the run.
 
     <the test file you created because the one your tests belong in
     did not exist, and each file of `## Test data` you copied, at its
-    new path — or a dash>
+    new path — a private one followed by `— private, ignored, not
+    committed` — or a dash>
 
     ## Decision applied
 
@@ -386,7 +406,9 @@ is merged**, and the worktree is removed at the end of the run.
 counts them declared, beside the sheet's `## Files` and the conception
 report's `## Declared`.** ⚠️ **`## Outside the lot` keeps its
 meaning**: a file you touched that none of the three names — 📌 **an older test adapted at move 4 in a file the sheet does
-not name, for one.**
+not name, for one**, 🔴 **and `.gitignore`, for a private copy** — ⚠️
+**declared like any file you modified**, unless the sheet's `## Files`
+names it.
 
 🔴 **`## Decision applied` names the blocking file whose `## Decision`
 you applied** — 📌 **a dash or a name, never omitted**: ⚠️ **a dash is

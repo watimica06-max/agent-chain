@@ -3,9 +3,9 @@
 Hand-written folders following the templates of the command and its agents:
 the sequence (verificateur.md:107-115), the lot list (cadreur.md:848-854),
 the verdict (relecteur.md:140-170), the Détailleur's blocking file at the
-split's root (detailleur.md:355-379), the Réalisateur's (realisateur.md:321-336),
+split's root (detailleur.md:355-379), the Réalisateur's (realisateur.md:328-343),
 the requests (arbitre.md:451-460), `code/redecoupage.md` (arbitre.md:379-399,
-cadreur.md:1054-1061) and the lot's commits (8_code.md:198-229). No real
+cadreur.md:1054-1061) and the lot's commits (8_code.md:206-237). No real
 folder of the current chain has a `code/` yet. No command runs."""
 import os
 import shutil
@@ -197,7 +197,7 @@ def test_a_re_split_that_does_not_hold_leaves_its_lots_to_the_other_rules(tmp_pa
 
 
 def test_a_lot_folder_holds_the_four_agents_blocking_files_only(tmp_path):
-    # 8_code.md:751-754: code/<lot>/ for the Concepteur, the Testeur, the
+    # 8_code.md:760-763: code/<lot>/ for the Concepteur, the Testeur, the
     # Réalisateur, the Relecteur; the Détailleur's at the split's root.
     app, f = hand_folder(tmp_path)
     (f / "code" / "lot-07" / "blocked_concepteur.md").write_text(
@@ -305,7 +305,7 @@ def sha_of(repo, subject):
 
 @pytest.mark.skipif(shutil.which("git") is None, reason="git absent")
 def test_a_lots_commits_are_found_by_their_subject_after_the_split_in_force(tmp_path):
-    """8_code.md:198-229: the subject `<working folder>/<lot>: ` alone, after
+    """8_code.md:206-237: the subject `<working folder>/<lot>: ` alone, after
     the commit that added the current code/decoupage.md, cut after the lot's
     last revert. Every shape the 1.5.1 scratch repository ran."""
     repo = tmp_path / "repo"

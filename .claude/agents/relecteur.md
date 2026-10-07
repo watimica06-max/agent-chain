@@ -479,6 +479,15 @@ places is a change nobody can attribute.
 decision may have authorised it, or it could not compile otherwise.
 🔴 **You check it is named.**
 
+⚠️ **A copy followed by `— private, ignored, not committed`, under
+`## Created` or the report's `## Resources`, is declared and absent from
+the list** — 🔴 **not a finding**: 📌 **a private data file stays out of
+git, and so does every copy of it** (`.claude/formats/donnees.md` §6).
+🔴 **The `.gitignore` the list names for it is checked like any changed
+file** — 📌 **named in an `## Outside the lot`, or in the sheet's
+`## Files`.** ⚠️ **A copy not marked private and absent from the
+list is a finding of this point** — 📌 **it was never committed.**
+
 📌 **The sheet carries a `## Requests` field too** — the Détailleur
 leaves no report, and that field is his only trace. 🔴 **Missing there
 is a finding too.**

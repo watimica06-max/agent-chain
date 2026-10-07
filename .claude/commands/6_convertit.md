@@ -172,6 +172,14 @@ answers are invisible inside it.
 ⚠️ **Never let the tooling branch it for you** — its default base is
 `origin/master`, which can sit several commits behind local.
 
+🔴 **Before entering it, carry the private files in** — 📌 **each path
+the private section of the main checkout's `.gitignore` lists
+(`.claude/formats/donnees.md` §6) that is on disk there, copied to the
+same path under `.claude/worktrees/<name>/`.** ⚠️ **A private file is
+in no commit**, and the convertisseur would find a data file its blocks
+cite missing. 📌 **No section, or nothing of it on disk, is a normal
+outcome.**
+
 📌 **Enter the worktree before anything below**, not after a write
 fails — the harness blocks a subagent's writes until the session is
 isolated.

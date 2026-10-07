@@ -24,14 +24,14 @@ import textfile
 PAS_COMMENCE, ENTAME, EN_COURS, PASSE, ECHOUE, TROIS, ANNULE, BLOQUE, REDECOUPE, INCONNU = (
     "pas commencé", "entamé", "en cours", "passé", "échoué", "échoué 3 fois", "annulé", "bloqué",
     "redécoupé", "inconnu")
-CAP = 3                      # cmd/8_code.md:297-299 — three codings, the first included
+CAP = 3                      # cmd/8_code.md:305-307 — three codings, the first included
 FIELDS = ("Anchor", "Needs", "Produces", "Modifies", "Touches")
 # Requests an agent of the lot writes to the Architecte, named by the lot.
 REQUEST = re.compile(r"^(concepteur|testeur|realisateur|detailleur|arbitre)-(lot-[A-Za-z0-9]+?)"
                      r"(?:-blocking-\d+)?(?:-\d+)?\.md$")
 BLOCKED = re.compile(r"^blocked_([A-Za-z0-9_]+?)(?:-(\d+))?\.md$")
 DETAILLEUR_ENTRY = re.compile(r"^## Blocking (\d+)\s*[—–-]+\s*(lot-[A-Za-z0-9]+)\b")
-# Who writes a blocking file in `code/<lot>/` (`B-OU`, cmd/8_code.md:751-752).
+# Who writes a blocking file in `code/<lot>/` (`B-OU`, cmd/8_code.md:760-761).
 LOT_AGENTS = ("concepteur", "testeur", "realisateur", "relecteur")
 # The lots the Arbitre names in `code/redecoupage.md`, and the Cadreur's two
 # sections, written once the split is cut again (`E-REDEC`).
@@ -45,34 +45,34 @@ RULES = {
     "L-ORDRE": "8_code.md:38-39 · agents/verificateur.md:107-115",
     "L-TITRE": "agents/cadreur.md:848-854",
     "E-PASSE": "8_code.md:80-82 · agents/relecteur.md:116",
-    "E-ECHOUE": "8_code.md:262-264",
-    "E-TROIS": "8_code.md:318-320",
-    "E-ANNULE": "8_code.md:163-165 · agents/relecteur.md:183-186",
-    "E-BLOQUE": "8_code.md:348-355 · 8_code.md:748-758",
+    "E-ECHOUE": "8_code.md:270-272",
+    "E-TROIS": "8_code.md:326-328",
+    "E-ANNULE": "8_code.md:171-173 · agents/relecteur.md:183-186",
+    "E-BLOQUE": "8_code.md:356-363 · 8_code.md:757-767",
     "E-REDEC": "agents/arbitre.md:392-396 · agents/cadreur.md:1054-1061 · 7_lots.md:165-167 · 7_lots.md:224 · 7_lots.md:227",
-    "E-ENTAME": "8_code.md:158-159 · 8_code.md:174-176",
-    "E-AFAIRE": "8_code.md:158-159",
-    "E-ENCOURS": "8_code.md:605-606 · 8_code.md:80-82",
+    "E-ENTAME": "8_code.md:166-167 · 8_code.md:182-184",
+    "E-AFAIRE": "8_code.md:166-167",
+    "E-ENCOURS": "8_code.md:613-614 · 8_code.md:80-82",
     "E-INCONNU": "aucune règle : un verdict sans « ## Status » lisible",
-    "T-ESSAIS": "8_code.md:318-320 · 8_code.md:322-323 · 8_code.md:331-336 · agents/relecteur.md:173-175",
-    "P-ORDRE": "8_code.md:158-159 · 8_code.md:174-176 · 8_code.md:190",
+    "T-ESSAIS": "8_code.md:326-328 · 8_code.md:330-331 · 8_code.md:339-344 · agents/relecteur.md:173-175",
+    "P-ORDRE": "8_code.md:166-167 · 8_code.md:182-184 · 8_code.md:198",
     "P-ECRIT": "agents/detailleur.md:55-56 · agents/relecteur.md:140 · agents/concepteur.md:301-304 · "
-               "agents/realisateur.md:738",
-    "P-ARBITRE": "8_code.md:760-763 · agents/realisateur.md:357-364 · agents/detailleur.md:408-415 · 8_code.md:751-754",
-    "P-ARCHITECTE": "8_code.md:488-492 · agents/arbitre.md:476-486",
-    "P-DEMANDES": "agents/concepteur.md:227-230 · agents/realisateur.md:481 · agents/detailleur.md:448 · "
+               "agents/realisateur.md:756",
+    "P-ARBITRE": "8_code.md:769-772 · agents/realisateur.md:364-371 · agents/detailleur.md:408-415 · 8_code.md:760-763",
+    "P-ARCHITECTE": "8_code.md:496-500 · agents/arbitre.md:476-486",
+    "P-DEMANDES": "agents/concepteur.md:227-230 · agents/realisateur.md:488 · agents/detailleur.md:448 · "
                   "agents/detailleur.md:466-467 · agents/arbitre.md:451-460",
-    "B-OU": "8_code.md:748-758 · agents/detailleur.md:355-358",
-    "C-GREP": "8_code.md:198-201 · 8_code.md:206-208 · 8_code.md:217-223",
-    "C-DOSSIER": "8_code.md:202-203 · 8_code.md:210-215 · 8_code.md:225-229 · agents/concepteur.md:309-312 · "
-                 "agents/testeur.md:334-337 · agents/realisateur.md:743-749",
-    "W-LIVE": "8_code.md:126-128 · 8_code.md:135-136 · 8_code.md:470-475",
-    "A-LOT": "8_code.md:605-606 · 8_code.md:564 · 8_code.md:573 · 8_code.md:582 · 8_code.md:597 · 8_code.md:442",
-    "A-DESC": "8_code.md:563 · 8_code.md:572 · 8_code.md:581 · 8_code.md:596 · agents/realisateur.md:361-363",
-    "A-BLOC": "8_code.md:418-419 · 8_code.md:440-441 · agents/detailleur.md:412-414",
-    "A-DOSSIER": "8_code.md:608-609",
-    "A-AUCUN": "8_code.md:509-510",
-    "A-IMBRIQUE": "agents/realisateur.md:357-364 · agents/arbitre.md:476-486",
+    "B-OU": "8_code.md:757-767 · agents/detailleur.md:355-358",
+    "C-GREP": "8_code.md:206-209 · 8_code.md:214-216 · 8_code.md:225-231",
+    "C-DOSSIER": "8_code.md:210-211 · 8_code.md:218-223 · 8_code.md:233-237 · agents/concepteur.md:309-312 · "
+                 "agents/testeur.md:352-356 · agents/realisateur.md:762-768",
+    "W-LIVE": "8_code.md:126-128 · 8_code.md:135-136 · 8_code.md:478-483",
+    "A-LOT": "8_code.md:613-614 · 8_code.md:572 · 8_code.md:581 · 8_code.md:590 · 8_code.md:605 · 8_code.md:450",
+    "A-DESC": "8_code.md:571 · 8_code.md:580 · 8_code.md:589 · 8_code.md:604 · agents/realisateur.md:368-370",
+    "A-BLOC": "8_code.md:426-427 · 8_code.md:448-449 · agents/detailleur.md:412-414",
+    "A-DOSSIER": "8_code.md:616-617",
+    "A-AUCUN": "8_code.md:517-518",
+    "A-IMBRIQUE": "agents/realisateur.md:364-371 · agents/arbitre.md:476-486",
     "D-ESTIME": "demande 1.5, §4 : la médiane des lots passés de la feature",
 }
 
@@ -276,7 +276,7 @@ def read_lots(app, feature, folder="", worktrees=(), passes=None, run=None, open
         row["state"], row["detail"], row["rule"] = state, detail, STATE_RULE[state]
         row["attempts"] = {"used": v["attempts"] if v else 0, "cap": CAP,
                            "note": None if not v else (None if v["attempts_written"] else
-                                   "pas de ## Attempts dans le verdict : lu comme 1 (8_code.md:322-323)")}
+                                   "pas de ## Attempts dans le verdict : lu comme 1 (8_code.md:330-331)")}
         lp = [p for p in mine if p.get("lot") == lot]
         row["passes"] = [_pass_row(p) for p in lp]
         hist = _blocking_history(W, lot, names)

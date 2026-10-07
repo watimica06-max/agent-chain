@@ -52,12 +52,16 @@ title alone**, or no index at all: the folder holds nothing the chain
 knows of.
 
 **`Private: yes`** — 📌 **the file holds personal or confidential
-data.** 🔴 **An agent reads it like any other, and never copies a value
-from it into a document the chain writes** — the product file, the
-technical document, a sheet, a question, a report: ⚠️ **it describes
-the file's shape, and names the file.** 📌 **The copies a lot makes of
-it — into a test folder, into a resource folder — are files, not
-documents**, and stay in the repository as the file itself does.
+data.** 🔴 **The file, and every copy a lot makes of it, stay out of
+git** — 📌 **a line each in the application's `.gitignore`, never
+staged** (§6): ⚠️ **a copy into a test folder or a resource folder is
+the file again**, and a commit would publish it. 🔴 **An agent reads it
+like any other, and never copies a value from it into a document the
+chain writes** — the product file, the technical document, a sheet, a
+question, a report: ⚠️ **it describes the file's shape, and names the
+file.** 🔴 **A test built on it runs only where the file is** — 📌
+**where its copy is absent, the test is skipped, never failed**: ⚠️ **a
+clone of the repository holds neither the file nor its copies.**
 
 Example, an embedded entry:
 
@@ -119,3 +123,32 @@ offer « Joindre un fichier »**, and where to save what is joined.
 saved in the folder, its entry written in the index, its name written
 in `Answer:`. ⚠️ **An answer saying there is no such file is an answer
 too** — 📌 text, and the block says so.
+
+## 6. Out of git — the private section of `.gitignore`
+
+🔴 **Every private file, and every copy of one, is a line of the
+application's `.gitignore`** — 📌 **the one at the repository's root,
+in a section of its own, opened by this exact line:**
+
+    # Données privées — .claude/formats/donnees.md
+    docs/features/<feature>/donnees/releve-2026-09-14.csv
+    app/src/test/resources/releve-2026-09-14.csv
+
+🔴 **One path per line, from the repository's root, the file itself** —
+⚠️ **never a pattern, never a folder**: 📌 **the section is a list of
+files someone can copy**, not a rule. 🔴 **It runs to the first blank
+line or the end of the file**; 📌 **absent, it is created at the end of
+the file**, ⚠️ **never twice.**
+
+| Who adds a line | Which |
+|---|---|
+| 📌 **Whoever writes the index** — the Product Owner, by hand or with the cockpit | 🔴 **The file's own path**, when its entry says `Private: yes` — ⚠️ **a file already committed is also taken out of git's index** (`git rm --cached`): 📌 **it stays in the history, and so do the copies lots committed before it became private** |
+| 📌 **The agent that copies the file** | 🔴 **The copy's path**, in the commit that would have carried the copy — ⚠️ **the copy itself never staged** |
+
+🔴 **A worktree is cut from a commit, and a private file is in none** —
+📌 **a command whose agents open a data file copies each path of the
+section that the main checkout holds into the worktree, at the same
+path, before invoking** — ⚠️ **and, when its agents copy one, each
+path the worktree holds back into the main checkout before removing
+it**: 🔴 **`git worktree remove` deletes what git ignores**, and a copy
+left there is lost.

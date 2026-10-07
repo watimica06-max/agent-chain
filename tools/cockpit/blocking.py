@@ -34,7 +34,7 @@ REQUEST_IN_WHERE = re.compile(r"architecte/cadreur\.md\s*[—–-]+\s*Request\s+
 REQUEST = re.compile(r"^# Request (\d+)\b")
 VERDICT = re.compile(r"^## Verdict\s*$")
 PO_DECISION = re.compile(r"^## Décision du Product Owner\s*$")
-# What the relecteur's three act rows name missing (cmd/8_code.md:748-750):
+# What the relecteur's three act rows name missing (cmd/8_code.md:757-759):
 # the act retires them; only « anything else » is hers. No line of the
 # command tells the rows apart from the file: this is a guess on the words
 # of `## What blocks` — one of its four inputs named, and said missing. It
@@ -294,7 +294,7 @@ def parse_lines(lines, path, rel, work_dir=None, worktree=None) -> ParsedBlockin
             # Perhaps an act row, retired by /8_code: a guess, so shown all the same.
             entry.note = (f"« Ce qui bloque » nomme « {seen.group(0)} » et dit « {missing.group(0)} » : "
                           "peut-être une des lignes que /8_code retire par un acte "
-                          "(8_code.md:770-772), sans décision. Ce n'est qu'une lecture du texte : "
+                          "(8_code.md:779-781), sans décision. Ce n'est qu'une lecture du texte : "
                           "l'entrée reste à décider.")
     if name == "blocked_batisseur.md":
         # agents/batisseur.md « When you cannot produce »: on a build tool,
@@ -403,7 +403,7 @@ def _has_po_decision(lines):
 
 
 def redecoupage_count(work_dir: str) -> int:
-    """cmd/8_code.md:634-640 — archived returns numbered above the highest
+    """cmd/8_code.md:642-648 — archived returns numbered above the highest
     one carrying `## Décision du Product Owner`, plus the current one."""
     code = os.path.join(work_dir, "code")
     archived = []

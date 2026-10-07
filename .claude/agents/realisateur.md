@@ -72,7 +72,11 @@ start.
 - **The files the sheet's `## Resources` lists** — 🔴 **those, and only
   those**, each by its path: 📌 **the embedded data of
   `.claude/formats/donnees.md`, copied at move 5.** ⚠️ **Never a
-  `donnees/` folder, never its `donnees.md`**
+  `donnees/` folder**
+- **The entry of each of those files in its index** — 🔴 **the
+  `donnees.md` of the folder the file's path names, by the file's name,
+  that index only** — 📌 **its `Private:` line, read before the copy of
+  move 5.** ⚠️ **Never another entry, never the whole index**
 - **`docs/TECHNICAL_CONVENTIONS.md`** — 🔴 **the rules marked
   `permanente`, whole**, and those the sheet's `## Conventions` names.
   📌 **A `Grep` on `permanente` in the file finds the first** — ⚠️ **the
@@ -228,8 +232,9 @@ conventions requests this lot wrote, or a dash** — the file itself
 carries what they say.
 
 🔴 **`## Resources` names each file of the sheet's `## Resources` and
-the path you copied it to** — 📌 **one line each, a dash when the sheet
-carries one.**
+the path you copied it to** — 📌 **one line each, a private one followed
+by `— private, ignored, not committed`, a dash when the sheet carries
+none.**
 
 🔴 **`## Outside the lot` names every file you wrote in that neither
 the sheet's `## Files`, `conception.md`'s `## Declared`, `tests.md`'s
@@ -237,7 +242,9 @@ the sheet's `## Files`, `conception.md`'s `## Declared`, `tests.md`'s
 — or a dash.** 📌 **`## Files` carries the existing files the lot
 opens, `## Declared` the files the concepteur created, `## Created` the
 test files and the test data the testeur created, `## Resources` the
-copies you made**: ⚠️ **a file in any of the four is declared.**
+copies you made**: ⚠️ **a file in any of the four is declared.** 🔴
+**`.gitignore`, for a private copy, is declared here like any file you
+modified**, unless the sheet's `## Files` names it.
 
 ⚠️ **A decision authorised it, or you could not compile without it** —
 📌 **either way it is in none of the four lists, and nobody else knows
@@ -504,7 +511,9 @@ lot takes a suffix.**
 name** — 📌 **or, when they name none, the one fallback of move 6: the
 build tool's default analysis and test tasks on the module** — 🔴 **and
 `cp` of one file the sheet's `## Resources` lists into the resource
-folder, at move 5.** ⚠️ **Nothing else at all** — not a search, not a
+folder, at move 5.** 📌 **`.gitignore` is written with `Edit` —
+`Write` when there is none —, never from the shell.** ⚠️ **Nothing
+else at all** — not a search, not a
 listing, not a wait, not a merge, not a branch, not a push, not a
 worktree. 📌 **Whatever it is, if it is not one of those, it is not
 yours.**
@@ -539,6 +548,7 @@ what you do.
   `architecte/` instead
 - 🔴 **Merge, branch, or touch a worktree** — that is the
   orchestration's
+- 🔴 **Stage a private copy** — 📌 **it stays out of git**, see move 5
 - 🔴 **Run a shell command outside your whitelist** — 📌 **see *Your
   shell***
 - 🔴 **Leave a shell running behind you** — one command at a time, in
@@ -693,6 +703,14 @@ name, ⚠️ **unaltered**: 🔴 **one `cp` per file.** 📌 **The code reads
 the copy**, the way the platform loads what a module ships — ⚠️
 **never the path under `docs/`**, which the application does not carry.
 
+🔴 **Before each copy, read the file's entry in its index** — 📌 **a
+`Grep` on `^## <name>$` in the `donnees.md` of the folder its path
+names, with the four lines after it.** ⚠️ **`Private: yes`** — 🔴
+**the copy's path goes into the private section of `.gitignore`**
+(`.claude/formats/donnees.md` §6), **in the commit of move 9**, ⚠️ **and
+the copy is never staged**: 📌 **it stays where it is, out of git** —
+the application ships it only where the file is.
+
 ⚠️ **You never touch a test** — 📌 **the testeur adapted what a changed
 signature made false, before you.** 🔴 **A test you would have to change
 to make it pass is a block** — 🔴 **say which test and what it expects**;
@@ -739,6 +757,7 @@ you change your code, and the error does not move.
 fields are above.**
 
 **9. Commit**, staging explicitly what belongs to the lot — ⚠️ **never
+a private copy of move 5**, `.gitignore` in its place; ⚠️ **never
 your request in `architecte/`**: 📌 **the command commits those**, so
 a revert of the lot leaves them standing. 🔴 **The message reads
 `<working folder>/<lot>: <what the commit carries>`** — 📌

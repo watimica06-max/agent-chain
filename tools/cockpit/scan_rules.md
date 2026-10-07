@@ -37,12 +37,12 @@ emulator (`/deploie`) → `/fusion`.
 | 3b_nature → 4_grille | 3b_nature.md:307 |
 | 4_grille → 4_grille (second time) → 5_reclasse | 4_grille.md:639, :641 |
 | 5_reclasse → 6_convertit | 5_reclasse.md:227 |
-| 6_convertit → conventions | 6_convertit.md:472 |
+| 6_convertit → conventions | 6_convertit.md:480 |
 | conventions → batir | conventions.md:317, :95-97 |
 | batir → 7_lots | batir.md:135, :273 |
 | 7_lots → batir, back | 7_lots.md:97 — the skeleton not built from the conventions in force |
 | 7_lots → 8_code | 7_lots.md:223, :265 |
-| 8_code → 8_code (lots left) → 9_controle | 8_code.md:551, :519 |
+| 8_code → 8_code (lots left) → 9_controle | 8_code.md:559, :519 |
 | 9_controle → *manual* | 9_controle.md:509-510 — `Next: manual lire le rapport de contrôle et la recette, décider d'une bug-list` |
 | /deploie → *done* | deploie.md:68-70 |
 
@@ -53,13 +53,13 @@ emulator (`/deploie`) → `/fusion`.
   (deploie.md:68-70). /fusion is named by `Next: run` in two places only:
   `/7_lots` when the technical document holds no `### §` (7_lots.md:75-81)
   and `/2_structure` on a Rédacteur block of invocation 3
-  (2_structure.md:80). 6_convertit.md:472 says `/fusion_compare`
+  (2_structure.md:80). 6_convertit.md:480 says `/fusion_compare`
   « branches off here whenever you choose ». **The test and /fusion are
   the Product Owner's to start**: the scan proposes the test step once a
   control is written, and /fusion is one click with a confirmation.
 - **Every answer loops back to `/1_lexique`**, not to the step that asked
   (2_structure.md:404, 3a_genre.md:294, 3b_nature.md:306, 4_grille.md:638,
-  :640, 6_convertit.md:469) — except technical answers (6_convertit.md:468),
+  :640, 6_convertit.md:477) — except technical answers (6_convertit.md:476),
   the architecte's (conventions.md:309) and the Bâtisseur's
   (batir.md:76, :133).
 - **`/4_grille` runs twice**: a first time, then a second time against the
@@ -71,7 +71,7 @@ emulator (`/deploie`) → `/fusion`.
   (« cut no split », 7_lots.md:97), /8_code never runs it, and « Bâtir »
   is then « faite » (`G-AMONT`).
 - **`/conventions` is run by hand** — « no command chains it »
-  (conventions.md:66-67) — though `/6_convertit` names it (6_convertit.md:472).
+  (conventions.md:66-67) — though `/6_convertit` names it (6_convertit.md:480).
 
 **Correction chain**, in a `bugfix-NN/` — `/diagnostique` → `/7_lots` →
 `/8_code` → `/9_controle` (diagnostique.md:13, :228). Every command
@@ -133,16 +133,16 @@ to the command named after it in « `answer …, then run X` »: that step is
 | `OWN-GEN` | `blocked_qualifieur.md` | 3a_genre | 3a_genre.md:39 |
 | `OWN-NAT` | `blocked_classeur.md` | 3b_nature | 3b_nature.md:38 |
 | `OWN-GRI` | `cadrage-produit/blocked_*.md`, `blocked_existant.md`, `blocked_assembleur.md` | 4_grille | 4_grille.md:47-61 |
-| `OWN-TEC` | `convertisseur/technique-*.md` | 6_convertit | 6_convertit.md:468 · 6_convertit.md:470 |
+| `OWN-TEC` | `convertisseur/technique-*.md` | 6_convertit | 6_convertit.md:476 · 6_convertit.md:478 |
 | `OWN-CNV` | `convertisseur/blocked_*.md` | 6_convertit | 6_convertit.md:56 |
 | `OWN-ARC` | a root `questions-architecte-NN.md` | conventions | conventions.md:90 |
 | `OWN-ARB` | `blocked_architecte.md`, invocation other than 3 | conventions | conventions.md:86 |
-| `OWN-AR3` | `blocked_architecte.md`, invocation 3, `code/decoupage.md` there (or in a `bugfix-NN/`) | 8_code | 8_code.md:348-354 |
+| `OWN-AR3` | `blocked_architecte.md`, invocation 3, `code/decoupage.md` there (or in a `bugfix-NN/`) | 8_code | 8_code.md:356-362 |
 | `OWN-BA3` | `blocked_architecte.md`, invocation 3, no `code/decoupage.md` in the feature folder | batir | batir.md:147-151 |
 | `OWN-BAT` | `blocked_batisseur.md` | batir | batir.md:76 · batir.md:133 |
 | `OWN-CAD` | `code/blocked_cadreur.md` | 7_lots | 7_lots.md:227 |
 | `OWN-RED` | `code/redecoupage.md`, third return | 7_lots | 7_lots.md:394-395 |
-| `OWN-COD` | `code/blocked_detailleur.md`, `code/<lot>/blocked_*.md` | 8_code | 8_code.md:354-355 · 8_code.md:773 |
+| `OWN-COD` | `code/blocked_detailleur.md`, `code/<lot>/blocked_*.md` | 8_code | 8_code.md:362-363 · 8_code.md:782 |
 | `OWN-FUS` | a root `questions-fusionneur-NN.md` | fusion | fusion.md:60 |
 | `OWN-FUB` | `blocked_fusionneur.md` | fusion | fusion.md:57 |
 | `OWN-DIA` | `investigation/blocked_*.md`, `blocked_diagnostiqueur.md` | diagnostique | diagnostique.md:233 · diagnostique.md:243 |
@@ -189,16 +189,16 @@ Rédacteur's.
 | `OWN-GEN` | 3a_genre | t'attend | see §3 | 3a_genre.md:39 |
 | `OWN-NAT` | 3b_nature | t'attend | see §3 | 3b_nature.md:38 |
 | `OWN-GRI` | 4_grille | t'attend | see §3 | 4_grille.md:47-61 |
-| `OWN-TEC` | 6_convertit | t'attend | see §3 | 6_convertit.md:468 · 6_convertit.md:470 |
+| `OWN-TEC` | 6_convertit | t'attend | see §3 | 6_convertit.md:476 · 6_convertit.md:478 |
 | `OWN-CNV` | 6_convertit | t'attend | see §3 | 6_convertit.md:56 |
 | `OWN-ARC` | conventions | t'attend | see §3 | conventions.md:90 |
 | `OWN-ARB` | conventions | t'attend | see §3 | conventions.md:86 |
-| `OWN-AR3` | 8_code | t'attend | see §3 | 8_code.md:348-354 |
+| `OWN-AR3` | 8_code | t'attend | see §3 | 8_code.md:356-362 |
 | `OWN-BA3` | batir | t'attend | see §3 | batir.md:147-151 |
 | `OWN-BAT` | batir | t'attend | see §3 | batir.md:76 · batir.md:133 |
 | `OWN-CAD` | 7_lots | t'attend | see §3 | 7_lots.md:227 |
 | `OWN-RED` | 7_lots | t'attend | see §3 | 7_lots.md:394-395 |
-| `OWN-COD` | 8_code | t'attend | see §3 | 8_code.md:354-355 · 8_code.md:773 |
+| `OWN-COD` | 8_code | t'attend | see §3 | 8_code.md:362-363 · 8_code.md:782 |
 | `OWN-FUS` | fusion | t'attend | see §3 | fusion.md:60 |
 | `OWN-FUB` | fusion | t'attend | see §3 | fusion.md:57 |
 | `OWN-DIA` | diagnostique | t'attend | see §3 | diagnostique.md:233 · diagnostique.md:243 |
@@ -296,7 +296,7 @@ Rédacteur's.
 | `LOT-9` | 7_lots | à faire | no split yet | 7_lots.md:156 |
 | `COD-1` | 8_code | à faire | no `code/sequence.md` | 8_code.md:80-83 |
 | `COD-2` | 8_code | à faire | defects, or `blocked_verificateur.md`: /7_lots first | 8_code.md:92-100 |
-| `COD-3` | 8_code | bloquée | a lot not PASS with `## Attempts` at 3 | 8_code.md:318-320 |
+| `COD-3` | 8_code | bloquée | a lot not PASS with `## Attempts` at 3 | 8_code.md:326-328 |
 | `COD-5` | 8_code | faite | every lot of `## Order` has a verdict opening on `PASS` | 8_code.md:85-87 |
 | `COD-6` | 8_code | à faire | « n / N lots en PASS », N > n | 8_code.md:80-83 |
 | `CTL-1` | 9_controle | à faire | no `desc-produit.md` | 9_controle.md:75-77 |
@@ -361,7 +361,7 @@ proposes the correction chain: the commands act on it.
   The scan follows the chain order and proposes /conventions.
 - **A `blocked_architecte.md` of invocation 3**: /batir invokes the
   Architecte's invocation 3 and stops on the file it leaves (batir.md:147-151),
-  as /8_code does (8_code.md:348-354). Nothing in the file tells the two
+  as /8_code does (8_code.md:356-362). Nothing in the file tells the two
   apart; the split does. Before `code/decoupage.md` exists, /8_code cannot
   have run, and the file is /batir's (`OWN-BA3`); after it, /8_code's
   (`OWN-AR3`). A correction has no « Bâtir »: there it is /8_code's.

@@ -38,7 +38,7 @@ relative to `.claude/`.
 | `hand/blocked_concepteur-01.md` | agents/concepteur.md:149-166 — `## Decision` filled |
 | `hand/blocked_relecteur-acte.md`, `blocked_relecteur-autre.md` | agents/relecteur.md:279-297 |
 | `hand/blocked_detailleur.md` | agents/detailleur.md:361-381 — `## Blocking N — lot-NN`, one `## Decision` at the end |
-| `hand/blocked_realisateur.md` | agents/realisateur.md:325-336 |
+| `hand/blocked_realisateur.md` | agents/realisateur.md:332-343 |
 | `hand/redecoupage/redecoupage.md`, `redecoupage-01.md`, `redecoupage-02.md` | agents/cadreur.md:1054-1061 — the Cadreur's two sections |
 | `hand/questions-hors-gabarit.md` | **none, on purpose**: a `## Q1` heading no template writes — the file the parser reports as an error |
 
@@ -49,4 +49,4 @@ The folders a test writes itself say their template in the test:
 (agents/arbitre.md:379-399), `test_scan.build_chain` (a feature through the
 whole chain, two corrections), and the git history of
 `test_codelots.test_a_lots_commits_are_found_by_their_subject_after_the_split_in_force`
-(8_code.md:198-229).
+(8_code.md:206-237).

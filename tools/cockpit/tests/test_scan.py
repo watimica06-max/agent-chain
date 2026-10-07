@@ -503,7 +503,7 @@ ARCHITECTE_BLOCKED_3 = ("## Invocation\n\n3\n\n## What blocks\n\nNo conventions.
 
 
 def test_blocked_architecte_3_is_batir_before_the_split_8_code_after(tmp_path):
-    """batir.md:147-151 and 8_code.md:348-354 both run invocation 3; before
+    """batir.md:147-151 and 8_code.md:356-362 both run invocation 3; before
     `code/decoupage.md`, /8_code cannot have run (`OWN-BA3`)."""
     app, feat = batir_app(tmp_path)
     bw.report(feat)

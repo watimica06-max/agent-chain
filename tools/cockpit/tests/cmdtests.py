@@ -8,7 +8,7 @@ hide itself.
   no `^Answer:\s*$` line.
 - shapes 1-3: `grep -A2 '^## Decision$'` — nothing under the heading.
 - shape 4: an entry is open when its number has no `N.` line under
-  `## Decision` (cmd/8_code.md:344-349).
+  `## Decision` (cmd/8_code.md:352-357).
 - shape 5: read on the last `## Decision`.
 """
 import re

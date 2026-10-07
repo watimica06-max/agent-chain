@@ -135,6 +135,14 @@ discarded.
 📌 **One worktree for the whole run**, not one per lot. Enter it before
 invoking anything.
 
+🔴 **Before entering it, carry the private files in** — 📌 **each path
+the private section of the main checkout's `.gitignore` lists
+(`.claude/formats/donnees.md` §6) that is on disk there, copied to the
+same path under `.claude/worktrees/<name>/`.** ⚠️ **A private file is
+in no commit**: 📌 **without this, the Testeur and the Réalisateur find
+neither the data file nor the copies earlier lots made of it.** 📌 **No
+section, or nothing of it on disk, is a normal outcome.**
+
 ⚠️ **The `concepteur`, the `testeur` and the `realisateur` commit
 inside it, lot by lot** — 📌 **each its own work, with a message
 reading `<working folder>/<lot>: <what the commit carries>`**, see move
@@ -705,7 +713,8 @@ five steps of *Git, once it has reported*, in this order:**
    `git -C <path> rev-parse HEAD`; the merge is refused from inside it
 3. `git merge --no-ff -m "<message>" <commit id>` from the main checkout root
 4. `git push`
-5. `git worktree remove <path>`
+5. The private files back, then `git worktree remove <path>` — as step
+   5 of *Git, once it has reported*
 
 ⚠️ **`/7_lots` creates its worktree from `HEAD`** — 📌 **and yours sat
 outside it**: unmerged, none of this run's lots are in the
@@ -833,7 +842,11 @@ fix that passes: carry on.
    the merge below, issued from inside it, is refused
 3. `git merge --no-ff -m "<message>" <commit id>` from the main checkout root
 4. `git push`
-5. `git worktree remove <path>`
+5. 🔴 **Carry the private files back, then `git worktree remove
+   <path>`** — 📌 **each path the private section of the worktree's
+   `.gitignore` lists that is on disk in the worktree, copied to the
+   same path in the main checkout**: ⚠️ **the removal deletes what git
+   ignores**, and the private copies the lots made would be lost
 
 ⚠️ **A worktree still dirty after step 1 refuses a plain remove** — 🔴
 **never force it**: 📌 **say what is left there, and stop** —

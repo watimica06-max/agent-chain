@@ -118,16 +118,16 @@ RULES = {
     "OWN-GEN": "3a_genre.md:39",
     "OWN-NAT": "3b_nature.md:38",
     "OWN-GRI": "4_grille.md:47-61",
-    "OWN-TEC": "6_convertit.md:468 · 6_convertit.md:470",
+    "OWN-TEC": "6_convertit.md:476 · 6_convertit.md:478",
     "OWN-CNV": "6_convertit.md:56",
     "OWN-ARC": "conventions.md:90",
     "OWN-ARB": "conventions.md:86",
     "OWN-BAT": "batir.md:76 · batir.md:133",
-    "OWN-AR3": "8_code.md:348-354",
+    "OWN-AR3": "8_code.md:356-362",
     "OWN-BA3": "batir.md:147-151",
     "OWN-CAD": "7_lots.md:227",
     "OWN-RED": "7_lots.md:394-395",
-    "OWN-COD": "8_code.md:354-355 · 8_code.md:773",
+    "OWN-COD": "8_code.md:362-363 · 8_code.md:782",
     "OWN-FUS": "fusion.md:60",
     "OWN-FUB": "fusion.md:57",
     "OWN-DIA": "diagnostique.md:233 · diagnostique.md:243",
@@ -225,7 +225,7 @@ RULES = {
     "LOT-9": "7_lots.md:156",
     "COD-1": "8_code.md:80-83",
     "COD-2": "8_code.md:92-100",
-    "COD-3": "8_code.md:318-320",
+    "COD-3": "8_code.md:326-328",
     "COD-5": "8_code.md:85-87",
     "COD-6": "8_code.md:80-83",
     "CTL-1": "9_controle.md:75-77",
@@ -486,7 +486,7 @@ def owner(rel, kind, lines, cut=True):
     if agent == "architecte":
         if invocation_of(lines) != 3:
             return "conventions", "OWN-ARB"
-        # Invocation 3 runs under /8_code (cmd/8_code.md:348-354) and under
+        # Invocation 3 runs under /8_code (cmd/8_code.md:356-362) and under
         # /batir (cmd/batir.md:147-151); before the split, only /batir.
         return ("8_code", "OWN-AR3") if cut else ("batir", "OWN-BA3")
     if agent == "fusionneur":

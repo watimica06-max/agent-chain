@@ -320,7 +320,7 @@ def test_a_guessed_entry_is_shown_with_what_the_guess_saw(tmp_path, page):
         go(page, "À répondre")
         card = page.locator(".entry", has_text="is missing")
         card.wait_for()
-        assert "8_code.md:770-772" in card.locator(".notice").inner_text()
+        assert "8_code.md:779-781" in card.locator(".notice").inner_text()
         assert no_real_errors(page) == []
 
 
