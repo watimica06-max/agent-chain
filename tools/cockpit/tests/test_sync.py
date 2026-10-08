@@ -223,6 +223,62 @@ def test_reconcile_clean(tmp_path):
     assert sync.compute(str(a))["state"] == sync.UP_TO_DATE
 
 
+def merged_worktree(repo, rel, text, command="/1_lexique f"):
+    """What a command does: a worktree from local HEAD, the agent's commit
+    in it, then `git merge --no-ff -m "Merge <command>"` from the main
+    checkout, by the commit's id, and the worktree removed."""
+    wt = repo / ".claude" / "worktrees" / "f"
+    git(repo, "worktree", "add", "-q", "--detach", str(wt), "HEAD")
+    write(wt, rel, text)
+    git(wt, "add", "-A")
+    git(wt, "commit", "-q", "-m", f"f: {rel}")
+    sha = git(wt, "rev-parse", "HEAD").strip()
+    git(repo, "merge", "--no-ff", "-q", "-m", f"Merge {command}", sha)
+    git(repo, "worktree", "remove", str(wt))
+    return sha
+
+
+def parents(repo, ref="HEAD"):
+    return git(repo, "log", "-1", "--format=%P", ref).split()
+
+
+def test_reconcile_keeps_the_merges(tmp_path):
+    """1.12.1 — the local side holds a command's `--no-ff` merge: after
+    « Réconcilier » it is still a merge, with its subject, on top of
+    GitHub's commits, and GitHub has it."""
+    remote, a, b = world(tmp_path)
+    theirs = change(b, "x.md", "x de l'autre ordinateur\n", push=True)
+    merged_worktree(a, "docs/features/f/lexique.md", "# Lexique\n")
+    assert git(a, "rev-list", "--merges", "--count", "HEAD").strip() == "1"
+    res = sync.reconcile(str(a))
+    assert res["ok"] and res["pushed"], res["message"]
+    # Still a merge, with its subject, at the top.
+    assert git(a, "log", "-1", "--format=%s").strip() == "Merge /1_lexique f"
+    first, second = parents(a)
+    assert git(a, "log", "-1", "--format=%s", second).strip() == "f: docs/features/f/lexique.md"
+    # On top of GitHub's commits: theirs is the merge's first parent.
+    assert first == theirs
+    assert git(a, "rev-list", "--merges", "--format=%s", "--no-commit-header", "HEAD").split("\n")[0] == "Merge /1_lexique f"
+    assert (a / "docs/features/f/lexique.md").read_text(encoding="utf-8") == "# Lexique\n"
+    assert (a / "x.md").read_text(encoding="utf-8") == "x de l'autre ordinateur\n"
+    assert git(remote, "rev-parse", "master").strip() == head(a)
+    assert sync.compute(str(a))["state"] == sync.UP_TO_DATE
+
+
+def test_reconcile_with_a_merge_conflicting_aborted_clone_unchanged(tmp_path):
+    _, a, b = world(tmp_path)
+    change(b, "README.md", "B\n", push=True)
+    merged_worktree(a, "README.md", "A, par la commande\n")
+    mine, status = head(a), git(a, "status", "--porcelain")
+    res = sync.reconcile(str(a))
+    assert not res["ok"] and res["conflicts"] == ["README.md"] and "Claude Code" in res["message"]
+    assert head(a) == mine and git(a, "status", "--porcelain") == status
+    assert git(a, "log", "-1", "--format=%s").strip() == "Merge /1_lexique f" and len(parents(a)) == 2
+    assert (a / "README.md").read_text(encoding="utf-8") == "A, par la commande\n"
+    assert not os.path.exists(a / ".git" / "rebase-merge") and not os.path.exists(a / ".git" / "rebase-apply")
+    assert sync.compute(str(a))["state"] == sync.DIVERGED
+
+
 def test_reconcile_conflict_aborted_clone_unchanged(tmp_path):
     remote, a, b = world(tmp_path)
     change(b, "README.md", "B\n", push=True)

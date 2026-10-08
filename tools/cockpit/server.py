@@ -1902,7 +1902,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.json_response({"ok": True, "push": p, "sync": st})
 
     async def sync_reconcile(request):
-        """« Réconcilier » (§4): `git pull --rebase`; a conflict aborted, the
+        """« Réconcilier » (§4): `git pull --rebase=merges`; a conflict aborted, the
         clone back as it was, the files named."""
         data = await body(request)
         folder = sync_target(data)

@@ -436,8 +436,10 @@ et dans la barre du haut de l'application ouverte quand ce n'est pas
   « Réconcilier ». **Non envoyé** devient une alerte, sur le tableau de
   bord et sur la ligne, avec **« Envoyer »** ; un push refusé récupère de
   nouveau et montre le nouvel état.
-- **« Réconcilier »** (divergé) : `git pull --rebase` — les commits d'ici
-  sont rejoués après ceux de GitHub, puis envoyés. Sur un conflit, il
+- **« Réconcilier »** (divergé) : `git pull --rebase=merges` — les commits
+  d'ici sont rejoués après ceux de GitHub, puis envoyés ; 1.12.1 : chaque
+  fusion d'une commande (`Merge /<commande> …`) reste une fusion, avec son
+  sujet. Sur un conflit, il
   annule (`git rebase --abort`) : le dépôt revient tel qu'il était, et la
   page dit quels fichiers sont en conflit — une session Claude Code ouverte
   sur l'application le réglera. Refusé tant que des fichiers suivis ont des
@@ -541,9 +543,9 @@ avec ce qu'il a vu.
 - Ajouter, renommer ou retirer une application ne change que sa liste,
   dans `config.json` : aucun fichier de son dossier n'est écrit — Ajouter
   règle seulement `core.longpaths=true` dans sa configuration git (1.12).
-- Avec GitHub (1.12), il récupère, envoie, et réconcilie par un rebase —
-  jamais de `--force`, de reset, de stash, ni de commit de fusion de sa
-  part ; « Envoyer mes réponses » ne commite que le dossier de la feature.
+- Avec GitHub (1.12), il récupère, envoie, et réconcilie par un rebase
+  qui garde les fusions déjà faites (1.12.1) — jamais de `--force`, de
+  reset, de stash, ni de commit de fusion à lui ; « Envoyer mes réponses » ne commite que le dossier de la feature.
 - « Nouvelle application » n'écrit que dans le dossier qu'elle crée, neuf
   ou vide, et ne le supprime jamais ; elle ne force jamais un dépôt
   distant qui contient déjà des commits. Elle ne reprend qu'une création

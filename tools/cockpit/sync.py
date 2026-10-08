@@ -11,8 +11,9 @@ command run outside the cockpit gets none.
 
 Every git command here runs with GIT_TERMINAL_PROMPT=0 and Git Credential
 Manager's prompts off (`env()`), under a timeout; never --force, never a
-reset, never a stash, never a merge commit — a pull is `--ff-only`, a
-reconciliation a rebase.
+reset, never a stash, never a merge commit of its own — a pull is
+`--ff-only`, a reconciliation a rebase that keeps the merges already made
+(1.12.1: each command merges its worktree `--no-ff`, `Merge /<command>`).
 """
 import os
 import re
@@ -265,9 +266,11 @@ def _rebasing(folder):
 
 
 def reconcile(folder):
-    """« divergé »: `git pull --rebase`. A conflict: `git rebase --abort`,
-    the clone back as it was, and which files conflict. Refused while
-    uncommitted files would be touched. Then the push."""
+    """« divergé »: `git pull --rebase=merges` — the local commits replayed
+    on GitHub's, each `Merge /<command>` kept as a merge with its subject
+    (1.12.1; a plain `--rebase` flattened them). A conflict: `git rebase
+    --abort`, the clone back as it was, and which files conflict. Refused
+    while uncommitted files would be touched. Then the push."""
     st = compute(folder)
     out = {"ok": False, "conflicts": [], "files": [], "pushed": False, "message": "", "before": st}
     if st["state"] != DIVERGED:
@@ -292,7 +295,7 @@ def reconcile(folder):
                           + " — les déplacer ou les commiter d'abord")
         return out
     head = git(folder, "rev-parse", "HEAD").out.strip()
-    r = git(folder, "pull", "-q", "--rebase", "--no-autostash", timeout=PULL_TIMEOUT)
+    r = git(folder, "pull", "-q", "--rebase=merges", "--no-autostash", timeout=PULL_TIMEOUT)
     if not r.ok:
         if _rebasing(folder):
             conflicts = sorted(x for x in git(folder, "diff", "--name-only", "--diff-filter=U").out.split("\n") if x)
