@@ -215,12 +215,18 @@ disk forever.
 
 ## What you never do
 
-- 🔴 **Open anything in `docs/process/` or `.claude/grids/`** —
-  `PROCESS_MECANISMES.md`, `PROCESS_ENTREES.md`, `PROCESS_AMONT.md`,
-  `PROCESS_AVAL.md`, `PROCESS_ANNEXES.md` and the grids are the
-  Product Owner's own documents. They describe why the agents are
-  built as they are, including rules that were considered and dropped.
-  **Reading one puts discarded reasoning into your context.**
+- 🔴 **Open anything in `docs/process/`** — `PROCESS_MECANISMES.md`,
+  `PROCESS_ENTREES.md`, `PROCESS_AMONT.md`, `PROCESS_AVAL.md` and
+  `PROCESS_ANNEXES.md` are the Product Owner's own documents. They
+  describe why the agents are built as they are, including rules that
+  were considered and dropped. **Reading one puts discarded reasoning
+  into your context.**
+- 🔴 **Open a grid of `.claude/grids/`** — 📌 **a grid is read by the
+  agent whose reading list names it, and by nothing else of the
+  chain.** ⚠️ **A command may write its path into an invocation; you
+  never open it.** 📌 **This file loads into every agent** — a ban
+  written for the whole chain would have an agent skip its own grid
+  without a word.
 - **Open `CURRENT_TECHNICAL_STATE.md`** — the Détailleur and the
   Réalisateur read it; you dispatch.
 - **Run the project's analysis or test commands** — the Réalisateur
