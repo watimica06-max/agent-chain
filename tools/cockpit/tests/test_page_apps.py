@@ -129,16 +129,18 @@ def test_add_and_the_card_menu(tmp_path, page, per_app_chain):
         assert no_real_errors(page) == []
 
 
-def test_applications_in_the_top_bar_from_every_screen(tmp_path, page, per_app_chain):
+def test_applications_in_the_side_menu_from_every_screen(tmp_path, page, per_app_chain):
     with FakeServer(tmp_path) as s:
         page.goto(s.url + "#dashboard")
         page.wait_for_function("document.getElementById('next-text').textContent !== '—'")
+        side = page.locator("#side").bounding_box()
         for name, scr in SCREENS:
             go(page, name)
             page.wait_for_selector(f"#{scr}", state="visible")
-            # At the right of the top bar.
+            # 1.11: at the foot of the side menu, under « Paramètres » (the right of the top bar until 1.10).
             box = page.locator("#tb-home").bounding_box()
-            assert box and box["x"] > 1000, name
+            settings = page.locator("#nav-settings").bounding_box()
+            assert box and box["x"] + box["width"] <= side["x"] + side["width"] and box["y"] > settings["y"] > 600, name
             page.locator("#tb-home").click()
             page.wait_for_selector("#scr-accueil", state="visible")
             assert not page.locator("#side").is_visible()

@@ -270,8 +270,9 @@ def test_settings_mode_diagnostic_commands(tmp_path, page):
         page.wait_for_function("document.getElementById('tb-mode').textContent.includes('Manuel')")
         assert s.state.mode == "manuel"
         # 1.9: five sections, in this order, each with its line; « Commandes » is gone.
+        # 1.11: « Apparence » before them — the theme.
         heads = page.locator("#scr-settings .sec > h2").all_inner_texts()
-        assert heads == ["Mode de permission", "Notifications", "Dossiers ignorés", "Outils sur cet ordinateur",
+        assert heads == ["Apparence", "Mode de permission", "Notifications", "Dossiers ignorés", "Outils sur cet ordinateur",
                          "Arrêter le cockpit"]
         leads = page.locator("#scr-settings .sec > .lead").all_inner_texts()
         assert len(leads) == 5 and all(t.strip() for t in leads)
@@ -286,6 +287,41 @@ def test_settings_mode_diagnostic_commands(tmp_path, page):
         # An alert on the dashboard now: the last diagnostic has a failure.
         go(page, "Tableau de bord")
         assert "a un échec" in page.locator("#alerts").inner_text()
+        assert no_real_errors(page) == []
+
+
+def test_the_theme_auto_light_dark_kept_across_a_reload(tmp_path, page):
+    # 1.11: « Paramètres → Apparence ». Auto follows the computer; Clair or
+    # Sombre forces it, on every screen, kept by the browser.
+    theme = "document.documentElement.dataset.theme || 'auto'"
+    bg = "getComputedStyle(document.body).backgroundColor"
+    with FakeServer(tmp_path) as s:
+        page.emulate_media(color_scheme="light")
+        page.goto(s.url + "#settings")
+        page.wait_for_selector("#scr-settings", state="visible")
+        assert page.locator("#set-theme input[value=auto]").is_checked() and page.evaluate(theme) == "auto"
+        light = page.evaluate(bg)
+        page.emulate_media(color_scheme="dark")                      # Auto: the computer's setting
+        dark = page.evaluate(bg)
+        assert dark != light
+        page.emulate_media(color_scheme="light")
+        page.locator("#set-theme label", has_text="Sombre").click()
+        assert page.evaluate(theme) == "dark" and page.evaluate(bg) == dark
+        page.reload()
+        page.wait_for_selector("#scr-settings", state="visible")
+        assert page.evaluate(theme) == "dark" and page.evaluate(bg) == dark
+        assert page.locator("#set-theme input[value=dark]").is_checked()
+        go(page, "Tableau de bord")
+        assert page.evaluate(bg) == dark
+        go(page, "Paramètres")
+        page.emulate_media(color_scheme="dark")
+        page.locator("#set-theme label", has_text="Clair").click()
+        assert page.evaluate(theme) == "light" and page.evaluate(bg) == light
+        page.locator("#set-theme label", has_text="Auto").click()
+        assert page.evaluate(theme) == "auto" and page.evaluate(bg) == dark
+        page.reload()
+        page.wait_for_selector("#scr-settings", state="visible")
+        assert page.evaluate(theme) == "auto" and page.locator("#set-theme input[value=auto]").is_checked()
         assert no_real_errors(page) == []
 
 

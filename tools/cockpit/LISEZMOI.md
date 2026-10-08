@@ -47,15 +47,15 @@ Dans une console, pour voir ce qu'il écrit : `python server.py --ouvrir`
 
 ## Les écrans
 
-**L'écran d'accueil — Applications** (1.6, 1.9) — une carte par
-application : son nom et son dossier ; sa chaîne (**à jour**, **en
+**L'écran d'accueil — Applications** (1.6, 1.9 ; un tableau depuis la
+1.11) — une ligne par application : son nom et son dossier ; sa chaîne (**à jour**, **en
 retard**, **modifiée sur place**, **absente**) ; sa feature et l'étape que
 le relevé du dossier y propose ; ce qui vous y attend, en nombre de
 questions et de blocages ; son dernier run (la commande, quand, comment il
 a fini) ; le nombre de fichiers non commités dans son dossier — pour
 information, le cockpit n'y touche jamais ; une commande qui y tourne,
-« en cours », avec « Arrêter ». Un clic sur la carte l'ouvre sur son
-tableau de bord. Son petit menu « ⋯ » : « Renommer », « Retirer de la
+« en cours », avec « Arrêter ». Un clic sur la ligne l'ouvre sur son
+tableau de bord, comme « Ouvrir ». Son petit menu « ⋯ » : « Renommer », « Retirer de la
 liste » (il demande d'abord ; le dossier n'est pas touché, seule la liste
 change). Quand sa chaîne n'est pas à jour, « Installer » ou « Mettre à
 jour la chaîne ». Pas de menu de côté sur cet écran : il appartient à une
@@ -106,9 +106,14 @@ application ouverte. En haut :
   laissée, et c'est dit. À la fin, une ligne par application : mise à jour
   (avec le commit), laissée (pourquoi), en échec (l'erreur).
 
-**La barre du haut** (1.9), dans une application : son nom, sa feature
-(un clic ouvre la liste des features), le mode ; et, à droite, sur tous
-ses écrans, **« Applications »**, qui ramène à l'accueil. **Une commande
+**Le menu de côté et la barre du haut** (1.9 ; 1.11), dans une
+application. Le menu, sur toute la hauteur à gauche : l'application et sa
+feature en tête ; ses écrans en trois groupes — Pilotage (Tableau de bord,
+À répondre, Chaîne, Correction), Projet (Données, Déploiement), Mesure
+(Statistiques) ; en bas, Paramètres et **« Applications »**, qui ramène à
+l'accueil. La barre du haut est un chemin — l'application / sa feature
+(un clic ouvre la liste des features) / l'écran —, puis, à droite, le mode
+et la commande qui tourne. **Une commande
 qui tourne continue** : elle vit dans le serveur, pas dans la page, et
 l'arrêter perdrait son travail. Partir le dit une fois par run :
 « Une commande tourne dans <application> : elle continue. Tu la retrouves
@@ -124,8 +129,8 @@ ailleurs, un bandeau le dit sur tous les écrans, et ses demandes
 d'autorisation y arrivent aussi. Le tableau de bord d'une autre
 application ne la montre pas comme la sienne.
 
-**Le menu** — le bouton à trois traits, à gauche de la barre du haut,
-ferme et rouvre le menu de côté ; l'espace de travail prend alors toute la
+**Le menu** — le bouton à gauche de la barre du haut ferme et rouvre le
+menu de côté ; l'espace de travail prend alors toute la
 largeur. Le cockpit s'en souvient. Menu fermé, un point sur le bouton
 signale qu'il y a quelque chose à répondre ou qu'une commande tourne.
 
@@ -145,9 +150,10 @@ l'ouverture, après chaque run et après chaque enregistrement de réponses.
 « Pourquoi ? » montre la règle (`scan_rules.md`), les fichiers et les
 lignes de la commande qui ont donné l'état.
 
-**Chaîne** — la chaîne principale, une étape par commande, son état en
-couleur et en mot : faite · t'attend · en cours · bloquée · à faire ·
-inconnu. La prochaine étape ressort ; un clic sur « Lancer » la lance avec
+**Chaîne** — la chaîne principale, une frise d'étapes, une par commande,
+son état en icône, en couleur et en mot : faite (✓) · t'attend (la main
+levée) · en cours (▶) · bloquée (le sens interdit) · à faire (son numéro) ·
+inconnu (le point d'interrogation, en pointillé). La prochaine étape ressort ; un clic sur « Lancer » la lance avec
 la feature. Une autre étape demande confirmation, et certaines commandes
 la demandent toujours (celles qui commitent ou déplacent des fichiers
 avant un de leurs tests — la confirmation dit pourquoi). Une étape
@@ -191,9 +197,9 @@ sont jamais là : l'Architecte y répond.
 `docs/donnees/` — ce que l'application embarque et livre ; **« De la
 fonctionnalité »**, le `donnees/` de la feature active — des instances
 réelles de ce qu'elle lit, dont la spécification et les tests partent,
-jamais livrées. Chaque onglet liste les entrées de l'index — le fichier, ce
-que c'est, d'où il vient, sa date, privé ou non — et « Aperçu » montre les
-premières lignes d'un fichier texte, ou l'image. **« Joindre des
+jamais livrées. Chaque onglet montre une carte par entrée de l'index — le
+fichier, ce que c'est, d'où il vient, sa date, privé ou non — et « Aperçu »
+montre à côté les premières lignes d'un fichier texte, ou l'image. **« Joindre des
 fichiers »** ouvre la fenêtre de choix, plusieurs fichiers à la fois : chacun
 est copié tel quel dans le dossier, et son entrée s'ouvre à remplir (la date
 du jour par défaut). « Modifier » une entrée ; « Retirer » demande, et le
@@ -303,11 +309,20 @@ suivant et son `bug-list.md` vide, rien d'autre, et l'ouvre pour l'écrire
 ici, tant que le diagnostic ne l'a pas lu.
 
 **Paramètres** (1.9) — ce qui appartient au cockpit lui-même, dans cet
-ordre, chacun avec sa ligne d'explication : le mode de permission, les
-notifications, les dossiers ignorés, « Outils sur cet ordinateur »,
-« Arrêter le cockpit ». La version de la chaîne est sous « Chaîne →
-Version », le profil de déploiement sous « Déploiement → Profil », la
-feature dans la barre du haut, l'application sur l'accueil.
+ordre : l'apparence (1.11), puis, chacun avec sa ligne d'explication, le
+mode de permission, les notifications, les dossiers ignorés, « Outils sur
+cet ordinateur », « Arrêter le cockpit ». La version de la chaîne est sous
+« Chaîne → Version », le profil de déploiement sous « Déploiement →
+Profil », la feature dans la barre du haut, l'application sur l'accueil.
+
+**Apparence** (1.11) — Paramètres → Apparence, « Thème : Auto / Clair /
+Sombre ». Auto, le défaut, suit le réglage de l'ordinateur ; Clair ou
+Sombre l'imposent, sur tous les écrans. Le choix est gardé par le
+navigateur, comme les notifications et le menu. Toutes les couleurs et
+toutes les tailles de la page sont des variables CSS, en tête de
+`static/index.html` ; le thème sombre redéfinit les mêmes. Les icônes sont
+des SVG dessinés pour le cockpit, dans la page elle-même : rien ne vient
+d'internet.
 
 **Notifications** — Paramètres → Notifications : une case par événement
 (fin d'un run avec sa ligne `Next:` en clair, autorisation qui attend,
