@@ -5,6 +5,7 @@ step finding nothing; §7's clone and long paths. Bare repositories play
 GitHub, in temporary folders; nothing reaches the real GitHub."""
 import os
 import re
+import shutil
 import subprocess
 
 import pytest
@@ -355,11 +356,21 @@ def test_every_commit_step_carries_on_when_nothing_is_left():
         assert "stop" not in before.lower(), (name, before)
 
 
+def git_bash():
+    """The shell a command's steps run in: Git for Windows' bash. 1.12.2:
+    the suite launched from PowerShell has none on its PATH — then the one
+    beside git (`Git/cmd/git.exe` → `Git/bin/bash.exe`)."""
+    found = shutil.which("bash")
+    if found:
+        return found
+    return os.path.join(os.path.dirname(os.path.dirname(shutil.which("git"))), "bin", "bash.exe")
+
+
 def play_commit_step(repo, feature, message):
     """The command's own step, as its file writes it, in a shell — then
     the next step, the worktree from local HEAD."""
     step = f'git add docs/features/{feature}/ && git commit -m "{message}"'
-    p = subprocess.run(["bash", "-c", step], cwd=str(repo), capture_output=True, text=True,
+    p = subprocess.run([git_bash(), "-c", step], cwd=str(repo), capture_output=True, text=True,
                        env=dict(os.environ, GIT_TERMINAL_PROMPT="0"))
     wt = repo / ".claude" / "worktrees" / feature
     w = subprocess.run(["git", "worktree", "add", "-q", str(wt), "HEAD"], cwd=str(repo), capture_output=True,

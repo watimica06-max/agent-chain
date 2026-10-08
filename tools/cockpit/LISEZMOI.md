@@ -293,7 +293,9 @@ type choisi, chacun avec ce qu'il veut dire. « Enregistrer le profil »
 écrit `.claude/deploy.json`, le commite seul dans l'application
 (`deploy: profil`) et pousse. Refusé pendant qu'un run ou un déploiement
 tourne dans l'application. Une application neuve n'a pas de profil tant
-qu'on n'en a pas écrit un.
+qu'on n'en a pas écrit un. Une cible ajoutée tout de suite après
+l'ouverture de l'onglet reste (1.12.2) : une seconde lecture du profil,
+arrivée après, ne remet plus le formulaire à zéro.
 
 **À fournir avant le code** (1.7) n'est plus : la chaîne apporte la
 compétence et le format du profil, `/conventions` écrit les conventions,
@@ -482,7 +484,8 @@ ne sait pas lire sont signalés en haut, jamais ignorés.
 **Le run** — sous son étape, dans « Chaîne » ou « Correction » : la
 commande qui tourne, l'agent actif, le texte au fil de l'eau. Une demande
 d'autorisation apparaît en bandeau sur tous les écrans : « Autoriser » ou
-« Refuser » ; la commande attend votre clic. « Arrêter maintenant »
+« Refuser » ; la commande attend votre clic — que la page se rafraîchisse
+pendant le clic ne le perd plus (1.12.2). « Arrêter maintenant »
 interrompt le tour en cours. « Arrêter au prochain lot » (sur `/8_code`
 seulement) écrit `stop.md` ; « Retirer stop.md » le renomme `stop1.md`.
 

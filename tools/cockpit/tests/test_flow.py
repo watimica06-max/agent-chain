@@ -271,9 +271,12 @@ def test_ou_on_en_est_rechecks_the_stored_next(tmp_path, page):
         page.get_by_role("button", name="Où on en est ?").click()
         page.wait_for_function("document.getElementById('next-source').textContent === 'déduite du dossier'")
         page.get_by_role("link", name="Tableau de bord").first.click()
+        # 1.12.2: the screen changes on the `hashchange` after the click —
+        # until then « Chaîne » is the one shown, its steps' « Pourquoi ? » first.
+        page.wait_for_selector("#scr-dashboard", state="visible")
         msg = page.locator("#next-message").inner_text()
         assert msg.startswith("Le dernier relais disait « Next: run /2_structure f » ; les fichiers disent « ")
-        page.get_by_role("button", name="Pourquoi ?").first.click()
+        page.locator("#next-card").get_by_role("button", name="Pourquoi ?").click()
         assert "X-AMONT" in page.locator("#next-why").inner_text()
         assert no_real_errors(page) == []
 

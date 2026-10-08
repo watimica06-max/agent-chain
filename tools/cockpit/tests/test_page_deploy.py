@@ -237,6 +237,64 @@ def test_parametres_deploiement(tmp_path, page, fa):
         assert [e for e in no_real_errors(page) if "status of 400" not in e] == []
 
 
+# Counts the reads of /api/deploy the page has finished with — its `api()`
+# returns once the body is read, and what follows runs before the next task.
+COUNT_DEPLOY_READS = """
+window.__deployReads = 0;
+const realFetch = window.fetch;
+window.fetch = (input, init) => realFetch(input, init).then((r) => {
+  if (String(input) === "/api/deploy" && !(init && init.method)) {
+    const json = r.json.bind(r);
+    r.json = () => json().finally(() => { window.__deployReads += 1; });
+  }
+  return r;
+});
+"""
+
+
+def test_a_target_added_survives_a_late_read_of_the_profile(tmp_path, page, fa):
+    """1.12.2: « Profil » clicked while « Déploiement » is still being
+    entered — two reads of the profile cross: the tab's, and the entry's own
+    once its destinations are read. Forced: the tab's comes back first, a
+    target is added, then the entry's comes back. The target stays."""
+    held, holding = [], {"on": True}
+
+    def hold(route):
+        if holding["on"] and route.request.method == "GET":
+            held.append(route)
+        else:
+            route.continue_()
+
+    def until(n):
+        for _ in range(200):
+            if len(held) >= n:
+                return
+            page.wait_for_timeout(50)
+        assert len(held) >= n, held
+    with FakeServer(tmp_path / "s") as s:
+        init(s.app_root)
+        commit(s.app_root, "first")
+        page.add_init_script(COUNT_DEPLOY_READS)
+        page.route("**/api/deploy", hold)
+        page.goto(s.url + "#deploy")
+        until(1)                                       # the entry's read
+        page.get_by_role("tab", name="Profil").click()
+        until(2)                                       # the tab's
+        held[0].continue_()
+        until(3)                                       # the entry's second, for « Profil »
+        held[1].continue_()
+        page.wait_for_selector("#dp-profil:not(.hidden) #dp-set-empty")
+        page.locator("#dps-new-type").select_option("commande")
+        page.get_by_role("button", name="Ajouter une cible").click()
+        assert page.locator(".dp-tgt").count() == 1
+        holding["on"] = False
+        held[2].continue_()
+        page.wait_for_function("window.__deployReads === 3")
+        assert page.locator(".dp-tgt").count() == 1
+        assert page.locator(".dp-tgt").first.get_by_label("Commande de lancement").count() == 1
+        assert no_real_errors(page) == []
+
+
 def test_notifications_a_deploy_ends_and_a_crash_comes(tmp_path, browser, fa):
     # The tab behind: a deploy's end and a crash each make a notification.
     from test_page_code import FAKE_NOTIFICATION

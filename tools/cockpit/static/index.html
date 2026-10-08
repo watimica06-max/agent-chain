@@ -3494,9 +3494,14 @@ function renderRun() {
 // The cards of the run going, whatever its application (1.6): the
 // snapshot, and those events brought since it was taken — a state fetched
 // just before a request arrived must not take its card away.
+// 1.12.2: a card still wanted stays the same element — a refresh landing
+// while she presses « Autoriser » would otherwise swap the button under her
+// pointer, and her click would be lost.
 function renderPerms() {
-  const pl = $("perm-banner"); pl.replaceChildren();
-  if (anyRun()) for (const p of [...S.busy.permissions, ...livePerms.values()]) if (!resolvedPerms.has(p.id)) addPermission(p);
+  const want = anyRun() ? [...S.busy.permissions, ...livePerms.values()].filter((p) => !resolvedPerms.has(p.id)) : [];
+  const keep = new Map(want.map((p) => ["perm-" + p.id, permMeta(p)]));
+  for (const c of [...$("perm-banner").children]) if (keep.get(c.id) !== c.dataset.meta) c.remove();
+  for (const p of want) addPermission(p);
   permAlert();
 }
 
@@ -3556,11 +3561,15 @@ function renderAgents(list) {
 }
 
 // A permission card is a banner at the top of every screen: a run waits on it.
+function permMeta(p) {
+  return `Outil : ${p.tool} · demandé par : ${agentName(p.agent)}` + (p.app && !sameApp(p.app, S.app_folder) ? ` · dans « ${appName(p.app)} »` : "");
+}
 function addPermission(p) {
   if ($("perm-" + p.id)) return;
-  $("perm-banner").append(el("div", {class: "perm", id: "perm-" + p.id},
+  const meta = permMeta(p);
+  $("perm-banner").append(el("div", {class: "perm", id: "perm-" + p.id, "data-meta": meta},
     el("div", {class: "title", text: p.title || ("Autoriser " + p.tool + " ?")}),
-    el("div", {class: "muted small", text: `Outil : ${p.tool} · demandé par : ${agentName(p.agent)}` + (p.app && !sameApp(p.app, S.app_folder) ? ` · dans « ${appName(p.app)} »` : "")}),
+    el("div", {class: "muted small", text: meta}),
     el("pre", {text: p.input}),
     el("div", {class: "row"},
       el("button", {class: "allow", text: "Autoriser", onclick: () => answerPerm(p.id, true)}),
@@ -4719,9 +4728,18 @@ async function loadDeploySettings() {
   if (!S.app_folder) return;
   let fresh = false;
   if (!DP.data || DP.settingsFor !== S.app_folder) {
-    try { DP.data = await api("/api/deploy"); } catch (e) { $("set-deploy").replaceChildren(el("div", {class: "notice warn", text: e.message})); return; }
-    if (DP.choice === null) DP.choice = DP.data.choice || {};
-    DP.settingsFor = S.app_folder; DP.edit = null;
+    const app = S.app_folder;
+    let data;
+    try { data = await api("/api/deploy"); } catch (e) { $("set-deploy").replaceChildren(el("div", {class: "notice warn", text: e.message})); return; }
+    // 1.12.2: two reads cross — the tab's click and « Déploiement »'s entry,
+    // once its destinations are read. The first one back builds the form; a
+    // later one finds it built and leaves it, with what she added since.
+    if (app !== S.app_folder) return;
+    if (DP.settingsFor !== app) {
+      DP.data = data;
+      if (DP.choice === null) DP.choice = DP.data.choice || {};
+      DP.settingsFor = app; DP.edit = null;
+    }
   }
   if (!DP.edit) { DP.edit = JSON.parse(JSON.stringify(DP.data.profile.targets || [])); fresh = true; }
   if (fresh || !$("set-deploy").querySelector(".dp-set")) renderDeploySettings();

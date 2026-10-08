@@ -129,6 +129,27 @@ def test_permission_card_is_a_banner_on_every_screen(tmp_path, page):
         assert no_real_errors(page) == []
 
 
+def test_a_refresh_while_she_presses_autoriser_keeps_her_click(tmp_path, page):
+    """1.12.2: a state refresh lands between the press and the release of
+    « Autoriser » — forced here. The card is the same element after it, and
+    the click answers the request."""
+    with FakeServer(tmp_path) as s:
+        page.goto(s.url + "#dashboard")
+        page.wait_for_selector("#side")
+        start_run(s, page)
+        allow = page.locator("#perm-banner").get_by_role("button", name="Autoriser")
+        before = allow.element_handle()
+        box = allow.bounding_box()
+        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+        page.mouse.down()
+        page.evaluate("refreshState()")
+        assert before.evaluate("e => e.isConnected")
+        page.mouse.up()
+        page.wait_for_selector("#perm-banner", state="hidden", timeout=5000)
+        s.call(_wait(s.rn.current(str(s.app_root)).task))                # the run goes on to its end
+        assert no_real_errors(page) == []
+
+
 def test_save_bar_stays_visible_while_the_form_scrolls(tmp_path, page):
     with FakeServer(tmp_path) as s:
         page.goto(s.url + "#dashboard")

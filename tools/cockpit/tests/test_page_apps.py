@@ -82,7 +82,10 @@ def test_new_application_is_a_page_of_its_own(tmp_path, page, per_app_chain):
         page.goto(s.url)
         page.wait_for_selector(".home-card")
         page.get_by_role("button", name="Nouvelle application").click()
-        page.wait_for_function("location.hash === '#nouvelle'")
+        # 1.12.2: the hash changes first, the screen on the `hashchange` that
+        # follows — wait for the screen, not for the hash.
+        page.wait_for_selector("#scr-nouvelle #new-app", state="visible")
+        assert page.evaluate("location.hash") == "#nouvelle"
         assert page.locator("#scr-nouvelle #new-app").is_visible()
         assert not page.locator("#scr-accueil").is_visible() and not page.locator("#side").is_visible()
         # Full width: the form spans the screen, no side menu beside it.
