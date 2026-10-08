@@ -44,6 +44,11 @@ Dans une console, pour voir ce qu'il écrit : `python server.py --ouvrir`
   modifie.
 - **Changer de feature** : la feature, dans la barre du haut, ouvre la
   liste des features de l'application.
+- **GitHub** (1.12) : le dépôt de la chaîne (agent-chain) est récupéré
+  depuis GitHub ; s'il était en retard, il est mis à jour — en avance
+  rapide seulement — et un bandeau dit « Nouvelle version du cockpit et de
+  la chaîne récupérée — redémarre le cockpit pour l'utiliser. » Chaque
+  application de la liste est récupérée aussi, en arrière-plan.
 
 ## Les écrans
 
@@ -52,8 +57,8 @@ Dans une console, pour voir ce qu'il écrit : `python server.py --ouvrir`
 retard**, **modifiée sur place**, **absente**) ; sa feature et l'étape que
 le relevé du dossier y propose ; ce qui vous y attend, en nombre de
 questions et de blocages ; son dernier run (la commande, quand, comment il
-a fini) ; le nombre de fichiers non commités dans son dossier — pour
-information, le cockpit n'y touche jamais ; une commande qui y tourne,
+a fini) ; **GitHub** (1.12) — où ce dépôt en est face à GitHub, et en
+dessous le nombre de fichiers non commités dans son dossier ; une commande qui y tourne,
 « en cours », avec « Arrêter ». Un clic sur la ligne l'ouvre sur son
 tableau de bord, comme « Ouvrir ». Son petit menu « ⋯ » : « Renommer », « Retirer de la
 liste » (il demande d'abord ; le dossier n'est pas touché, seule la liste
@@ -90,9 +95,15 @@ application ouverte. En haut :
   et sur l'accueil, même après un redémarrage du cockpit ; « Abandonner »
   la retire de la liste, le dossier reste tel quel. Une création finie
   ouvre le tableau de bord de la nouvelle application.
+- **« Ajouter depuis GitHub »** (1.12) : sur le second ordinateur, une
+  application qui est déjà sur GitHub — l'adresse du dépôt et le dossier
+  parent ; elle y est clonée (`core.longpaths=true` réglé dans le clone),
+  puis ajoutée à la liste comme « Ajouter » le fait. Un dossier qui existe
+  et n'est pas vide est refusé.
 - **« Ajouter une application »** : la fenêtre de choix de Windows, ou le
   chemin collé. Il faut la racine d'un dépôt git ; un autre dossier est
-  refusé, et la page dit pourquoi. Ajouter n'écrit rien dans le dossier.
+  refusé, et la page dit pourquoi. Ajouter ne touche à aucun fichier du
+  dossier ; 1.12 : il règle `core.longpaths=true` dans sa configuration git.
   Un dépôt où la chaîne n'est pas encore installée s'ajoute aussi : il
   montre « chaîne absente », et sa carte l'installe. L'ouvrir sur une
   feature demande `docs/features/`.
@@ -208,7 +219,10 @@ commite le dossier (`donnees: …`) et pousse ; refusé pendant qu'une commande
 tourne dans l'application. **Privé** : le fichier va dans `.gitignore` et
 n'est jamais commité — ni lui, ni les copies que les lots en feront ; un
 fichier déjà commité sort de l'index de git, et la page dit qu'il reste dans
-l'historique, comme les copies déjà commitées. Dans « À répondre », une
+l'historique, comme les copies déjà commitées. Un fichier privé ne passe
+donc jamais d'un ordinateur à l'autre : sur celui qui ne l'a pas, son entrée
+dit **« pas sur cet ordinateur »**, et « Enregistrer » la garde (1.12) ; un
+fichier non privé absent du disque est toujours refusé. Dans « À répondre », une
 question qui demande un fichier (sa ligne `Folder:`) offre **« Joindre un
 fichier »** : le fichier va dans le dossier qu'elle nomme, son entrée
 s'ouvre à remplir, et la réponse nomme le fichier ; ses autres options
@@ -394,7 +408,50 @@ l'autre) : quand l'application ouverte n'en a pas, le cockpit le lance une
 fois de lui-même et garde le résultat. Le tableau de bord ne l'affiche que
 s'il a un ✗ ; Paramètres → Outils sur cet ordinateur le relance à la
 demande. Il dit aussi (1.8) si scrcpy et l'émulateur Android sont là, ✓ ou
-« non trouvé » : tous deux facultatifs, jamais une alerte.
+« non trouvé » : tous deux facultatifs, jamais une alerte. 1.12 :
+**Chemins longs de git** — `core.longpaths` dans la configuration git de
+chaque application, ✓ ou ✗, et « Régler » le met à `true`.
+
+**GitHub — toujours d'accord** (1.12). Le Product Owner travaille sur les
+mêmes applications depuis deux ordinateurs, jamais en même temps. Le
+cockpit récupère chaque dépôt (`git fetch`) et dit où il en est :
+**à jour** ; **en retard** (GitHub a des commits que cet ordinateur n'a
+pas) ; **non envoyé** (cet ordinateur a des commits que GitHub n'a pas) ;
+**divergé** (les deux) ; **GitHub injoignable** ; **sans GitHub** (un
+dépôt sans dépôt distant). C'est calculé à l'ouverture du cockpit, à
+l'ouverture d'une application, avant chaque lancement, après chaque run et
+après chaque action git du cockpit — et montré sur la ligne de l'accueil,
+et dans la barre du haut de l'application ouverte quand ce n'est pas
+« à jour ».
+- **Avant chaque lancement** — une commande, « Enregistrer » dans
+  Données, le profil de déploiement, une installation ou une mise à jour
+  de la chaîne : **en retard**, il récupère (`git pull --ff-only`) puis
+  lance ; si git refuse parce qu'il écraserait un fichier non commité, rien
+  ne se lance et la page dit lequel. **Divergé** : rien ne se lance,
+  « Réconcilier » est proposé. **GitHub injoignable** : il lance, et dit
+  que l'état n'est pas vérifié. **Non envoyé** : il envoie d'abord
+  (`git push`), puis lance.
+- **Après chaque run** : la fin du run dit si GitHub a ses commits ; un
+  push de fin de run refusé y est écrit en clair, avec « Envoyer » ou
+  « Réconcilier ». **Non envoyé** devient une alerte, sur le tableau de
+  bord et sur la ligne, avec **« Envoyer »** ; un push refusé récupère de
+  nouveau et montre le nouvel état.
+- **« Réconcilier »** (divergé) : `git pull --rebase` — les commits d'ici
+  sont rejoués après ceux de GitHub, puis envoyés. Sur un conflit, il
+  annule (`git rebase --abort`) : le dépôt revient tel qu'il était, et la
+  page dit quels fichiers sont en conflit — une session Claude Code ouverte
+  sur l'application le réglera. Refusé tant que des fichiers suivis ont des
+  modifications non commitées.
+- **« Envoyer mes réponses »**, sur « À répondre » et sur la ligne, quand
+  le dossier de la feature a des modifications non commitées : le même
+  commit que la prochaine commande ferait — `docs/features/<feature>/`,
+  `chore: answers` — puis le push. La commande qui suit ne trouve rien à
+  commiter, ce que chacune lit comme normal, et continue.
+- **Jamais** de `--force`, de reset, de stash, ni de commit de fusion fait
+  par le cockpit ; jamais de demande de mot de passe : un push ou un clone
+  refusé faute d'identifiants GitHub le dit.
+- **Hors du cockpit**, une commande lancée depuis Claude Code n'a aucune
+  de ces vérifications : aucune commande de la chaîne n'a changé.
 
 **À répondre** — toutes les questions ouvertes et tous les blocages qui
 vous attendent, dans un seul formulaire, **à gauche** ; **à droite**, le
@@ -482,12 +539,18 @@ avec ce qu'il a vu.
   appareil sans un clic. Les noms de vos appareils restent dans
   `config.json`, jamais dans l'application.
 - Ajouter, renommer ou retirer une application ne change que sa liste,
-  dans `config.json` : rien n'est écrit dans son dossier.
+  dans `config.json` : aucun fichier de son dossier n'est écrit — Ajouter
+  règle seulement `core.longpaths=true` dans sa configuration git (1.12).
+- Avec GitHub (1.12), il récupère, envoie, et réconcilie par un rebase —
+  jamais de `--force`, de reset, de stash, ni de commit de fusion de sa
+  part ; « Envoyer mes réponses » ne commite que le dossier de la feature.
 - « Nouvelle application » n'écrit que dans le dossier qu'elle crée, neuf
   ou vide, et ne le supprime jamais ; elle ne force jamais un dépôt
   distant qui contient déjà des commits. Elle ne reprend qu'une création
   qu'elle a commencée : une application existante n'est jamais touchée.
-- Il ne touche jamais au travail non commité d'une application.
+- Il ne touche jamais au travail non commité d'une application — sauf
+  « Envoyer mes réponses », qui commite le dossier de la feature comme la
+  prochaine commande l'aurait fait.
 - Après chaque écriture, il relit le fichier avec le test de la commande ;
   si la commande le lirait encore comme sans réponse, il annule l'écriture
   et vous le dit.

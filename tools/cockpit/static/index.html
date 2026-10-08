@@ -183,6 +183,19 @@ button.chip:hover { border-color: var(--accent); }
 #chain-banner button.link { color: inherit; text-decoration: underline; }
 #chain-line { margin: 0; }
 #chain-line.off { color: var(--warn); }
+/* 1.12 — GitHub: the state in the top bar, the banner of what the sync did. */
+#tb-sync.late, #tb-sync.mod { font-weight: 600; }
+#tb-sync.late { border-color: var(--warn-line); background: var(--warn-soft); color: var(--warn); }
+#tb-sync.mod { border-color: var(--err); background: var(--err-soft); color: var(--err); }
+#tb-sync.abs { color: var(--soft); border-style: dashed; }
+#sync-banner { border-top: var(--bw) solid var(--line); background: var(--raised); color: var(--ink); padding: var(--sp-8) var(--sp-20);
+  display: flex; gap: var(--sp-10); align-items: center; flex-wrap: wrap; }
+#sync-banner.warn { border-top-color: var(--warn-line); background: var(--warn-soft); color: var(--warn); }
+#sync-banner.err { border-top-color: var(--err); background: var(--err-soft); color: var(--err); }
+#sync-banner.ok { border-top-color: var(--ok); background: var(--ok-soft); color: var(--ok); }
+#sync-banner .txt { flex: 1; min-width: 0; }
+#sync-banner .files { font-family: var(--mono); font-size: var(--fs-12); display: block; margin-top: var(--sp-2); }
+#sync-banner button { min-height: var(--h-28); font-size: var(--fs-12); }
 .chain-list { margin: var(--sp-6) 0 0; padding-left: var(--sp-20); }
 #perm-banner { border-top: var(--bw) solid var(--err-line); background: var(--err-soft); padding: var(--sp-10) var(--sp-20) var(--sp-12);
   max-height: 46vh; overflow: auto; }
@@ -241,6 +254,9 @@ body.at-home .screen { margin: 0 auto; }
 .home-head { display: flex; gap: var(--sp-10); align-items: flex-end; flex-wrap: wrap; margin-bottom: var(--sp-18); }
 .home-head h2 { margin: 0; font-size: var(--fs-20); }
 .home-head .sub { color: var(--soft); margin-top: var(--sp-2); }
+/* 1.12: four buttons on one line — the title's block gives way first. */
+.home-head > div:first-child { flex: 1 1 var(--w-220); min-width: 0; }
+.home-head > button { flex: none; }
 #home-notice { display: flex; gap: var(--sp-12); align-items: center; border: var(--bw) solid var(--accent); background: var(--accent-soft);
   color: var(--ink); border-radius: var(--r-10); padding: var(--sp-10) var(--sp-16); margin: 0 0 var(--sp-16); }
 #home-notice .ic-dot { flex: none; width: var(--sp-10); height: var(--sp-10); border-radius: 50%; background: var(--accent); animation: pulse 1.6s ease-in-out infinite; }
@@ -249,7 +265,7 @@ body.at-home .screen { margin: 0 auto; }
 .home-cards > .card { border: none; box-shadow: none; border-radius: 0; }
 .apps-head, .home-card { display: grid; column-gap: var(--sp-16); row-gap: 0; padding: 0 var(--sp-16);
   grid-template-columns: var(--w-220) minmax(0, 1fr) var(--w-330) var(--w-180) var(--w-150);
-  grid-template-areas: "id next facts chain foot" "run run run run run" "msg msg msg msg msg"; align-items: center; }
+  grid-template-areas: "id next facts chain foot" "run run run run run" "alert alert alert alert alert" "msg msg msg msg msg"; align-items: center; }
 .apps-head { grid-template-areas: none; min-height: var(--h-36); background: var(--raised); border-bottom: var(--bw) solid var(--line);
   font-size: var(--fs-12); font-weight: 600; color: var(--soft); }
 .apps-head .ah-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-16); }
@@ -293,6 +309,29 @@ body.at-home .screen { margin: 0 auto; }
   padding: 0 var(--sp-10); border-radius: var(--r-8); border: var(--bw) solid var(--line-strong); background: var(--card); }
 .home-card.missing .hc-open { border: none; background: none; color: var(--soft); font-weight: 400; }
 .hc-msg { grid-area: msg; font-size: var(--fs-12); color: var(--warn); }
+/* 1.12: the row's GitHub state, and what it asks of her. */
+.hc-sync { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
+.hc-sync .u { font-size: var(--fs-12); color: var(--soft); }
+.hc-alert { grid-area: alert; display: flex; flex-direction: column; gap: var(--sp-4); margin-top: var(--sp-8); }
+.hc-alert:empty { display: none; }
+.hc-alert > div { display: flex; gap: var(--sp-10); align-items: center; border-radius: var(--r-8); padding: var(--sp-6) var(--sp-12);
+  font-size: var(--fs-13); background: var(--warn-soft); color: var(--warn); }
+.hc-alert > div.mod { background: var(--err-soft); color: var(--err); }
+.hc-alert > div.info { background: var(--raised); color: var(--ink); }
+.hc-alert button { margin-left: auto; min-height: var(--h-28); font-size: var(--fs-12); flex: none; }
+#apps-clone { margin-bottom: var(--sp-16); }
+#apps-clone .row + .row { margin-top: var(--sp-8); }
+#apps-clone label { min-width: var(--w-160); font-weight: 600; font-size: var(--fs-13); }
+#chain-sync-line { display: flex; gap: var(--sp-8); align-items: center; margin-top: var(--sp-4); }
+#chain-sync-line button { min-height: var(--h-28); font-size: var(--fs-12); }
+#chain-sync-line:empty { display: none; }
+.run-sync { margin: var(--sp-8) 0; }
+#answers-send { display: flex; gap: var(--sp-10); align-items: center; flex-wrap: wrap; margin: 0 0 var(--sp-12); }
+#answers-send.hidden { display: none; }
+#answers-msg:empty { display: none; }
+#longpaths { list-style: none; padding: 0; margin: var(--sp-6) 0 0; }
+#longpaths li { display: flex; gap: var(--sp-10); align-items: center; padding: var(--sp-4) 0; }
+#longpaths li button { min-height: var(--h-28); font-size: var(--fs-12); }
 .hc-msg:empty { display: none; }
 #scr-nouvelle .back, #scr-pick .back { margin-bottom: var(--sp-14); }
 .cst { display: inline-flex; align-items: center; gap: var(--sp-6); font-size: var(--fs-12); padding: 0 var(--sp-8) 0 var(--sp-6); border-radius: var(--r-pill); font-weight: 650; }
@@ -316,7 +355,7 @@ body.at-home .screen { margin: 0 auto; }
 .step .subcmds button { min-height: var(--h-28); padding: 0 var(--sp-8); font-family: var(--mono); font-size: var(--fs-12); }
 .sec .lead { margin: calc(-1 * var(--sp-8)) 0 var(--sp-12); color: var(--soft); font-size: var(--fs-13); }
 @media (max-width: 1100px) { .apps-head { display: none; }
-  .home-card { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id foot" "next next" "facts facts" "chain chain" "run run" "msg msg"; }
+  .home-card { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id foot" "next next" "facts facts" "chain chain" "run run" "alert alert" "msg msg"; }
   .hc-facts .k { position: static; width: auto; height: auto; clip: auto; font-size: var(--fs-11); color: var(--soft); }
   #apps-report .line { grid-template-columns: 1fr; } .aud { grid-template-columns: 1fr; } }
 /* « Nouvelle application » (1.7) */
@@ -968,6 +1007,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       <span class="crumb-sep hidden" id="tb-sep2" aria-hidden="true">/</span>
       <span id="tb-page"></span>
       <span class="grow"></span>
+      <button id="tb-sync" class="chip hidden" title="Où en est ce dépôt face à GitHub"></button>
       <button id="tb-mode" class="chip hidden" title="Mode de permission">Mode</button>
       <span id="tb-run-wrap"><span id="tb-run" class="chip hidden"></span><button id="tb-stop" class="danger hidden" title="Arrêter maintenant la commande qui tourne">Arrêter</button></span>
       <button id="perm-badge" class="hidden">Autorisation demandée</button>
@@ -975,6 +1015,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     <div id="perm-banner" class="hidden" role="alert" aria-label="Autorisation demandée"></div>
     <div id="chain-banner" class="hidden" role="status" aria-label="État de la chaîne"></div>
     <div id="busy-banner" class="hidden" role="status" aria-label="Commande dans une autre application"></div>
+    <div id="sync-banner" class="hidden" role="status" aria-label="GitHub"></div>
   </div>
 
   <div id="main">
@@ -985,21 +1026,34 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       <div id="start-error" class="notice err hidden"></div>
       <div id="home-notice" class="hidden" role="status"></div>
       <div class="home-head">
-        <div><h2>Applications</h2><div class="sub" id="apps-count"></div></div>
+        <div><h2>Applications</h2><div class="sub" id="apps-count"></div><div class="sub" id="chain-sync-line" aria-label="agent-chain face à GitHub"></div></div>
         <span class="grow"></span>
         <button id="btn-app-new" class="primary"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Nouvelle application</button>
         <button id="btn-app-add"><svg class="ic" aria-hidden="true"><use href="#i-folder"/></svg>Ajouter une application</button>
+        <button id="btn-app-clone" title="Cloner une application depuis GitHub sur cet ordinateur, puis l'ajouter à la liste"><svg class="ic" aria-hidden="true"><use href="#i-folder"/></svg>Ajouter depuis GitHub</button>
         <button id="btn-update-all" title="Installe la chaîne du dépôt dans chaque application « en retard », l'une après l'autre"><svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Tout mettre à jour</button>
       </div>
       <div class="card hidden" id="apps-add">
         <h3>Ajouter une application</h3>
-        <p class="muted small">La racine d'un dépôt git. L'ajouter n'écrit rien dans son dossier : seule la liste du cockpit change. La chaîne s'y installe ensuite depuis sa carte.</p>
+        <p class="muted small">La racine d'un dépôt git. L'ajouter ne touche à aucun de ses fichiers : la liste du cockpit change, et sa configuration git reçoit <span class="mono">core.longpaths=true</span>. La chaîne s'y installe ensuite depuis sa carte.</p>
         <div class="row">
           <input type="text" id="app-path" class="grow" placeholder="C:\Dev\mon_application" aria-label="Dossier de l'application">
           <button id="btn-browse">Parcourir…</button>
           <button id="btn-app" class="primary">Ajouter</button>
         </div>
         <p class="muted small" style="margin:var(--sp-8) 0 0">Si la fenêtre de choix ne s'ouvre pas, collez le chemin dans le champ.</p>
+      </div>
+      <div class="card hidden" id="apps-clone">
+        <h3>Ajouter depuis GitHub</h3>
+        <p class="muted small">Une application qui est déjà sur GitHub — créée ou travaillée sur l'autre ordinateur : elle est clonée ici, puis ajoutée à la liste comme « Ajouter » le fait. Sans identifiant GitHub sur cet ordinateur, le clone d'un dépôt privé est refusé, et c'est dit — jamais demandé.</p>
+        <div class="row"><label for="clone-url">L'adresse du dépôt</label>
+          <input type="text" id="clone-url" class="grow" placeholder="https://github.com/vous/mon-application.git" autocomplete="off"></div>
+        <div class="row"><label for="clone-parent">Le dossier parent</label>
+          <input type="text" id="clone-parent" class="grow" placeholder="C:\Dev" autocomplete="off">
+          <button id="clone-parent-pick" class="small">Parcourir…</button></div>
+        <div class="hint">Chemin complet : <span class="mono" id="clone-path">—</span></div>
+        <div class="row" style="margin-top:var(--sp-10)"><button id="btn-clone" class="primary">Cloner et ajouter</button>
+          <span class="small" id="clone-msg"></span></div>
       </div>
       <div id="home-creations" aria-label="Les créations en cours ou arrêtées"></div>
       <div class="card hidden" id="apps-report" aria-label="Tout mettre à jour : le compte rendu"></div>
@@ -1107,6 +1161,11 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
           <span class="grow"></span>
           <button id="btn-reload"><svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Recharger</button>
         </div>
+        <div id="answers-send" class="notice warn hidden" role="status">
+          <span id="answers-pending"></span><span class="grow"></span>
+          <button id="btn-send-answers" class="primary small" title="Le commit que la prochaine commande ferait — le dossier de la feature, « chore: answers » — puis le push">Envoyer mes réponses</button>
+        </div>
+        <div id="answers-msg" class="notice" role="status"></div>
         <div class="filters" id="filters"></div>
         <div id="save-summary"></div>
         <div id="form-errors"></div>
@@ -1339,6 +1398,9 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <div class="row"><button id="btn-diag" class="primary">Vérifier les outils</button>
           <span id="diag-wait" class="muted small hidden">En cours… jusqu'à 120 secondes : le premier appel de Gradle peut télécharger Gradle.</span></div>
         <div id="diag-result" class="diag"></div>
+        <h3 style="margin-top:var(--sp-16)">Chemins longs de git</h3>
+        <p class="muted small" style="margin:0">Dans la configuration git de chaque application, <span class="mono">core.longpaths=true</span> : un build dans un worktree écrit des chemins plus longs que la limite de Windows.</p>
+        <ul id="longpaths" aria-label="core.longpaths de chaque application"></ul>
       </div>
       <div class="card sec" id="sec-quit">
         <h2>Arrêter le cockpit</h2>
@@ -1575,11 +1637,13 @@ function route() {
     if (s === r && inApp) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   }
   if (r === "accueil") { loadApps(); loadCreations(); renderHomeNotice(); }
+  renderSyncBanner();
   if (r === "nouvelle" && entering) { openNewApp(); loadCreations(); }
   if (pick) renderWorkCard();
   if (inApp && r === "answer") hint();
   if (inApp && (r === "chaine" || r === "correction")) placeRun();
   if (inApp && r === "stats") loadStats();
+  if (inApp && r === "settings" && entering) loadLongpaths();
   if (inApp && r === "donnees" && entering) enterDonnees();
   // 1.8: « Déploiement » polls its destinations while it is shown, and only then.
   if (inApp && r === "deploy") enterDeploy(); else leaveDeploy();
@@ -1643,7 +1707,8 @@ async function addApp() {
   try {
     const r = await api("/api/apps/add", {path: $("app-path").value});
     $("app-path").value = ""; $("apps-add").classList.add("hidden");
-    appsMsg(r.added ? `« ${r.app.name} » ajoutée à la liste. Rien n'a été écrit dans son dossier.` : `« ${r.app.name} » est déjà dans la liste.`, "ok");
+    appsMsg(r.added ? `« ${r.app.name} » ajoutée à la liste. Aucun de ses fichiers n'a été touché` + (r.longpaths_error ? ` — ${r.longpaths_error}.` : " ; core.longpaths=true dans sa configuration git.")
+      : `« ${r.app.name} » est déjà dans la liste.`, r.longpaths_error ? "warn" : "ok");
     await refreshState();
   } catch (e) { appsMsg(e.message); }
 }
@@ -1845,7 +1910,154 @@ async function loadApps() {
   A = r;
   renderApps();
 }
-const CHAIN_CLS = {"à jour": "ok", "en retard": "late", "modifiée sur place": "mod", "absente": "abs"};
+const CHAIN_CLS = {"à jour": "ok", "en retard": "late", "modifiée sur place": "mod", "absente": "abs", "plus récente": "mod"};
+// 1.12 — where a clone stands against GitHub (sync.py).
+const SYNC_CLS = {"à jour": "ok", "en retard": "late", "non envoyé": "late", "divergé": "mod", "GitHub injoignable": "abs", "sans GitHub": "abs"};
+const SYNC_CHIP = {"GitHub injoignable": "injoignable", "sans GitHub": "aucun dépôt distant"};
+function syncBadge(st) {
+  if (!st) return el("span", {class: "muted", text: "vérification…"});
+  if (!st.state) return el("span", {class: "muted", title: st.summary || "", text: st.detail || "—"});
+  return el("span", {class: "cst " + (SYNC_CLS[st.state] || "abs"), title: st.summary || "", text: st.state});
+}
+// What the row asks of her (1.12): « non envoyé » → « Envoyer », « divergé »
+// → « Réconcilier », answers saved and not committed → « Envoyer mes réponses ».
+function syncAlerts(r, going) {
+  const box = el("div", {class: "hc-alert"});
+  const st = r.sync, stop = (e) => e.stopPropagation();
+  const busy = going || anyRun();
+  if (st && st.state === "non envoyé") box.append(el("div", {}, el("span", {text: st.summary + "."}),
+    el("button", {class: "small sync-push", text: "Envoyer", disabled: busy || undefined, onclick: (e) => { stop(e); syncPush(r.folder); }})));
+  if (st && st.state === "divergé") box.append(el("div", {class: "mod"}, el("span", {text: st.summary + "."}),
+    el("button", {class: "small sync-reconcile", text: "Réconcilier", disabled: busy || undefined, onclick: (e) => { stop(e); syncReconcile(r.folder); }})));
+  if (r.answers_pending) box.append(el("div", {class: "info"},
+    el("span", {text: `Réponses enregistrées dans ${r.feature}, pas encore commitées : ${plural(r.answers_pending, "fichier", "fichiers")}.`}),
+    el("button", {class: "small sync-answers", text: "Envoyer mes réponses", disabled: busy || undefined, onclick: (e) => { stop(e); sendAnswers(r.folder); }})));
+  return box;
+}
+function renderChainSyncLine() {
+  const box = $("chain-sync-line"); box.replaceChildren();
+  const cs = (A && A.chain_sync) || S.chain_sync;
+  const st = cs && cs.sync;
+  if (!st || !st.state) return;
+  box.append(el("span", {text: "agent-chain :"}), syncBadge(st));
+  if (st.state === "non envoyé") box.append(el("button", {class: "small sync-push", text: "Envoyer", onclick: () => syncPush(null, true)}));
+  if (st.state === "divergé") box.append(el("button", {class: "small sync-reconcile", text: "Réconcilier", disabled: anyRun() || undefined, onclick: () => syncReconcile(null, true)}));
+}
+
+// ------------------------------------------------ GitHub actions (1.12)
+// What the sync did or refused, said on every screen until dismissed.
+let syncNote = null, chainNoticeSeen = "";
+function showSync(note) { syncNote = note; renderSyncBanner(); }
+function renderSyncBanner() {
+  const b = $("sync-banner");
+  const cs = S.chain_sync || {};
+  const chain = (cs.notice || cs.error) && chainNoticeSeen !== (cs.notice || cs.error)
+    ? {kind: cs.error ? "err" : "warn", text: cs.error || cs.notice, chain: true} : null;
+  const n = syncNote || chain;
+  b.classList.toggle("hidden", !n);
+  if (!n) return;
+  b.className = n.kind || "";
+  b.replaceChildren(el("span", {class: "txt" + (n.conflict ? " conflict" : "")}, el("b", {text: n.title || ""}), n.title ? " " : "", n.text || "",
+    n.files && n.files.length ? el("span", {class: "files", text: n.files.join(" · ")}) : null),
+    ...(n.actions || []),
+    el("button", {class: "small", text: "Compris", onclick: () => { if (n.chain) chainNoticeSeen = n.text; else syncNote = null; renderSyncBanner(); }}));
+}
+function reconcileButton(folder) {
+  return el("button", {class: "small sync-reconcile", text: "Réconcilier", onclick: () => syncReconcile(folder)});
+}
+async function afterSync() { if (atHome()) await loadApps(); await refreshState(); }
+async function syncPush(folder, chain) {
+  try {
+    const r = await api("/api/sync/push", chain ? {chain: true} : folder ? {folder} : {});
+    showSync({kind: "ok", text: `${chain ? "agent-chain" : appName(folder || S.app_folder)} — envoyé à GitHub. ${r.sync.summary}.`});
+  } catch (e) {
+    const st = e.body && e.body.sync;
+    showSync({kind: "err", title: "Envoi refusé.", text: e.message,
+      actions: st && st.state === "divergé" ? [reconcileButton(folder)] : []});
+  }
+  await afterSync();
+}
+async function syncReconcile(folder, chain) {
+  showSync({kind: "warn", text: "Réconciliation avec GitHub en cours…"});
+  try {
+    const r = await api("/api/sync/reconcile", chain ? {chain: true} : folder ? {folder} : {});
+    showSync({kind: r.pushed ? "ok" : "warn", text: r.message});
+  } catch (e) {
+    const b = e.body || {};
+    showSync({kind: "err", title: b.conflicts && b.conflicts.length ? "Conflit — rien n'a changé." : "Réconcilier refusé.",
+      text: e.message, conflict: !!(b.conflicts && b.conflicts.length)});
+  }
+  await afterSync();
+}
+async function sendAnswers(folder) {
+  const msg = $("answers-msg");
+  try {
+    const r = await api("/api/answers/send", folder ? {folder} : {});
+    const text = r.commit ? `Commit ${r.commit} « ${r.message} » de ${r.path}` + (r.pushed ? ", envoyé à GitHub."
+      : r.diverged ? " — pas envoyé : ce dépôt a divergé de GitHub, « Réconcilier » d'abord." : r.push ? ` — pas envoyé : ${r.push.message}` : ".")
+      : "Rien à commiter : les réponses étaient déjà commitées.";
+    if (!folder) { msg.className = "notice " + (r.commit && (r.pushed || !r.push) && !r.diverged ? "ok" : "warn"); msg.textContent = text; }
+    else showSync({kind: r.pushed ? "ok" : "warn", text: `${appName(folder)} — ${text}`, actions: r.diverged ? [reconcileButton(folder)] : []});
+  } catch (e) {
+    if (!folder) { msg.className = "notice err"; msg.textContent = e.message; }
+    else showSync({kind: "err", text: e.message});
+  }
+  await afterSync();
+}
+function renderAnswersSend() {
+  const n = S.answers_pending || 0;
+  $("answers-send").classList.toggle("hidden", !n);
+  $("answers-pending").textContent = n ? `${plural(n, "fichier", "fichiers")} de docs/features/${S.feature}/ pas encore ${n > 1 ? "commités" : "commité"} — la prochaine commande les commitera, ou ce bouton tout de suite, puis les envoie à GitHub.` : "";
+  $("btn-send-answers").disabled = anyRun() && !elsewhere();
+}
+$("btn-send-answers").onclick = async () => { const b = $("btn-send-answers"); b.disabled = true; try { await sendAnswers(null); } finally { b.disabled = false; } };
+
+// « Ajouter depuis GitHub » (1.12 §7).
+const cloneName = (u) => { const x = (u || "").trim().replace(/[\/\\]+$/, "").split(/[\/\\:]/).pop() || ""; return x.toLowerCase().endsWith(".git") ? x.slice(0, -4) : x; };
+function renderClonePath() {
+  const p = $("clone-parent").value.trim().replace(/[\\/]+$/, ""), n = cloneName($("clone-url").value);
+  $("clone-path").textContent = p && n ? `${p}\\${n}` : "—";
+}
+$("btn-app-clone").onclick = () => {
+  $("apps-clone").classList.toggle("hidden");
+  if (!$("apps-clone").classList.contains("hidden")) { if (!$("clone-parent").value) $("clone-parent").value = "C:\\Dev"; renderClonePath(); $("clone-url").focus(); }
+};
+$("clone-url").addEventListener("input", renderClonePath);
+$("clone-parent").addEventListener("input", renderClonePath);
+$("clone-parent-pick").onclick = async () => {
+  const b = $("clone-parent-pick"); b.disabled = true;
+  try { const r = await api("/api/pick-folder", {initial: $("clone-parent").value}); if (r.path) { $("clone-parent").value = r.path; renderClonePath(); } }
+  catch (e) { $("clone-msg").textContent = e.message; }
+  finally { b.disabled = false; }
+};
+$("btn-clone").onclick = async () => {
+  const b = $("btn-clone"), m = $("clone-msg");
+  b.disabled = true; m.className = "small"; m.textContent = "Clonage depuis GitHub…";
+  try {
+    const r = await api("/api/apps/clone", {url: $("clone-url").value, parent: $("clone-parent").value});
+    m.textContent = "";
+    $("apps-clone").classList.add("hidden"); $("clone-url").value = "";
+    appsMsg(`« ${r.app.name} » clonée dans ${r.path} et ajoutée à la liste — core.longpaths=true dans sa configuration git.`, "ok");
+    await refreshState();
+  } catch (e) { m.className = "small err"; m.textContent = e.message; }
+  finally { b.disabled = false; }
+};
+
+// « Outils sur cet ordinateur » — core.longpaths of each application (§7).
+async function loadLongpaths() {
+  const ul = $("longpaths");
+  let r;
+  try { r = await api("/api/longpaths"); } catch (e) { ul.replaceChildren(el("li", {class: "muted", text: e.message})); return; }
+  ul.replaceChildren(...r.apps.map((x) => el("li", {"data-folder": x.folder},
+    el("b", {text: x.value ? "✓" : "✗"}), el("span", {text: x.name}),
+    el("span", {class: "muted small mono", text: !x.exists ? "dossier introuvable" : x.value ? "core.longpaths=true" : x.value === false ? "core.longpaths=false" : "core.longpaths absent"}),
+    x.exists && !x.value ? el("button", {class: "small lp-set", text: "Régler", onclick: async (ev) => {
+      ev.target.disabled = true;
+      try { await api("/api/longpaths", {folder: x.folder}); } catch (e) { alert(e.message); }
+      await loadLongpaths();
+    }}) : null)));
+  if (!r.apps.length) ul.append(el("li", {class: "muted", text: "Aucune application dans la liste."}));
+}
 function renderApps() {
   const box = $("apps-list"); box.replaceChildren();
   const rows = (A && A.apps) || [];
@@ -1857,10 +2069,11 @@ function renderApps() {
   // 1.11: the columns' heads, once — each row's own labels are for screen readers.
   if (rows.length) box.append(el("div", {class: "apps-head", "aria-hidden": "true"},
     el("span", {text: "Application"}), el("span", {text: "Prochaine étape"}),
-    el("span", {class: "ah-facts"}, el("span", {text: "Vous attend"}), el("span", {text: "Dernier run"}), el("span", {text: "Non commité"})),
+    el("span", {class: "ah-facts"}, el("span", {text: "Vous attend"}), el("span", {text: "Dernier run"}), el("span", {text: "GitHub"})),
     el("span", {text: "Chaîne"}), el("span")));
   for (const r of rows) box.append(homeCard(r));
   $("btn-update-all").disabled = bulkBusy || !!(A && A.bulk_going) || !rows.length;
+  renderChainSyncLine();
   renderReport();
 }
 const msgId = (folder) => "app-msg-" + appKey(folder).replace(/[^a-z0-9]/g, "_");
@@ -1898,12 +2111,13 @@ function homeCard(r) {
   const last = !lr ? [el("span", {class: "muted", text: "aucun run mémorisé"})]
     : [el("span", {class: "mono", text: lr.command || "—"}),
        el("div", {class: "muted small", text: going ? "en cours" : `${lr.at ? fmtWhen(new Date(lr.at)) : "—"} — ${lr.outcome || "?"}`})];
-  const unc = r.uncommitted === null ? "—" : r.uncommitted ? plural(r.uncommitted, "fichier", "fichiers") : "aucun";
+  const unc = r.uncommitted === null ? "—" : r.uncommitted ? plural(r.uncommitted, "fichier non commité", "fichiers non commités") : "rien de non commité";
   const fact = (k, ...v) => el("div", {}, el("div", {class: "k", text: k}), el("div", {class: "v"}, ...v));
   const chainLine = el("div", {class: "hc-chain"},
     c ? el("span", {class: "cst " + (CHAIN_CLS[st] || "abs"), text: `chaîne ${st || "inconnue"}`}) : el("span", {class: "muted", text: "chaîne —"}),
     c ? el("span", {text: c.summary.replace(/^Chaîne (à jour|en retard|modifiée sur place|absente) ?(— )?/, "")}) : null,
-    c && st && st !== "à jour" ? el("button", {class: "small",
+    c && st === "plus récente" ? el("span", {class: "small", text: "Jamais installée par-dessus : " + (c.refused || "")}) : null,
+    c && st && st !== "à jour" && st !== "plus récente" ? el("button", {class: "small",
       text: st === "absente" ? "Installer la chaîne" : "Mettre à jour la chaîne", disabled: going || anyRun() || undefined,
       title: st === "en retard" ? "Son installation, seule" : "Son installation demande avant de remplacer quoi que ce soit",
       onclick: (e) => { stop(e); rowInstall(r.folder); }}) : null);
@@ -1920,8 +2134,10 @@ function homeCard(r) {
       el("div", {class: "hc-id"}, el("div", {class: "hc-name", text: r.name}), el("div", {class: "hc-folder", text: r.folder}))),
     running, next,
     el("div", {class: "hc-facts"}, fact("Vous attend", waits), fact("Dernier run", ...last),
-      fact("Non commité", el("span", {class: "muted", title: "Information : le cockpit n'y touche jamais", text: unc}))),
+      fact("GitHub", el("div", {class: "hc-sync"}, syncBadge(r.sync),
+        el("span", {class: "u", title: "Information : le cockpit n'y touche jamais, sauf « Envoyer mes réponses »", text: unc})))),
     chainLine,
+    syncAlerts(r, going),
     el("div", {class: "hc-foot"}, el("div", {class: "hc-menu-wrap"}, menuBtn, menu),
       el("span", {class: "hc-open"}, r.exists ? "Ouvrir" : "dossier introuvable", r.exists ? icon("arrow", "sm") : null)),
     el("div", {class: "hc-msg", id: msgId(r.folder), text: (r.errors || []).join(" · ")}));
@@ -2127,6 +2343,7 @@ async function refreshState(reason) {
 
 function renderAll() {
   renderChrome(); renderChainState(); renderDashboard(); renderChaine(); renderCorrection(); renderRun(); renderSettings();
+  renderAnswersSend();
   placeRun();
   watchDiagnostic();
 }
@@ -2176,7 +2393,13 @@ function renderChrome() {
   else tb.textContent = "Au repos";
   tb.title = anyRun() ? busyNote() : "Aucune commande ne tourne";
   $("tb-stop").classList.toggle("hidden", !anyRun());
+  // 1.12: the open application's clone, when it is not « à jour » with GitHub.
+  const sy = S.sync, tbs = $("tb-sync");
+  const showSy = isOpen && !!(sy && sy.state && sy.state !== "à jour");
+  tbs.classList.toggle("hidden", !showSy);
+  if (showSy) { tbs.className = "chip " + (SYNC_CLS[sy.state] || "abs"); tbs.replaceChildren("GitHub : ", el("b", {text: SYNC_CHIP[sy.state] || sy.state})); tbs.title = sy.summary || ""; }
   renderBusyBanner();
+  renderSyncBanner();
   updateTitle();
   if (!isOpen) return;
   $("tb-folder").replaceChildren(el("b", {text: S.feature || S.working_folder}), el("span", {class: "caret", text: " ▾"}));
@@ -2238,6 +2461,7 @@ $("tb-menu").onclick = () => {
 };
 function baseName(p) { return (p || "").split(/[\\/]/).filter(Boolean).pop() || ""; }
 $("tb-mode").onclick = () => go("settings", "sec-mode");
+$("tb-sync").onclick = () => go("dashboard");
 $("perm-badge").onclick = () => { $("perm-banner").scrollTop = 0; };
 $("chaine-where").onclick = async () => {
   const b = $("chaine-where"); b.disabled = true;
@@ -2374,6 +2598,15 @@ function renderAlerts() {
   const box = $("alerts"); box.replaceChildren();
   const add = (cls, ...kids) => box.append(el("div", {class: "alert " + cls}, ...kids));
   for (const a of (S.scan && S.scan.alerts) || []) if (a.rule === "G-WT") add("", a.text);
+  // 1.12 §3: what GitHub and this clone disagree on, with what settles it.
+  const sy = S.sync;
+  if (sy && sy.state === "non envoyé") add("sync-alert", el("b", {text: sy.summary + ". "}), "Le prochain lancement les envoie d'abord ; ",
+    el("button", {class: "small sync-push", text: "Envoyer", disabled: running() || undefined, onclick: () => syncPush(S.app_folder)}));
+  if (sy && sy.state === "divergé") add("sync-alert", el("b", {text: sy.summary + ". "}), "Rien ne se lance avant de réconcilier : les commits d'ici sont rejoués après ceux de GitHub. ",
+    el("button", {class: "small sync-reconcile", text: "Réconcilier", disabled: running() || undefined, onclick: () => syncReconcile(S.app_folder)}));
+  if (sy && sy.state === "en retard") add("sync-alert", el("b", {text: sy.summary + ". "}), "Ils sont récupérés avant le prochain lancement.");
+  if (sy && sy.state === "GitHub injoignable") add("sync-alert", el("b", {text: "GitHub injoignable. "}), sy.detail || "", " ",
+    el("button", {class: "link", text: "Revérifier", onclick: async () => { try { await api("/api/sync/refresh", {}); } catch (e) {} await refreshState(); }}));
   for (const w of S.worktrees || []) add("", `Un worktree est resté après un run : `, el("span", {class: "mono", text: w}));
   if (S.stop_file) add("", "stop.md est présent : /8_code s'arrêtera après le lot en cours. ",
     el("button", {class: "link", text: "Retirer stop.md", onclick: disarm}));
@@ -2509,13 +2742,26 @@ function chainQuestion(c) {
 }
 async function postRun(name, args) {
   if (chainOff(S.chain) && !confirm(chainQuestion(S.chain))) return false;
+  let r;
   try {
-    await api("/api/run", {command: name, args: args || "", chain_ok: chainOff(S.chain)});
+    r = await api("/api/run", {command: name, args: args || "", chain_ok: chainOff(S.chain)});
   } catch (e) {
+    if (syncRefused(e)) return false;
     if (!(e.status === 409 && e.body && e.body.chain)) throw e;
+    if (e.body.sync && e.body.sync.notice) showSync({kind: "warn", text: e.body.sync.notice});
     if (!confirm(chainQuestion(e.body.chain))) return false;
-    await api("/api/run", {command: name, args: args || "", chain_ok: true});
+    try { r = await api("/api/run", {command: name, args: args || "", chain_ok: true}); }
+    catch (e2) { if (syncRefused(e2)) return false; throw e2; }
   }
+  if (r && r.sync && r.sync.notice) showSync({kind: /injoignable|sans envoyer|identifiant/.test(r.sync.notice) ? "warn" : "ok", text: r.sync.notice});
+  return true;
+}
+// 1.12 §2: a launch GitHub stopped — said in the banner, with « Réconcilier » when diverged.
+function syncRefused(e) {
+  const b = e && e.body && e.body.sync_refused;
+  if (!b) return false;
+  showSync({kind: "err", title: "Rien n'a été lancé.", text: e.message, actions: b.reconcile ? [reconcileButton(S.app_folder)] : []});
+  refreshState().catch(() => {});
   return true;
 }
 
@@ -3265,6 +3511,16 @@ function renderRunEnd() {
   if (run.usage) b.append(el("div", {class: "run-total", id: "run-total"}, el("b", {text: "Total du run — "}), usageText(run.usage)));
   else b.append(el("div", {class: "run-total muted", id: "run-total", text: "Total du run : aucun message de résultat, la consommation n'est pas connue."}));
   for (const p of run.passes || []) b.append(el("div", {class: "muted small", text: `${agentName(p.agent)} — ${usageText(p)}`}));
+  // 1.12 §3: the run's final push — GitHub has its commits, or it does not.
+  const sy = run.sync;
+  if (!sy) b.append(el("div", {class: "run-sync muted small", text: "GitHub : vérification de ce que le run a envoyé…"}));
+  else if (sy.state === "non envoyé" || sy.state === "divergé") b.append(el("div", {class: "run-sync bad notice err"},
+    el("b", {text: "Le push de fin de run n'a pas abouti : GitHub n'a pas les commits de ce run. "}), sy.summary + ". ",
+    sy.state === "divergé" ? el("button", {class: "small sync-reconcile", text: "Réconcilier", onclick: () => syncReconcile(S.app_folder)})
+      : el("button", {class: "small sync-push", text: "Envoyer", onclick: () => syncPush(S.app_folder)})));
+  else if (sy.state === "GitHub injoignable") b.append(el("div", {class: "run-sync notice warn", text: "GitHub injoignable : le push de fin de run n'a pas pu être vérifié."}));
+  else if (sy.state === "à jour") b.append(el("div", {class: "run-sync ok muted small", text: "✓ GitHub a tout ce que ce run a commité."}));
+  else if (sy.state) b.append(el("div", {class: "run-sync muted small", text: "GitHub : " + sy.summary + "."}));
   if (run.log_path) b.append(el("div", {class: "muted small"}, "Journal brut : ", logLink(run.log_path)));
   const wts = run.worktrees_left || [];
   if (wts.length) b.append(el("div", {class: "notice warn"}, el("div", {text: `Worktree${wts.length > 1 ? "s" : ""} resté${wts.length > 1 ? "s" : ""} en place :`}),
@@ -3399,6 +3655,8 @@ function onEvent(ev) {
   }
   if (ev.seq <= seen) return;
   seen = ev.seq;
+  // 1.12: a clone's new state against GitHub, whatever its application.
+  if (ev.type === "sync") { onSyncEvent(ev); return; }
   // 1.8: a deploy and a crash, whatever the screen.
   if ((ev.type || "").startsWith("deploy_")) { onDeployEvent(ev); return; }
   // 1.6: every run's events arrive; another application's run is not this
@@ -3484,6 +3742,28 @@ function otherAppEvent(ev) {
       break;
     case "limits":
       S.limits = {...(S.limits || {}), [d.window]: d}; renderGauges(); break;
+  }
+}
+
+let syncReload = null;
+function onSyncEvent(ev) {
+  const d = ev.data || {};
+  if (S.chain_root && sameApp(d.app, S.chain_root)) {
+    S.chain_sync = {...(S.chain_sync || {}), sync: d.sync};
+    if (A) A.chain_sync = S.chain_sync;
+    renderChainSyncLine();
+    return;
+  }
+  if (sameApp(d.app, S.app_folder)) {
+    S.sync = d.sync;
+    // A run's end, checked against GitHub: the state is read afresh — the
+    // run is over, whatever the page last heard of it.
+    if (d.run && S.run && S.run.id === d.run) { S.run.sync = d.sync; refreshState().catch(() => {}); }
+    renderChrome(); if (S.open) renderAlerts();
+  }
+  if (atHome() && A) {
+    const row = (A.apps || []).find((x) => sameApp(x.folder, d.app));
+    if (row) { row.sync = d.sync; clearTimeout(syncReload); syncReload = setTimeout(renderApps, 50); }
   }
 }
 
@@ -5045,7 +5325,9 @@ function dnRow(e) {
   const tags = [];
   if (e._loose) tags.push(el("span", {class: "badge warn", text: "pas dans l'index"}));
   if (e._new) tags.push(el("span", {class: "badge", text: "joint"}));
-  if (!e.on_disk) tags.push(el("span", {class: "badge err", text: "fichier absent"}));
+  // 1.12 §8: a private file lives on one computer — git never carries it.
+  if (e.elsewhere) tags.push(el("span", {class: "badge plain", title: "Privé : git ne le transporte pas d'un ordinateur à l'autre. « Enregistrer » garde son entrée.", text: "pas sur cet ordinateur"}));
+  else if (!e.on_disk) tags.push(el("span", {class: "badge err", text: "fichier absent"}));
   const nameCell = el("td", {}, el("span", {class: "mono", text: e.name}), e.size !== null && e.size !== undefined ? el("span", {class: "u", text: fmtSize(e.size)}) : null,
     tags.length ? el("div", {class: "dn-tags"}, ...tags) : null);
   const actions = el("td", {class: "dn-act"}, el("div", {class: "dn-acts"},

@@ -463,7 +463,8 @@ def _git(repo, args):
     """`git -C repo <args>`, read-only: (stdout, None) or (None, message)."""
     try:
         out = subprocess.run(["git", "-C", repo, *args], capture_output=True, text=True, encoding="utf-8",
-                             errors="replace", timeout=GIT_TIMEOUT, stdin=subprocess.DEVNULL)
+                             errors="replace", timeout=GIT_TIMEOUT, stdin=subprocess.DEVNULL,
+                             env=dict(os.environ, GIT_TERMINAL_PROMPT="0"))
     except (OSError, subprocess.SubprocessError) as e:
         return None, f"git n'a pas répondu : {e}"
     if out.returncode != 0:

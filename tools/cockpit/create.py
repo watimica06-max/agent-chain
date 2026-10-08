@@ -31,6 +31,7 @@ import unicodedata
 from datetime import datetime
 
 import chain as chain_mod
+import sync
 
 GIT_TIMEOUT = 60
 REMOTE_TIMEOUT = 90
@@ -177,7 +178,7 @@ def summary(v):
 # ---------------------------------------------------------------- git
 
 def _git(repo, *args, timeout=GIT_TIMEOUT, ok=(0,)):
-    env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
+    env = sync.env()
     try:
         p = subprocess.run(["git", "-C", repo, "-c", "core.quotepath=off", *args], capture_output=True,
                            timeout=timeout, env=env, stdin=subprocess.DEVNULL)

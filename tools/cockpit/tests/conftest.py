@@ -34,6 +34,16 @@ def _logs_in_tmp(tmp_path_factory, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _no_sync_at_start(monkeypatch):
+    """1.12: the cockpit fetches agent-chain's own clone, and pulls it, when
+    it starts — never in a test, which would touch this repository. A test
+    turns it on with a scratch CHAIN_ROOT of its own."""
+    import server
+    monkeypatch.setattr(server, "SYNC_CHAIN_AT_START", False)
+    monkeypatch.setattr(server, "SYNC_APPS_AT_START", False)
+
+
+@pytest.fixture(autouse=True)
 def _no_java_home(monkeypatch):
     """1.5: the diagnostic checks the Java of JAVA_HOME when it is set. A
     test sets it itself, never this machine's."""

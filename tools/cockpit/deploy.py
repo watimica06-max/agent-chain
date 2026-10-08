@@ -73,7 +73,7 @@ def head_of(app):
     def git(*args):
         try:
             p = subprocess.run(["git", "-C", app, "-c", "core.quotepath=off", *args], capture_output=True,
-                               timeout=20, stdin=subprocess.DEVNULL)
+                               timeout=20, stdin=subprocess.DEVNULL, env=dict(os.environ, GIT_TERMINAL_PROMPT="0"))
         except (OSError, subprocess.SubprocessError):
             return None
         return p.stdout.decode("utf-8", "replace").strip() if p.returncode == 0 else None

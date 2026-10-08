@@ -29,6 +29,7 @@ import os
 import subprocess
 
 import gitref
+import sync
 
 CHAIN_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 PATHS = (".claude/CLAUDE.md", ".claude/agents", ".claude/commands", ".claude/scripts", ".claude/grids",
@@ -39,6 +40,9 @@ PUSH_TIMEOUT = 180
 WINDOWS = os.name == "nt"
 
 UP_TO_DATE, BEHIND, MODIFIED, ABSENT = "à jour", "en retard", "modifiée sur place", "absente"
+# 1.12: the chain installed is not an ancestor of this computer's chain — the
+# other computer installed a newer one. Never installed over.
+NEWER = "plus récente"
 
 
 class InstallError(Exception):
@@ -55,7 +59,7 @@ class NeedsConfirm(Exception):
 
 
 def _git(repo, *args, data=None, timeout=GIT_TIMEOUT):
-    env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
+    env = sync.env()
     try:
         p = subprocess.run(["git", "-C", repo, "-c", "core.quotepath=off", *args], input=data,
                            capture_output=True, timeout=timeout, env=env,
@@ -147,6 +151,34 @@ def behind(installed, info, root=CHAIN_ROOT):
     return res
 
 
+_older_cache = {}
+
+
+def older_or_same(installed, root=CHAIN_ROOT):
+    """1.12 — True when the installed chain commit is an ancestor of the
+    chain's `HEAD` (or it): installing then never goes back in time. False
+    for a commit this computer's chain does not have — a newer one. Kept
+    per `HEAD`."""
+    key = (os.path.normcase(root), installed, gitref.head(root))
+    if key[2] and key in _older_cache:
+        return _older_cache[key]
+    try:
+        _git(root, "merge-base", "--is-ancestor", installed, "HEAD")
+        res = True
+    except InstallError:
+        res = False
+    if key[2]:
+        _older_cache[key] = res
+    return res
+
+
+def newer_text(installed, info):
+    return (f"la chaîne installée ({installed['commit'][:7]} du {_day(installed.get('date'))}) est plus récente "
+            f"que celle de cet ordinateur ({info['commit'][:7]} du {_day(info['date'])}) : l'installer "
+            "remplacerait une chaîne plus récente par une plus ancienne — récupérer agent-chain sur cet "
+            "ordinateur (redémarrer le cockpit le fait), puis réessayer")
+
+
 # ------------------------------------------------------- the application
 
 def read_version(app):
@@ -178,7 +210,7 @@ def state(app, root=CHAIN_ROOT):
     except InstallError as e:
         return {"state": None, "summary": f"État de la chaîne inconnu — {e}", "error": str(e)}
     out = {"chain_commit": info["commit"][:7], "chain_date": _day(info["date"]),
-           "commit": None, "date": None, "behind": None, "subjects": [], "modified": []}
+           "commit": None, "date": None, "behind": None, "subjects": [], "modified": [], "newer": False}
     try:
         v = read_version(app)
     except (OSError, ValueError) as e:
@@ -195,7 +227,12 @@ def state(app, root=CHAIN_ROOT):
         out["behind"] = len(subjects) if subjects is not None else None
     out["modified"] = modified_files(app, v)
     installed = f"{out['commit']} du {out['date']}"
-    if out["modified"]:
+    out["newer"] = v["commit"] != info["commit"] and not older_or_same(v["commit"], root)
+    if out["newer"]:
+        out.update(state=NEWER, summary=f"Chaîne plus récente que celle de cet ordinateur — installée : {installed} ; "
+                                        f"ici : {out['chain_commit']} du {out['chain_date']}",
+                   refused=newer_text(v, info))
+    elif out["modified"]:
         n = len(out["modified"])
         out.update(state=MODIFIED, summary=f"Chaîne modifiée sur place — {n} fichier{'s' if n > 1 else ''} : "
                    + ", ".join(out["modified"]))
@@ -268,6 +305,8 @@ def plan(app, root=CHAIN_ROOT):
     except (OSError, ValueError) as e:
         raise InstallError(f"{VERSION_FILE} illisible ({e}) : le corriger, ou le supprimer — "
                            "l'installation demandera alors avant de remplacer chaque fichier")
+    if prev and not older_or_same(prev["commit"], root):
+        raise InstallError(newer_text(prev, chain_commit(root)))
     managed = sorted(set(prev["files"]) | {VERSION_FILE}) if prev else []
     dirty = _dirty(app, managed)
     if dirty:
@@ -353,9 +392,15 @@ def push_branch(app):
     track it, so that every later push, the chain's commands' included, is a
     plain `git push`. Raises InstallError when it fails."""
     try:
-        _git(app, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
-    except InstallError:
-        if "origin" in _git(app, "remote").decode("utf-8", "replace").split():
-            _git(app, "push", "-q", "-u", "origin", "HEAD", timeout=PUSH_TIMEOUT)
-            return
-    _git(app, "push", "-q", timeout=PUSH_TIMEOUT)
+        try:
+            _git(app, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
+        except InstallError:
+            if "origin" in _git(app, "remote").decode("utf-8", "replace").split():
+                _git(app, "push", "-q", "-u", "origin", "HEAD", timeout=PUSH_TIMEOUT)
+                return
+        _git(app, "push", "-q", timeout=PUSH_TIMEOUT)
+    except InstallError as e:
+        # 1.12: refused for lack of credentials, said so — never a prompt.
+        if sync.credentials(str(e)):
+            raise InstallError(sync.CREDENTIALS_TEXT)
+        raise

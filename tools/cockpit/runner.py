@@ -152,6 +152,9 @@ class Run:
     usage: dict | None = None         # the run's totals, once it ended
     replay_cache: object = field(default=None, repr=False)
     logged: int = 0                   # the run's lines in its log, probes left out
+    # 1.12: where the clone stands against GitHub once the run ended — None
+    # while the cockpit fetches.
+    sync: dict | None = None
 
     @property
     def prompt(self):
@@ -194,6 +197,7 @@ class Run:
             "log_path": self.log_path, "worktrees_left": list(self.worktrees_left),
             "idle": self.idle,
             "usage": self.usage,
+            "sync": self.sync,
             "passes": [p.summary() for p in self.tally.passes.values() if p.ended],
             "can_continue": (self.status == "ended" and bool(self.session_id)
                              and bool(self.next) and self.next.get("kind") == "unknown"),
@@ -699,7 +703,8 @@ def _now() -> str:
 def list_worktrees(repo: str) -> list[str]:
     try:
         out = subprocess.run(["git", "-C", repo, "worktree", "list", "--porcelain"],
-                             capture_output=True, text=True, timeout=15, check=True).stdout
+                             capture_output=True, text=True, timeout=15, check=True, stdin=subprocess.DEVNULL,
+                             env=dict(os.environ, GIT_TERMINAL_PROMPT="0")).stdout
     except (OSError, subprocess.SubprocessError):
         return []
     paths = [l[len("worktree "):].strip() for l in out.splitlines() if l.startswith("worktree ")]

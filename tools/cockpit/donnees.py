@@ -15,6 +15,7 @@ from dataclasses import dataclass, asdict
 from datetime import date
 
 import chain as chain_mod
+import sync
 import textfile
 
 INDEX = "donnees.md"
@@ -246,7 +247,7 @@ def with_section(text, add=(), drop=()):
 # ------------------------------------------------------------ git
 
 def _git(app, *args, env=None):
-    e = dict(os.environ, GIT_TERMINAL_PROMPT="0", **(env or {}))
+    e = sync.env(env)
     p = subprocess.run(["git", "-C", app, "-c", "core.quotepath=off", *args], capture_output=True,
                        stdin=subprocess.DEVNULL, env=e, timeout=60)
     if p.returncode:
@@ -318,7 +319,8 @@ def listing(app, tab, feature):
         p = _abs(app, folder + "/" + e.name)
         here = os.path.isfile(p)
         rel = folder + "/" + e.name
-        rows.append({**e.to_dict(), "on_disk": here, "kind": kind_of(p) if here else None,
+        rows.append({**e.to_dict(), "on_disk": here, "elsewhere": not here and e.private == "yes",
+                     "kind": kind_of(p) if here else None,
                      "size": os.path.getsize(p) if here else None, "path": rel,
                      "tracked": rel in held, "ignored": rel in section})
     named = {e.name for e in entries}
@@ -425,7 +427,11 @@ def save(app, folder, entries, removed=(), push=True, answer_for=None):
         bad = check_entry(e)
         if bad:
             errs.setdefault(e.name, []).extend(bad)
-        if e.name not in removed and not os.path.isfile(_abs(app, folder + "/" + e.name)):
+        # 1.12: a private file lives on one computer only — git never carries
+        # it. Absent here, its entry stays and the save goes on; a file git
+        # carries, absent, is still refused.
+        if (e.name not in removed and e.private != "yes"
+                and not os.path.isfile(_abs(app, folder + "/" + e.name))):
             errs.setdefault(e.name, []).append("le fichier n'est pas dans le dossier")
     if errs:
         raise DataError("; ".join(f"{n} : {', '.join(v)}" for n, v in errs.items()))

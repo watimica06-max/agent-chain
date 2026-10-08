@@ -16,12 +16,13 @@ import os
 import subprocess
 
 import chain as chain_mod
+import sync
 
 GIT_TIMEOUT = 30
 
 
 def _git(folder, *args, timeout=GIT_TIMEOUT):
-    env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
+    env = sync.env()
     return subprocess.run(["git", "-C", folder, "-c", "core.quotepath=off", *args], capture_output=True,
                           timeout=timeout, env=env, stdin=subprocess.DEVNULL)
 
@@ -48,7 +49,7 @@ def uncommitted(folder):
     """How many paths git sees changed and not committed — untracked ones
     included —, or None when git cannot say."""
     try:
-        p = _git(folder, "status", "--porcelain", "-z")
+        p = _git(folder, "--no-optional-locks", "status", "--porcelain", "-z")
     except (OSError, subprocess.SubprocessError):
         return None
     if p.returncode:
@@ -69,12 +70,14 @@ def uncommitted(folder):
 UPDATED, SKIPPED, FAILED = "mise à jour", "laissée", "échec"
 
 
-def update_all(apps, chain_state, install, running):
+def update_all(apps, chain_state, install, running, prepare=None):
     """Every application of `apps` ({name, folder}), in the list's order:
     those « en retard » are installed, one after the other; every other is
     said, with why. `chain_state(folder)`, `install(folder)` — chain.py's,
     never with `confirm` — and `running(folder)` are given by the server.
-    One line per application, nothing left out."""
+    1.12: `prepare(folder)` — the sync before a launch — runs first, and
+    returns why the install may not go, or None. One line per application,
+    nothing left out."""
     out = []
     for a in apps:
         folder, line = a["folder"], {"name": a["name"], "folder": a["folder"]}
@@ -86,6 +89,10 @@ def update_all(apps, chain_state, install, running):
         line["state"] = st.get("state")
         if st.get("state") == chain_mod.UP_TO_DATE:
             line.update(outcome=SKIPPED, text="déjà à jour — rien à faire")
+            continue
+        if st.get("state") == chain_mod.NEWER:
+            # 1.12: never an older chain over a newer one.
+            line.update(outcome=SKIPPED, text=st.get("refused") or st["summary"])
             continue
         if st.get("state") in (chain_mod.MODIFIED, chain_mod.ABSENT):
             # Never in bulk: its own install asks, file by file, before
@@ -99,6 +106,17 @@ def update_all(apps, chain_state, install, running):
         if running(folder):
             line.update(outcome=SKIPPED, text="une commande tourne dans cette application : rien n'est installé pendant un run")
             continue
+        if prepare:
+            why = prepare(folder)
+            if why:
+                line.update(outcome=SKIPPED, text=why)
+                continue
+            st = chain_state(folder)
+            if st.get("state") != chain_mod.BEHIND:
+                # What GitHub brought changed it: said, never installed blind.
+                line.update(outcome=SKIPPED, state=st.get("state"),
+                            text=f"après la récupération depuis GitHub : {st.get('summary')} — rien d'installé en bloc")
+                continue
         try:
             res = install(folder)
         except chain_mod.NeedsConfirm as e:

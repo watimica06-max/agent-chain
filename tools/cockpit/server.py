@@ -36,6 +36,7 @@ import scan as scan_mod  # noqa: E402
 import startup  # noqa: E402
 import stats as stats_mod  # noqa: E402
 import statsview  # noqa: E402
+import sync as sync_mod  # noqa: E402
 import textfile   # noqa: E402
 import writer     # noqa: E402
 from state import State  # noqa: E402
@@ -44,7 +45,7 @@ HOST = "127.0.0.1"
 STATE_KEY = web.AppKey("state", State)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.10"
+VERSION = "1.12"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -56,6 +57,13 @@ CHAIN_PUSH = True
 PROFILE_PUSH = True
 # Whether « Données » pushes its commit (1.10); the tests put False here.
 DONNEES_PUSH = True
+# 1.12 — when the cockpit starts: agent-chain's own clone fetched, and pulled
+# when « en retard »; every application of the list fetched. The tests put
+# False here: none of them touches the real agent-chain.
+SYNC_CHAIN_AT_START = True
+SYNC_APPS_AT_START = True
+CHAIN_RESTART = ("Nouvelle version du cockpit et de la chaîne récupérée — redémarre le cockpit pour "
+                 "l'utiliser.")
 # A joined file comes in the request, base64 in JSON: what one may weigh.
 MAX_REQUEST = 256 * 1024 * 1024
 # What opens the browser; the tests put a fake here.
@@ -333,7 +341,7 @@ def conventions_commit(app):
     try:
         p = subprocess.run(["git", "-C", app, "log", "-1", "--format=%H", "--", "docs/TECHNICAL_CONVENTIONS.md"],
                            capture_output=True, timeout=20, stdin=subprocess.DEVNULL,
-                           env=dict(os.environ, GIT_TERMINAL_PROMPT="0"))
+                           env=sync_mod.env())
     except (OSError, subprocess.SubprocessError):
         return None
     out = p.stdout.decode("utf-8", "replace").strip() if p.returncode == 0 else ""
@@ -525,6 +533,14 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     # « Nouvelle application » (1.7): the one going, and the last one this
     # server finished — config.json keeps those not finished.
     making = {"current": None, "last": None}
+    # 1.12 — where each clone stands against GitHub (sync.py), and agent-chain's
+    # own clone, fetched when the cockpit starts.
+    book = sync_mod.Book()
+    chain_sync = {"sync": None, "notice": "", "error": "", "checking": False}
+    # The page as this server started: a pull of agent-chain changes the file
+    # on disk, never the page this server serves.
+    with open(os.path.join(HERE, "static", "index.html"), "rb") as f:
+        page_bytes = f.read()
     # 1.6: a run stored with no application is given its own — main()'s
     # backfill did it already; this covers a store handed over as it is.
     if store:
@@ -570,6 +586,18 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     dep = deploy_mod.Deployer(state, rn.log_dir, emit=broadcast)
     app[DEPLOY_KEY] = dep
 
+    # 1.12 §3: after every run, where the clone stands — a run whose final
+    # push GitHub refused says so in its end panel.
+    remember = rn.on_end
+
+    def on_end(run):
+        try:
+            if remember:
+                remember(run)
+        finally:
+            refresh_later(run.repo, run)
+    rn.on_end = on_end
+
     def pair():
         a, w = state.app_folder, state.working_folder
         if not a or check_app_folder(a) or not w or not os.path.isdir(work_dir(a, w)) or state.is_ignored(w):
@@ -592,8 +620,71 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return data if isinstance(data, dict) else {}
 
     async def index(request):
-        return web.FileResponse(os.path.join(HERE, "static", "index.html"),
-                                headers={"Cache-Control": "no-store"})
+        return web.Response(body=page_bytes, content_type="text/html", charset="utf-8",
+                            headers={"Cache-Control": "no-store"})
+
+    # ------------------------------------------------- GitHub (1.12, sync.py)
+    def sync_said(folder, what, res):
+        print(f"GitHub — {state.name_of(folder) or folder} : {what} — {res}", flush=True)
+
+    told = {}
+
+    def announce(folder, st, run_id=None):
+        """The new state of a clone, to every page — only when it changed,
+        or for a run's end panel."""
+        k = sync_mod.Book.key(folder)
+        seen = (st or {}).get("state"), (st or {}).get("ahead"), (st or {}).get("behind"), (st or {}).get("uncommitted")
+        if run_id is None and (told.get(k) == seen or (k not in told and seen[0] is None)):
+            return
+        told[k] = seen
+        broadcast("sync", {"app": folder, "sync": st, "run": run_id})
+
+    def refresh_later(folder, run=None):
+        """Fetched in the background — after a run, at an opening — then
+        told to the page."""
+        loop = loop_box["loop"]
+        if loop is None or not folder or not os.path.isdir(folder):
+            return
+
+        async def go():
+            try:
+                st = await loop.run_in_executor(None, book.refresh, folder)
+            except Exception as e:      # said, never raised into the loop
+                print(f"GitHub — {folder} : état non calculé ({e})", flush=True)
+                return
+            if run is not None:
+                run.sync = st
+                if st.get("state") in (sync_mod.AHEAD, sync_mod.DIVERGED):
+                    sync_said(folder, f"après {run.prompt}", st["summary"])
+            announce(folder, st, run.id if run is not None else None)
+        loop.create_task(go())
+
+    async def synced_first(a):
+        """§2 — before a launch, an « Enregistrer », an install: pulled when
+        « en retard », pushed when « non envoyé », refused when « divergé ».
+        (refusal response or None, the sync's result)."""
+        loop = asyncio.get_running_loop()
+        res = await loop.run_in_executor(None, sync_mod.before_launch, book, a)
+        for d in res["done"]:
+            sync_said(a, "avant de lancer", d)
+        announce(a, res["sync"])
+        if not res["ok"]:
+            sync_said(a, "lancement refusé", res["error"])
+            return web.json_response({"error": res["error"], "sync_refused": res}, status=409), res
+        return None, res
+
+    async def resync(a):
+        """After a git action of the cockpit: fetched again, told."""
+        st = await asyncio.get_running_loop().run_in_executor(None, book.refresh, a)
+        announce(a, st)
+        return st
+
+    def sync_target(data):
+        """The clone an action names: an application of the list, or
+        agent-chain's own (`chain`)."""
+        if data.get("chain"):
+            return CHAIN_ROOT
+        return listed_folder(data) if data.get("folder") else state.app_folder
 
     def busy_payload():
         """The run going, whatever its application (1.6): the top bar says
@@ -628,6 +719,11 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                "limits": _limits(store), "now": datetime.now().isoformat(timespec="seconds")}
         out["ignored"] = state.ignored
         out["creating"] = making["current"].path if making["current"] else None
+        # 1.12: where the open application's clone stands against GitHub —
+        # the last known state; agent-chain's own, with its notice.
+        out["sync"] = book.peek(state.app_folder) if state.app_folder else None
+        out["chain_sync"] = chain_sync
+        out["chain_root"] = CHAIN_ROOT
         if state.app_folder and os.path.isdir(state.app_folder):
             # The chain installed in the application (§20) — 1.6: also where
             # it is not installed yet, and no feature can open.
@@ -656,6 +752,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                 "run_place": run_place(sc, run),
                 "bugfixes": bugfixes(a, feature),
                 "recette": recette(a, feature),
+                # 1.12 §5: what the next command's own commit would take.
+                "answers_pending": sync_mod.answers_pending(a, feature),
             })
         return out
 
@@ -669,6 +767,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         a, _ = need_pair()
         if data.get("reason") == "ouverture":
             auto_diagnostic(a)
+            if book.peek(a) is None:
+                refresh_later(a)
         return web.json_response(state_payload(data.get("reason") or "bouton"))
 
     async def pick_folder(request):
@@ -722,7 +822,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         row = {"name": x["name"], "folder": folder, "exists": os.path.isdir(folder),
                "active": bool(state.app_folder) and key == runner_mod.repo_key(state.app_folder),
                "feature": None, "proposal": None, "questions": None, "blocking": None,
-               "chain": None, "uncommitted": None, "last_run": None, "running": False, "errors": []}
+               "chain": None, "uncommitted": None, "last_run": None, "running": False, "errors": [],
+               "sync": None, "answers_pending": 0}
         if not row["exists"]:
             row["errors"].append("dossier introuvable")
             return row
@@ -731,6 +832,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         except Exception as e:
             row["errors"].append(f"état de la chaîne : {e}")
         row["uncommitted"] = apps_mod.uncommitted(folder)
+        # 1.12: where it stands against GitHub — known, else fetched now.
+        row["sync"] = book.get(folder)
         row["open_error"] = check_app_folder(folder)
         row["features"] = working_folders(folder, state.ignored_for(folder)) if not row["open_error"] else []
         run = rn.current(folder)
@@ -739,6 +842,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         f = x.get("last_feature")
         if f and f in row["features"]:
             row["feature"] = f
+            row["answers_pending"] = sync_mod.answers_pending(folder, f)
             try:
                 sc = scan_of(folder, f, snap)
                 prop = sc["proposal"]
@@ -760,9 +864,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     async def apps_get(request):
         loop = asyncio.get_running_loop()
-        rows = await loop.run_in_executor(None, lambda: [app_row(x) for x in state.apps()])
-        return web.json_response({"apps": rows, "busy": busy_payload(), "bulk_going": bulk["going"],
-                                  "report": bulk["report"]})
+        # 1.12: one application's fetch never waits for another's.
+        rows = await asyncio.gather(*(loop.run_in_executor(None, app_row, x) for x in state.apps()))
+        return web.json_response({"apps": list(rows), "busy": busy_payload(), "bulk_going": bulk["going"],
+                                  "report": bulk["report"], "chain_sync": chain_sync})
 
     async def apps_add(request):
         """« Ajouter une application »: the folder picked or pasted joins the
@@ -775,7 +880,15 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if err:
             return web.json_response({"error": err}, status=400)
         x, added = state.add_app(path, data.get("name"))
-        return web.json_response({"app": x, "added": added, "apps": apps_light()})
+        # 1.12 §7: `core.longpaths=true` in its own git config — the one thing
+        # « Ajouter » writes there.
+        longpaths = None
+        try:
+            sync_mod.set_long_paths(x["folder"])
+        except sync_mod.SyncError as e:
+            longpaths = str(e)
+        refresh_later(x["folder"])
+        return web.json_response({"app": x, "added": added, "apps": apps_light(), "longpaths_error": longpaths})
 
     async def apps_rename(request):
         data = await body(request)
@@ -806,6 +919,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         a, _ = pair()
         if os.path.isdir(folder):
             auto_diagnostic(folder)
+            # 1.12: an application that opens is fetched.
+            refresh_later(folder)
         return web.json_response({"ok": True, "open": bool(a), "open_error": check_app_folder(folder)})
 
     # --------------------------------------------- Nouvelle application (1.7)
@@ -1052,16 +1167,21 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if dep.going_in(a):
             return web.json_response({"error": "un déploiement construit dans cette application : lancer après sa fin"},
                                      status=409)
+        # 1.12 §2: GitHub first — what the other computer pushed is pulled
+        # before anything reads the files, the chain's version included.
+        refused, synced = await synced_first(a)
+        if refused:
+            return refused
         # A chain not « à jour » (§20): the launch asks first.
         ch = chain_state(a)
         if ch.get("state") != chain_mod.UP_TO_DATE and not data.get("chain_ok"):
-            return web.json_response({"error": ch["summary"], "chain": ch}, status=409)
+            return web.json_response({"error": ch["summary"], "chain": ch, "sync": synced}, status=409)
         try:
             r = await rn.start(a, w, feature_of(w), cmd, args)
         except runner_mod.Busy as e:
             b = busy_payload()
             return web.json_response({"error": busy_text(b) if b else str(e), "busy": b}, status=409)
-        return web.json_response({"run": r.snapshot()})
+        return web.json_response({"run": r.snapshot(), "sync": synced})
 
     def busy_text(b):
         return (f"une commande tourne déjà : {b['prompt']}" if b["active"]
@@ -1099,6 +1219,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": "une commande tourne : pas d'installation maintenant"}, status=409)
         if bulk["going"]:
             return web.json_response({"error": "« Tout mettre à jour » est en cours"}, status=409)
+        refused, synced = await synced_first(a)
+        if refused:
+            return refused
         loop = asyncio.get_running_loop()
         try:
             res = await loop.run_in_executor(None, lambda: chain_mod.install(
@@ -1112,7 +1235,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
               + (f", commit {res['app_commit']}" if res["app_commit"] else ", rien à commiter")
               + (" et poussé" if res["pushed"] else f" — push : {res['push_error']}" if res["push_error"] else "")
               + ".", flush=True)
-        return web.json_response({"ok": True, "result": res, "chain": chain_state(a)})
+        if res["app_commit"]:
+            refresh_later(a)
+        return web.json_response({"ok": True, "result": res, "chain": chain_state(a), "sync": synced})
 
     async def chain_install_all(request):
         """« Tout mettre à jour » (1.6): the chain installed in every
@@ -1125,13 +1250,24 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": "« Tout mettre à jour » est déjà en cours"}, status=409)
         bulk["going"] = True
         loop = asyncio.get_running_loop()
+
+        def prepare(folder):
+            """1.12 §2, in each application before its install."""
+            res = sync_mod.before_launch(book, folder)
+            for d in res["done"]:
+                sync_said(folder, "avant d'installer", d)
+            announce(folder, res["sync"])
+            return None if res["ok"] else res["error"]
         try:
             lines = await loop.run_in_executor(None, lambda: apps_mod.update_all(
                 state.apps(), chain_state,
                 lambda f: chain_mod.install(f, CHAIN_ROOT, confirm=False, push=CHAIN_PUSH),
-                rn.is_running))
+                rn.is_running, prepare))
         finally:
             bulk["going"] = False
+        for x in lines:
+            if x.get("outcome") == apps_mod.UPDATED:
+                refresh_later(x["folder"])
         bulk["report"] = {"at": datetime.now().isoformat(timespec="seconds"), "lines": lines}
         for x in lines:
             print(f"Tout mettre à jour — {x['name']} : {x['outcome']} — {x['text']}", flush=True)
@@ -1173,8 +1309,39 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                 print(f"Diagnostic automatique non abouti ({a}) : {e}", flush=True)
         diag["tasks"][key] = asyncio.get_running_loop().create_task(go())
 
+    def sync_chain():
+        """§6 — agent-chain's own clone, when the cockpit starts: fetched;
+        « en retard », pulled (fast-forward only), and a restart asked."""
+        chain_sync["checking"] = True
+        notice = error = ""
+        try:
+            with book.lock(CHAIN_ROOT):
+                st = book.put(CHAIN_ROOT, sync_mod.compute(CHAIN_ROOT))
+                if st["state"] == sync_mod.BEHIND:
+                    r = sync_mod.pull_ff(CHAIN_ROOT)
+                    if r["ok"]:
+                        notice = CHAIN_RESTART
+                        sync_said(CHAIN_ROOT, "au démarrage", f"git pull --ff-only — {st['behind']} commit(s) récupéré(s)")
+                    else:
+                        error = ("La nouvelle version du cockpit et de la chaîne n'a pas pu être récupérée : "
+                                 + r["message"])
+                        sync_said(CHAIN_ROOT, "au démarrage", error)
+                    st = book.put(CHAIN_ROOT, sync_mod.compute(CHAIN_ROOT, fetch=False))
+                chain_sync.update(sync=st, notice=notice, error=error)
+        finally:
+            chain_sync["checking"] = False
+        announce(CHAIN_ROOT, chain_sync["sync"])
+
     async def opening(_app):
         loop_box["loop"] = asyncio.get_running_loop()
+        loop = loop_box["loop"]
+        # 1.12: GitHub, when the cockpit opens — agent-chain's clone, then
+        # every application, in the background.
+        if SYNC_CHAIN_AT_START:
+            loop.run_in_executor(None, sync_chain)
+        if SYNC_APPS_AT_START:
+            for x in state.apps():
+                refresh_later(x["folder"])
         # 1.6: the active application's, a feature open or not.
         a = state.app_folder
         if a and os.path.isdir(a):
@@ -1511,6 +1678,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         targets = data.get("targets")
         if not isinstance(targets, list):
             return web.json_response({"error": "liste de cibles attendue"}, status=400)
+        refused, _ = await synced_first(a)
+        if refused:
+            return refused
         loop = asyncio.get_running_loop()
         try:
             res = await loop.run_in_executor(None, lambda: deploy_profile.save(a, targets, push=PROFILE_PUSH))
@@ -1520,6 +1690,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
               + ((f"commit {res['commit']}" + (" et poussé" if res["pushed"] else
                                                f" — push : {res['push_error']}" if res["push_error"] else ""))
                  if res["commit"] else "rien n'avait changé") + ".", flush=True)
+        if res["commit"]:
+            refresh_later(a)
         return web.json_response({**res, "profile": dep.profile(a)})
 
     async def deploy_cleanup(_app):
@@ -1605,6 +1777,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         entries, removed = data.get("entries"), data.get("removed") or []
         if not isinstance(entries, list) or not isinstance(removed, list):
             return web.json_response({"error": "entrées attendues"}, status=400)
+        refused, _ = await synced_first(a)
+        if refused:
+            return refused
         loop = asyncio.get_running_loop()
         try:
             res = await loop.run_in_executor(None, lambda: donnees_mod.save(
@@ -1614,6 +1789,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         except OSError as e:
             return web.json_response({"error": f"non écrit : {e}"}, status=500)
         data_said(res, folder)
+        if res["commit"]:
+            refresh_later(a)
         listing = await loop.run_in_executor(None, donnees_mod.listing, a, data.get("tab"), feature)
         return web.json_response({**res, "listing": listing})
 
@@ -1651,6 +1828,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": str(e)}, status=400)
         if os.path.exists(os.path.join(a, *folder.split("/"), name)) and not data.get("replace"):
             return web.json_response({"error": f"« {name} » est déjà dans {folder}/", "exists": True}, status=409)
+        refused, _ = await synced_first(a)
+        if refused:
+            return refused
         loop = asyncio.get_running_loop()
 
         def go():
@@ -1664,9 +1844,177 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         except OSError as e:
             return web.json_response({"error": f"non écrit : {e}"}, status=500)
         data_said(res, folder)
+        if res["commit"]:
+            refresh_later(a)
         written = writer.write_question(entry, writer.Choice(kind="free", text=name))
         state.clear_fresh(a, feature_of(w))
         return web.json_response({**res, "name": name, "folder": folder + "/", "answer": written.to_dict()})
+
+    # ------------------------------------------------- GitHub (1.12)
+    def sync_busy(folder):
+        """Why nothing may touch this clone's git now, or None."""
+        if bulk["going"]:
+            return "« Tout mettre à jour » est en cours"
+        if os.path.normcase(os.path.abspath(folder)) == os.path.normcase(os.path.abspath(CHAIN_ROOT)):
+            return None
+        if rn.is_running(folder):
+            return "une commande tourne dans cette application : après sa fin"
+        if dep.going_in(folder):
+            return "un déploiement construit dans cette application : après sa fin"
+        return None
+
+    async def sync_get(request):
+        """Where a clone stands — the known state, else fetched now."""
+        folder = sync_target(dict(request.query))
+        if not folder:
+            return web.json_response({"error": "aucune application"}, status=409)
+        st = await asyncio.get_running_loop().run_in_executor(None, book.get, folder)
+        return web.json_response({"sync": st})
+
+    async def sync_refresh(request):
+        data = await body(request)
+        folder = sync_target(data)
+        if not folder:
+            return web.json_response({"error": "aucune application"}, status=409)
+        return web.json_response({"sync": await resync(folder)})
+
+    async def sync_push(request):
+        """« Envoyer » (§3): `git push`. Refused by GitHub: fetched again,
+        and the new state said."""
+        data = await body(request)
+        folder = sync_target(data)
+        if not folder:
+            return web.json_response({"error": "aucune application"}, status=409)
+        why = sync_busy(folder)
+        if why:
+            return web.json_response({"error": why}, status=409)
+        loop = asyncio.get_running_loop()
+
+        def go():
+            with book.lock(folder):
+                return sync_mod.push(folder)
+        p = await loop.run_in_executor(None, go)
+        sync_said(folder, "Envoyer", "envoyé" if p["ok"] else p["message"])
+        st = await resync(folder)
+        if not p["ok"]:
+            return web.json_response({"error": p["message"] + (f" — {st['summary'].lower()}" if p["rejected"] else ""),
+                                      "push": p, "sync": st}, status=409)
+        return web.json_response({"ok": True, "push": p, "sync": st})
+
+    async def sync_reconcile(request):
+        """« Réconcilier » (§4): `git pull --rebase`; a conflict aborted, the
+        clone back as it was, the files named."""
+        data = await body(request)
+        folder = sync_target(data)
+        if not folder:
+            return web.json_response({"error": "aucune application"}, status=409)
+        why = sync_busy(folder) or (("une commande tourne : agent-chain se réconcilie après sa fin" if rn.going() else None)
+                                     if folder == CHAIN_ROOT else None)
+        if why:
+            return web.json_response({"error": why}, status=409)
+        loop = asyncio.get_running_loop()
+
+        def go():
+            with book.lock(folder):
+                return sync_mod.reconcile(folder)
+        res = await loop.run_in_executor(None, go)
+        sync_said(folder, "Réconcilier", res["message"])
+        st = await resync(folder)
+        res.pop("before", None)
+        if not res["ok"]:
+            res["error"] = res["message"]
+        return web.json_response({**res, "sync": st}, status=200 if res["ok"] else 409)
+
+    async def answers_send(request):
+        """« Envoyer mes réponses » (§5): the commit the next command would
+        make before its worktree — the feature folder, `chore: answers` —
+        then the push. The open application's feature, or a row's: `folder`
+        and its last feature."""
+        data = await body(request)
+        if data.get("folder"):
+            folder = listed_folder(data)
+            feature = state.app(folder).get("last_feature")
+        else:
+            folder, w = need_pair()
+            feature = feature_of(w)
+        if not feature:
+            return web.json_response({"error": "aucune feature ouverte dans cette application"}, status=409)
+        why = sync_busy(folder)
+        if why:
+            return web.json_response({"error": why}, status=409)
+        loop = asyncio.get_running_loop()
+        # GitHub first: what the other computer pushed comes in before the commit.
+        res = await loop.run_in_executor(None, sync_mod.before_launch, book, folder)
+        for d in res["done"]:
+            sync_said(folder, "avant d'envoyer les réponses", d)
+        if not res["ok"] and not res["reconcile"]:
+            announce(folder, res["sync"])
+            return web.json_response({"error": res["error"], "sync_refused": res}, status=409)
+
+        def go():
+            with book.lock(folder):
+                sha = sync_mod.commit_answers(folder, feature)
+                st = sync_mod.compute(folder, fetch=False)
+                p = sync_mod.push(folder) if sha and st["state"] == sync_mod.AHEAD else None
+                return sha, p
+        try:
+            sha, p = await loop.run_in_executor(None, go)
+        except sync_mod.SyncError as e:
+            return web.json_response({"error": str(e)}, status=409)
+        sync_said(folder, "Envoyer mes réponses", (f"commit {sha} « {sync_mod.ANSWERS_MESSAGE} »" if sha else "rien à commiter")
+                  + (", poussé" if p and p["ok"] else f", non poussé : {p['message']}" if p else ""))
+        st = await resync(folder)
+        state.clear_fresh(folder, feature)
+        return web.json_response({"ok": True, "commit": sha, "message": sync_mod.ANSWERS_MESSAGE, "path": sync_mod.feature_path(feature),
+                                  "pushed": bool(p and p["ok"]), "push": p, "sync": st,
+                                  "diverged": res.get("reconcile", False)})
+
+    async def apps_clone(request):
+        """« Ajouter depuis GitHub » (§7): the repository's address and the
+        parent folder; the clone, `core.longpaths=true` in it, then the list
+        as « Ajouter » makes it."""
+        data = await body(request)
+        url = (data.get("url") or "").strip()
+        parent = os.path.normpath((data.get("parent") or "").strip().strip('"')) if (data.get("parent") or "").strip() else ""
+        name = sync_mod.repo_name(url)
+        if not url or "\n" in url or not name:
+            return web.json_response({"error": "l'adresse du dépôt manque"}, status=400)
+        if not parent or not os.path.isdir(parent):
+            return web.json_response({"error": "le dossier parent est introuvable"}, status=400)
+        dest = os.path.join(parent, name)
+        if os.path.exists(dest) and (not os.path.isdir(dest) or os.listdir(dest)):
+            return web.json_response({"error": f"{dest} existe déjà et n'est pas vide : rien n'est cloné par-dessus"},
+                                     status=409)
+        res = await asyncio.get_running_loop().run_in_executor(None, sync_mod.clone, url, dest)
+        sync_said(dest, "Ajouter depuis GitHub", "cloné" if res["ok"] else res["message"])
+        if not res["ok"]:
+            return web.json_response({"error": res["message"], "credentials": res["credentials"]}, status=409)
+        err = apps_mod.check_new_app(dest)
+        if err:
+            return web.json_response({"error": f"cloné dans {dest}, mais : {err}"}, status=409)
+        x, added = state.add_app(dest, data.get("name"))
+        refresh_later(x["folder"])
+        return web.json_response({"app": x, "added": added, "path": dest, "apps": apps_light()})
+
+    async def longpaths_get(request):
+        """« Outils sur cet ordinateur » (§7): `core.longpaths` of each
+        application's own git config."""
+        loop = asyncio.get_running_loop()
+
+        def rows():
+            return [{"name": x["name"], "folder": x["folder"],
+                     "value": sync_mod.long_paths(x["folder"]) if os.path.isdir(x["folder"]) else None,
+                     "exists": os.path.isdir(x["folder"])} for x in state.apps()]
+        return web.json_response({"apps": await loop.run_in_executor(None, rows)})
+
+    async def longpaths_set(request):
+        data = await body(request)
+        folder = listed_folder(data)
+        try:
+            await asyncio.get_running_loop().run_in_executor(None, sync_mod.set_long_paths, folder)
+        except sync_mod.SyncError as e:
+            return web.json_response({"error": str(e)}, status=409)
+        return web.json_response({"ok": True, "value": sync_mod.long_paths(folder)})
 
     async def reveal_log(request):
         """1.9.1: a log's path is a link — its folder opens on this computer,
@@ -1784,6 +2132,14 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/donnees/join", data_join)
     r.add_post("/api/donnees/save", data_save)
     r.add_post("/api/donnees/answer", data_answer)
+    r.add_get("/api/sync", sync_get)
+    r.add_post("/api/sync/refresh", sync_refresh)
+    r.add_post("/api/sync/push", sync_push)
+    r.add_post("/api/sync/reconcile", sync_reconcile)
+    r.add_post("/api/answers/send", answers_send)
+    r.add_post("/api/apps/clone", apps_clone)
+    r.add_get("/api/longpaths", longpaths_get)
+    r.add_post("/api/longpaths", longpaths_set)
     app.on_startup.append(opening)
     app.on_cleanup.append(deploy_cleanup)
     return app
