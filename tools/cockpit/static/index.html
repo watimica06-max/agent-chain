@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cockpit</title>
 <link rel="icon" href="data:,">
+<!-- 1.13: the page can be added to a phone's home screen. No service worker yet. -->
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#4B44D6">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cockpit">
 <!-- 1.11: « Paramètres → Apparence » — Auto follows the computer; Clair or Sombre
      forces it. Read before the first paint, kept by the browser like the menu. -->
 <script>try { const t = localStorage.getItem("cockpit-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
@@ -52,6 +58,8 @@
   --mh-72: 72px; --mh-110: 110px; --mh-200: 200px; --mh-220: 220px; --mh-260: 260px; --mh-300: 300px; --mh-320: 320px;
   --mh-360: 360px; --mh-420: 420px; --mh-460: 460px;
   --stream-off: 380px; --sw-light: #F6F7F9; --sw-dark: #15171C;
+  /* 1.13 — the phone: its tabs under the thumb, a touch target, the dim behind a sheet */
+  --nav-h: 64px; --tap: 44px; --dim: rgba(16, 18, 27, .45);
   color-scheme: light;
 }
 /* The dark theme: the same names. Following the computer unless « Clair »
@@ -943,6 +951,162 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
 .dp-set .bool { display: flex; gap: var(--sp-8); align-items: center; padding-top: var(--sp-8); }
 .dp-set .bool input { width: var(--sp-18); height: var(--sp-18); }
 @media (max-width: 1100px) { .dp-set .grid { grid-template-columns: 1fr; } .dp-set .grid > label { padding-top: 0; } }
+
+/* ================================================================ phone (1.13)
+   One page: below 720 px the side menu gives way to five tabs under the
+   thumb (#phone-nav), the rest of the menu to a sheet (#phone-sheet), and a
+   screen of the computer says « Sur l'ordinateur ». Every control is 44 px
+   at least, nothing waits on a hover. Above 720 px, none of this applies. */
+@media (max-width: 720px) {
+  body { font-size: var(--fs-15); }
+  input[type=text], input[type=number], input[type=date], textarea, select { font-size: var(--fs-16); }
+  /* a touch target: the desktop's own sizes, ids and inline styles included, give way */
+  button, .chip, select, input[type=text], input[type=number], input[type=date], summary { min-height: var(--tap) !important; }
+  #tb-folder, #phone-ctx-close { min-width: var(--tap); }
+  button.link { padding: 0 var(--sp-8); }
+  input[type=checkbox], input[type=radio] { width: var(--sp-20); height: var(--sp-20); }
+  .desk-only, .opt .key, #keys-legend, #btn-chain, #audits { display: none !important; }
+  .on-desk { display: inline-flex; align-items: center; gap: var(--sp-6); min-height: var(--tap); color: var(--soft); font-size: var(--fs-14); }
+  .on-desk .ic { width: var(--ic-sm); height: var(--ic-sm); }
+
+  /* the frame: no side menu; the top bar holds the application, its feature, the run */
+  #shell, #shell.menu-closed { grid-template-columns: minmax(0, 1fr); }
+  #side { display: none; }
+  #topbar { padding: 0 var(--sp-8) 0 var(--sp-12); gap: var(--sp-6); min-height: var(--sp-48); flex-wrap: nowrap; }
+  #tb-menu, .crumb-sep, #tb-page, #tb-sync, #tb-mode, #tb-stop, #perm-badge { display: none !important; }
+  #tb-app { color: var(--ink); font-weight: 650; max-width: none; flex: 0 1 auto; min-width: 0; }
+  #tb-folder { min-height: var(--tap); }
+  #tb-run-wrap { min-width: 0; flex: 0 1 auto; }
+  #tb-run { display: block; max-width: 44vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: calc(var(--tap) - 2px);
+    border-radius: var(--r-pill); padding: 0 var(--sp-12); }
+  #tb-run::before { display: inline-block; vertical-align: middle; margin-right: var(--sp-6); }
+  #chain-banner, #busy-banner, #sync-banner { padding: var(--sp-8) var(--sp-16); }
+  /* no stacking of its own: its menu and the permission sheet rise above the tabs */
+  #chrome { z-index: auto; }
+  #main { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); }
+  body.at-home #main { padding-bottom: env(safe-area-inset-bottom); }
+  .screen { padding: var(--sp-16) var(--sp-16) var(--sp-32); }
+  .card { padding: var(--sp-14) var(--sp-16); }
+  .pop { position: fixed; top: auto; left: var(--sp-8); right: var(--sp-8); bottom: calc(var(--nav-h) + var(--sp-8)); min-width: 0; max-width: none; z-index: 70; }
+
+  /* the tabs, and the sheet of the rest */
+  #phone-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+    min-height: var(--nav-h); padding: var(--sp-4) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom));
+    background: var(--card); border-top: var(--bw) solid var(--line); box-shadow: var(--shadow-up); }
+  body.at-home #phone-nav { display: none; }
+  #phone-nav > a, #phone-nav > button { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-2);
+    min-height: var(--sp-48); padding: 0; border: none; background: none; border-radius: var(--r-10); color: var(--soft); text-decoration: none;
+    font-size: var(--fs-12); font-weight: 500; }
+  #phone-nav .pill { width: var(--sp-48); height: var(--h-28); border-radius: var(--r-pill); display: grid; place-items: center; }
+  #phone-nav .ic { width: var(--ic-lg); height: var(--ic-lg); }
+  #phone-nav [aria-current=page] { color: var(--accent); font-weight: 650; }
+  #phone-nav [aria-current=page] .pill { background: var(--accent-soft); }
+  #phone-nav .count { position: absolute; top: var(--sp-2); left: calc(50% + var(--sp-8)); margin: 0; box-shadow: 0 0 0 var(--sp-2) var(--card); }
+  #phone-nav .dot { position: absolute; top: var(--sp-6); left: calc(50% + var(--sp-12)); margin: 0; }
+  #phone-nav .dot.perm { background: var(--err); box-shadow: 0 0 0 var(--sp-2) var(--card); }
+  #phone-sheet { position: fixed; inset: 0 0 var(--nav-h); z-index: 60; display: flex; flex-direction: column; justify-content: flex-end; }
+  #phone-sheet.hidden { display: none; }
+  #phone-sheet .back { position: absolute; inset: 0; background: var(--dim); border: none; border-radius: 0; min-height: 0; padding: 0; }
+  #phone-sheet .sheet { position: relative; background: var(--card); border-radius: var(--r-16) var(--r-16) 0 0; box-shadow: var(--shadow-pop);
+    padding: var(--sp-10) var(--sp-8) var(--sp-12); display: flex; flex-direction: column; max-height: 100%; overflow: auto; }
+  #phone-sheet .grab { align-self: center; width: var(--sp-40); height: var(--sp-4); border-radius: var(--r-pill); background: var(--line-strong); margin-bottom: var(--sp-6); }
+  #phone-sheet .it { display: flex; align-items: center; justify-content: flex-start; gap: var(--sp-14); min-height: var(--h-52); padding: 0 var(--sp-12);
+    border: none; background: none; border-radius: var(--r-10); color: var(--ink); text-decoration: none; text-align: left; width: 100%; }
+  #phone-sheet .it > .ic { width: var(--ic-lg); height: var(--ic-lg); color: var(--accent); }
+  #phone-sheet .it .lbl { flex: 1; font-weight: 600; }
+  #phone-sheet .it .val { color: var(--soft); font-size: var(--fs-14); display: inline-flex; align-items: center; gap: var(--sp-6); }
+  #phone-sheet .it.desk > .ic { color: var(--soft); }
+  #phone-sheet .it.desk .lbl { font-weight: 450; }
+  #phone-sheet .info { color: var(--soft); font-size: var(--fs-14); padding: var(--sp-8) var(--sp-12); }
+  #phone-sheet .info b { color: var(--ink); font-weight: 600; }
+  #phone-sheet .sep { height: var(--bw); background: var(--line); margin: var(--sp-6) var(--sp-12); }
+  #phone-sheet .kicker { padding: var(--sp-6) var(--sp-12) var(--sp-2); }
+
+  /* « Sur l'ordinateur »: a screen of the computer, reached on the phone */
+  :is(#scr-correction, #scr-deploy, #scr-stats, #scr-settings, #scr-nouvelle) > :not(.phone-desk) { display: none !important; }
+  .phone-desk { display: flex; flex-direction: column; gap: var(--sp-12); }
+  .phone-desk h2 { margin: 0; }
+  .phone-desk .box, .phone-note { display: flex; gap: var(--sp-12); align-items: center; padding: var(--sp-14); border-radius: var(--r-14);
+    background: var(--card); border: var(--bw) solid var(--line); }
+  .phone-desk .tile { flex: none; width: var(--h-40); height: var(--h-40); border-radius: var(--r-10); background: var(--idle-soft); color: var(--soft);
+    display: grid; place-items: center; }
+  .phone-desk .box b { font-weight: 600; }
+  .phone-desk a { align-self: flex-start; display: inline-flex; align-items: center; gap: var(--sp-6); min-height: var(--tap); font-weight: 600; text-decoration: none; }
+  .phone-note { background: var(--idle-soft); border: none; color: var(--soft); font-size: var(--fs-14); margin: 0 0 var(--sp-14); }
+  .phone-note .ic { flex: none; }
+  .phone-note b { color: var(--ink); font-weight: 600; }
+
+  /* home: one card per application */
+  .home-head > button, #apps-add, #apps-clone, #home-creations, #apps-report, .hc-menu-wrap, .hc-chain button { display: none !important; }
+  .home-head { margin-bottom: var(--sp-12); }
+  .home-cards { background: none; border: none; box-shadow: none; overflow: visible; display: flex; flex-direction: column; gap: var(--sp-12); }
+  .home-card { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id foot" "next next" "facts facts" "chain chain" "run run" "alert alert" "msg msg";
+    row-gap: var(--sp-8); background: var(--card); border: var(--bw) solid var(--line); border-radius: var(--r-14); box-shadow: var(--shadow-1); padding: var(--sp-14); }
+  .home-card + .home-card { border-top: var(--bw) solid var(--line); }
+  .hc-facts { grid-template-columns: repeat(auto-fit, minmax(var(--w-80), 1fr)); gap: var(--sp-10); }
+  .hc-open { min-height: var(--tap); }
+  .hc-alert > div, .hc-running { flex-wrap: wrap; }
+
+  /* dashboard */
+  #next-text { font-size: var(--fs-20); }
+  .next-acts { flex-direction: column; align-items: stretch; }
+  #next-detail { display: flex; flex-wrap: wrap; gap: var(--sp-8); align-items: center; width: 100%; }
+  .next-acts > button { align-self: flex-start; }
+  .gauges { grid-template-columns: minmax(0, 1fr); }
+  #next-detail button.big { flex: 1 1 100%; min-height: var(--sp-48); font-size: var(--fs-16); }
+  .next-lots { flex: 1 1 100%; justify-content: space-between; font-size: var(--fs-15); color: var(--ink); }
+  .lots-n input { width: var(--w-80); min-height: var(--tap); }
+  #history { overflow-x: auto; }
+
+  /* À répondre: one column; the document opens over it; the save bar above the tabs */
+  #main:has(> #scr-answer:not(.hidden)) { overflow: auto; }
+  #scr-answer { display: block; height: auto; overflow: visible; padding-bottom: var(--h-52); }
+  #scr-answer.hidden { display: none; }
+  #answer-left { overflow: visible; }
+  #answer-left > .screen { padding: var(--sp-12) var(--sp-16) var(--sp-24); }
+  #ctx-pane { display: none; }
+  #scr-answer.ctx-open #ctx-pane { display: flex; position: fixed; inset: 0; z-index: 80; padding: 0; background: var(--card); }
+  #scr-answer.ctx-open #ctx-pane > * { border: none; }
+  #ctx-head { border-radius: 0; grid-template-columns: auto minmax(0, 1fr); }
+  #phone-ctx-close { grid-row: 1 / span 2; grid-column: 1; }
+  #ctx-head .doc, #ctx-head .what { grid-column: 2; }
+  #ctx-nav { grid-column: 1 / -1; grid-row: auto; margin-top: var(--sp-6); }
+  #ctx-doc { padding: var(--sp-12) var(--sp-16) var(--sp-40); }
+  .phone-ctx { margin: 0 0 var(--sp-6); background: var(--raised); border-color: var(--line); font-weight: 600; }
+  .phone-ctx .ic { color: var(--accent); }
+  #answer-foot { position: fixed; left: 0; right: 0; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); z-index: 35; }
+  #save-bar { padding: var(--sp-8) var(--sp-16); gap: var(--sp-12); }
+  #btn-save { min-width: 0; min-height: var(--sp-48); font-size: var(--fs-16); }
+  .entry { padding: var(--sp-14); }
+  .grp > summary { display: flex; align-items: center; }
+
+  /* a permission: a sheet over any screen */
+  #perm-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; max-height: 80vh; border: none; background: var(--card);
+    border-radius: var(--r-16) var(--r-16) 0 0; padding: var(--sp-14) var(--sp-16) calc(var(--sp-16) + env(safe-area-inset-bottom));
+    box-shadow: 0 0 0 100vmax var(--dim), var(--shadow-pop); }
+  .perm { border: none; padding: 0; }
+  .perm + .perm { margin-top: var(--sp-16); padding-top: var(--sp-16); border-top: var(--bw) solid var(--line); border-radius: 0; }
+  .perm .title { font-size: var(--fs-17); }
+  .perm pre { max-height: 28vh; }
+  .perm .row { flex-wrap: nowrap; }
+  .perm .row button { flex: 1; min-height: var(--h-52); font-size: var(--fs-16); }
+  .perm .row button.allow { order: 2; flex: 2; }
+
+  /* Chaîne, read: the steps' actions under them */
+  .flow-head { flex-wrap: wrap; }
+  .step { grid-template-columns: var(--disc) minmax(0, 1fr); padding: var(--sp-4) var(--sp-8); }
+  .flow::before { left: calc(var(--sp-8) + var(--disc) / 2 - var(--bw)); }
+  .step .acts { grid-column: 2; justify-content: flex-start; padding-top: 0; }
+  #stream { height: 45vh; }
+  #run-head .row { flex-wrap: wrap; }
+  .st-table-wrap, .lot-detail, .timeline { max-width: 100%; overflow-x: auto; }
+
+  /* Données: the list, the preview under it */
+  #dn-panel > div { grid-template-columns: minmax(0, 1fr); }
+  .dn-line .dn-field { width: 100%; }
+  #dn-list .dn-acts button { flex: 1; }
+  pre.dn-text { max-width: 100%; }
+}
 </style>
 </head>
 <body>
@@ -972,6 +1136,9 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
   <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/></symbol>
   <symbol id="i-target" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M12 12h.01"/></symbol>
   <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12 M7 10l5 5 5-5 M4 19h16"/></symbol>
+  <symbol id="i-desk" viewBox="0 0 24 24"><path d="M3 5h18v11H3z M8 20h8 M12 16v4"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><path d="M5 12h.01 M12 12h.01 M19 12h.01"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5 M11 6l-6 6 6 6"/></symbol>
 </svg>
 <div id="shell" class="nofolder">
   <nav id="side" aria-label="Menu">
@@ -1449,6 +1616,9 @@ const el = (tag, attrs = {}, ...kids) => {
   for (const c of kids.flat()) if (c !== null && c !== undefined) n.append(c);
   return n;
 };
+// 1.13: the phone's layout, below 720 px — the stylesheet's one breakpoint (« phone » below).
+const PHONE_MQ = window.matchMedia("(max-width: 720px)");
+let PHONE = PHONE_MQ.matches;
 // 1.11: an icon of the page's sprite — SVG drawn for the cockpit, nothing from the internet.
 function icon(name, cls) {
   const SVGNS = "http://www.w3.org/2000/svg";
@@ -1642,11 +1812,11 @@ function route() {
   if (pick) renderWorkCard();
   if (inApp && r === "answer") hint();
   if (inApp && (r === "chaine" || r === "correction")) placeRun();
-  if (inApp && r === "stats") loadStats();
+  if (inApp && r === "stats" && !PHONE) loadStats();
   if (inApp && r === "settings" && entering) loadLongpaths();
   if (inApp && r === "donnees" && entering) enterDonnees();
   // 1.8: « Déploiement » polls its destinations while it is shown, and only then.
-  if (inApp && r === "deploy") enterDeploy(); else leaveDeploy();
+  if (inApp && r === "deploy" && !PHONE) enterDeploy(); else leaveDeploy();
   renderChrome();
   if (S.app_folder !== undefined) renderChainState();
 }
@@ -2401,6 +2571,7 @@ function renderChrome() {
   renderBusyBanner();
   renderSyncBanner();
   updateTitle();
+  if (PHONE) phoneRender();
   if (!isOpen) return;
   $("tb-folder").replaceChildren(el("b", {text: S.feature || S.working_folder}), el("span", {class: "caret", text: " ▾"}));
   $("tb-mode").replaceChildren("Mode : ", el("b", {text: S.mode === "manuel" ? "Manuel" : "Auto"}));
@@ -2531,8 +2702,11 @@ function renderDashboard() {
   if (d.source === "run") {
     detail.append(el("button", {class: "primary big", text: "Voir la chaîne", onclick: () => goStep(d.chain, d.step)}));
   } else if (n.kind === "run") {
-    detail.append(el("button", {class: "primary big", text: `Lancer /${n.command} ${n.args || ""}`.trim(),
-      disabled: elsewhere() || undefined, title: elsewhere() ? busyNote() : undefined, onclick: () => launchNext(d)}));
+    const go8 = el("button", {class: "primary big", text: `Lancer /${n.command} ${n.args || ""}`.trim(),
+      disabled: elsewhere() || undefined, title: elsewhere() ? busyNote() : undefined, onclick: () => launchNext(d)});
+    // 1.13: on the phone, « Lots à coder » rides on the proposed /8_code — Chaîne's own field is the computer's.
+    if (PHONE && n.command === "8_code") detail.append(nextLotsField(d, go8));
+    detail.append(go8);
     if (elsewhere()) detail.append(el("span", {class: "muted", text: busyNote()}));
   } else if (n.kind === "answer") {
     // The folder's proposal is one step's answers; a chain's Next: names
@@ -2545,10 +2719,10 @@ function renderDashboard() {
     if (n.command) detail.append(el("span", {class: "muted", text: `Ensuite : /${n.command} ${n.args || ""}`}));
   } else if (n.kind === "manual") {
     if (d.step === "diagnostique" && d.chain && d.chain !== "main") {
-      detail.append(el("button", {class: "primary big", text: "Écrire la bug-list", onclick: () => { corrSel = d.chain; bug.name = null; renderCorrection(); go("correction"); }}));
+      detail.append(el("button", {class: "primary big desk-only", text: "Écrire la bug-list", onclick: () => { corrSel = d.chain; bug.name = null; renderCorrection(); go("correction"); }}), ...phoneDesk());
     }
     if (d.step === "test" || (d.proposal && d.proposal.step === "test" && !n.command)) {
-      detail.append(el("button", {class: "primary big", text: "Déployer", onclick: () => openDeploy("deployer")}));
+      detail.append(el("button", {class: "primary big desk-only", text: "Déployer", onclick: () => openDeploy("deployer")}), ...phoneDesk());
       if (S.recette) detail.append(el("span", {class: "muted", text: `À tester : ${S.recette.rel} (${S.recette.count} points)`}));
     }
     if (n.command) detail.append(el("span", {class: "muted", text: `Ensuite : /${n.command} ${n.args || ""}`}));
@@ -2776,7 +2950,7 @@ async function runCommand(name, args, chain, stepId) {
 }
 
 function goStep(chain, step) {
-  if (chain && chain !== "main") { corrSel = chain; renderCorrection(); go("correction"); }
+  if (chain && chain !== "main" && !PHONE) { corrSel = chain; renderCorrection(); go("correction"); }
   else go("chaine");
   setTimeout(() => { placeRun(); const s = $(`step-${chain || "main"}-${step}`); if (s) s.scrollIntoView({block: "center"}); }, 40);
 }
@@ -2813,11 +2987,12 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     const waiting = openCountFor(s.id, chain === "main" ? "main" : chain);
     if (s.state === "t'attend" || waiting) acts.append(el("button", {class: s.state === "t'attend" ? "primary" : "",
       text: `Répondre (${waiting})`, onclick: () => openAnswers(s.id, chain)}));
-    if (s.command === "8_code") acts.append(lotsField(chain, `lots-n-${chain}`, !launchable || anyRun()));
-    if (s.command && s.id !== "test") acts.append(el("button", {class: isNext && d.next && d.next.kind === "run" ? "primary" : "",
+    if (s.command === "8_code") acts.append(deskOnly(lotsField(chain, `lots-n-${chain}`, !launchable || anyRun())));
+    if (s.command || s.id === "test") acts.append(...phoneDesk());
+    if (s.command && s.id !== "test") acts.append(el("button", {class: (isNext && d.next && d.next.kind === "run" ? "primary" : "") + " desk-only",
       disabled: !launchable || anyRun() || undefined, title: elsewhere() ? busyNote() : launchable ? `/${s.command}` : offNote,
       onclick: () => launchStep(s, chain)}, icon("play", "sm"), "Lancer"));
-    if (s.id === "test") acts.append(el("button", {class: isNext ? "primary" : "",
+    if (s.id === "test") acts.append(el("button", {class: (isNext ? "primary" : "") + " desk-only",
       title: "Ouvre « Déploiement » : construire, installer, regarder tourner", onclick: () => openDeploy("deployer")}, icon("deploy", "sm"), "Déployer"));
     const key = `${chain}:${s.id}`;
     const wb = whyBox(s);
@@ -2836,7 +3011,7 @@ function renderFlow(box, steps, chain, launchable, offNote) {
     // 1.9: the fusion step's two halves, launched alone — Paramètres →
     // Commandes until 1.8. /fusion runs both, and is the step's button.
     const subs = s.id === "fusion" && chain === "main" ? (S.commands || []).filter((c) => ["fusion_compare", "fusion_applique"].includes(c.name)) : [];
-    if (subs.length) main.append(el("div", {class: "subcmds"}, "Seulement une moitié :",
+    if (subs.length) main.append(el("div", {class: "subcmds desk-only"}, "Seulement une moitié :",
       ...subs.map((c) => el("button", {text: "/" + c.name, disabled: anyRun() || undefined,
         title: anyRun() ? busyNote() : c.description, onclick: () => launchCommand(c)}))));
     if (s.id === "test") main.append(el("div", {class: "extra", text: S.recette
@@ -3083,7 +3258,10 @@ function entryCard(id, head, body, choice) {
   return el("div", {class: "entry" + (id === focusedId ? " focused" : ""), id: "e-" + id, tabindex: "0", "data-id": id,
     onfocusin: () => { if (focusedId !== id) setFocus(id); },
     onmousedown: () => { if (focusedId !== id) setFocus(id); }},
-    el("div", {class: "head"}, head), body, choice);
+    el("div", {class: "head"}, head), body,
+    PHONE && id.startsWith("q:") ? el("button", {class: "phone-ctx", type: "button", onclick: (ev) => { ev.stopPropagation(); phoneContext(id); }},
+      icon("doc", "sm"), "Voir le document") : null,
+    choice);
 }
 
 // 1.5: « À répondre » filtered on one lot, from the Code tab.
@@ -3464,6 +3642,7 @@ function placeRun() {
   if (!run) { parkRun(); return; }
   const p = S.run_place;
   let slot = p ? $(`slot-${p.chain}-${p.step}`) : null;
+  if (PHONE && slot && !$("scr-chaine").contains(slot)) slot = null;
   if (!slot) {
     // Under « Chaîne » when its step is in no flow shown (a tool, an older correction).
     slot = $("run-fallback");
@@ -3940,8 +4119,8 @@ function renderCode(box, chain) {
   const acts = el("div", {class: "code-actions"});
   if (here) {
     const step = findStep(chain, "8_code");
-    if (!anyRun()) acts.append(lotsField(chain, `code-lots-n-${chain}`),
-      el("button", {class: "primary", text: "Lancer /8_code", onclick: () => launchStep(step, chain)}));
+    if (!anyRun()) acts.append(deskOnly(lotsField(chain, `code-lots-n-${chain}`)),
+      el("button", {class: "primary desk-only", text: "Lancer /8_code", onclick: () => launchStep(step, chain)}), ...phoneDesk());
     if (mine) {
       acts.append(el("button", {class: "stopnext", text: S.stop_file ? "stop.md posé : arrêt après ce lot" : "Arrêter au prochain lot",
         disabled: S.stop_file || undefined, onclick: async () => { try { await api("/api/stop-next-lot", {}); await refreshState(); loadCode(chain); } catch (e) { alert(e.message); } }}));
@@ -5540,6 +5719,140 @@ async function joinAnswer(q, btn) {
     btn.disabled = false;
   }
 }
+
+// ================================================================ phone (1.13)
+// Below 720 px, the same page: five tabs under the thumb replace the side
+// menu, a sheet holds the rest of it, and every screen or action of the
+// computer says « Sur l'ordinateur » — nothing hidden without a word. All of
+// it is built here, and only while the screen is that narrow: above, the
+// desktop's page is exactly as before.
+const DESK_SCREENS = [["correction", "Correction", "bug"], ["deploy", "Déploiement", "deploy"],
+  ["stats", "Statistiques", "stats"], ["settings", "Paramètres", "settings"]];
+function onDesk() {
+  return el("span", {class: "on-desk"}, icon("desk", "sm"), "Sur l'ordinateur");
+}
+const phoneDesk = () => PHONE ? [onDesk()] : [];
+function deskOnly(node) { node.classList.add("desk-only"); return node; }
+
+// « Lots à coder » on the proposed /8_code: the same number as Chaîne's, the button saying what it launches.
+function nextLotsField(d, btn) {
+  const chain = d.chain || "main";
+  const step = findStep(chain, "8_code") || {command: "8_code"};
+  const say = () => { btn.textContent = `Lancer /8_code ${argsFor(step, chain)}`.trim(); };
+  const f = lotsField(chain, "next-lots-n", elsewhere());
+  f.classList.add("next-lots");
+  const input = f.querySelector("input");
+  input.addEventListener("input", say);
+  input.addEventListener("change", say);
+  say();
+  return f;
+}
+
+// A question's document, over « À répondre »: what the right pane shows on the computer.
+function phoneContext(id) {
+  setFocus(id);
+  $("scr-answer").classList.add("ctx-open");
+  $("ctx-doc").scrollTop = 0;
+}
+function phoneCloseContext() { $("scr-answer").classList.remove("ctx-open"); }
+
+function phoneSheet(open) {
+  const sh = $("phone-sheet"); if (!sh) return;
+  sh.classList.toggle("hidden", !open);
+  $("phone-more").setAttribute("aria-expanded", String(open));
+  if (open) phoneRender();
+}
+
+function phoneBuild() {
+  if ($("phone-nav")) return;
+  const tab = (route, label, ic, extra) => el("a", {href: "#" + route, id: "phone-tab-" + route, "data-phone": ""},
+    el("span", {class: "pill"}, icon(ic)), label, extra || null);
+  document.body.append(
+    el("nav", {id: "phone-nav", "aria-label": "Écrans", "data-phone": ""},
+      tab("dashboard", "Tableau", "dashboard"),
+      tab("answer", "À répondre", "answer", el("span", {class: "count hidden", id: "phone-answer-count"})),
+      tab("chaine", "Chaîne", "chain", el("span", {class: "dot hidden", id: "phone-run-dot"})),
+      tab("donnees", "Données", "data"),
+      el("button", {id: "phone-more", type: "button", "aria-haspopup": "dialog", "aria-expanded": "false", "aria-controls": "phone-sheet",
+        onclick: () => phoneSheet($("phone-sheet").classList.contains("hidden"))},
+        el("span", {class: "pill"}, icon("more")), "Plus")),
+    el("div", {id: "phone-sheet", class: "hidden", role: "dialog", "aria-label": "Plus", "data-phone": ""},
+      el("button", {class: "back", type: "button", "aria-label": "Fermer", onclick: () => phoneSheet(false)}),
+      el("div", {class: "sheet"},
+        el("span", {class: "grab", "aria-hidden": "true"}),
+        el("button", {class: "it", id: "phone-apps", type: "button", onclick: () => { phoneSheet(false); $("tb-home").click(); }},
+          icon("apps"), el("span", {class: "lbl", text: "Changer d'application"}), el("span", {class: "val", id: "phone-apps-n"})),
+        el("button", {class: "it", id: "phone-feat", type: "button", onclick: (ev) => { ev.stopPropagation(); phoneSheet(false); $("tb-folder").click(); }},
+          icon("folder"), el("span", {class: "lbl", text: "Changer de fonctionnalité"}), el("span", {class: "val mono", id: "phone-feat-name"})),
+        el("div", {class: "info", id: "phone-state"}),
+        el("div", {class: "sep"}),
+        el("div", {class: "kicker", text: "Sur l'ordinateur"}),
+        ...DESK_SCREENS.map(([r, label, ic]) => el("a", {class: "it desk", href: "#" + r, id: "phone-desk-" + r, onclick: () => phoneSheet(false)},
+          icon(ic), el("span", {class: "lbl", text: label}), el("span", {class: "val"}, icon("desk", "sm"), "Sur l'ordinateur"))))));
+  // A screen of the computer, reached on the phone: its name, and where it is done.
+  for (const [r, label] of [...DESK_SCREENS, ["nouvelle", "Nouvelle application"]]) {
+    const back = r === "nouvelle" ? el("a", {href: "#accueil"}, icon("back"), "Retour aux applications")
+      : el("a", {href: "#dashboard"}, icon("back"), "Retour au tableau de bord");
+    $("scr-" + r).prepend(el("div", {class: "phone-desk", "data-phone": ""}, el("h2", {text: label}),
+      el("div", {class: "box"}, el("span", {class: "tile"}, icon("desk")), el("b", {text: "Sur l'ordinateur"})), back));
+  }
+  document.querySelector("#scr-accueil .home-head").after(el("div", {class: "phone-note", id: "phone-home-desk", "data-phone": ""},
+    icon("desk"), el("span", {}, "Nouvelle application, ajouter une application, installer ou mettre à jour la chaîne, renommer ou retirer une application : ",
+      el("b", {text: "sur l'ordinateur"}))));
+  // Chaîne: the chain's install (Version) and the audits are the computer's.
+  $("btn-chain").after(el("span", {"data-phone": ""}, onDesk()));
+  $("audits").before(el("div", {class: "phone-note", id: "phone-audits-desk", "data-phone": ""}, icon("desk"),
+    el("span", {}, "Les audits : ", el("b", {text: "sur l'ordinateur"}))));
+  $("ctx-head").prepend(el("button", {id: "phone-ctx-close", type: "button", "aria-label": "Fermer le document", "data-phone": "",
+    onclick: phoneCloseContext}, icon("back")));
+  phoneRender();
+}
+function phoneTear() {
+  for (const n of document.querySelectorAll("[data-phone]")) n.remove();
+  phoneCloseContext();
+}
+function phoneRender() {
+  const nav = $("phone-nav"); if (!nav) return;
+  const r = currentRoute(), inApp = !atHome() && !!S.open;
+  nav.classList.toggle("hidden", !inApp);
+  for (const a of nav.querySelectorAll("a")) {
+    if (inApp && a.getAttribute("href") === "#" + r) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  }
+  const more = DESK_SCREENS.some(([x]) => x === r) && inApp;
+  if (more) $("phone-more").setAttribute("aria-current", "page"); else $("phone-more").removeAttribute("aria-current");
+  const n = S.open ? openCount() : 0, c = $("phone-answer-count");
+  c.textContent = n; c.classList.toggle("hidden", !n);
+  const perm = $("perm-banner").children.length > 0, dot = $("phone-run-dot");
+  dot.classList.toggle("hidden", !(running() || perm));
+  dot.classList.toggle("perm", perm);
+  dot.title = perm ? "Autorisation demandée" : running() ? "Une commande tourne" : "";
+  $("phone-apps-n").textContent = (S.apps || []).length || "";
+  $("phone-feat-name").textContent = S.feature || S.working_folder || "";
+  const sy = S.sync;
+  $("phone-state").replaceChildren("GitHub : ", el("b", {text: sy && sy.state ? (SYNC_CHIP[sy.state] || sy.state) : "—"}),
+    " · Mode : ", el("b", {text: S.mode === "manuel" ? "Manuel" : "Auto"}));
+}
+// Crossing the width: the page rebuilt for the side it lands on.
+function phoneSwitch() {
+  PHONE = PHONE_MQ.matches;
+  if (PHONE) phoneBuild(); else phoneTear();
+  if (!S || !S.open) return;
+  route(); renderAll(); renderForms();
+}
+PHONE_MQ.addEventListener("change", phoneSwitch);
+window.addEventListener("hashchange", () => { phoneSheet(false); phoneCloseContext(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape" || !PHONE) return;
+  phoneSheet(false); phoneCloseContext();
+});
+// Données: the preview sits under the list — « Aperçu » brings it into view.
+document.addEventListener("click", (e) => {
+  if (PHONE && e.target.closest && e.target.closest("#dn-list .dn-show")) setTimeout(() => $("dn-preview").scrollIntoView({block: "start", behavior: "smooth"}), 60);
+});
+// A run's end or a new permission redraws the tab's dot.
+new MutationObserver(() => { if (PHONE) phoneRender(); }).observe($("perm-banner"), {childList: true});
+if (PHONE) phoneBuild();
+
 
 refreshState().catch((e) => showStart(e.message));
 </script>

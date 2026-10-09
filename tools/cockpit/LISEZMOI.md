@@ -519,6 +519,41 @@ devine qu'une entrée n'est peut-être pas à vous (un manque que `/8_code`
 règle seul, un verdict de l'Architecte), elle reste dans « À répondre »
 avec ce qu'il a vu.
 
+## Sur le téléphone (1.13)
+
+La même page, sous 720 px de large : le téléphone pilote, l'ordinateur
+construit, déploie et règle. Au-dessus de 720 px, rien ne change.
+
+- **Cinq onglets en bas**, sous le pouce, à la place du menu de côté :
+  Tableau, À répondre (avec son nombre), Chaîne (un point quand une
+  commande tourne, rouge quand une autorisation attend), Données, Plus.
+  La barre du haut garde l'application, la fonctionnalité — un toucher la
+  change — et la commande qui tourne.
+- **« Plus »** : changer d'application ou de fonctionnalité, l'état GitHub
+  et le mode, puis une ligne « Sur l'ordinateur » par écran qui y reste.
+- **Sur le téléphone** : la liste des applications ; le tableau de bord
+  entier, « Envoyer » et « Réconcilier » compris ; « À répondre » entier —
+  le document d'une question s'ouvre par « Voir le document », la barre
+  « Enregistrer » reste au-dessus des onglets, « Joindre un fichier »
+  propose l'appareil photo ou les fichiers ; l'étape proposée se lance
+  avec les mêmes confirmations, et quand c'est `/8_code`, « Lots à coder »
+  est à côté du bouton ; un run se suit dans « Chaîne », avec « Arrêter au
+  prochain lot » et « Arrêter maintenant » ; une autorisation monte du bas
+  de l'écran, par-dessus n'importe quel écran ; « Données » : la liste,
+  l'aperçu sous elle, « Joindre » ; « Chaîne » en lecture.
+- **Sur l'ordinateur** — et le téléphone le dit à leur place : Correction,
+  Déploiement, Statistiques, Paramètres, Nouvelle application, ajouter une
+  application, installer ou mettre à jour la chaîne, Renommer et Retirer
+  de la liste, les audits, et chaque « Lancer » de Chaîne. Les questions
+  et les blocages d'une correction passent par « À répondre », et le
+  tableau de bord propose ses étapes ; écrire sa bug-list et en ouvrir
+  une nouvelle restent sur l'ordinateur.
+- **L'écran d'accueil du téléphone** : la page a un manifeste et ses
+  icônes, pour s'y ajouter. Pas encore de service worker ni de
+  notifications : ils attendent l'accès HTTPS depuis le téléphone, un
+  chantier à venir — aujourd'hui le cockpit n'écoute que sur cette
+  machine.
+
 
 ## Ce que le cockpit ne fait jamais
 

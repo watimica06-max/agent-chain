@@ -623,6 +623,21 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return web.Response(body=page_bytes, content_type="text/html", charset="utf-8",
                             headers={"Cache-Control": "no-store"})
 
+    # 1.13 — the web app manifest and its icons, so that a phone can put the
+    # page on its home screen. Read from static/, nothing else served from there.
+    ICONS = {"icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"}
+
+    async def manifest(request):
+        with open(os.path.join(HERE, "static", "manifest.webmanifest"), "rb") as f:
+            return web.Response(body=f.read(), content_type="application/manifest+json", charset="utf-8")
+
+    async def app_icon(request):
+        name = request.match_info["name"]
+        if name not in ICONS:
+            raise web.HTTPNotFound()
+        with open(os.path.join(HERE, "static", "icons", name), "rb") as f:
+            return web.Response(body=f.read(), content_type="image/png", headers={"Cache-Control": "max-age=86400"})
+
     # ------------------------------------------------- GitHub (1.12, sync.py)
     def sync_said(folder, what, res):
         print(f"GitHub — {state.name_of(folder) or folder} : {what} — {res}", flush=True)
@@ -2071,6 +2086,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     r = app.router
     r.add_get("/", index)
+    r.add_get("/manifest.webmanifest", manifest)
+    r.add_get("/icons/{name}", app_icon)
     r.add_get("/api/ping", ping)
     r.add_post("/api/reveal-log", reveal_log)
     r.add_post("/api/open-logs", open_logs)
