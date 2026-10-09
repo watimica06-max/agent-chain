@@ -269,6 +269,23 @@ body.at-home .screen { margin: 0 auto; }
   color: var(--ink); border-radius: var(--r-10); padding: var(--sp-10) var(--sp-16); margin: 0 0 var(--sp-16); }
 #home-notice .ic-dot { flex: none; width: var(--sp-10); height: var(--sp-10); border-radius: 50%; background: var(--accent); animation: pulse 1.6s ease-in-out infinite; }
 #home-notice button { margin-left: auto; }
+/* 1.14 — « Nouvelle version du cockpit disponible », at the top of the home
+   screen; the same block in Paramètres → Version du cockpit. */
+#cockpit-update { border: var(--bw) solid var(--accent); background: var(--accent-soft); color: var(--ink);
+  border-radius: var(--r-10); padding: var(--sp-12) var(--sp-16); margin: 0 0 var(--sp-16); }
+#cockpit-update h3 { margin: 0 0 var(--sp-4); font-size: var(--fs-15); }
+.cu-head { display: flex; gap: var(--sp-12); align-items: flex-start; flex-wrap: wrap; }
+.cu-head > div { flex: 1 1 var(--w-220); min-width: 0; }
+.cu-head > .cu-actions { flex: none; display: flex; gap: var(--sp-8); flex-wrap: wrap; }
+.cu-subjects { list-style: none; margin: var(--sp-8) 0 0; padding: 0; max-height: 9.5em; overflow-y: auto; font-size: var(--fs-13); }
+.cu-subjects li { display: flex; gap: var(--sp-8); padding: var(--sp-2) 0; min-width: 0; }
+.cu-subjects .id { font-family: var(--mono); color: var(--soft); flex: none; }
+.cu-subjects .s { min-width: 0; overflow-wrap: anywhere; }
+.cu-msg .notice { margin-bottom: 0; }
+.cu-msg .files { display: block; font-family: var(--mono); font-size: var(--fs-12); margin-top: var(--sp-2); overflow-wrap: anywhere; }
+.cu-msg ol { margin: var(--sp-4) 0 0; padding-left: var(--sp-20); }
+#sec-cockpit .cu-subjects { background: var(--raised); border-radius: var(--r-6); padding: var(--sp-6) var(--sp-10); }
+#stopped.restart .card::before { content: "↻"; }
 .home-cards { background: var(--card); border: var(--bw) solid var(--line); border-radius: var(--r-10); overflow: hidden; box-shadow: var(--shadow-1); }
 .home-cards > .card { border: none; box-shadow: none; border-radius: 0; }
 .apps-head, .home-card { display: grid; column-gap: var(--sp-16); row-gap: 0; padding: 0 var(--sp-16);
@@ -1192,6 +1209,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     <section id="scr-accueil" class="screen hidden">
       <div id="start-error" class="notice err hidden"></div>
       <div id="home-notice" class="hidden" role="status"></div>
+      <div id="cockpit-update" class="hidden" role="status" aria-label="Nouvelle version du cockpit"></div>
       <div class="home-head">
         <div><h2>Applications</h2><div class="sub" id="apps-count"></div><div class="sub" id="chain-sync-line" aria-label="agent-chain face à GitHub"></div></div>
         <span class="grow"></span>
@@ -1568,6 +1586,14 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <h3 style="margin-top:var(--sp-16)">Chemins longs de git</h3>
         <p class="muted small" style="margin:0">Dans la configuration git de chaque application, <span class="mono">core.longpaths=true</span> : un build dans un worktree écrit des chemins plus longs que la limite de Windows.</p>
         <ul id="longpaths" aria-label="core.longpaths de chaque application"></ul>
+      </div>
+      <div class="card sec" id="sec-cockpit">
+        <h2>Version du cockpit</h2>
+        <p class="lead">Le cockpit et la chaîne viennent du dépôt agent-chain de cet ordinateur. « Mettre à jour le cockpit » y récupère la dernière version depuis GitHub, réinstalle ses dépendances Python si elles ont changé, puis redémarre le cockpit : la page se recharge d'elle-même. Refusé pendant qu'une commande tourne.</p>
+        <div id="cockpit-version" class="small"></div>
+        <ul class="cu-subjects hidden" id="cockpit-set-subjects" aria-label="Commits que ce cockpit n'a pas encore"></ul>
+        <div class="row" style="margin-top:var(--sp-12)"><button id="btn-cockpit-update" class="primary cockpit-update-btn">Mettre à jour le cockpit</button></div>
+        <div class="cu-msg" id="cockpit-set-msg"></div>
       </div>
       <div class="card sec" id="sec-quit">
         <h2>Arrêter le cockpit</h2>
@@ -2097,6 +2123,10 @@ function syncAlerts(r, going) {
   const busy = going || anyRun();
   if (st && st.state === "non envoyé") box.append(el("div", {}, el("span", {text: st.summary + "."}),
     el("button", {class: "small sync-push", text: "Envoyer", disabled: busy || undefined, onclick: (e) => { stop(e); syncPush(r.folder); }})));
+  // 1.14: « en retard » — GitHub's version taken now, without launching anything.
+  if (st && st.state === "en retard") box.append(el("div", {}, el("span", {text: st.summary + "."}),
+    el("button", {class: "small sync-pull", text: "Récupérer", disabled: busy || undefined, title: "git pull --ff-only : les commits de GitHub, sans rien lancer",
+      onclick: (e) => { stop(e); syncPull(r.folder, e.currentTarget); }})));
   if (st && st.state === "divergé") box.append(el("div", {class: "mod"}, el("span", {text: st.summary + "."}),
     el("button", {class: "small sync-reconcile", text: "Réconcilier", disabled: busy || undefined, onclick: (e) => { stop(e); syncReconcile(r.folder); }})));
   if (r.answers_pending) box.append(el("div", {class: "info"},
@@ -2130,12 +2160,141 @@ function renderSyncBanner() {
   b.replaceChildren(el("span", {class: "txt" + (n.conflict ? " conflict" : "")}, el("b", {text: n.title || ""}), n.title ? " " : "", n.text || "",
     n.files && n.files.length ? el("span", {class: "files", text: n.files.join(" · ")}) : null),
     ...(n.actions || []),
+    // 1.14: agent-chain pulled at start — the notice carries « Mettre à jour le cockpit ».
+    ...(n.chain ? [el("button", {class: "small primary cockpit-update-btn", text: "Mettre à jour le cockpit", onclick: (e) => updateCockpit(e.currentTarget)})] : []),
     el("button", {class: "small", text: "Compris", onclick: () => { if (n.chain) chainNoticeSeen = n.text; else syncNote = null; renderSyncBanner(); }}));
 }
 function reconcileButton(folder) {
   return el("button", {class: "small sync-reconcile", text: "Réconcilier", onclick: () => syncReconcile(folder)});
 }
 async function afterSync() { if (atHome()) await loadApps(); await refreshState(); }
+// « Récupérer » (1.14): an application « en retard » — git pull --ff-only, the
+// one a launch makes first, refused the same ways; then its state and its
+// chain's, read again.
+async function syncPull(folder, btn) {
+  if (btn) btn.disabled = true;
+  showSync({kind: "warn", text: `${appName(folder)} — récupération depuis GitHub…`});
+  try {
+    const r = await api("/api/sync/pull", {folder});
+    showSync({kind: "ok", text: `${appName(folder)} — ${plural(r.pulled, "commit récupéré", "commits récupérés")} de GitHub. ${r.sync.summary}.`
+      + (r.chain && r.chain.summary ? ` ${r.chain.summary}.` : "")});
+  } catch (e) {
+    const b = e.body || {};
+    showSync({kind: "err", title: "Récupérer refusé.", text: e.message, files: b.files,
+      actions: b.reconcile ? [reconcileButton(folder)] : []});
+  }
+  await afterSync();
+}
+
+// ------------------------------------------- « Mettre à jour le cockpit » (1.14)
+// The state: chain_sync.cockpit — « à jour », « disponible » (GitHub has
+// commits agent-chain lacks), « récupérée » (agent-chain has commits this
+// server does not run). Shown at the top of the home screen when it is not
+// « à jour », and always in Paramètres → Version du cockpit.
+let cockpitNote = null, restarting = false;
+const cockpitState = () => { const cs = (A && A.chain_sync) || S.chain_sync; return cs && cs.cockpit; };
+function cockpitTitle(c) {
+  if (!c) return "";
+  if (c.diverged) return "agent-chain a divergé de GitHub";
+  return c.state === "disponible" ? "Nouvelle version du cockpit disponible"
+    : c.state === "récupérée" ? "Nouvelle version du cockpit récupérée — pas encore en service" : "Le cockpit est à jour";
+}
+function cockpitSubjects(c, id) {
+  return el("ul", {class: "cu-subjects", ...(id ? {id} : {}), "aria-label": "Commits que ce cockpit n'a pas encore"},
+    ...(c.subjects || []).map((x) => { const i = x.indexOf(" "); return el("li", {}, el("span", {class: "id", text: x.slice(0, i)}), el("span", {class: "s", text: x.slice(i + 1)})); }));
+}
+function cockpitMsg() {
+  const n = cockpitNote;
+  if (!n) return [];
+  return [el("div", {class: "notice " + (n.kind || "")}, n.title ? el("b", {text: n.title + " "}) : null, n.text || "",
+    n.files && n.files.length ? el("span", {class: "files", text: n.files.join(" · ")}) : null,
+    n.steps && n.steps.length ? el("ol", {}, ...n.steps.map((x) => el("li", {text: x}))) : null,
+    n.reconcile ? el("span", {}, " ", el("button", {class: "small sync-reconcile", text: "Réconcilier", onclick: () => syncReconcile(null, true)})) : null)];
+}
+function renderCockpitUpdate() {
+  const box = $("cockpit-update");
+  const c = cockpitState();
+  const show = !!(c && c.state && c.state !== "à jour") || !!cockpitNote;
+  box.classList.toggle("hidden", !show);
+  if (show) {
+    const n = (c && c.count) || 0;
+    const what = !c || c.state === "à jour" ? ""
+      : c.diverged ? `${c.summary}. Rien ne se récupère avant « Réconcilier ».`
+      : c.state === "disponible" ? `GitHub a ${plural(n, "commit", "commits")} du cockpit et de la chaîne que cet ordinateur n'a pas encore. « Mettre à jour le cockpit » les récupère et redémarre le cockpit : la page se recharge d'elle-même.`
+      : `${plural(n, "commit récupéré", "commits récupérés")} dans agent-chain : le cockpit les met en service en redémarrant ; la page se recharge d'elle-même.`;
+    box.replaceChildren(
+      el("div", {class: "cu-head"},
+        el("div", {}, el("h3", {text: c && c.state !== "à jour" ? cockpitTitle(c) : "Mettre à jour le cockpit"}), what ? el("div", {class: "small", text: what}) : null),
+        el("div", {class: "cu-actions"},
+          c && c.diverged ? el("button", {class: "small sync-reconcile", text: "Réconcilier", onclick: () => syncReconcile(null, true)}) : null,
+          c && c.state !== "à jour" && !c.diverged ? el("button", {class: "primary cockpit-update-btn", id: "btn-cockpit-update-home", text: "Mettre à jour le cockpit",
+            onclick: (e) => updateCockpit(e.currentTarget)}) : null,
+          !c || c.state === "à jour" ? el("button", {class: "small", text: "Compris", onclick: () => { cockpitNote = null; renderCockpitUpdate(); }}) : null)),
+      c && (c.subjects || []).length ? cockpitSubjects(c, "cockpit-subjects") : "",
+      el("div", {class: "cu-msg", id: "cockpit-update-msg"}, ...cockpitMsg()));
+  }
+  renderCockpitSettings();
+}
+function renderCockpitSettings() {
+  const v = $("cockpit-version");
+  if (!v) return;
+  const c = cockpitState();
+  v.replaceChildren(el("div", {}, "Ce cockpit : ", el("b", {text: `version ${(c && c.version) || "—"}`}),
+      c && c.started ? el("span", {class: "mono", text: ` — commit ${c.started}`}) : ""),
+    el("div", {class: c && c.state !== "à jour" ? "" : "muted", text: !c ? "agent-chain face à GitHub : pas encore vérifié."
+      : c.state === "à jour" ? `À jour — ${c.summary || "agent-chain face à GitHub"}.` : cockpitTitle(c) + (c.count ? ` — ${plural(c.count, "commit", "commits")} :` : ".")}));
+  const ul = $("cockpit-set-subjects");
+  ul.replaceChildren(...(c && c.state !== "à jour" ? cockpitSubjects(c).children : []));
+  ul.classList.toggle("hidden", !ul.children.length);
+  $("cockpit-set-msg").replaceChildren(...cockpitMsg());
+}
+async function updateCockpit(btn) {
+  const btns = [...document.querySelectorAll(".cockpit-update-btn")];
+  for (const b of btns) b.disabled = true;
+  cockpitNote = {kind: "warn", text: "Mise à jour du cockpit : récupération depuis GitHub, dépendances si elles ont changé, puis redémarrage…"};
+  renderCockpitUpdate();
+  let r;
+  try { r = await api("/api/cockpit/update", {}); }
+  catch (e) {
+    const b = e.body || {};
+    cockpitNote = {kind: "err", title: b.busy ? "Pas maintenant." : "Mise à jour arrêtée.", text: e.message, files: b.files, reconcile: b.reconcile, steps: b.steps};
+    if (b.cockpit) { S.chain_sync = {...(S.chain_sync || {}), cockpit: b.cockpit}; if (A) A.chain_sync = S.chain_sync; }
+    for (const x of btns) x.disabled = false;
+    renderCockpitUpdate();
+    return;
+  }
+  if (r.nothing) {
+    cockpitNote = {kind: "ok", text: r.message, steps: r.steps};
+    if (r.cockpit) { S.chain_sync = {...(S.chain_sync || {}), cockpit: r.cockpit}; if (A) A.chain_sync = S.chain_sync; }
+    for (const x of btns) x.disabled = false;
+    renderCockpitUpdate();
+    return;
+  }
+  waitRestart(r);
+}
+// The old server exits once the new one answers; the page polls /api/ping and
+// reloads as soon as another server answers there.
+function waitRestart(r) {
+  restarting = true; quitting = true; closeEvents();
+  $("stopped").classList.add("restart");
+  $("stopped-title").textContent = "Redémarrage du cockpit…";
+  $("stopped-text").textContent = `La nouvelle version (${r.version || "?"}) démarre. La page se recharge d'elle-même dès qu'elle répond.`;
+  $("stopped").classList.remove("hidden");
+  const t0 = Date.now();
+  const poll = async () => {
+    try {
+      const p = await (await fetch("/api/ping", {cache: "no-store"})).json();
+      if (p && p.cockpit && p.pid !== r.old_pid) { location.reload(); return; }
+    } catch (e) { /* between the two servers */ }
+    if (Date.now() - t0 > 90000) {
+      $("stopped-title").textContent = "Le cockpit ne répond plus";
+      $("stopped-text").textContent = "Le nouveau serveur n'a pas pris la relève. Pour le rouvrir : le raccourci du bureau (lancer.bat) ; logs\\server.log dit pourquoi.";
+    }
+    setTimeout(poll, 500);
+  };
+  setTimeout(poll, 400);
+}
+$("btn-cockpit-update").onclick = (e) => updateCockpit(e.currentTarget);
 async function syncPush(folder, chain) {
   try {
     const r = await api("/api/sync/push", chain ? {chain: true} : folder ? {folder} : {});
@@ -2244,6 +2403,7 @@ function renderApps() {
   for (const r of rows) box.append(homeCard(r));
   $("btn-update-all").disabled = bulkBusy || !!(A && A.bulk_going) || !rows.length;
   renderChainSyncLine();
+  renderCockpitUpdate();
   renderReport();
 }
 const msgId = (folder) => "app-msg-" + appKey(folder).replace(/[^a-z0-9]/g, "_");
@@ -2778,7 +2938,9 @@ function renderAlerts() {
     el("button", {class: "small sync-push", text: "Envoyer", disabled: running() || undefined, onclick: () => syncPush(S.app_folder)}));
   if (sy && sy.state === "divergé") add("sync-alert", el("b", {text: sy.summary + ". "}), "Rien ne se lance avant de réconcilier : les commits d'ici sont rejoués après ceux de GitHub. ",
     el("button", {class: "small sync-reconcile", text: "Réconcilier", disabled: running() || undefined, onclick: () => syncReconcile(S.app_folder)}));
-  if (sy && sy.state === "en retard") add("sync-alert", el("b", {text: sy.summary + ". "}), "Ils sont récupérés avant le prochain lancement.");
+  if (sy && sy.state === "en retard") add("sync-alert", el("b", {text: sy.summary + ". "}), "Ils sont récupérés avant le prochain lancement ; ",
+    el("button", {class: "small sync-pull", text: "Récupérer", disabled: running() || undefined, title: "git pull --ff-only : les commits de GitHub, sans rien lancer",
+      onclick: (e) => syncPull(S.app_folder, e.currentTarget)}));
   if (sy && sy.state === "GitHub injoignable") add("sync-alert", el("b", {text: "GitHub injoignable. "}), sy.detail || "", " ",
     el("button", {class: "link", text: "Revérifier", onclick: async () => { try { await api("/api/sync/refresh", {}); } catch (e) {} await refreshState(); }}));
   for (const w of S.worktrees || []) add("", `Un worktree est resté après un run : `, el("span", {class: "mono", text: w}));
@@ -3937,9 +4099,9 @@ let syncReload = null;
 function onSyncEvent(ev) {
   const d = ev.data || {};
   if (S.chain_root && sameApp(d.app, S.chain_root)) {
-    S.chain_sync = {...(S.chain_sync || {}), sync: d.sync};
+    S.chain_sync = {...(S.chain_sync || {}), sync: d.sync, ...(d.cockpit ? {cockpit: d.cockpit, notice: d.notice || "", error: d.error || ""} : {})};
     if (A) A.chain_sync = S.chain_sync;
-    renderChainSyncLine();
+    renderChainSyncLine(); renderCockpitUpdate(); renderSyncBanner();
     return;
   }
   if (sameApp(d.app, S.app_folder)) {
@@ -3955,6 +4117,16 @@ function onSyncEvent(ev) {
   }
 }
 
+// 1.14: what agent-chain's clone said before the stream was open — its
+// fetch at start, the home screen's — is read once the stream is.
+async function readChainSync() {
+  try {
+    const r = await api("/api/cockpit");
+    S.chain_sync = r.chain_sync;
+    if (A) A.chain_sync = S.chain_sync;
+    renderChainSyncLine(); renderCockpitUpdate(); renderSyncBanner();
+  } catch (e) { /* the next event says it */ }
+}
 let offline = false;
 function openEvents() {
   if (es || quitting) return;
@@ -3962,7 +4134,7 @@ function openEvents() {
   es.onmessage = (m) => { try { onEvent(JSON.parse(m.data)); } catch (e) { console.error(e); } };
   // Each connection starts with the run's stream so far, rebuilt from its
   // log (1.5): the page starts afresh, and the server's sequence with it.
-  es.onopen = () => { if (quitting) return; seen = 0; $("stream").replaceChildren(); if (offline) { offline = false; $("stopped").classList.add("hidden"); refreshState().catch(() => {}); } };
+  es.onopen = () => { if (quitting) return; seen = 0; $("stream").replaceChildren(); if (offline) { offline = false; $("stopped").classList.add("hidden"); refreshState().catch(() => {}); } readChainSync(); };
   es.onerror = async () => {
     if (quitting) return;
     // The server gone: the stopped page; EventSource keeps trying, and the
@@ -4386,6 +4558,7 @@ function renderSettings() {
   f.append(el("div", {class: "muted small", text: `Dans « ${S.app_name || "—"} » — une case cochée : le dossier est ignoré.`}), ig);
 
   renderDiag();
+  renderCockpitSettings();
 }
 
 // A command launched from outside a flow — « Audits », the fusion step's own

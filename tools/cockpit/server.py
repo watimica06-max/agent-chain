@@ -33,6 +33,7 @@ import gitref     # noqa: E402
 import questions  # noqa: E402
 import runner as runner_mod  # noqa: E402
 import scan as scan_mod  # noqa: E402
+import selfupdate  # noqa: E402
 import startup  # noqa: E402
 import stats as stats_mod  # noqa: E402
 import statsview  # noqa: E402
@@ -45,7 +46,7 @@ HOST = "127.0.0.1"
 STATE_KEY = web.AppKey("state", State)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.12"
+VERSION = "1.14"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -62,8 +63,17 @@ DONNEES_PUSH = True
 # False here: none of them touches the real agent-chain.
 SYNC_CHAIN_AT_START = True
 SYNC_APPS_AT_START = True
-CHAIN_RESTART = ("Nouvelle version du cockpit et de la chaîne récupérée — redémarre le cockpit pour "
-                 "l'utiliser.")
+# 1.14 — agent-chain's clone fetched again when the home screen opens, at
+# most every CHAIN_HOME_EVERY seconds; the tests put False here.
+SYNC_CHAIN_ON_HOME = True
+CHAIN_HOME_EVERY = 60.0
+CHAIN_RESTART = ("Nouvelle version du cockpit et de la chaîne récupérée — « Mettre à jour le cockpit » "
+                 "la met en service.")
+# 1.14 — « Mettre à jour le cockpit »: how the new server is started — the
+# tests put a fake here —, and the arguments this one was started with that
+# the new one takes again (--config, --stats, --journaux).
+SPAWN_SERVER = selfupdate.spawn
+LAUNCH_ARGS = []
 # A joined file comes in the request, base64 in JSON: what one may weigh.
 MAX_REQUEST = 256 * 1024 * 1024
 # What opens the browser; the tests put a fake here.
@@ -536,7 +546,12 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     # 1.12 — where each clone stands against GitHub (sync.py), and agent-chain's
     # own clone, fetched when the cockpit starts.
     book = sync_mod.Book()
-    chain_sync = {"sync": None, "notice": "", "error": "", "checking": False}
+    chain_sync = {"sync": None, "notice": "", "error": "", "checking": False, "cockpit": None}
+    # 1.14 — the commit this server's code comes from: agent-chain's HEAD when
+    # it started. « Mettre à jour le cockpit » going, and the last restart
+    # that failed.
+    started = gitref.head(CHAIN_ROOT)
+    updating = {"going": False, "restarting": False, "error": "", "home_at": None}
     # The page as this server started: a pull of agent-chain changes the file
     # on disk, never the page this server serves.
     with open(os.path.join(HERE, "static", "index.html"), "rb") as f:
@@ -644,15 +659,38 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     told = {}
 
+    def is_chain(folder):
+        return bool(folder) and sync_mod.Book.key(folder) == sync_mod.Book.key(CHAIN_ROOT)
+
+    def cockpit_status(st=None):
+        """1.14 — where the running cockpit stands: the commit it runs, agent-
+        chain's clone, GitHub; the commits it does not run yet."""
+        st = st if st is not None else (book.peek(CHAIN_ROOT) or chain_sync.get("sync"))
+        try:
+            out = selfupdate.status(CHAIN_ROOT, started, st, gitref.head(CHAIN_ROOT))
+        except Exception as e:          # said, never raised
+            out = {"state": selfupdate.UP_TO_DATE, "subjects": [], "count": 0, "error_state": str(e)}
+        out.update(version=VERSION, pid=os.getpid(), going=updating["going"], restarting=updating["restarting"],
+                   error=updating["error"])
+        return out
+
     def announce(folder, st, run_id=None):
         """The new state of a clone, to every page — only when it changed,
-        or for a run's end panel."""
+        or for a run's end panel. 1.14: agent-chain's own carries the
+        cockpit's state with it."""
         k = sync_mod.Book.key(folder)
         seen = (st or {}).get("state"), (st or {}).get("ahead"), (st or {}).get("behind"), (st or {}).get("uncommitted")
+        extra = {}
+        if is_chain(folder):
+            if st is not None:
+                chain_sync["sync"] = st
+            c = chain_sync["cockpit"] = cockpit_status(st)
+            seen += (c["state"], c.get("head"), c["count"], chain_sync["notice"], chain_sync["error"])
+            extra.update(cockpit=c, notice=chain_sync["notice"], error=chain_sync["error"])
         if run_id is None and (told.get(k) == seen or (k not in told and seen[0] is None)):
             return
         told[k] = seen
-        broadcast("sync", {"app": folder, "sync": st, "run": run_id})
+        broadcast("sync", {"app": folder, "sync": st, "run": run_id, **extra})
 
     def refresh_later(folder, run=None):
         """Fetched in the background — after a run, at an opening — then
@@ -879,6 +917,12 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     async def apps_get(request):
         loop = asyncio.get_running_loop()
+        # 1.14: the home screen opening — agent-chain's clone fetched again,
+        # in the background: « Nouvelle version du cockpit disponible ».
+        if (SYNC_CHAIN_ON_HOME and not chain_sync["checking"] and not updating["going"]
+                and (updating["home_at"] is None or loop.time() - updating["home_at"] > CHAIN_HOME_EVERY)):
+            updating["home_at"] = loop.time()
+            refresh_later(CHAIN_ROOT)
         # 1.12: one application's fetch never waits for another's.
         rows = await asyncio.gather(*(loop.run_in_executor(None, app_row, x) for x in state.apps()))
         return web.json_response({"apps": list(rows), "busy": busy_payload(), "bulk_going": bulk["going"],
@@ -1173,6 +1217,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": "l'argument tient sur une ligne"}, status=400)
         if bulk["going"]:
             return web.json_response({"error": "« Tout mettre à jour » installe la chaîne : lancer après"}, status=409)
+        if updating["going"]:
+            return web.json_response({"error": "le cockpit se met à jour : lancer après son redémarrage"}, status=409)
         # One run at a time, whatever the application (1.6): said with where it goes.
         busy = busy_payload()
         if busy:
@@ -1342,7 +1388,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                                  + r["message"])
                         sync_said(CHAIN_ROOT, "au démarrage", error)
                     st = book.put(CHAIN_ROOT, sync_mod.compute(CHAIN_ROOT, fetch=False))
-                chain_sync.update(sync=st, notice=notice, error=error)
+                chain_sync.update(sync=st, notice=notice, error=error, cockpit=cockpit_status(st))
         finally:
             chain_sync["checking"] = False
         announce(CHAIN_ROOT, chain_sync["sync"])
@@ -2031,6 +2077,153 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": str(e)}, status=409)
         return web.json_response({"ok": True, "value": sync_mod.long_paths(folder)})
 
+    async def sync_pull(request):
+        """« Récupérer » (1.14): an application « en retard » — the same
+        `git pull --ff-only` a launch makes first (§2), refused the same
+        ways. Then its state and its chain's, computed again: the chain block
+        shows what was pulled."""
+        data = await body(request)
+        folder = sync_target(data)
+        if not folder or is_chain(folder):
+            return web.json_response({"error": "aucune application"}, status=409)
+        why = sync_busy(folder)
+        if why:
+            return web.json_response({"error": why}, status=409)
+        loop = asyncio.get_running_loop()
+
+        def go():
+            with book.lock(folder):
+                st = book.put(folder, sync_mod.compute(folder))
+                out = {"ok": False, "error": "", "files": [], "reconcile": False, "pulled": 0}
+                if st["state"] == sync_mod.BEHIND:
+                    r = sync_mod.pull_ff(folder)
+                    if r["ok"]:
+                        out.update(ok=True, pulled=st["behind"])
+                    else:
+                        out.update(error=r["message"], files=r["files"])
+                    st = book.put(folder, sync_mod.compute(folder, fetch=False))
+                elif st["state"] == sync_mod.DIVERGED:
+                    out.update(reconcile=True, error=sync_mod.summary(st) + " — « Réconcilier » d'abord")
+                else:
+                    out["error"] = f"rien à récupérer : {sync_mod.summary(st).lower()}"
+                out["sync"] = st
+                return out
+        res = await loop.run_in_executor(None, go)
+        sync_said(folder, "Récupérer", f"git pull --ff-only — {res['pulled']} commit(s) récupéré(s)" if res["ok"]
+                  else res["error"])
+        announce(folder, res["sync"])
+        res["chain"] = await loop.run_in_executor(None, chain_state, folder)
+        return web.json_response(res, status=200 if res["ok"] else 409)
+
+    # ------------------------------------------------- the cockpit itself (1.14)
+    def update_busy():
+        """Why the cockpit may not update now, or None."""
+        x = rn.going()
+        if x:
+            return (f"une commande tourne dans « {state.name_of(x.repo) or x.repo} » : {x.prompt} — le cockpit "
+                    "se met à jour après sa fin")
+        if bulk["going"]:
+            return "« Tout mettre à jour » est en cours : le cockpit se met à jour après sa fin"
+        if dep.going():
+            return "un déploiement construit : le cockpit se met à jour après sa fin"
+        if making["current"]:
+            return f"une création est en cours ({making['current'].path}) : le cockpit se met à jour après sa fin"
+        if updating["going"]:
+            return "la mise à jour du cockpit est déjà en cours"
+        return None
+
+    async def cockpit_get(request):
+        return web.json_response({"cockpit": cockpit_status(), "chain_sync": chain_sync})
+
+    def pull_chain():
+        """agent-chain's clone: fetched; « en retard », pulled — fast-forward
+        only; « divergé », refused."""
+        with book.lock(CHAIN_ROOT):
+            st = book.put(CHAIN_ROOT, sync_mod.compute(CHAIN_ROOT))
+            out = {"ok": True, "error": "", "files": [], "reconcile": False, "pulled": 0}
+            if st["state"] == sync_mod.BEHIND:
+                r = sync_mod.pull_ff(CHAIN_ROOT)
+                if r["ok"]:
+                    out["pulled"] = st["behind"]
+                else:
+                    out.update(ok=False, error="agent-chain — " + r["message"], files=r["files"])
+                st = book.put(CHAIN_ROOT, sync_mod.compute(CHAIN_ROOT, fetch=False))
+            elif st["state"] == sync_mod.DIVERGED:
+                out.update(ok=False, reconcile=True,
+                           error="agent-chain — " + sync_mod.summary(st) + " — « Réconcilier » d'abord")
+            out["sync"] = st
+            return out
+
+    async def cockpit_update(request):
+        """« Mettre à jour le cockpit » (1.14): refused while something
+        goes; agent-chain pulled, fast-forward only; pip when
+        requirements.txt changed; then the restart — see selfupdate.py."""
+        why = update_busy()
+        if why:
+            return web.json_response({"error": why, "busy": True, "cockpit": cockpit_status()}, status=409)
+        updating.update(going=True, error="")
+        loop = asyncio.get_running_loop()
+        sock = request.transport.get_extra_info("sockname") if request.transport else None
+        port = sock[1] if sock else None
+        steps = []
+
+        def refuse(error, **kw):
+            updating.update(going=False, restarting=False, error=error)
+            print(f"Mettre à jour le cockpit — arrêté : {error}", flush=True)
+            return web.json_response({"error": error, "steps": steps, "cockpit": cockpit_status(), **kw}, status=409)
+        try:
+            p = await loop.run_in_executor(None, pull_chain)
+            announce(CHAIN_ROOT, p["sync"])
+            if not p["ok"]:
+                return refuse(p["error"], files=p["files"], reconcile=p["reconcile"])
+            if p["pulled"]:
+                n = p["pulled"]
+                steps.append(f"git pull --ff-only — {n} commit{'s' if n > 1 else ''} récupéré{'s' if n > 1 else ''}")
+                sync_said(CHAIN_ROOT, "Mettre à jour le cockpit", steps[-1])
+            head = gitref.head(CHAIN_ROOT)
+            if not head or head == started:
+                if p["sync"].get("state") == sync_mod.OFFLINE:
+                    return refuse("agent-chain — " + sync_mod.summary(p["sync"]))
+                updating.update(going=False, error="")
+                return web.json_response({"ok": True, "nothing": True, "steps": steps, "cockpit": cockpit_status(),
+                                          "message": "Le cockpit est à jour : rien à récupérer."})
+            # The new code is on disk; this server still runs the old one.
+            chain_sync.update(notice="", error="")
+            if await loop.run_in_executor(None, selfupdate.requirements_changed, CHAIN_ROOT, started, head):
+                r = await loop.run_in_executor(None, selfupdate.pip_install, CHAIN_ROOT)
+                print(f"Mettre à jour le cockpit — {' '.join(r['command'])} : {'fait' if r['ok'] else r['message']}",
+                      flush=True)
+                if not r["ok"]:
+                    return refuse(r["message"], step="pip")
+                steps.append("pip install --user -r tools/cockpit/requirements.txt — fait")
+            if not port:
+                return refuse("le port de ce serveur est inconnu : redémarrer le cockpit à la main")
+            # The restart: the new server on a trial port first.
+            updating["restarting"] = True
+            announce(CHAIN_ROOT, book.peek(CHAIN_ROOT))
+            trial = selfupdate.free_port(HOST)
+            try:
+                proc = SPAWN_SERVER(port, trial, list(LAUNCH_ARGS), rn.log_dir)
+            except OSError as e:
+                return refuse(f"le nouveau serveur n'a pas pu démarrer : {e}", step="restart")
+            print(f"Mettre à jour le cockpit — nouveau serveur lancé (pid {getattr(proc, 'pid', '?')}), "
+                  f"port d'essai {trial}.", flush=True)
+            t0 = loop.time()
+            got = await loop.run_in_executor(None, selfupdate.wait_answer, proc, trial, os.getpid(),
+                                             selfupdate.RESTART_WAIT)
+            if not got:
+                await loop.run_in_executor(None, selfupdate.give_up, proc)
+                return refuse(selfupdate.why_not(proc, loop.time() - t0, rn.log_dir, trial), step="restart")
+            steps.append(f"nouveau serveur prêt — cockpit {got.get('version')}, pid {got.get('pid')}")
+            print(f"Mettre à jour le cockpit — le nouveau serveur répond (pid {got.get('pid')}) : "
+                  "celui-ci s'arrête et lui laisse le port.", flush=True)
+            if on_quit:
+                loop.call_later(0.3, on_quit)
+            return web.json_response({"ok": True, "restarting": True, "steps": steps, "old_pid": os.getpid(),
+                                      "new_pid": got.get("pid"), "version": got.get("version")})
+        except Exception as e:
+            return refuse(f"mise à jour interrompue : {e}")
+
     async def reveal_log(request):
         """1.9.1: a log's path is a link — its folder opens on this computer,
         the file selected. A log only: an existing .jsonl or .log file."""
@@ -2059,7 +2252,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     async def ping(request):
         """What a second start asks before starting a server of its own."""
-        return web.json_response({"cockpit": True, "version": VERSION, "pid": os.getpid()})
+        return web.json_response({"cockpit": True, "version": VERSION, "pid": os.getpid(),
+                                  "restarting": updating["restarting"], "error": updating["error"]})
 
     async def shutdown(request):
         """Paramètres → « Arrêter le cockpit ». With a run going, it asks
@@ -2156,6 +2350,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/answers/send", answers_send)
     r.add_post("/api/apps/clone", apps_clone)
     r.add_get("/api/longpaths", longpaths_get)
+    r.add_post("/api/sync/pull", sync_pull)
+    r.add_get("/api/cockpit", cockpit_get)
+    r.add_post("/api/cockpit/update", cockpit_update)
     r.add_post("/api/longpaths", longpaths_set)
     app.on_startup.append(opening)
     app.on_cleanup.append(deploy_cleanup)
@@ -2236,14 +2433,42 @@ def _sse(ev):
     return f"data: {json.dumps(ev, ensure_ascii=False)}\n\n".encode("utf-8")
 
 
-async def serve(app, port, url, ouvrir, quit_box):
-    """Serve until « Arrêter le cockpit » (or Ctrl+C in a console)."""
+async def take_port(runner, port, wait):
+    """1.14, a new server taking over: the cockpit's port, as soon as the
+    old server has let it go — at most `wait` seconds."""
+    loop = asyncio.get_running_loop()
+    deadline = loop.time() + wait
+    while True:
+        site = web.TCPSite(runner, HOST, port)
+        try:
+            await site.start()
+            return site
+        except OSError:
+            await site.stop()
+            if loop.time() >= deadline:
+                raise
+            await asyncio.sleep(0.2)
+
+
+async def serve(app, port, url, ouvrir, quit_box, relay=None):
+    """Serve until « Arrêter le cockpit » (or Ctrl+C in a console). 1.14:
+    `relay`, a trial port — the new server « Mettre à jour le cockpit »
+    started answers there first, then takes the cockpit's port once the old
+    server has exited, and closes the trial one."""
     quit_box["event"] = asyncio.Event()
     runner = web.AppRunner(app, shutdown_timeout=2)
     await runner.setup()
-    site = web.TCPSite(runner, HOST, port)
     try:
-        await site.start()
+        if relay:
+            trial = web.TCPSite(runner, HOST, relay)
+            await trial.start()
+            print(f"Relève : le nouveau serveur répond sur le port d'essai {relay} ; il attend le port {port}.",
+                  flush=True)
+            await take_port(runner, port, selfupdate.TAKEOVER_WAIT)
+            await trial.stop()
+            print(f"Relève faite : le port {port} est à ce serveur, le port d'essai est fermé.", flush=True)
+        else:
+            await web.TCPSite(runner, HOST, port).start()
     except OSError:
         await runner.cleanup()
         raise
@@ -2266,7 +2491,13 @@ def main(argv=None):
     p.add_argument("--config", default=None)
     p.add_argument("--stats", default=None, help="la base de consommation (stats.sqlite par défaut)")
     p.add_argument("--journaux", default=None, help="le dossier des journaux (logs/ par défaut)")
+    p.add_argument("--relais", type=int, default=None,
+                   help="1.14 — « Mettre à jour le cockpit » : le port d'essai où répondre d'abord, avant de "
+                        "prendre --port une fois l'ancien serveur arrêté")
     args = p.parse_args(argv)
+    # What a restart starts the new server with again (1.14).
+    LAUNCH_ARGS[:] = [x for k, v in (("--config", args.config), ("--stats", args.stats),
+                                     ("--journaux", args.journaux)) if v for x in (k, v)]
     url = f"http://{HOST}:{args.port}/"
     log_dir = args.journaux or runner_mod.LOG_DIR
 
@@ -2276,7 +2507,7 @@ def main(argv=None):
     print(f"--- {datetime.now().isoformat(timespec='seconds')} · démarrage, pid {os.getpid()}, "
           + ("sans console" if startup.windowless() else "dans une console"), flush=True)
 
-    other = startup.ping(args.port)
+    other = None if args.relais else startup.ping(args.port)
     if other:
         print(f"Un cockpit répond déjà sur {url} (pid {other.get('pid')}) : la page s'ouvre sur lui, "
               "aucun second serveur.", flush=True)
@@ -2311,10 +2542,16 @@ def main(argv=None):
 
     app = make_app(state, rn, on_quit=on_quit)
     try:
-        asyncio.run(serve(app, args.port, url, args.ouvrir, quit_box))
+        asyncio.run(serve(app, args.port, url, args.ouvrir, quit_box, relay=args.relais))
     except KeyboardInterrupt:
         return 0
     except OSError as e:
+        if args.relais:
+            msg = (f"Mettre à jour le cockpit : le nouveau serveur n'a pas pu prendre le port {args.port} "
+                   f"en {int(selfupdate.TAKEOVER_WAIT)} s ({e}). Relancer le cockpit par son raccourci.")
+            print(msg, flush=True)
+            startup.error_box(msg)
+            return 1
         # Taken between the ping and the bind: by a cockpit started at the
         # same moment, or by another program.
         if startup.ping(args.port):

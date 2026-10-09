@@ -47,7 +47,7 @@ def main(out_dir, phase, cockpit=None):
                         "ici : 959eabd du 2026-10-07",
              "refused": "la chaîne installée (7b1c2d4 du 2026-10-08) est plus récente que celle de cet ordinateur "
                         "(959eabd du 2026-10-07) : l'installer remplacerait une chaîne plus récente par une plus "
-                        "ancienne — récupérer agent-chain sur cet ordinateur (redémarrer le cockpit le fait), "
+                        "ancienne — récupérer agent-chain sur cet ordinateur (« Mettre à jour le cockpit » le fait), "
                         "puis réessayer"}
     fine = {"state": "à jour", "summary": "Chaîne à jour — 959eabd du 2026-10-07", "commit": "959eabd",
             "date": "2026-10-07", "chain_commit": "959eabd", "chain_date": "2026-10-07", "behind": None,

@@ -41,6 +41,8 @@ def _no_sync_at_start(monkeypatch):
     import server
     monkeypatch.setattr(server, "SYNC_CHAIN_AT_START", False)
     monkeypatch.setattr(server, "SYNC_APPS_AT_START", False)
+    # 1.14: nor when the home screen opens.
+    monkeypatch.setattr(server, "SYNC_CHAIN_ON_HOME", False)
 
 
 @pytest.fixture(autouse=True)

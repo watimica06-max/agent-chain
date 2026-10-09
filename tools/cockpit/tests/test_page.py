@@ -294,9 +294,9 @@ def test_settings_mode_diagnostic_commands(tmp_path, page):
         # 1.11: « Apparence » before them — the theme.
         heads = page.locator("#scr-settings .sec > h2").all_inner_texts()
         assert heads == ["Apparence", "Mode de permission", "Notifications", "Dossiers ignorés", "Outils sur cet ordinateur",
-                         "Arrêter le cockpit"]
+                         "Version du cockpit", "Arrêter le cockpit"]
         leads = page.locator("#scr-settings .sec > .lead").all_inner_texts()
-        assert len(leads) == 5 and all(t.strip() for t in leads)
+        assert len(leads) == 6 and all(t.strip() for t in leads)
         assert "Java, Gradle ou Flutter, adb, Claude Code, git" in leads[3]
         # « Outils sur cet ordinateur » — the diagnostic: ✓ / ✗ / non concerné, the Java hint, kept with its date.
         page.get_by_role("button", name="Vérifier les outils").click()

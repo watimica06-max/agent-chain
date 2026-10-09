@@ -176,7 +176,7 @@ def newer_text(installed, info):
     return (f"la chaîne installée ({installed['commit'][:7]} du {_day(installed.get('date'))}) est plus récente "
             f"que celle de cet ordinateur ({info['commit'][:7]} du {_day(info['date'])}) : l'installer "
             "remplacerait une chaîne plus récente par une plus ancienne — récupérer agent-chain sur cet "
-            "ordinateur (redémarrer le cockpit le fait), puis réessayer")
+            "ordinateur (« Mettre à jour le cockpit » le fait), puis réessayer")
 
 
 # ------------------------------------------------------- the application

@@ -91,7 +91,10 @@ def test_home_rows_top_bar_and_alerts(tmp_path, page, five):
         assert row(page, "Carnet").locator("button.sync-push").is_visible()
         assert row(page, "Carnet").locator("button.sync-answers").is_visible()
         assert row(page, "Budget").locator("button.sync-reconcile").is_visible()
-        for n in ("Hyrox", "Belivo", "Velo"):
+        # 1.14: « en retard » — « Récupérer », GitHub's version without launching.
+        assert row(page, "Belivo").locator(".hc-alert > div").count() == 1
+        assert row(page, "Belivo").locator("button.sync-pull").is_visible()
+        for n in ("Hyrox", "Velo"):
             assert row(page, n).locator(".hc-alert > div").count() == 0, n
         # The top bar: hidden « à jour », said otherwise.
         open_app(page, s, "Hyrox")

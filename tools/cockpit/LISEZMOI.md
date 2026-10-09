@@ -47,8 +47,9 @@ Dans une console, pour voir ce qu'il écrit : `python server.py --ouvrir`
 - **GitHub** (1.12) : le dépôt de la chaîne (agent-chain) est récupéré
   depuis GitHub ; s'il était en retard, il est mis à jour — en avance
   rapide seulement — et un bandeau dit « Nouvelle version du cockpit et de
-  la chaîne récupérée — redémarre le cockpit pour l'utiliser. » Chaque
-  application de la liste est récupérée aussi, en arrière-plan.
+  la chaîne récupérée — « Mettre à jour le cockpit » la met en service. »,
+  avec ce bouton (1.14). Chaque application de la liste est récupérée
+  aussi, en arrière-plan.
 
 ## Les écrans
 
@@ -327,7 +328,7 @@ ici, tant que le diagnostic ne l'a pas lu.
 **Paramètres** (1.9) — ce qui appartient au cockpit lui-même, dans cet
 ordre : l'apparence (1.11), puis, chacun avec sa ligne d'explication, le
 mode de permission, les notifications, les dossiers ignorés, « Outils sur
-cet ordinateur », « Arrêter le cockpit ». La version de la chaîne est sous
+cet ordinateur », « Version du cockpit » (1.14), « Arrêter le cockpit ». La version de la chaîne est sous
 « Chaîne → Version », le profil de déploiement sous « Déploiement →
 Profil », la feature dans la barre du haut, l'application sur l'accueil.
 
@@ -446,6 +447,15 @@ et dans la barre du haut de l'application ouverte quand ce n'est pas
   page dit quels fichiers sont en conflit — une session Claude Code ouverte
   sur l'application le réglera. Refusé tant que des fichiers suivis ont des
   modifications non commitées.
+- **« Récupérer »** (1.14), sur la ligne de l'accueil et sur le tableau de
+  bord, quand l'application est **en retard** : prendre la version de
+  GitHub sans rien lancer — le même `git pull --ff-only` qu'avant un
+  lancement, refusé de la même façon (un fichier non commité qu'il
+  écraserait est nommé ; **divergé** renvoie à « Réconcilier »), et refusé
+  pendant qu'une commande ou un déploiement y tourne. Ensuite, son état
+  GitHub et l'état de sa chaîne sont recalculés : le bloc de la chaîne
+  montre ce qui vient d'être récupéré — une chaîne installée sur l'autre
+  ordinateur, par exemple.
 - **« Envoyer mes réponses »**, sur « À répondre » et sur la ligne, quand
   le dossier de la feature a des modifications non commitées : le même
   commit que la prochaine commande ferait — `docs/features/<feature>/`,
@@ -456,6 +466,48 @@ et dans la barre du haut de l'application ouverte quand ce n'est pas
   refusé faute d'identifiants GitHub le dit.
 - **Hors du cockpit**, une commande lancée depuis Claude Code n'a aucune
   de ces vérifications : aucune commande de la chaîne n'a changé.
+
+**« Mettre à jour le cockpit »** (1.14). Le cockpit tourne depuis le dépôt
+agent-chain de cet ordinateur, et c'est ce dépôt qu'il installe dans les
+applications. Quand le cockpit ou la chaîne change sur l'autre ordinateur,
+celui-ci prend la nouvelle version sans terminal :
+- **L'état**, en tête de l'écran d'accueil quand il n'est pas « à jour » :
+  **« Nouvelle version du cockpit disponible »** — agent-chain en retard
+  sur GitHub, vu par une récupération (`git fetch`) au démarrage et à
+  l'ouverture de l'écran d'accueil (au plus une par minute) ; ou
+  **« Nouvelle version du cockpit récupérée — pas encore en service »** —
+  agent-chain a déjà les commits (le pull du démarrage) mais le serveur
+  tourne encore sur l'ancien code. Dessous, le sujet de chaque commit que
+  ce cockpit n'a pas encore. Paramètres → « Version du cockpit » dit la
+  même chose, avec la version et le commit qui tournent.
+- **Le bouton « Mettre à jour le cockpit »**, là, dans Paramètres et dans
+  le bandeau du démarrage :
+  1. refusé tant qu'une commande tourne — ou « Tout mettre à jour », un
+     déploiement, une création — et il le dit ;
+  2. `git pull --ff-only` dans agent-chain ; refusé, le fichier nommé, si
+     git écraserait un fichier non commité ; **divergé** : refusé, et
+     « Réconcilier » proposé comme pour une application ;
+  3. si `tools/cockpit/requirements.txt` a changé depuis le commit sur
+     lequel le serveur a démarré : `python -m pip install --user -r` ce
+     fichier ; s'il échoue, tout s'arrête là, avec l'erreur de pip — le
+     bouton réessaie ;
+  4. le redémarrage, tout seul — voir ci-dessous. La page se recharge
+     d'elle-même sur le nouveau serveur.
+- **Le redémarrage.** L'ancien serveur choisit un port libre, le port
+  d'essai, et démarre le nouveau comme `lancer.bat` le fait (`pythonw
+  server.py`, sinon `python server.py`), détaché, sans `--ouvrir`, avec
+  `--relais <port d'essai>` et les `--config`, `--stats`, `--journaux` de
+  l'ancien. Le nouveau démarre entièrement — imports, `config.json`,
+  statistiques — et répond d'abord sur le port d'essai seulement.
+  L'ancien interroge ce port (`/api/ping`, un autre pid) jusqu'à
+  60 secondes : **pas de réponse**, ou le nouveau s'arrête avant, il
+  l'arrête, continue de tourner et dit pourquoi — le code de sortie et la
+  fin de ce que le nouveau a écrit (`logs/relais-<port d'essai>.log`). **Une réponse** :
+  l'ancien s'arrête, comme « Arrêter le cockpit » ; le nouveau prend le
+  port du cockpit dès qu'il est libre (jusqu'à 30 secondes), puis ferme le
+  port d'essai. Pendant ce temps la page montre « Redémarrage du
+  cockpit… », interroge `/api/ping`, et se recharge dès qu'un autre serveur
+  y répond. Aucune commande ne se lance pendant la mise à jour.
 
 **À répondre** — toutes les questions ouvertes et tous les blocages qui
 vous attendent, dans un seul formulaire, **à gauche** ; **à droite**, le
@@ -584,6 +636,10 @@ construit, déploie et règle. Au-dessus de 720 px, rien ne change.
 - Avec GitHub (1.12), il récupère, envoie, et réconcilie par un rebase
   qui garde les fusions déjà faites (1.12.1) — jamais de `--force`, de
   reset, de stash, ni de commit de fusion à lui ; « Envoyer mes réponses » ne commite que le dossier de la feature.
+- « Mettre à jour le cockpit » (1.14) ne fait qu'un `git pull --ff-only`
+  dans agent-chain, `pip install --user` quand ses dépendances ont changé,
+  et le redémarrage ; un nouveau serveur qui ne répond pas est arrêté, et
+  l'ancien continue.
 - « Nouvelle application » n'écrit que dans le dossier qu'elle crée, neuf
   ou vide, et ne le supprime jamais ; elle ne force jamais un dépôt
   distant qui contient déjà des commits. Elle ne reprend qu'une création
