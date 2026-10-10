@@ -290,6 +290,9 @@ class Pilot:
         self.task = None
         self.last = None           # the last summary
         self.wake = None
+        # Each change of the programme counted: a page that got a newer one
+        # through the stream never goes back to an older one (1.19).
+        self.rev = 0
 
     # ------------------------------------------------------------- reading
 
@@ -302,6 +305,7 @@ class Pilot:
         now = self.clock.now()
         out = {k: v for k, v in self.p.items() if k not in ("run_obj",)}
         out["bounds_text"] = bounds_text(self.p, now)
+        out["rev"] = self.rev
         out["notice"] = LATER if self.p["status"] == PROGRAMME and self.p.get("later") else ""
         dl = deadline(self.p)
         out["deadline"] = dl.isoformat(timespec="seconds") if dl else None
@@ -377,6 +381,7 @@ class Pilot:
     # ------------------------------------------------------------- driving
 
     def _changed(self):
+        self.rev += 1
         if self.p and self.p["status"] != FINI:
             self.host.save(self.p)
         self.host.changed(self.public())
@@ -641,6 +646,7 @@ class Pilot:
             self.host.push("stop", f"{self._app()} — pilote automatique arrêté",
                            f"{reason} {summary_counts(self.last)}")
         print(f"Pilote automatique — {p['name'] or p['id']} arrêté : {reason} {summary_counts(self.last)}", flush=True)
+        self.rev += 1
         self.host.changed(self.public())
         return self.last
 

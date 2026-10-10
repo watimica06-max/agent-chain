@@ -52,6 +52,7 @@ import statsview  # noqa: E402
 import sync as sync_mod  # noqa: E402
 import textfile   # noqa: E402
 import usage as usage_mod  # noqa: E402
+import explain as explain_mod  # noqa: E402
 import webpush   # noqa: E402
 import writer     # noqa: E402
 from state import State  # noqa: E402
@@ -63,7 +64,7 @@ STATE_KEY = web.AppKey("state", State)
 PORT_KEY = web.AppKey("port", dict)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.18"
+VERSION = "1.19"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -114,6 +115,8 @@ MEASURE_USAGE = True
 MEASURE_CLIENT = None
 # 1.18 — the automatic mode's clock: the real one; the tests put a fake here.
 PILOT_CLOCK = None
+# 1.19 — « Expliquer »: the client of its call; the tests put a fake here.
+EXPLAIN_CLIENT = None
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
 # `.claude/CLAUDE.md`'s table: upstream cycle, downstream cycle, bug-fix entry,
 # merge, and what is run by hand outside the chain. A command not listed is a tool.
@@ -580,7 +583,7 @@ def default_export_folder():
 
 def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
              diag_runner=None, export_picker=ask_export_folder, on_quit=None, file_picker=ask_idea_file,
-             measurer=None, pilot_clock=None):
+             measurer=None, pilot_clock=None, explainer=None):
     store = rn.stats
     diag_runner = diag_runner or DIAG_RUNNER
     # The diagnostic run in the background (1.4.5): once, at the opening,
@@ -1523,7 +1526,73 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     async def forms(request):
         a, w = need_pair()
-        return web.json_response(forms_payload(a, w, rn))
+        out = forms_payload(a, w, rn)
+        # 1.19: each question's kept explanation — dropped when its file changed.
+        sigs = {}
+        for q in out["questions"]:
+            if q["file"] not in sigs:
+                sigs[q["file"]] = explain_mod.file_sig(q["file"])
+            q["explanation"] = kept_explanation(a, w, q["id"], sigs[q["file"]])
+            q["explaining"] = expl.going(explain_key(a, w, q["id"]))
+        return web.json_response(out)
+
+    # --------------------------------------------- « Expliquer » (1.19)
+    expl = explainer or explain_mod.Explainer(store, rn.log_dir, client_factory=EXPLAIN_CLIENT)
+
+    def explain_key(a, w, qid):
+        return f"{runner_mod.repo_key(a)}|{feature_of(w)}|{qid}"
+
+    def kept_explanation(a, w, qid, sig):
+        if not store or not sig:
+            return None
+        try:
+            row = store.explanation(explain_key(a, w, qid), sig)
+            return json.loads(row["text"]) if row else None
+        except Exception:
+            return None
+
+    def question_of(a, w, qid):
+        qs, _, _, _, _, _ = collect_forms(a, w, rn)
+        return next((q for q in qs if q.id == qid), None)
+
+    async def explain(request):
+        """« Expliquer »: the kept explanation at once; otherwise — or on
+        « Réexpliquer » — the call, after 1.17's threshold."""
+        a, w = need_pair()
+        data = await body(request)
+        entry = question_of(a, w, data.get("id") or "")
+        if entry is None:
+            return web.json_response({"error": "cette question n'est plus à répondre — rechargez"}, status=404)
+        key = explain_key(a, w, entry.id)
+        sig = explain_mod.file_sig(entry.file)
+        if not data.get("again"):
+            kept = kept_explanation(a, w, entry.id, sig)
+            if kept:
+                return web.json_response({"explanation": kept, "kept": True})
+        what = f"Q{entry.number} de {entry.rel}"
+        refused = await usage_gate(data, f"« Expliquer » sur {what}", a)
+        if refused:
+            return refused
+        base = work_dir(a, feature_of(w))
+        ctx = explain_mod.gather(entry, base)
+        try:
+            got = await expl.explain(key, explain_mod.build_prompt(ctx), a, feature_of(w), what)
+        except explain_mod.Cancelled:
+            return web.json_response({"cancelled": True, "error": "explication annulée"}, status=409)
+        except explain_mod.Failed as e:
+            return web.json_response({"error": f"Pas d'explication : {e}."}, status=502)
+        used = {"passage": {k: ctx["passage"][k] for k in ("doc", "ids")} if ctx["passage"] else None,
+                "passage_missing": ctx["passage_missing"], "lexicon": len(ctx["lexicon"])}
+        out = {**got, "used": used}
+        if store and sig:
+            store.keep_explanation(key, sig, json.dumps(out, ensure_ascii=False), got["at"], got["seconds"],
+                                   got["run_id"])
+        return web.json_response({"explanation": out, "kept": False})
+
+    async def explain_cancel(request):
+        a, w = need_pair()
+        data = await body(request)
+        return web.json_response({"cancelled": expl.cancel(explain_key(a, w, data.get("id") or ""))})
 
     async def question_ctx(request):
         a, w = need_pair()
@@ -3358,6 +3427,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_get("/api/usage", usage_get)
     r.add_post("/api/usage/thresholds", usage_thresholds)
     r.add_post("/api/usage/measure", usage_measure)
+    r.add_post("/api/explain", explain)
+    r.add_post("/api/explain/cancel", explain_cancel)
     r.add_get("/api/pilot", pilot_get)
     r.add_post("/api/pilot/start", pilot_start)
     r.add_post("/api/pilot/stop", pilot_stop)

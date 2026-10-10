@@ -281,6 +281,20 @@ body.at-home .screen { margin: 0 auto; }
 .usage-measure { margin-top: var(--sp-10); display: flex; flex-wrap: wrap; gap: var(--sp-6) var(--sp-10); align-items: center; font-size: var(--fs-12); color: var(--soft); }
 .usage-measure.err { color: var(--err); }
 #home-usage { margin-bottom: var(--sp-16); }
+/* 1.19 — « Expliquer » on a question. */
+.explain { margin: var(--sp-8) 0 var(--sp-4); display: grid; gap: var(--sp-6); justify-items: start; }
+.explain .ex-going { display: flex; gap: var(--sp-10); align-items: center; font-size: var(--fs-13); color: var(--soft); }
+.explain .ex-spin { width: var(--sp-12); height: var(--sp-12); border-radius: 50%; border: var(--sp-2) solid var(--line);
+  border-top-color: var(--accent); animation: ex-turn 0.9s linear infinite; }
+@keyframes ex-turn { to { transform: rotate(360deg); } }
+.explain details.ex-text { width: 100%; border: var(--bw) solid var(--accent); background: var(--accent-soft); border-radius: var(--r-8);
+  padding: var(--sp-6) var(--sp-12); }
+.explain details.ex-text > summary { cursor: pointer; font-weight: 650; font-size: var(--fs-13); color: var(--accent); }
+.explain .ex-body { font-size: var(--fs-14); line-height: 1.5; color: var(--ink); margin-top: var(--sp-6); }
+.explain .ex-body p { margin: 0 0 var(--sp-6); }
+.explain .ex-body ul { margin: 0 0 var(--sp-6); padding-left: var(--sp-18); }
+.explain .ex-meta { font-size: var(--fs-12); color: var(--soft); margin: var(--sp-4) 0; }
+.explain .ex-acts { display: flex; gap: var(--sp-10); align-items: center; }
 /* 1.18 — le pilote automatique. */
 #pilot-card { margin-bottom: var(--sp-16); }
 #pilot-card .pl-head { display: flex; flex-wrap: wrap; gap: var(--sp-8) var(--sp-12); align-items: center; }
@@ -2953,10 +2967,10 @@ async function refreshState(reason) {
   if (!opened || reason) {
     const probe = await api("/api/state");
     if (quitting) return;
-    if (probe.open) { S = await api("/api/check", {reason: reason || "ouverture"}); opened = true; }
-    else S = probe;
+    if (probe.open) { S = keepPilot(await api("/api/check", {reason: reason || "ouverture"})); opened = true; }
+    else S = keepPilot(probe);
   } else {
-    S = await api("/api/state");
+    S = keepPilot(await api("/api/state"));
   }
   // A refresh that comes back once the stop was asked changes nothing: it
   // would reopen the stream, and the stop screen would go.
@@ -3327,6 +3341,20 @@ $("btn-chain").onclick = async () => {
 // for, its bounds in words, and its two stops.
 const PL_STATUS = {"programmé": "Programmé", "en cours": "En cours", "pause": "En pause", "attend": "Attend", "arrêté": "Arrêté"};
 const pilotOn = () => !!(S.pilot && S.pilot.status !== "arrêté");
+// A request's answer can arrive after a newer state came through the stream:
+// the programme's state never goes back (its `rev`).
+// A whole state read while the stream brought a newer programme: the newer kept.
+function keepPilot(next) {
+  const cur = S && S.pilot, p = next && next.pilot;
+  if (cur && p && cur.id === p.id && (cur.rev || 0) > (p.rev || 0)) next.pilot = cur;
+  return next;
+}
+function setPilot(p, last) {
+  const cur = S.pilot;
+  if (p && cur && cur.id === p.id && (cur.rev || 0) > (p.rev || 0)) return;
+  S.pilot = p;
+  if (last !== undefined) S.pilot_last = last;
+}
 const capF = (t) => t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
 function renderPilot() {
   const card = $("pilot-card"); if (!card) return;
@@ -3408,7 +3436,7 @@ async function startPilot(what, name) {
   if (!confirm(`Lancer le pilote automatique « ${name} » sur ${S.feature} ?\n\nIl enchaîne les étapes proposées, en mode Auto, et s'arrête dès qu'on a besoin de vous ou qu'une borne est atteinte.`)) return;
   try {
     const r = await api("/api/pilot/start", what);
-    S.pilot = r.pilot; S.pilot_saved = r.pilot_saved; S.pilot_last = r.pilot_last;
+    setPilot(r.pilot, r.pilot_last); S.pilot_saved = r.pilot_saved;
     pilotFormOpen = false; renderPilot();
     if (r.created && r.created.notice) alert(`Démarre ${fmtWhen(new Date(r.created.start_at))}.\n\n${r.created.notice}`);
   } catch (e) { alert(e.message); }
@@ -3420,7 +3448,7 @@ async function stopPilot(how) {
     : p.run ? (p.run.command === "8_code" ? "Arrêter après le lot en cours ? stop.md est posé pour /8_code, et retiré à sa fin." : "Arrêter après la commande en cours ?")
     : "Arrêter le programme ?";
   if (!confirm(q)) return;
-  try { const r = await api("/api/pilot/stop", {how}); S.pilot = r.pilot; S.pilot_last = r.pilot_last; renderPilot(); }
+  try { const r = await api("/api/pilot/stop", {how}); setPilot(r.pilot, r.pilot_last); renderPilot(); }
   catch (e) { alert(e.message); }
 }
 async function forgetPilot(name) {
@@ -3498,7 +3526,7 @@ async function submitPilot(saveOnly) {
     if (saveOnly) { const r = await api("/api/pilot/save", {spec}); S.pilot_saved = r.pilot_saved; msg.className = "small ok"; msg.textContent = "Enregistré."; renderPilot(); return; }
     if (!confirm(`Lancer ce programme sur ${S.feature} ?`)) return;
     const r = await api("/api/pilot/start", {spec, save: $("pl-save").checked});
-    S.pilot = r.pilot; S.pilot_saved = r.pilot_saved; pilotFormOpen = false; renderPilot();
+    setPilot(r.pilot, r.pilot_last); S.pilot_saved = r.pilot_saved; pilotFormOpen = false; renderPilot();
     if (r.created && r.created.notice) alert(`Démarre ${fmtWhen(new Date(r.created.start_at))}.\n\n${r.created.notice}`);
   } catch (e) { msg.className = "small err"; msg.textContent = e.message; }
 }
@@ -3799,6 +3827,11 @@ async function refreshForms() {
   try { F = await api("/api/forms"); }
   catch (e) { $("form").replaceChildren(el("div", {class: "notice err", text: e.message})); return; }
   for (const e of allEntries()) seenOpen.add(e.id);
+  // 1.19: an explanation the server no longer keeps — its file changed — is dropped here too.
+  for (const q of F.questions) {
+    const st = EXPL.get(q.id);
+    if (st && !st.going && !q.explanation) { st.data = null; st.open = undefined; }
+  }
   formsPrimed = true;
   ctxCache.clear();                 // the documents are read again; the pane stays put if nothing moved
   renderForms();
@@ -4019,6 +4052,7 @@ function renderForms() {
       if (q.answer) body.push(el("div", {class: "notice warn small", text: "Texte déjà présent sous Answer:, hors de la ligne — il sera remplacé : " + q.answer}));
       const join = questionJoin(q);
       if (join) body.push(join);
+      body.push(explainBox(q));
       if (!files.has(q.rel)) files.set(q.rel, []);
       files.get(q.rel).push(entryCard(q.id, head, body, choiceBlock(q.id, q.options, q.default)));
     }
@@ -4026,6 +4060,104 @@ function renderForms() {
   }
   hint();
   ensureFocus();
+}
+
+// ===================================================== « Expliquer » (1.19)
+// A short explanation of the question, in plain French — never a
+// recommendation. Kept by the cockpit for the question; a file that changed
+// drops it. Folded under the question once read; one tap opens it again.
+const EXPL = new Map();      // question id -> {going, t0, data, open, error}
+function explainState(id) { if (!EXPL.has(id)) EXPL.set(id, {}); return EXPL.get(id); }
+function explainBox(q) {
+  const st = explainState(q.id);
+  const data = st.data || q.explanation || null;
+  const box = el("div", {class: "explain", "data-qid": q.id});
+  const stop = (ev) => ev.stopPropagation();
+  if (st.going) {
+    box.append(el("div", {class: "ex-going"}, el("span", {class: "ex-spin", "aria-hidden": "true"}),
+      el("span", {class: "ex-elapsed", text: elapsedText(st.t0)}),
+      el("button", {class: "small ex-cancel", text: "Annuler", onclick: (ev) => { stop(ev); cancelExplain(q); }})));
+    return box;
+  }
+  if (st.error) box.append(el("div", {class: "notice err small ex-err", text: st.error}));
+  if (data) {
+    const d = el("details", {class: "ex-text", open: st.open || undefined});
+    d.addEventListener("toggle", () => { st.open = d.open; });
+    d.append(el("summary", {text: st.open === undefined && !st.data ? `Explication — gardée ${fmtWhen(new Date(data.at))}` : "Explication"}),
+      el("div", {class: "ex-body"}, ...exRender(data.text)),
+      el("div", {class: "ex-meta", text: exMeta(data)}),
+      el("div", {class: "ex-acts"}, el("button", {class: "small link ex-again", text: "Réexpliquer",
+        onclick: (ev) => { stop(ev); askExplain(q, true); }})));
+    box.append(d);
+  } else {
+    box.append(el("button", {class: "small ex-btn", text: "Expliquer", title: "Une explication courte de la question, en français courant — jamais une recommandation",
+      onclick: (ev) => { stop(ev); askExplain(q, false); }}));
+  }
+  return box;
+}
+function elapsedText(t0) {
+  const s = Math.floor((Date.now() - t0) / 1000);
+  return `Explication en cours… ${s} s`;
+}
+function exMeta(x) {
+  const u = x.used || {};
+  const from = u.passage ? `D'après ${u.passage.ids.join(", ")} de ${u.passage.doc}` : `Bloc introuvable (${u.passage_missing || "?"}) : expliquée à partir de la question seule`;
+  const lex = u.lexicon ? ` · ${plural(u.lexicon, "entrée", "entrées")} du lexique` : " · aucune entrée du lexique";
+  return `${from}${lex} · ${String(x.seconds).replace(".", ",")} s`;
+}
+// The model's few lines: paragraphs, « - » lists, **gras**.
+function exRender(text) {
+  const out = [];
+  let list = null;
+  const inl = (t) => t.split(/(\*\*[^*]+\*\*)/).filter(Boolean).map((x) => /^\*\*[^*]+\*\*$/.test(x) ? el("b", {text: x.slice(2, -2)}) : x);
+  for (const raw of (text || "").split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) { list = null; continue; }
+    const item = line.match(/^[-•*]\s+(.*)$/);
+    if (item) { if (!list) { list = el("ul"); out.push(list); } list.append(el("li", {}, ...inl(item[1]))); continue; }
+    list = null;
+    out.push(el("p", {}, ...inl(line.replace(/^#+\s*/, ""))));
+  }
+  return out;
+}
+function redrawExplain(id) {
+  const q = F && F.questions.find((x) => x.id === id);
+  const old = document.querySelector(`.explain[data-qid="${CSS.escape(id)}"]`);
+  if (q && old) old.replaceWith(explainBox(q));
+}
+let explainTick = null;
+function tickExplain() {
+  const going = [...EXPL.entries()].filter(([, st]) => st.going);
+  for (const [id, st] of going) {
+    const n = document.querySelector(`.explain[data-qid="${CSS.escape(id)}"] .ex-elapsed`);
+    if (n) n.textContent = elapsedText(st.t0);
+  }
+  if (!going.length) { clearInterval(explainTick); explainTick = null; }
+}
+async function askExplain(q, again, usageOk) {
+  const st = explainState(q.id);
+  const before = st.data || q.explanation || null;
+  Object.assign(st, {going: true, t0: Date.now(), error: null});
+  redrawExplain(q.id);
+  if (!explainTick) explainTick = setInterval(tickExplain, 1000);
+  try {
+    const r = await api("/api/explain", {id: q.id, again: !!again, usage_ok: !!usageOk});
+    Object.assign(st, {going: false, data: r.explanation, open: true});
+  } catch (e) {
+    st.going = false;
+    // 1.17's blocking threshold: « Lancer quand même », after a confirmation that names the level.
+    if (e.status === 409 && e.body && e.body.usage_block && !usageOk) {
+      redrawExplain(q.id);
+      if (confirm(usageQuestion(e.body.usage_block))) return askExplain(q, again, true);
+      return;
+    }
+    st.data = before;
+    st.error = e.body && e.body.cancelled ? "Explication annulée." : e.message;
+  }
+  redrawExplain(q.id);
+}
+async function cancelExplain(q) {
+  try { await api("/api/explain/cancel", {id: q.id}); } catch (e) { /* the answer says what became of it */ }
 }
 
 // ================================================ the question's document (1.4)
@@ -4538,7 +4670,8 @@ function onEvent(ev) {
   if (ev.type === "usage") { setUsage(d); return; }
   // 1.18: the programme moved — its card and its chip.
   if (ev.type === "pilot") {
-    Object.assign(S, {pilot: d.pilot, pilot_last: d.pilot_last, pilot_presets: d.pilot_presets, pilot_saved: d.pilot_saved});
+    setPilot(d.pilot, d.pilot_last);
+    Object.assign(S, {pilot_presets: d.pilot_presets, pilot_saved: d.pilot_saved});
     renderPilot(); return;
   }
   if (ev.type === "pilot_push") return;

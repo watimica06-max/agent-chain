@@ -317,7 +317,7 @@ def test_the_phone_sees_the_summary_and_cannot_repair(tmp_path, chain_root, fake
 def test_ping_says_the_commit_the_server_started_from(tmp_path, chain_root):
     async def body(c, st, rn, quit):
         p = await (await c.get("/api/ping")).json()
-        assert p["started"] == head(chain_root) and p["version"] == "1.18"
+        assert p["started"] == head(chain_root) and p["version"] == "1.19"
     serve(tmp_path, body)
 
 

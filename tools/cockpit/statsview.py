@@ -188,7 +188,8 @@ def _run_view(r, limits_of, names):
                                  "cache_read_tokens", "cache_creation_tokens", "output_tokens",
                                  "next_line", "outcome", "log_path", "resumed", "backfilled", "kind")}
     # 1.17: the usage measure is no command — named as itself, whole.
-    out["cmd"] = r.get("command") if r.get("kind") == "mesure" else command_of(r.get("command"))
+    # 1.19: an explanation too — any kind is named as its command, whole.
+    out["cmd"] = r.get("command") if r.get("kind") else command_of(r.get("command"))
     out["app_name"] = names.get(app_key(r.get("app"))) or (os.path.basename(r["app"]) if r.get("app") else None)
     out["read_tokens"] = _read(r)
     ms = limits_of.get(r["id"], [])

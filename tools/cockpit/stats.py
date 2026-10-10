@@ -419,6 +419,8 @@ CREATE TABLE IF NOT EXISTS programmes (
   id TEXT PRIMARY KEY, app TEXT, feature TEXT, name TEXT, spec TEXT, created_at TEXT, started_at TEXT,
   ended_at TEXT, commands INTEGER, lots INTEGER, prompts TEXT, five_hour REAL, five_hour_unknown INTEGER,
   seven_day REAL, seven_day_unknown INTEGER, reason TEXT, reason_kind TEXT);
+CREATE TABLE IF NOT EXISTS explanations (
+  key TEXT PRIMARY KEY, file_sig TEXT, text TEXT, at TEXT, seconds REAL, run_id TEXT);
 """
 # 1.5: the columns a 1.4 store lacks, added in place.
 NEW_PASS_COLUMNS = ("lot", "block", "folder")
@@ -522,6 +524,24 @@ class Store:
              s.get("created_at"), s.get("started_at"), s.get("ended_at"), s.get("commands"), s.get("lots"),
              json.dumps(s.get("prompts") or [], ensure_ascii=False), f.get("spent"), f.get("unknown"),
              w.get("spent"), w.get("unknown"), s.get("reason"), s.get("reason_kind"))))
+
+    # 1.19 — « Expliquer »: each question's explanation, kept with the hash of
+    # its file; a file that changed drops it.
+    def explanation(self, key, file_sig):
+        def go(db):
+            r = db.execute("SELECT * FROM explanations WHERE key=?", (key,)).fetchone()
+            if r is None:
+                return None
+            if r["file_sig"] != file_sig:
+                db.execute("DELETE FROM explanations WHERE key=?", (key,))
+                return None
+            return dict(r)
+        return self._exec(go)
+
+    def keep_explanation(self, key, file_sig, text, at, seconds, run_id):
+        self._exec(lambda db: db.execute(
+            "INSERT OR REPLACE INTO explanations (key, file_sig, text, at, seconds, run_id) VALUES (?,?,?,?,?,?)",
+            (key, file_sig, text, at, seconds, run_id)))
 
     def programmes(self, limit=20):
         def go(db):
@@ -703,7 +723,7 @@ class Store:
         returns its folder. Returns how many were given one."""
         rows = self._exec(lambda db: [dict(r) for r in db.execute(
             "SELECT id, log_path, feature FROM runs WHERE (app IS NULL OR app = '')"
-            " AND (kind IS NULL OR kind <> 'mesure')")])
+            " AND kind IS NULL")])
         done = 0
         for r in rows:
             app = resolve({**r, "cwd": log_cwd(r.get("log_path"))})

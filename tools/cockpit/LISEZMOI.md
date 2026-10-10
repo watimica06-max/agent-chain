@@ -726,6 +726,34 @@ Le défaut proposé est pré-coché : le garder sans remarque laisse
 enregistrée ou pourquoi elle ne l'est pas. Les fichiers que le cockpit
 ne sait pas lire sont signalés en haut, jamais ignorés.
 
+**Expliquer** (1.19) — sous chaque question, sur l'ordinateur et le
+téléphone : une explication courte, en français courant — ce que la
+question demande, pourquoi c'est important pour l'utilisateur de
+l'application, ce que change chaque option, les mots techniques définis
+en une ligne, 150 mots au plus. **Jamais une recommandation** : ni
+préférence, ni « en général », ni défaut à choisir — la consigne donnée au
+modèle l'interdit (`explain.py`, `INSTRUCTION`), la décision est la vôtre.
+
+- Ce qu'elle lit, et rien d'autre, tout dans la demande : la question, ses
+  options et son `Défaut:` ; le passage que nomme sa ligne `Block:`, pris
+  comme le volet de droite le montre ; les entrées de `## Tranché` de
+  `lexique.md` dont les termes sont dans la question ou ses options —
+  jamais le fichier entier. Sans bloc trouvé (ou sans ligne `Block:`), elle
+  le dit, et explique à partir de la question seule ; la ligne sous
+  l'explication dit d'après quoi elle a été faite.
+- L'appel est celui de la mesure de 1.17 : le modèle le plus léger, un
+  tour, sans outil ni serveur MCP, dans un dossier temporaire à lui. 60 s
+  au plus, puis il le dit ; « Annuler » pendant qu'il tourne. Son coût est
+  enregistré dans `stats.sqlite`, marqué `kind = 'explication'`
+  (« (explication) » dans les Statistiques), son journal
+  `logs/<date>-explication.jsonl`. Le seuil de blocage de 1.17 vaut comme
+  pour un lancement, « Lancer quand même » compris.
+- Gardée par le cockpit pour la question (dans `stats.sqlite`, jamais dans
+  le dépôt de l'application) : repliée sous la question une fois lue, un
+  appui l'ouvre aussitôt, sans nouvel appel ; « Réexpliquer » la redemande.
+  Dès que le fichier de la question change — une réponse écrite dedans
+  comprise —, elle est oubliée.
+
 **Le run** — sous son étape, dans « Chaîne » ou « Correction » : la
 commande qui tourne, l'agent actif, le texte au fil de l'eau. Une demande
 d'autorisation apparaît en bandeau sur tous les écrans : « Autoriser » ou

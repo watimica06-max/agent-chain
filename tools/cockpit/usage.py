@@ -167,7 +167,7 @@ def estimates(store_path, app=None):
     akey = statsview.app_key(app)
     rows = {}
     for r in runs:
-        if r.get("kind") == KIND:
+        if r.get("kind"):            # a measure, an explanation: no command
             continue
         cmd = statsview.command_of(r.get("command"))
         ms = by_run.get(r["id"], [])
