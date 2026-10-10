@@ -604,8 +604,8 @@ this cycle »).
   chose atterrit lui revient.
 - Au Vérificateur et au Détailleur : un `# Preamble` de trois lignes
   `Intent:`, `Out of scope:`, `Dependencies:` — une ligne
-  `Dependencies:` et pas de `Vocabulary` (`verificateur.md` L64 ;
-  `detailleur.md` L629 : les termes sont ceux de la feature).
+  `Dependencies:` et pas de `Vocabulary` (`verificateur.md` L66 ;
+  `detailleur.md` L631 : les termes sont ceux de la feature).
 - À l'Arbitre : le document qui nomme le cycle où il se trouve
   (`arbitre.md` L64).
 - Au Fusionneur, invocation 3 : `desc-bug.md`, jamais `bug-list.md` —

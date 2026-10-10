@@ -1,11 +1,11 @@
 """Cockpit 1.5 — the « Code » tab's reader (codelots.py, code_rules.md).
 
 Hand-written folders following the templates of the command and its agents:
-the sequence (verificateur.md:107-115), the lot list (cadreur.md:848-854),
+the sequence (verificateur.md:109-117), the lot list (cadreur.md:904-910),
 the verdict (relecteur.md:140-170), the Détailleur's blocking file at the
-split's root (detailleur.md:355-379), the Réalisateur's (realisateur.md:328-343),
+split's root (detailleur.md:357-381), the Réalisateur's (realisateur.md:328-343),
 the requests (arbitre.md:451-460), `code/redecoupage.md` (arbitre.md:379-399,
-cadreur.md:1054-1061) and the lot's commits (8_code.md:206-237). No real
+cadreur.md:1114-1121) and the lot's commits (8_code.md:206-237). No real
 folder of the current chain has a `code/` yet. No command runs."""
 import os
 import shutil
@@ -162,7 +162,7 @@ lot-06, whose code is dropped; lot-03, lot-04, lot-05 left
 
 S8 exists before lot-06 is coded.
 """
-# The Cadreur's two sections, at the end, once it has cut again (agents/cadreur.md:1061-1068).
+# The Cadreur's two sections, at the end, once it has cut again (agents/cadreur.md:1121-1128).
 CADREUR_REDEC = "\n## Ce qui revient\n\nrien\n\n## Ce que j'en fais\n\nrien de récurrent\n"
 
 

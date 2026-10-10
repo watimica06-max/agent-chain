@@ -63,7 +63,9 @@ block. 📌 **Its shape is below**; read it before you start.
   the prompt**; the sequence says which lots it holds
 - **`code/decoupage.md`**, restricted to those lots — 📌 **plus its
   `## Symbols` inventory**, which says what a symbol you consume
-  carries and which entries ask it
+  carries and which entries ask it. ⚠️ **Never a lot's `For the user:`
+  line** — 📌 **the Product Owner's, in French**: 🔴 **a signature or a
+  criterion comes from the cited entries, never from it**
 - **The technical document's preamble** — 🔴 **always**, whatever your
   block. Its `## Intent and vocabulary` names the terms your signatures
   must use; its `## Dependencies` lists what already exists, so you grep

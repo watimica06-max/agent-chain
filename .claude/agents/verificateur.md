@@ -54,7 +54,9 @@ you start.
 
 - **`code/decoupage.md`**, in full — 📌 **the `## Symbols` inventory at
   its head, then the lots**: the inventory is what the lots are checked
-  against
+  against. ⚠️ **Each lot's `For the user:` line is the Product Owner's,
+  in French** — 🔴 **you check nothing on it**: 📌 **what a lot
+  announces is what its `Produces` and `Modifies` declare**
 - **The technical document's preamble** — 🔴 **always, on both
   documents.** 📌 **Grep `^## §1 ` for its line number, and Read from
   the top of the file to the line before it** — ⚠️ **never the file

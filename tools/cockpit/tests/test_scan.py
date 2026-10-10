@@ -60,8 +60,8 @@ def write(path, text=""):
 
 
 def split(code, lots):
-    """A split that holds: `code/decoupage.md` (agents/cadreur.md:855-861) and
-    `code/sequence.md` with an empty `## Defects` (agents/verificateur.md:105-117),
+    """A split that holds: `code/decoupage.md` (agents/cadreur.md:911-918) and
+    `code/sequence.md` with an empty `## Defects` (agents/verificateur.md:107-119),
     every lot reviewed PASS (agents/relecteur.md:144-174)."""
     write(code / "decoupage.md", "".join(
         f"## {l}\n\nAnchor: §{k}.1 — Entry {k}\nNeeds: —\nProduces: S{k}\nModifies: —\nTouches: —\n\n"

@@ -33,14 +33,14 @@ relative to `.claude/`.
 | `hand/blocked_architecte.md` | agents/architecte.md:285-291 — `## Invocation` first |
 | `hand/blocked_redacteur.md` | agents/redacteur.md:402-421 and :430-436 — invocation 3, one `## Blocking N` and one `## Decision` per entry |
 | `hand/blocked_qualifieur.md` | agents/qualifieur.md:274-293 |
-| `hand/blocked_cadreur.md`, `hand/cadreur-request/blocked_cadreur.md` | agents/cadreur.md:194-213 — the first appended twice, its last `## Decision` live |
-| `hand/cadreur-request/architecte-cadreur.md` | agents/cadreur.md:247-253 — two `# Request N`, the first with its verdict |
-| `hand/blocked_verificateur.md` | agents/verificateur.md:200-211 — three headings, no `## Decision` |
+| `hand/blocked_cadreur.md`, `hand/cadreur-request/blocked_cadreur.md` | agents/cadreur.md:195-214 — the first appended twice, its last `## Decision` live |
+| `hand/cadreur-request/architecte-cadreur.md` | agents/cadreur.md:248-254 — two `# Request N`, the first with its verdict |
+| `hand/blocked_verificateur.md` | agents/verificateur.md:202-213 — three headings, no `## Decision` |
 | `hand/blocked_concepteur-01.md` | agents/concepteur.md:153-170 — `## Decision` filled |
 | `hand/blocked_relecteur-acte.md`, `blocked_relecteur-autre.md` | agents/relecteur.md:283-301 |
-| `hand/blocked_detailleur.md` | agents/detailleur.md:365-385 — `## Blocking N — lot-NN`, one `## Decision` at the end |
+| `hand/blocked_detailleur.md` | agents/detailleur.md:367-387 — `## Blocking N — lot-NN`, one `## Decision` at the end |
 | `hand/blocked_realisateur.md` | agents/realisateur.md:336-347 |
-| `hand/redecoupage/redecoupage.md`, `redecoupage-01.md`, `redecoupage-02.md` | agents/cadreur.md:1061-1068 — the Cadreur's two sections |
+| `hand/redecoupage/redecoupage.md`, `redecoupage-01.md`, `redecoupage-02.md` | agents/cadreur.md:1121-1128 — the Cadreur's two sections |
 | `hand/questions-hors-gabarit.md` | **none, on purpose**: a `## Q1` heading no template writes — the file the parser reports as an error |
 
 ## Built in the tests
