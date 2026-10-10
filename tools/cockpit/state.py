@@ -45,6 +45,8 @@ MAX_RECENT = 8
 MAX_HISTORY = 30
 INSTALL_MODES = ("rapide", "pas_a_pas", "demander")
 MODES = ("auto", "manuel")
+# 1.21: what a repository is told of a computer with no nickname.
+COMPUTER_DEFAULT = "ordinateur"
 
 
 def app_key(app: str) -> str:
@@ -379,6 +381,34 @@ class State:
         with self._lock:
             self.data["install_mode"] = mode
             self._save()
+
+    # ------------------------------------------------ cet ordinateur (1.21)
+
+    @property
+    def computer(self):
+        """Paramètres → « Cet ordinateur »: the short name she chose — what
+        the cockpit writes into a repository for this computer, never its
+        network name —, and whether she was asked."""
+        c = self.data.get("computer")
+        c = c if isinstance(c, dict) else {}
+        name = c.get("name") if isinstance(c.get("name"), str) else ""
+        return {"name": name.strip(), "asked": bool(c.get("asked"))}
+
+    @property
+    def computer_label(self):
+        """What a journal line and a report say of this computer."""
+        return self.computer["name"] or COMPUTER_DEFAULT
+
+    def set_computer(self, name):
+        name = " ".join(str(name or "").split())
+        if len(name) > 40:
+            raise ValueError("40 caractères au plus")
+        if "|" in name:
+            raise ValueError("pas de « | » : le journal est un tableau")
+        with self._lock:
+            self.data["computer"] = {"name": name, "asked": True}
+            self._save()
+        return self.computer
 
     # ------------------------------------------------ consommation (1.17)
 

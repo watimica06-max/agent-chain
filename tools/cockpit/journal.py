@@ -21,7 +21,6 @@ the reconstruction of the runs before 1.20, and the end-of-cycle report.
 """
 import os
 import re
-import socket
 import statistics
 import subprocess
 from datetime import datetime
@@ -58,7 +57,7 @@ LIMITS = {"cost_factor": (1.1, 10.0), "repeat_runs": (2, 20), "blocking_repeat":
 # The cockpit's own commits, and the chain's commits before a worktree —
 # what the Product Owner wrote, committed from the main checkout.
 PO_PREFIXES = ("chore: answers", "chore: pre-", "donnees:")
-COCKPIT_PREFIXES = ("journal:", "chain:", "deploy:", "donnees:", "chore:")
+COCKPIT_PREFIXES = ("journal:", "chain:", "deploy:", "donnees:", "chore:", "enquete:")
 MERGE = re.compile(r"^Merge (/[A-Za-z0-9_]+)(?:\s+(.*))?$")
 BUGFIX = re.compile(r"^bugfix-\d+$")
 
@@ -79,8 +78,10 @@ def clean_thresholds(raw):
     return out
 
 
-def computer_name():
-    return os.environ.get("COMPUTERNAME") or socket.gethostname() or UNKNOWN
+# 1.21: a journal line names the computer by the nickname she chose in
+# Paramètres → « Cet ordinateur » (state.computer_label) — never its network
+# name, which would be published on GitHub. None given: « ordinateur ».
+COMPUTER = "ordinateur"
 
 
 # ------------------------------------------------------------ the cycle
@@ -321,7 +322,7 @@ def run_entry(run, usage_shares, created, programme_name=None, lots=None, note=N
     if dur is None and run.started_at and getattr(run, "ended_at", ""):
         a, b = _local(run.started_at), _local(run.ended_at)
         dur = (b - a).total_seconds() if a and b else None
-    return {"at": (run.started_at or "")[:16], "computer": computer or computer_name(), "command": run.prompt,
+    return {"at": (run.started_at or "")[:16], "computer": computer or COMPUTER, "command": run.prompt,
             "duration_s": dur, "read_tokens": u.get("read_tokens"),
             "output_tokens": u.get("output_tokens"), "five_hour": usage_shares.get("five_hour"),
             "seven_day": usage_shares.get("seven_day"),
@@ -641,7 +642,8 @@ def points(entries, hist, estimates, thresholds, programmes=()):
         by_agent.setdefault(b["agent"], []).append(b)
     for agent, bl in sorted(by_agent.items()):
         if len(bl) >= th["blocking_repeat"]:
-            out.append({"kind": "blocage", "at": bl[-1]["created_at"], "command": None,
+            out.append({"kind": "blocage", "at": bl[-1]["created_at"], "command": None, "agent": agent,
+                        "files": [b["file"] for b in bl],
                         "text": f"{len(bl)} fichiers de blocage de {agent} dans ce cycle : "
                                 + ", ".join(b["file"] for b in bl) + "."})
     for e in entries:
@@ -662,6 +664,7 @@ def points(entries, hist, estimates, thresholds, programmes=()):
             continue
         if len(run) >= th["repeat_runs"]:
             out.append({"kind": "sur place", "at": run[-1].get("at"), "command": run[-1].get("command"),
+                        "runs": [{"at": x.get("at"), "command": x.get("command")} for x in run],
                         "text": f"{_cmd(run[-1].get('command'))} lancée {len(run)} fois de suite sans que l'étape "
                                 f"proposée bouge (« {run[-1].get('next')} »), du {_human(run[0].get('at'))} au "
                                 f"{_human(run[-1].get('at'))}."})
@@ -670,13 +673,13 @@ def points(entries, hist, estimates, thresholds, programmes=()):
     for p in programmes or ():
         if p.get("reason_kind") == "erreur":
             seen.add(p.get("name"))
-            out.append({"kind": "programme", "at": p.get("ended_at"), "command": None,
+            out.append({"kind": "programme", "at": p.get("ended_at"), "command": None, "programme": p.get("name"),
                         "text": f"Le programme « {p.get('name')} » s'est arrêté sur une erreur le "
                                 f"{_human(p.get('ended_at'))} : {p.get('reason')}"})
     for e in entries:
         if e.get("programme") and e.get("outcome") in FAILED and e["programme"] not in seen:
             seen.add(e["programme"])
-            out.append({"kind": "programme", "at": e.get("at"), "command": e.get("command"),
+            out.append({"kind": "programme", "at": e.get("at"), "command": e.get("command"), "programme": e["programme"],
                         "text": f"Le programme « {e['programme']} » s'est arrêté sur une erreur : {e.get('command')} "
                                 f"le {_human(e.get('at'))}."})
     out.sort(key=lambda p: p.get("at") or "")
@@ -828,7 +831,7 @@ def reconstruct(app, feature, store_path, log_dir, app_name=None, computer=None,
     logs first, git alone for the rest (cost and duration « inconnu »).
     {cycle: [entries]} — nothing written. A run already in a journal is
     left out."""
-    computer = computer or computer_name()
+    computer = computer or COMPUTER
     feat_rel = cycle_rel(feature)
     flog = git_log(app, feat_rel) if os.path.isdir(os.path.join(app, *feat_rel.split("/"))) else []
     # The whole feature's log, the bugfix-NN/ included.

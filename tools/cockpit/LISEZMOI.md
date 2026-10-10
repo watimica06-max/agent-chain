@@ -125,7 +125,7 @@ application ouverte. En haut :
 application. Le menu, sur toute la hauteur à gauche : l'application et sa
 feature en tête ; ses écrans en trois groupes — Pilotage (Tableau de bord,
 À répondre, Chaîne, Correction), Projet (Données, Déploiement), Mesure
-(Statistiques, Journal — 1.20) ; en bas, Paramètres et **« Applications »**, qui ramène à
+(Statistiques, Journal — 1.20, Enquêtes — 1.21) ; en bas, Paramètres et **« Applications »**, qui ramène à
 l'accueil. La barre du haut est un chemin — l'application / sa feature
 (un clic ouvre la liste des features) / l'écran —, puis, à droite, le mode
 et la commande qui tourne. **Une commande
@@ -491,7 +491,8 @@ les notes prises à la main.
 - **Une ligne par commande**, à la fin de chaque run lancé depuis le
   cockpit — un clic, une commande d'un programme, « Continuer » —, ajoutée
   à `docs/features/<feature>/journal.md` (le `bugfix-NN/journal.md` d'une
-  correction) : la date et l'heure, l'ordinateur, la commande, sa durée,
+  correction) : la date et l'heure, l'ordinateur (son nom court, 1.21 —
+  Paramètres → « Cet ordinateur »), la commande, sa durée,
   son coût (tokens lus et écrits, part de la fenêtre de 5 heures et de la
   semaine), son issue (fait · questions · blocage · à la main · erreur ·
   pas connecté · arrêté · sans Next…), ce qu'elle propose ensuite, les
@@ -549,6 +550,94 @@ les notes prises à la main.
   `rapport-cycle.md` dans le dossier du cycle : durée, coût, questions et
   blocages par étape, où est passé son temps, ce qui a échoué, les points à
   creuser. Montré d'abord, commité sur confirmation seulement.
+- **« Enquêter sur ce point »** (1.21), sur chaque point à creuser : voir
+  « Enquêtes ».
+
+**Enquêtes** (1.21) — une question, en français, sur l'application ou sur
+la chaîne et le cockpit : une enquête lit, et seulement lit, et répond pour
+une lectrice qui n'est pas technicienne.
+
+- **« Nouvelle enquête »** : la question ; la cible — **l'application**
+  ouverte (son dossier) ou **la chaîne et le cockpit** (le dossier
+  d'agent-chain, `C:\Dev\chaine`) — ; le modèle — par défaut celui des
+  commandes de la chaîne (aucun n'est passé : celui des réglages de Claude
+  Code, que le formulaire nomme), ou un autre pour cette enquête. Elle a sa
+  route à elle (`/api/enquetes/start`, pas `/api/run`), comme les
+  installations de 1.16. **Une à la fois, comme tout run** : refusée tant
+  qu'une commande tourne, et une commande, une mise à jour du cockpit,
+  attendent sa fin ; le seuil de blocage de 1.17 s'applique (« Lancer quand
+  même » noté dans `consommation.log`) ; le pilote automatique n'en lance
+  jamais — un programme attend la fin d'une enquête en cours.
+- **Lecture seule, imposée par le cockpit** — pas demandée au modèle.
+  L'enquête n'a que quatre outils : Read, Grep, Glob et Bash — ni Write,
+  ni Edit, ni NotebookEdit, ni outil du web, ni agent, ni serveur MCP, ni
+  réglage chargé. Chaque appel d'outil passe deux fois par la même règle
+  (`enquete.gate`) : le crochet PreToolUse, que Claude Code exécute avant
+  tout outil quel que soit le mode de permission, et la fonction de
+  permission. Une commande shell ne passe que si chacune de ses commandes
+  est une de celles-ci :
+
+  | Commande | Pour |
+  |---|---|
+  | `git log`, `git show`, `git diff`, `git status`, `git blame`, `git grep` | lire l'historique — avant la sous-commande, seuls `--no-pager` et `-C <dossier>` ; jamais `--output`, `--ext-diff`, `git grep -O` |
+  | `ls`, `find` | lister — `find` sans `-delete`, `-exec`, `-execdir`, `-ok`, `-okdir`, `-fprint`, `-fprint0`, `-fprintf`, `-fls` |
+  | `cat`, `head`, `tail`, `wc`, `stat` | lire un fichier — `tail` sans `-f` |
+  | `grep`, `egrep`, `fgrep`, `rg` | chercher — `rg` sans `--pre` |
+  | `sort`, `uniq`, `cut` | ranger ce qu'une autre lit — `sort` sans `-o`, `uniq` sans fichier de sortie |
+  | `pwd`, `cd`, `basename`, `dirname`, `realpath` | se repérer |
+
+  Reliées par `|`, `&&`, `||` ou `;` ; `2>/dev/null` et `2>&1` permis.
+  Refusé : toute autre commande, une substitution (`$(…)`, `` ` ``, `$`
+  hors apostrophes), une redirection vers un fichier, `&`, une variable
+  posée, plusieurs lignes. Une commande refusée l'est avec sa raison ;
+  l'écran la montre en rouge, et le rapport les liste.
+- **Ce qu'on demande au modèle** : répondre en français, pour une lectrice
+  qui n'est pas technicienne ; citer `fichier:ligne` pour chaque
+  affirmation ; dire ce qui n'a pas pu être établi ; finir par « Ce que je
+  conseille d'en faire » — enquêter plus loin, une correction, ou rien.
+- **Le rapport** : `docs/enquetes/<date>-<sujet>.md` dans le dépôt qu'il
+  concerne — la question, la réponse, le modèle, le coût (tokens lus et
+  écrits, durée, équivalent API), la date, l'ordinateur —, commité
+  `enquete: <question>` et poussé (règles de 1.12 ; le relais de la chaîne
+  reporté sur ce commit, comme pour le journal). Listé sur l'écran avec son
+  coût ; lisible sur le téléphone (« Plus » → « Enquêtes », en lecture
+  seule). Une enquête arrêtée ou en erreur n'écrit rien.
+- **Pas de redémarrage pour un rapport.** Un commit dans `C:\Dev\chaine`
+  fait bouger son HEAD, que 1.16 lit comme « nouveau code du cockpit ».
+  Des commits qui ne touchent que `docs/enquetes/` ne redémarrent pas le
+  serveur et n'affichent pas « pas encore en service » ; ceux que l'autre
+  ordinateur a poussés sont récupérés en silence quand l'écran s'ouvre.
+- **D'un problème à une enquête** : « Enquêter sur ce point », sur chaque
+  point à creuser du Journal et sur un run fini en erreur — la question
+  est écrite (ce qui s'est passé, où, les fichiers et le journal de run à
+  regarder), la cible choisie (la chaîne et le cockpit) ; rien ne part
+  avant qu'elle l'ait relue et lancée.
+- **D'une enquête à la suite**, selon sa cible :
+  - **la chaîne ou le cockpit** : « Préparer un prompt de correction » — un
+    second appel (sans outil, un tour) écrit un prompt dans la forme de
+    ceux de la conversation de conception, enregistré à côté du rapport
+    (`…-prompt.md`), marqué **« À relire dans la conversation de conception
+    avant de lancer »**, commité et poussé. **Aucun bouton ne le lance** :
+    une correction de la chaîne ou du cockpit passe toujours par la
+    conversation de conception.
+  - **l'application** : un comportement de l'application se corrige par un
+    cycle de correction, pour que ses documents restent vrais. « Ajouter à
+    la liste de bugs » — un second appel écrit l'entrée d'après le rapport
+    (ce qu'on observe, où, ce qui est attendu), au format que lit le
+    Diagnostiqueur (`.claude/agents/diagnostiqueur.md`, « What a gap looks
+    like » : un `G<n>` qui ouvre l'écart, puis ce qui ne va pas et ce qui
+    devrait être) — `G03 Sur l'écran de course : … Elle devrait …`. Elle la
+    lit, la change si besoin ; **rien n'est écrit avant « Ajouter »**. Elle
+    va dans le `bug-list.md` de la correction ouverte (le `bugfix-NN/` le
+    plus haut, tant que `desc-bug.md` n'y est pas), ou d'une nouvelle,
+    créée alors — par le même code que « Correction ».
+
+**Cet ordinateur** (Paramètres, 1.21) — le nom court qu'écrivent le journal
+de cycle et les rapports d'enquête : « travail », « perso ». **Jamais le nom
+de l'ordinateur sur le réseau**, qui partirait sur GitHub. Demandé une fois,
+au premier run qui écrit dans un dépôt sans qu'il soit donné ; « Plus tard »
+écrit « ordinateur ». Gardé dans `config.json`. Les lignes déjà écrites
+restent telles qu'elles sont.
 
 **La chaîne de l'application** — les agents, les commandes, les scripts,
 les grilles, les formats et la compétence `technical-state-format`
@@ -974,6 +1063,10 @@ suite ; `tailscale serve reset` retire le service de Tailscale.
   proposées, dans ses bornes, et s'arrête dès qu'on a besoin de vous. Son seul appel
   à Claude de lui-même est la mesure de la consommation (1.17) : une
   phrase, le modèle le plus léger, sans outil, dans un dossier à lui.
+- Une enquête (1.21) ne fait que lire, et c'est le cockpit qui l'impose ;
+  il ne lance jamais une correction de la chaîne ou du cockpit — son prompt
+  passe par la conversation de conception —, et n'écrit une entrée de bug
+  qu'une fois qu'elle l'a confirmée.
 - Il ne remplace la ligne `Next:` que quand les fichiers la contredisent,
   et il le dit ; sa proposition porte toujours « déduite du dossier ».
   Il ne saute jamais une étape bloquée ou inconnue.
@@ -988,8 +1081,9 @@ suite ; `tailscale serve reset` retire le service de Tailscale.
   correction — et, quand vous cliquez « Installer / mettre à jour la
   chaîne » ou « Tout mettre à jour », les fichiers de la chaîne dans
   l'application, leur commit et son push ; quand vous cliquez « Enregistrer
-  le profil », `.claude/deploy.json`, son commit et son push. Tout le reste
-  est en lecture.
+  le profil », `.claude/deploy.json`, son commit et son push ; 1.21, les
+  rapports d'enquête et leurs prompts dans `docs/enquetes/`, et l'entrée de
+  bug que vous avez confirmée. Tout le reste est en lecture.
 - « Déploiement » ne lance que les commandes du profil, quand vous
   cliquez ; il n'installe, ne lance, n'associe ni ne connecte rien sur un
   appareil sans un clic. Les noms de vos appareils restent dans

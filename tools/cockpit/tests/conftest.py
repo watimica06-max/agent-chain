@@ -95,6 +95,20 @@ def _no_sync_at_start(monkeypatch):
     # 1.20: nor does a run's end commit its journal line in the application —
     # the journal's own tests turn it on (test_journal_server.py).
     monkeypatch.setattr(server, "JOURNAL", False)
+    # 1.21: nor is this computer's nickname asked after a launch — the
+    # investigations' tests turn it on.
+    monkeypatch.setattr(server, "ASK_COMPUTER", False)
+
+
+@pytest.fixture(autouse=True)
+def _no_real_investigation(monkeypatch):
+    """1.21: an investigation, or its second call, never reaches Claude in a
+    test — a test passes its fake client (enqueteworld.py)."""
+    import enquete
+
+    def refuse(options):
+        raise AssertionError("une enquête a voulu appeler Claude pour de vrai dans un test")
+    monkeypatch.setattr(enquete, "sdk_client_factory", refuse)
 
 
 @pytest.fixture(autouse=True)

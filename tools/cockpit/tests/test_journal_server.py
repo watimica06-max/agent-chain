@@ -117,7 +117,7 @@ def test_a_line_per_run_committed_and_pushed(tmp_path):
         rows = await run_and_journal(c)
         assert len(rows) == 1
         e = rows[0]
-        assert e["command"] == "/2_structure f" and e["computer"] == journal.computer_name()
+        assert e["command"] == "/2_structure f" and e["computer"] == "ordinateur"
         assert e["outcome"] == journal.QUESTIONS and e["next"] == "répondre → /2_structure"
         assert e["created"] == ["questions-redacteur-01.md"] and e["duration_s"] is not None
         assert e["programme"] is None

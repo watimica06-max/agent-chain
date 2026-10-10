@@ -27,6 +27,7 @@ pull at start, 1.12 (« récupérée »). The update:
    polls `/api/ping` and reloads once another pid answers.
 """
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -69,13 +70,55 @@ def subjects(root, rng):
     return [x for x in r.out.splitlines() if x.strip()] if r.ok else []
 
 
+def only_reports(root, base, head):
+    """True when every file that differs between the two commits is under
+    docs/enquetes/ (1.21): the cockpit's reports, never its code. Asked of
+    git once per pair."""
+    if not base or not head or base == head:
+        return True
+    # A ref — origin/master — moves: the cache keeps commits only.
+    base, head = (x if _SHA.fullmatch(x) else sync.git(root, "rev-parse", "-q", "--verify", x).out.strip()
+                  for x in (base, head))
+    if not base or not head:
+        return False
+    if base == head:
+        return True
+    key = (sync.Book.key(root), base, head)
+    if key not in _quiet_cache:
+        r = sync.git(root, "diff", "--name-only", "--no-renames", base, head)
+        files = [x.strip() for x in r.out.splitlines() if x.strip()] if r.ok else None
+        _quiet_cache[key] = bool(files is not None and all(f.startswith(QUIET) for f in files))
+    return _quiet_cache[key]
+
+
+# 1.21: what the cockpit commits into agent-chain's own clone without its
+# code changing — a commit there moves HEAD, which 1.16 reads as « new code ».
+QUIET = ("docs/enquetes/",)
+_quiet_cache = {}
+_SHA = re.compile(r"[0-9a-f]{40}")
+
+
+def code_head(root, started, head):
+    """The commit the code on disk stands for, against the one the server
+    started from: `started` itself when only reports came since — no
+    restart, no « pas encore en service » —, else `head`."""
+    if started and head and started != head and only_reports(root, started, head):
+        return started
+    return head
+
+
 def status(root, started, st, head):
     """Where the running cockpit stands against agent-chain's clone and
     GitHub: `state` — « à jour », « disponible » (GitHub has commits the
     clone lacks), « récupérée » (the clone has commits the running server
-    does not run) —, and the commits' subjects the cockpit does not run."""
+    does not run) —, and the commits' subjects the cockpit does not run.
+    1.21: commits that touch only docs/enquetes/ do not count."""
     st = st or {}
+    disk, head = head, code_head(root, started, head)
     behind = st.get("state") == sync.BEHIND or (st.get("state") == sync.DIVERGED and st.get("behind"))
+    if behind and st.get("state") == sync.BEHIND and st.get("upstream") and disk \
+            and only_reports(root, disk, st["upstream"]):
+        behind = False
     pending = bool(started and head and started != head)
     out = {"state": UP_TO_DATE, "started": _short(started), "head": _short(head), "subjects": [],
            "count": 0, "sync": st.get("state"), "diverged": st.get("state") == sync.DIVERGED,

@@ -38,6 +38,7 @@ import deploy as deploy_mod  # noqa: E402
 import deploy_profile  # noqa: E402
 import diagnostic  # noqa: E402
 import donnees as donnees_mod  # noqa: E402
+import enquete as enquete_mod  # noqa: E402
 import gitref     # noqa: E402
 import installs   # noqa: E402
 import journal as journal_mod  # noqa: E402
@@ -65,7 +66,7 @@ STATE_KEY = web.AppKey("state", State)
 PORT_KEY = web.AppKey("port", dict)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.20"
+VERSION = "1.21"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -121,6 +122,11 @@ EXPLAIN_CLIENT = None
 # 1.20 — the cycle journal (journal.py): a line per run, committed and
 # pushed in the application. A test turns it off to see a run without it.
 JOURNAL = True
+# 1.21 — « Enquêtes »: the client of an investigation and of its second calls;
+# the tests put a fake here. And the nickname of this computer, asked once on
+# the first run that writes into a repository — a test turns it on.
+ENQUETE_CLIENT = None
+ASK_COMPUTER = True
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
 # `.claude/CLAUDE.md`'s table: upstream cycle, downstream cycle, bug-fix entry,
 # merge, and what is run by hand outside the chain. A command not listed is a tool.
@@ -440,6 +446,25 @@ def log_dropped(state, rn, stored, dec, reason):
     d["logged_to"] = path
 
 
+def write_buglist(p, text):
+    """The cockpit's one writer of `bug-list.md` — « Correction »'s editor
+    and, 1.21, « Ajouter à la liste de bugs »: the file's own line ends kept."""
+    old = textfile.load(p) if os.path.exists(p) else None
+    nl = old.newline if old else "\n"
+    body_text = nl.join(text.replace("\r\n", "\n").split("\n")).rstrip() + (nl if text.strip() else "")
+    textfile.write_bytes(p, body_text.encode("utf-8"))
+
+
+def open_correction(app, feature):
+    """1.21 — the correction a bug entry goes to: the highest `bugfix-NN/`
+    whose list the diagnostic has not read yet (no `desc-bug.md`); None when
+    there is none — a new one is made."""
+    bf = bugfixes(app, feature)
+    if bf and not os.path.exists(os.path.join(work_dir(app, feature), bf[-1], "desc-bug.md")):
+        return bf[-1]
+    return None
+
+
 def new_bugfix(app, feature):
     """The next `bugfix-NN/` and its empty `bug-list.md` — the only two
     things this writes (§3.3)."""
@@ -507,7 +532,10 @@ PHONE_LOCAL_ONLY = {"/api/phone/settings", "/api/phone/disconnect",
                     # 1.17: Paramètres → Consommation.
                     "/api/usage/thresholds",
                     # 1.20: the journal is read on the phone, never written from it.
-                    "/api/journal/reconstruct", "/api/journal/report", "/api/journal/thresholds"}
+                    "/api/journal/reconstruct", "/api/journal/report", "/api/journal/thresholds",
+                    # 1.21: an investigation is read on the phone; started, and followed up, here.
+                    "/api/enquetes/start", "/api/enquetes/cancel", "/api/enquetes/prefill", "/api/enquetes/prompt",
+                    "/api/enquetes/bug", "/api/computer"}
 
 
 def phone_open(path):
@@ -589,7 +617,7 @@ def default_export_folder():
 
 def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
              diag_runner=None, export_picker=ask_export_folder, on_quit=None, file_picker=ask_idea_file,
-             measurer=None, pilot_clock=None, explainer=None):
+             measurer=None, pilot_clock=None, explainer=None, investigator=None):
     store = rn.stats
     diag_runner = diag_runner or DIAG_RUNNER
     # The diagnostic run in the background (1.4.5): once, at the opening,
@@ -1166,6 +1194,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         out["install_mode"] = state.install_mode
         # 1.20: Paramètres → Journal.
         out["journal_thresholds"] = state.journal_thresholds
+        # 1.21: this computer's nickname — asked once a run wrote with none —,
+        # and the investigation going, if any.
+        out["computer"] = {**state.computer, "wanted": computer_box["wanted"] and not state.computer["asked"]}
+        out["enquete"] = inq.public()
         if state.app_folder and os.path.isdir(state.app_folder):
             # The chain installed in the application (§20) — 1.6: also where
             # it is not installed yet, and no feature can open.
@@ -1659,12 +1691,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         p = buglist_path(a, w, data.get("name", ""))
         if os.path.exists(os.path.join(os.path.dirname(p), "desc-bug.md")):
             return web.json_response({"error": "desc-bug.md existe : le diagnostic a déjà lu cette bug-list"}, status=409)
-        text = data.get("text") or ""
         try:
-            old = textfile.load(p) if os.path.exists(p) else None
-            nl = old.newline if old else "\n"
-            body_text = nl.join(text.replace("\r\n", "\n").split("\n")).rstrip() + (nl if text.strip() else "")
-            textfile.write_bytes(p, body_text.encode("utf-8"))
+            write_buglist(p, data.get("text") or "")
         except (OSError, textfile.UnreadableFile) as e:
             return web.json_response({"error": f"bug-list.md non écrit : {e}"}, status=500)
         return web.json_response({"ok": True})
@@ -1688,7 +1716,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": busy_text(b) if b else str(e), "busy": b}, status=409)
         if data.get("_overrode"):
             r.note = journal_mod.OVERRIDE_NOTE
-        return web.json_response({"run": r.snapshot(), "sync": synced})
+        return web.json_response({"run": r.snapshot(), "sync": synced, "ask_computer": want_computer()})
 
     async def launch_checks(a, cmd, args, data):
         """What refuses a launch, in this order — a click's and a
@@ -1710,6 +1738,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if inst.going():
             return web.json_response({"error": f"« {inst.going().title} » est en cours : lancer après sa fin"},
                                      status=409), None
+        # 1.21: an investigation is a run — one at a time, whatever it reads.
+        if inq.going():
+            return web.json_response({"error": f"une enquête est en cours : {inq.going().question[:80]} — lancer "
+                                               "après sa fin", "busy_enquete": True}, status=409), None
         # 1.16 §2: what blocks a launch — Claude Code, its login, git's
         # identity —, checked again now; « Bâtir », Java and the Android tools.
         refused = await machine_block(machine.LAUNCH, a) or (
@@ -1768,7 +1800,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         with book.lock(a):
             created = journal_mod.created_files(a, feature, cycle, run.head_before, gitref.head(a))
             limits = store.limits_of(run.id) if store else []
-            entry = journal_mod.run_entry(run, journal_mod.shares(limits), created, prog_name, lots, run.note)
+            entry = journal_mod.run_entry(run, journal_mod.shares(limits), created, prog_name, lots, run.note,
+                                          computer=state.computer_label)
             path = journal_mod.journal_path(a, feature, cycle)
             out["line"] = journal_mod.append(path, entry, feature, cycle)
             out.update(cycle=cycle, outcome=entry["outcome"])
@@ -1883,7 +1916,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                 "points": pts, "programmes": progs, "overrides": ovr, "thresholds": state.journal_thresholds,
                 "final_done": final, "report": f"{rel}/{journal_mod.REPORT}",
                 "report_exists": os.path.isfile(journal_mod.report_path(a, feature, cycle)),
-                "computer": journal_mod.computer_name(), "run_going": rn.is_running(a)}
+                "computer": state.computer_label, "run_going": rn.is_running(a)}
 
     async def journal_get(request):
         a, feature, cycle = journal_args(request)
@@ -1915,7 +1948,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": why}, status=409)
         loop = asyncio.get_running_loop()
         rec = await loop.run_in_executor(None, lambda: journal_mod.reconstruct(
-            a, feature, store.path if store else None, rn.log_dir, state.name_of(a)))
+            a, feature, store.path if store else None, rn.log_dir, state.name_of(a), computer=state.computer_label))
         n = sum(len(v) for v in rec.values())
         preview = {cy: [journal_mod.format_row(e) for e in es] for cy, es in rec.items()}
         if not data.get("confirm") or not n:
@@ -1984,6 +2017,351 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": str(e)}, status=400)
         return web.json_response({"thresholds": th})
 
+    # ------------------------------------------------ « Enquêtes » (1.21)
+    # This computer's nickname: asked once, on the first run that writes into
+    # a repository while she has given none.
+    computer_box = {"wanted": False}
+
+    def want_computer():
+        if not ASK_COMPUTER or state.computer["asked"]:
+            return False
+        computer_box["wanted"] = True
+        return True
+
+    async def computer_set(request):
+        """Paramètres → « Cet ordinateur », and the question asked once —
+        « Plus tard » gives no name: « ordinateur » is written."""
+        data = await body(request)
+        try:
+            c = state.set_computer(data.get("name") or "")
+        except ValueError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        computer_box["wanted"] = False
+        out = {**c, "wanted": False, "label": state.computer_label}
+        broadcast("computer", out)
+        return web.json_response({"computer": out})
+
+    def cockpit_commit(folder, paths, message):
+        """1.12's rules: GitHub first — pulled when « en retard », pushed
+        when « non envoyé » —, then, as the journal's, these files alone, the
+        relays carried onto the commit, pushed when there is a remote."""
+        try:
+            pre = sync_mod.before_launch(book, folder)
+            for d in pre["done"]:
+                sync_said(folder, "avant d'écrire un rapport", d)
+            if not pre["ok"]:
+                sync_said(folder, "avant d'écrire un rapport", pre["error"])
+        except Exception as e:      # said, never raised: the report is written all the same
+            sync_said(folder, "avant d'écrire un rapport", f"GitHub non vérifié ({e})")
+        return journal_commit(folder, paths, message)
+
+    def inq_emit(snap):
+        broadcast("enquete", {"enquete": snap, "app": snap.get("folder")})
+
+    async def inq_end(inv):
+        """§2 — the report, once the investigation answered: written,
+        committed and pushed in the repository it concerns."""
+        if inv.outcome != "terminé":
+            return
+        inv.computer = state.computer_label
+
+        def go():
+            rel = enquete_mod.report_rel(inv.folder, inv.question)
+            path = os.path.join(inv.folder, *rel.split("/"))
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w", encoding="utf-8", newline="\n") as f:
+                f.write(enquete_mod.report_md(inv, rel))
+            out = {"path": rel, "commit": None, "pushed": None, "push_error": None, "error": None}
+            try:
+                out.update(cockpit_commit(inv.folder, [rel], enquete_mod.MESSAGE.format(
+                    subject=enquete_mod.title_of(inv.question)[:72])))
+            except sync_mod.SyncError as e:
+                out["error"] = f"écrit, non commité : {e}"
+            return out
+        inv.report = r = await asyncio.get_running_loop().run_in_executor(None, go)
+        sync_said(inv.folder, "enquête", f"{r['path']} — " + (r["error"] or f"commit {r['commit']}" + (
+            f", non poussé : {r['push_error']}" if r["pushed"] is False else "")))
+        st = book.peek(inv.folder)
+        if st is not None:
+            announce(inv.folder, st)
+
+    inq = investigator or enquete_mod.Investigator(store, rn.log_dir, client_factory=ENQUETE_CLIENT)
+    inq.emit, inq.on_end = inq_emit, inq_end
+
+    def inq_busy():
+        """Why an investigation may not start now — one run at a time, an
+        investigation included."""
+        b = busy_payload()
+        if b:
+            return busy_text(b)
+        if inq.going():
+            return "une enquête est déjà en cours : une à la fois"
+        if bulk["going"]:
+            return "« Tout mettre à jour » est en cours : après sa fin"
+        if updating["going"] or updating["restarting"]:
+            return "le cockpit se met à jour : après son redémarrage"
+        if inst.going():
+            return f"« {inst.going().title} » est en cours : après sa fin"
+        if making["current"]:
+            return "une création d'application est en cours : après sa fin"
+        return None
+
+    def inq_target(target):
+        if target == enquete_mod.CHAIN:
+            return CHAIN_ROOT, "la chaîne et le cockpit"
+        a = state.app_folder
+        if not a or not os.path.isdir(a):
+            raise web.HTTPConflict(text=json.dumps({"error": "aucune application ouverte"}),
+                                   content_type="application/json")
+        return a, state.name_of(a) or os.path.basename(a.rstrip("\\/"))
+
+    def inq_folder(kind):
+        return CHAIN_ROOT if kind == enquete_mod.CHAIN else state.app_folder
+
+    def quiet_pull_chain():
+        """Reports the other computer pushed to agent-chain — and nothing
+        else — taken at once: no code changes, nothing to put in service."""
+        st = book.peek(CHAIN_ROOT)
+        if not st or st.get("state") != sync_mod.BEHIND or not st.get("upstream") or inq.going():
+            return
+        with book.lock(CHAIN_ROOT):
+            if selfupdate.only_reports(CHAIN_ROOT, gitref.head(CHAIN_ROOT), st["upstream"]):
+                r = sync_mod.pull_ff(CHAIN_ROOT)
+                if r["ok"]:
+                    sync_said(CHAIN_ROOT, "Enquêtes", f"git pull --ff-only — {st['behind']} rapport(s) récupéré(s)")
+                book.put(CHAIN_ROOT, sync_mod.compute(CHAIN_ROOT, fetch=False))
+
+    def inq_list():
+        a = state.app_folder
+        out = []
+        if a and os.path.isdir(a) and sync_mod.Book.key(a) != sync_mod.Book.key(CHAIN_ROOT):
+            for x in enquete_mod.list_reports(a, enquete_mod.APP):
+                out.append({**x, "target_label": f"« {state.name_of(a) or os.path.basename(a)} »"})
+        try:
+            quiet_pull_chain()
+        except Exception as e:      # said, never raised
+            print(f"Enquêtes : rapports de l'autre ordinateur non récupérés ({e})", flush=True)
+        for x in enquete_mod.list_reports(CHAIN_ROOT, enquete_mod.CHAIN):
+            out.append({**x, "target_label": "La chaîne et le cockpit"})
+        out.sort(key=lambda x: x["name"], reverse=True)
+        return out
+
+    async def enquetes_get(request):
+        reports = await asyncio.get_running_loop().run_in_executor(None, inq_list)
+        a = state.app_folder
+        return web.json_response({
+            "current": inq.public(), "reports": reports, "busy": inq_busy(),
+            "app": a, "app_name": state.name_of(a) if a else None, "chain_root": CHAIN_ROOT,
+            "models": list(enquete_mod.MODELS), "default_model": enquete_mod.default_model(),
+            "computer": state.computer_label})
+
+    async def enquetes_start(request):
+        """« Lancer l'enquête »: her question, its target, its model — read-only
+        enforced (enquete.py §1); 1.17's threshold; never by a programme."""
+        data = await body(request)
+        q = (data.get("question") or "").strip()
+        if not q:
+            return web.json_response({"error": "la question est vide"}, status=400)
+        if len(q) > enquete_mod.MAX_QUESTION:
+            return web.json_response({"error": f"la question tient en {enquete_mod.MAX_QUESTION} caractères"},
+                                     status=400)
+        target = data.get("target")
+        if target not in enquete_mod.TARGETS:
+            return web.json_response({"error": "cible inconnue"}, status=400)
+        model = data.get("model") or ""
+        if model not in enquete_mod.MODELS:
+            return web.json_response({"error": f"modèle inconnu : {model}"}, status=400)
+        why = inq_busy()
+        if why:
+            return web.json_response({"error": why, "busy": True}, status=409)
+        folder, name = inq_target(target)
+        refused = await machine_block(machine.LAUNCH, state.app_folder if target == enquete_mod.APP else None)
+        if refused:
+            return refused
+        a = state.app_folder or folder
+        refused = await usage_gate(data, f"l'enquête « {enquete_mod.title_of(q)[:60]} »", a)
+        if refused:
+            return refused
+        why = inq_busy()            # the measure took a while
+        if why:
+            return web.json_response({"error": why, "busy": True}, status=409)
+        try:
+            inv = inq.start(q, target, folder, name, model, source=data.get("source"),
+                            computer=state.computer_label)
+        except enquete_mod.Failed as e:
+            return web.json_response({"error": str(e), "busy": True}, status=409)
+        return web.json_response({"enquete": inv.snapshot(), "ask_computer": want_computer()})
+
+    async def enquetes_cancel(request):
+        return web.json_response({"cancelled": inq.cancel()})
+
+    def read_report(kind, path):
+        rel = enquete_mod.safe_rel(path)
+        folder = inq_folder(kind)
+        if not rel or not folder:
+            raise web.HTTPBadRequest(text=json.dumps({"error": "rapport inconnu"}), content_type="application/json")
+        p = os.path.join(folder, *rel.split("/"))
+        try:
+            text = textfile.load(p).text()
+        except (OSError, textfile.UnreadableFile):
+            raise web.HTTPNotFound(text=json.dumps({"error": f"{rel} introuvable"}), content_type="application/json")
+        return folder, rel, text
+
+    async def enquetes_report(request):
+        kind = request.query.get("target") or ""
+        folder, rel, text = read_report(kind, request.query.get("path"))
+        prel = enquete_mod.prompt_rel(rel)
+        pp = os.path.join(folder, *prel.split("/"))
+        prompt = textfile.load(pp).text() if os.path.exists(pp) else None
+        return web.json_response({"path": rel, "target": kind, "text": text, "meta": enquete_mod.parse_report(text),
+                                  "prompt": {"path": prel, "text": prompt} if prompt is not None else None})
+
+    def logs_for(a, wanted):
+        """The run logs on this computer of journal lines: [(at, command, path)]."""
+        if not store or not wanted:
+            return []
+        runs, _p, _l, err = statsview.read_store(store.path)
+        if err:
+            return []
+        k = statsview.app_key(a)
+        out = []
+        for at, command in wanted:
+            for r in runs:
+                if (not r.get("kind") and statsview.app_key(r.get("app")) == k and r.get("command") == command
+                        and (r.get("started_at") or "")[:16] == (at or "")[:16] and r.get("log_path")):
+                    out.append((at, command, r["log_path"]))
+                    break
+        return out
+
+    async def enquetes_prefill(request):
+        """§3 — a point à creuser, or the run that ended in error: the
+        question written — what happened, where, what to look at."""
+        data = await body(request)
+        a, w = need_pair()
+        feature = feature_of(w)
+        name = state.name_of(a) or os.path.basename(a)
+        if data.get("source") == "run":
+            run = rn.current(a)
+            if not run or not run.id or run.status != "ended" or run.outcome != "erreur":
+                return web.json_response({"error": "aucun run terminé en erreur ici"}, status=404)
+            snap = {**run.snapshot(), "relay": run.relay}
+            sc = scan_of(a, feature)
+            chain, _ = decide_mod.chain_of(sc, run.command)
+            cy = chain if chain and chain != "main" else "main"
+            ctx = {"app_name": name, "app": a, "feature": feature,
+                   "journal": journal_mod.journal_path(a, feature, cy)}
+            return web.json_response(enquete_mod.question_from_run(snap, ctx))
+        point = data.get("point")
+        if not isinstance(point, dict) or not point.get("kind"):
+            return web.json_response({"error": "aucun point"}, status=400)
+        cycle = (data.get("cycle") or "main").strip("/")
+        if cycle not in journal_mod.cycles(a, feature):
+            cycle = "main"
+        wanted = [(x.get("at"), x.get("command")) for x in point.get("runs") or [] if isinstance(x, dict)] \
+            or ([(point.get("at"), point.get("command"))] if point.get("command") else [])
+        logs = await asyncio.get_running_loop().run_in_executor(None, logs_for, a, wanted)
+        base = os.path.join(a, *journal_mod.cycle_rel(feature, cycle).split("/"))
+        files = [os.path.join(base, *str(f).split("/")) for f in point.get("files") or []]
+        ctx = {"app_name": name, "app": a, "feature": feature, "cycle": cycle, "logs": logs, "files": files,
+               "journal": journal_mod.journal_path(a, feature, cycle)}
+        return web.json_response(enquete_mod.question_from_point(point, ctx))
+
+    async def enquetes_prompt(request):
+        """§4 — the chain or the cockpit: « Préparer un prompt de
+        correction ». Written by a second call, saved beside the report,
+        marked « à relire », committed and pushed — never launched."""
+        data = await body(request)
+        folder, rel, report = read_report(enquete_mod.CHAIN, data.get("path"))
+        prel = enquete_mod.prompt_rel(rel)
+        refused = await usage_gate(data, f"le prompt de correction de {rel}", state.app_folder or folder)
+        if refused:
+            return refused
+        meta = enquete_mod.parse_report(report)
+        try:
+            text = await enquete_mod.ask(enquete_mod.prompt_request(report), enquete_mod.PROMPT_INSTRUCTION,
+                                         enquete_mod.SCRATCH, client_factory=inq.client_factory, store=store,
+                                         log_dir=rn.log_dir, app=folder)
+        except enquete_mod.Failed as e:
+            return web.json_response({"error": f"Pas de prompt : {e}."}, status=502)
+        content = enquete_mod.prompt_file(rel, meta.get("model") or "?") + text.strip() + "\n"
+
+        def go():
+            with open(os.path.join(folder, *prel.split("/")), "w", encoding="utf-8", newline="\n") as f:
+                f.write(content)
+            return cockpit_commit(folder, [prel], enquete_mod.PROMPT_MESSAGE.format(subject=meta.get("title", "")[:60]))
+        try:
+            out = await asyncio.get_running_loop().run_in_executor(None, go)
+        except (OSError, sync_mod.SyncError) as e:
+            return web.json_response({"error": f"prompt non enregistré : {e}"}, status=409)
+        sync_said(folder, "prompt de correction", f"{prel} — commit {out['commit']}")
+        return web.json_response({**out, "path": prel, "text": content})
+
+    async def enquetes_bug(request):
+        """§4 — the application: « Ajouter à la liste de bugs ». Without
+        `confirm`: the entry drafted from the report, shown. With it: her
+        entry — read, maybe changed — appended to the open correction's
+        bug-list.md, or to a new correction's."""
+        data = await body(request)
+        a, w = need_pair()
+        _folder, rel, report = read_report(enquete_mod.APP, data.get("path"))
+        features = working_folders(a, state.ignored)
+        feature = data.get("feature") or feature_of(w)
+        if feature not in features:
+            return web.json_response({"error": f"feature inconnue : {feature}"}, status=400)
+        open_bf = open_correction(a, feature)
+        bf = bugfixes(a, feature)
+        new_name = f"bugfix-{(int(bf[-1].split('-')[1]) + 1) if bf else 1:02d}"
+
+        def current_list(name):
+            p = os.path.join(work_dir(a, feature), name, "bug-list.md") if name else None
+            return textfile.load(p).text() if p and os.path.exists(p) else ""
+        where_ = {"feature": feature, "features": features, "bugfix": open_bf, "new_bugfix": None if open_bf else new_name}
+        if not data.get("confirm"):
+            given = data.get("fields")
+            if isinstance(given, dict) and given.get("observé") and given.get("attendu"):
+                # Another feature chosen: the same entry, numbered for its list — no second call.
+                fields = {k: str(given.get(k) or "") for k in ("observé", "ou", "attendu")}
+            else:
+                refused = await usage_gate(data, f"l'entrée de bug de {rel}", a)
+                if refused:
+                    return refused
+                try:
+                    said = await enquete_mod.ask(f"Le rapport d'enquête :\n\n{report.strip()}",
+                                                 enquete_mod.BUG_INSTRUCTION, enquete_mod.SCRATCH,
+                                                 client_factory=inq.client_factory, store=store, log_dir=rn.log_dir,
+                                                 app=a)
+                except enquete_mod.Failed as e:
+                    return web.json_response({"error": f"Pas d'entrée : {e}."}, status=502)
+                fields = enquete_mod.bug_fields(said)
+                if not fields.get("observé") or not fields.get("attendu"):
+                    return web.json_response({"error": "Pas d'entrée : la réponse n'a pas la forme attendue.",
+                                              "said": said}, status=502)
+            n = enquete_mod.next_gap(current_list(open_bf))
+            return web.json_response({**where_, "fields": fields, "entry": enquete_mod.bug_entry(fields, n)})
+        entry = " ".join((data.get("entry") or "").split()) if "\n" not in (data.get("entry") or "").strip() \
+            else (data.get("entry") or "").strip()
+        if not entry.strip():
+            return web.json_response({"error": "l'entrée est vide"}, status=400)
+        if rn.is_running(a):
+            return web.json_response({"error": "une commande tourne dans cette application : après sa fin"}, status=409)
+
+        def go():
+            name = open_correction(a, feature) or new_bugfix(a, feature)
+            p = os.path.join(work_dir(a, feature), name, "bug-list.md")
+            text = textfile.load(p).text() if os.path.exists(p) else ""
+            line = enquete_mod.renumber(entry, enquete_mod.next_gap(text))
+            write_buglist(p, enquete_mod.append_gap(text, line))
+            return name, line
+        try:
+            name, line = await asyncio.get_running_loop().run_in_executor(None, go)
+        except (OSError, textfile.UnreadableFile) as e:
+            return web.json_response({"error": f"bug-list.md non écrit : {e}"}, status=500)
+        state.clear_fresh(a, feature)
+        print(enquete_mod.console(f"Enquêtes — {state.name_of(a)} : {feature}/{name}/bug-list.md, ajouté : {line[:80]}"),
+              flush=True)
+        return web.json_response({"ok": True, "feature": feature, "bugfix": name, "entry": line,
+                                  "path": f"docs/features/{feature}/{name}/bug-list.md"})
+
     # ---------------------------------------- pilote automatique (1.18)
     class PilotHost:
         """What the programme asks of the server (autopilot.py)."""
@@ -1993,12 +2371,19 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
         def busy(self):
             x = rn.going()
-            return x.prompt if x and not x.programme else None
+            if x and not x.programme:
+                return x.prompt
+            # 1.21: an investigation goes — the programme waits; it never launches one.
+            i = inq.going()
+            return "l'enquête en cours" if i else None
 
         async def wait_idle(self):
             x = rn.going()
             if x and x.task:
                 await asyncio.gather(asyncio.shield(x.task), return_exceptions=True)
+            i = inq.going()
+            if i and i.task:
+                await asyncio.gather(asyncio.shield(i.task), return_exceptions=True)
 
         async def refresh_usage(self, force):
             if MEASURE_USAGE and (force or meas.stale()):
@@ -2329,9 +2714,12 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             with book.lock(CHAIN_ROOT):
                 st = book.put(CHAIN_ROOT, sync_mod.compute(CHAIN_ROOT))
                 if st["state"] == sync_mod.BEHIND:
+                    before = gitref.head(CHAIN_ROOT)
                     r = sync_mod.pull_ff(CHAIN_ROOT)
                     if r["ok"]:
-                        notice = CHAIN_RESTART
+                        # 1.21: reports alone — nothing to put in service.
+                        quiet = selfupdate.only_reports(CHAIN_ROOT, before, gitref.head(CHAIN_ROOT))
+                        notice = "" if quiet else CHAIN_RESTART
                         sync_said(CHAIN_ROOT, "au démarrage", f"git pull --ff-only — {st['behind']} commit(s) récupéré(s)")
                     else:
                         error = ("La nouvelle version du cockpit et de la chaîne n'a pas pu être récupérée : "
@@ -3145,6 +3533,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if pilot.active():
             return (f"le pilote automatique a un programme actif ({pilot.p['status']}) : le cockpit se met à jour "
                     "après sa fin")
+        if inq.going():
+            return "une enquête est en cours : le cockpit se met à jour après sa fin"
         return None
 
     async def cockpit_get(request):
@@ -3197,7 +3587,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                 steps.append(f"git pull --ff-only — {n} commit{'s' if n > 1 else ''} récupéré{'s' if n > 1 else ''}")
                 sync_said(CHAIN_ROOT, "Mettre à jour le cockpit", steps[-1])
             head = gitref.head(CHAIN_ROOT)
-            if not head or head == started:
+            if not head or selfupdate.code_head(CHAIN_ROOT, started, head) == started:
                 if p["sync"].get("state") == sync_mod.OFFLINE:
                     return refuse("agent-chain — " + sync_mod.summary(p["sync"]))
                 updating.update(going=False, error="")
@@ -3326,7 +3716,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             apps.append(row)
         x = rn.going()
         why = restart_busy()
-        return {"chain_root": CHAIN_ROOT, "started": started, "head": gitref.head(CHAIN_ROOT), "apps": apps,
+        # 1.21: a commit of reports alone is not newer code.
+        head = selfupdate.code_head(CHAIN_ROOT, started, gitref.head(CHAIN_ROOT))
+        return {"chain_root": CHAIN_ROOT, "started": started, "head": head, "apps": apps,
                 "chain_sync": chain_sync.get("sync") or book.peek(CHAIN_ROOT), "diagnostic": state.diagnostic(),
                 "app_name": state.app_name, "restart": restart_box, "pip": pip_box,
                 "busy": f"la fin de {x.prompt}" if x else ("la fin de ce qui est en cours" if why else None)}
@@ -3411,7 +3803,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         per reason."""
         if not AUTO_RESTART:
             return
-        head = gitref.head(CHAIN_ROOT)
+        # 1.21: commits of docs/enquetes/ alone are not newer code.
+        head = selfupdate.code_head(CHAIN_ROOT, started, gitref.head(CHAIN_ROOT))
         older = bool(head and started and head != started)
         if not (older or restart_box["wanted"]) or updating["restarting"] or restart_busy():
             return
@@ -3734,6 +4127,14 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/journal/reconstruct", journal_reconstruct)
     r.add_post("/api/journal/report", journal_report)
     r.add_post("/api/journal/thresholds", journal_thresholds)
+    r.add_get("/api/enquetes", enquetes_get)
+    r.add_post("/api/enquetes/start", enquetes_start)
+    r.add_post("/api/enquetes/cancel", enquetes_cancel)
+    r.add_get("/api/enquetes/report", enquetes_report)
+    r.add_post("/api/enquetes/prefill", enquetes_prefill)
+    r.add_post("/api/enquetes/prompt", enquetes_prompt)
+    r.add_post("/api/enquetes/bug", enquetes_bug)
+    r.add_post("/api/computer", computer_set)
     r.add_get("/api/code", code_get)
     r.add_get("/api/code/lot", code_lot)
     r.add_get("/api/stats/csv", stats_csv)
@@ -3915,8 +4316,8 @@ def older_server(other, port):
     against the code on disk; older, it is asked to restart — refused while
     something goes there, and the page then says so —, and the browser waits
     for the new one. True when it restarted."""
-    head = gitref.head(CHAIN_ROOT)
     was = other.get("started")
+    head = selfupdate.code_head(CHAIN_ROOT, was, gitref.head(CHAIN_ROOT))
     if not was or not head or was == head:
         return False
     print(f"Ce cockpit tourne sur {was[:7]}, le code sur le disque est à {head[:7]} : il est prié de redémarrer.",

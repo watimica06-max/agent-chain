@@ -861,6 +861,43 @@ details pre { max-height: var(--mh-360); overflow: auto; background: var(--raise
   .jn-ev { grid-template-columns: minmax(0, 1fr); gap: var(--sp-2); }
   .jn-panel pre { white-space: pre-wrap; }
 }
+/* ------------------------------------------------- enquêtes (1.21) */
+#scr-enquetes { max-width: var(--w-1240); }
+.jn-point .eq-go { margin-left: auto; flex: none; }
+.eq-form textarea { width: 100%; min-height: calc(var(--h-28) * 6); font: inherit; font-size: var(--fs-14); line-height: 1.5;
+  padding: var(--sp-10) var(--sp-12); border: var(--bw) solid var(--line); border-radius: var(--r-8); background: var(--card); color: inherit; resize: vertical; }
+.eq-form .eq-opts { display: flex; gap: var(--sp-16) var(--sp-24); flex-wrap: wrap; align-items: flex-start; margin: var(--sp-12) 0; }
+.eq-form fieldset { border: none; margin: 0; padding: 0; display: grid; gap: var(--sp-4); }
+.eq-form legend { font-weight: 650; font-size: var(--fs-13); margin-bottom: var(--sp-4); }
+.eq-form label.opt { display: flex; gap: var(--sp-6); align-items: baseline; font-size: var(--fs-14); }
+.eq-form .row, .eq-reader .row, .eq-cur .row { display: flex; gap: var(--sp-10); align-items: center; flex-wrap: wrap; }
+.eq-ro { font-size: var(--fs-13); color: var(--soft); margin: var(--sp-8) 0 var(--sp-12); }
+.eq-cur { margin-bottom: var(--sp-16); }
+.eq-cur .eq-q { white-space: pre-wrap; font-size: var(--fs-14); margin: var(--sp-6) 0 var(--sp-10); max-height: calc(var(--h-28) * 5); overflow: auto; }
+.eq-steps { font: var(--fs-12) var(--mono); background: var(--raised); border: var(--bw) solid var(--line); border-radius: var(--r-8);
+  padding: var(--sp-8) var(--sp-12); max-height: calc(var(--h-28) * 8); overflow: auto; margin: var(--sp-8) 0; }
+.eq-steps div { white-space: pre-wrap; overflow-wrap: anywhere; }
+.eq-steps .no { color: var(--err); }
+.eq-list { display: grid; gap: var(--sp-8); }
+.eq-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp-4) var(--sp-12); text-align: left; width: 100%;
+  background: var(--card); border: var(--bw) solid var(--line); border-radius: var(--r-10); padding: var(--sp-10) var(--sp-14); color: inherit; font: inherit; cursor: pointer; }
+.eq-item:hover, .eq-item[aria-current=true] { border-color: var(--accent); }
+.eq-item .t { font-weight: 650; overflow-wrap: anywhere; }
+.eq-item .m { grid-column: 1 / -1; color: var(--soft); font-size: var(--fs-13); display: flex; gap: var(--sp-6) var(--sp-12); flex-wrap: wrap; }
+.eq-reader { margin-bottom: var(--sp-16); }
+/* A report is read whole, the page scrolling — never in a box of its own. */
+.eq-reader .mdoc { font-size: var(--fs-15); line-height: 1.6; margin: var(--sp-10) 0; max-height: none; overflow: visible; border: none; padding: 0; }
+.eq-next { border-top: var(--bw) solid var(--line); margin-top: var(--sp-12); padding-top: var(--sp-12); }
+.eq-mark { background: var(--warn-soft); color: var(--warn); border-radius: var(--r-8); padding: var(--sp-8) var(--sp-12); font-weight: 650; margin: var(--sp-8) 0; }
+.eq-prompt pre { max-height: var(--mh-420); overflow: auto; background: var(--raised); border: var(--bw) solid var(--line); border-radius: var(--r-8);
+  padding: var(--sp-10) var(--sp-12); font: var(--fs-12) var(--mono); white-space: pre-wrap; margin: var(--sp-10) 0; }
+.eq-bug textarea { width: 100%; min-height: calc(var(--h-28) * 3); font: inherit; font-size: var(--fs-14); padding: var(--sp-8) var(--sp-10);
+  border: var(--bw) solid var(--line); border-radius: var(--r-8); background: var(--card); color: inherit; resize: vertical; }
+#computer-ask { display: flex; gap: var(--sp-10); align-items: center; flex-wrap: wrap; margin: var(--sp-8) var(--sp-16); }
+#computer-ask input, #set-computer input { width: calc(var(--w-80) * 2.5); max-width: 100%; }
+@media (max-width: 720px) {
+  .eq-item { grid-template-columns: minmax(0, 1fr); }
+}
 /* ------------------------------------------------- statistiques (1.4.5) */
 #scr-stats { max-width: var(--w-1240); }
 .st-filters { display: flex; gap: var(--sp-10); align-items: center; flex-wrap: wrap; }
@@ -1317,6 +1354,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
   <symbol id="i-desk" viewBox="0 0 24 24"><path d="M3 5h18v11H3z M8 20h8 M12 16v4"/></symbol>
   <symbol id="i-more" viewBox="0 0 24 24"><path d="M5 12h.01 M12 12h.01 M19 12h.01"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5 M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13z M15.5 15.5L20 20"/></symbol>
 </svg>
 <div id="shell" class="nofolder">
   <nav id="side" aria-label="Menu">
@@ -1333,6 +1371,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     <div class="side-group">Mesure</div>
     <a href="#stats" id="nav-stats"><svg class="ic" aria-hidden="true"><use href="#i-stats"/></svg>Statistiques</a>
     <a href="#journal" id="nav-journal"><svg class="ic" aria-hidden="true"><use href="#i-journal"/></svg>Journal</a>
+    <a href="#enquetes" id="nav-enquetes"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>Enquêtes <span id="nav-eq-dot" class="dot hidden" title="Une enquête est en cours"></span></a>
     <span class="spacer"></span>
     <a href="#settings" id="nav-settings"><svg class="ic" aria-hidden="true"><use href="#i-settings"/></svg>Paramètres</a>
     <button id="tb-home" class="hidden" title="Retour à l'écran d'accueil : toutes les applications"><svg class="ic" aria-hidden="true"><use href="#i-apps"/></svg>Applications</button>
@@ -1366,6 +1405,8 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     <div id="usage-banner" class="hidden" role="alert" aria-label="Consommation"></div>
     <div id="sync-banner" class="hidden" role="status" aria-label="GitHub"></div>
     <div id="phone-lock" class="hidden" role="alert" aria-label="Accès depuis le téléphone bloqué"></div>
+    <!-- 1.21: this computer's nickname, asked once — what a repository is told of it. -->
+    <div id="computer-ask" class="notice hidden desk-only" role="dialog" aria-label="Le nom de cet ordinateur"></div>
   </div>
 
   <div id="main">
@@ -1754,6 +1795,34 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       <div class="st-sec" id="jn-prog-sec"><h3>Pilote automatique et « Lancer quand même »</h3><div id="jn-prog"></div></div>
     </section>
 
+    <!-- ============================ Enquêtes (1.21) ============================ -->
+    <!-- Her question, read-only investigated; the report kept in the repository
+         it concerns (docs/enquetes/). Read on the phone, started on the computer. -->
+    <section id="scr-enquetes" class="screen hidden">
+      <div class="flow-head">
+        <h2>Enquêtes</h2>
+        <span class="grow"></span>
+        <button id="eq-new" class="primary desk-only">Nouvelle enquête</button>
+      </div>
+      <p class="st-note" id="eq-note">Une question, en français : une enquête lit l'application ou la chaîne et le cockpit, et répond pour vous. Elle lit seulement — le cockpit lui refuse toute écriture. Son rapport est commité et poussé dans le dépôt qu'il concerne.</p>
+      <div id="eq-msg" class="notice hidden" role="status"></div>
+      <div id="eq-form" class="card eq-form hidden desk-only">
+        <h3>Nouvelle enquête</h3>
+        <label for="eq-question" class="small muted">Votre question</label>
+        <textarea id="eq-question" placeholder="Par exemple : pourquoi /8_code s'est-il arrêté hier soir sur le lot 3 ?"></textarea>
+        <div class="eq-opts">
+          <fieldset id="eq-target"><legend>Sur quoi</legend></fieldset>
+          <fieldset><legend>Modèle</legend><select id="eq-model" aria-label="Modèle"></select></fieldset>
+        </div>
+        <p class="eq-ro" id="eq-ro"></p>
+        <div class="row"><button id="eq-launch" class="primary">Lancer l'enquête</button><button id="eq-form-cancel">Annuler</button>
+          <span id="eq-busy" class="small muted"></span></div>
+      </div>
+      <div id="eq-current" class="card eq-cur hidden" aria-live="polite"></div>
+      <div id="eq-reader" class="card eq-reader hidden"></div>
+      <div class="st-sec"><h3>Rapports</h3><div id="eq-list" class="eq-list"></div></div>
+    </section>
+
     <!-- ============================ Paramètres ============================ -->
     <!-- 1.9: what belongs to the cockpit itself. The chain's version is under
          « Chaîne → Version », the deploy profile under « Déploiement → Profil ». -->
@@ -1808,6 +1877,13 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <div class="row" style="margin-top:var(--sp-12)"><button id="btn-journal-th" class="primary">Enregistrer</button>
           <span class="muted small">Par défaut : 2 fois, 3 fois, 2 fichiers.</span>
           <span id="journal-th-msg" class="small" role="status"></span></div>
+      </div>
+      <!-- 1.21: the name a repository is told of this computer — never its network name. -->
+      <div class="card sec" id="sec-computer">
+        <h2>Cet ordinateur</h2>
+        <p class="lead">Le nom court qu'écrivent le journal de cycle et les rapports d'enquête, poussés sur GitHub — « travail », « perso ». Jamais le nom de l'ordinateur sur le réseau. Sans nom : « ordinateur ».</p>
+        <div class="row" id="set-computer"><label for="computer-name">Nom</label><input type="text" id="computer-name" maxlength="40" autocomplete="off" placeholder="travail">
+          <button id="btn-computer" class="primary">Enregistrer</button><span id="computer-msg" class="small" role="status"></span></div>
       </div>
       <div class="card sec phone-keep" id="sec-notes">
         <h2>Notifications</h2>
@@ -2197,7 +2273,7 @@ const STATE_CLASS = {"faite": "st-faite", "t'attend": "st-attend", "en cours": "
 // 1.9: the cockpit opens on the home screen — « accueil » — and never
 // straight on a dashboard. « nouvelle » is the creation form, a page of its
 // own. Every other screen is an open application's, with the side menu.
-const SCREENS = ["dashboard", "answer", "chaine", "correction", "donnees", "deploy", "stats", "journal", "settings"];
+const SCREENS = ["dashboard", "answer", "chaine", "correction", "donnees", "deploy", "stats", "journal", "enquetes", "settings"];
 const HOME = ["accueil", "nouvelle"];
 function currentRoute() {
   const h = (location.hash || "").replace("#", "");
@@ -2235,6 +2311,8 @@ function route() {
   if (inApp && r === "stats" && !PHONE) loadStats();
   // 1.20: the journal — on the phone too, to read.
   if (inApp && r === "journal") loadJn();
+  // 1.21: the investigations — on the phone too, to read.
+  if (inApp && r === "enquetes") loadEq();
   // 1.16: « État de l'ordinateur » checked when the screen opens.
   if (inApp && r === "settings" && entering) checkMachine();
   if (inApp && r === "donnees" && entering) enterDonnees();
@@ -3076,6 +3154,7 @@ async function refreshState(reason) {
 }
 
 function renderAll() {
+  renderComputerAsk(); renderEqDot();
   renderChrome(); renderChainState(); renderDashboard(); renderChaine(); renderCorrection(); renderRun(); renderSettings();
   renderAnswersSend();
   placeRun();
@@ -3104,7 +3183,7 @@ function watchDiagnostic() {
 // its screens. The home screen has none of them. The run going is said with
 // its application, and « Arrêter » acts on it from any screen (1.6).
 const PAGE_NAMES = {dashboard: "Tableau de bord", answer: "À répondre", chaine: "Chaîne", correction: "Correction",
-  donnees: "Données", deploy: "Déploiement", stats: "Statistiques", journal: "Journal", settings: "Paramètres"};
+  donnees: "Données", deploy: "Déploiement", stats: "Statistiques", journal: "Journal", enquetes: "Enquêtes", settings: "Paramètres"};
 function renderChrome() {
   const home = atHome();
   const isOpen = !!S.open && !home;
@@ -3713,6 +3792,8 @@ async function postRun(name, args) {
     }
   } finally { clearTimeout(said); launchingMeasure = false; renderUsageBanner(); }
   if (!r) return false;
+  // 1.21: the first run that writes a journal line with no nickname given — asked once.
+  if (r.ask_computer) { S.computer = {...(S.computer || {}), wanted: true}; renderComputerAsk(); }
   if (r && r.sync && r.sync.notice) showSync({kind: /injoignable|sans envoyer|identifiant/.test(r.sync.notice) ? "warn" : "ok", text: r.sync.notice});
   return true;
 }
@@ -4601,6 +4682,9 @@ function renderRunEnd() {
   if (run.auth_failed) b.append(el("div", {class: "notice err run-auth"}, el("b", {text: "Claude Code n'est pas connecté sur cet ordinateur. "}),
     repairsHere() ? el("button", {class: "small primary", text: "Se connecter", onclick: (e) => { go("settings"); doRepair({repair: {id: "claude_login", label: "Se connecter à Claude"}}, e.currentTarget); }})
       : el("span", {text: "Réparer sur l'ordinateur."})));
+  // 1.21: a run that ended in error — an investigation, its question written.
+  if (run.outcome === "erreur" && !PHONE) b.append(el("div", {class: "row", style: "margin:var(--sp-6) 0"},
+    el("button", {class: "small", id: "run-enquete", text: "Enquêter sur ce point", onclick: () => eqFromProblem({source: "run"})})));
   if (run.usage) b.append(el("div", {class: "run-total", id: "run-total"}, el("b", {text: "Total du run — "}), usageText(run.usage)));
   else b.append(el("div", {class: "run-total muted", id: "run-total", text: "Total du run : aucun message de résultat, la consommation n'est pas connue."}));
   for (const p of run.passes || []) b.append(el("div", {class: "muted small", text: `${agentName(p.agent)} — ${usageText(p)}`}));
@@ -4784,6 +4868,9 @@ function onEvent(ev) {
   if (ev.type === "pilot_push") return;
   // 1.20: a run's journal line committed — the Journal, when it is shown.
   if (ev.type === "journal") { if (currentRoute() === "journal" && sameApp(d.app, S.app_folder)) loadJn(); return; }
+  // 1.21: an investigation moved; this computer's nickname given.
+  if (ev.type === "enquete") { onEqEvent(d.enquete); return; }
+  if (ev.type === "computer") { S.computer = d; renderComputerAsk(); if (currentRoute() === "settings") renderComputer(); return; }
   // 1.8: a deploy and a crash, whatever the screen.
   if ((ev.type || "").startsWith("deploy_")) { onDeployEvent(ev); return; }
   // 1.6: every run's events arrive; another application's run is not this
@@ -5459,6 +5546,7 @@ function renderSettings() {
   $("mode-note").textContent = "Le mode choisi vaut pour le prochain run ; un run en cours garde le sien. Même en Auto, une demande renvoyée vers toi devient un bandeau.";
   renderThresholds();
   renderJnThresholds();
+  renderComputer();
 
   renderNotes();
   // 1.15: the phone — its access, its notifications.
@@ -6864,7 +6952,9 @@ function renderJnPoints() {
   if (!JN.points.length) { box.append(el("p", {class: "jn-none", text: "Aucun point à creuser pour ce cycle."})); return; }
   box.append(el("div", {class: "jn-points"}, ...JN.points.map((p) => {
     const [cls, label] = JN_POINT[p.kind] || ["warn", p.kind];
-    return el("div", {class: "jn-point " + p.kind.replace(" ", "-")}, jnBadge(label, cls), el("span", {text: p.text}));
+    // 1.21: « Enquêter sur ce point » — the question written, the target chosen; she reads it before launching.
+    return el("div", {class: "jn-point " + p.kind.replace(" ", "-")}, jnBadge(label, cls), el("span", {text: p.text}),
+      PHONE ? null : el("button", {class: "small eq-go", text: "Enquêter sur ce point", onclick: () => eqFromProblem({source: "point", point: p, cycle: JN.cycle})}));
   })));
 }
 
@@ -7067,6 +7157,305 @@ $("btn-journal-th").onclick = async () => {
   for (const k of ["cost_factor", "repeat_runs", "blocking_repeat"]) t[k] = $("jt-" + k).value;
   try { const r = await api("/api/journal/thresholds", {thresholds: t}); S.journal_thresholds = r.thresholds; renderJnThresholds();
     msg.className = "small ok"; msg.textContent = "Enregistré."; }
+  catch (e) { msg.className = "small err"; msg.textContent = e.message; }
+};
+
+// ================================================ enquêtes (1.21)
+// Her question, investigated read-only — the cockpit refuses every write —,
+// its report kept in the repository it concerns (docs/enquetes/). Read on
+// the phone; started, stopped and followed up on the computer: a correction
+// prompt for the chain or the cockpit, never launched from here; a bug entry
+// for the application, written once she confirmed it.
+const EQ = {data: null, token: 0, formOpen: false, draft: null, open: null, report: null, panel: null, bug: null};
+const EQ_TARGET = {application: "L'application", chaine: "La chaîne et le cockpit"};
+const EQ_OUTCOME = {"terminé": "ok", "erreur": "err", "annulé": "plain", "délai dépassé": "err"};
+const EQ_READONLY = "Lecture seule, imposée par le cockpit : ni écriture, ni commit, ni push, ni suppression, ni accès au web. "
+  + "Seules passent les commandes de lecture — git log, show, diff, status, blame, grep ; lister, lire, chercher dans les fichiers.";
+async function loadEq() {
+  const tok = ++EQ.token;
+  let data;
+  try { data = await api("/api/enquetes"); }
+  catch (e) { if (tok === EQ.token) eqMsg(e.message, "err"); return; }
+  if (tok !== EQ.token) return;
+  EQ.data = data; S.enquete = data.current = eqNewest(S.enquete, data.current);
+  renderEq();
+}
+// An investigation's state, told by the stream and by a request's answer —
+// in either order: the page keeps the newest (its `seq`), never an older one.
+function eqNewest(had, got) {
+  if (had && got && had.id === got.id && (had.seq || 0) > (got.seq || 0)) return had;
+  return got;
+}
+function eqMsg(text, kind = "warn") {
+  const m = $("eq-msg");
+  m.className = "notice " + kind + (text ? "" : " hidden");
+  m.textContent = text || "";
+}
+const eqGoing = () => !!(S.enquete && S.enquete.status === "going");
+function renderEqDot() {
+  const d = $("nav-eq-dot"); if (d) d.classList.toggle("hidden", !eqGoing());
+}
+function renderEq() {
+  if (!EQ.data) return;
+  renderEqDot(); renderEqForm(); renderEqCurrent(); renderEqList();
+  $("eq-new").classList.toggle("hidden", EQ.formOpen);
+}
+
+function eqTargetLabel(t) {
+  return t === "chaine" ? `${EQ_TARGET.chaine} — ${EQ.data.chain_root}` : `${EQ_TARGET.application} « ${EQ.data.app_name || "?"} »`;
+}
+function renderEqForm() {
+  const f = $("eq-form");
+  f.classList.toggle("hidden", !EQ.formOpen || PHONE);
+  if (!EQ.formOpen) return;
+  const d = EQ.draft || {};
+  if (d.fresh) { $("eq-question").value = d.question || ""; d.fresh = false; }
+  const want = d.target || "application";
+  const box = $("eq-target"); box.replaceChildren(el("legend", {text: "Sur quoi"}));
+  for (const t of ["application", "chaine"]) {
+    const i = el("input", {type: "radio", name: "eq-target", value: t, checked: want === t || undefined});
+    i.onchange = () => { EQ.draft = {...(EQ.draft || {}), target: t}; };
+    box.append(el("label", {class: "opt"}, i, el("span", {text: eqTargetLabel(t)})));
+  }
+  const sel = $("eq-model"), keep = sel.value || d.model || "";
+  sel.replaceChildren(...EQ.data.models.map((m) => el("option", {value: m,
+    text: m ? cap(m) : `Celui des commandes de la chaîne${EQ.data.default_model ? ` (${EQ.data.default_model})` : ""}`})));
+  sel.value = keep;
+  $("eq-ro").textContent = EQ_READONLY;
+  const busy = EQ.data.busy;
+  $("eq-launch").disabled = !!busy || undefined;
+  $("eq-busy").textContent = busy ? cap(busy) + "." : "";
+}
+function eqOpenForm(draft) {
+  EQ.formOpen = true;
+  EQ.draft = {...(draft || {}), fresh: true};
+  if (!draft) $("eq-question").value = "";
+  renderEq();
+  $("eq-form").scrollIntoView({block: "start", behavior: "smooth"});
+  setTimeout(() => $("eq-question").focus(), 50);
+}
+$("eq-new").onclick = () => { eqMsg(""); eqOpenForm(null); };
+$("eq-form-cancel").onclick = () => { EQ.formOpen = false; EQ.draft = null; renderEq(); };
+$("eq-launch").onclick = async () => {
+  const q = $("eq-question").value.trim();
+  if (!q) { eqMsg("La question est vide."); return; }
+  const target = (document.querySelector("input[name=eq-target]:checked") || {}).value || "application";
+  const body = {question: q, target, model: $("eq-model").value, source: (EQ.draft || {}).source || null};
+  const b = $("eq-launch"); b.disabled = true;
+  let r = null;
+  try {
+    for (let i = 0; i < 2 && !r; i++) {
+      try { r = await api("/api/enquetes/start", body); }
+      catch (e) {
+        const x = e.status === 409 && e.body;
+        // 1.17: the blocking threshold — « Lancer quand même », after a confirmation that names the level.
+        if (x && x.usage_block && !body.usage_ok) { if (!confirm(usageQuestion(x.usage_block))) return; body.usage_ok = true; continue; }
+        throw e;
+      }
+    }
+  } catch (e) { eqMsg(e.message, "err"); return; }
+  finally { b.disabled = false; }
+  if (!r) return;
+  if (r.ask_computer) { S.computer = {...(S.computer || {}), wanted: true}; renderComputerAsk(); }
+  EQ.formOpen = false; EQ.draft = null; eqMsg("");
+  S.enquete = EQ.data.current = eqNewest(S.enquete, r.enquete);
+  renderEq();
+  $("eq-current").scrollIntoView({block: "start", behavior: "smooth"});
+};
+
+// §3 — a point à creuser, a run that ended in error: the question written, read before launching.
+async function eqFromProblem(src) {
+  let r;
+  try { r = await api("/api/enquetes/prefill", src); } catch (e) { alert(e.message); return; }
+  EQ.formOpen = true;
+  EQ.draft = {question: r.question, target: r.target, source: src.source, fresh: true};
+  go("enquetes");
+  eqMsg("La question est écrite d'après ce qui s'est passé : relisez-la, changez-la si besoin, puis « Lancer l'enquête ».", "ok");
+  setTimeout(() => { if (!$("eq-form").classList.contains("hidden")) $("eq-form").scrollIntoView({block: "start"}); }, 80);
+}
+
+function renderEqCurrent() {
+  const c = EQ.data && EQ.data.current, box = $("eq-current");
+  box.classList.toggle("hidden", !c);
+  if (!c) return;
+  const going = c.status === "going";
+  const head = el("div", {class: "row"},
+    going ? jnBadge("en cours", "warn") : jnBadge(c.outcome || "?", EQ_OUTCOME[c.outcome] || "plain"),
+    el("b", {text: going ? "Enquête en cours" : "Dernière enquête"}),
+    el("span", {class: "muted small", text: [c.target === "chaine" ? EQ_TARGET.chaine : `« ${c.target_name} »`,
+      c.model_used || (c.model ? cap(c.model) : "modèle par défaut"), `depuis ${fmtDate(c.started_at)}`,
+      c.seconds !== null && c.seconds !== undefined ? fmtDur(c.seconds) : null].filter(Boolean).join(" · ")}));
+  const steps = el("div", {class: "eq-steps", "aria-label": "Ce que l'enquête lit"},
+    ...(c.steps.length ? c.steps.map((s) => el("div", {class: s.text.startsWith("Refusé") ? "no" : "", text: `${s.at.slice(11, 19)}  ${s.text}`}))
+      : [el("div", {class: "muted", text: going ? "Elle commence…" : "Aucune lecture."})]));
+  const out = [head, el("div", {class: "eq-q", text: c.question}), steps];
+  if (c.refused.length) out.push(el("div", {class: "small", text: `${plural(c.refused.length, "commande refusée", "commandes refusées")} par le cockpit — elles ne lisaient pas seulement.`}));
+  if (!going && c.error && c.outcome !== "terminé") out.push(el("div", {class: "notice err", text: c.error}));
+  const r = c.report;
+  if (!going && r) {
+    if (r.error) out.push(el("div", {class: "notice err", text: `${r.path || "Rapport"} — ${r.error}`}));
+    else out.push(el("div", {class: "notice ok"}, `✓ ${r.path} — commit ${r.commit || "?"}`,
+      r.pushed ? ", poussé." : r.push_error ? ` — push en échec : ${r.push_error}. Il partira au prochain lancement.` : "."));
+  }
+  const acts = el("div", {class: "row"});
+  if (going && !PHONE) acts.append(el("button", {class: "danger small", id: "eq-stop", text: "Arrêter l'enquête", onclick: async () => {
+    try { await api("/api/enquetes/cancel", {}); } catch (e) { alert(e.message); } }}));
+  if (!going && r && r.path && !r.error) acts.append(el("button", {class: "primary small", text: "Lire le rapport",
+    onclick: () => openEqReport(c.target, r.path)}));
+  if (c.log_path && !PHONE) acts.append(el("span", {class: "muted small"}, "Journal brut : ", logLink(c.log_path)));
+  out.push(acts);
+  box.replaceChildren(...out);
+}
+function onEqEvent(snap) {
+  if (!snap) return;
+  const was = S.enquete && S.enquete.id === snap.id ? S.enquete : null;
+  if (was && (was.seq || 0) > (snap.seq || 0)) return;
+  S.enquete = snap;
+  if (EQ.data) EQ.data.current = snap;
+  renderEqDot();
+  if (currentRoute() !== "enquetes") {
+    if (snap.status === "ended" && (!was || was.status !== "ended")) notify("fin", `Enquête ${snap.outcome}`, snap.question.slice(0, 120), () => go("enquetes"));
+    return;
+  }
+  if (snap.status === "ended") loadEq(); else renderEqCurrent();
+}
+
+function renderEqList() {
+  const box = $("eq-list"); box.replaceChildren();
+  const rows = EQ.data.reports;
+  if (!rows.length) { box.append(el("p", {class: "jn-none", text: "Aucun rapport encore, ni dans cette application ni dans la chaîne."})); return; }
+  for (const x of rows) {
+    const cur = EQ.open && EQ.open.path === x.path && EQ.open.target === x.target_kind;
+    box.append(el("button", {class: "eq-item", type: "button", "aria-current": cur ? "true" : "false", onclick: () => openEqReport(x.target_kind, x.path)},
+      el("span", {class: "t", text: x.title || x.name}),
+      el("span", {}, jnBadge(x.target_label, x.target_kind === "chaine" ? "plain" : "ok")),
+      el("span", {class: "m"}, el("span", {text: x.date || x.name.slice(0, 10)}), el("span", {text: x.cost || "coût inconnu"}),
+        x.computer ? el("span", {text: x.computer}) : null, x.prompt ? jnBadge("prompt à relire", "warn") : null)));
+  }
+}
+
+async function openEqReport(target, path) {
+  let r;
+  try { r = await api("/api/enquetes/report?" + new URLSearchParams({target, path})); } catch (e) { eqMsg(e.message, "err"); return; }
+  EQ.open = {target, path}; EQ.report = r; EQ.panel = null; EQ.bug = null;
+  renderEqReader(); renderEqList();
+  $("eq-reader").scrollIntoView({block: "start", behavior: "smooth"});
+}
+function renderEqReader() {
+  const box = $("eq-reader"), r = EQ.report;
+  box.classList.toggle("hidden", !r);
+  if (!r) return;
+  const out = [el("div", {class: "row"}, el("b", {class: "mono", text: r.path}), el("span", {class: "grow"}),
+    el("button", {class: "small", text: "Fermer", onclick: () => { EQ.report = EQ.open = null; renderEqReader(); renderEqList(); }})),
+    el("div", {class: "mdoc"}, ...renderDoc(r.text.split("\n")))];
+  const next = el("div", {class: "eq-next"});
+  if (r.target === "chaine") {
+    next.append(el("h3", {text: "Ensuite : une correction de la chaîne ou du cockpit"}),
+      el("p", {class: "muted small", text: "Une correction de la chaîne ou du cockpit ne se lance jamais depuis le cockpit : son prompt passe d'abord par la conversation de conception."}));
+    if (r.prompt) next.append(eqPromptView(r.prompt));
+    else if (!PHONE) next.append(el("div", {class: "row"}, el("button", {class: "primary small", id: "eq-prompt", text: "Préparer un prompt de correction", onclick: eqMakePrompt})));
+    else next.append(el("p", {class: "small"}, onDesk()));
+  } else {
+    next.append(el("h3", {text: "Ensuite : la liste de bugs de l'application"}),
+      el("p", {class: "muted small", text: "Un comportement de l'application se corrige par un cycle de correction, pour que ses documents restent vrais : l'entrée va dans la liste de bugs, que le Diagnostiqueur lit."}));
+    if (EQ.bug) next.append(eqBugView());
+    else if (!PHONE) next.append(el("div", {class: "row"}, el("button", {class: "primary small", id: "eq-bug", text: "Ajouter à la liste de bugs", onclick: () => eqDraftBug()})));
+    else next.append(el("p", {class: "small"}, onDesk()));
+  }
+  if (EQ.panel) next.append(el("div", {class: "notice " + EQ.panel.kind, text: EQ.panel.text}));
+  out.push(next);
+  box.replaceChildren(...out);
+}
+function eqPromptView(p) {
+  const pre = el("pre", {text: p.text});
+  return el("div", {class: "eq-prompt"}, el("div", {class: "eq-mark", text: "À relire dans la conversation de conception avant de lancer"}),
+    el("div", {class: "muted small"}, el("span", {class: "mono", text: p.path}), " — enregistré à côté du rapport, commité et poussé. Aucun bouton ne le lance."),
+    pre, el("div", {class: "row"}, el("button", {class: "small", text: "Copier", onclick: async (e) => {
+      try { await navigator.clipboard.writeText(p.text); e.currentTarget.textContent = "Copié"; } catch (err) { alert("Copie refusée par le navigateur : sélectionnez le texte."); } }})));
+}
+async function eqMakePrompt() {
+  const b = $("eq-prompt"); if (b) { b.disabled = true; b.textContent = "Claude écrit le prompt…"; }
+  const body = {path: EQ.report.path};
+  let r = null;
+  try {
+    for (let i = 0; i < 2 && !r; i++) {
+      try { r = await api("/api/enquetes/prompt", body); }
+      catch (e) {
+        const x = e.status === 409 && e.body;
+        if (x && x.usage_block && !body.usage_ok) { if (!confirm(usageQuestion(x.usage_block))) { renderEqReader(); return; } body.usage_ok = true; continue; }
+        throw e;
+      }
+    }
+  } catch (e) { EQ.panel = {kind: "err", text: e.message}; renderEqReader(); return; }
+  EQ.report.prompt = {path: r.path, text: r.text};
+  EQ.panel = {kind: "ok", text: `✓ ${r.path} — commit ${r.commit || "?"}` + (r.pushed ? ", poussé." : r.push_error ? ` — push en échec : ${r.push_error}.` : ".")};
+  renderEqReader(); loadEq();
+}
+async function eqDraftBug(feature, fields) {
+  const b = $("eq-bug"); if (b) { b.disabled = true; b.textContent = "Claude écrit l'entrée…"; }
+  const body = {path: EQ.report.path, feature: feature || undefined, fields: fields || undefined};
+  let r = null;
+  try {
+    for (let i = 0; i < 2 && !r; i++) {
+      try { r = await api("/api/enquetes/bug", body); }
+      catch (e) {
+        const x = e.status === 409 && e.body;
+        if (x && x.usage_block && !body.usage_ok) { if (!confirm(usageQuestion(x.usage_block))) { renderEqReader(); return; } body.usage_ok = true; continue; }
+        throw e;
+      }
+    }
+  } catch (e) { EQ.panel = {kind: "err", text: e.message}; renderEqReader(); return; }
+  EQ.bug = r; EQ.panel = null;
+  renderEqReader();
+}
+function eqBugView() {
+  const g = EQ.bug;
+  const sel = el("select", {id: "eq-bug-feature", "aria-label": "Feature"}, ...g.features.map((f) => el("option", {value: f, text: f})));
+  sel.value = g.feature;
+  sel.onchange = () => eqDraftBug(sel.value, g.fields);
+  const where = g.bugfix ? `docs/features/${g.feature}/${g.bugfix}/bug-list.md — la correction ouverte`
+    : `docs/features/${g.feature}/${g.new_bugfix}/bug-list.md — une nouvelle correction, créée à l'ajout`;
+  const ta = el("textarea", {id: "eq-bug-entry", "aria-label": "L'entrée"}); ta.value = g.entry;
+  return el("div", {class: "eq-bug"},
+    el("div", {class: "row"}, el("label", {for: "eq-bug-feature", text: "Feature"}), sel),
+    el("p", {class: "small"}, "Va dans ", el("span", {class: "mono", text: where}), "."),
+    el("p", {class: "muted small", text: "Au format que lit le Diagnostiqueur : un G<n> qui ouvre l'écart, ce qui ne va pas, ce qui devrait être. Relisez-la, changez-la si besoin : rien n'est écrit avant « Ajouter »."}),
+    ta,
+    el("div", {class: "row"}, el("button", {class: "primary small", id: "eq-bug-add", text: "Ajouter à la liste de bugs", onclick: async (e) => {
+      e.currentTarget.disabled = true;
+      try {
+        const r = await api("/api/enquetes/bug", {path: EQ.report.path, feature: sel.value, entry: ta.value, confirm: true});
+        EQ.bug = null; EQ.panel = {kind: "ok", text: `✓ Ajouté à ${r.path} : ${r.entry}`};
+      } catch (err) { EQ.panel = {kind: "err", text: err.message}; }
+      renderEqReader(); }}),
+      el("button", {class: "small", text: "Annuler", onclick: () => { EQ.bug = null; renderEqReader(); }})));
+}
+
+// 1.21 — this computer's nickname: asked once, in Paramètres for good.
+function renderComputerAsk() {
+  const box = $("computer-ask"), c = S.computer || {};
+  const show = !!c.wanted && !c.asked && !PHONE;
+  box.classList.toggle("hidden", !show);
+  if (!show) { box.replaceChildren(); return; }
+  if (box.childElementCount) return;
+  const input = el("input", {type: "text", id: "computer-ask-name", maxlength: "40", placeholder: "travail", "aria-label": "Nom de cet ordinateur"});
+  const send = async (name) => {
+    try { const r = await api("/api/computer", {name}); S.computer = r.computer; renderComputerAsk(); if (currentRoute() === "settings") renderComputer(); }
+    catch (e) { alert(e.message); }
+  };
+  box.append(el("b", {text: "Comment appeler cet ordinateur ?"}),
+    el("span", {class: "small", text: "Ce nom s'écrit dans le journal de cycle et les rapports d'enquête, poussés sur GitHub — à la place du nom de l'ordinateur sur le réseau."}),
+    input, el("button", {class: "primary small", id: "computer-ask-save", text: "Enregistrer", onclick: () => send(input.value)}),
+    el("button", {class: "small", id: "computer-ask-later", text: "Plus tard", title: "« ordinateur » sera écrit ; Paramètres → Cet ordinateur le change", onclick: () => send("")}));
+}
+function renderComputer() {
+  const i = $("computer-name"), c = S.computer || {};
+  if (i && document.activeElement !== i) i.value = c.name || "";
+}
+$("btn-computer").onclick = async () => {
+  const msg = $("computer-msg");
+  try { const r = await api("/api/computer", {name: $("computer-name").value}); S.computer = r.computer; renderComputer(); renderComputerAsk();
+    msg.className = "small ok"; msg.textContent = r.computer.name ? "Enregistré." : "Enregistré : « ordinateur » sera écrit."; }
   catch (e) { msg.className = "small err"; msg.textContent = e.message; }
 };
 
@@ -7419,6 +7808,9 @@ function phoneBuild() {
         // 1.20: the journal, read on the phone — never written from it.
         el("a", {class: "it", id: "phone-journal", href: "#journal", onclick: () => phoneSheet(false)},
           icon("journal"), el("span", {class: "lbl", text: "Journal"}), el("span", {class: "val", text: "lecture seule"})),
+        // 1.21: the investigations, read on the phone — started on the computer.
+        el("a", {class: "it", id: "phone-enquetes", href: "#enquetes", onclick: () => phoneSheet(false)},
+          icon("search"), el("span", {class: "lbl", text: "Enquêtes"}), el("span", {class: "val", text: "lecture seule"})),
         el("div", {class: "sep"}),
         el("div", {class: "kicker", text: "Sur l'ordinateur"}),
         ...DESK_SCREENS.map(([r, label, ic]) => el("a", {class: "it desk", href: "#" + r, id: "phone-desk-" + r, onclick: () => phoneSheet(false)},
@@ -7454,7 +7846,7 @@ function phoneRender() {
   for (const a of nav.querySelectorAll("a")) {
     if (inApp && a.getAttribute("href") === "#" + r) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   }
-  const more = (DESK_SCREENS.some(([x]) => x === r) || r === "journal") && inApp;
+  const more = (DESK_SCREENS.some(([x]) => x === r) || r === "journal" || r === "enquetes") && inApp;
   if (more) $("phone-more").setAttribute("aria-current", "page"); else $("phone-more").removeAttribute("aria-current");
   const n = S.open ? openCount() : 0, c = $("phone-answer-count");
   c.textContent = n; c.classList.toggle("hidden", !n);
