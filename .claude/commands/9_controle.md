@@ -62,7 +62,7 @@ else:**
 
 | | |
 |---|---|
-| **The manual list**, assembled and ordered | 📌 **What no automated test could exercise** |
+| **The manual list**, assembled and ordered | 📌 **Every check the Product Owner can make on the device, ordered so that each starts from the state the one before it left** |
 | **The register of escaped product questions** | 📌 **Gathered, never concluded** |
 | **The product decisions taken while coding** | 📌 **One file per cycle**, for the Rédacteur |
 
@@ -125,9 +125,9 @@ isolated.
 **Six phases.**
 
 📌 **`code/recette.md` absent from the working folder** — ⚠️ **normal,
-not a stop**: no lot had a criterion beyond a test. 🔴 **Phase 4 then
-builds from `par-genre/recette.md` alone**, and says the other source
-was empty.
+not a stop**: no lot had a check the Product Owner can make on the
+device. 🔴 **Phase 4 then builds from `par-genre/recette.md` alone**,
+and says the other source was empty.
 
 ### Phase 1 — build the block-to-lot map
 
@@ -337,7 +337,57 @@ nowhere else** — `/5_reclasse` writes it there, on the main cycle. ⚠️
 **On a correction cycle it is not in the working folder**: 📌 **look for
 it one level up, at the feature folder's root**, and use it from there.
 
-🔴 **Order it by state, never by intention.**
+🔴 **You add nothing and you reword nothing** — 📌 **you order.** ⚠️
+**Every line is copied as it stands**; 🔴 **the one thing you write is
+an announcement, on a line of its own opening on `## `** — 📌 **in
+French, in the forms this phase names, and no other.**
+
+⚠️ **Every reset costs the Product Owner dearly** — 🔴 **as few as
+possible, and each one announced on its own line.**
+
+🔴 **Order by state, never by intention.** 📌 **Two kinds of line, and
+they are not ordered the same way:**
+
+| The line | How it is ordered |
+|---|---|
+| **Its five fields** — `Lot:` · `From:` · `Do:` · `Expect:` · `Leaves:`, the shape of `agents/testeur.md`, move 5 | 🔴 **By the states lines leave** — the walk below |
+| **Without them** — an older feature's line, a block of `par-genre/recette.md` | 📌 **As before** — after the walk, see below |
+
+**The walk** — 🔴 **one current state, starting at `application
+vide`, and the lines placed one at a time:**
+
+1. 🔴 **The next line starts from the current state** — 📌 **its
+   `From:` is, word for word, the `Leaves:` of the line placed before
+   it, or `application vide` at the start.** 📌 **Placed, its `Leaves:`
+   becomes the current state**
+2. 🔴 **Several start from it** — 📌 **first a line that changes
+   nothing, its `Leaves:` repeating its `From:`; then a line whose
+   `Leaves:` another line still to place starts from; then the rest** —
+   ⚠️ **in each group, the order of `code/recette.md`**
+3. 🔴 **A line that destroys or resets comes after every line that
+   needs what it destroys** — 📌 **its `Leaves:` carries
+   `définitivement`, or no longer holds what its `From:` held**: ⚠️
+   **while a line still to place starts from a state holding what it
+   takes, that line waits**, even when nothing else starts from the
+   current state
+4. 🔴 **None starts from it, and a line still to place starts from
+   `application vide`** — 📌 **announce `## Réinitialiser
+   l'application`**, and the current state is `application vide` again
+5. 🔴 **None starts from it, and none starts from `application vide`**
+   — 📌 **take the first line of `code/recette.md` still to place,
+   preferring one no line still to place leaves**, and announce
+   `## Amener l'application à : <its From:, copied>`, and that `From:`
+   is the current state — ⚠️ **the one announcement that says how to
+   reach a state no other line leaves**: 📌 **her own words, the line's
+   starting state, and nothing added**
+
+🔴 **The list opens on `## Depuis l'application vide`** — 📌 **when
+its first line starts there**; ⚠️ **otherwise on the announcement of
+step 5.**
+
+**The lines without the five fields** — 🔴 **after the walk, as
+before**, under `## Sans état décrit`, 📌 **each state change announced
+on a `## ` line in her words**:
 
 | | |
 |---|---|
@@ -345,14 +395,8 @@ it one level up, at the feature folder's root**, and use it from there.
 | **Then with one record** | 📌 **announce the state change** |
 | **Then with several** | — |
 
-⚠️ **Every reset costs the Product Owner dearly** — 🔴 **as few as
-possible, and each one announced on its own line.**
-
-📌 **One line, one thing to look at** — 🔴 **in the Product Owner's
-words, with what is expected.** ⚠️ **A line that does not say its state
-cannot be placed**: leave it at the end, under *state not stated*.
-
-🔴 **You add nothing and you reword nothing** — 📌 **you order.**
+⚠️ **A line there that does not say its state cannot be placed**:
+leave it at the end, under `## État non précisé`.
 
 ⚠️ **Why it matters**: 📌 **a manual test file has existed and was
 abandoned** — 🔴 **not because it was useless, but because it was

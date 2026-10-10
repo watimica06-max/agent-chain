@@ -102,7 +102,7 @@ RULES = {
     "G-ATT": "« À qui est une réponse » : la commande nommée après « answer …, then run »",
     "G-AMONT": "6_convertit.md:35-38 · 2_structure.md:248-255 · 7_lots.md:87-97",
     "G-AVAL": "§1.3 de la demande : « nothing upstream changed it since »",
-    "G-BUGFIX": "7_lots.md:18-19 · 8_code.md:25-26 · 9_controle.md:20-21 · 9_controle.md:512-513",
+    "G-BUGFIX": "7_lots.md:18-19 · 8_code.md:25-26 · 9_controle.md:20-21 · 9_controle.md:556-557",
     "G-WT": "1_lexique.md:138-140 — git worktree add .claude/worktrees/<name>, dans chaque commande à agent",
     "G-ERR": "TECHNICAL_V1 §8.1 : un fichier illisible est une erreur, jamais un fichier sans question",
     "G-RUN": "le run en cours du cockpit",
@@ -229,12 +229,12 @@ RULES = {
     "COD-5": "8_code.md:85-87",
     "COD-6": "8_code.md:80-83",
     "CTL-1": "9_controle.md:75-77",
-    "CTL-3": "9_controle.md:488-495 · 9_controle.md:509-510",
-    "CTL-4": "9_controle.md:488-495",
+    "CTL-3": "9_controle.md:532-539 · 9_controle.md:553-554",
+    "CTL-4": "9_controle.md:532-539",
     "TST-1": "fusion.md:59",
-    "TST-2": "9_controle.md:509-513",
-    "TST-3": "9_controle.md:512-513",
-    "TST-4": "9_controle.md:509-513",
+    "TST-2": "9_controle.md:553-557",
+    "TST-3": "9_controle.md:556-557",
+    "TST-4": "9_controle.md:553-557",
     "FUS-1": "fusion.md:56",
     "FUS-2": "fusion.md:59",
     "FUS-3": "fusion.md:61-66",
@@ -970,7 +970,7 @@ class Scan:
         F = self.F
         if not F.has("desc-produit.md"):
             return self.set(s, A_FAIRE, "CTL-1", "desc-produit.md absent : rien à confronter encore.", [])
-        # 9_controle.md:488-495 — the four files a run writes.
+        # 9_controle.md:532-539 — the four files a run writes.
         four = [F.rel(W.p("code", "recette-ordonnee.md")), F.rel(W.p("code", "decisions-produit.md")), "registre-questions.md"]
         have = [x for x in four if os.path.isfile(os.path.join(self.fpath, *x.split("/")))]
         reports = [n for n in (os.listdir(F.p("code")) if F.has("code") else []) if re.match(r"^rapport-controle.*\.md$", n)]
@@ -1206,7 +1206,7 @@ def run_scan(app, feature, run=None, conventions_commit=None):
 
     # Superseded by a correction cycle: the commands' working folder is the
     # highest bugfix-NN/ (cmd/7_lots.md:19-21, 8_code.md:26-28, 9_controle.md:20-22),
-    # and a bug-list is what follows a control (9_controle.md:511-513).
+    # and a bug-list is what follows a control (9_controle.md:555-557).
     if hb:
         for s in main:
             if s.id in ("7_lots", "8_code", "9_controle") and s.state in (A_FAIRE, INCONNU):

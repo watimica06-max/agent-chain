@@ -589,7 +589,7 @@ Utilisé par: les vingt agents ; les dix-huit commandes.
 | `code/decoupage.md` · `code/sequence.md` · `code/redecoupage.md` · `code/redecoupage-NN.md` | → `### Fichiers du découpage` | |
 | `code/blocked_cadreur.md` · `code/blocked_verificateur.md` · `code/blocked_detailleur.md` | cadreur, verificateur, detailleur | → `### Emplacement des fichiers de blocage` |
 | `code/<lot>/fiche-executable.md` · `conception.md` · `tests.md` · `compte-rendu.md` · `verdict.md` · `reprise_realisateur.md` · `blocked_<agent>.md` | → `### Fichiers d'un lot` | |
-| `code/recette.md` | testeur, en ajout, jamais réécrit | `/9_controle` (phase 4) |
+| `code/recette.md` | testeur, en ajout, jamais réécrit — une ligne par chose que le Product Owner fait et regarde sur l'appareil, testée ou non, en français : `Lot:` · `From:` (l'état de départ, données comprises) · `Do:` · `Expect:` · `Leaves:` (l'état laissé, dans les mots d'un `From:`) | `/9_controle` (phase 4) ; le testeur des lots suivants (`From:`, `Leaves:`, pour reprendre les mots d'un état) |
 | `code/controle/<group>.md` · `code/rapport-controle.md` (`-NN`) | controleur (1 ; 2) | controleur (2) ; `/9_controle` (phase 5) |
 | `tracabilite-full.md` · `code/recette-ordonnee.md` · `registre-questions.md` · `code/decisions-produit.md` | `/9_controle` (phases 1, 4, 5, 6) | `/9_controle` (phase 2, `grouper.py`), le Product Owner, le Product Owner, redacteur (3) |
 | `desc-produit-fusion.md` · `plan-fusion.md` · `rapport-fusion.md` | `/fusion` (copie), redacteur (3), fusionneur (3) ; fusionneur (1) ; fusionneur (2) | fusionneur ; `/fusion`, `/fusion_compare`, `/fusion_applique` |
@@ -1027,11 +1027,11 @@ Un seul utilisateur : décrit dans le document de l'agent ou de la commande qui 
 - La marche du bloc, les neuf mouvements, le mode divergence, la dérivation d'une signature et les trois propriétés d'un critère → `PROCESS_AVAL.md` §detailleur, mode ordinaire — écrire les fiches exécutables d'un bloc, §detailleur, mode divergence — réécrire les fiches qu'une divergence a rendues fausses
 - Le test unique de l'Arbitre, les trois mouvements, les quatre destinations d'une règle manquante, le sondage du Product Owner (toutes les 2 minutes de 0 à 10, toutes les 5 de 10 à 20, arrêt à 20) → `PROCESS_AVAL.md` §arbitre — remplir le `## Decision` d'un fichier de blocage du Détailleur ou du Réalisateur
 - Les cinq points de la checklist et ses deux règles de tête → `PROCESS_AVAL.md` §relecteur — juger un lot contre sa fiche et écrire le verdict
-- Les six mouvements du Testeur, le test laissé vert par la déclaration seule, `code/recette.md` → `PROCESS_AVAL.md` §testeur — écrire un test par critère, avant les corps, et vérifier qu'il est rouge
+- Les six mouvements du Testeur, le test laissé vert par la déclaration seule, `code/recette.md` et la forme de sa ligne → `PROCESS_AVAL.md` §testeur — écrire un test par critère, avant les corps, et vérifier qu'il est rouge
 - Les cinq mouvements du Concepteur et le corps `not implemented` → `PROCESS_AVAL.md` §concepteur — déclarer les signatures de la fiche, corps `not implemented`, et compiler
 - Les neuf mouvements du Réalisateur, la reprise après FAIL, deux échecs identiques de suite → `PROCESS_AVAL.md` §realisateur — première passe sur un lot : remplir les corps jusqu'à ce que les tests passent, §realisateur, reprise après FAIL — corriger ce que le verdict nomme
 - Les mouvements 1 à 7 de `/8_code`, le compte de trois tentatives (`## Attempts`), la tentative vide, le retour au découpage à trois → `PROCESS_AVAL.md` §/8_code — coder les lots en attente d'un découpage, un par un
-- Les six phases de `/9_controle`, `grouper.py`, le tri par état de `recette-ordonnee.md`, la forme de `decisions-produit.md` (identifiant, deux espaces, une ligne par décision) → `PROCESS_AVAL.md` §/9_controle — confronter le fichier produit à toutes les fiches
+- Les six phases de `/9_controle`, `grouper.py`, le tri de `recette-ordonnee.md` par les états que les lignes laissent, ses annonces `## `, la forme de `decisions-produit.md` (identifiant, deux espaces, une ligne par décision) → `PROCESS_AVAL.md` §/9_controle — confronter le fichier produit à toutes les fiches
 - Les cinq lieux et les cinq trouvailles de `/audit_blocages`, les sept trouvailles de `/audit_conventions` → `PROCESS_ANNEXES.md`
 - `docs/PRODUIT_GLOBAL.md` à `# Application`, `docs/CURRENT_TECHNICAL_STATE.md` à `# Technical state` — ce que `socle.py` crée → `PROCESS_ENTREES.md` §socle.py
 

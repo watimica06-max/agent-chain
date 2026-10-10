@@ -487,7 +487,7 @@ def run_place(sc, run):
 
 def recette(app, feature):
     """What to test by hand: `code/recette-ordonnee.md` of the working
-    folder, when /9_controle wrote it (cmd/9_controle.md:362)."""
+    folder, when /9_controle wrote it (cmd/9_controle.md:406)."""
     bf = bugfixes(app, feature)
     base = os.path.join(work_dir(app, feature), *([bf[-1]] if bf else []))
     p = os.path.join(base, "code", "recette-ordonnee.md")

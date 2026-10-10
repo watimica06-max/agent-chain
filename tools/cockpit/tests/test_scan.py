@@ -90,7 +90,7 @@ def build_chain(app, name):
     bw.report(f)
     write(f / "questions-sondeur-03.md", "### Q1\nBlock: B1\nQuestion: what is missing?\nAnswer:\n")
     split(f / "code", ["lot-01", "lot-02"])
-    # /9_controle's four files (9_controle.md:488-495).
+    # /9_controle's four files (9_controle.md:532-539).
     write(f / "code" / "rapport-controle.md", "# Rapport\n")
     write(f / "code" / "recette-ordonnee.md", "# Recette\n")
     write(f / "code" / "decisions-produit.md", "# Décisions\n")
@@ -117,7 +117,7 @@ def test_a_feature_through_the_chain_and_its_corrections(tmp_path):
         "2_structure": F, "3_decoupe": F, "3a_genre": F, "3b_nature": F,
         "4_grille": F, "5_reclasse": F, "6_convertit": F,
         "conventions": F, "batir": F, "7_lots": F, "8_code": F,
-        # A correction is open: the feature was controlled and tested (9_controle.md:512-513).
+        # A correction is open: the feature was controlled and tested (9_controle.md:556-557).
         "9_controle": F, "test": F,
         "fusion": AF,
     }

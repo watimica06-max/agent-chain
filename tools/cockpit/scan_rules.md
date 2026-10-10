@@ -43,13 +43,13 @@ emulator (`/deploie`) → `/fusion`.
 | 7_lots → batir, back | 7_lots.md:97 — the skeleton not built from the conventions in force |
 | 7_lots → 8_code | 7_lots.md:223, :265 |
 | 8_code → 8_code (lots left) → 9_controle | 8_code.md:559, :519 |
-| 9_controle → *manual* | 9_controle.md:509-510 — `Next: manual lire le rapport de contrôle et la recette, décider d'une bug-list` |
+| 9_controle → *manual* | 9_controle.md:553-554 — `Next: manual lire le rapport de contrôle et la recette, décider d'une bug-list` |
 | /deploie → *done* | deploie.md:68-70 |
 
 **Where it differs from the order in the request:**
 - **No command prints `Next: run /fusion` after `/9_controle` or
   `/deploie`.** /9_controle ends on a `manual` line — read, test, decide on
-  a bug-list (9_controle.md:509-513); /deploie ends on `done`
+  a bug-list (9_controle.md:553-557); /deploie ends on `done`
   (deploie.md:68-70). /fusion is named by `Next: run` in two places only:
   `/7_lots` when the technical document holds no `### §` (7_lots.md:75-81)
   and `/2_structure` on a Rédacteur block of invocation 3
@@ -173,7 +173,7 @@ Rédacteur's.
 | `G-ATT` | any | t'attend | an open entry belongs to the step (§3) | « À qui est une réponse » : la commande nommée après « answer …, then run » |
 | `G-AMONT` | 1_lexique → 6_convertit, batir | faite | `code/decoupage.md` exists: a change to the product belongs to a new cycle; and /7_lots tested the build before cutting it, /8_code never tests it again | 6_convertit.md:35-38 · 2_structure.md:248-255 · 7_lots.md:87-97 |
 | `G-AVAL` | any | à faire | its output exists, but a step before it is not done — not applied past the split to steps `G-AMONT` closed | §1.3 de la demande : « nothing upstream changed it since » |
-| `G-BUGFIX` | main 7_lots, 8_code, 9_controle | faite | a `bugfix-NN/` exists: these commands now act on it, and a bug-list follows a control | 7_lots.md:18-19 · 8_code.md:25-26 · 9_controle.md:20-21 · 9_controle.md:512-513 |
+| `G-BUGFIX` | main 7_lots, 8_code, 9_controle | faite | a `bugfix-NN/` exists: these commands now act on it, and a bug-list follows a control | 7_lots.md:18-19 · 8_code.md:25-26 · 9_controle.md:20-21 · 9_controle.md:556-557 |
 | `G-WT` | first step not done | bloquée | `.claude/worktrees/<feature>/` exists and no run goes: the command would fail to create it | 1_lexique.md:138-140 — git worktree add .claude/worktrees/<name>, dans chaque commande à agent |
 | `G-ERR` | the file's step | bloquée | a file the form cannot read | TECHNICAL_V1 §8.1 : un fichier illisible est une erreur, jamais un fichier sans question |
 | `G-RUN` | the run's step | en cours | the cockpit's run of this command goes | le run en cours du cockpit |
@@ -300,12 +300,12 @@ Rédacteur's.
 | `COD-5` | 8_code | faite | every lot of `## Order` has a verdict opening on `PASS` | 8_code.md:85-87 |
 | `COD-6` | 8_code | à faire | « n / N lots en PASS », N > n | 8_code.md:80-83 |
 | `CTL-1` | 9_controle | à faire | no `desc-produit.md` | 9_controle.md:75-77 |
-| `CTL-3` | 9_controle | faite | the four files of a run: `code/rapport-controle*.md` (feature), `code/recette-ordonnee.md` and `code/decisions-produit.md` (working folder), `registre-questions.md` (feature) | 9_controle.md:488-495 · 9_controle.md:509-510 |
-| `CTL-4` | 9_controle | à faire | the four files are not all there | 9_controle.md:488-495 |
+| `CTL-3` | 9_controle | faite | the four files of a run: `code/rapport-controle*.md` (feature), `code/recette-ordonnee.md` and `code/decisions-produit.md` (working folder), `registre-questions.md` (feature) | 9_controle.md:532-539 · 9_controle.md:553-554 |
+| `CTL-4` | 9_controle | à faire | the four files are not all there | 9_controle.md:532-539 |
 | `TST-1` | test | faite | `rapport-fusion.md` exists | fusion.md:59 |
-| `TST-2` | test | à faire | the highest correction is controlled: test, then decide | 9_controle.md:509-513 |
-| `TST-3` | test | faite | a correction is open: the bug-list is what follows the test | 9_controle.md:512-513 |
-| `TST-4` | test | à faire | after the control: test, then decide | 9_controle.md:509-513 |
+| `TST-2` | test | à faire | the highest correction is controlled: test, then decide | 9_controle.md:553-557 |
+| `TST-3` | test | faite | a correction is open: the bug-list is what follows the test | 9_controle.md:556-557 |
+| `TST-4` | test | à faire | after the control: test, then decide | 9_controle.md:553-557 |
 | `FUS-1` | fusion | à faire | no `desc-produit.md` | fusion.md:56 |
 | `FUS-2` | fusion | faite | `rapport-fusion.md` exists: the merge is done | fusion.md:59 |
 | `FUS-3` | fusion | à faire | no `rapport-fusion.md` | fusion.md:61-66 |
@@ -376,7 +376,7 @@ proposes the correction chain: the commands act on it.
   root file (« turn » rules), not from a test of their own.
 - **/9_controle's « done »**: the command has no such test — « an existing
   `rapport-controle.md` is not a reason to stop » (9_controle.md:92). Read
-  as « its four files are there » (9_controle.md:488-495).
+  as « its four files are there » (9_controle.md:532-539).
 - **/5_reclasse's « nothing changed since »**: no test in the command;
   read by comparing each block of the views with `desc-produit.md`, the
   copy the command says it makes (5_reclasse.md:136-139).
