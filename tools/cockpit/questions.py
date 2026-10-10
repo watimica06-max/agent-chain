@@ -3,10 +3,14 @@
 Reads the root `questions-<agent>-NN.md` and `convertisseur/technique-*.md`,
 in the shape the writers' templates give: `### Q<n>`, `Key: value` lines
 (`Block:`, `Terms:`, `Entries:`, `Kind:`, `Folder:`), `Question:`, an optional
-`Options:` list of `- ` items, an optional `Défaut:`, `Answer:`. What a
+`Options:` list of `- ` items, an optional `Occurrences:` list of `- ` items
+(.claude/formats/questions.md §3 — the places the answer applies to, kept
+apart from the question and out of its fingerprint), an optional `Défaut:`,
+`Answer:`. What a
 current template produces besides, and is read: a `Question:` over several
-lines (agents/lexicographe.md:348-350), a title on the `Block:` line
-(agents/architecte.md:579), and the file's own title above the first `### Q`
+lines (the lexicographe's, before .claude/formats/questions.md moved its
+occurrences to `Occurrences:`: premiere-app-3), a title on the `Block:` line
+(agents/architecte.md:590), and the file's own title above the first `### Q`
 (the lexicographe's, premiere-app-3). Anything else is an error, and a file
 it cannot read is an error, never a file with no questions.
 """
@@ -28,6 +32,7 @@ ANSWER = re.compile(r"^Answer:(.*)$")
 ANSWER_EMPTY = re.compile(r"^Answer:\s*$")          # the commands' own test
 QUESTION = re.compile(r"^Question:(.*)$")
 OPTIONS = re.compile(r"^Options:\s*$")
+OCCURRENCES = re.compile(r"^Occurrences:\s*$")
 DEFAUT = re.compile(r"^Défaut:(.*)$")
 OPTION_ITEM = re.compile(r"^- (.*)$")                 # `- <a proposal…>`, every template
 CONTEXT_KEY = re.compile(r"^[A-Z][A-Za-z]*:\s")       # `Block:`, `Terms:`, `Entries:`, `Kind:`, `Folder:`
@@ -52,6 +57,7 @@ class Question:
     heading_line: int = 0
     answer_line: int = 0
     answer_end: int = 0  # last line of the answer text, inclusive
+    occurrences: list[str] = field(default_factory=list)  # `Occurrences:` items
 
     def to_dict(self):
         d = asdict(self)
@@ -164,7 +170,7 @@ def parse_lines(lines: list[str], path: str, rel: str, kind: str) -> ParsedFile:
 
 
 def _parse_entry(lines, start, end, number, path, rel, kind):
-    context, question_lines, options = [], [], []
+    context, question_lines, options, occurrences = [], [], [], []
     default_line = None
     answer_line = None
     mode = "context"
@@ -178,7 +184,7 @@ def _parse_entry(lines, start, end, number, path, rel, kind):
             mode = "answer"
             continue
         if mode == "answer":
-            if QUESTION.match(line) or OPTIONS.match(line) or DEFAUT.match(line):
+            if QUESTION.match(line) or OPTIONS.match(line) or OCCURRENCES.match(line) or DEFAUT.match(line):
                 return None, (f"ligne {j + 1} : Q{number}, « {line.split(':')[0]}: » "
                               "sous « Answer: »")
             continue
@@ -189,6 +195,9 @@ def _parse_entry(lines, start, end, number, path, rel, kind):
             continue
         if OPTIONS.match(line):
             mode = "options"
+            continue
+        if OCCURRENCES.match(line):
+            mode = "occurrences"
             continue
         m = DEFAUT.match(line)
         if m:
@@ -210,6 +219,12 @@ def _parse_entry(lines, start, end, number, path, rel, kind):
                 options.append(m.group(1).strip())
             elif line.strip():
                 return None, f"ligne {j + 1} : Q{number}, sous « Options: », une ligne qui n'ouvre pas sur « - »"
+        elif mode == "occurrences":
+            m = OPTION_ITEM.match(line)
+            if m:
+                occurrences.append(m.group(1).strip())
+            elif line.strip():
+                return None, f"ligne {j + 1} : Q{number}, sous « Occurrences: », une ligne qui n'ouvre pas sur « - »"
         elif mode == "defaut":
             if line.strip():
                 return None, f"ligne {j + 1} : Q{number}, « Défaut: » tient sur une ligne"
@@ -252,6 +267,7 @@ def _parse_entry(lines, start, end, number, path, rel, kind):
         answer_empty=empty,
         fingerprint=_fingerprint(question, options, default_line),
         heading_line=start, answer_line=answer_line, answer_end=answer_end,
+        occurrences=occurrences,
     )
     return q, None
 

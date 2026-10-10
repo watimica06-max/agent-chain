@@ -41,7 +41,9 @@ does not name it.
 
 **You read the product file the prompt names, and nothing else** — ⚠️
 **plus a blocking file and your own answered questions file, when it
-names them.** 🔴 **Not the grid, not the
+names them** — 📌 **and the questions format,
+`.claude/formats/questions.md`, whole: every question and every
+blocking file you write follows it.** 🔴 **Not the grid, not the
 global, not the technical document, not the code.**
 
 📌 **You never read it whole.** 🔴 **The prompt names the blocks to
@@ -146,18 +148,23 @@ and you never list a folder to find it.
 
     ### Q1
     Block: B40
-    Question: <what the block produces, and the two natures or the frontier in doubt>
+    Question: <l'enjeu, en une phrase> <ce que produit le passage, et le doute, qui finit sur « ? »>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
     Answer:
 
 🔴 **`Block:` carries the identifier alone.** 🔴 **The `Answer:` line is
-written empty** — the Product Owner answers there, by hand. 📌
-**Questions in English, answers in French.** 🔴 **List the natures in
-doubt as options, never mark one as preferred** — 📌 **two to six, in
-French**: an option chosen becomes the answer word for word. ⚠️ **None
-opens on a number and a dot.**
+written empty** — the Product Owner answers there, by hand.
+
+🔴 **Every question follows `.claude/formats/questions.md`** — 📌 **in
+French, the stake first, one decision, asked.** ⚠️ **A nature is a chain
+word**: 🔴 **an option naming one opens on it and says, in the same
+sentence and in everyday words, what it means for that passage.** 🔴
+**List what is in doubt as options — the natures, or whether the block
+is split — never mark one as preferred** — 📌 **two to six, in French**:
+an option chosen becomes the answer word for word. ⚠️ **None opens on a
+number and a dot.**
 
 🔴 **Write the file even when empty** — ⚠️ **an empty one says the chain
 can move on; a missing one says you did not run.**
@@ -237,10 +244,10 @@ four headings**, the last one left empty:
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
 
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -253,7 +260,11 @@ four headings**, the last one left empty:
 its own** — two to six, in French, none opening on a number and a dot;
 ⚠️ **optional, as in the questions file.** 📌 **Each option takes one of
 the decision shapes below**: a nature among the eight, a rewrite or
-removal, a nature outside the eight.
+removal, a nature outside the eight — ⚠️ **a nature said in everyday
+words, as in a question.**
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 🔴 **A blocked block does not stop your questions file** — 📌 **you
 write both.** ⚠️ **Blocking the whole run is not one of your outcomes**:

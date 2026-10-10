@@ -18,7 +18,7 @@ guessed.
 | Rule | What | Lines |
 |---|---|---|
 | `L-ORDRE` | The lots, in order: the `lot-NN` of `code/sequence.md`'s `## Order`; the blocks: its `## Blocks`, `block-N: lot-…, lot-…`. A lot is named `lot-` and its number. The `Round: N` line above them is the Vérificateur's and is not read. | 8_code.md:38-39 · agents/verificateur.md:107-115 |
-| `L-TITRE` | What the Product Owner can read of a lot: its section `## lot-NN` in `code/decoupage.md`, five fields — `Anchor` (the entries it builds from, `§n.m — heading`: shown as its **title**), `Needs`, `Produces`, `Modifies`, `Touches` (its **scope**). No lot carries a title of its own. | agents/cadreur.md:848-854 |
+| `L-TITRE` | What the Product Owner can read of a lot: its section `## lot-NN` in `code/decoupage.md`, five fields — `Anchor` (the entries it builds from, `§n.m — heading`: shown as its **title**), `Needs`, `Produces`, `Modifies`, `Touches` (its **scope**). No lot carries a title of its own. | agents/cadreur.md:855-861 |
 
 The reader of « n / N en PASS » (`scan.lot_order`, `scan.lot_verdict`) is the
 one the « Code » tab uses: the bar and the badge cannot disagree.
@@ -31,11 +31,11 @@ Read in this order — the first that applies:
 |---|---|---|---|
 | `E-ENCOURS` | **en cours** | a `/8_code` run of the cockpit goes on this working folder, and its running agent's input names the lot (§6); when no running agent names one (the Détailleur on a block, the orchestrator between two agents), the next lot by the command's own rule: the first of the sequence with no `verdict.md` whose `## Status` starts with `PASS` — said so | 8_code.md:613-614 · 8_code.md:80-82 |
 | `E-BLOQUE` | **bloqué** | a blocking entry waiting on her belongs to the lot — read by « À répondre », never again here: an unnumbered `code/<lot>/blocked_*.md`, or an entry `## Blocking N — <lot>` of `code/blocked_detailleur.md` | 8_code.md:356-363 · 8_code.md:757-767 |
-| `E-PASSE` | **passé** | `## Status` starts with `PASS`; « avec réserve » for `PASS with reservation` | 8_code.md:80-82 · agents/relecteur.md:116 |
-| `E-REDEC` | **redécoupé** | a lot of the split that came back: `code/redecoupage.md` names it under `## Ce qui ne l'est pas` — « the lot in hand, whose code is dropped, and the lots left », or « the block's lots » — in an Arbitre's section (`## Ce qui bloque` …) after the Cadreur's last `## Ce qui revient` / `## Ce que j'en fais`. Once the Cadreur has written those two, the split in `code/` is the new one even when the file stays unnumbered — a re-split that did not hold (`## Defects` carrying lines, a block standing) leaves it there — and its lots are read by the other rules | agents/arbitre.md:392-396 · agents/cadreur.md:1054-1061 · 7_lots.md:165-167 · 7_lots.md:224 · 7_lots.md:227 |
+| `E-PASSE` | **passé** | `## Status` starts with `PASS`; « avec réserve » for `PASS with reservation` | 8_code.md:80-82 · agents/relecteur.md:120 |
+| `E-REDEC` | **redécoupé** | a lot of the split that came back: `code/redecoupage.md` names it under `## Ce qui ne l'est pas` — « the lot in hand, whose code is dropped, and the lots left », or « the block's lots » — in an Arbitre's section (`## Ce qui bloque` …) after the Cadreur's last `## Ce qui revient` / `## Ce que j'en fais`. Once the Cadreur has written those two, the split in `code/` is the new one even when the file stays unnumbered — a re-split that did not hold (`## Defects` carrying lines, a block standing) leaves it there — and its lots are read by the other rules | agents/arbitre.md:392-396 · agents/cadreur.md:1061-1068 · 7_lots.md:165-167 · 7_lots.md:224 · 7_lots.md:227 |
 | `E-INCONNU` | **inconnu** | a `verdict.md` with no readable `## Status` | aucune règle : un verdict sans « ## Status » lisible |
 | `E-TROIS` | **échoué 3 fois** | not PASS, `## Attempts` at 3 or more: the lot is the Product Owner's | 8_code.md:326-328 |
-| `E-ANNULE` | **annulé** | not PASS, `## Cause` reads `sheet`, and no `fiche-executable.md`: a run reverted the lot's commits and deleted its sheet, which the Détailleur writes again | 8_code.md:171-173 · agents/relecteur.md:183-186 |
+| `E-ANNULE` | **annulé** | not PASS, `## Cause` reads `sheet`, and no `fiche-executable.md`: a run reverted the lot's commits and deleted its sheet, which the Détailleur writes again | 8_code.md:171-173 · agents/relecteur.md:187-190 |
 | `E-ECHOUE` | **échoué** | any other verdict not PASS: a fresh Réalisateur, then the Relecteur again | 8_code.md:270-272 |
 | `E-ENTAME` | **entamé** | no verdict, some of its files there: the sheet, then `conception.md`, `tests.md`, `compte-rendu.md` — each agent skipped when its report is there; « reprend au … » names the first missing, « codé, pas encore relu » when the three are there | 8_code.md:166-167 · 8_code.md:182-184 |
 | `E-AFAIRE` | **pas commencé** | no verdict, no sheet, no report | 8_code.md:166-167 |
@@ -43,30 +43,30 @@ Read in this order — the first that applies:
 **Attempts** (`T-ESSAIS`) — the verdict's `## Attempts`, out of 3; a verdict
 without the line reads 1, and the row says so; no verdict, 0 — an empty first
 attempt is counted in the run's memory alone, never on disk. —
-8_code.md:326-328 · 8_code.md:330-331 · 8_code.md:339-344 · agents/relecteur.md:173-175
+8_code.md:326-328 · 8_code.md:330-331 · 8_code.md:339-344 · agents/relecteur.md:177-179
 
 ## 3. The passes of a lot
 
 | Rule | What | Lines |
 |---|---|---|
 | `P-ORDRE` | Per lot, in order: the Détailleur when the lot has no sheet (it works on the lot's **block**), then the Concepteur, the Testeur, the Réalisateur — each skipped when its report is there — then the Relecteur once the Réalisateur has reported. A FAIL is a fresh Réalisateur and the Relecteur again; three codings at most (`E-TROIS`). | 8_code.md:166-167 · 8_code.md:182-184 · 8_code.md:198 |
-| `P-ECRIT` | Where each writes: the Détailleur `code/<lot>/fiche-executable.md`, the Relecteur `code/<lot>/verdict.md`, the Concepteur `code/<lot>/conception.md`, the Testeur `code/<lot>/tests.md`, the Réalisateur `code/<lot>/compte-rendu.md`. | agents/detailleur.md:55-56 · agents/relecteur.md:140 · agents/concepteur.md:301-304 · agents/realisateur.md:756 |
-| `P-ARBITRE` | **The Arbitre steps in** when the Détailleur or the Réalisateur blocks: they call it themselves; the orchestrator never does. Marked on a lot when an Arbitre pass names it, or when a blocking file of the Réalisateur (`code/<lot>/blocked_realisateur*.md`) or an entry of the Détailleur naming the lot (`code/blocked_detailleur*.md`, `## Blocking N — lot-NN`) exists, settled or not. A lot's folder holds the blocking files of the Concepteur, the Testeur, the Réalisateur and the Relecteur alone. | 8_code.md:769-772 · agents/realisateur.md:364-371 · agents/detailleur.md:408-415 · 8_code.md:760-763 |
+| `P-ECRIT` | Where each writes: the Détailleur `code/<lot>/fiche-executable.md`, the Relecteur `code/<lot>/verdict.md`, the Concepteur `code/<lot>/conception.md`, the Testeur `code/<lot>/tests.md`, the Réalisateur `code/<lot>/compte-rendu.md`. | agents/detailleur.md:55-56 · agents/relecteur.md:144 · agents/concepteur.md:308-311 · agents/realisateur.md:763 |
+| `P-ARBITRE` | **The Arbitre steps in** when the Détailleur or the Réalisateur blocks: they call it themselves; the orchestrator never does. Marked on a lot when an Arbitre pass names it, or when a blocking file of the Réalisateur (`code/<lot>/blocked_realisateur*.md`) or an entry of the Détailleur naming the lot (`code/blocked_detailleur*.md`, `## Blocking N — lot-NN`) exists, settled or not. A lot's folder holds the blocking files of the Concepteur, the Testeur, the Réalisateur and the Relecteur alone. | 8_code.md:769-772 · agents/realisateur.md:371-378 · agents/detailleur.md:415-422 · 8_code.md:760-763 |
 | `P-ARCHITECTE` | **The Architecte steps in** at the end of a lot (move 7, on every request with an empty `## Verdict`), and when the Arbitre calls it. | 8_code.md:496-500 · agents/arbitre.md:476-486 |
-| `P-DEMANDES` | The requests it answers that are a lot's: `architecte/concepteur-<lot>.md`, `realisateur-<lot>.md`, `detailleur-<lot>.md` (a request of the walk under the block's first lot), `arbitre-<lot>-blocking-N.md`; `-NN` suffixes for a second one. Marked with whether `## Verdict` is written. `arbitre-<block>-blocking-N.md` names a block, not a lot: not on a lot's row. | agents/concepteur.md:227-230 · agents/realisateur.md:488 · agents/detailleur.md:448 · agents/detailleur.md:466-467 · agents/arbitre.md:451-460 |
+| `P-DEMANDES` | The requests it answers that are a lot's: `architecte/concepteur-<lot>.md`, `realisateur-<lot>.md`, `detailleur-<lot>.md` (a request of the walk under the block's first lot), `arbitre-<lot>-blocking-N.md`; `-NN` suffixes for a second one. Marked with whether `## Verdict` is written. `arbitre-<block>-blocking-N.md` names a block, not a lot: not on a lot's row. | agents/concepteur.md:234-237 · agents/realisateur.md:495 · agents/detailleur.md:455 · agents/detailleur.md:473-474 · agents/arbitre.md:451-460 |
 
 ## 4. A lot's blocking files and questions
 
 | Rule | What | Lines |
 |---|---|---|
-| `B-OU` | Three places: `code/<lot>/blocked_<agent>.md` (Concepteur, Testeur, Réalisateur, Relecteur), `code/blocked_detailleur.md` at the split's root — its entries name their lot, `## Blocking N — lot-NN` — and `blocked_architecte.md` at the working folder's root, which blocks the run, not a lot. What waits is « À répondre »'s list: the tab links to it, filtered on the lot, and parses nothing again. No questions file sits in `code/`. | 8_code.md:757-767 · agents/detailleur.md:355-358 |
+| `B-OU` | Three places: `code/<lot>/blocked_<agent>.md` (Concepteur, Testeur, Réalisateur, Relecteur), `code/blocked_detailleur.md` at the split's root — its entries name their lot, `## Blocking N — lot-NN` — and `blocked_architecte.md` at the working folder's root, which blocks the run, not a lot. What waits is « À répondre »'s list: the tab links to it, filtered on the lot, and parses nothing again. No questions file sits in `code/`. | 8_code.md:757-767 · agents/detailleur.md:359-362 |
 
 ## 5. A lot's commits
 
 | Rule | What | Lines |
 |---|---|---|
 | `C-GREP` | The three committing agents write `<working folder>/<lot>: <what the commit carries>`, `<working folder>` the path under `docs/features/` — `premiere-app-3`, `premiere-app-3/bugfix-01`; a revert writes `Revert "<working folder>/<lot>: …"`. The tab runs the command's three lines, read-only: `<split>` (see `C-DOSSIER`), then every commit after it whose **subject** opens on one of the two, newest first, with the files each changed (`git log --name-only`). The command's list is what follows the lot's last revert; a commit before it is marked « annulé ensuite ». | 8_code.md:206-209 · 8_code.md:214-216 · 8_code.md:225-231 |
-| `C-DOSSIER` | Every split, every feature and every bug-fix cycle reuses `lot-01`, `lot-02`…: the folder in the subject tells them apart, and the search starts after `<split>`, the commit that added the current `code/decoupage.md` — only a first split creates it, so a lot kept on a PASS through a redécoupage stays after it, and a deleted split's lots before it. The subject alone: never the body (`--grep` reads it), never the files a commit stages — a Réalisateur retry that touches only code is the lot's. | 8_code.md:210-211 · 8_code.md:218-223 · 8_code.md:233-237 · agents/concepteur.md:309-312 · agents/testeur.md:352-356 · agents/realisateur.md:762-768 |
+| `C-DOSSIER` | Every split, every feature and every bug-fix cycle reuses `lot-01`, `lot-02`…: the folder in the subject tells them apart, and the search starts after `<split>`, the commit that added the current `code/decoupage.md` — only a first split creates it, so a lot kept on a PASS through a redécoupage stays after it, and a deleted split's lots before it. The subject alone: never the body (`--grep` reads it), never the files a commit stages — a Réalisateur retry that touches only code is the lot's. | 8_code.md:210-211 · 8_code.md:218-223 · 8_code.md:233-237 · agents/concepteur.md:316-319 · agents/testeur.md:359-363 · agents/realisateur.md:769-775 |
 
 ## 6. During a run
 
@@ -89,11 +89,11 @@ their logs, once.
 | Rule | Read | Lines |
 |---|---|---|
 | `A-LOT` | the prompt's `Your lot: <lot>` — the orchestrator names the lot of every agent of a lot, and the Détailleur's after a `sheet` FAIL | 8_code.md:613-614 · 8_code.md:572 · 8_code.md:581 · 8_code.md:590 · 8_code.md:605 · 8_code.md:450 |
-| `A-DESC` | else the description: `Declare <lot>`, `Test <lot>`, `Code <lot>`, `Review <lot>`, and the Arbitre's `Settle <lot>`, whose prompt names `code/<lot>/blocked_realisateur.md` | 8_code.md:571 · 8_code.md:580 · 8_code.md:589 · 8_code.md:604 · agents/realisateur.md:368-370 |
-| `A-BLOC` | the Détailleur names a **block** (`Your block:`, `Detail <block>`, `Propagate <block>`), and so does the Arbitre it calls (`Settle <block>`): the pass's lot is « inconnu », its block known | 8_code.md:426-427 · 8_code.md:448-449 · agents/detailleur.md:412-414 |
+| `A-DESC` | else the description: `Declare <lot>`, `Test <lot>`, `Code <lot>`, `Review <lot>`, and the Arbitre's `Settle <lot>`, whose prompt names `code/<lot>/blocked_realisateur.md` | 8_code.md:571 · 8_code.md:580 · 8_code.md:589 · 8_code.md:604 · agents/realisateur.md:375-377 |
+| `A-BLOC` | the Détailleur names a **block** (`Your block:`, `Detail <block>`, `Propagate <block>`), and so does the Arbitre it calls (`Settle <block>`): the pass's lot is « inconnu », its block known | 8_code.md:426-427 · 8_code.md:448-449 · agents/detailleur.md:419-421 |
 | `A-DOSSIER` | the prompt's `Working folder:` gives the folder — the feature, or its `bugfix-NN` — so that `lot-01` of one split is not taken for another's | 8_code.md:616-617 |
 | `A-AUCUN` | the Architecte of move 7 is named neither a lot nor a block: its lot is « inconnu » | 8_code.md:517-518 |
-| `A-IMBRIQUE` | a nested agent works for its caller: the Arbitre a Réalisateur calls, the Architecte the Arbitre calls take their caller's lot when their own input names none — read from the stream's `parent_tool_use_id`, not from timing | agents/realisateur.md:364-371 · agents/arbitre.md:476-486 |
+| `A-IMBRIQUE` | a nested agent works for its caller: the Arbitre a Réalisateur calls, the Architecte the Arbitre calls take their caller's lot when their own input names none — read from the stream's `parent_tool_use_id`, not from timing | agents/realisateur.md:371-378 · agents/arbitre.md:476-486 |
 
 ## 8. What is left « inconnu »
 

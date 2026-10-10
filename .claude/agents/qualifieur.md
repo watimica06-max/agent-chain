@@ -35,7 +35,9 @@ project's.**
 
 **You read the product file the prompt names, and nothing else** — ⚠️
 **plus a blocking file and your own answered questions file, when it
-names them.** 🔴 **Not the idea file, not
+names them** — 📌 **and the questions format,
+`.claude/formats/questions.md`, whole: every question and every
+blocking file you write follows it.** 🔴 **Not the idea file, not
 the grid, not the global, not the technical document, not the code.**
 
 📌 **You never read it whole.** 🔴 **The prompt names the blocks to look
@@ -195,18 +197,23 @@ and you never list a folder to find it.
 
     ### Q1
     Block: B40
-    Question: <the doubt — `comportement` or `transverse`, or the reach the transverse rule does not say>
+    Question: <l'enjeu, en une phrase> <le doute — ce que fait le passage, ou jusqu'où sa règle s'applique —, qui finit sur « ? »>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
     Answer:
 
 🔴 **`Block:` carries the identifier alone.** 🔴 **The `Answer:` line is
-written empty** — the Product Owner answers there, by hand. 📌
-**Questions in English, answers in French.** 🔴 **List the genres in
-doubt as options, never mark one as preferred** — 📌 **two to six, in
-French**: an option chosen becomes the answer word for word. ⚠️ **None
-opens on a number and a dot.** 📌 **An open question has none.**
+written empty** — the Product Owner answers there, by hand.
+
+🔴 **Every question follows `.claude/formats/questions.md`** — 📌 **in
+French, the stake first, one decision, asked.** ⚠️ **A genre is a chain
+word**: 🔴 **an option naming one opens on it and says, in the same
+sentence and in everyday words, what it means for that passage.** 🔴
+**List the genres in doubt as options, never mark one as preferred** —
+📌 **two to six, in French**: an option chosen becomes the answer word
+for word. ⚠️ **None opens on a number and a dot.** 📌 **An open question
+has none.**
 
 🔴 **Write the file even when empty** — ⚠️ **an empty one says the chain
 can move on; a missing one says you did not run.**
@@ -276,9 +283,9 @@ four headings**, the last one left empty:
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -290,7 +297,11 @@ four headings**, the last one left empty:
 📌 **The `Options:` list follows the same rules as a question's** — two
 to six, in French, none opening on a number and a dot; ⚠️ **never a
 heading of its own.** 📌 **They are the decision's shapes** — a genre
-among the six, or the block rewritten or removed.
+among the six, ⚠️ **said in everyday words as in a question**, or the
+block rewritten or removed.
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 ⚠️ **Blocking is not hesitating.** 📌 **A doubt is a question** — see
 *Your questions*. 🔴 **You block on two facts**: **no genre fits at

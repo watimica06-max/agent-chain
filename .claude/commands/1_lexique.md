@@ -214,8 +214,13 @@ left the choice open, and it waits on the Product Owner.
 
 **After every invocation** — 🔴 **check `lexique.md` exists**, and grep
 the lines under `## Non tranché`: 📌 **what still waits on an answer.**
-⚠️ **That section alone** — `## Tranché` and `## Relevé` are not
-counted.
+⚠️ **That section alone** — `## Tranché`, `## Tranché sans toi` and
+`## Relevé` are not counted.
+
+📌 **Then count the lines under `## Tranché sans toi`, and say how many
+there are** — 🔴 **what the Lexicographe settled without the Product
+Owner, quotes and words only**: she reads them in `lexique.md` and
+overrules one by saying so in a later answer.
 
 **After 1 or 3** — 🔴 **grep `^### Q` in the new
 `questions-lexicographe-NN.md`** and count. 📌 **Say how many.**

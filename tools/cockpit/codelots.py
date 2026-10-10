@@ -43,36 +43,36 @@ GIT_TIMEOUT = 20
 # Every rule, with the lines it comes from (code_rules.md is the same table).
 RULES = {
     "L-ORDRE": "8_code.md:38-39 · agents/verificateur.md:107-115",
-    "L-TITRE": "agents/cadreur.md:848-854",
-    "E-PASSE": "8_code.md:80-82 · agents/relecteur.md:116",
+    "L-TITRE": "agents/cadreur.md:855-861",
+    "E-PASSE": "8_code.md:80-82 · agents/relecteur.md:120",
     "E-ECHOUE": "8_code.md:270-272",
     "E-TROIS": "8_code.md:326-328",
-    "E-ANNULE": "8_code.md:171-173 · agents/relecteur.md:183-186",
+    "E-ANNULE": "8_code.md:171-173 · agents/relecteur.md:187-190",
     "E-BLOQUE": "8_code.md:356-363 · 8_code.md:757-767",
-    "E-REDEC": "agents/arbitre.md:392-396 · agents/cadreur.md:1054-1061 · 7_lots.md:165-167 · 7_lots.md:224 · 7_lots.md:227",
+    "E-REDEC": "agents/arbitre.md:392-396 · agents/cadreur.md:1061-1068 · 7_lots.md:165-167 · 7_lots.md:224 · 7_lots.md:227",
     "E-ENTAME": "8_code.md:166-167 · 8_code.md:182-184",
     "E-AFAIRE": "8_code.md:166-167",
     "E-ENCOURS": "8_code.md:613-614 · 8_code.md:80-82",
     "E-INCONNU": "aucune règle : un verdict sans « ## Status » lisible",
-    "T-ESSAIS": "8_code.md:326-328 · 8_code.md:330-331 · 8_code.md:339-344 · agents/relecteur.md:173-175",
+    "T-ESSAIS": "8_code.md:326-328 · 8_code.md:330-331 · 8_code.md:339-344 · agents/relecteur.md:177-179",
     "P-ORDRE": "8_code.md:166-167 · 8_code.md:182-184 · 8_code.md:198",
-    "P-ECRIT": "agents/detailleur.md:55-56 · agents/relecteur.md:140 · agents/concepteur.md:301-304 · "
-               "agents/realisateur.md:756",
-    "P-ARBITRE": "8_code.md:769-772 · agents/realisateur.md:364-371 · agents/detailleur.md:408-415 · 8_code.md:760-763",
+    "P-ECRIT": "agents/detailleur.md:55-56 · agents/relecteur.md:144 · agents/concepteur.md:308-311 · "
+               "agents/realisateur.md:763",
+    "P-ARBITRE": "8_code.md:769-772 · agents/realisateur.md:371-378 · agents/detailleur.md:415-422 · 8_code.md:760-763",
     "P-ARCHITECTE": "8_code.md:496-500 · agents/arbitre.md:476-486",
-    "P-DEMANDES": "agents/concepteur.md:227-230 · agents/realisateur.md:488 · agents/detailleur.md:448 · "
-                  "agents/detailleur.md:466-467 · agents/arbitre.md:451-460",
-    "B-OU": "8_code.md:757-767 · agents/detailleur.md:355-358",
+    "P-DEMANDES": "agents/concepteur.md:234-237 · agents/realisateur.md:495 · agents/detailleur.md:455 · "
+                  "agents/detailleur.md:473-474 · agents/arbitre.md:451-460",
+    "B-OU": "8_code.md:757-767 · agents/detailleur.md:359-362",
     "C-GREP": "8_code.md:206-209 · 8_code.md:214-216 · 8_code.md:225-231",
-    "C-DOSSIER": "8_code.md:210-211 · 8_code.md:218-223 · 8_code.md:233-237 · agents/concepteur.md:309-312 · "
-                 "agents/testeur.md:352-356 · agents/realisateur.md:762-768",
+    "C-DOSSIER": "8_code.md:210-211 · 8_code.md:218-223 · 8_code.md:233-237 · agents/concepteur.md:316-319 · "
+                 "agents/testeur.md:359-363 · agents/realisateur.md:769-775",
     "W-LIVE": "8_code.md:126-128 · 8_code.md:135-136 · 8_code.md:478-483",
     "A-LOT": "8_code.md:613-614 · 8_code.md:572 · 8_code.md:581 · 8_code.md:590 · 8_code.md:605 · 8_code.md:450",
-    "A-DESC": "8_code.md:571 · 8_code.md:580 · 8_code.md:589 · 8_code.md:604 · agents/realisateur.md:368-370",
-    "A-BLOC": "8_code.md:426-427 · 8_code.md:448-449 · agents/detailleur.md:412-414",
+    "A-DESC": "8_code.md:571 · 8_code.md:580 · 8_code.md:589 · 8_code.md:604 · agents/realisateur.md:375-377",
+    "A-BLOC": "8_code.md:426-427 · 8_code.md:448-449 · agents/detailleur.md:419-421",
     "A-DOSSIER": "8_code.md:616-617",
     "A-AUCUN": "8_code.md:517-518",
-    "A-IMBRIQUE": "agents/realisateur.md:364-371 · agents/arbitre.md:476-486",
+    "A-IMBRIQUE": "agents/realisateur.md:371-378 · agents/arbitre.md:476-486",
     "D-ESTIME": "demande 1.5, §4 : la médiane des lots passés de la feature",
 }
 
@@ -144,7 +144,7 @@ def redecoupage_lots(W):
     hand, whose code is dropped, and the lots left », or « the block's lots »
     (agents/arbitre.md:392-396), one set per return, appended. Once the
     Cadreur has cut the split again it writes `## Ce qui revient` and `## Ce
-    que j'en fais` at the end (agents/cadreur.md:1054-1061); the file stays
+    que j'en fais` at the end (agents/cadreur.md:1061-1068); the file stays
     unnumbered when that split does not hold (cmd/7_lots.md:165-175, :224,
     :212). So: the lots named under `## Ce qui ne l'est pas` in the Arbitre's
     sections after the Cadreur's last one — none when the Cadreur's come

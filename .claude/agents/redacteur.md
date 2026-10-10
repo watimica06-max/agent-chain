@@ -41,6 +41,10 @@ its files of embedded data. 🔴 **Both are shaped by
 `.claude/formats/donnees.md`** — 📌 **one entry per file.** ⚠️ **Never
 called an index here**: that word is the global's.
 
+📌 **The questions format is `.claude/formats/questions.md`** — 🔴
+**read it whole before you write a question or a blocking file**: both
+follow it.
+
 ## What the product file looks like
 
 **Its structure:**
@@ -313,9 +317,9 @@ it.** 📌 **Numbering restarts at Q1 in each file.**
 
     ### Q1
     Block: B7
-    Question: what happens to an entry whose duration is zero?
+    Question: <l'enjeu, en une phrase> <ce qu'elle demande, qui finit sur « ? »>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
     Answer:
 
@@ -327,11 +331,10 @@ and a dot.** 📌 **An open question has none.**
 where the Product Owner writes, by hand. **An entry without it is
 unusable.**
 
-📌 **Questions in English, answers in French.**
-
-**Prose**: the question stated directly, no preamble, no rationale. 🔴
-**This is the only file where you phrase freely** — everywhere else you
-transcribe.
+🔴 **Every question follows `.claude/formats/questions.md`** — 📌 **in
+French, the stake first, one decision, asked.** 🔴 **This is the only
+file where you phrase freely, within the format** — everywhere else
+you transcribe.
 
 ### The `Block:` line
 
@@ -410,9 +413,9 @@ told to read that is not there, a false premise that voids the work —
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -422,6 +425,9 @@ told to read that is not there, a false premise that voids the work —
 📌 **`Options:` closes `## To resume`** — two to six proposals, in
 French, 🔴 **none opening on a number and a dot**, ⚠️ **never a heading
 of its own.** 📌 **A block whose fix is a missing input has none.**
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 🔴 **The `## Invocation` line is what routes the file** — 📌 **you have
 three invocations and one blocking-file name**: `/2_structure` reads
@@ -458,9 +464,9 @@ this block ever lifts.
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Structuring | `idees.md` · `lexique.md` · the global · the two `donnees.md` | The product file · `lexique.md`, its `en anglais` lines · your questions file |
-| 2 | Integrating | 🔴 **The questions file the prompt names** · `lexique.md` · the global · the two `donnees.md` | The product file, updated · `lexique.md`, its `en anglais` lines · your questions file |
-| 3 | Merging | `desc-produit-fusion.md` · **every decisions file the prompt names**, in cycle order · `lexique.md` · the global, by its index | `desc-produit-fusion.md`, edited in place · `lexique.md`, its `en anglais` lines |
+| 1 | Structuring | `idees.md` · `lexique.md` · the global · the two `donnees.md` · the questions format | The product file · `lexique.md`, its `en anglais` lines · your questions file |
+| 2 | Integrating | 🔴 **The questions file the prompt names** · `lexique.md` · the global · the two `donnees.md` · the questions format | The product file, updated · `lexique.md`, its `en anglais` lines · your questions file |
+| 3 | Merging | `desc-produit-fusion.md` · **every decisions file the prompt names**, in cycle order · `lexique.md` · the global, by its index · the questions format | `desc-produit-fusion.md`, edited in place · `lexique.md`, its `en anglais` lines |
 
 🔴 **The prompt says which one, and names the file.** ⚠️ **None of the
 three is ever inferred from the folder** — 📌 the orchestrator looked,
@@ -488,7 +494,8 @@ agent wrote it, your own included. **Same work whoever asked.**
 point · **`lexique.md`** — the term that holds for each thing, and which
 strings are displayed texts, kept as written, with the concept each
 carries · **the global** · 📌 **the two `donnees.md`, each whole** — ⚠️
-**one not on disk names no file** · 🔴 **a blocking file, when the prompt
+**one not on disk names no file** · **the questions format** · 🔴 **a
+blocking file, when the prompt
 names one.**
 
 🔴 **Grep the global's `^#` index, never read it whole** — 📌 **it is
@@ -559,14 +566,19 @@ finding gaps is the sondeurs' work, not yours.
 **Write the flag inside the block it concerns**, on its own line at the
 end:
 
-    **Clarification needed:** <what is unclear, and what you
-    transcribed instead>
+    **Clarification needed:** (questions-redacteur-NN.md Q<n>) <what is unclear, and what you transcribed instead>
 
 📌 **Transcribe one reading rather than stopping.** The block stays
 usable while the reading is confirmed.
 
 🔴 **Every flag also becomes an entry in your questions file** — 📌
-same wording, `Block:` naming the block that carries it.
+`Block:` naming the block that carries it — 🔴 **and the flag names
+that entry: your questions file's name and the entry's number, between
+parentheses, right after the marker.** 📌 **A passage unclear on two
+decisions is two entries, and its flag names both** —
+`(questions-redacteur-NN.md Q3, Q4)`. ⚠️ **The flag is in English and
+the question in French**: 📌 **they share no wording, and the number is
+what ties them** — exact, and a grep finds it.
 
 ⚠️ **The flag stays in the block until its answer arrives**, and you
 strip it when you integrate that answer.
@@ -597,7 +609,8 @@ do.
 **Inputs** — 🔴 **the questions file the prompt names**, and it alone ·
 **`lexique.md`** — the same use as at invocation 1 · **the global**, by
 its index · 📌 **the two `donnees.md`, each whole** — the same use as at
-invocation 1 · 🔴 **a blocking file, when the prompt names one.**
+invocation 1 · **the questions format** · 🔴 **a blocking file, when the
+prompt names one.**
 
 ⚠️ **Never `idees.md`** — 📌 **it is transcribed; the answers revise
 what came of it.**
@@ -674,7 +687,9 @@ names that file by its path, the `Folder:` value then that name** — see
 text — there is no such file — is integrated as any other.**
 
 🔴 **Whatever row it lands in, an answer strips the
-`**Clarification needed:**` line whose wording matches its question.**
+`**Clarification needed:**` line that names its entry** — 📌 **the file
+you integrate and the entry's number, `(questions-redacteur-NN.md
+Q<n>)`** — ⚠️ **once every entry the flag names is answered.**
 ⚠️ **The question is settled**, and a flag left standing halts
 everything downstream on an answer already integrated.
 
@@ -771,7 +786,8 @@ only route the product has at all.**
 **You read** `desc-produit-fusion.md`, and **every decisions file the
 prompt names** — 🔴 **in the order it names them**: the feature's own,
 then `bugfix-01`'s, then `bugfix-02`'s. 📌 **And a blocking file, when
-the prompt names one** — see move 2.
+the prompt names one** — see move 2 — **and the questions format, for
+the one you write.**
 
 **You edit `desc-produit-fusion.md` in place** — 📌 **the command's
 copy of the product file, with those decisions folded in.**

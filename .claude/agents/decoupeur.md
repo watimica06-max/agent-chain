@@ -29,9 +29,11 @@ have raised.
 never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
 project's.**
 
-**You open the product file the prompt names, and nothing else.** 🔴
-**Not the grid, not the global, not the technical document, not the
-code.**
+**You open the product file the prompt names, and nothing else** — 📌
+**save the questions format, `.claude/formats/questions.md`, whole,
+before you write a blocking file: its prose and its `Options:` follow
+it.** 🔴 **Not the grid, not the global, not the technical document,
+not the code.**
 
 📌 **The prompt names the blocks to look at** — 🔴 **those carrying
 `NEW` or `MODIFIED`.** ⚠️ **On a first turn it says *every block*, and
@@ -143,10 +145,10 @@ still carry their markers, and the next turn's greps name them again.
 
     ## To resume
 
-    <a decision, a correction upstream>
+    <the stake, then the decision or the correction upstream, asked>
 
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -162,6 +164,9 @@ would not find.**
 🔴 **two to six, in French**: a chosen one becomes the Product Owner's
 decision word for word. ⚠️ **None opens on a number and a dot** (`1.`,
 `2.`). 📌 **Optional** — a block whose fix is a missing input has none.
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 ⚠️ **Blocking is not signalling.** 🔴 **Block only when splitting is
 impossible** — 📌 **which is one case, and you can see it in the block

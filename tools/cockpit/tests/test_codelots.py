@@ -162,7 +162,7 @@ lot-06, whose code is dropped; lot-03, lot-04, lot-05 left
 
 S8 exists before lot-06 is coded.
 """
-# The Cadreur's two sections, at the end, once it has cut again (agents/cadreur.md:1054-1061).
+# The Cadreur's two sections, at the end, once it has cut again (agents/cadreur.md:1061-1068).
 CADREUR_REDEC = "\n## Ce qui revient\n\nrien\n\n## Ce que j'en fais\n\nrien de récurrent\n"
 
 

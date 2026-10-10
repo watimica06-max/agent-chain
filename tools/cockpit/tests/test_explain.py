@@ -170,6 +170,22 @@ def test_exactly_the_question_its_options_its_block_and_the_matching_lexicon(tmp
         assert absent not in prompt
 
 
+def test_the_occurrences_never_reach_the_prompt(tmp_path):
+    # .claude/formats/questions.md §3: « Expliquer » never reads `Occurrences:`
+    # — the places the answer applies to, not what she decides.
+    _, feat = feature_folder(tmp_path)
+    path = feat / "questions-sondeur-01.md"
+    text = path.read_text(encoding="utf-8").replace(
+        "- À part, comme une transition\nDéfaut:",
+        "- À part, comme une transition\nOccurrences:\n- marqueur-a · §2 \"marqueur-b\"\nDéfaut:", 1)
+    path.write_text(text, encoding="utf-8")
+    e = entry(feat, 1)
+    assert e.occurrences == ['marqueur-a · §2 "marqueur-b"']
+    prompt = explain.build_prompt(explain.gather(e, str(feat)))
+    assert "marqueur-a" not in prompt and "marqueur-b" not in prompt and "Occurrences" not in prompt
+    assert "## Ses options\n- Dans le segment de l'atelier" in prompt
+
+
 def test_a_missing_block_is_said_and_the_question_alone_is_used(tmp_path):
     _, feat = feature_folder(tmp_path)
     ctx = explain.gather(entry(feat, 2), str(feat))

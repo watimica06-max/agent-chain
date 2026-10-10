@@ -45,9 +45,9 @@ never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
 project's.** An absolute path points outside your session and fails.
 
 🔴 **Every path below is relative to the feature folder the prompt
-names**, 📌 **except three, relative to the repository root** — the
-grid, the application's `donnees.md` and a data file: their rows say
-so.
+names**, 📌 **except four, relative to the repository root** — the
+grid, the questions format, the application's `donnees.md` and a data
+file: their rows say so.
 
 | Referred to as | On disk |
 |---|---|
@@ -66,14 +66,16 @@ so.
 | the technical document | `spec-technique.md` |
 | the traceability file | `tracabilite.md` |
 | the grid | 🔴 **`.claude/grids/GRILLE_FERMETURE_TECHNIQUE.md`** — ⚠️ **from the repository root**, not the feature folder |
+| **the questions format** | 🔴 **`.claude/formats/questions.md`** — ⚠️ **from the repository root** · 📌 **every question, technical or not, and every blocking file you write follows it** |
 | **the two `donnees.md`** | 🔴 **`donnees/donnees.md`**, the feature's reference data, **and `docs/donnees/donnees.md`**, the application's embedded data — ⚠️ **the second from the repository root** · 📌 **shaped by `.claude/formats/donnees.md`**, one entry per file |
 | **a data file** | 🔴 **A file a `donnees.md` names, by the path a block cites** — ⚠️ **from the repository root**, as the block gives it |
 
 📌 **`<nature>` is the nature's name from the table below, a hyphen for
 a space** — `external-exchange`.
 
-⚠️ **Nothing outside the feature folder but the grid, the
-application's `donnees.md` and the data files your blocks cite** — you
+⚠️ **Nothing outside the feature folder but the grid, the questions
+format, the application's `donnees.md` and the data files your blocks
+cite** — you
 never open the global, ⚠️ **nor a `donnees/` folder**: 📌 **a data file
 is found by the path a block cites, and by nothing else.**
 
@@ -425,9 +427,9 @@ does not land in a block:**
 
     ### Q1
     Entries: §3.2, [B12: recorded start time]
-    Question: <the choice, and what each side would cost>
+    Question: <l'enjeu, en une phrase> <le choix, qui finit sur « ? »>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
     Answer:
 
@@ -474,9 +476,9 @@ it** — you never number a questions file.
 
     ### Q1
     Block: B7
-    Question: what happens to an entry whose duration is zero?
+    Question: <l'enjeu, en une phrase> <ce qu'elle demande, qui finit sur « ? »>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
     Answer:
 
@@ -492,11 +494,13 @@ integrates by block.**
 it is where the Product Owner writes, by hand. **An entry without it is
 unusable.**
 
-📌 **Questions in English, answers in French.**
-
-**Prose**: the question stated directly, no preamble, no rationale. 🔴
-**This is the only file where an agent phrases freely** — everywhere
-else it transcribes or files.
+🔴 **Every question follows `.claude/formats/questions.md`** — 📌 **in
+French, the stake first, one decision, asked** — ⚠️ **a technical one
+too**: 📌 **its stake says what each side changes for the
+application's user, in her words, never in the code's.** 🔴 **This is
+the only file where an agent phrases freely, within the format** —
+everywhere else it
+transcribes or files.
 
 🔴 **Write it even when empty.** An empty file says *"nothing to
 flag"*; a missing one says *"the agent did not run"*.
@@ -660,10 +664,10 @@ told to read that is not there, a false premise that voids the work.
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
 
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -676,6 +680,9 @@ this block ever lifts.
 
 📌 **`Options:` closes `## To resume`, never a heading of its own** —
 same rules as in a questions file; ⚠️ **a missing input has none.**
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 
@@ -708,7 +715,8 @@ write, not what the block says.
 - 🔴 **Group entries into units of work** — one entry, one rule or one
   table; the Cadreur groups
 - 🔴 **Open `idees.md`**, or any questions file 📌 **but the two the
-  prompt names**: your answered technical file, and your answered
+  prompt names** — ⚠️ **the questions format is not one; you read
+  it**: your answered technical file, and your answered
   questions file when its answers changed no block — a product answer
   reaches you through the product file, ⚠️ **or through that file when
   it changed no block**, a technical one through the technical file
@@ -734,8 +742,8 @@ write, not what the block says.
 
 | # | Invocation | Reads | Writes |
 |---|---|---|---|
-| 1 | **Nature** — one of several running at once | Your blocks · the headings · the grid · 📌 **the two `donnees.md`, and the data files your blocks cite** · 🔴 **your answered technical file, when the prompt names one** · 🔴 **your answered questions file, when the prompt names one** · 📌 **the blocking file the prompt names, when it names one** | Your section · your notes · your questions · 📌 **your technical questions, when you have any** |
-| 2 | **Transversal** — once every section is written | The technical document · every `convertisseur/*-notes.md` · 🔴 **`par-genre/transverses.md`, `references.md`, `hors-perimetre.md`** · the headings · the grid · 📌 **the two `donnees.md`, and the data files the blocks of those three cite** · 📌 **the blocking file the prompt names, when it names one** | The technical document, completed · your record · the traceability file · your questions · 📌 **your technical questions, when you have any** |
+| 1 | **Nature** — one of several running at once | Your blocks · the headings · the grid · the questions format · 📌 **the two `donnees.md`, and the data files your blocks cite** · 🔴 **your answered technical file, when the prompt names one** · 🔴 **your answered questions file, when the prompt names one** · 📌 **the blocking file the prompt names, when it names one** | Your section · your notes · your questions · 📌 **your technical questions, when you have any** |
+| 2 | **Transversal** — once every section is written | The technical document · every `convertisseur/*-notes.md` · 🔴 **`par-genre/transverses.md`, `references.md`, `hors-perimetre.md`** · the headings · the grid · the questions format · 📌 **the two `donnees.md`, and the data files the blocks of those three cite** · 📌 **the blocking file the prompt names, when it names one** | The technical document, completed · your record · the traceability file · your questions · 📌 **your technical questions, when you have any** |
 
 🔴 **The prompt says which, and at invocation 1 which nature.** It is
 never inferred.

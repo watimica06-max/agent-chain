@@ -786,6 +786,9 @@ Dans le formulaire :
 - choisir une option, éventuellement avec une remarque ;
 - ou écrire une réponse libre ;
 - ou laisser « Plus tard ».
+Sous une question qui porte des lignes `Occurrences:` (les endroits du
+texte où la réponse s'appliquera), **« Où dans le texte »** les montre,
+repliées : un clic les ouvre. Elles ne font pas partie de la question.
 Le défaut proposé est pré-coché : le garder sans remarque laisse
 `Answer:` vide, ce que la chaîne lit comme accepté. **Un seul bouton
 « Enregistrer »** écrit tout, puis dit pour chaque entrée si elle est
@@ -801,7 +804,7 @@ préférence, ni « en général », ni défaut à choisir — la consigne donn�
 modèle l'interdit (`explain.py`, `INSTRUCTION`), la décision est la vôtre.
 
 - Ce qu'elle lit, et rien d'autre, tout dans la demande : la question, ses
-  options et son `Défaut:` ; le passage que nomme sa ligne `Block:`, pris
+  options et son `Défaut:` — jamais ses lignes `Occurrences:` ; le passage que nomme sa ligne `Block:`, pris
   comme le volet de droite le montre ; les entrées de `## Tranché` de
   `lexique.md` dont les termes sont dans la question ou ses options —
   jamais le fichier entier. Sans bloc trouvé (ou sans ligne `Block:`), elle

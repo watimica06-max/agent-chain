@@ -35,14 +35,15 @@ against what is already built**, once the first time has closed.
 never `C:\…` or `/…`. ⚠️ **You run in a worktree; your root is not the
 project's.**
 
-**Two files always, and a third only when the prompt names it** — 📌
-**at every invocation; invocation 1 adds the two indexes, invocation 3
-the global, each named in its row:**
+**Three files always, and a fourth only when the prompt names it** —
+📌 **at every invocation; invocation 1 adds the two indexes, invocation
+3 the global, each named in its row:**
 
 | What | How |
 |---|---|
 | **The product file** the prompt names | 📌 **The blocks the prompt names, by their heading** — 🔴 **always a list, never the file whole** |
 | **The grid** — 📌 `.claude/grids/GRILLE_CADRAGE_PRODUIT_V2.md` at invocations 1 and 2, `.claude/grids/GRILLE_EXISTANT.md` at invocation 3 | 🔴 **Whole** |
+| **The questions format**, `.claude/formats/questions.md` | 🔴 **Whole** — 📌 **every question and every blocking file you write follows it** |
 | **A blocking file** | 📌 **Only when the prompt names one** |
 | **The global**, `docs/PRODUIT_GLOBAL.md` | 🔴 **Invocation 3 only** — 📌 **the sections your blocks name, never the file whole** |
 | **The two indexes** — 📌 **the feature's, `docs/features/<feature>/donnees/donnees.md`, and the application's, `docs/donnees/donnees.md`**, shaped by `.claude/formats/donnees.md` | 🔴 **Invocation 1 only, each whole** — 📌 **for `A1.10` and `A1.11`**, nothing else. ⚠️ **Never a file an index names, never the folder** |
@@ -141,9 +142,9 @@ there.**
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -157,6 +158,9 @@ this block ever lifts.
 📌 **`Options:` closes `## To resume`, never under a heading of its
 own** — two to six proposals, in French, none opening on a number and
 a dot. ⚠️ **Optional**: a block whose fix is a missing input has none.
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 ⚠️ **Blocking is not raising a question.** 📌 **A gap goes in your
 questions file and the cycle carries on.** 🔴 **You block only when
@@ -253,7 +257,7 @@ questions file.** 📌 **Nothing is open inside the feature any more** —
 a `Global:` line.** ⚠️ **A block attached to nothing hits nothing**: it
 describes something that did not exist.
 
-**What you read, beyond the three above**
+**What you read, beyond the four above**
 
 🔴 **The global product file, `docs/PRODUIT_GLOBAL.md`** — 📌 **and only
 the sections your blocks' `Global:` lines name.**
@@ -289,8 +293,9 @@ corpus holds is precisely what is in conflict.
 📌 **The two sides of the arbitration are its options**, in French — 🔴
 **and still no `Défaut:`.**
 
-📌 **Say which section of the global the question stands against**, in
-the question's own words.
+📌 **Say which part of what is already built the question stands
+against**, in everyday words — ⚠️ **never its `§` number nor the
+global's name**: 📌 the `Block:` line and the record carry those.
 
 🔴 **Write the file even when empty** — 📌 **that is what ends the
 second time.**
@@ -363,9 +368,9 @@ they do not cover is still asked**, as it always was.
 🔴 **A block of the feature that does what one of them excludes is a
 contradiction of the product** — 📌 **you raise it, as an obligatory
 question**: ⚠️ **its `Block:` line carries the feature's block alone**,
-and the question's own words name the out-of-scope block it
-contradicts — on the model of invocation 3, which names the global's
-section the same way. 🔴 **Never a *défaut***: the Product Owner
+and the question says in everyday words what the out-of-scope block
+excludes — ⚠️ **never its identifier** — on the model of invocation 3,
+which names what is already built the same way. 🔴 **Never a *défaut***: the Product Owner
 settles which of the two stands. 📌 **It is the global's** — the one
 invocation that holds the out-of-scope blocks.
 
@@ -397,9 +402,9 @@ a divergence, it is an exception.
 
     ### Q1
     Block: B7
-    Question: <what is missing, stated directly>
+    Question: <l'enjeu, en une phrase> <ce qui manque, demandé, qui finit sur « ? »>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
     Answer:
 
@@ -418,9 +423,9 @@ and a dot.** 📌 **Optional** — an open question has none.
 
     ### Q2
     Block: B12
-    Question: <what is missing, stated directly>
+    Question: <l'enjeu, en une phrase> <ce qui manque, demandé, qui finit sur « ? »>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
     Défaut: <the answer you propose> — <the block and the words that found it>
     Answer:
@@ -450,7 +455,7 @@ Product Owner writing what she has written before.
     ### Q3
     Block: B9
     Folder: docs/features/<feature>/donnees/
-    Question: <what is missing, stated directly>
+    Question: <l'enjeu, en une phrase> <ce qui manque, demandé, qui finit sur « ? »>
     Answer:
 
 🔴 **Its value, `.claude/formats/donnees.md` §5 gives** — 📌 **the
@@ -492,10 +497,9 @@ crossing.
 does the hitting.** ⚠️ **Never a block of the global**, which this chain
 does not address by identifier.
 
-📌 **Questions in English, answers in French.**
-
-🔴 **State the question directly** — no preamble, no rationale, never a
-suggested answer, never the grid identifier that raised it. 📌 **The
+🔴 **Every question follows `.claude/formats/questions.md`** — 📌 **in
+French, the stake first, one decision, asked.** ⚠️ **Beyond it: never a
+suggested answer, never the grid identifier that raised it.** 📌 **The
 identifier belongs to the record**, not to a question put to the
 Product Owner.
 

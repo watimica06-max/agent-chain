@@ -15,7 +15,7 @@ import textfile
 
 _lock = threading.Lock()
 
-FORBIDDEN_LINE = re.compile(r"^(#|(Answer|Question|Options|Défaut):)")
+FORBIDDEN_LINE = re.compile(r"^(#|(Answer|Question|Options|Occurrences|Défaut):)")
 NUMBERED_START = re.compile(r"^\s*\d+\.")
 
 

@@ -60,9 +60,9 @@ def write(path, text=""):
 
 
 def split(code, lots):
-    """A split that holds: `code/decoupage.md` (agents/cadreur.md:848-854) and
+    """A split that holds: `code/decoupage.md` (agents/cadreur.md:855-861) and
     `code/sequence.md` with an empty `## Defects` (agents/verificateur.md:105-117),
-    every lot reviewed PASS (agents/relecteur.md:140-170)."""
+    every lot reviewed PASS (agents/relecteur.md:144-174)."""
     write(code / "decoupage.md", "".join(
         f"## {l}\n\nAnchor: §{k}.1 — Entry {k}\nNeeds: —\nProduces: S{k}\nModifies: —\nTouches: —\n\n"
         for k, l in enumerate(lots, 1)))
@@ -204,7 +204,7 @@ def turn_folder(tmp_path, root_files=(), markers=True, filed_sondeur=True):
 
 
 @pytest.mark.parametrize("root,expect", [
-    # After /2_structure: the Rédacteur's file at the root (agents/redacteur.md:301).
+    # After /2_structure: the Rédacteur's file at the root (agents/redacteur.md:305).
     (["questions-redacteur-02.md"], {"2_structure": F, "3_decoupe": AF, "3a_genre": AF, "3b_nature": AF}),
     # After /3_decoupe: it filed that file (3_decoupe.md:66-69) — the root is empty.
     ([], {"2_structure": F, "3_decoupe": F, "3a_genre": AF, "3b_nature": AF}),

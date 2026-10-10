@@ -17,7 +17,7 @@ def parse(rel, as_name=None, work_dir=None):
 # ------------------------------------------------- decided, broken, empty
 
 def test_shape1_decided_is_not_waiting():
-    # agents/concepteur.md:150-166, its `## Decision` filled.
+    # agents/concepteur.md:154-170, its `## Decision` filled.
     p, path = parse("hand/blocked_concepteur-01.md", as_name="blocked_concepteur.md")
     (e,) = p.entries
     assert e.shape == 1 and not e.waiting

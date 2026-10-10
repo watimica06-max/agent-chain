@@ -85,6 +85,10 @@ that name.
   that index only** — 📌 **its `Private:` line, read before the copy of
   move 3.** ⚠️ **Never another entry, never the whole index**
 
+📌 **And `.claude/formats/questions.md`, the questions format, whole,
+before you write a blocking file** — 🔴 **its prose and its `Options:`
+follow it.**
+
 **How you find things**
 
 🔴 **A declaration, by grep** — 📌 **on the file `## Declared` names**,
@@ -213,10 +217,10 @@ and is not a block.
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
 
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -227,6 +231,9 @@ and is not a block.
 a number and a dot** — a chosen one becomes the Product Owner's
 decision word for word; ⚠️ a block whose fix is a missing input has
 none.
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 ---
 

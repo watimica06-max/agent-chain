@@ -107,6 +107,10 @@ start.
   see *When you resume a lot in FAIL*
 - **The code you are about to touch**, and nothing more
 
+📌 **And `.claude/formats/questions.md`, the questions format, whole,
+before you write a blocking file** — 🔴 **its prose and its `Options:`
+follow it.**
+
 🔴 **Never the technical document, the lot list, or the sequence.** 📌
 **The sheet says what to build** — ⚠️ **if it does not, it is wrong, and
 that is a block.** 📌 **The two reports above say where it landed and
@@ -335,7 +339,7 @@ only one, and 🔴 **one `## Decision` at the end**, whatever the count.
     ### Where
     ### To resume
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -349,6 +353,9 @@ French, since a chosen option becomes the Product Owner's decision word
 for word; ⚠️ **none for a missing input.** 🔴 **No option opens on a
 number and a dot** (`1.`) — the answers under `## Decision` are counted
 by their `N.` lines.
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 It is where the Arbitre answers — and the Product Owner, by hand, when

@@ -289,6 +289,8 @@ body.at-home .screen { margin: 0 auto; }
 @keyframes ex-turn { to { transform: rotate(360deg); } }
 .explain details.ex-text { width: 100%; border: var(--bw) solid var(--accent); background: var(--accent-soft); border-radius: var(--r-8);
   padding: var(--sp-6) var(--sp-12); }
+.occ > summary { font-size: var(--fs-13); margin-top: var(--sp-4); }
+.occ-list { margin: var(--sp-4) 0 0 var(--sp-18); padding: 0; font-size: var(--fs-13); overflow-wrap: anywhere; }
 .explain details.ex-text > summary { cursor: pointer; font-weight: 650; font-size: var(--fs-13); color: var(--accent); }
 .explain .ex-body { font-size: var(--fs-14); line-height: 1.5; color: var(--ink); margin-top: var(--sp-6); }
 .explain .ex-body p { margin: 0 0 var(--sp-6); }
@@ -4138,6 +4140,8 @@ function renderForms() {
     for (const q of qs) {
       const head = [el("b", {text: "Q" + q.number}), el("span", {class: "ctx", text: q.context.join(" · ")}), stepBadge(q)];
       const body = [el("pre", {class: "text q", text: q.question})];
+      const occ = occurrencesBox(q);
+      if (occ) body.push(occ);
       if (q.default_source) body.push(el("div", {class: "muted small", text: "Source du défaut : " + q.default_source}));
       if (q.answer) body.push(el("div", {class: "notice warn small", text: "Texte déjà présent sous Answer:, hors de la ligne — il sera remplacé : " + q.answer}));
       const join = questionJoin(q);
@@ -4150,6 +4154,19 @@ function renderForms() {
   }
   hint();
   ensureFocus();
+}
+
+// « Où dans le texte »: the `Occurrences:` lines (.claude/formats/questions.md
+// §3) — the places the answer applies to, kept out of the question. Folded;
+// its open state survives a redraw.
+const OCC_OPEN = new Set();  // question ids whose list is unfolded
+function occurrencesBox(q) {
+  if (!q.occurrences || !q.occurrences.length) return null;
+  const d = el("details", {class: "occ", open: OCC_OPEN.has(q.id) || undefined},
+    el("summary", {text: `Où dans le texte (${q.occurrences.length})`}),
+    el("ul", {class: "occ-list"}, q.occurrences.map((o) => el("li", {text: o}))));
+  d.addEventListener("toggle", () => { if (d.open) OCC_OPEN.add(q.id); else OCC_OPEN.delete(q.id); });
+  return d;
 }
 
 // ===================================================== « Expliquer » (1.19)

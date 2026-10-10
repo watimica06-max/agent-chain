@@ -31,8 +31,9 @@ does not touch it.
 French as the options are. ⚠️ **What follows ` — ` names its source** —
 📌 **a quote stays in the language of the text it quotes.**
 
-📌 **`Occurrences:` is not hers to read** — see *§3*. ⚠️ **The rules
-below are the question's**, and none of them reaches those lines.
+📌 **`Occurrences:` lists the places the answer applies to** — see
+*§3*. ⚠️ **The rules below are the question's**, and none of them
+reaches those lines.
 
 🔴 **Everything else an agent writes keeps its own language** — 📌 the
 product file, the technical document, a report, a `## Decision` the
@@ -192,15 +193,16 @@ remark she never wrote.
 
 ### `Occurrences:` — where the answer applies
 
-🔴 **An agent that applies the answer to places in a text writes them
-here, after `Options:`, one line each:**
+🔴 **The places the answer applies to go here, after `Options:`, one
+line each, in the shape its agent's file gives:**
 
     Occurrences:
-    - <ce sous quoi la ligne est rangée> · §<ref> "<sa phrase, mot pour mot>"
-    - <…> · §<ref> "<…>"
+    - <ce sous quoi la ligne est rangée> · <l'endroit>
+    - <…> · <…>
 
-📌 **Today the Lexicographe alone writes it** — see its file. ⚠️
-**`Défaut:`, when an entry carries both, comes after `Occurrences:`.**
+📌 **Two agents write it** — the Lexicographe, for the places an answer
+renames, and the Architecte, for the lots a `replacement` names — see
+their files.
 
 🔴 **Every place, however many** — 📌 **a long list is still one
 question**: its length is in `Occurrences:`, never in `Question:`.

@@ -54,7 +54,9 @@ first row of the table reads `architecte/cadreur.md`**, which a glob of
 
 🔴 **A path starting with `docs/` is relative to the repository root**,
 not to the working folder — the conventions are shared by the whole
-project.
+project. 📌 **So is `.claude/formats/questions.md`, the questions
+format** — 🔴 **read it whole before you write a blocking file, in any
+block below**: its prose and its `Options:` follow it.
 
 | Referred to as | On disk |
 |---|---|
@@ -200,10 +202,10 @@ blocking file alone stops the run.
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
 
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -216,6 +218,9 @@ word. ⚠️ **None opens on a number and a dot** (`1.`, `2.`). 📌 **A block
 whose fix is a missing input carries none**, nor does a conventions
 block — the Architecte's verdict lifts it. 🔴 **Each block appended
 below a filled `## Decision` carries its own.**
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 🔴 **The `## Decision` heading is written empty, and never omitted.**
 📌 **It is where the Product Owner answers, by hand.** ⚠️ **One block
@@ -302,7 +307,8 @@ no blocking file beside it, is found the same way** — 📌 **nothing in
   wait*
 - 🔴 **Group lots into blocks** — that is the Vérificateur, who has the
   execution order
-- 🔴 **Open the product file, either grid, or any questions file**
+- 🔴 **Open the product file, either grid, or any questions file** —
+  ⚠️ **the questions format is not one; you read it**
 - 🔴 **Grep the code outside the folders the conventions name** — ⚠️
   **never a bare pattern**; 📌 **the technical document is grepped by
   its own path**, at move 1
@@ -463,7 +469,8 @@ for callers. ⚠️ **A search without a path sweeps `docs/` and the build
 output.**
 
 🔴 **Never the product file, either grid, or any questions file.** They
-belong to the chain before you.
+belong to the chain before you. ⚠️ **The questions format is not one** —
+see *Where you work*.
 
 ---
 

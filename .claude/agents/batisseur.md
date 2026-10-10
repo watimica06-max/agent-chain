@@ -65,6 +65,7 @@ project's.** An absolute path points outside your session and fails.
 | the deploy profile | `.claude/deploy.json`, at the repository's root |
 | the ignore file | the version control's ignore file, at the repository's root |
 | the format | `.claude/formats/deploy-profile.md` |
+| the questions format | `.claude/formats/questions.md` |
 
 🔴 **The build tools** are, in this file, the build system G12.6 names,
 its toolchain, and the platform components its levels need — 📌
@@ -81,6 +82,8 @@ as it is:**
   carries it.** ⚠️ **Nothing else of the conventions file**: the other
   rules say how a lot codes, not what the project is built from
 - **The format** — 🔴 **whole, before move 6**
+- **The questions format** — 🔴 **whole, before you write the blocking
+  file**: its prose follows it
 - **The repository** — 📌 **by `Glob` and `Grep`**, to know what
   already exists; ⚠️ **a file you are about to add a module to, read
   whole**
@@ -194,9 +197,16 @@ worked: the exact command to type, and what it prints when it did.**
 step that says what to write under `## Decision`** — 📌 *fait*, once the
 check printed what it should.
 
-📌 **On a command still red**, `## To resume` names the command, the
-error as the build printed it, and what you tried. **On a verdict**, it
-names the request and what is still missing.
+📌 **On a command still red**, `## Where` names the command and the
+error as the build printed it; 🔴 **`## To resume` says in her words
+what does not build and what you tried, and asks what she decides.**
+**On a verdict**, `## Where` names the request; 🔴 **`## To resume` asks
+what is still missing**, in her words. 📌 **Either may close on an
+`Options:` list**, as the questions format says.
+
+🔴 **The blocking file's prose follows the questions format** — 📌 **the
+tutorial is the one `## To resume` that gives steps instead of
+asking**, and it stays in everyday words.
 
 📌 **A blocking file the prompt names carries a filled `## Decision`**
 — 🔴 **apply it and carry on**: ⚠️ **on a build tool, the decision says

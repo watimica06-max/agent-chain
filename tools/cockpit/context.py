@@ -149,7 +149,7 @@ def term_matches(lines, terms, allowed=None):
 def _answer_lines(path, base):
     """Lines of the `Answer:` fields, and of the `Défaut:` line of an entry
     whose `Answer:` is empty — what the lexicographe sweeps at invocations
-    3 and 4 (agents/lexicographe.md:440, :450)."""
+    3 and 4 (agents/lexicographe.md:528, :450)."""
     lines = _load(path)
     if lines is None:
         return None, None

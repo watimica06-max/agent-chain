@@ -74,7 +74,9 @@ existe ; les commandes elles-mêmes sont décrites dans
 3. `/1_lexique`, invocation 2 — Settling : le Lexicographe applique le
    fichier répondu à `idees.md` — un terme retiré remplacé à chaque
    occurrence hors guillemets, des guillemets ajoutés ou retirés à
-   chaque occurrence quand la réponse tranche une citation — et rien
+   chaque occurrence quand la réponse tranche une citation, une réponse
+   à deux sens appliquée depuis les lignes `Occurrences:` de son entrée
+   — et rien
    d'autre : aucune phrase réécrite, aucune règle, précision ou exemple
    ajouté (`lexicographe.md`, *What you never do*). Puis invocation 1
    de nouveau, jusqu'à un `questions-lexicographe-NN.md` sans `### Q`.
@@ -718,7 +720,7 @@ Modèle: sonnet · effort medium · outils: Read, Grep, Glob, Write
 Invoquée par: `/diagnostique`, phase 1 — un appel par manque à
 envoyer, tous dans un seul message, après le tri sur `investigation/` ;
 jamais par un autre agent ni une autre commande.
-Lit: le manque, dans le prompt (`Gap G<n>: <texte>`), et son identifiant
+Lit: le format des questions, `.claude/formats/questions.md` (→ MECANISMES §Poser une question au Product Owner), avant d'écrire une question ou un fichier de blocage ; le manque, dans le prompt (`Gap G<n>: <texte>`), et son identifiant
 · `docs/TECHNICAL_CONVENTIONS.md`, entier, avant de chercher, pour les
 dossiers de code du projet (→ MECANISMES §Lecture des conventions —
 divergence) · le code, par grep avec chemin, plus le corps de chaque
@@ -931,7 +933,7 @@ Modèle: sonnet · effort medium · outils: Read, Grep, Glob, Write
 Invoquée par: `/diagnostique`, phase 2 — une fois, quand chaque rapport
 existe et qu'aucun `desc-bug.md` n'existe ; jamais par un autre agent
 ni une autre commande.
-Lit: son propre fichier de blocage `blocked_diagnostiqueur.md` et ses
+Lit: le format des questions, `.claude/formats/questions.md` (→ MECANISMES §Poser une question au Product Owner), avant d'écrire une question ou un fichier de blocage ; son propre fichier de blocage `blocked_diagnostiqueur.md` et ses
 `-NN` réglés, par un `Glob` `blocked_diagnostiqueur*.md` · l'existence
 de `desc-bug.md`, par `Glob` · `investigation/<id>.md` pour chaque
 identifiant de `bug-list.md`, tous, entiers — jamais un `blocked_*.md`

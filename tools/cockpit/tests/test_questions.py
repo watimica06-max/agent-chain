@@ -17,6 +17,7 @@ OPEN = [
     ("hand/questions-redacteur-01.md", 2, 1),
     ("hand/questions-sondeur-02.md", 3, 2),
     ("hand/questions-architecte-02.md", 2, 2),
+    ("hand/questions-lexicographe-03.md", 2, 1),
 ]
 
 
@@ -35,7 +36,8 @@ def test_files_parse_like_the_commands_read_them(rel, count, open_count):
 
 
 def test_multiline_question_runs_until_answer():
-    # agents/lexicographe.md:348-350: a `Question:` over several lines.
+    # The lexicographe's shape before .claude/formats/questions.md: a
+    # `Question:` over several lines, its occurrences inside it.
     parsed, _ = parse("real/premiere-app-3/questions-lexicographe-01.md")
     q1 = parsed.entries[0]
     assert q1.context == ["Terms: atelier, STATION"]
@@ -52,13 +54,13 @@ def test_the_files_own_title_before_the_first_question_is_not_an_entry():
 
 
 def test_title_on_the_block_line_and_kind():
-    # agents/architecte.md:578-585: `Block: §3.2 — Reconciling two real entries`, `Kind:`.
+    # agents/architecte.md:589-598: `Block: §3.2 — Reconciling two real entries`, `Kind:`.
     parsed, _ = parse("hand/questions-architecte-02.md")
     assert parsed.entries[0].context == ["Block: §3.2 — Reconciling two real entries", "Kind: replacement"]
 
 
 def test_a_question_asking_for_a_file_carries_its_folder():
-    # agents/sondeur.md:450-454, agents/assembleur.md:191-195: `Folder:` between
+    # agents/sondeur.md:455-459, agents/assembleur.md:199-203: `Folder:` between
     # `Block:` and `Question:` — the folder a joined file goes to
     # (.claude/formats/donnees.md §5).
     lines = ["### Q1", "Block: B9", "Folder: docs/features/f/donnees/",
@@ -87,11 +89,15 @@ def test_unreadable_shape_is_an_error_never_no_questions():
     (["### Q1", "Race segment structure", "Block: B1", "Question: x", "Answer:"], "hors gabarit"),
     # Every template has a `Question:` line.
     (["### Q1", "Block: B1", "Answer:"], "Question:"),
-    # `Options:` holds `- ` items (agents/redacteur.md:317-319 and the others).
+    # `Options:` holds `- ` items (agents/redacteur.md:321-323 and the others).
     (["### Q1", "Block: B1", "Question: x", "Options:", "* une", "Answer:"], "Options:"),
     (["### Q1", "Block: B1", "Question: x", "Options:", "1. une", "Answer:"], "Options:"),
-    # `Défaut:` is one line (agents/sondeur.md:425).
+    # `Défaut:` is one line (agents/sondeur.md:430).
     (["### Q1", "Block: B1", "Question: x", "Défaut: a — B2", "suite", "Answer:"], "Défaut:"),
+    # `Occurrences:` holds `- ` items (.claude/formats/questions.md §3).
+    (["### Q1", "Terms: a, b", "Question: x ?", "Occurrences:", "a · §2 \"y\"", "Answer:"], "Occurrences:"),
+    # Never under `Answer:`: it would be read as the answer's own text.
+    (["### Q1", "Terms: a, b", "Question: x ?", "Answer:", "Occurrences:", "- a · §2"], "Occurrences:"),
 ])
 def test_what_no_template_writes_is_an_error(lines, where):
     parsed = questions.parse_lines(lines, "x", "x", "questions")
@@ -120,6 +126,33 @@ def test_lexicographe_two_meanings_template():
     q3 = parsed.entries[2]
     assert q3.open, "text starting on the next line reads as empty"
     assert q3.answer == "Oui, un tour est le segment de course."
+
+
+def test_occurrences_are_kept_apart_from_the_question():
+    # .claude/formats/questions.md §3: the places the answer applies to, in
+    # their own `- ` lines after `Options:` — never part of the question.
+    parsed, _ = parse("hand/questions-lexicographe-03.md")
+    q1, q2 = parsed.entries
+    assert q1.question.endswith("et lequel garder ?") and "§" not in q1.question
+    assert q1.options == ["Une même chose : client est gardé.", "Une même chose : acheteur est gardé.",
+                          "Deux choses différentes."]
+    assert q1.occurrences == ['client · §2 "Le client choisit un article."',
+                              "acheteur · §4.1 \"L'acheteur reçoit un reçu.\""]
+    assert q1.open and q1.to_dict()["occurrences"] == q1.occurrences
+    assert len(q2.occurrences) == 3 and not q2.open
+    assert q2.answer == "Pour le plan du magasin, carte devient plan."
+
+
+def test_occurrences_stay_out_of_the_fingerprint():
+    # What she answers is the question and its options; a place listed or
+    # moved below them changes neither.
+    base = ["### Q1", "Terms: a, b", "Question: x ?", "Options:", "- Une même chose : a est gardé.",
+            "- Deux choses différentes."]
+    bare = questions.parse_lines(base + ["Answer:"], "x", "x", "questions").entries[0]
+    listed = questions.parse_lines(base + ["Occurrences:", "- a · §2 \"y\"", "- b · §3 \"z\"", "Answer:"],
+                                   "x", "x", "questions").entries[0]
+    assert bare.occurrences == [] and listed.occurrences == ['a · §2 "y"', 'b · §3 "z"']
+    assert bare.fingerprint == listed.fingerprint and bare.question == listed.question
 
 
 def test_technique_file_is_open_on_an_empty_answer():

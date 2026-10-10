@@ -51,6 +51,10 @@ project's.** An absolute path points outside your session and fails.
 
 **The global** is `docs/PRODUIT_GLOBAL.md`, outside the feature folder.
 
+📌 **The questions format is `.claude/formats/questions.md`**, from the
+repository root — 🔴 **every question and every blocking file you write
+follows it.**
+
 ---
 
 ## What the global is
@@ -114,9 +118,9 @@ file:
 
     ### Q1
     Block: B7
-    Question: what happens to an entry whose duration is zero?
+    Question: <l'enjeu, en une phrase> <ce qu'elle demande, qui finit sur « ? »>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
     Answer:
 
@@ -132,11 +136,12 @@ the free-text answer, and an option alone would be ambiguous, see
 it is where the Product Owner writes, by hand. **An entry without it is
 unusable.**
 
-📌 **Questions in English, answers in French.**
-
-**Prose**: the question stated directly, no preamble, no rationale. 🔴
-**This is the only file where an agent phrases freely** — everywhere
-else it transcribes or files.
+🔴 **Every question follows `.claude/formats/questions.md`** — 📌 **in
+French, the stake first, one decision, asked.** 🔴 **A question whose
+answer may be a new wording says so in its last sentence** — 📌 **she
+picks an option, or writes the new sentence or title.** 🔴 **This is the
+only file where an agent phrases freely** — everywhere else it
+transcribes or files.
 
 🔴 **Write it even when empty.** An empty file says *"nothing to
 flag"*; a missing one says *"the agent did not run"*.
@@ -260,9 +265,9 @@ told to read that is not there, a false premise that voids the work.
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -276,6 +281,9 @@ this block ever lifts.
 📌 **`Options:` closes `## To resume`, never as a heading of its own** —
 in French, two to six, none opening on a number and a dot. ⚠️ **A fix
 that is a missing input has none.**
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 
@@ -313,9 +321,9 @@ that is a missing input has none.**
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Compare and question | The final product file · the global | The merge plan · the next questions file |
-| 2 | Apply | The merge plan · **the questions file you wrote**, answered · the global | The updated global · the merge report — **or** the next questions file alone, on an ambiguous answer |
-| 3 | Bug-fix decisions | Every `bugfix-*/desc-bug.md` of the feature · `desc-produit-fusion.md` · **your answered questions file** at the root, when there is one · the global | The updated global — **or the updated `desc-produit-fusion.md`, on a first feature** · the next questions file |
+| 1 | Compare and question | The final product file · the global · the questions format | The merge plan · the next questions file |
+| 2 | Apply | The merge plan · **the questions file you wrote**, answered · the global · the questions format | The updated global · the merge report — **or** the next questions file alone, on an ambiguous answer |
+| 3 | Bug-fix decisions | Every `bugfix-*/desc-bug.md` of the feature · `desc-produit-fusion.md` · **your answered questions file** at the root, when there is one · the global · the questions format | The updated global — **or the updated `desc-produit-fusion.md`, on a first feature** · the next questions file |
 
 🔴 **Grep the global's `^#` index, never read it whole** — 📌 **it is
 the whole product**, and you need a handful of sections.
@@ -438,7 +446,7 @@ live*, above.
 ## INVOCATION 2 — Apply
 
 **Inputs**: the merge plan · **the questions file its `PENDING` lines
-name**, answered · the global.
+name**, answered · the global · the questions format.
 
 📌 **Look for it at the root first, then in `questions/fusionneur/`** —
 another agent may have filed it away since.
@@ -552,7 +560,7 @@ longer behaves that way.
 
 **Inputs**: every `bugfix-*/desc-bug.md` of the feature ·
 `desc-produit-fusion.md` · **your answered questions file** at the
-root, when there is one · the global.
+root, when there is one · the global · the questions format.
 
 ### Where invocation 3 writes
 

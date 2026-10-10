@@ -104,10 +104,10 @@ settled**; see the head of invocation 2.
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
 
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -122,6 +122,9 @@ this block ever lifts.
 **none opening on a number and a dot**: a chosen one becomes the
 Product Owner's decision word for word. ⚠️ **A block whose fix is a
 missing input has none.**
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 📌 **Never block out of caution.** Doubt is flagged, not blocked.
 
@@ -155,8 +158,8 @@ missing input has none.**
 
 | # | Invocation | Inputs | Output |
 |---|---|---|---|
-| 1 | Investigation | **One gap, in the prompt** · `docs/TECHNICAL_CONVENTIONS.md` · the code, by grep — 📌 **plus the body of each caller of the bearer, at move 5** · `docs/CURRENT_TECHNICAL_STATE.md` — 📌 **its `## Traps — general` and `## Dead state` sections only**, as a search aid: 🔴 **grep the two headings, then a bounded read from each to the next `## `** — never the whole file | `investigation/<id>.md` |
-| 2 | Assembly | `investigation/<id>.md` for each identifier of `bug-list.md` · `bug-list.md`, for its identifiers and the order · `.claude/grids/GRILLE_FERMETURE_TECHNIQUE.md` | `desc-bug.md` |
+| 1 | Investigation | **One gap, in the prompt** · `docs/TECHNICAL_CONVENTIONS.md` · the questions format, `.claude/formats/questions.md`, whole, before a blocking file · the code, by grep — 📌 **plus the body of each caller of the bearer, at move 5** · `docs/CURRENT_TECHNICAL_STATE.md` — 📌 **its `## Traps — general` and `## Dead state` sections only**, as a search aid: 🔴 **grep the two headings, then a bounded read from each to the next `## `** — never the whole file | `investigation/<id>.md` |
+| 2 | Assembly | `investigation/<id>.md` for each identifier of `bug-list.md` · `bug-list.md`, for its identifiers and the order · `.claude/grids/GRILLE_FERMETURE_TECHNIQUE.md` · the questions format, whole, before a blocking file | `desc-bug.md` |
 
 🔴 **The prompt says which one, and invocation 1 says which gap.**
 Neither is inferred.

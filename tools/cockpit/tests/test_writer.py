@@ -184,7 +184,7 @@ def test_compose_rules():
 # ============================================================= blocking
 
 def test_shape1_round_trip(place):
-    # agents/relecteur.md:279-295: four headings, `## Decision` left empty.
+    # agents/relecteur.md:283-299: four headings, `## Decision` left empty.
     path = place("hand/blocked_relecteur-autre.md", "code/lot-22/blocked_relecteur.md")
     (e,) = b_entries(path)
     text = "Le lot core-sync porte ces deux fichiers.\nLot-22 attend qu'il soit livré."

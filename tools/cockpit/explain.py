@@ -5,7 +5,8 @@ know, or ask about a consequence she cannot see. « Expliquer » gives a short
 explanation in plain French — never a recommendation.
 
 §1 — what the model reads, and only that, all of it in the prompt:
-- the question, its options and its `Défaut:`;
+- the question, its options and its `Défaut:` — never its `Occurrences:`,
+  the places the answer applies to (.claude/formats/questions.md §3);
 - the passage its `Block:` line names, extracted as « À répondre » shows it
   beside the question (context.resolve: the `### B<n>` section of the
   product file, or the `§n.m` entry of the technical document for the

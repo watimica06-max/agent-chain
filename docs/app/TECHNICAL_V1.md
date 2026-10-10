@@ -229,10 +229,12 @@ nothing about how the chain reads the Product Owner's answers.
 ```
 ### Q<n>
 <Key>: <value>              ← as today (Block:, Terms:, Entries:, Kind:, Folder:)
-Question: <text, in English, may run over several lines>
+Question: <text, in French, may run over several lines>
 Options:
-- <first proposal, a full sentence, in French>
-- <second proposal, a full sentence, in French>
+- <first proposal, one short sentence, in French>
+- <second proposal, one short sentence, in French>
+Occurrences:                                               ← optional
+- <what the line is filed under> · <the place>
 Défaut: <the exact text of one option> — <its source>      ← optional, as today
 Answer:
 ```
@@ -241,7 +243,15 @@ Answer:
   has none. It holds two to six proposals.
 - **Options are written in French**, because an option chosen becomes
   the answer word for word, and answers are in French by the chain's
-  rule. The question stays in English.
+  rule. 📌 **The question too, since the chain's questions format**
+  (`.claude/formats/questions.md`, 2026-10-10): French, the stake first,
+  one decision, asked.
+- **`Occurrences:`** (the same format, §3) — `- ` lines after `Options:`:
+  the places the answer applies to, kept out of the question. The parser
+  reads them apart (`Question.occurrences`), never in the fingerprint;
+  « À répondre » shows them folded under « Où dans le texte »;
+  « Expliquer » never reads them. A line starting `Occurrences:` is
+  refused in an answer, like the other keys.
 - **No option opens on a number and a dot** (`1.`, `2.`): see §8.2,
   shape 4.
 - **`Folder:`** (the chain, 2026-10-07) — a `Key: value` line between

@@ -141,3 +141,25 @@ def test_on_the_phone(world, phone):
         card.locator("details.ex-text").scroll_into_view_if_needed()
         shot(phone, "5-expliquer-telephone")
         assert errors(phone) == []
+
+
+def test_occurrences_folded_under_the_question(world, page):
+    # .claude/formats/questions.md §3: `Occurrences:` shown folded, under
+    # « Où dans le texte », apart from the question.
+    s, f, store = world()
+    with s:
+        path = s.feat / "questions-sondeur-01.md"
+        path.write_text(path.read_text(encoding="utf-8").replace(
+            "- À part, comme une transition\nDéfaut:",
+            "- À part, comme une transition\nOccurrences:\n- premier lieu · §2 \"une phrase\"\n"
+            "- second lieu · §4.1 \"une autre\"\nDéfaut:", 1), encoding="utf-8")
+        to_question(page, s)
+        card = page.locator(CARD)
+        occ = card.locator("details.occ")
+        assert occ.get_attribute("open") is None
+        assert occ.locator("summary").inner_text() == "Où dans le texte (2)"
+        assert "premier lieu" not in card.locator("pre.text.q").inner_text()
+        occ.locator("summary").click()
+        assert occ.locator("li").all_inner_texts() == ['premier lieu · §2 "une phrase"', 'second lieu · §4.1 "une autre"']
+        shot(page, "6-ou-dans-le-texte")
+        assert errors(page) == []

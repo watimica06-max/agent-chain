@@ -177,7 +177,7 @@ def test_architecte_points_to_entries_of_the_technical_document(feat):
 
 
 def test_architecte_question_naming_a_grid_entry_has_no_context(feat):
-    # agents/architecte.md:178 — the coverage question G4.4 raises names the grid entry, no `§`.
+    # agents/architecte.md:182 — the coverage question G4.4 raises names the grid entry, no `§`.
     p = feat / "questions-architecte-01.md"
     p.write_text("### Q1\nBlock: G4.4\nKind: coverage\nQuestion: what does the application run on?\nAnswer:\n",
                  encoding="utf-8")
@@ -236,31 +236,31 @@ RULES = open(os.path.join(COCKPIT, "context_rules.md"), encoding="utf-8").read()
 
 # What each cited line must still say.
 SAYS = {
-    "agents/lexicographe.md:311": "Terms:", "agents/lexicographe.md:318": "`Terms:` carries the terms",
-    "agents/lexicographe.md:103": "The idea file", "commands/1_lexique.md:158": "idees.md",
-    "agents/lexicographe.md:539": "Terms:", "agents/lexicographe.md:440": "You sweep the `Answer:` fields",
-    "agents/lexicographe.md:445": "Such a line is an answer", "commands/1_lexique.md:62": "Another agent's, and `questions-lexicographe`",
+    "agents/lexicographe.md:371": "Terms:", "agents/lexicographe.md:382": "`Terms:` carries the terms",
+    "agents/lexicographe.md:140": "The idea file", "commands/1_lexique.md:158": "idees.md",
+    "agents/lexicographe.md:630": "Terms:", "agents/lexicographe.md:528": "You sweep the `Answer:` fields",
+    "agents/lexicographe.md:533": "Such a line is an answer", "commands/1_lexique.md:62": "Another agent's, and `questions-lexicographe`",
     "commands/1_lexique.md:65": "the answered file", "commands/1_lexique.md:63": "Two files of other agents",
-    "agents/redacteur.md:315": "Block: B7", "agents/redacteur.md:34": "`desc-produit.md`",
-    "agents/redacteur.md:338": "Identifiers only", "agents/redacteur.md:344": "`Block: -` when the question is about the feature",
-    "agents/qualifieur.md:197": "Block: B40", "agents/qualifieur.md:204": "`Block:` carries the identifier alone",
-    "commands/3a_genre.md:169": "desc-produit.md", "agents/classeur.md:148": "Block: B40",
-    "agents/classeur.md:155": "`Block:` carries the identifier alone", "commands/3b_nature.md:171": "desc-produit.md",
-    "agents/sondeur.md:399": "Block: B7", "agents/sondeur.md:471": "the title is in the product file",
-    "agents/assembleur.md:140": "`Block:` carries identifiers", "agents/assembleur.md:142": "not of a block",
+    "agents/redacteur.md:319": "Block: B7", "agents/redacteur.md:34": "`desc-produit.md`",
+    "agents/redacteur.md:341": "Identifiers only", "agents/redacteur.md:347": "`Block: -` when the question is about the feature",
+    "agents/qualifieur.md:199": "Block: B40", "agents/qualifieur.md:206": "`Block:` carries the identifier alone",
+    "commands/3a_genre.md:169": "desc-produit.md", "agents/classeur.md:150": "Block: B40",
+    "agents/classeur.md:157": "`Block:` carries the identifier alone", "commands/3b_nature.md:171": "desc-produit.md",
+    "agents/sondeur.md:404": "Block: B7", "agents/sondeur.md:476": "the title is in the product file",
+    "agents/assembleur.md:148": "`Block:` carries identifiers", "agents/assembleur.md:150": "not of a block",
     "commands/4_grille.md:568": "Copy `cadrage-produit/questions.md`", "commands/4_grille.md:388": "desc-produit.md",
-    "agents/sondeur.md:280": "names the feature's block", "agents/sondeur.md:281": "never a block of the global",
-    "commands/4_grille.md:395": "questions-existant-NN.md", "agents/sondeur.md:482": "`Block: -` for a pass C question",
-    "agents/convertisseur.md:476": "Block: B7", "agents/convertisseur.md:487": "`Block:` names the blocks the answer will change",
+    "agents/sondeur.md:284": "names the feature's block", "agents/sondeur.md:285": "never a block of the global",
+    "commands/4_grille.md:395": "questions-existant-NN.md", "agents/sondeur.md:487": "`Block: -` for a pass C question",
+    "agents/convertisseur.md:478": "Block: B7", "agents/convertisseur.md:489": "`Block:` names the blocks the answer will change",
     "agents/convertisseur.md:58": "`desc-produit.md`", "commands/6_convertit.md:363": "questions-convertisseur-NN.md",
-    "commands/6_convertit.md:375": "Every entry copied as written", "agents/convertisseur.md:427": "Entries: §3.2",
-    "agents/convertisseur.md:436": "`Entries:` names the entries", "agents/convertisseur.md:438": "inside your section",
+    "commands/6_convertit.md:375": "Every entry copied as written", "agents/convertisseur.md:429": "Entries: §3.2",
+    "agents/convertisseur.md:438": "`Entries:` names the entries", "agents/convertisseur.md:440": "inside your section",
     "agents/convertisseur.md:60": "`convertisseur/<nature>.md`", "agents/convertisseur.md:66": "`spec-technique.md`",
-    "agents/convertisseur.md:336": "A reference inside your section is its number",
-    "agents/convertisseur.md:337": "outside it is the block",
-    "agents/architecte.md:579": "Block: §3.2", "agents/architecte.md:367": "`spec-technique.md`",
-    "agents/architecte.md:614": "its `Block:`", "agents/architecte.md:178": "its `Block:` naming", "agents/fusionneur.md:116": "Block: B7",
-    "agents/fusionneur.md:47": "`desc-produit-fusion.md`", "agents/fusionneur.md:174": "The title line",
+    "agents/convertisseur.md:338": "A reference inside your section is its number",
+    "agents/convertisseur.md:339": "outside it is the block",
+    "agents/architecte.md:590": "Block: §3.2", "agents/architecte.md:377": "`spec-technique.md`",
+    "agents/architecte.md:636": "its `Block:`", "agents/architecte.md:182": "its `Block:` naming", "agents/fusionneur.md:120": "Block: B7",
+    "agents/fusionneur.md:47": "`desc-produit-fusion.md`", "agents/fusionneur.md:179": "The title line",
 }
 
 

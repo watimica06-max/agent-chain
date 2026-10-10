@@ -73,6 +73,10 @@ that name.
   in it.** ⚠️ **Never to read what it does**: the conventions say where
   a symbol goes, and a file that does not exist yet you create
 
+📌 **And `.claude/formats/questions.md`, the questions format, whole,
+before you write a blocking file** — 🔴 **its prose and its `Options:`
+follow it.**
+
 **How you find things**
 
 🔴 **A symbol, by grep** — 📌 **on the code folders the conventions
@@ -156,10 +160,10 @@ for the resumed run.
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
 
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -169,6 +173,9 @@ for the resumed run.
 📌 **`Options:` closes `## To resume`** — two to six, in French, none
 opening on a number and a dot: ⚠️ **a chosen one becomes the Product
 Owner's decision word for word.** None when the fix is a missing input.
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 🔴 **You block on a signature that cannot be written** — 📌 **a type the
 language does not have, a name it refuses, a return the platform cannot

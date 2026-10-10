@@ -92,6 +92,10 @@ block. 📌 **Its shape is below**; read it before you start.
 ⚠️ **The code confirms that a symbol exists, never what a rule means.**
 A grep, not a file read.
 
+📌 **And `.claude/formats/questions.md`, the questions format, whole,
+before you write a blocking file** — 🔴 **its prose and its `Options:`
+follow it.**
+
 🔴 **Nothing else.** Not the product file, neither grid, no upstream
 questions file.
 
@@ -370,10 +374,10 @@ the count.
 
     ### To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
 
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -384,6 +388,9 @@ the count.
 own** — 🔴 **two to six, in French**: a chosen one becomes the Product
 Owner's decision word for word. ⚠️ **None opens on a number and a dot**
 — it would be counted as an answer. A missing input carries none.
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 🔴 **The `## Decision` heading is written empty, and never omitted** —
 📌 **the Arbitre answers each blocking there, numbered.**
@@ -599,8 +606,9 @@ end of the walk and file everything you found.**
 📌 **Each `### To resume` may end on its `Options:`**, as above.
 
 📌 **Each entry carries its own lack and its own question** — ⚠️ **and,
-when you see it, what it depends on**: *« this one only has a meaning
-if the previous one is settled that way »*.
+when you see it, what it depends on, quoted in full**: 🔴 **the other
+entry's decision in its own words, never « the previous one »** — the
+questions format, rule 5.
 
 🔴 **The Arbitre is called once, on that file.** ⚠️ **No decision is
 applied and no sheet is written until it comes back** — 📌 **applying

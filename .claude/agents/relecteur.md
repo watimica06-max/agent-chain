@@ -72,6 +72,10 @@ its shape; read it before you start.
   Architecte has not derived it yet**, and a filter matching nothing is
   not a file with no rules
 
+📌 **And `.claude/formats/questions.md`, the questions format, whole,
+before you write a blocking file** — 🔴 **its prose and its `Options:`
+follow it.**
+
 🔴 **The prompt is your only source for what the lot changed.** ⚠️
 **You cannot grep a commit** — 📌 **the orchestration has git and
 computes the list before invoking you.**
@@ -286,10 +290,10 @@ the report, `conception.md`, `tests.md`.
 
     ## To resume
 
-    <the decision or fix needed>
+    <the stake, then the decision, asked>
 
     Options:
-    - <a proposal, one full sentence, in French>
+    - <one complete choice, in one short sentence, in French>
     - <another>
 
     ## Decision
@@ -306,6 +310,9 @@ one becomes her decision word for word, and none opening on a number
 and a dot (`1.`, `2.`). ⚠️ **A block naming the report, the sheet,
 `conception.md` or `tests.md` missing carries none** — the act answers
 it.
+
+🔴 **The blocking file's prose and its `Options:` follow
+`.claude/formats/questions.md`.**
 
 📌 **Never block out of caution.**
 
