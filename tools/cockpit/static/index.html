@@ -789,6 +789,12 @@ details pre { max-height: var(--mh-360); overflow: auto; background: var(--raise
 .mc-line.fixing .mc-mark, .mc-line.fixing .mc-state { color: var(--accent); }
 .mc-line.opt .mc-mark, .mc-line.skip .mc-mark, .mc-line.unknown .mc-mark, .mc-line.opt .mc-state, .mc-line.skip .mc-state { color: var(--soft); }
 .mc-form { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: var(--sp-8); align-items: center; margin-top: var(--sp-6); }
+.mc-act.mc-accounts { flex-direction: column; align-items: stretch; gap: var(--sp-4); }
+.mc-manual { grid-column: 2 / -1; }
+.mc-manual summary { margin-top: var(--sp-2); font-size: var(--fs-12); }
+.mc-set { grid-column: 2 / -1; font-size: var(--fs-13); overflow-wrap: anywhere; }
+.mc-set code { font-size: var(--fs-12); }
+.mc-set.err { color: var(--err); }
 .mc-mode { margin: var(--sp-10) 0; gap: var(--sp-10); flex-wrap: wrap; }
 .mc-badge { display: inline-flex; gap: var(--sp-4); align-items: center; margin-top: var(--sp-6); border-radius: var(--r-8);
   padding: var(--sp-2) var(--sp-10); font-size: var(--fs-13); text-align: left; min-height: 0; max-width: 100%; white-space: nowrap;
@@ -5648,7 +5654,9 @@ function renderDiag() {
 // repair. The phone shows the same, and says « Réparer sur l'ordinateur ».
 let M = null;                  // /api/machine: {machine, session, install_mode}
 let machineChecking = false;
-let identityOpen = false;
+let identityOpen = false;     // « Saisir à la main », unfolded
+let identitySet = null;        // 1.21.1: what « Utiliser mon compte GitHub » set, said on its line
+let identityMsg = "";
 const MC_MARK = {"ok": ["✓", "ok"], "à voir": ["!", "warn"], "bloque": ["✗", "block"], "réparé": ["✓", "ok"],
   "se répare": ["↻", "fixing"], "facultatif": ["○", "opt"], "non concerné": ["—", "skip"], "inconnu": ["?", "unknown"]};
 const repairsHere = () => !(PHONE || ON_PHONE_ADDRESS);
@@ -5694,13 +5702,46 @@ function machineLine(x) {
       el("div", {class: "mc-detail", text: x.detail || ""}),
       el("div", {class: "mc-rule muted small"}, el("span", {text: "Règle : " + (x.rule_text || x.rule)}),
         el("span", {class: "mc-age", title: x.checked_at || "", text: " · vérifié " + sinceShort(x.checked_at)}))),
-    el("div", {class: "mc-act"}, repairNode(x)));
-  if (x.id === "git_identity" && identityOpen && repairsHere()) li.append(identityForm());
+    el("div", {class: "mc-act" + (x.repair && x.repair.id === "identity_github" ? " mc-accounts" : "")}, repairNode(x)));
+  if (x.id === "git_identity") identityExtra(x, li);
   return li;
+}
+// 1.21.1 — the identity's line: what « Utiliser mon compte GitHub » set, its
+// error, and the manual entry, folded — on every screen the line is drawn
+// (1.16's form opened in Paramètres alone: from the home screen « Régler »
+// showed nothing).
+function identityExtra(x, li) {
+  if (identitySet && x.status === "ok") li.append(el("div", {class: "mc-set id-set"}, "Réglé dans la configuration globale de git : ",
+    el("code", {text: `user.name = ${identitySet["user.name"]}`}), " · ", el("code", {text: `user.email = ${identitySet["user.email"]}`})));
+  if (!repairsHere() || ["ok", "réparé", "non concerné"].includes(x.status)) return;
+  if (identityMsg) li.append(el("div", {class: "mc-set err id-msg-github", role: "status", text: identityMsg}));
+  const d = el("details", {class: "mc-manual", open: identityOpen || undefined}, el("summary", {text: "Saisir à la main"}), identityForm());
+  d.addEventListener("toggle", () => { identityOpen = d.open; });
+  li.append(d);
+}
+async function useGithubAccount(login, btn) {
+  btn.disabled = true; identityMsg = "";
+  try {
+    const out = await api("/api/machine/repair", {id: "identity_github", args: {login}});
+    identitySet = out.set; mergeMachine(out); renderMachineAll();
+  } catch (e) {
+    identityMsg = e.message; btn.disabled = false; renderMachineAll();
+  }
 }
 function repairNode(x) {
   if (!x.repair || ["ok", "réparé", "non concerné"].includes(x.status)) return null;
   if (!repairsHere()) return el("span", {class: "mc-there muted small", text: "Réparer sur l'ordinateur"});
+  if (x.repair.id === "identity_github") {
+    // One account: the button. Several: one per account — she picks, never a guess.
+    const accounts = (x.repair.args && x.repair.args.accounts) || [];
+    return accounts.map((login) => {
+      const b = el("button", {class: "small mc-repair" + (x.status === "bloque" ? " primary" : ""), "data-repair": "identity_github", "data-login": login,
+        title: `user.name = ${login}, user.email = l'adresse privée que GitHub donne au compte`,
+        text: accounts.length === 1 ? "Utiliser mon compte GitHub" : `Utiliser ${login}`});
+      b.onclick = () => useGithubAccount(login, b);
+      return b;
+    });
+  }
   const going = !!(M && M.session && M.session.status !== "ended");
   const b = el("button", {class: "small mc-repair" + (x.status === "bloque" ? " primary" : ""), "data-repair": x.repair.id,
     text: x.repair.label, disabled: (going && ["claude_login", "github_login", "pip", "claude_code", "tool"].includes(x.repair.id)) || undefined});
@@ -5709,18 +5750,17 @@ function repairNode(x) {
 }
 const idDraft = {name: "", email: ""};       // what she typed, kept across a re-render
 function identityForm() {
-  const name = el("input", {type: "text", id: "id-name", placeholder: "Prénom Nom", "aria-label": "Nom pour git", autocomplete: "name", value: idDraft.name,
+  const name = el("input", {type: "text", class: "id-name", placeholder: "Prénom Nom", "aria-label": "Nom pour git", autocomplete: "name", value: idDraft.name,
     oninput: (e) => { idDraft.name = e.target.value; }});
-  const mail = el("input", {type: "email", id: "id-email", placeholder: "vous@exemple.fr", "aria-label": "E-mail pour git", autocomplete: "email", value: idDraft.email,
+  const mail = el("input", {type: "email", class: "id-email", placeholder: "vous@exemple.fr", "aria-label": "E-mail pour git", autocomplete: "email", value: idDraft.email,
     oninput: (e) => { idDraft.email = e.target.value; }});
-  const msg = el("span", {class: "small", id: "id-msg"});
+  const msg = el("span", {class: "small id-msg"});
   const save = el("button", {class: "primary small", text: "Enregistrer", onclick: async () => {
     save.disabled = true;
-    try { mergeMachine(await api("/api/machine/repair", {id: "identity", args: {name: name.value, email: mail.value}})); identityOpen = false; renderMachineAll(); }
+    try { mergeMachine(await api("/api/machine/repair", {id: "identity", args: {name: name.value, email: mail.value}})); identityOpen = false; identitySet = null; renderMachineAll(); }
     catch (e) { msg.textContent = e.message; save.disabled = false; }
   }});
-  return el("div", {class: "mc-form"}, el("span", {class: "muted small", text: "Dans la configuration globale de git (user.name, user.email) :"}), name, mail, save,
-    el("button", {class: "small", text: "Annuler", onclick: () => { identityOpen = false; renderMachine(); }}), msg);
+  return el("div", {class: "mc-form"}, el("span", {class: "muted small", text: "Dans la configuration globale de git (user.name, user.email) :"}), name, mail, save, msg);
 }
 function renderMachine() {
   const box = $("machine-list"); if (!box) return;
@@ -5768,7 +5808,8 @@ function openMachine() {
 // belongs to an open application.
 function renderMachineHome() {
   const box = $("machine-home"); if (!box) return;
-  const bad = machineItems().filter((x) => x.status === "bloque" || x.status === "à voir");
+  // 1.21.1: the identity just set stays in view, with what was set.
+  const bad = machineItems().filter((x) => x.status === "bloque" || x.status === "à voir" || (x.id === "git_identity" && identitySet));
   const s = M && M.session;
   const show = bad.length > 0 || !!(s && s.status !== "ended");
   box.classList.toggle("hidden", !show);
@@ -5785,7 +5826,6 @@ async function doRepair(x, btn) {
   const msg = $("machine-msg");
   if (msg) msg.textContent = "";
   try {
-    if (r.id === "identity") { identityOpen = true; renderMachine(); return; }
     if (r.id === "push") { await syncPush(a.folder || null, !!a.chain); return loadMachine(); }
     if (r.id === "reconcile") { await syncReconcile(a.folder || null, !!a.chain); return loadMachine(); }
     if (r.id === "pull") { await syncPull(a.folder, btn); return loadMachine(); }

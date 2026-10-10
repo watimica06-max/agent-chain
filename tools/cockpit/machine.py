@@ -198,6 +198,105 @@ def git_run(root, *args, timeout=TIMEOUT):
     return _try(["git", "-C", root, *args], timeout=timeout, env=sync_mod.env())
 
 
+# 1.21.1 — the identity of her commits: her GitHub username, and the private
+# address GitHub gives every account (decided by the Product Owner, 10
+# October) — never a real address published.
+NOREPLY = re.compile(r"(\d+)\+([A-Za-z0-9-]+)@users\.noreply\.github\.com", re.I)
+GITHUB_API = "https://api.github.com/users/"
+GITHUB_API_TIMEOUT = 15
+
+
+class IdentityError(Exception):
+    pass
+
+
+def github_accounts():
+    """(the GitHub accounts Git Credential Manager holds, or None when it is
+    not there) — the sign-in 1.12 and 1.16 already use, no new one."""
+    code, text, missing = _try(["git", "credential-manager", "--version"])
+    if missing or code:
+        return None
+    c, t, _ = _try(["git", "credential-manager", "github", "list"])
+    return [x.strip() for x in t.splitlines() if x.strip()] if c == 0 else []
+
+
+def github_user(login):
+    """GET api.github.com/users/<login> — public, no token: its JSON. Raises
+    IdentityError with what went wrong, said for her."""
+    import urllib.error
+    import urllib.parse
+    import urllib.request
+    req = urllib.request.Request(GITHUB_API + urllib.parse.quote(login),
+                                 headers={"Accept": "application/vnd.github+json", "User-Agent": "agent-chain-cockpit"})
+    try:
+        with urllib.request.urlopen(req, timeout=GITHUB_API_TIMEOUT) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            raise IdentityError(f"GitHub ne connaît pas le compte « {login} »")
+        if e.code in (403, 429):
+            raise IdentityError("GitHub refuse pour l'instant (trop de demandes sans connexion) — réessayer dans une heure")
+        raise IdentityError(f"GitHub répond {e.code} pour le compte « {login} »")
+    except (urllib.error.URLError, OSError, ValueError) as e:
+        raise IdentityError(f"GitHub ne répond pas : {getattr(e, 'reason', e)}")
+
+
+GITHUB_USER = github_user
+
+
+def github_identity(login):
+    """(user.name, user.email) of a GitHub account: its login as GitHub
+    writes it, and <id>+<login>@users.noreply.github.com."""
+    u = GITHUB_USER(login)
+    got, uid = (u or {}).get("login"), (u or {}).get("id")
+    if not got or got.lower() != login.lower() or not isinstance(uid, int):
+        raise IdentityError(f"GitHub ne rend pas l'identifiant du compte « {login} »")
+    return got, f"{uid}+{got}@users.noreply.github.com"
+
+
+def use_github_account(root, login, git=None):
+    """« Utiliser mon compte GitHub »: the account must be one this computer
+    is signed in with; its identity is set in git's global configuration.
+    Returns (name, email) as set."""
+    accounts = github_accounts()
+    if accounts is None:
+        raise IdentityError("Git Credential Manager est absent : aucun compte GitHub à lire")
+    match = next((a for a in accounts if a.lower() == (login or "").lower()), None)
+    if not match:
+        raise IdentityError(f"« {login} » n'est pas un compte GitHub connecté sur cet ordinateur"
+                            + (f" (connectés : {', '.join(accounts)})" if accounts else " (aucun)"))
+    name, mail = github_identity(match)
+    git = git or sync_mod.git
+    for k, v in (("user.name", name), ("user.email", mail)):
+        r = git(root, "config", "--global", k, v)
+        if not r.ok:
+            raise IdentityError(f"git config --global {k} : {r.text}")
+    return name, mail
+
+
+def github_identity_of(name, mail):
+    """The login when (name, mail) is a GitHub account's identity, else None."""
+    m = NOREPLY.fullmatch(mail or "")
+    return m.group(2) if m and (name or "").lower() == m.group(2).lower() else None
+
+
+def identity_fix(accounts):
+    """What the identity card offers: the account(s) this computer is signed
+    in with, or GitHub's sign-in first — never a guess."""
+    if accounts:
+        return repair("identity_github", "Utiliser mon compte GitHub", accounts=accounts)
+    return repair("github_login", "Se connecter à GitHub")
+
+
+def identity_hint(accounts):
+    if accounts is None:
+        return " ; Git Credential Manager absent : aucun compte GitHub à lire (voir sa ligne)"
+    if not accounts:
+        return " ; aucun compte GitHub connecté sur cet ordinateur : « Se connecter à GitHub », puis « Utiliser mon compte GitHub »"
+    return " ; « Utiliser mon compte GitHub » la règle sur " + (f"le compte {accounts[0]}" if len(accounts) == 1
+                                                               else "l'un des comptes " + ", ".join(accounts))
+
+
 def probe_identity(ctx):
     g = "git et GitHub"
     root = ctx["chain_root"]
@@ -211,20 +310,31 @@ def probe_identity(ctx):
     out = [item("git", g, "git", OK, R_BLOCK, first_line(text), rule_text=rt)]
     name = git_run(root, "config", "--get", "user.name")
     mail = git_run(root, "config", "--get", "user.email")
-    ident = git_run(root, "var", "GIT_AUTHOR_IDENT")
-    fix = repair("identity", "Régler")
-    if name[0] == 0 and mail[0] == 0 and name[1].strip() and mail[1].strip():
+    n = name[1].strip() if name[0] == 0 else ""
+    m = mail[1].strip() if mail[0] == 0 else ""
+    if n and m and github_identity_of(n, m):
         out.append(item("git_identity", g, "git — identité des commits", OK, R_BLOCK,
-                        f"{name[1].strip()} <{mail[1].strip()}>", rule_text=rt))
-    elif ident[0] == 0 and ident[1].strip():
+                        f"{n} <{m}> — votre compte GitHub, sans adresse réelle", rule_text=rt))
+        return out
+    accounts = github_accounts()
+    fix = identity_fix(accounts)
+    if n and m:
+        if not accounts:
+            out.append(item("git_identity", g, "git — identité des commits", OK, R_BLOCK, f"{n} <{m}>", rule_text=rt))
+        else:
+            out.append(item("git_identity", g, "git — identité des commits", WARN, R_BLOCK,
+                            f"réglée sur {n} <{m}> : pas votre compte GitHub" + identity_hint(accounts),
+                            [], fix, rule_text=rt))
+        return out
+    ident = git_run(root, "var", "GIT_AUTHOR_IDENT")
+    if ident[0] == 0 and ident[1].strip():
         who = re.sub(r"\s+\d+\s+[+-]\d{4}\s*$", "", ident[1].strip().splitlines()[0])
         out.append(item("git_identity", g, "git — identité des commits", WARN, R_BLOCK,
-                        f"non réglée : git la devine — {who} ; « Régler » la fixe dans la configuration globale",
-                        [], fix, rule_text=rt))
+                        f"non réglée : git la devine — {who}" + identity_hint(accounts), [], fix, rule_text=rt))
     else:
         out.append(item("git_identity", g, "git — identité des commits", BLOCK, R_BLOCK,
-                        "aucune : git refuse de commiter sans nom ni e-mail (user.name, user.email)", COMMITS, fix,
-                        rule_text=rt))
+                        "aucune : git refuse de commiter sans nom ni e-mail (user.name, user.email)"
+                        + identity_hint(accounts), COMMITS, fix, rule_text=rt))
     return out
 
 

@@ -257,6 +257,77 @@ def test_repairs_identity_and_longpaths(tmp_path, chain_root, fake_machine, glob
     serve(tmp_path, body, listed(tmp_path, a))
 
 
+@pytest.fixture
+def throwaway_home(tmp_path, monkeypatch, chain_root):
+    """1.21.1 — HOME and git's global configuration: a folder of the test, git's
+    system configuration out of reach; never this computer's. The scratch
+    clone's own identity removed: the global one is what git reads."""
+    for k in ("user.name", "user.email"):
+        subprocess.run(["git", "-C", str(chain_root), "config", "--local", "--unset", k], capture_output=True)
+    home = tmp_path / "home"
+    home.mkdir()
+    cfg = home / ".gitconfig"
+    cfg.write_text("", encoding="utf-8")
+    for k in ("HOME", "USERPROFILE"):
+        monkeypatch.setenv(k, str(home))
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(cfg))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    for k in ("GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL", "EMAIL"):
+        monkeypatch.delenv(k, raising=False)
+    return cfg
+
+
+def test_use_my_github_account_sets_the_identity_and_the_rule_goes_green(tmp_path, chain_root, fake_machine,
+                                                                          throwaway_home):
+    """1.21.1 — « Utiliser mon compte GitHub »: the account Git Credential
+    Manager holds (faked), its id from api.github.com (faked), set in a
+    throwaway global configuration; the identity rule read by git itself."""
+    _, a, _ = app_world(tmp_path, "app")
+    fake_machine.identity = "real"
+
+    async def body(c, st, rn, quit):
+        resp = await post(c, "/api/machine/check", {})
+        x = {i["id"]: i for i in (await resp.json())["machine"]["items"]}["git_identity"]
+        assert x["status"] in ("à voir", "bloque") and x["repair"]["id"] == "identity_github"
+        # Never an account this computer is not signed in with.
+        resp = await post(c, "/api/machine/repair", {"id": "identity_github", "args": {"login": "autre-compte"}})
+        assert resp.status == 409 and "n'est pas un compte GitHub connecté sur cet ordinateur" in (await resp.json())["error"]
+        assert throwaway_home.read_text(encoding="utf-8") == ""
+        # GitHub not answering: said, nothing set.
+        fake_machine.github_api = "offline"
+        resp = await post(c, "/api/machine/repair", {"id": "identity_github", "args": {"login": "quelqu-un"}})
+        assert resp.status == 409 and (await resp.json())["error"].startswith("GitHub ne répond pas")
+        assert throwaway_home.read_text(encoding="utf-8") == ""
+        fake_machine.github_api = "ok"
+        resp = await post(c, "/api/machine/repair", {"id": "identity_github", "args": {"login": "quelqu-un"}})
+        r = await resp.json()
+        assert resp.status == 200, r
+        assert r["set"] == {"user.name": "quelqu-un", "user.email": "4242+quelqu-un@users.noreply.github.com"}
+        got = lambda k: subprocess.run(["git", "config", "--global", "--get", k], capture_output=True, text=True).stdout.strip()
+        assert got("user.name") == "quelqu-un" and got("user.email") == "4242+quelqu-un@users.noreply.github.com"
+        x = {i["id"]: i for i in r["machine"]["items"]}["git_identity"]
+        assert x["status"] == "ok" and x["detail"].startswith("quelqu-un <4242+quelqu-un@users.noreply.github.com>")
+        # Nothing blocks a commit any more.
+        resp = await post(c, "/api/machine/check", {})
+        assert not [i for i in (await resp.json())["machine"]["items"] if i["id"] == "git_identity" and i["stops"]]
+    serve(tmp_path, body, listed(tmp_path, a))
+
+
+def test_no_github_account_signed_in_says_what_to_do(tmp_path, chain_root, fake_machine, throwaway_home):
+    _, a, _ = app_world(tmp_path, "app")
+    fake_machine.identity = "real"
+    fake_machine.accounts = []
+
+    async def body(c, st, rn, quit):
+        resp = await post(c, "/api/machine/check", {})
+        x = {i["id"]: i for i in (await resp.json())["machine"]["items"]}["git_identity"]
+        assert x["repair"]["id"] == "github_login" and "« Se connecter à GitHub »" in x["detail"]
+        resp = await post(c, "/api/machine/repair", {"id": "identity_github", "args": {"login": "quelqu-un"}})
+        assert resp.status == 409 and "(aucun)" in (await resp.json())["error"]
+        assert fake_machine.github_asked == [] and throwaway_home.read_text(encoding="utf-8") == ""
+    serve(tmp_path, body, listed(tmp_path, a))
+
+
 def test_tool_install_needs_claude_signed_in_first_and_its_mode(tmp_path, chain_root, fake_machine):
     fake_machine.logged_in = False
 
@@ -317,7 +388,7 @@ def test_the_phone_sees_the_summary_and_cannot_repair(tmp_path, chain_root, fake
 def test_ping_says_the_commit_the_server_started_from(tmp_path, chain_root):
     async def body(c, st, rn, quit):
         p = await (await c.get("/api/ping")).json()
-        assert p["started"] == head(chain_root) and p["version"] == "1.21"
+        assert p["started"] == head(chain_root) and p["version"] == "1.21.1"
     serve(tmp_path, body)
 
 

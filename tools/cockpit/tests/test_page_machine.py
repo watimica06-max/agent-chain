@@ -65,17 +65,70 @@ def test_the_screen_every_item_its_rule_and_its_age(tmp_path, page, fake_machine
         assert page.locator("#tb-machine").inner_text().startswith("Ordinateur : à voir")
         assert page.locator("#set-install-mode").input_value() == "demander"
         shot(page, "1-parametres-etat-de-l-ordinateur", full=True)
-        # « Régler »: the identity, a small form — git's global configuration a file of the test.
+        # The manual entry, folded under « Utiliser mon compte GitHub » (1.21.1) — git's
+        # global configuration a file of the test.
         monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(tmp_path / "gitconfig"))
-        ident.locator("button.mc-repair").click()
-        page.locator("#id-name").fill("Product Owner")
-        page.locator("#id-email").fill("po@example.com")
+        assert ident.locator("button.mc-repair").inner_text() == "Utiliser mon compte GitHub"
+        assert not ident.locator(".id-name").is_visible()
+        ident.get_by_text("Saisir à la main").click()
+        ident.locator(".id-name").fill("Product Owner")
+        ident.locator(".id-email").fill("po@example.com")
         shot(page, "2-regler-identite")
-        fake_machine.identity = "set"
+        fake_machine.identity = "other"
+        fake_machine.accounts = []
         page.locator("#machine-list").get_by_role("button", name="Enregistrer").click()
         page.wait_for_selector('#machine-list li[data-id="git_identity"][data-status="ok"]')
         page.wait_for_selector("#tb-machine.hidden", state="attached")
         assert "name = Product Owner" in (tmp_path / "gitconfig").read_text(encoding="utf-8")
+        assert errors(page) == [], page.js_errors
+
+
+def test_use_my_github_account_from_the_home_screen(tmp_path, page, fake_machine, monkeypatch):
+    """1.21.1 — from the home screen, where 1.16's « Régler » showed nothing:
+    the account, one click, what was set; several accounts, one button each;
+    none, GitHub's sign-in. git's global configuration a file of the test."""
+    cfg = tmp_path / "gitconfig"
+    cfg.write_text("", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(cfg))
+    fake_machine.identity = "guessed"
+    with FakeServer(tmp_path, opened=False) as s:
+        post(page, s, "/api/machine/check")
+        page.goto(s.url)
+        line = page.locator('#machine-home li[data-id="git_identity"]')
+        line.wait_for()
+        assert "« Utiliser mon compte GitHub » la règle sur le compte quelqu-un" in line.inner_text()
+        assert not line.locator(".id-name").is_visible()
+        shot(page, "1-accueil-identite-devinee")
+        # GitHub not answering: said on the line, nothing set.
+        fake_machine.github_api = "offline"
+        line.get_by_role("button", name="Utiliser mon compte GitHub").click()
+        page.wait_for_selector('#machine-home li[data-id="git_identity"] .id-msg-github')
+        assert "GitHub ne répond pas" in line.inner_text() and cfg.read_text(encoding="utf-8") == ""
+        fake_machine.github_api = "ok"
+        fake_machine.identity = "set"            # what git reads once set: the rule's own test is the server's
+        line.get_by_role("button", name="Utiliser mon compte GitHub").click()
+        page.wait_for_selector('#machine-home li[data-id="git_identity"][data-status="ok"] .id-set')
+        text = line.inner_text()
+        assert "user.name = quelqu-un" in text and "user.email = 4242+quelqu-un@users.noreply.github.com" in text
+        assert "name = quelqu-un" in cfg.read_text(encoding="utf-8")
+        assert line.locator(".id-msg-github").count() == 0
+        shot(page, "2-accueil-identite-reglee")
+        # Several accounts: one button each — never one guessed.
+        fake_machine.identity, fake_machine.accounts = "guessed", ["quelqu-un", "autre-compte"]
+        post(page, s, "/api/machine/check")
+        page.evaluate("identitySet = null; loadMachine()")
+        page.wait_for_selector('#machine-home li[data-id="git_identity"] button[data-login="autre-compte"]')
+        assert line.locator("button.mc-repair").all_inner_texts() == ["Utiliser quelqu-un", "Utiliser autre-compte"]
+        shot(page, "3-accueil-deux-comptes")
+        # None signed in: GitHub's sign-in, and the manual entry still there, folded.
+        fake_machine.accounts = []
+        post(page, s, "/api/machine/check")
+        page.evaluate("loadMachine()")
+        page.wait_for_selector('#machine-home li[data-id="git_identity"] button[data-repair="github_login"]')
+        assert "aucun compte GitHub connecté sur cet ordinateur" in line.inner_text()
+        line.get_by_text("Saisir à la main").click()
+        assert line.locator(".id-name").is_visible()
+        shot(page, "4-accueil-aucun-compte")
         assert errors(page) == [], page.js_errors
 
 

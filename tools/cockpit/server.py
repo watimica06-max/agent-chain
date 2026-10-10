@@ -66,7 +66,7 @@ STATE_KEY = web.AppKey("state", State)
 PORT_KEY = web.AppKey("port", dict)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.21"
+VERSION = "1.21.1"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -3918,6 +3918,17 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             print(f"État de l'ordinateur — identité git réglée : {name} <{mail}>", flush=True)
             await machine_refresh(["identity"])
             return web.json_response({"ok": True, **machine_payload()})
+        if rid == "identity_github":
+            # 1.21.1 — « Utiliser mon compte GitHub »: the account this
+            # computer is signed in with, its id read from GitHub.
+            try:
+                name, mail = await loop.run_in_executor(None, machine.use_github_account, CHAIN_ROOT,
+                                                        (args.get("login") or "").strip())
+            except machine.IdentityError as e:
+                return web.json_response({"error": str(e)}, status=409)
+            print(f"État de l'ordinateur — identité git réglée sur le compte GitHub : {name} <{mail}>", flush=True)
+            await machine_refresh(["identity"])
+            return web.json_response({"ok": True, "set": {"user.name": name, "user.email": mail}, **machine_payload()})
         if rid == "restart":
             return await cockpit_restart(request)
         busy = repair_busy()

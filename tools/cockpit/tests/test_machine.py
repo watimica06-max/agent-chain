@@ -98,21 +98,66 @@ def test_claude_status_that_does_not_answer_is_unknown_and_blocks_nothing(ctx, f
 def test_identity_set_guessed_missing(ctx, fake_machine):
     it = items("identity", ctx)
     assert it["git"]["status"] == OK and it["git_identity"]["status"] == OK
-    assert it["git_identity"]["detail"] == "Product Owner <po@example.com>"
+    assert it["git_identity"]["detail"] == ("quelqu-un <4242+quelqu-un@users.noreply.github.com>"
+                                            " — votre compte GitHub, sans adresse réelle")
     fake_machine.identity = "guessed"
     m = check(ctx, "identity")
     x = {i["id"]: i for i in m.items()}["git_identity"]
     assert x["status"] == WARN and "git la devine" in x["detail"] and "PO Devine <po@ordinateur.local>" in x["detail"]
-    assert x["repair"]["id"] == "identity" and m.blockers(COMMIT) == [] and m.blockers(LAUNCH) == []
+    assert "« Utiliser mon compte GitHub » la règle sur le compte quelqu-un" in x["detail"]
+    assert x["repair"] == {"id": "identity_github", "label": "Utiliser mon compte GitHub", "args": {"accounts": ["quelqu-un"]}}
+    assert m.blockers(COMMIT) == [] and m.blockers(LAUNCH) == []
     fake_machine.identity = "missing"
     m = check(ctx, "identity")
     x = {i["id"]: i for i in m.items()}["git_identity"]
-    assert x["status"] == BLOCK and x["repair"]["label"] == "Régler"
+    assert x["status"] == BLOCK and x["repair"]["label"] == "Utiliser mon compte GitHub"
     # Anything that commits: a launch, an install of the chain, « Envoyer mes réponses », Données…
     for action in (LAUNCH, CHAIN_INSTALL, SEND, COMMIT, SAVE):
         assert [b["id"] for b in m.blockers(action)] == ["git_identity"], action
     # … not a push, nor « Bâtir »'s tools.
     assert m.blockers(PUSH) == [] and m.blockers(DEPLOY) == []
+
+
+def test_identity_its_github_account_or_what_to_do(ctx, fake_machine):
+    """1.21.1 — set to anything but her GitHub account's: said, never a block;
+    several accounts: each offered, never one guessed; none signed in: GitHub's
+    sign-in first; Git Credential Manager absent: its own line."""
+    fake_machine.identity = "other"
+    x = items("identity", ctx)["git_identity"]
+    assert x["status"] == WARN and x["stops"] == []
+    assert x["detail"].startswith("réglée sur Product Owner <po@example.com> : pas votre compte GitHub")
+    assert x["repair"]["id"] == "identity_github"
+    fake_machine.accounts = ["quelqu-un", "autre-compte"]
+    x = items("identity", ctx)["git_identity"]
+    assert x["repair"]["args"]["accounts"] == ["quelqu-un", "autre-compte"]
+    assert "l'un des comptes quelqu-un, autre-compte" in x["detail"]
+    # Set, and no account to compare it with: nothing to say against it.
+    fake_machine.accounts = []
+    x = items("identity", ctx)["git_identity"]
+    assert x["status"] == OK and x["detail"] == "Product Owner <po@example.com>" and x["repair"] is None
+    fake_machine.identity = "guessed"
+    x = items("identity", ctx)["git_identity"]
+    assert x["status"] == WARN and x["repair"] == {"id": "github_login", "label": "Se connecter à GitHub", "args": {}}
+    assert "aucun compte GitHub connecté sur cet ordinateur : « Se connecter à GitHub », puis « Utiliser mon compte GitHub »" in x["detail"]
+    fake_machine.gcm = False
+    x = items("identity", ctx)["git_identity"]
+    assert "Git Credential Manager absent" in x["detail"]
+    # Her GitHub identity is read without asking Git Credential Manager.
+    fake_machine.identity, fake_machine.gcm, fake_machine.calls = "set", True, []
+    assert items("identity", ctx)["git_identity"]["status"] == OK
+    assert not any(c[:2] == ["git", "credential-manager"] for c in fake_machine.calls)
+
+
+def test_github_identity_of_an_account(fake_machine):
+    assert machine.github_identity("Quelqu-Un") == ("quelqu-un", "4242+quelqu-un@users.noreply.github.com")
+    assert machine.github_identity_of("quelqu-un", "4242+quelqu-un@users.noreply.github.com") == "quelqu-un"
+    assert machine.github_identity_of("Product Owner", "4242+quelqu-un@users.noreply.github.com") is None
+    assert machine.github_identity_of("quelqu-un", "quelqu-un@users.noreply.github.com") is None
+    with pytest.raises(machine.IdentityError, match="ne connaît pas"):
+        machine.github_identity("personne")
+    fake_machine.github_ids["bizarre"] = "pas-un-nombre"
+    with pytest.raises(machine.IdentityError, match="ne rend pas l'identifiant"):
+        machine.github_identity("bizarre")
 
 
 def test_git_missing_blocks_what_commits(ctx, fake_machine):

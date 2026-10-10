@@ -721,7 +721,12 @@ Les règles :
 | BUILD_REPORT plus ancien que les conventions | signale (« Bâtir » proposé à nouveau) | — |
 
 Une identité que git **devine** (sans `user.name` ni `user.email`) est
-signalée, jamais bloquante : git commite avec elle ; « Régler » la fixe.
+signalée, jamais bloquante : git commite avec elle ; « Utiliser mon compte
+GitHub » la fixe. Depuis la 1.21.1, l'identité de vos commits est votre
+nom d'utilisateur GitHub et l'adresse privée que GitHub donne à chaque
+compte (`<id>+<nom>@users.noreply.github.com`) : aucune adresse réelle
+publiée. Une identité réglée sur autre chose, alors qu'un compte GitHub est
+connecté sur cet ordinateur, est signalée de même.
 
 **Quand c'est vérifié** : au démarrage du cockpit, à l'ouverture de
 l'écran, après chaque réparation, et juste avant une action pour ce qui la
@@ -744,8 +749,16 @@ réparation ne se fait depuis lui.
   le cockpit, qui le transmet. Puis `claude auth status`.
 - **« Se connecter à GitHub »** : `git credential-manager github login
   --browser`, sans fenêtre, puis le push à blanc sur agent-chain.
-- **« Régler »** : `core.longpaths`, et l'identité git (un nom, un
-  e-mail, dans la configuration globale).
+- **« Utiliser mon compte GitHub »** (1.21.1), sur la ligne de l'identité :
+  le cockpit lit le compte GitHub auquel cet ordinateur est connecté (Git
+  Credential Manager — aucune nouvelle connexion), son numéro sur
+  api.github.com (public, sans jeton), et règle dans la configuration
+  globale `user.name` = ce compte, `user.email` = son adresse privée
+  GitHub ; la ligne dit ce qui a été réglé. Plusieurs comptes connectés :
+  un bouton par compte, à vous de choisir. Aucun : la ligne propose
+  « Se connecter à GitHub » d'abord. « Saisir à la main », replié dessous,
+  reste le recours : un nom, un e-mail.
+- **« Régler »** : `core.longpaths`.
 - **« Redémarrer le cockpit »** : le redémarrage de la 1.14, sans rien
   récupérer, avec le PATH tel que Windows l'a maintenant. `lancer.bat`,
   quand un cockpit répond déjà, compare le commit dont il est parti au

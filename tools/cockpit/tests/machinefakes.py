@@ -20,7 +20,7 @@ class FakeMachine:
         self.version = "2.1.285 (Claude Code)"
         self.logged_in = True
         self.git = True
-        self.identity = "set"            # set, guessed, missing
+        self.identity = "set"            # set (her GitHub account's), other, guessed, missing, real (git itself)
         self.gcm = True
         self.accounts = ["quelqu-un"]
         self.github = "ok"               # ok, credentials, offline, rejected
@@ -32,6 +32,10 @@ class FakeMachine:
         self.sdk = r"C:\fake\sdk"
         self.deps = {"ok": True, "missing": [], "count": 3}
         self.answers = {}                # a command's first words → (code, text), over the defaults
+        # 1.21.1: api.github.com/users/<login> — the ids GitHub would give.
+        self.github_ids = {"quelqu-un": 4242, "autre-compte": 777}
+        self.github_api = "ok"           # ok, offline, limited
+        self.github_asked = []
 
     # ------------------------------------------------------------ hooks
     def sdk_cli(self):
@@ -43,6 +47,17 @@ class FakeMachine:
 
     def deps_check(self):
         return self.deps
+
+    def github_user(self, login):
+        self.github_asked.append(login)
+        if self.github_api == "offline":
+            raise machine.IdentityError("GitHub ne répond pas : getaddrinfo failed (faux)")
+        if self.github_api == "limited":
+            raise machine.IdentityError("GitHub refuse pour l'instant (trop de demandes sans connexion) — réessayer dans une heure")
+        hit = next((k for k in self.github_ids if k.lower() == login.lower()), None)
+        if hit is None:
+            raise machine.IdentityError(f"GitHub ne connaît pas le compte « {login} »")
+        return {"login": hit, "id": self.github_ids[hit], "type": "User"}
 
     def run(self, argv, timeout=30, env=None, cwd=None):
         argv = [str(a) for a in argv]
@@ -72,10 +87,14 @@ class FakeMachine:
                 return 0, "\n".join(self.accounts)
         if argv[:2] == ["git", "-C"]:
             rest = argv[3:]
+            if self.identity == "real" and (rest[:2] == ["config", "--get"] or rest[:1] == ["var"]):
+                p = subprocess.run(argv, capture_output=True, text=True, env=env)
+                return p.returncode, (p.stdout + p.stderr).strip()
             if rest[:3] == ["config", "--get", "user.name"]:
-                return (0, "Product Owner") if self.identity == "set" else (1, "")
+                return {"set": (0, "quelqu-un"), "other": (0, "Product Owner")}.get(self.identity, (1, ""))
             if rest[:3] == ["config", "--get", "user.email"]:
-                return (0, "po@example.com") if self.identity == "set" else (1, "")
+                return {"set": (0, "4242+quelqu-un@users.noreply.github.com"),
+                        "other": (0, "po@example.com")}.get(self.identity, (1, ""))
             if rest[:2] == ["var", "GIT_AUTHOR_IDENT"]:
                 if self.identity == "missing":
                     return 128, "Author identity unknown\n*** Please tell me who you are."
@@ -109,6 +128,7 @@ def install(monkeypatch, fm=None):
     monkeypatch.setattr(machine, "SDK_CLI", fm.sdk_cli)
     monkeypatch.setattr(machine, "ANDROID", fm.android)
     monkeypatch.setattr(machine, "DEPS_CHECK", fm.deps_check)
+    monkeypatch.setattr(machine, "GITHUB_USER", fm.github_user)
     return fm
 
 
