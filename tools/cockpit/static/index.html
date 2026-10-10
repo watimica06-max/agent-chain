@@ -5113,11 +5113,17 @@ function renderMachineSession() {
     box.append(card);
   }
 }
+// The code she types survives the panel drawn again by a step that arrives meanwhile.
+const codeDraft = {value: "", focused: false};
 function signinCode() {
-  const inp = el("input", {type: "text", class: "signin-code", placeholder: "Le code que la page affiche", "aria-label": "Code de connexion", autocomplete: "off"});
+  const inp = el("input", {type: "text", class: "signin-code", placeholder: "Le code que la page affiche", "aria-label": "Code de connexion", autocomplete: "off",
+    value: codeDraft.value, oninput: (e) => { codeDraft.value = e.target.value; },
+    onfocus: () => { codeDraft.focused = true; }, onblur: () => { codeDraft.focused = false; }});
+  if (codeDraft.focused) setTimeout(() => { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }, 0);
   const b = el("button", {class: "primary small", text: "Envoyer le code", onclick: async () => {
     b.disabled = true;
-    try { await api("/api/machine/session/code", {code: inp.value}); inp.value = ""; } catch (e) { alert(e.message); } finally { b.disabled = false; }
+    try { await api("/api/machine/session/code", {code: codeDraft.value || inp.value}); codeDraft.value = ""; inp.value = ""; }
+    catch (e) { alert(e.message); } finally { b.disabled = false; }
   }});
   return el("div", {class: "row mc-code"}, el("span", {class: "small", text: "Si la page affiche un code :"}), inp, b);
 }

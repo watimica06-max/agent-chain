@@ -105,6 +105,9 @@ def test_a_block_its_badge_and_the_claude_login(tmp_path, page, fake_machine, mo
         shot(page, "4-se-connecter-a-claude")
         fake_machine.logged_in = True
         page.locator("#machine-session-home .signin-code").fill("bon#etat")
+        # A step arriving meanwhile draws the panel again: what she typed stays.
+        page.evaluate("renderMachineSession()")
+        assert page.locator("#machine-session-home .signin-code").input_value() == "bon#etat"
         page.locator("#machine-session-home").get_by_role("button", name="Envoyer le code").click()
         page.wait_for_selector('#machine-session-home .mc-session.done', timeout=20000)
         assert "connecté" in page.locator("#machine-session-home").inner_text()
