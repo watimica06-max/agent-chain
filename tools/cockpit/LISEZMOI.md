@@ -327,8 +327,8 @@ ici, tant que le diagnostic ne l'a pas lu.
 
 **Paramètres** (1.9) — ce qui appartient au cockpit lui-même, dans cet
 ordre : l'apparence (1.11), puis, chacun avec sa ligne d'explication, le
-mode de permission, les notifications, les dossiers ignorés, « Outils sur
-cet ordinateur », « Version du cockpit » (1.14), « Arrêter le cockpit ». La version de la chaîne est sous
+mode de permission, les notifications, l'accès depuis le téléphone
+(1.15), les dossiers ignorés, « Outils sur cet ordinateur », « Version du cockpit » (1.14), « Arrêter le cockpit ». La version de la chaîne est sous
 « Chaîne → Version », le profil de déploiement sous « Déploiement →
 Profil », la feature dans la barre du haut, l'application sur l'accueil.
 
@@ -601,10 +601,79 @@ construit, déploie et règle. Au-dessus de 720 px, rien ne change.
   tableau de bord propose ses étapes ; écrire sa bug-list et en ouvrir
   une nouvelle restent sur l'ordinateur.
 - **L'écran d'accueil du téléphone** : la page a un manifeste et ses
-  icônes, pour s'y ajouter. Pas encore de service worker ni de
-  notifications : ils attendent l'accès HTTPS depuis le téléphone, un
-  chantier à venir — aujourd'hui le cockpit n'écoute que sur cette
-  machine.
+  icônes, pour s'y ajouter ; atteinte par l'adresse Tailscale (1.15), elle
+  a aussi son service worker — elle s'installe comme une application — et
+  les notifications. Voir « Téléphone » juste en dessous.
+
+## Téléphone (1.15)
+
+Le cockpit tourne sur cet ordinateur ; Tailscale relie l'ordinateur et le
+téléphone en réseau privé, et `tailscale serve` présente le cockpit en
+HTTPS à l'adresse Tailscale de l'ordinateur. Rien n'est ouvert sur
+internet : seuls les appareils de votre compte Tailscale voient cette
+adresse. Le serveur du cockpit, lui, n'écoute toujours que sur
+`127.0.0.1` ; c'est Tailscale qui lui transmet les demandes du téléphone.
+
+**Une fois, pour mettre en place**
+
+1. Sur l'ordinateur : installer Tailscale (tailscale.com/download), et se
+   connecter avec son compte.
+2. Sur le téléphone : installer l'application Tailscale (App Store ou
+   Play Store), se connecter avec **le même compte**, et la laisser
+   connectée.
+3. Dans la console Tailscale (login.tailscale.com → DNS) : MagicDNS
+   activé — il l'est d'office — et « HTTPS Certificates » activé. Si ce
+   n'est pas fait, la commande de l'étape 4 le propose elle-même.
+4. Sur l'ordinateur, dans un terminal (PowerShell), le cockpit lancé :
+
+       tailscale serve --bg 8765
+
+   `8765` est le port du cockpit (celui de `--port` si vous en avez donné
+   un autre). `--bg` laisse le service en place, même après un redémarrage
+   de l'ordinateur, jusqu'à `tailscale serve reset`. L'aide de la commande
+   le dit ainsi : « Expose an HTTP server running at 127.0.0.1:3000 in the
+   background: `tailscale serve --bg 3000` » — `tailscale serve --help`
+   l'affiche pour la version installée.
+5. L'adresse : `tailscale serve status` la montre, de la forme
+   `https://<ordinateur>.<tailnet>.ts.net`, suivie de
+   `proxy http://127.0.0.1:8765`.
+6. Dans le cockpit, sur l'ordinateur : Paramètres → **« Accès depuis le
+   téléphone »** — coller l'adresse, choisir un **code d'accès** (au moins
+   6 caractères), cocher, « Enregistrer ».
+
+**Sur le téléphone**
+
+- Ouvrir l'adresse dans le navigateur, Tailscale connecté. Le cockpit
+  demande le code, **une seule fois** : il pose ensuite un cookie valable
+  400 jours, que seul ce navigateur garde.
+- L'ajouter à l'écran d'accueil — iPhone : Safari → Partager → « Sur
+  l'écran d'accueil » ; Android : menu → « Installer l'application ».
+- Paramètres → Notifications → **« Sur ce téléphone »** → « Activer sur ce
+  téléphone », puis « Essayer ». Sur iPhone, les notifications ne viennent
+  qu'au cockpit ouvert depuis l'écran d'accueil (iOS 16.4 ou plus récent).
+  Elles arrivent même le cockpit fermé sur le téléphone : une autorisation
+  qui attend ; un run qui se termine — fini, arrêté ou en erreur — ; un run
+  qui se termine en vous laissant des questions ou un blocage. Un toucher
+  ouvre le cockpit sur l'écran concerné : l'étape du run, ou « À répondre ».
+  Les notifications du navigateur de l'ordinateur (1.5) ne changent pas.
+
+**Ce qui protège l'accès**
+
+- Une demande venue par Tailscale n'est acceptée que si son adresse est
+  celle de Paramètres, le réglage coché ; puis seulement avec le cookie
+  que donne le code. Celles de l'ordinateur ne demandent jamais de code.
+- Le code est gardé chiffré (PBKDF2) dans `config.json`, jamais réaffiché ;
+  en taper un nouveau le remplace.
+- Cinq codes faux de suite : l'accès depuis le téléphone est refusé quinze
+  minutes, même au bon code, et l'ordinateur l'affiche en bandeau rouge.
+- **« Déconnecter le téléphone »** (Paramètres) : tous les cookies donnés ne
+  valent plus rien, et les abonnements aux notifications sont retirés —
+  le téléphone redemandera le code.
+- L'adresse, le code et la déconnexion se règlent sur l'ordinateur
+  seulement ; le téléphone n'y a pas accès.
+
+**Arrêter** : décocher « Accès depuis le téléphone » ferme l'accès tout de
+suite ; `tailscale serve reset` retire le service de Tailscale.
 
 
 ## Ce que le cockpit ne fait jamais
@@ -651,7 +720,9 @@ construit, déploie et règle. Au-dessus de 720 px, rien ne change.
   si la commande le lirait encore comme sans réponse, il annule l'écriture
   et vous le dit.
 - Il n'accorde aucune autorisation tout seul.
-- Il n'écoute que sur cette machine (`127.0.0.1`).
+- Il n'écoute que sur cette machine (`127.0.0.1`). Le téléphone (1.15)
+  passe par Tailscale, à l'adresse et avec le code que vous avez choisis ;
+  rien n'est ouvert sur internet.
 
 S'il tombe en panne, rien n'est perdu : toutes les commandes se lancent
 toujours depuis Claude Code, et les fichiers sont les mêmes.

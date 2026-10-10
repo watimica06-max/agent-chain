@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cockpit — code d'accès</title>
+<link rel="icon" href="data:,">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#4B44D6">
+<!-- 1.15: what the phone is served through its Tailscale address until it
+     gave the access code once. Nothing of the cockpit is reachable before. -->
+<script>try { const t = localStorage.getItem("cockpit-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<style>
+:root {
+  --bg: #F6F7F9; --card: #FFFFFF; --ink: #15171C; --soft: #5A6070; --line: #E2E4E9; --line-strong: #CDD0D7;
+  --accent: #4B44D6; --accent-ink: #FFFFFF; --accent-ring: #D9D6FA;
+  --err: #BC2A2F; --err-soft: #FCE6E6; --err-line: #F3C1C2;
+  --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; --mono: "Cascadia Mono", Consolas, ui-monospace, monospace;
+  --tap: 44px; --r-10: 10px; --r-16: 16px;
+  --shadow-2: 0 8px 24px rgba(16, 18, 27, .07);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D0E11; --card: #15171B; --ink: #E7E8EC; --soft: #9AA0AD; --line: #262931; --line-strong: #363A44;
+    --accent: #9A95FF; --accent-ink: #121033; --accent-ring: #34306B;
+    --err: #FF8A85; --err-soft: #3A1718; --err-line: #5A2526;
+    --shadow-2: 0 8px 24px rgba(0, 0, 0, .45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D0E11; --card: #15171B; --ink: #E7E8EC; --soft: #9AA0AD; --line: #262931; --line-strong: #363A44;
+  --accent: #9A95FF; --accent-ink: #121033; --accent-ring: #34306B;
+  --err: #FF8A85; --err-soft: #3A1718; --err-line: #5A2526;
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, .45);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 var(--sans); }
+main { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+.card { width: 100%; max-width: 380px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-16);
+  box-shadow: var(--shadow-2); padding: 28px 22px; display: flex; flex-direction: column; gap: 14px; }
+.logo { width: 48px; height: 48px; border-radius: 12px; }
+h1 { margin: 0; font-size: 22px; font-weight: 650; }
+p { margin: 0; color: var(--soft); }
+label { font-weight: 600; font-size: 14px; }
+input { width: 100%; min-height: var(--tap); padding: 0 14px; border: 1px solid var(--line-strong); border-radius: var(--r-10);
+  background: var(--bg); color: var(--ink); font: 18px var(--mono); letter-spacing: .08em; }
+input:focus { outline: 3px solid var(--accent-ring); border-color: var(--accent); }
+button { min-height: var(--tap); border: 0; border-radius: var(--r-10); background: var(--accent); color: var(--accent-ink);
+  font: 600 16px var(--sans); cursor: pointer; }
+button:disabled { opacity: .55; cursor: default; }
+.err { background: var(--err-soft); border: 1px solid var(--err-line); color: var(--err); border-radius: var(--r-10); padding: 10px 12px; font-size: 14px; }
+.hidden { display: none; }
+.small { font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <form class="card" id="code-form" autocomplete="off">
+    <img class="logo" src="/icons/icon-192.png" alt="">
+    <h1>Cockpit</h1>
+    <p>Ce téléphone n'est pas encore connu du cockpit. Tapez le code d'accès choisi sur l'ordinateur, dans Paramètres → Accès depuis le téléphone. Il n'est demandé qu'une fois.</p>
+    <label for="code">Code d'accès</label>
+    <input id="code" name="code" type="password" autocomplete="current-password" required minlength="1" autofocus>
+    <div id="code-err" class="err hidden" role="alert"></div>
+    <button id="code-go" type="submit">Entrer</button>
+    <p class="small">Cinq codes faux de suite : l'accès est refusé quinze minutes, et l'ordinateur le montre.</p>
+  </form>
+</main>
+<script>
+"use strict";
+const form = document.getElementById("code-form"), input = document.getElementById("code"),
+      err = document.getElementById("code-err"), go = document.getElementById("code-go");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  go.disabled = true; err.classList.add("hidden");
+  try {
+    const r = await fetch("/api/phone/login", {method: "POST", headers: {"Content-Type": "application/json"},
+                                               body: JSON.stringify({code: input.value})});
+    let body = {}; try { body = await r.json(); } catch (x) {}
+    // The same address, now with the cookie: the cockpit — on the screen it was asked for.
+    if (r.ok) { location.reload(); return; }
+    err.textContent = body.error || `erreur ${r.status}`;
+    err.classList.remove("hidden");
+    input.value = ""; input.focus();
+  } catch (x) {
+    err.textContent = "Le cockpit ne répond pas : l'ordinateur est-il allumé, et Tailscale connecté ?";
+    err.classList.remove("hidden");
+  } finally { go.disabled = false; }
+});
+</script>
+</body>
+</html>

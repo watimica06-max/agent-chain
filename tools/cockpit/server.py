@@ -13,6 +13,7 @@ import sys
 import webbrowser
 from datetime import datetime
 
+import aiohttp
 from aiohttp import web
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -30,6 +31,7 @@ import deploy_profile  # noqa: E402
 import diagnostic  # noqa: E402
 import donnees as donnees_mod  # noqa: E402
 import gitref     # noqa: E402
+import phone as phone_mod  # noqa: E402
 import questions  # noqa: E402
 import runner as runner_mod  # noqa: E402
 import scan as scan_mod  # noqa: E402
@@ -39,6 +41,7 @@ import stats as stats_mod  # noqa: E402
 import statsview  # noqa: E402
 import sync as sync_mod  # noqa: E402
 import textfile   # noqa: E402
+import webpush   # noqa: E402
 import writer     # noqa: E402
 from state import State  # noqa: E402
 
@@ -46,7 +49,7 @@ HOST = "127.0.0.1"
 STATE_KEY = web.AppKey("state", State)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.14"
+VERSION = "1.15"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -76,6 +79,8 @@ SPAWN_SERVER = selfupdate.spawn
 LAUNCH_ARGS = []
 # A joined file comes in the request, base64 in JSON: what one may weigh.
 MAX_REQUEST = 256 * 1024 * 1024
+# 1.15 — how long a push service is given to take one notification.
+PUSH_TIMEOUT = 15.0
 # What opens the browser; the tests put a fake here.
 OPEN_BROWSER = webbrowser.open
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
@@ -454,7 +459,14 @@ def ask_directory(initial, title="Choisir le dossier de l'application"):
     return path or ""
 
 
-LOCAL_NAMES = {"127.0.0.1", "localhost"}
+LOCAL_NAMES = phone_mod.LOCAL_NAMES
+# 1.15 — through the phone's address: what is served before the code (the
+# code page itself is "/"), and what only this computer's page may do.
+PHONE_LOCAL_ONLY = {"/api/phone/settings", "/api/phone/disconnect"}
+
+
+def phone_open(path):
+    return path in ("/", "/manifest.webmanifest", "/api/phone/login") or path.startswith("/icons/")
 # What runs the diagnostic when make_app is given nothing; the tests put a
 # fake here, so that no page test runs the real version commands.
 DIAG_RUNNER = diagnostic.run_diagnostic
@@ -556,6 +568,11 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     # on disk, never the page this server serves.
     with open(os.path.join(HERE, "static", "index.html"), "rb") as f:
         page_bytes = f.read()
+    # 1.15: the phone's code page, and the service worker.
+    with open(os.path.join(HERE, "static", "code.html"), "rb") as f:
+        code_bytes = f.read()
+    with open(os.path.join(HERE, "static", "sw.js"), "rb") as f:
+        sw_bytes = f.read()
     # 1.6: a run stored with no application is given its own — main()'s
     # backfill did it already; this covers a store handed over as it is.
     if store:
@@ -563,18 +580,29 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             store.backfill_apps(app_resolver(state))
         except Exception as e:
             print(f"Consommation : application des anciens runs non retrouvée : {e}", flush=True)
+    # 1.15 — the phone, through Tailscale (phone.py).
+    ph = phone_mod.Phone(state)
+
     @web.middleware
     async def guard(request, handler):
         # Only this machine's browser, on this page: a foreign site cannot
         # reach the server through DNS rebinding or a cross-site request.
-        if _host_name(request.host) not in LOCAL_NAMES:
+        # 1.15: or the phone, at the address Paramètres names, once its code
+        # was given — never a request a proxy forwarded under a local Host.
+        where = ph.where(request.headers, request.host)
+        if where is None:
             return web.json_response({"error": "hôte refusé"}, status=403)
         if request.method == "POST":
             origin = request.headers.get("Origin")
-            if origin and _host_name(origin.split("://", 1)[-1]) not in LOCAL_NAMES:
+            if origin and not ph.origin_ok(origin, where):
                 return web.json_response({"error": "origine refusée"}, status=403)
             if request.content_type != "application/json":
                 return web.json_response({"error": "JSON attendu"}, status=415)
+        if where == "phone":
+            if request.path in PHONE_LOCAL_ONLY:
+                return web.json_response({"error": "sur l'ordinateur"}, status=403)
+            if not ph.signed_in(request.cookies.get(phone_mod.COOKIE)) and not phone_open(request.path):
+                return web.json_response({"error": "code d'accès demandé", "code": True}, status=401)
         return await handler(request)
 
     app = web.Application(middlewares=[guard], client_max_size=MAX_REQUEST)
@@ -635,8 +663,212 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         return data if isinstance(data, dict) else {}
 
     async def index(request):
+        # 1.15: through the phone's address with no cookie, the code page.
+        if on_phone(request) and not ph.signed_in(request.cookies.get(phone_mod.COOKIE)):
+            return web.Response(body=code_bytes, content_type="text/html", charset="utf-8",
+                                headers={"Cache-Control": "no-store"})
         return web.Response(body=page_bytes, content_type="text/html", charset="utf-8",
                             headers={"Cache-Control": "no-store"})
+
+    # ------------------------------------------------- the phone (1.15)
+    def on_phone(request):
+        return ph.where(request.headers, request.host) == "phone"
+
+    async def service_worker(request):
+        return web.Response(body=sw_bytes, content_type="text/javascript", charset="utf-8",
+                            headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"})
+
+    def phone_said(what):
+        print(f"Téléphone : {what}", flush=True)
+
+    async def phone_get(request):
+        return web.json_response({**ph.public(), "here": "phone" if on_phone(request) else "local"})
+
+    async def phone_settings(request):
+        """Paramètres → « Accès depuis le téléphone », on this computer only."""
+        data = await body(request)
+        try:
+            out = ph.configure(bool(data.get("enabled")), data.get("address") or "",
+                               data.get("code") if isinstance(data.get("code"), str) else None)
+        except ValueError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        phone_said(("accès ouvert à " + out["address"] if out["enabled"] else "accès fermé")
+                   + (" ; code d'accès changé" if data.get("code") else "") + ".")
+        broadcast("phone", out)
+        return web.json_response(out)
+
+    async def phone_disconnect(request):
+        n = ph.disconnect()
+        phone_said(f"déconnecté ({n} cookie{'s' if n > 1 else ''} révoqué{'s' if n > 1 else ''}, abonnements retirés).")
+        out = ph.public()
+        broadcast("phone", out)
+        return web.json_response({**out, "revoked": n})
+
+    async def phone_login(request):
+        """The code page's « Entrer ». Five wrong codes in a row: fifteen
+        minutes refused, and the computer's page says it."""
+        if not on_phone(request):
+            return web.json_response({"error": "inutile sur l'ordinateur"}, status=400)
+        data = await body(request)
+        token, what = ph.try_code(data.get("code") if isinstance(data.get("code"), str) else "")
+        if what == "ok":
+            phone_said("code d'accès accepté, cookie donné.")
+            resp = web.json_response({"ok": True})
+            resp.set_cookie(phone_mod.COOKIE, token, max_age=phone_mod.COOKIE_AGE, path="/",
+                            secure=True, httponly=True, samesite="Lax")
+            broadcast("phone", ph.public())
+            return resp
+        pub = ph.public()
+        if what in ("verrouillé", "bloqué"):
+            if what == "verrouillé":
+                phone_said(f"code d'accès faux {phone_mod.MAX_FAILS} fois de suite — refusé jusqu'à {pub['locked_until']}.")
+                broadcast("phone", pub)
+            return web.json_response({"error": f"trop de codes faux : réessayez après {pub['locked_until'][11:16]}",
+                                      "locked_until": pub["locked_until"]}, status=429)
+        left = phone_mod.MAX_FAILS - ph.fails
+        return web.json_response({"error": f"code faux — encore {left} essai{'s' if left > 1 else ''} avant "
+                                           f"{phone_mod.LOCK_SECONDS // 60} minutes de blocage"}, status=403)
+
+    async def push_subscribe(request):
+        data = await body(request)
+        try:
+            ph.subscribe(data.get("subscription"))
+        except ValueError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        phone_said("notifications activées sur un téléphone.")
+        out = ph.public()
+        broadcast("phone", out)
+        return web.json_response(out)
+
+    async def push_unsubscribe(request):
+        data = await body(request)
+        n = ph.unsubscribe(data.get("endpoint") or "")
+        out = ph.public()
+        broadcast("phone", out)
+        return web.json_response({**out, "removed": n})
+
+    async def push_status(request):
+        data = await body(request)
+        return web.json_response({"subscribed": ph.subscribed(data.get("endpoint") or "")})
+
+    # Web Push: each subscription, at once; a subscription its service says
+    # is gone (404, 410) is removed.
+    async def push_to(subs, message):
+        if not subs:
+            return 0
+        vapid, subject = ph.vapid(), ph.address or "mailto:cockpit@localhost"
+
+        async def one(session, sub):
+            try:
+                status = await webpush.send(session, sub, message, vapid, subject)
+            except Exception as e:
+                phone_said(f"notification non envoyée — {type(e).__name__}: {e}")
+                return 0
+            if status in (404, 410):
+                ph.unsubscribe(sub["endpoint"])
+                phone_said(f"abonnement disparu ({status}), retiré.")
+                broadcast("phone", ph.public())
+                return 0
+            if status >= 400:
+                phone_said(f"notification refusée par son service ({status}).")
+                return 0
+            return 1
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=PUSH_TIMEOUT)) as session:
+            return sum(await asyncio.gather(*(one(session, s) for s in subs)))
+
+    def entries_of(a, w):
+        """What « À répondre » holds for the run's feature: {id: (kind, file)}."""
+        try:
+            qs, _, bs, _, redec, _ = collect_forms(a, w, rn)
+        except Exception:
+            return {}
+        out = {e.id: ("question", e.rel) for e in qs}
+        out.update({getattr(e, "id", e.rel): ("blocage", e.rel) for e in bs + ([redec] if redec else [])})
+        return out
+
+    push_box = {"task": None, "before": {}}
+
+    def push_message(ev, kind, title, text, screen):
+        d = ev.get("data") or {}
+        return {"kind": kind, "title": title, "body": text, "app": ev.get("app") or "",
+                "work": d.get("work") or (rn.current(ev["app"]).work if ev.get("app") and rn.current(ev["app"]) else ""),
+                "screen": screen, "tag": f"cockpit-{kind}-{d.get('id') or ev.get('run') or ev.get('seq')}"}
+
+    async def push_event(ev):
+        """The three moments a push goes: a permission waits; a run ends —
+        done, stopped or failed —, with the questions or blocking files it
+        left for her when it left some."""
+        kind, d, a = ev["type"], ev.get("data") or {}, ev.get("app")
+        loop = asyncio.get_running_loop()
+        if kind == "run_started":
+            # Read before the run's task takes its first step — a few files,
+            # here on the loop: what it leaves is what was not there yet.
+            push_box["before"][ev["run"]] = entries_of(a, d.get("work") or "")
+            return
+        if kind not in ("permission", "run_ended"):
+            return
+        before = push_box["before"].pop(ev["run"], None) if kind == "run_ended" else None
+        subs = ph.subscriptions()
+        if not subs:
+            return
+        name = state.name_of(a) if a else "Cockpit"
+        if kind == "permission":
+            msg = push_message(ev, "autorisation", f"{name} — une autorisation attend",
+                               f"{d.get('tool')} — demandé par {d.get('agent') or 'orchestrateur'}. "
+                               "Le run attend votre réponse.", "run")
+        else:
+            after = await loop.run_in_executor(None, entries_of, a, d.get("work") or "")
+            fresh = [v for k, v in after.items() if before is not None and k not in before]
+            n = d.get("next") or {"kind": "unknown"}
+            if fresh:
+                nq = sum(1 for k, _ in fresh if k == "question")
+                nb = len(fresh) - nq
+                files = list(dict.fromkeys(rel for _, rel in fresh))
+                what = " et ".join(x for x in (
+                    f"{nq} question{'s' if nq > 1 else ''}" if nq else "",
+                    f"{nb} blocage{'s' if nb > 1 else ''}" if nb else "") if x)
+                msg = push_message(ev, "reponse", f"{name} — " + (f"{len(fresh)} réponses vous attendent"
+                                                                   if len(fresh) > 1 else "une réponse vous attend"),
+                                   f"{d.get('prompt')} — {d.get('outcome')}. {what} : {', '.join(files[:3])}"
+                                   + (" …" if len(files) > 3 else ""), "answer")
+            elif d.get("outcome") == "erreur":
+                msg = push_message(ev, "erreur", f"{name} — {d.get('prompt')} s'est arrêté sur une erreur",
+                                   d.get("error") or "Erreur", "run")
+            else:
+                msg = push_message(ev, "fin", f"{name} — {d.get('prompt')} — {d.get('outcome')}",
+                                   "Le relais ne finit pas par une ligne Next:." if n.get("kind") == "unknown"
+                                   else "Ensuite : " + (n.get("french") or n.get("raw") or ""), "run")
+        sent = await push_to(subs, msg)
+        print(f"Téléphone : notification « {msg['title']} » — {sent}/{len(subs)} envoyée{'s' if sent > 1 else ''}.",
+              flush=True)
+
+    async def push_watch():
+        q = rn.watch()
+        try:
+            while True:
+                ev = await q.get()
+                try:
+                    await push_event(ev)
+                except Exception as e:      # said, never raised into the loop
+                    phone_said(f"notification non préparée — {type(e).__name__}: {e}")
+        finally:
+            rn.unwatch(q)
+
+    async def push_cleanup(_app):
+        t = push_box["task"]
+        if t and not t.done():
+            t.cancel()
+            await asyncio.gather(t, return_exceptions=True)
+
+    async def push_test(request):
+        """« Essayer », on the phone: one push to this subscription."""
+        data = await body(request)
+        sub = next((s for s in ph.subscriptions() if s["endpoint"] == data.get("endpoint")), None)
+        if not sub:
+            return web.json_response({"error": "ce téléphone n'est pas abonné"}, status=404)
+        sent = await push_to([sub], {"kind": "essai", "title": "Cockpit", "body": "Les notifications arrivent.",
+                                     "screen": "settings", "tag": "cockpit-essai"})
+        return web.json_response({"sent": sent})
 
     # 1.13 — the web app manifest and its icons, so that a phone can put the
     # page on its home screen. Read from static/, nothing else served from there.
@@ -777,6 +1009,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         out["sync"] = book.peek(state.app_folder) if state.app_folder else None
         out["chain_sync"] = chain_sync
         out["chain_root"] = CHAIN_ROOT
+        # 1.15: the access from the phone — never its code nor a cookie.
+        out["phone"] = ph.public()
         if state.app_folder and os.path.isdir(state.app_folder):
             # The chain installed in the application (§20) — 1.6: also where
             # it is not installed yet, and no feature can open.
@@ -1396,6 +1630,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     async def opening(_app):
         loop_box["loop"] = asyncio.get_running_loop()
         loop = loop_box["loop"]
+        # 1.15: the pushes to the phone, from every run's events.
+        push_box["task"] = loop.create_task(push_watch())
         # 1.12: GitHub, when the cockpit opens — agent-chain's clone, then
         # every application, in the background.
         if SYNC_CHAIN_AT_START:
@@ -2282,6 +2518,15 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_get("/", index)
     r.add_get("/manifest.webmanifest", manifest)
     r.add_get("/icons/{name}", app_icon)
+    r.add_get("/sw.js", service_worker)
+    r.add_get("/api/phone", phone_get)
+    r.add_post("/api/phone/settings", phone_settings)
+    r.add_post("/api/phone/disconnect", phone_disconnect)
+    r.add_post("/api/phone/login", phone_login)
+    r.add_post("/api/push/subscribe", push_subscribe)
+    r.add_post("/api/push/unsubscribe", push_unsubscribe)
+    r.add_post("/api/push/status", push_status)
+    r.add_post("/api/push/test", push_test)
     r.add_get("/api/ping", ping)
     r.add_post("/api/reveal-log", reveal_log)
     r.add_post("/api/open-logs", open_logs)
@@ -2356,6 +2601,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/longpaths", longpaths_set)
     app.on_startup.append(opening)
     app.on_cleanup.append(deploy_cleanup)
+    app.on_cleanup.append(push_cleanup)
     return app
 
 

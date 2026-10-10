@@ -31,7 +31,9 @@ held there can be resumed; a creation finished is dropped.
 1.8 — `deploy_devices`: the devices deployed to, by their own key, with the
 name the Product Owner gave and the last Wi-Fi address; and in each
 application's entry, `deploy_choice`, the targets and destinations last
-chosen in « Déployer »."""
+chosen in « Déployer ».
+
+1.15 — `phone`: the access from the phone (phone.py)."""
 import json
 import os
 import threading
@@ -457,6 +459,24 @@ class State:
             a["deploy_choice"] = clean
             self._save()
         return clean
+
+    # ------------------------------------------------------- phone (1.15)
+
+    def phone(self):
+        """`phone` (phone.py): the access from the phone, its code hashed,
+        its cookies, the Web Push keys and subscriptions. A copy."""
+        p = self.data.get("phone")
+        return json.loads(json.dumps(p)) if isinstance(p, dict) else {}
+
+    def update_phone(self, change):
+        """`change(phone dict)` applied in place, then saved; its result."""
+        with self._lock:
+            p = self.data.get("phone")
+            if not isinstance(p, dict):
+                p = self.data["phone"] = {}
+            out = change(p)
+            self._save()
+        return out
 
     # ------------------------------------------------------------ ignored
 

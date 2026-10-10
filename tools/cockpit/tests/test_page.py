@@ -293,11 +293,12 @@ def test_settings_mode_diagnostic_commands(tmp_path, page):
         # 1.9: five sections, in this order, each with its line; « Commandes » is gone.
         # 1.11: « Apparence » before them — the theme.
         heads = page.locator("#scr-settings .sec > h2").all_inner_texts()
-        assert heads == ["Apparence", "Mode de permission", "Notifications", "Dossiers ignorés", "Outils sur cet ordinateur",
-                         "Version du cockpit", "Arrêter le cockpit"]
+        # 1.15: « Accès depuis le téléphone » after the notifications.
+        assert heads == ["Apparence", "Mode de permission", "Notifications", "Accès depuis le téléphone", "Dossiers ignorés",
+                         "Outils sur cet ordinateur", "Version du cockpit", "Arrêter le cockpit"]
         leads = page.locator("#scr-settings .sec > .lead").all_inner_texts()
-        assert len(leads) == 6 and all(t.strip() for t in leads)
-        assert "Java, Gradle ou Flutter, adb, Claude Code, git" in leads[3]
+        assert len(leads) == 7 and all(t.strip() for t in leads)
+        assert "Java, Gradle ou Flutter, adb, Claude Code, git" in leads[4]
         # « Outils sur cet ordinateur » — the diagnostic: ✓ / ✗ / non concerné, the Java hint, kept with its date.
         page.get_by_role("button", name="Vérifier les outils").click()
         page.wait_for_selector("#diag-result li")

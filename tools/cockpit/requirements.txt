@@ -1,2 +1,3 @@
 claude-agent-sdk>=0.2,<0.3
 aiohttp>=3.9,<4
+cryptography>=42      # 1.15: Web Push to the phone (VAPID, aes128gcm)

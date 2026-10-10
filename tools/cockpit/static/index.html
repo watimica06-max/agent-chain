@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cockpit</title>
 <link rel="icon" href="data:,">
-<!-- 1.13: the page can be added to a phone's home screen. No service worker yet. -->
+<!-- 1.13: the page can be added to a phone's home screen. 1.15: through the phone's address, a service worker (sw.js) makes it an app, with Web Push. -->
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <meta name="theme-color" content="#4B44D6">
@@ -120,11 +120,11 @@ button.allow { background: var(--ok); color: var(--on-solid); border-color: var(
 button.link { border: none; background: none; color: var(--accent); padding: 0 var(--sp-2); min-height: 0; font-weight: 500; }
 button.link:hover:not(:disabled) { text-decoration: underline; }
 a { color: var(--accent); }
-input[type=text], input[type=number], textarea, select { font: inherit; width: 100%; padding: var(--sp-8) var(--sp-12);
+input[type=text], input[type=password], input[type=number], textarea, select { font: inherit; width: 100%; padding: var(--sp-8) var(--sp-12);
   border-radius: var(--r-8); border: var(--bw) solid var(--line-strong); background: var(--card); color: var(--ink); }
 input[type=number] { width: auto; }
 textarea { min-height: var(--mh-72); resize: vertical; }
-input[type=text]:focus, input[type=number]:focus, textarea:focus, select:focus {
+input[type=text]:focus, input[type=password]:focus, input[type=number]:focus, textarea:focus, select:focus {
   outline: var(--bw-2) solid var(--accent); outline-offset: calc(-1 * var(--bw)); box-shadow: 0 0 0 var(--sp-3) var(--accent-soft); }
 input[type=checkbox], input[type=radio] { accent-color: var(--accent); }
 .muted { color: var(--soft); }
@@ -204,6 +204,17 @@ button.chip:hover { border-color: var(--accent); }
 #sync-banner .txt { flex: 1; min-width: 0; }
 #sync-banner .files { font-family: var(--mono); font-size: var(--fs-12); display: block; margin-top: var(--sp-2); }
 #sync-banner button { min-height: var(--h-28); font-size: var(--fs-12); }
+/* 1.15 — five wrong codes from the phone: said on the computer, whatever the screen. */
+#phone-lock { border-top: var(--bw) solid var(--err); background: var(--err-soft); color: var(--err); padding: var(--sp-8) var(--sp-20);
+  display: flex; gap: var(--sp-10); align-items: center; flex-wrap: wrap; }
+#phone-lock .txt { flex: 1; min-width: 0; }
+#phone-lock button { min-height: var(--h-28); font-size: var(--fs-12); }
+.phone-form { display: grid; gap: var(--sp-10); max-width: var(--w-520); }
+.phone-form label.field { display: grid; gap: var(--sp-4); font-weight: 600; }
+.phone-form input[type=text], .phone-form input[type=password] { font-family: var(--mono); }
+.phone-form label.field .muted { font-weight: 400; }
+.phone-facts { margin: var(--sp-10) 0 0; padding-left: var(--sp-20); }
+#set-push .row { flex-wrap: wrap; }
 .chain-list { margin: var(--sp-6) 0 0; padding-left: var(--sp-20); }
 #perm-banner { border-top: var(--bw) solid var(--err-line); background: var(--err-soft); padding: var(--sp-10) var(--sp-20) var(--sp-12);
   max-height: 46vh; overflow: auto; }
@@ -1040,7 +1051,9 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
   #phone-sheet .kicker { padding: var(--sp-6) var(--sp-12) var(--sp-2); }
 
   /* « Sur l'ordinateur »: a screen of the computer, reached on the phone */
-  :is(#scr-correction, #scr-deploy, #scr-stats, #scr-settings, #scr-nouvelle) > :not(.phone-desk) { display: none !important; }
+  :is(#scr-correction, #scr-deploy, #scr-stats, #scr-settings, #scr-nouvelle) > :not(.phone-desk):not(.phone-keep) { display: none !important; }
+  /* 1.15: Paramètres keeps « Notifications → Sur ce téléphone » on the phone. */
+  #scr-settings > .phone-keep { margin-top: var(--sp-16); }
   .phone-desk { display: flex; flex-direction: column; gap: var(--sp-12); }
   .phone-desk h2 { margin: 0; }
   .phone-desk .box, .phone-note { display: flex; gap: var(--sp-12); align-items: center; padding: var(--sp-14); border-radius: var(--r-14);
@@ -1200,6 +1213,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     <div id="chain-banner" class="hidden" role="status" aria-label="État de la chaîne"></div>
     <div id="busy-banner" class="hidden" role="status" aria-label="Commande dans une autre application"></div>
     <div id="sync-banner" class="hidden" role="status" aria-label="GitHub"></div>
+    <div id="phone-lock" class="hidden" role="alert" aria-label="Accès depuis le téléphone bloqué"></div>
   </div>
 
   <div id="main">
@@ -1567,10 +1581,19 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <div class="modes" id="set-mode"></div>
         <p class="muted small" id="mode-note"></p>
       </div>
-      <div class="card sec" id="sec-notes">
+      <div class="card sec phone-keep" id="sec-notes">
         <h2>Notifications</h2>
-        <p class="lead">Quand l'onglet du cockpit n'est pas devant : le navigateur montre une notification ; un clic ramène l'onglet sur l'écran concerné. Devant, la page le montre déjà.</p>
-        <div id="set-notes" class="notes"></div>
+        <p class="lead desk-only">Quand l'onglet du cockpit n'est pas devant : le navigateur montre une notification ; un clic ramène l'onglet sur l'écran concerné. Devant, la page le montre déjà.</p>
+        <div id="set-notes" class="notes desk-only"></div>
+        <!-- 1.15: Web Push, to the phone — even with the cockpit closed on it. -->
+        <h3 id="push-title" style="margin-top:var(--sp-16)">Sur ce téléphone</h3>
+        <div id="set-push"></div>
+      </div>
+      <!-- 1.15: the cockpit reached from the phone, through Tailscale. -->
+      <div class="card sec" id="sec-phone">
+        <h2>Accès depuis le téléphone</h2>
+        <p class="lead">Tailscale relie cet ordinateur et le téléphone en réseau privé ; <span class="mono">tailscale serve</span> y présente le cockpit en HTTPS, à l'adresse de l'ordinateur. Rien n'est ouvert sur internet. Le téléphone donne le code d'accès une fois ; ce navigateur-ci n'en a jamais besoin. Les étapes : LISEZMOI.md, « Téléphone ».</p>
+        <div id="set-phone"></div>
       </div>
       <div class="card sec" id="sec-folders">
         <h2>Dossiers ignorés</h2>
@@ -1758,6 +1781,8 @@ async function api(path, data) {
   const r = await fetch(path, opts);
   let body = {};
   try { body = await r.json(); } catch (e) { /* not json */ }
+  // 1.15: through the phone's address, a cookie revoked — the code page again.
+  if (r.status === 401 && body.code) { location.reload(); }
   if (!r.ok) { const e = new Error(body.error || `erreur ${r.status}`); e.status = r.status; e.body = body; throw e; }
   return body;
 }
@@ -2665,6 +2690,7 @@ async function refreshState(reason) {
   // 1.6: the stream is every run's, whatever its application — open even
   // with no feature open, so that a card or an end elsewhere reaches the page.
   openEvents();
+  renderPhoneLock();
   if (!S.open) { showStart(S.load_error); return; }
   route();
   renderAll();
@@ -4007,6 +4033,8 @@ function onEvent(ev) {
   seen = ev.seq;
   // 1.12: a clone's new state against GitHub, whatever its application.
   if (ev.type === "sync") { onSyncEvent(ev); return; }
+  // 1.15: the access from the phone — a lock, a phone connected or not.
+  if (ev.type === "phone") { S.phone = d; renderPhoneLock(); if (currentRoute() === "settings") renderPhone(); return; }
   // 1.8: a deploy and a crash, whatever the screen.
   if ((ev.type || "").startsWith("deploy_")) { onDeployEvent(ev); return; }
   // 1.6: every run's events arrive; another application's run is not this
@@ -4139,7 +4167,7 @@ function openEvents() {
     if (quitting) return;
     // The server gone: the stopped page; EventSource keeps trying, and the
     // page comes back by itself when the cockpit is started again.
-    try { await fetch("/api/ping"); } catch (e) { showStopped(false); }
+    try { const r = await fetch("/api/ping"); if (r.status === 401) location.reload(); } catch (e) { showStopped(false); }
   };
 }
 function closeEvents() { if (es) { es.close(); es = null; } }
@@ -4468,6 +4496,153 @@ function renderNotes() {
 }
 document.addEventListener("visibilitychange", updateTitle);
 
+// ================================================ the phone, for real (1.15)
+// Paramètres → « Accès depuis le téléphone », on this computer: the address
+// tailscale serve gives, the access code (hashed by the server, never shown
+// back), « Déconnecter le téléphone ». Notifications → « Sur ce téléphone »:
+// Web Push, subscribed from the phone itself. Through the phone's address the
+// page registers sw.js; on this computer, nothing of it runs.
+const ON_PHONE_ADDRESS = !["127.0.0.1", "localhost", "[::1]"].includes(location.hostname);
+const hhmm = (iso) => iso ? iso.slice(11, 16) : "";
+function renderPhoneLock() {
+  const b = $("phone-lock"), p = S.phone || {};
+  const show = !!p.locked && !ON_PHONE_ADDRESS;
+  b.classList.toggle("hidden", !show);
+  if (!show) { b.replaceChildren(); return; }
+  b.replaceChildren(el("span", {class: "txt"}, el("b", {text: "Téléphone : cinq codes d'accès faux de suite"}),
+    ` à ${hhmm(p.last_lock)} — l'accès depuis le téléphone est refusé jusqu'à ${hhmm(p.locked_until)}. Si ce n'était pas vous : changez le code dans Paramètres.`),
+    el("button", {class: "small", text: "Paramètres", onclick: () => go("settings", "sec-phone")}));
+}
+async function readPhone() {
+  try { S.phone = await api("/api/phone"); } catch (e) { return; }
+  renderPhoneLock(); renderPhone();
+}
+function renderPhone() {
+  renderPhoneSettings();
+  renderPush();
+}
+function renderPhoneSettings() {
+  const box = $("set-phone"), p = S.phone || {};
+  box.replaceChildren();
+  if (ON_PHONE_ADDRESS) { box.append(el("p", {class: "muted small", text: "Se règle sur l'ordinateur."})); return; }
+  const on = el("input", {type: "checkbox", id: "phone-on", checked: p.enabled || undefined});
+  const addr = el("input", {type: "text", id: "phone-address", value: p.address || "", spellcheck: "false", autocomplete: "off",
+    placeholder: "https://ordinateur.tailnet.ts.net", "aria-label": "Adresse du cockpit sur le téléphone"});
+  const code = el("input", {type: "password", id: "phone-code", autocomplete: "new-password", "aria-label": "Code d'accès",
+    placeholder: p.has_code ? "inchangé — tapez-en un pour le changer" : "au moins 6 caractères"});
+  const msg = el("span", {class: "muted small", id: "phone-msg"});
+  const save = el("button", {class: "primary", id: "phone-save", text: "Enregistrer", onclick: async () => {
+    save.disabled = true; msg.textContent = "";
+    try {
+      S.phone = {...(S.phone || {}), ...await api("/api/phone/settings", {enabled: on.checked, address: addr.value, code: code.value})};
+      renderPhone(); renderPhoneLock();
+      $("phone-msg").textContent = S.phone.enabled ? "Enregistré : le téléphone est accepté à cette adresse." : "Enregistré : l'accès depuis le téléphone est fermé.";
+    } catch (e) { msg.textContent = "✗ " + e.message; save.disabled = false; }
+  }});
+  const lock = p.locked ? el("div", {class: "notice err", id: "phone-locked", text:
+    `Cinq codes faux de suite à ${hhmm(p.last_lock)} : refusé jusqu'à ${hhmm(p.locked_until)}. Un nouveau code lève le blocage.`}) : null;
+  const facts = el("ul", {class: "phone-facts small"},
+    el("li", {text: p.phones ? `${p.phones} connexion${p.phones > 1 ? "s" : ""} de téléphone en cours (cookie valable 400 jours).` : "Aucun téléphone connecté."}),
+    el("li", {text: p.subscriptions ? `${p.subscriptions} abonnement${p.subscriptions > 1 ? "s" : ""} aux notifications.` : "Aucun téléphone abonné aux notifications."}));
+  const out = el("button", {class: "danger small", id: "phone-disconnect", text: "Déconnecter le téléphone", disabled: !(p.phones || p.subscriptions) || undefined,
+    onclick: async () => {
+      if (!confirm("Déconnecter le téléphone ?\n\nIl redemandera le code d'accès à sa prochaine visite, et ne reçoit plus de notifications tant qu'il ne s'y est pas réabonné.")) return;
+      try { S.phone = {...(S.phone || {}), ...await api("/api/phone/disconnect", {})}; renderPhone(); $("phone-msg").textContent = "Téléphone déconnecté."; }
+      catch (e) { alert(e.message); }
+    }});
+  box.append(el("div", {class: "phone-form"},
+    el("label", {class: "row", for: "phone-on"}, on, el("b", {text: "Accès depuis le téléphone"})),
+    el("label", {class: "field", for: "phone-address"}, "Adresse du cockpit sur le téléphone", addr,
+      el("span", {class: "muted small", text: "Celle que montre « tailscale serve status » sur cet ordinateur."})),
+    el("label", {class: "field", for: "phone-code"}, "Code d'accès", code,
+      el("span", {class: "muted small", text: p.has_code ? "Un code est enregistré, chiffré : il n'est jamais réaffiché." : "Aucun code encore : il en faut un pour ouvrir l'accès."})),
+    lock, el("div", {class: "row"}, save, msg)), facts, el("div", {class: "row", style: "margin-top:var(--sp-8)"}, out));
+}
+function b64uBytes(s) {
+  const b = atob(s.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - s.length % 4) % 4));
+  return Uint8Array.from(b, (c) => c.charCodeAt(0));
+}
+let swReg = null;
+async function pushSubscription() {
+  if (!swReg || !swReg.pushManager) return null;
+  try { return await swReg.pushManager.getSubscription(); } catch (e) { return null; }
+}
+async function renderPush() {
+  const box = $("set-push"); if (!box) return;
+  const p = S.phone || {};
+  if (!ON_PHONE_ADDRESS) {
+    box.replaceChildren(el("p", {class: "muted small", style: "margin:0", text:
+      "Ouvrez le cockpit depuis le téléphone, à son adresse Tailscale, puis activez-les ici, sur le téléphone : une autorisation qui attend, un run qui se termine, des questions ou un blocage qui vous arrivent — même le cockpit fermé sur le téléphone. " +
+      (p.subscriptions ? `${p.subscriptions} téléphone${p.subscriptions > 1 ? "s" : ""} abonné${p.subscriptions > 1 ? "s" : ""}.` : "Aucun téléphone abonné.")}));
+    return;
+  }
+  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+    box.replaceChildren(el("p", {class: "muted small", style: "margin:0", id: "push-unsupported", text:
+      "Ce navigateur ne reçoit pas de notifications ainsi. Sur iPhone : ajoutez d'abord le cockpit à l'écran d'accueil (Partager → Sur l'écran d'accueil), puis ouvrez-le de là."}));
+    return;
+  }
+  const sub = await pushSubscription();
+  let mine = false;
+  if (sub) { try { mine = (await api("/api/push/status", {endpoint: sub.endpoint})).subscribed; } catch (e) {} }
+  const say = el("span", {class: "muted small", id: "push-msg"});
+  const status = Notification.permission === "denied" ? "Le téléphone a refusé les notifications au cockpit : rétablissez-les dans ses réglages, pour ce site."
+    : mine ? "Ce téléphone les reçoit : une autorisation qui attend, un run qui se termine, des questions ou un blocage pour vous."
+    : "Ce téléphone ne les reçoit pas.";
+  const toggle = el("button", {class: mine ? "" : "primary", id: "push-toggle", text: mine ? "Désactiver sur ce téléphone" : "Activer sur ce téléphone",
+    disabled: Notification.permission === "denied" || undefined,
+    onclick: async () => {
+      toggle.disabled = true; say.textContent = "";
+      try {
+        if (mine) {
+          await api("/api/push/unsubscribe", {endpoint: sub.endpoint});
+          try { await sub.unsubscribe(); } catch (e) {}
+        } else {
+          if (await Notification.requestPermission() !== "granted") throw new Error("le téléphone n'a pas autorisé les notifications");
+          const fresh = sub || await swReg.pushManager.subscribe({userVisibleOnly: true, applicationServerKey: b64uBytes(p.vapid_public || "")});
+          S.phone = {...(S.phone || {}), ...await api("/api/push/subscribe", {subscription: fresh.toJSON()})};
+        }
+        renderPush();
+      } catch (e) { say.textContent = "✗ " + e.message; toggle.disabled = false; }
+    }});
+  const test = mine ? el("button", {class: "small", text: "Essayer", onclick: async () => {
+    try { const r = await api("/api/push/test", {endpoint: sub.endpoint}); say.textContent = r.sent ? "Envoyée." : "Non envoyée : voir le journal du serveur."; }
+    catch (e) { say.textContent = "✗ " + e.message; }
+  }}) : null;
+  box.replaceChildren(el("p", {class: "muted small", style: "margin:0 0 var(--sp-8)", text: status}), el("div", {class: "row"}, toggle, test, say));
+}
+// A notification tapped: the cockpit on the right screen — its application,
+// its feature, then the run's step or « À répondre ».
+async function openFromPush(o) {
+  if (!o || typeof o !== "object") return;
+  const feature = (o.work || "").split("/")[0];
+  try {
+    if (o.app && (!sameApp(o.app, S.app_folder) || (feature && feature !== S.feature))) {
+      if (feature) await api("/api/open", {app: o.app, work: feature}); else await api("/api/apps/open", {folder: o.app});
+      resetForApp();
+    }
+  } catch (e) { /* gone since: the screen below says where things stand */ }
+  if (!S.open || atHome()) location.hash = "#dashboard";
+  await refreshState();
+  if (o.screen === "answer") openAnswersOfKind("all");
+  else if (o.screen === "run") goStep(runChain(), S.run_place && S.run_place.step);
+  else if (SCREENS.includes(o.screen)) go(o.screen);
+}
+function pushFromAddress() {
+  const h = location.hash || "";
+  if (!h.startsWith("#push=")) return null;
+  let o = null;
+  try { o = JSON.parse(decodeURIComponent(h.slice(6))); } catch (e) {}
+  history.replaceState(null, "", location.pathname + "#dashboard");
+  return o;
+}
+// The same address, the page already open on it: only the hash changes.
+window.addEventListener("hashchange", () => { const o = pushFromAddress(); if (o) openFromPush(o); });
+if (ON_PHONE_ADDRESS && "serviceWorker" in navigator && window.isSecureContext) {
+  navigator.serviceWorker.register("/sw.js", {scope: "/"}).then((r) => { swReg = r; if (currentRoute() === "settings") renderPush(); })
+    .catch((e) => console.warn("service worker non enregistré :", e.message));
+  navigator.serviceWorker.addEventListener("message", (e) => { if (e.data && e.data.type === "cockpit-push") openFromPush(e.data.open); });
+}
+
 // =================================================== « Arrêter le cockpit »
 $("btn-quit").onclick = async () => {
   const b = $("btn-quit"); b.disabled = true;
@@ -4535,6 +4710,8 @@ function renderSettings() {
   $("mode-note").textContent = "Le mode choisi vaut pour le prochain run ; un run en cours garde le sien. Même en Auto, une demande renvoyée vers toi devient un bandeau.";
 
   renderNotes();
+  // 1.15: the phone — its access, its notifications.
+  renderPhone();
 
   // 1.5.1 — the folders never shown: the earlier chain's. Ticked, a folder and
   // its bugfix-NN/ leave the feature list, « Correction », the scan, the
@@ -5967,7 +6144,9 @@ function phoneBuild() {
     const back = r === "nouvelle" ? el("a", {href: "#accueil"}, icon("back"), "Retour aux applications")
       : el("a", {href: "#dashboard"}, icon("back"), "Retour au tableau de bord");
     $("scr-" + r).prepend(el("div", {class: "phone-desk", "data-phone": ""}, el("h2", {text: label}),
-      el("div", {class: "box"}, el("span", {class: "tile"}, icon("desk")), el("b", {text: "Sur l'ordinateur"})), back));
+      el("div", {class: "box"}, el("span", {class: "tile"}, icon("desk")), el("b", {text: "Sur l'ordinateur"})),
+      // 1.15: Paramètres keeps one thing on the phone — its own notifications.
+      r === "settings" ? el("p", {class: "muted small", style: "margin:0", text: "Ici : les notifications de ce téléphone, ci-dessous."}) : null, back));
   }
   document.querySelector("#scr-accueil .home-head").after(el("div", {class: "phone-note", id: "phone-home-desk", "data-phone": ""},
     icon("desk"), el("span", {}, "Nouvelle application, ajouter une application, installer ou mettre à jour la chaîne, renommer ou retirer une application : ",
@@ -6027,7 +6206,9 @@ new MutationObserver(() => { if (PHONE) phoneRender(); }).observe($("perm-banner
 if (PHONE) phoneBuild();
 
 
-refreshState().catch((e) => showStart(e.message));
+// 1.15: opened by a notification tapped — its screen, once the state is read.
+const pushOpen = pushFromAddress();
+refreshState().then(() => pushOpen && openFromPush(pushOpen)).catch((e) => showStart(e.message));
 </script>
 </body>
 </html>

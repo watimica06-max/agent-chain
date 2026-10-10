@@ -377,8 +377,12 @@ def test_chaine_is_read_only_and_the_computer_screens_say_so(tmp_path, phone):
             scr.locator(".phone-desk").wait_for()
             assert scr.locator(".phone-desk h2").inner_text() == label
             assert "Sur l'ordinateur" in scr.locator(".phone-desk").inner_text()
-            assert scr.evaluate("s => [...s.children].filter(c => !c.classList.contains('phone-desk') "
-                                "&& getComputedStyle(c).display !== 'none').length") == 0, r
+            # 1.15: Paramètres keeps one card on the phone — Notifications, « Sur ce téléphone ».
+            shown = scr.evaluate("s => [...s.children].filter(c => !c.classList.contains('phone-desk') "
+                                 "&& getComputedStyle(c).display !== 'none').map(c => c.id)")
+            assert shown == (["sec-notes"] if r == "settings" else []), r
+            if r == "settings":
+                assert not page.locator("#set-notes").is_visible() and page.locator("#push-title").is_visible()
             assert no_side_scroll(page) and small(page) == [], r
         assert errors(page) == []
 
