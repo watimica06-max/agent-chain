@@ -30,6 +30,7 @@ CLONE_TIMEOUT = 900
 UP_TO_DATE, BEHIND, AHEAD, DIVERGED, OFFLINE, NO_REMOTE = (
     "à jour", "en retard", "non envoyé", "divergé", "GitHub injoignable", "sans GitHub")
 ANSWERS_MESSAGE = "chore: answers"
+JOURNAL_FILE = "journal.md"      # journal.py — never an answer to send
 
 CREDENTIALS_TEXT = ("GitHub refuse : aucun identifiant GitHub utilisable sur cet ordinateur pour ce dépôt. "
                     "Se connecter une fois à GitHub avec git sur cet ordinateur (Git Credential Manager), "
@@ -351,7 +352,8 @@ def answers_pending(folder, feature):
     if not feature:
         return 0
     d = dirty_paths(folder, [feature_path(feature)])
-    return len(d) if d is not None else 0
+    # 1.20: a journal line is no answer — the cockpit commits it itself.
+    return len([1 for _, p in d if p.rstrip("/").split("/")[-1] != JOURNAL_FILE]) if d is not None else 0
 
 
 def commit_answers(folder, feature):

@@ -40,6 +40,7 @@ import diagnostic  # noqa: E402
 import donnees as donnees_mod  # noqa: E402
 import gitref     # noqa: E402
 import installs   # noqa: E402
+import journal as journal_mod  # noqa: E402
 import machine    # noqa: E402
 import phone as phone_mod  # noqa: E402
 import questions  # noqa: E402
@@ -64,7 +65,7 @@ STATE_KEY = web.AppKey("state", State)
 PORT_KEY = web.AppKey("port", dict)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.19"
+VERSION = "1.20"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -117,6 +118,9 @@ MEASURE_CLIENT = None
 PILOT_CLOCK = None
 # 1.19 — « Expliquer »: the client of its call; the tests put a fake here.
 EXPLAIN_CLIENT = None
+# 1.20 — the cycle journal (journal.py): a line per run, committed and
+# pushed in the application. A test turns it off to see a run without it.
+JOURNAL = True
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
 # `.claude/CLAUDE.md`'s table: upstream cycle, downstream cycle, bug-fix entry,
 # merge, and what is run by hand outside the chain. A command not listed is a tool.
@@ -501,7 +505,9 @@ PHONE_LOCAL_ONLY = {"/api/phone/settings", "/api/phone/disconnect",
                     "/api/machine/repair", "/api/machine/session/answer", "/api/machine/session/code",
                     "/api/machine/session/cancel", "/api/cockpit/restart", "/api/install-mode",
                     # 1.17: Paramètres → Consommation.
-                    "/api/usage/thresholds"}
+                    "/api/usage/thresholds",
+                    # 1.20: the journal is read on the phone, never written from it.
+                    "/api/journal/reconstruct", "/api/journal/report", "/api/journal/thresholds"}
 
 
 def phone_open(path):
@@ -731,6 +737,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if data.get("usage_ok"):
             override_line(f"seuil de blocage passé outre — « Lancer quand même » : {what} dans "
                           f"« {state.name_of(a)} » — {text}")
+            data["_overrode"] = True        # 1.20: said in the run's journal line
             return None
         return web.json_response({"error": f"Seuil de blocage atteint : {text}. Rien n'a été lancé.",
                                   "usage_block": {"windows": blocked, "text": text}}, status=409)
@@ -744,6 +751,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             if remember:
                 remember(run)
         finally:
+            # 1.20: its journal line, committed once the relay is remembered.
+            journal_after(run)
             refresh_later(run.repo, run)
     rn.on_end = on_end
 
@@ -1080,7 +1089,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     async def synced_first(a):
         """§2 — before a launch, an « Enregistrer », an install: pulled when
         « en retard », pushed when « non envoyé », refused when « divergé ».
-        (refusal response or None, the sync's result)."""
+        (refusal response or None, the sync's result). 1.20: the last run's
+        journal line committed first, alone — never swept into the command's
+        « chore: answers », never pushed at once with this."""
+        await journal_settled(a)
         loop = asyncio.get_running_loop()
         res = await loop.run_in_executor(None, sync_mod.before_launch, book, a)
         for d in res["done"]:
@@ -1152,6 +1164,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         out["machine_summary"] = mach.report()["summary"]
         out["machine_at"] = mach.at
         out["install_mode"] = state.install_mode
+        # 1.20: Paramètres → Journal.
+        out["journal_thresholds"] = state.journal_thresholds
         if state.app_folder and os.path.isdir(state.app_folder):
             # The chain installed in the application (§20) — 1.6: also where
             # it is not installed yet, and no feature can open.
@@ -1672,6 +1686,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         except runner_mod.Busy as e:
             b = busy_payload()
             return web.json_response({"error": busy_text(b) if b else str(e), "busy": b}, status=409)
+        if data.get("_overrode"):
+            r.note = journal_mod.OVERRIDE_NOTE
         return web.json_response({"run": r.snapshot(), "sync": synced})
 
     async def launch_checks(a, cmd, args, data):
@@ -1714,6 +1730,259 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if ch.get("state") != chain_mod.UP_TO_DATE and not data.get("chain_ok"):
             return web.json_response({"error": ch["summary"], "chain": ch, "sync": synced}, status=409), synced
         return None, synced
+
+    # ------------------------------------------ journal de cycle (1.20)
+    # The task writing each application's last line: a launch waits for it.
+    journal_tasks = {}
+
+    def programme_name(pid):
+        if not pid:
+            return None
+        p = pilot.p or {}
+        if p.get("id") == pid:
+            return p.get("name") or pid
+        try:
+            for x in (store.programmes(200) if store else []):
+                if x["id"] == pid:
+                    return x.get("name") or pid
+        except Exception:
+            pass
+        return pid
+
+    def journal_write(run, prog_name):
+        """In a worker thread, under the clone's lock: the line, its commit
+        `journal: <command> — <outcome>`, the relays carried onto it, the push."""
+        a, feature = run.repo, run.feature
+        out = {"app": a, "feature": feature, "line": None, "commit": None, "pushed": None, "error": None}
+        sc = scan_of(a, feature)
+        chain, _ = decide_mod.chain_of(sc, run.command)
+        cycle = chain if chain and chain != "main" else "main"
+        lots = None
+        if run.command == "8_code":
+            try:
+                got = codelots.read_lots(a, feature, "" if cycle == "main" else cycle)
+                if got.get("exists"):
+                    lots = (got["passed"], got["total"])
+            except Exception:
+                lots = None
+        with book.lock(a):
+            created = journal_mod.created_files(a, feature, cycle, run.head_before, gitref.head(a))
+            limits = store.limits_of(run.id) if store else []
+            entry = journal_mod.run_entry(run, journal_mod.shares(limits), created, prog_name, lots, run.note)
+            path = journal_mod.journal_path(a, feature, cycle)
+            out["line"] = journal_mod.append(path, entry, feature, cycle)
+            out.update(cycle=cycle, outcome=entry["outcome"])
+            rel = journal_mod.cycle_rel(feature, cycle) + "/" + journal_mod.FILE
+            message = journal_mod.MESSAGE.format(command=run.prompt, outcome=entry["outcome"])
+            try:
+                old, new = journal_mod.commit(a, [rel], message)
+            except sync_mod.SyncError as e:
+                out["error"] = str(e)
+                return out
+            if new:
+                # The relay stays the chain's: its HEAD is now the journal's commit.
+                state.carry_relay_heads(a, old, new)
+                out.update(commit=new[:7], message=message)
+                if sync_mod.git(a, "remote").out.split():
+                    p = sync_mod.push(a)
+                    out.update(pushed=p["ok"], push_error=p["message"] or None)
+                book.put(a, sync_mod.compute(a, fetch=False))
+        return out
+
+    def journal_after(run):
+        if not JOURNAL or not run.id or not run.feature:
+            return
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            return
+        name = programme_name(run.programme)
+
+        async def go():
+            try:
+                out = await loop.run_in_executor(None, journal_write, run, name)
+            except Exception as e:      # said, never raised into the loop
+                print(f"Journal — {state.name_of(run.repo) or run.repo} : ligne non écrite ({e})", flush=True)
+                return
+            if out.get("error"):
+                print(f"Journal — {state.name_of(run.repo) or run.repo} : {out['error']}", flush=True)
+            elif out.get("pushed") is False:
+                sync_said(run.repo, f"journal de {run.prompt}", f"non poussé : {out.get('push_error')}")
+            broadcast("journal", out)
+            st = book.peek(run.repo)
+            if st is not None:
+                announce(run.repo, st)
+        journal_tasks[sync_mod.Book.key(run.repo)] = loop.create_task(go())
+
+    async def journal_settled(a):
+        """Before any launch: the last run's line written and committed; a
+        line left uncommitted — a commit that failed — committed now, alone,
+        and pushed with the launch's own sync."""
+        t = journal_tasks.get(sync_mod.Book.key(a))
+        if t is not None and not t.done():
+            await asyncio.gather(asyncio.shield(t), return_exceptions=True)
+        if not JOURNAL:
+            return
+
+        def go():
+            with book.lock(a):
+                dirty = journal_mod.dirty_journals(a)
+                if not dirty:
+                    return None
+                old, new = journal_mod.commit(a, dirty, journal_mod.PENDING_MESSAGE)
+                state.carry_relay_heads(a, old, new)
+                return new
+        try:
+            new = await asyncio.get_running_loop().run_in_executor(None, go)
+        except sync_mod.SyncError as e:
+            print(f"Journal — {state.name_of(a) or a} : lignes en attente non commitées ({e})", flush=True)
+            return
+        if new:
+            sync_said(a, "avant de lancer", f"commit {new[:7]} « {journal_mod.PENDING_MESSAGE} »")
+
+    def journal_args(request, data=None):
+        a, w = need_pair()
+        feature = feature_of(w)
+        cycle = ((data or {}).get("cycle") or request.query.get("cycle") or "main").strip("/")
+        if cycle not in journal_mod.cycles(a, feature):
+            raise web.HTTPBadRequest(text=json.dumps({"error": "cycle inconnu"}), content_type="application/json")
+        return a, feature, cycle
+
+    def journal_programmes(a, feature):
+        try:
+            rows = store.programmes(200) if store else []
+        except Exception:
+            rows = []
+        k = statsview.app_key(a)
+        return [p for p in rows if statsview.app_key(p.get("app")) == k and p.get("feature") == feature]
+
+    def journal_view(a, feature, cycle):
+        entries = journal_mod.read(journal_mod.journal_path(a, feature, cycle))
+        hist = journal_mod.history(a, feature, cycle)
+        hist.pop("commits", None)
+        progs = journal_programmes(a, feature)
+        est = usage_mod.estimates(store.path, a) if store else {}
+        pts = journal_mod.points(entries, hist, est, state.journal_thresholds, progs)
+        ovr = journal_mod.overrides(rn.log_dir, state.name_of(a), feature)
+        return entries, hist, progs, pts, ovr
+
+    def journal_payload(a, feature, cycle):
+        entries, hist, progs, pts, ovr = journal_view(a, feature, cycle)
+        journal_mod.attach_steps(entries, hist)
+        try:
+            _, dec = where(state, rn, a, feature)
+            final = (dec.get("next") or {}).get("kind") == "done"
+        except Exception:
+            final = False
+        rel = journal_mod.cycle_rel(feature, cycle)
+        return {"feature": feature, "cycle": cycle, "cycles": journal_mod.cycles(a, feature),
+                "file": f"{rel}/{journal_mod.FILE}",
+                "exists": os.path.isfile(journal_mod.journal_path(a, feature, cycle)),
+                "entries": entries, "questions": hist["questions"], "blocking": hist["blocking"],
+                "totals": journal_mod.totals(entries, hist), "by_step": journal_mod.by_step(entries, hist),
+                "points": pts, "programmes": progs, "overrides": ovr, "thresholds": state.journal_thresholds,
+                "final_done": final, "report": f"{rel}/{journal_mod.REPORT}",
+                "report_exists": os.path.isfile(journal_mod.report_path(a, feature, cycle)),
+                "computer": journal_mod.computer_name(), "run_going": rn.is_running(a)}
+
+    async def journal_get(request):
+        a, feature, cycle = journal_args(request)
+        out = await asyncio.get_running_loop().run_in_executor(None, journal_payload, a, feature, cycle)
+        return web.json_response(out)
+
+    def journal_commit(a, paths, message):
+        """The cockpit's commit of journal files alone — the relays carried
+        onto it — and its push. {commit, pushed, push_error}."""
+        with book.lock(a):
+            old, new = journal_mod.commit(a, paths, message)
+            out = {"commit": new[:7] if new else None, "pushed": None, "push_error": None}
+            if new:
+                state.carry_relay_heads(a, old, new)
+                if sync_mod.git(a, "remote").out.split():
+                    p = sync_mod.push(a)
+                    out.update(pushed=p["ok"], push_error=p["message"] or None)
+                book.put(a, sync_mod.compute(a, fetch=False))
+        return out
+
+    async def journal_reconstruct(request):
+        """« Reconstituer le passé »: the lines of the runs before 1.20,
+        shown; written and committed once, on her confirmation."""
+        data = await body(request)
+        a, w = need_pair()
+        feature = feature_of(w)
+        why = sync_busy(a)
+        if why:
+            return web.json_response({"error": why}, status=409)
+        loop = asyncio.get_running_loop()
+        rec = await loop.run_in_executor(None, lambda: journal_mod.reconstruct(
+            a, feature, store.path if store else None, rn.log_dir, state.name_of(a)))
+        n = sum(len(v) for v in rec.values())
+        preview = {cy: [journal_mod.format_row(e) for e in es] for cy, es in rec.items()}
+        if not data.get("confirm") or not n:
+            return web.json_response({"preview": preview, "count": n, "committed": False,
+                                      "header": "| " + " | ".join(journal_mod.COLUMNS) + " |"})
+        refused = await machine_block(machine.SEND, a)
+        if refused:
+            return refused
+
+        def go():
+            paths = []
+            for cy, es in rec.items():
+                path = journal_mod.journal_path(a, feature, cy)
+                journal_mod.rewrite(path, journal_mod.read(path) + es, feature, cy)
+                paths.append(journal_mod.cycle_rel(feature, cy) + "/" + journal_mod.FILE)
+            return journal_commit(a, paths, journal_mod.REBUILD_MESSAGE.format(n=n))
+        try:
+            out = await loop.run_in_executor(None, go)
+        except sync_mod.SyncError as e:
+            return web.json_response({"error": str(e)}, status=409)
+        sync_said(a, "Reconstituer le passé", f"commit {out['commit']} — {n} lignes")
+        if book.peek(a) is not None:
+            announce(a, book.peek(a))
+        return web.json_response({**out, "count": n, "preview": preview, "committed": True})
+
+    async def journal_report(request):
+        """« Rapport de fin de cycle »: shown; `rapport-cycle.md` written and
+        committed on her confirmation only."""
+        data = await body(request)
+        a, feature, cycle = journal_args(request, data)
+        loop = asyncio.get_running_loop()
+
+        def build():
+            entries, hist, progs, pts, ovr = journal_view(a, feature, cycle)
+            return journal_mod.report_md(feature, cycle, entries, hist, pts, progs, ovr)
+        text = await loop.run_in_executor(None, build)
+        rel = journal_mod.cycle_rel(feature, cycle) + "/" + journal_mod.REPORT
+        if not data.get("confirm"):
+            return web.json_response({"preview": text, "path": rel, "committed": False})
+        why = sync_busy(a)
+        if why:
+            return web.json_response({"error": why}, status=409)
+        refused = await machine_block(machine.SEND, a)
+        if refused:
+            return refused
+
+        def go():
+            with open(journal_mod.report_path(a, feature, cycle), "w", encoding="utf-8", newline="\n") as f:
+                f.write(text)
+            return journal_commit(a, [rel], journal_mod.REPORT_MESSAGE)
+        try:
+            out = await loop.run_in_executor(None, go)
+        except (OSError, sync_mod.SyncError) as e:
+            return web.json_response({"error": str(e)}, status=409)
+        sync_said(a, "Rapport de fin de cycle", f"commit {out['commit']}")
+        if book.peek(a) is not None:
+            announce(a, book.peek(a))
+        return web.json_response({**out, "path": rel, "preview": text, "committed": True})
+
+    async def journal_thresholds(request):
+        """Paramètres → Journal: the thresholds of the points à creuser."""
+        data = await body(request)
+        try:
+            th = state.set_journal_thresholds(data.get("thresholds"))
+        except ValueError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        return web.json_response({"thresholds": th})
 
     # ---------------------------------------- pilote automatique (1.18)
     class PilotHost:
@@ -2263,12 +2532,15 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         refused = await usage_gate(data, f"la suite de {old.prompt}" if old and old.id else "la suite", a)
         if refused:
             return refused
+        await journal_settled(a)
         try:
             r = await rn.continue_session(a)
         except runner_mod.NotRunning as e:
             return web.json_response({"error": str(e)}, status=409)
         except runner_mod.Busy as e:
             return web.json_response({"error": str(e)}, status=409)
+        if data.get("_overrode"):
+            r.note = journal_mod.OVERRIDE_NOTE
         return web.json_response({"run": r.snapshot()})
 
     async def stop_next(request):
@@ -2702,6 +2974,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         folder = sync_target(data)
         if not folder:
             return web.json_response({"error": "aucune application"}, status=409)
+        await journal_settled(folder)
         why = sync_busy(folder) or (("une commande tourne : agent-chain se réconcilie après sa fin" if rn.going() else None)
                                      if folder == CHAIN_ROOT else None)
         if why:
@@ -2740,6 +3013,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if refused:
             return refused
         loop = asyncio.get_running_loop()
+        await journal_settled(folder)
         # GitHub first: what the other computer pushed comes in before the commit.
         res = await loop.run_in_executor(None, sync_mod.before_launch, book, folder)
         for d in res["done"]:
@@ -3456,6 +3730,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/permission", permission)
     r.add_get("/api/events", events)
     r.add_get("/api/stats", stats_get)
+    r.add_get("/api/journal", journal_get)
+    r.add_post("/api/journal/reconstruct", journal_reconstruct)
+    r.add_post("/api/journal/report", journal_report)
+    r.add_post("/api/journal/thresholds", journal_thresholds)
     r.add_get("/api/code", code_get)
     r.add_get("/api/code/lot", code_lot)
     r.add_get("/api/stats/csv", stats_csv)

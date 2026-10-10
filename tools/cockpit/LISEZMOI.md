@@ -125,7 +125,7 @@ application ouverte. En haut :
 application. Le menu, sur toute la hauteur à gauche : l'application et sa
 feature en tête ; ses écrans en trois groupes — Pilotage (Tableau de bord,
 À répondre, Chaîne, Correction), Projet (Données, Déploiement), Mesure
-(Statistiques) ; en bas, Paramètres et **« Applications »**, qui ramène à
+(Statistiques, Journal — 1.20) ; en bas, Paramètres et **« Applications »**, qui ramène à
 l'accueil. La barre du haut est un chemin — l'application / sa feature
 (un clic ouvre la liste des features) / l'écran —, puis, à droite, le mode
 et la commande qui tourne. **Une commande
@@ -483,6 +483,72 @@ ce que le compte a utilisé entre-temps, et se lisent au pour cent. Un
 chiffre absent de la base est « inconnu » et n'entre dans aucune somme,
 qui le dit. « Exporter » écrit les runs et les passages des filtres en
 deux fichiers CSV, dans le dossier choisi.
+
+**Journal** (1.20) — le journal de cycle : pour la feature ouverte, et pour
+chacune de ses corrections, ce qui s'est passé étape par étape. Il remplace
+les notes prises à la main.
+
+- **Une ligne par commande**, à la fin de chaque run lancé depuis le
+  cockpit — un clic, une commande d'un programme, « Continuer » —, ajoutée
+  à `docs/features/<feature>/journal.md` (le `bugfix-NN/journal.md` d'une
+  correction) : la date et l'heure, l'ordinateur, la commande, sa durée,
+  son coût (tokens lus et écrits, part de la fenêtre de 5 heures et de la
+  semaine), son issue (fait · questions · blocage · à la main · erreur ·
+  pas connecté · arrêté · sans Next…), ce qu'elle propose ensuite, les
+  fichiers de questions et de blocage qu'elle a créés, son programme, et
+  une note (« lancé quand même », « suite de session », l'erreur). Un
+  tableau markdown, lisible sur GitHub tel quel, que le cockpit relit ; son
+  format est écrit dans `tools/cockpit/journal.py`, nulle part ailleurs.
+  **Aucun agent de la chaîne ne le lit**, et aucun ne le reçoit à lire.
+- **Commité et poussé** : `journal: <commande> — <issue>`, le journal seul,
+  poussé comme les autres commits du cockpit (1.12) — les deux ordinateurs
+  voient tout. Un push qui échoue (hors ligne) part au lancement suivant,
+  avec « non envoyé ».
+- **Le relais reste celui de la chaîne.** Le commit du journal fait bouger
+  HEAD, et la règle G-HEAD écarte un relais quand HEAD a bougé sans run du
+  cockpit. Le cockpit sait ce que son commit a touché : le relais mémorisé
+  sur l'ancien HEAD est reporté sur le commit du journal
+  (`State.carry_relay_heads`) — et seulement lui ; G-HEAD garde tout son
+  sens pour tout autre commit, et `decide.py` ne lance toujours aucune
+  commande git. De même pour la reconstitution et le rapport.
+- **Jamais avalé par `chore: answers`.** Avant tout lancement, tout
+  « Enregistrer », toute installation (là où le cockpit synchronise avec
+  GitHub), la ligne du dernier run est écrite et commitée d'abord ; une
+  ligne restée non commitée (un commit qui a échoué) l'est alors seule,
+  `journal: lignes en attente`. Avalée quand même — une commande lancée
+  hors du cockpit —, elle est sans effet : le relevé, « À répondre » et
+  « Envoyer mes réponses » ne la lisent pas.
+- **Ce que le journal calcule** : à partir des lignes, de l'historique git
+  du dossier et, sur cet ordinateur, des statistiques et des journaux de
+  run — chaque fichier de questions (quand il est arrivé, quand il a été
+  répondu, donc le temps qu'elle a pris ; combien de questions, de quel
+  agent) ; chaque fichier de blocage (arrivé, décidé, réglé — renommé
+  `-NN` —, et par qui quand on peut le dire : l'Arbitre quand la décision
+  est dans le commit d'un agent, le Product Owner quand elle est dans un
+  `chore: answers` ou un `chore: pre-…`, « inconnu » sinon) ; les
+  programmes, leurs arrêts et leurs raisons ; les « Lancer quand même ».
+- **Points à creuser**, en haut de l'écran, chacun avec sa raison : une
+  commande en erreur ou pas connectée ; plusieurs fichiers de blocage du
+  même agent dans le cycle ; un run qui a pris plus de deux fois sa part
+  habituelle de la fenêtre de 5 heures (l'estimation de 1.17) ; la même
+  commande lancée trois fois de suite sans que l'étape proposée bouge ; un
+  programme arrêté sur une erreur. Les seuils : Paramètres → Journal de
+  cycle.
+- **L'écran** : le cycle, les filtres (questions, blocages, erreurs), les
+  totaux, le pas à pas par étape, par étape en tableau, « Son temps »,
+  les programmes. Sur le téléphone : « Plus » → « Journal », en lecture
+  seule.
+- **« Reconstituer le passé »** : les lignes des runs d'avant le journal —
+  d'après les statistiques et les journaux de run de cet ordinateur, et
+  d'après git seul pour le reste (chaque `Merge /<commande>`, et le commit
+  d'un agent qui a créé un fichier de questions ou de blocage ; durée et
+  coût « inconnu ») —, montrées d'abord, écrites et commitées une fois sur
+  confirmation.
+- **« Rapport de fin de cycle »** : sur demande, et proposé sur le tableau
+  de bord quand la dernière étape de la feature est faite —
+  `rapport-cycle.md` dans le dossier du cycle : durée, coût, questions et
+  blocages par étape, où est passé son temps, ce qui a échoué, les points à
+  creuser. Montré d'abord, commité sur confirmation seulement.
 
 **La chaîne de l'application** — les agents, les commandes, les scripts,
 les grilles, les formats et la compétence `technical-state-format`

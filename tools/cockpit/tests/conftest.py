@@ -92,6 +92,9 @@ def _no_sync_at_start(monkeypatch):
     monkeypatch.setattr(server, "SYNC_CHAIN_ON_HOME", False)
     # 1.17: nor is the usage measured — a test turns it on with a fake client.
     monkeypatch.setattr(server, "MEASURE_USAGE", False)
+    # 1.20: nor does a run's end commit its journal line in the application —
+    # the journal's own tests turn it on (test_journal_server.py).
+    monkeypatch.setattr(server, "JOURNAL", False)
 
 
 @pytest.fixture(autouse=True)

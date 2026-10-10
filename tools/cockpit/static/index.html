@@ -825,6 +825,40 @@ details pre { max-height: var(--mh-360); overflow: auto; background: var(--raise
 .notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--sp-20); }
 .notes .row { grid-column: 1 / -1; }
 #sec-quit { border-color: var(--err-line); }
+/* ------------------------------------------------- journal de cycle (1.20) */
+#scr-journal { max-width: var(--w-1240); }
+.jn-points { display: grid; gap: var(--sp-8); }
+.jn-point { display: flex; gap: var(--sp-10); align-items: baseline; background: var(--card); border: var(--bw) solid var(--warn-line);
+  border-left: var(--bw-3) solid var(--warn); border-radius: var(--r-10); padding: var(--sp-10) var(--sp-14); }
+.jn-point.erreur, .jn-point.programme { border-color: var(--err-line); border-left-color: var(--err); }
+.jn-point .badge { flex: none; }
+.jn-none { color: var(--soft); font-size: var(--fs-13); }
+.jn-step { background: var(--card); border: var(--bw) solid var(--line); border-radius: var(--r-10); margin-bottom: var(--sp-10); }
+.jn-step > header { display: flex; gap: var(--sp-10); align-items: baseline; flex-wrap: wrap; padding: var(--sp-10) var(--sp-14);
+  border-bottom: var(--bw) solid var(--line); }
+.jn-step > header b { font-size: var(--fs-15); }
+.jn-step > header .muted { font-size: var(--fs-13); }
+.jn-ev { display: grid; grid-template-columns: var(--w-150) minmax(0, 1fr); gap: var(--sp-12); padding: var(--sp-8) var(--sp-14);
+  border-top: var(--bw) solid var(--line); font-size: var(--fs-13); }
+.jn-ev:first-of-type { border-top: none; }
+.jn-ev time { color: var(--soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.jn-ev .what { display: flex; gap: var(--sp-6); align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.jn-ev .what .mono { overflow-wrap: anywhere; }
+.jn-ev .meta { color: var(--soft); }
+.jn-ev.run.failed { background: var(--err-soft); }
+.badge.ok { background: var(--ok-soft); color: var(--ok); }
+.badge.unk { background: var(--unk-soft); color: var(--unk); }
+.jn-panel { margin-bottom: var(--sp-16); }
+.jn-panel pre { max-height: var(--mh-420); overflow: auto; background: var(--raised); border: var(--bw) solid var(--line);
+  border-radius: var(--r-8); padding: var(--sp-10) var(--sp-12); font: var(--fs-12) var(--mono); white-space: pre; margin: var(--sp-10) 0; }
+.jn-panel .row { display: flex; gap: var(--sp-10); align-items: center; flex-wrap: wrap; }
+.jn-list { margin: 0; padding-left: var(--sp-18); font-size: var(--fs-13); }
+.jn-list li { margin: var(--sp-4) 0; }
+.jn-th { grid-template-columns: minmax(0, 1fr) var(--w-80); }
+@media (max-width: 720px) {
+  .jn-ev { grid-template-columns: minmax(0, 1fr); gap: var(--sp-2); }
+  .jn-panel pre { white-space: pre-wrap; }
+}
 /* ------------------------------------------------- statistiques (1.4.5) */
 #scr-stats { max-width: var(--w-1240); }
 .st-filters { display: flex; gap: var(--sp-10); align-items: center; flex-wrap: wrap; }
@@ -1259,6 +1293,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
   <symbol id="i-data" viewBox="0 0 24 24"><path d="M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6 M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
   <symbol id="i-deploy" viewBox="0 0 24 24"><path d="M12 15V3 M7 8l5-5 5 5 M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></symbol>
   <symbol id="i-stats" viewBox="0 0 24 24"><path d="M4 20V11 M10 20V5 M16 20v-7 M21 20H3"/></symbol>
+  <symbol id="i-journal" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v16H8a2 2 0 0 1-2-2z M6 19a2 2 0 0 1 2-2h11 M10 7h5 M10 11h5"/></symbol>
   <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 6h9 M17 6h3 M4 12h3 M11 12h9 M4 18h11 M19 18h1 M15 4v4 M9 10v4 M17 16v4"/></symbol>
   <symbol id="i-apps" viewBox="0 0 24 24"><path d="M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h6v6h-6z"/></symbol>
   <symbol id="i-sidebar" viewBox="0 0 24 24"><path d="M4 4h16v16H4z M9 4v16"/></symbol>
@@ -1295,6 +1330,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     <a href="#deploy" id="nav-deploy"><svg class="ic" aria-hidden="true"><use href="#i-deploy"/></svg>Déploiement</a>
     <div class="side-group">Mesure</div>
     <a href="#stats" id="nav-stats"><svg class="ic" aria-hidden="true"><use href="#i-stats"/></svg>Statistiques</a>
+    <a href="#journal" id="nav-journal"><svg class="ic" aria-hidden="true"><use href="#i-journal"/></svg>Journal</a>
     <span class="spacer"></span>
     <a href="#settings" id="nav-settings"><svg class="ic" aria-hidden="true"><use href="#i-settings"/></svg>Paramètres</a>
     <button id="tb-home" class="hidden" title="Retour à l'écran d'accueil : toutes les applications"><svg class="ic" aria-hidden="true"><use href="#i-apps"/></svg>Applications</button>
@@ -1684,6 +1720,38 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <button id="st-logs-open" class="small" title="Les runs, les déploiements, server.log et next-ecarte.jsonl">Ouvrir le dossier</button></div>
     </section>
 
+    <!-- ============================ Journal (1.20) ============================ -->
+    <!-- One line per command the cockpit ran, kept in the application's
+         repository (docs/features/<f>/journal.md), with what git says of the
+         questions and blocking files. Read on the phone, written on the computer. -->
+    <section id="scr-journal" class="screen hidden">
+      <div class="flow-head">
+        <h2>Journal de cycle</h2>
+        <span class="grow"></span>
+        <div class="st-filters" role="group" aria-label="Filtres du journal">
+          <label>Cycle <select id="jn-cycle"></select></label>
+          <div class="seg" id="jn-filter" role="group" aria-label="Montrer">
+            <button data-f="tout">Tout</button><button data-f="questions">Questions</button><button data-f="blocages">Blocages</button><button data-f="erreurs">Erreurs</button>
+          </div>
+          <button id="jn-rebuild" class="small desk-only" title="Les lignes des runs d'avant 1.20 : montrées d'abord, commitées sur confirmation">Reconstituer le passé</button>
+          <button id="jn-report" class="small desk-only" title="rapport-cycle.md : montré d'abord, commité sur confirmation">Rapport de fin de cycle</button>
+        </div>
+      </div>
+      <p class="st-note" id="jn-note"></p>
+      <div id="jn-msg" class="notice hidden" role="status"></div>
+      <div id="jn-panel" class="card jn-panel hidden" aria-live="polite"></div>
+      <div class="st-sec" id="jn-points-sec"><h3>Points à creuser</h3><div id="jn-points"></div></div>
+      <div class="st-sec"><h3>En bref</h3><div class="tiles" id="jn-tiles"></div></div>
+      <div class="st-sec"><h3>Pas à pas</h3>
+        <div class="sub">Étape par étape, dans l'ordre où elles ont commencé : chaque commande, chaque fichier de questions et de blocage, quand il est arrivé, quand il a été répondu ou réglé, et par qui.</div>
+        <div id="jn-timeline"></div></div>
+      <div class="st-sec"><h3>Par étape</h3><div id="jn-steps"></div></div>
+      <div class="st-sec"><h3>Son temps</h3>
+        <div class="sub">D'un fichier créé à sa réponse — ou à la décision, pour un blocage réglé par le Product Owner —, d'après les commits.</div>
+        <div class="st-pair"><div><h4>Questions</h4><div id="jn-q"></div></div><div><h4>Fichiers de blocage</h4><div id="jn-b"></div></div></div></div>
+      <div class="st-sec" id="jn-prog-sec"><h3>Pilote automatique et « Lancer quand même »</h3><div id="jn-prog"></div></div>
+    </section>
+
     <!-- ============================ Paramètres ============================ -->
     <!-- 1.9: what belongs to the cockpit itself. The chain's version is under
          « Chaîne → Version », the deploy profile under « Déploiement → Profil ». -->
@@ -1722,6 +1790,22 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <div class="row" style="margin-top:var(--sp-12)"><button id="btn-thresholds" class="primary">Enregistrer</button>
           <span class="muted small">En pourcentage, de 1 à 100. Par défaut : 90 partout.</span>
           <span id="thresholds-msg" class="small" role="status"></span></div>
+      </div>
+      <!-- 1.20: the thresholds of the journal's points à creuser. -->
+      <div class="card sec" id="sec-journal">
+        <h2>Journal de cycle</h2>
+        <p class="lead">Ce qui fait lever un point à creuser dans le Journal. Une commande en erreur, pas connectée, ou un programme arrêté sur une erreur en lèvent toujours un.</p>
+        <div class="th-grid jn-th" id="set-journal">
+          <label for="jt-cost_factor">Coût inhabituel : plus de … fois sa part habituelle de la fenêtre de 5 heures</label>
+          <input type="number" id="jt-cost_factor" min="1.1" max="10" step="0.1" aria-label="Coût inhabituel : facteur">
+          <label for="jt-repeat_runs">Sur place : la même commande lancée … fois de suite sans que l'étape proposée bouge</label>
+          <input type="number" id="jt-repeat_runs" min="2" max="20" step="1" aria-label="Sur place : nombre de fois">
+          <label for="jt-blocking_repeat">Blocages répétés : … fichiers de blocage du même agent dans le cycle</label>
+          <input type="number" id="jt-blocking_repeat" min="2" max="20" step="1" aria-label="Blocages répétés : nombre de fichiers">
+        </div>
+        <div class="row" style="margin-top:var(--sp-12)"><button id="btn-journal-th" class="primary">Enregistrer</button>
+          <span class="muted small">Par défaut : 2 fois, 3 fois, 2 fichiers.</span>
+          <span id="journal-th-msg" class="small" role="status"></span></div>
       </div>
       <div class="card sec phone-keep" id="sec-notes">
         <h2>Notifications</h2>
@@ -2111,7 +2195,7 @@ const STATE_CLASS = {"faite": "st-faite", "t'attend": "st-attend", "en cours": "
 // 1.9: the cockpit opens on the home screen — « accueil » — and never
 // straight on a dashboard. « nouvelle » is the creation form, a page of its
 // own. Every other screen is an open application's, with the side menu.
-const SCREENS = ["dashboard", "answer", "chaine", "correction", "donnees", "deploy", "stats", "settings"];
+const SCREENS = ["dashboard", "answer", "chaine", "correction", "donnees", "deploy", "stats", "journal", "settings"];
 const HOME = ["accueil", "nouvelle"];
 function currentRoute() {
   const h = (location.hash || "").replace("#", "");
@@ -2147,6 +2231,8 @@ function route() {
   if (inApp && r === "answer") hint();
   if (inApp && (r === "chaine" || r === "correction")) placeRun();
   if (inApp && r === "stats" && !PHONE) loadStats();
+  // 1.20: the journal — on the phone too, to read.
+  if (inApp && r === "journal") loadJn();
   // 1.16: « État de l'ordinateur » checked when the screen opens.
   if (inApp && r === "settings" && entering) checkMachine();
   if (inApp && r === "donnees" && entering) enterDonnees();
@@ -3016,7 +3102,7 @@ function watchDiagnostic() {
 // its screens. The home screen has none of them. The run going is said with
 // its application, and « Arrêter » acts on it from any screen (1.6).
 const PAGE_NAMES = {dashboard: "Tableau de bord", answer: "À répondre", chaine: "Chaîne", correction: "Correction",
-  donnees: "Données", deploy: "Déploiement", stats: "Statistiques", settings: "Paramètres"};
+  donnees: "Données", deploy: "Déploiement", stats: "Statistiques", journal: "Journal", settings: "Paramètres"};
 function renderChrome() {
   const home = atHome();
   const isOpen = !!S.open && !home;
@@ -3210,7 +3296,11 @@ function renderDashboard() {
     $("next-text").textContent = "Le dernier relais ne finit pas par une ligne Next:.";
     $("relay-box").classList.remove("hidden"); $("relay-box").open = true;
     if (S.run && S.run.can_continue) detail.append(el("button", {class: "primary big", text: "Continuer la session", onclick: continueSession}));
-  }                            // stop, done, a blocked or unknown step: the text, no button (§9)
+  } else if (n.kind === "done") {
+    // 1.20: the feature's final step done — its end-of-cycle report, proposed.
+    detail.append(el("button", {class: "primary big desk-only", id: "next-report", text: "Rapport de fin de cycle",
+      onclick: () => { jnWantReport = true; go("journal"); }}), ...phoneDesk());
+  }                            // stop, a blocked or unknown step: the text, no button (§9)
   $("next-meta").textContent = S.last ? `Dernier relais : ${S.last.command} — ${S.last.outcome || ""} — ${(S.last.at || "").replace("T", " ")}` : "Aucun relais mémorisé pour cette feature.";
   if (S.last && !running() && n.kind !== "unknown") $("relay-box").classList.remove("hidden");
   $("relay").textContent = S.last ? (S.last.relay || "(relais vide)") : "";
@@ -4675,6 +4765,8 @@ function onEvent(ev) {
     renderPilot(); return;
   }
   if (ev.type === "pilot_push") return;
+  // 1.20: a run's journal line committed — the Journal, when it is shown.
+  if (ev.type === "journal") { if (currentRoute() === "journal" && sameApp(d.app, S.app_folder)) loadJn(); return; }
   // 1.8: a deploy and a crash, whatever the screen.
   if ((ev.type || "").startsWith("deploy_")) { onDeployEvent(ev); return; }
   // 1.6: every run's events arrive; another application's run is not this
@@ -5349,6 +5441,7 @@ function renderSettings() {
   }
   $("mode-note").textContent = "Le mode choisi vaut pour le prochain run ; un run en cours garde le sien. Même en Auto, une demande renvoyée vers toi devient un bandeau.";
   renderThresholds();
+  renderJnThresholds();
 
   renderNotes();
   // 1.15: the phone — its access, its notifications.
@@ -6695,6 +6788,271 @@ function fileBase64(file) {
     r.readAsDataURL(file);
   });
 }
+// ================================================ journal de cycle (1.20)
+// One line per command the cockpit ran, read from the application's
+// repository (journal.md), with what git says of the questions and blocking
+// files. Read on the phone; « Reconstituer le passé » and « Rapport de fin de
+// cycle » are the computer's — each shown first, committed on confirmation only.
+let JN = null, jnToken = 0, jnCycle = "main", jnFilter = "tout", jnWantReport = false;
+async function loadJn() {
+  const tok = ++jnToken;
+  let data;
+  try { data = await api("/api/journal?" + new URLSearchParams({cycle: jnCycle})); }
+  catch (e) { if (tok === jnToken) jnMsg(e.message); return; }
+  if (tok !== jnToken) return;
+  JN = data; jnCycle = data.cycle;
+  renderJn();
+  if (jnWantReport && !PHONE) { jnWantReport = false; jnShowReport(); }
+}
+function jnMsg(text, kind = "warn") {
+  const m = $("jn-msg");
+  m.className = "notice " + kind + (text ? "" : " hidden");
+  m.textContent = text || "";
+}
+const jnCmd = (c) => (c || "").split(" ")[0] || "inconnu";
+const JN_FAILED = ["erreur", "pas connecté"];
+const JN_OUTCOME = {"fait": "ok", "questions": "warn", "blocage": "warn", "questions et blocage": "warn", "sans Next": "warn",
+  "erreur": "err", "pas connecté": "err", "arrêté": "plain", "à la main": "plain", "arrêt de la chaîne": "plain", "inconnu": "unk"};
+const JN_POINT = {"erreur": ["err", "Erreur"], "programme": ["err", "Programme"], "blocage": ["warn", "Blocages répétés"],
+  "coût": ["warn", "Coût inhabituel"], "sur place": ["warn", "Sur place"]};
+const jnBadge = (text, cls) => el("span", {class: "badge " + (cls || "plain"), text});
+const jnWhen = (at) => at ? fmtDate(String(at).replace(" ", "T")) : "—";
+const jnShare = (x) => x === null || x === undefined ? null : `≈ ${frNum(x, 1)} % de 5 h`;
+const jnCycleName = (c) => c === "main" ? "Principal" : `Correction ${c}`;
+const jnByWhom = (b) => b === "Product Owner" ? "le Product Owner" : b === "Arbitre" ? "l'Arbitre" : "on ne sait qui";
+
+function renderJn() {
+  if (!JN) return;
+  const sel = $("jn-cycle");
+  sel.replaceChildren(...JN.cycles.map((c) => el("option", {value: c, text: jnCycleName(c)})));
+  sel.value = JN.cycle;
+  for (const b of $("jn-filter").querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.f === jnFilter));
+  const n = JN.entries.length;
+  $("jn-note").replaceChildren(el("span", {class: "mono", text: JN.file}), " — ",
+    JN.exists ? plural(n, "ligne", "lignes") : "pas encore écrit : la prochaine commande lancée depuis le cockpit l'écrira",
+    ". Écrit et lu par le cockpit seul, commité et poussé : les deux ordinateurs le voient. Aucun agent de la chaîne ne le lit.",
+    PHONE ? " Ici, en lecture seule." : "");
+  const rep = $("jn-report");
+  rep.classList.toggle("primary", !!JN.final_done && !JN.report_exists);
+  rep.textContent = JN.report_exists ? "Rapport de fin de cycle (refaire)" : "Rapport de fin de cycle";
+  rep.disabled = $("jn-rebuild").disabled = !!JN.run_going || undefined;
+  rep.title = JN.run_going ? "Une commande tourne dans cette application : après sa fin" : "rapport-cycle.md : montré d'abord, commité sur confirmation";
+  if (!$("jn-msg").textContent && JN.final_done && !JN.report_exists && !PHONE)
+    jnMsg("La dernière étape de la feature est faite : « Rapport de fin de cycle » écrit son bilan, montré avant d'être commité.", "ok");
+  renderJnPoints(); renderJnTiles(); renderJnTimeline(); renderJnSteps(); renderJnTimes(); renderJnProg();
+}
+
+function renderJnPoints() {
+  const box = $("jn-points"); box.replaceChildren();
+  if (!JN.points.length) { box.append(el("p", {class: "jn-none", text: "Aucun point à creuser pour ce cycle."})); return; }
+  box.append(el("div", {class: "jn-points"}, ...JN.points.map((p) => {
+    const [cls, label] = JN_POINT[p.kind] || ["warn", p.kind];
+    return el("div", {class: "jn-point " + p.kind.replace(" ", "-")}, jnBadge(label, cls), el("span", {text: p.text}));
+  })));
+}
+
+function renderJnTiles() {
+  const t = JN.totals, box = $("jn-tiles"); box.replaceChildren();
+  const dont = (k, one, many) => k ? `dont ${plural(k, one, many)}` : null;
+  box.append(
+    tile("Commandes", String(t.runs), jnCycleName(JN.cycle), t.errors ? `dont ${t.errors} en erreur` : null),
+    tile("Temps des commandes", t.runs ? fmtDurC(t.duration_s) : "—", dont(t.duration_unknown, "durée inconnue", "durées inconnues")),
+    tile("Tokens lus", t.runs ? fmtTok(t.read_tokens) : "—", t.output_tokens !== null ? `${fmtTok(t.output_tokens)} écrits` : null,
+      dont(t.read_unknown, "run inconnu", "runs inconnus")),
+    tile("Fenêtre de 5 h", fmtPct(t.five_hour), `semaine : ${fmtPct(t.seven_day)}`, dont(t.five_hour_unknown, "run sans mesure", "runs sans mesure")),
+    tile("Questions · blocages", `${t.questions} · ${t.blocking}`, `${plural(t.questions_files, "fichier de questions", "fichiers de questions")}`),
+    tile("Son temps de réponse", t.her_seconds === null ? "—" : fmtDur(t.her_seconds),
+      t.her_median_s === null ? "aucune réponse datée" : `médiane ${fmtDur(t.her_median_s)} par fichier`));
+}
+
+function jnEvents() {
+  const out = [];
+  for (const e of JN.entries) out.push({t: e.at, step: jnCmd(e.command), kind: "run", e});
+  for (const q of JN.questions) {
+    out.push({t: q.created_at, step: q.step, kind: "q-new", q});
+    if (q.answered_at) out.push({t: q.answered_at, step: q.step, kind: "q-done", q});
+  }
+  for (const b of JN.blocking) {
+    out.push({t: b.created_at, step: b.step, kind: "b-new", b});
+    if (b.decided_at && b.seen_waiting) out.push({t: b.decided_at, step: b.step, kind: "b-dec", b});
+    if (b.settled_at) out.push({t: b.settled_at, step: b.step, kind: "b-set", b});
+  }
+  const made = (e, blocked) => (e.created || []).some((f) => f.split("/").pop().startsWith("blocked_") === blocked);
+  const keep = {
+    tout: () => true,
+    questions: (x) => x.kind.startsWith("q-") || (x.kind === "run" && made(x.e, false)),
+    blocages: (x) => x.kind.startsWith("b-") || (x.kind === "run" && made(x.e, true)),
+    erreurs: (x) => x.kind === "run" && [...JN_FAILED, "arrêté"].includes(x.e.outcome),
+  }[jnFilter] || (() => true);
+  const norm = (t) => String(t || "").replace(" ", "T");
+  return out.filter(keep).sort((a, b) => norm(a.t).localeCompare(norm(b.t)));
+}
+
+function jnRow(x) {
+  const time = el("time", {text: jnWhen(x.t)});
+  let what, cls = "jn-ev";
+  if (x.kind === "run") {
+    const e = x.e;
+    cls += " run" + (JN_FAILED.includes(e.outcome) ? " failed" : "");
+    const meta = [fmtDurC(e.duration_s), e.read_tokens !== null ? `${fmtTok(e.read_tokens)} lus` : "tokens inconnus",
+      jnShare(e.five_hour), e.computer].filter(Boolean).join(" · ");
+    what = el("div", {class: "what"}, jnBadge(e.outcome, JN_OUTCOME[e.outcome]), el("b", {class: "mono", text: e.command}),
+      el("span", {class: "meta", text: meta}),
+      e.next && e.next !== "inconnu" ? el("span", {class: "meta", text: `ensuite : ${e.next}`}) : null,
+      e.created && e.created.length ? el("span", {class: "meta"}, "a créé ", el("span", {class: "mono", text: e.created.join(", ")})) : null,
+      e.programme ? jnBadge(`programme « ${e.programme} »`, "plain") : null,
+      e.note ? el("span", {class: "meta", text: e.note}) : null);
+  } else if (x.kind === "q-new") {
+    what = el("div", {class: "what"}, jnBadge("questions", "warn"), el("span", {class: "mono", text: x.q.file}),
+      el("span", {class: "meta", text: `arrive — ${x.q.questions === null ? "?" : plural(x.q.questions, "question", "questions")} du ${agentName(x.q.agent)}`}));
+  } else if (x.kind === "q-done") {
+    what = el("div", {class: "what"}, jnBadge("répondu", "ok"), el("span", {class: "mono", text: x.q.file}),
+      el("span", {class: "meta", text: `en ${fmtDur(x.q.seconds)}, par ${jnByWhom(x.q.answered_by)}`}));
+  } else if (x.kind === "b-new") {
+    what = el("div", {class: "what"}, jnBadge("blocage", "warn"), el("span", {class: "mono", text: x.b.file}),
+      el("span", {class: "meta", text: `arrive — ${agentName(x.b.agent)}`}));
+  } else if (x.kind === "b-dec") {
+    what = el("div", {class: "what"}, jnBadge("décidé", "ok"), el("span", {class: "mono", text: x.b.file}),
+      el("span", {class: "meta", text: `par ${jnByWhom(x.b.by)}, en ${fmtDur(x.b.seconds)}`}));
+  } else {
+    const by = x.b.seen_waiting ? "" : ` — décidé dans le run, par ${jnByWhom(x.b.by)}`;
+    what = el("div", {class: "what"}, jnBadge("réglé", "ok"), el("span", {class: "mono", text: x.b.file}),
+      el("span", {class: "meta", text: (x.b.settled_as === "supprimé" ? "supprimé" : `renommé ${String(x.b.settled_as || "").split("/").pop()}`) + by}));
+  }
+  return el("div", {class: cls}, time, what);
+}
+
+function renderJnTimeline() {
+  const box = $("jn-timeline"); box.replaceChildren();
+  const evs = jnEvents();
+  if (!evs.length) {
+    box.append(el("p", {class: "jn-none", text: jnFilter === "tout" ? "Rien encore : ni commande lancée depuis le cockpit, ni fichier de questions ou de blocage dans ce cycle."
+      : "Rien pour ce filtre."}));
+    return;
+  }
+  const order = [], groups = {};
+  for (const x of evs) {
+    if (!groups[x.step]) { groups[x.step] = []; order.push(x.step); }
+    groups[x.step].push(x);
+  }
+  for (const step of order) {
+    const g = groups[step];
+    const runs = g.filter((x) => x.kind === "run");
+    const sum = runs.reduce((a, x) => a + (x.e.duration_s || 0), 0);
+    box.append(el("section", {class: "jn-step", "data-step": step},
+      el("header", {}, el("b", {class: "mono", text: step}),
+        el("span", {class: "muted", text: [runs.length ? plural(runs.length, "run", "runs") : null, sum ? fmtDur(sum) : null,
+          `${jnWhen(g[0].t)} → ${jnWhen(g[g.length - 1].t)}`].filter(Boolean).join(" · ")})),
+      ...g.map(jnRow)));
+  }
+}
+
+function renderJnSteps() {
+  const box = $("jn-steps"); box.replaceChildren();
+  box.append(stTable("jn-steps", [
+    txt("command", "Commande", (r) => r.command, (r) => el("span", {class: "mono", text: r.command})),
+    num("runs", "Runs", (r) => r.runs, (r) => String(r.runs)),
+    num("duration_s", "Durée", (r) => r.runs > r.duration_unknown ? r.duration_s : null,
+      (r) => r.runs > r.duration_unknown ? fmtDur(r.duration_s) : "inconnue"),
+    num("five_hour", "≈ 5 h", (r) => r.runs > r.five_hour_unknown ? r.five_hour : null,
+      (r) => r.runs > r.five_hour_unknown ? fmtPct(r.five_hour) : "inconnu"),
+    txt("questions", "Questions créées", (r) => r.questions.length, (r) => r.questions.join(", ") || "—", "mono"),
+    txt("blocking", "Blocages créés", (r) => r.blocking.length, (r) => r.blocking.join(", ") || "—", "mono"),
+    num("failed", "En erreur", (r) => r.failed, (r) => String(r.failed)),
+  ], JN.by_step, {empty: "Aucune commande dans le journal de ce cycle."}));
+}
+
+function renderJnTimes() {
+  const q = $("jn-q"), b = $("jn-b");
+  q.replaceChildren(stTable("jn-q", [
+    txt("file", "Fichier", (r) => r.file, (r) => el("span", {class: "mono", text: r.file})),
+    txt("step", "Étape", (r) => r.step, (r) => r.step, "mono"),
+    num("questions", "Questions", (r) => r.questions, (r) => r.questions === null ? "?" : String(r.questions)),
+    txt("created_at", "Arrivé", (r) => r.created_at, (r) => jnWhen(r.created_at)),
+    txt("answered_at", "Répondu", (r) => r.answered_at, (r) => r.answered_at ? jnWhen(r.answered_at) : "pas encore"),
+    num("seconds", "Son temps", (r) => r.seconds, (r) => r.seconds === null ? "—" : fmtDur(r.seconds)),
+  ], JN.questions.filter((r) => r.questions !== 0), {empty: "Aucun fichier de questions dans ce cycle."}));
+  b.replaceChildren(stTable("jn-b", [
+    txt("file", "Fichier", (r) => r.file, (r) => el("span", {class: "mono", text: r.file})),
+    txt("agent", "Agent", (r) => r.agent, (r) => agentName(r.agent)),
+    txt("created_at", "Arrivé", (r) => r.created_at, (r) => jnWhen(r.created_at)),
+    txt("by", "Réglé par", (r) => r.by || "", (r) => r.by ? (r.by === "inconnu" ? jnBadge("inconnu", "unk") : r.by) : (r.decided_at ? "—" : "pas encore")),
+    num("seconds", "Temps", (r) => r.seconds, (r) => r.seconds === null ? "—" : fmtDur(r.seconds)),
+  ], JN.blocking, {empty: "Aucun fichier de blocage dans ce cycle."}));
+}
+
+function renderJnProg() {
+  const box = $("jn-prog"); box.replaceChildren();
+  const inLines = {};
+  for (const e of JN.entries) if (e.programme) inLines[e.programme] = (inLines[e.programme] || 0) + 1;
+  const items = [
+    ...JN.programmes.map((p) => el("li", {}, el("b", {text: `« ${p.name || p.id} »`}), ` — ${plural(p.commands || 0, "commande", "commandes")}, arrêté ${jnWhen(p.ended_at)} : ${p.reason || "?"}`)),
+    ...Object.entries(inLines).filter(([name]) => !JN.programmes.some((p) => p.name === name))
+      .map(([name, k]) => el("li", {}, el("b", {text: `« ${name} »`}), ` — ${plural(k, "ligne", "lignes")} au journal (lancé sur l'autre ordinateur, ou avant que celui-ci ne le garde)`)),
+    ...JN.overrides.map((o) => el("li", {}, el("b", {text: "Lancer quand même"}), ` — ${jnWhen(o.at.slice(0, 16))} : ${o.text}`)),
+    ...JN.entries.filter((e) => (e.note || "").includes("lancé quand même") && !JN.overrides.length)
+      .map((e) => el("li", {}, el("b", {text: "Lancer quand même"}), ` — ${jnWhen(e.at)} : ${e.command}`)),
+  ];
+  box.append(items.length ? el("ul", {class: "jn-list"}, ...items) : el("p", {class: "jn-none", text: "Aucun programme, aucun « Lancer quand même » pour cette feature."}));
+}
+
+// « Reconstituer le passé » and « Rapport de fin de cycle »: shown, then committed on confirmation.
+function jnPanel(title, lead, text, confirmLabel, onConfirm) {
+  const p = $("jn-panel"); p.classList.remove("hidden");
+  const ok = el("button", {class: "primary", text: confirmLabel});
+  ok.onclick = async () => { ok.disabled = true; ok.textContent = "Commit en cours…"; await onConfirm(); };
+  p.replaceChildren(el("h3", {text: title}), el("p", {class: "muted small", text: lead}), el("pre", {text}),
+    el("div", {class: "row"}, onConfirm ? ok : null, el("button", {text: onConfirm ? "Annuler" : "Fermer", onclick: () => p.classList.add("hidden")})));
+  p.scrollIntoView({block: "start", behavior: "smooth"});
+}
+function jnCommitted(r, what) {
+  $("jn-panel").classList.add("hidden");
+  jnMsg(`✓ ${what} — commit ${r.commit || "?"}` + (r.pushed ? ", poussé." : r.push_error ? ` — push en échec : ${r.push_error}. Il partira au prochain lancement.` : "."), "ok");
+  loadJn();
+}
+$("jn-rebuild").onclick = async () => {
+  jnMsg("");
+  let r;
+  try { r = await api("/api/journal/reconstruct", {}); } catch (e) { jnMsg(e.message); return; }
+  if (!r.count) { jnMsg("Rien à reconstituer : chaque run d'avant le journal y est déjà, ou git n'en garde aucune trace.", "ok"); $("jn-panel").classList.add("hidden"); return; }
+  const text = [r.header, ...Object.entries(r.preview).flatMap(([cy, rows]) => [`— ${jnCycleName(cy)} —`, ...rows])].join("\n");
+  jnPanel(`Reconstituer le passé — ${plural(r.count, "ligne", "lignes")}`,
+    "Les runs d'avant le journal : ceux de cet ordinateur d'après ses statistiques et ses journaux de run, les autres d'après git seul (durée et coût « inconnu »). Rien n'est écrit avant « Commiter ».",
+    text, `Commiter ces ${r.count} lignes`, async () => {
+      try { jnCommitted(await api("/api/journal/reconstruct", {confirm: true}), `${plural(r.count, "ligne reconstituée", "lignes reconstituées")}`); }
+      catch (e) { jnMsg(e.message); $("jn-panel").classList.add("hidden"); }
+    });
+};
+async function jnShowReport() {
+  jnMsg("");
+  let r;
+  try { r = await api("/api/journal/report", {cycle: jnCycle}); } catch (e) { jnMsg(e.message); return; }
+  jnPanel(`Rapport de fin de cycle — ${r.path}`, "Montré tel qu'il sera écrit. Rien n'est écrit ni commité avant « Enregistrer et commiter ».",
+    r.preview, "Enregistrer et commiter", async () => {
+      try { jnCommitted(await api("/api/journal/report", {cycle: jnCycle, confirm: true}), `${r.path} écrit`); }
+      catch (e) { jnMsg(e.message); $("jn-panel").classList.add("hidden"); }
+    });
+}
+$("jn-report").onclick = jnShowReport;
+$("jn-cycle").onchange = () => { jnCycle = $("jn-cycle").value; $("jn-panel").classList.add("hidden"); jnMsg(""); loadJn(); };
+for (const b of $("jn-filter").querySelectorAll("button")) b.onclick = () => { jnFilter = b.dataset.f; renderJn(); };
+
+// Paramètres → Journal de cycle: the three thresholds.
+function renderJnThresholds() {
+  const th = S.journal_thresholds || {cost_factor: 2, repeat_runs: 3, blocking_repeat: 2};
+  for (const k of ["cost_factor", "repeat_runs", "blocking_repeat"]) {
+    const i = $("jt-" + k);
+    if (i && document.activeElement !== i) i.value = th[k];
+  }
+}
+$("btn-journal-th").onclick = async () => {
+  const t = {}, msg = $("journal-th-msg");
+  for (const k of ["cost_factor", "repeat_runs", "blocking_repeat"]) t[k] = $("jt-" + k).value;
+  try { const r = await api("/api/journal/thresholds", {thresholds: t}); S.journal_thresholds = r.thresholds; renderJnThresholds();
+    msg.className = "small ok"; msg.textContent = "Enregistré."; }
+  catch (e) { msg.className = "small err"; msg.textContent = e.message; }
+};
+
 function fmtSize(n) {
   if (n === null || n === undefined) return "";
   if (n < 1024) return `${n} o`;
@@ -7041,6 +7399,9 @@ function phoneBuild() {
         el("button", {class: "it", id: "phone-feat", type: "button", onclick: (ev) => { ev.stopPropagation(); phoneSheet(false); $("tb-folder").click(); }},
           icon("folder"), el("span", {class: "lbl", text: "Changer de fonctionnalité"}), el("span", {class: "val mono", id: "phone-feat-name"})),
         el("div", {class: "info", id: "phone-state"}),
+        // 1.20: the journal, read on the phone — never written from it.
+        el("a", {class: "it", id: "phone-journal", href: "#journal", onclick: () => phoneSheet(false)},
+          icon("journal"), el("span", {class: "lbl", text: "Journal"}), el("span", {class: "val", text: "lecture seule"})),
         el("div", {class: "sep"}),
         el("div", {class: "kicker", text: "Sur l'ordinateur"}),
         ...DESK_SCREENS.map(([r, label, ic]) => el("a", {class: "it desk", href: "#" + r, id: "phone-desk-" + r, onclick: () => phoneSheet(false)},
@@ -7076,7 +7437,7 @@ function phoneRender() {
   for (const a of nav.querySelectorAll("a")) {
     if (inApp && a.getAttribute("href") === "#" + r) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   }
-  const more = DESK_SCREENS.some(([x]) => x === r) && inApp;
+  const more = (DESK_SCREENS.some(([x]) => x === r) || r === "journal") && inApp;
   if (more) $("phone-more").setAttribute("aria-current", "page"); else $("phone-more").removeAttribute("aria-current");
   const n = S.open ? openCount() : 0, c = $("phone-answer-count");
   c.textContent = n; c.classList.toggle("hidden", !n);

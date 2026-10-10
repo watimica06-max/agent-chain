@@ -304,6 +304,24 @@ class State:
                 self._fresh.discard(_key(app, work))
             self._save()
 
+    def carry_relay_heads(self, app: str, old: str | None, new: str | None):
+        """1.20 — a commit of the cockpit's own that touched the journal
+        alone: each relay of this application recorded on `old` is now on
+        `new`. G-HEAD keeps its meaning for every other commit: the
+        cockpit knows what its commit touched, and decide.py runs no git."""
+        if not old or not new or old == new:
+            return 0
+        n = 0
+        with self._lock:
+            a = self._entry(app)
+            for r in (a or {}).get("relays", {}).values():
+                if r and r.get("head") == old:
+                    r["head"] = new
+                    n += 1
+            if n:
+                self._save()
+        return n
+
     def is_fresh(self, app: str, work: str) -> bool:
         return _key(app, work) in self._fresh
 
@@ -379,6 +397,25 @@ class State:
         clean = usage.clean_thresholds(raw)
         with self._lock:
             self.data["usage_thresholds"] = clean
+            self._save()
+        return clean
+
+    # ------------------------------------------- journal de cycle (1.20)
+
+    @property
+    def journal_thresholds(self):
+        """Paramètres → Journal: the thresholds of the points à creuser."""
+        import journal
+        try:
+            return journal.clean_thresholds(self.data.get("journal_thresholds"))
+        except ValueError:
+            return journal.clean_thresholds(None)
+
+    def set_journal_thresholds(self, raw):
+        import journal
+        clean = journal.clean_thresholds(raw)
+        with self._lock:
+            self.data["journal_thresholds"] = clean
             self._save()
         return clean
 

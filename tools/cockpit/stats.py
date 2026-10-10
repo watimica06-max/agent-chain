@@ -621,6 +621,11 @@ class Store:
             return {r["log_path"]: dict(r) for r in db.execute(q, paths)}
         return self._exec(go)
 
+    def limits_of(self, run_id):
+        """1.20 — one run's measures, for its journal line."""
+        return self._exec(lambda db: [dict(r) for r in db.execute(
+            "SELECT * FROM rate_limits WHERE run_id=? ORDER BY measured_at, id", (run_id,))])
+
     def passes(self, run_id):
         return self._exec(lambda db: [dict(r) for r in db.execute(
             "SELECT * FROM agent_passes WHERE run_id=? ORDER BY id", (run_id,))])

@@ -24,6 +24,7 @@ import uuid
 from dataclasses import asdict, dataclass, field, is_dataclass
 from datetime import datetime
 
+import gitref
 import nextline
 import stats as stats_mod
 import stream as stream_mod
@@ -172,6 +173,10 @@ class Run:
     # the stop.md the cockpit wrote for it — disarmed once the run ended.
     programme: str = ""
     stop_written: str = ""
+    # 1.20: the HEAD it started on — the journal's « Créés » is what git
+    # added since —, and what its journal line notes (« lancé quand même »).
+    head_before: str = ""
+    note: str = ""
 
     @property
     def prompt(self):
@@ -271,6 +276,7 @@ class Runner:
                   started_at=datetime.now().isoformat(timespec="seconds"),
                   resume=resume)
         run.message = message or run.prompt
+        run.head_before = gitref.head(repo) or ""
         # 1.18: a programme's runs are always in « auto », whatever Paramètres says.
         wanted = mode or self.mode_getter()
         run.mode = wanted if wanted in PERMISSION_MODES else "auto"

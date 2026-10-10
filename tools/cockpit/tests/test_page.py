@@ -17,7 +17,7 @@ from test_runner import script_until_interrupted  # noqa: E402
 SCREENS = [("Tableau de bord", "scr-dashboard"), ("À répondre", "scr-answer"),
            ("Chaîne", "scr-chaine"), ("Correction", "scr-correction"), ("Données", "scr-donnees"),
            ("Déploiement", "scr-deploy"),
-           ("Statistiques", "scr-stats"), ("Paramètres", "scr-settings")]
+           ("Statistiques", "scr-stats"), ("Journal", "scr-journal"), ("Paramètres", "scr-settings")]
 
 
 @pytest.fixture
@@ -129,10 +129,10 @@ def test_each_screen_loads_without_js_error(tmp_path, page):
             page.wait_for_selector(f"#{scr}", state="visible")
             assert page.locator("#main section:visible").evaluate_all("els => els.map(e => e.id)") == [scr]
         # Eight entries (1.8: « Déploiement »; 1.9: « Applications » left for the home screen;
-        # 1.10: « Données »), « Paramètres » last in the menu, the count on « À répondre ».
+        # 1.10: « Données »; 1.20: « Journal »), « Paramètres » last in the menu, the count on « À répondre ».
         names = [t.split("\n")[0].strip() for t in page.locator("#side a").all_inner_texts()]
         assert names == ["Tableau de bord", "À répondre", "Chaîne", "Correction", "Données", "Déploiement",
-                         "Statistiques", "Paramètres"]
+                         "Statistiques", "Journal", "Paramètres"]
         assert page.locator("#tb-home").is_visible()
         assert page.locator("#nav-answer-count").inner_text() == "7"
         assert " ".join(page.locator("#tb-mode").inner_text().split()) == "Mode : Auto"
@@ -249,7 +249,8 @@ NEXT_FORMS = [
     ("Fini.\nNext: answer questions, then run /4_grille f", "answer", "Répondre (4)"),
     ("Fini.\nNext: manual installer l'application sur le téléphone", "manual", None),
     ("Fini.\nNext: stop le split n'est pas cohérent", "stop", None),
-    ("Fini.\nNext: done", "done", None),
+    # 1.20: the feature's final step done — its end-of-cycle report proposed.
+    ("Fini.\nNext: done", "done", "Rapport de fin de cycle"),
 ]
 
 
@@ -345,11 +346,13 @@ def test_settings_mode_diagnostic_commands(tmp_path, page):
         # 1.15: « Accès depuis le téléphone » after the notifications.
         # 1.16: « État de l'ordinateur » replaces « Outils sur cet ordinateur », at its place.
         # 1.17: « Consommation » after the mode — its thresholds.
-        assert heads == ["Apparence", "Mode de permission", "Consommation", "Notifications", "Accès depuis le téléphone",
-                         "Dossiers ignorés", "État de l'ordinateur", "Version du cockpit", "Arrêter le cockpit"]
+        # 1.20: « Journal de cycle » after it — the thresholds of the points à creuser.
+        assert heads == ["Apparence", "Mode de permission", "Consommation", "Journal de cycle", "Notifications",
+                         "Accès depuis le téléphone", "Dossiers ignorés", "État de l'ordinateur", "Version du cockpit",
+                         "Arrêter le cockpit"]
         leads = page.locator("#scr-settings .sec > .lead").all_inner_texts()
-        assert len(leads) == 8 and all(t.strip() for t in leads)
-        assert "se répare seul, signale, ou bloque" in leads[5]
+        assert len(leads) == 9 and all(t.strip() for t in leads)
+        assert "se répare seul, signale, ou bloque" in leads[6]
         # « Vérifier maintenant » — the open application's diagnostic with the rest: ✓ / ✗ / non concerné, the
         # Java hint, kept with its date; Java's ✗ on its line, which stops « Bâtir » and the deploy screen.
         page.get_by_role("button", name="Vérifier maintenant").click()
