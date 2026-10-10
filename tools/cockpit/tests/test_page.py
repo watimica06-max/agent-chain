@@ -33,23 +33,30 @@ def page(browser):
 def watch_requests(pg):
     """The page's requests still going, for `settled` — its event stream
     aside, which never ends. A request of a document a navigation replaced
-    never says it ended: once the new document has loaded, those started
-    before its own request are dropped."""
-    pg.going, seq = {}, {"n": 0, "nav": 0}
+    never says it ended — the old document may even start one after the
+    navigation began: once the new document has loaded, those started
+    before it took the frame (the first commit after the navigation's own
+    request; a hash change later commits nothing new) are dropped."""
+    pg.going, seq = {}, {"n": 0, "commit": None}
 
     def start(r):
         seq["n"] += 1
         if r.is_navigation_request() and r.frame == pg.main_frame:
-            seq["nav"] = seq["n"]
+            seq["commit"] = None
         elif "/api/events" not in r.url:
             pg.going[r] = seq["n"]
 
+    def committed(frame):
+        if frame == pg.main_frame and seq["commit"] is None:
+            seq["commit"] = seq["n"]
+
     def new_document(_):
-        for r in [r for r, n in pg.going.items() if n < seq["nav"]]:
+        for r in [r for r, n in pg.going.items() if seq["commit"] is not None and n <= seq["commit"]]:
             del pg.going[r]
     pg.on("request", start)
     pg.on("requestfinished", lambda r: pg.going.pop(r, None))
     pg.on("requestfailed", lambda r: pg.going.pop(r, None))
+    pg.on("framenavigated", committed)
     pg.on("domcontentloaded", new_document)
     return pg
 
