@@ -130,7 +130,8 @@ def update_all(apps, chain_state, install, running, prepare=None):
         except Exception as e:          # said, never hidden, and the next one goes on
             line.update(outcome=FAILED, text=f"{type(e).__name__} : {e}")
             continue
-        line.update(outcome=UPDATED, result=res,
+        # 1.16: a commit GitHub did not get is never said like a success.
+        line.update(outcome=UPDATED, result=res, unpushed=bool(res["app_commit"] and not res["pushed"]),
                     text=(f"chaîne {res['commit']} du {res['date']} — commit {res['app_commit']} « {res.get('message', '')} »"
                           + (", poussé" if res["pushed"] else f", non poussé : {res['push_error']}" if res["push_error"] else ", non poussé")
                           if res["app_commit"] else f"chaîne {res['commit']} du {res['date']} — rien n'avait changé, aucun commit"))

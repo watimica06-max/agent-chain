@@ -13,11 +13,18 @@ import sys
 import webbrowser
 from datetime import datetime
 
-import aiohttp
-from aiohttp import web
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+
+if __name__ == "__main__":
+    # 1.16: the Python dependencies, before anything imports them — installed
+    # when one is missing, in the mode Paramètres sets (deps.py).
+    import deps as _deps  # noqa: E402
+    if not _deps.at_start(next((sys.argv[i + 1] for i, a in enumerate(sys.argv[:-1]) if a == "--config"), None)):
+        sys.exit(1)
+
+import aiohttp  # noqa: E402,F811
+from aiohttp import web  # noqa: E402,F811
 
 import apps as apps_mod  # noqa: E402
 import blocking   # noqa: E402
@@ -31,6 +38,8 @@ import deploy_profile  # noqa: E402
 import diagnostic  # noqa: E402
 import donnees as donnees_mod  # noqa: E402
 import gitref     # noqa: E402
+import installs   # noqa: E402
+import machine    # noqa: E402
 import phone as phone_mod  # noqa: E402
 import questions  # noqa: E402
 import runner as runner_mod  # noqa: E402
@@ -47,9 +56,12 @@ from state import State  # noqa: E402
 
 HOST = "127.0.0.1"
 STATE_KEY = web.AppKey("state", State)
+# 1.16: the port this server serves the page on — what a restart it starts
+# itself takes over.
+PORT_KEY = web.AppKey("port", dict)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.15"
+VERSION = "1.16"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -70,6 +82,9 @@ SYNC_APPS_AT_START = True
 # most every CHAIN_HOME_EVERY seconds; the tests put False here.
 SYNC_CHAIN_ON_HOME = True
 CHAIN_HOME_EVERY = 60.0
+# 1.16 — a chain install while GitHub cannot be reached: refused.
+OFFLINE_INSTALL = ("GitHub injoignable : la chaîne ne s'installe pas tant que GitHub ne répond pas — l'autre "
+                   "ordinateur a peut-être déjà fait ce commit")
 CHAIN_RESTART = ("Nouvelle version du cockpit et de la chaîne récupérée — « Mettre à jour le cockpit » "
                  "la met en service.")
 # 1.14 — « Mettre à jour le cockpit »: how the new server is started — the
@@ -83,6 +98,13 @@ MAX_REQUEST = 256 * 1024 * 1024
 PUSH_TIMEOUT = 15.0
 # What opens the browser; the tests put a fake here.
 OPEN_BROWSER = webbrowser.open
+# 1.16 — « État de l'ordinateur »: checked when the cockpit starts; the
+# server restarts itself, when nothing goes, once the code on disk is newer
+# than the one it runs — looked at every RESTART_POLL seconds. The tests put
+# False here.
+MACHINE_AT_START = True
+AUTO_RESTART = True
+RESTART_POLL = 15.0
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
 # `.claude/CLAUDE.md`'s table: upstream cycle, downstream cycle, bug-fix entry,
 # merge, and what is run by hand outside the chain. A command not listed is a tool.
@@ -462,7 +484,10 @@ def ask_directory(initial, title="Choisir le dossier de l'application"):
 LOCAL_NAMES = phone_mod.LOCAL_NAMES
 # 1.15 — through the phone's address: what is served before the code (the
 # code page itself is "/"), and what only this computer's page may do.
-PHONE_LOCAL_ONLY = {"/api/phone/settings", "/api/phone/disconnect"}
+PHONE_LOCAL_ONLY = {"/api/phone/settings", "/api/phone/disconnect",
+                    # 1.16: a repair of this computer is made on this computer.
+                    "/api/machine/repair", "/api/machine/session/answer", "/api/machine/session/code",
+                    "/api/machine/session/cancel", "/api/cockpit/restart", "/api/install-mode"}
 
 
 def phone_open(path):
@@ -628,6 +653,14 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             pass
     dep = deploy_mod.Deployer(state, rn.log_dir, emit=broadcast)
     app[DEPLOY_KEY] = dep
+    # 1.16 — « État de l'ordinateur »: the last check of each family, the
+    # repair going (a sign-in, an install), and the server's own restart.
+    mach = machine.Machine()
+    inst = installs.Installs(rn.log_dir, emit=lambda snap: broadcast("machine_session", {"session": snap}))
+    restart_box = {"error": "", "tried": None, "wanted": False}
+    pip_box = {"going": False, "error": "", "restart": False}
+    port_box = app[PORT_KEY] = {"port": None}
+    watch_box = {"task": None}
 
     # 1.12 §3: after every run, where the clone stands — a run whose final
     # push GitHub refused says so in its end panel.
@@ -855,10 +888,13 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             rn.unwatch(q)
 
     async def push_cleanup(_app):
-        t = push_box["task"]
-        if t and not t.done():
-            t.cancel()
-            await asyncio.gather(t, return_exceptions=True)
+        for t in (push_box["task"], watch_box["task"]):
+            if t and not t.done():
+                t.cancel()
+                await asyncio.gather(t, return_exceptions=True)
+        s = inst.going()
+        if s:
+            s.cancel()
 
     async def push_test(request):
         """« Essayer », on the phone: one push to this subscription."""
@@ -1011,6 +1047,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         out["chain_root"] = CHAIN_ROOT
         # 1.15: the access from the phone — never its code nor a cookie.
         out["phone"] = ph.public()
+        # 1.16: « État de l'ordinateur » — its summary, for the badge.
+        out["machine_summary"] = mach.report()["summary"]
+        out["machine_at"] = mach.at
+        out["install_mode"] = state.install_mode
         if state.app_folder and os.path.isdir(state.app_folder):
             # The chain installed in the application (§20) — 1.6: also where
             # it is not installed yet, and no feature can open.
@@ -1160,7 +1200,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         # 1.12: one application's fetch never waits for another's.
         rows = await asyncio.gather(*(loop.run_in_executor(None, app_row, x) for x in state.apps()))
         return web.json_response({"apps": list(rows), "busy": busy_payload(), "bulk_going": bulk["going"],
-                                  "report": bulk["report"], "chain_sync": chain_sync})
+                                  "report": bulk["report"], "chain_sync": chain_sync,
+                                  "machine_summary": mach.report()["summary"]})
 
     async def apps_add(request):
         """« Ajouter une application »: the folder picked or pasted joins the
@@ -1305,6 +1346,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if v["resume"]:
             return web.json_response({"error": "la création de ce dossier attend « Reprendre »"}, status=409)
         v.pop("idea_text", None)
+        refused = await machine_block(machine.COMMIT)
+        if refused:
+            return refused
         c = create_mod.Creation(v, save_creation, finish_creation, CHAIN_ROOT)
         state.set_creation(c.record())
         launch_creation(c)
@@ -1462,6 +1506,15 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if dep.going_in(a):
             return web.json_response({"error": "un déploiement construit dans cette application : lancer après sa fin"},
                                      status=409)
+        if inst.going():
+            return web.json_response({"error": f"« {inst.going().title} » est en cours : lancer après sa fin"},
+                                     status=409)
+        # 1.16 §2: what blocks a launch — Claude Code, its login, git's
+        # identity —, checked again now; « Bâtir », Java and the Android tools.
+        refused = await machine_block(machine.LAUNCH, a) or (
+            await machine_block(machine.BATIR, a) if cmd == "batir" else None)
+        if refused:
+            return refused
         # 1.12 §2: GitHub first — what the other computer pushed is pulled
         # before anything reads the files, the chain's version included.
         refused, synced = await synced_first(a)
@@ -1514,9 +1567,17 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": "une commande tourne : pas d'installation maintenant"}, status=409)
         if bulk["going"]:
             return web.json_response({"error": "« Tout mettre à jour » est en cours"}, status=409)
+        refused = await machine_block(machine.CHAIN_INSTALL, a)
+        if refused:
+            return refused
         refused, synced = await synced_first(a)
         if refused:
             return refused
+        # 1.16: never while GitHub cannot be reached — how the duplicate of
+        # 9 October happened.
+        if (synced.get("sync") or {}).get("state") == sync_mod.OFFLINE:
+            return web.json_response({"error": OFFLINE_INSTALL + " — " + synced["sync"]["summary"],
+                                      "sync": synced["sync"]}, status=409)
         loop = asyncio.get_running_loop()
         try:
             res = await loop.run_in_executor(None, lambda: chain_mod.install(
@@ -1543,15 +1604,21 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         and said. One line per application."""
         if bulk["going"]:
             return web.json_response({"error": "« Tout mettre à jour » est déjà en cours"}, status=409)
+        refused = await machine_block(machine.CHAIN_INSTALL)
+        if refused:
+            return refused
         bulk["going"] = True
         loop = asyncio.get_running_loop()
 
         def prepare(folder):
-            """1.12 §2, in each application before its install."""
+            """1.12 §2, in each application before its install. 1.16: GitHub
+            unreachable, nothing installed there."""
             res = sync_mod.before_launch(book, folder)
             for d in res["done"]:
                 sync_said(folder, "avant d'installer", d)
             announce(folder, res["sync"])
+            if res["ok"] and (res.get("sync") or {}).get("state") == sync_mod.OFFLINE:
+                return OFFLINE_INSTALL
             return None if res["ok"] else res["error"]
         try:
             lines = await loop.run_in_executor(None, lambda: apps_mod.update_all(
@@ -1634,8 +1701,20 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         push_box["task"] = loop.create_task(push_watch())
         # 1.12: GitHub, when the cockpit opens — agent-chain's clone, then
         # every application, in the background.
-        if SYNC_CHAIN_AT_START:
-            loop.run_in_executor(None, sync_chain)
+        chain_done = loop.run_in_executor(None, sync_chain) if SYNC_CHAIN_AT_START else None
+        # 1.16: « État de l'ordinateur », once agent-chain's state is known;
+        # and the restart, when the code on disk gets newer.
+        if MACHINE_AT_START:
+            async def first_check():
+                if chain_done is not None:
+                    await asyncio.gather(chain_done, return_exceptions=True)
+                try:
+                    await machine_full()
+                except Exception as e:
+                    print(f"État de l'ordinateur : vérification au démarrage non aboutie ({e})", flush=True)
+            loop.create_task(first_check())
+        if AUTO_RESTART:
+            watch_box["task"] = loop.create_task(restart_watch())
         if SYNC_APPS_AT_START:
             for x in state.apps():
                 refresh_later(x["folder"])
@@ -1903,6 +1982,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         refused = run_refusal(a, "le build ferait la course avec son merge : déployer après sa fin")
         if refused:
             return refused
+        refused = await machine_block(machine.DEPLOY, a)
+        if refused:
+            return refused
         choice = data.get("choice") if isinstance(data.get("choice"), dict) else {}
         state.set_deploy_choice(a, choice)
         loop = asyncio.get_running_loop()
@@ -1972,6 +2054,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         if dep.going_in(a):
             return web.json_response({"error": "un déploiement est en cours dans cette application : "
                                                "le profil s'enregistre après sa fin"}, status=409)
+        refused = await machine_block(machine.COMMIT, a)
+        if refused:
+            return refused
         targets = data.get("targets")
         if not isinstance(targets, list):
             return web.json_response({"error": "liste de cibles attendue"}, status=400)
@@ -2074,6 +2159,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         entries, removed = data.get("entries"), data.get("removed") or []
         if not isinstance(entries, list) or not isinstance(removed, list):
             return web.json_response({"error": "entrées attendues"}, status=400)
+        refused = await machine_block(machine.COMMIT, a)
+        if refused:
+            return refused
         refused, _ = await synced_first(a)
         if refused:
             return refused
@@ -2185,6 +2273,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         why = sync_busy(folder)
         if why:
             return web.json_response({"error": why}, status=409)
+        refused = await machine_block(machine.PUSH)
+        if refused:
+            return refused
         loop = asyncio.get_running_loop()
 
         def go():
@@ -2239,6 +2330,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         why = sync_busy(folder)
         if why:
             return web.json_response({"error": why}, status=409)
+        refused = await machine_block(machine.SEND, folder)
+        if refused:
+            return refused
         loop = asyncio.get_running_loop()
         # GitHub first: what the other computer pushed comes in before the commit.
         res = await loop.run_in_executor(None, sync_mod.before_launch, book, folder)
@@ -2366,6 +2460,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return f"une création est en cours ({making['current'].path}) : le cockpit se met à jour après sa fin"
         if updating["going"]:
             return "la mise à jour du cockpit est déjà en cours"
+        if inst.going():
+            return f"« {inst.going().title} » est en cours : le cockpit se met à jour après sa fin"
         return None
 
     async def cockpit_get(request):
@@ -2397,6 +2493,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         why = update_busy()
         if why:
             return web.json_response({"error": why, "busy": True, "cockpit": cockpit_status()}, status=409)
+        data = await body(request) if request.can_read_body else {}
         updating.update(going=True, error="")
         loop = asyncio.get_running_loop()
         sock = request.transport.get_extra_info("sockname") if request.transport else None
@@ -2426,39 +2523,411 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             # The new code is on disk; this server still runs the old one.
             chain_sync.update(notice="", error="")
             if await loop.run_in_executor(None, selfupdate.requirements_changed, CHAIN_ROOT, started, head):
-                r = await loop.run_in_executor(None, selfupdate.pip_install, CHAIN_ROOT)
-                print(f"Mettre à jour le cockpit — {' '.join(r['command'])} : {'fait' if r['ok'] else r['message']}",
-                      flush=True)
-                if not r["ok"]:
-                    return refuse(r["message"], step="pip")
-                steps.append("pip install --user -r tools/cockpit/requirements.txt — fait")
+                # 1.16: an install the cockpit drives — the page asks « Rapide »
+                # or « Pas à pas » first (`asked`), unless Paramètres says.
+                mode = None
+                if data.get("asked"):
+                    mode = data.get("mode") if data.get("mode") in installs.MODES else resolve_mode({})
+                    if mode is None:
+                        updating.update(going=False, error="")
+                        d = await loop.run_in_executor(None, installs.describe_pip)
+                        return web.json_response({"error": "Rapide ou Pas à pas ?", "ask": True, "describe": d,
+                                                  "steps": steps, "cockpit": cockpit_status()}, status=409)
+                if mode == installs.PAS_A_PAS:
+                    sess = start_pip(installs.PAS_A_PAS)
+                    while sess.status != "ended":
+                        await asyncio.sleep(0.3)
+                    if sess.outcome not in ("installé", "rien à installer"):
+                        return refuse(sess.message or sess.outcome, step="pip")
+                    steps.append("pip, pas à pas — " + (", ".join(sess.installed) or sess.outcome)
+                                 + " ; licences acceptées : " + (", ".join(l["name"] for l in sess.licences) or "aucune"))
+                else:
+                    if mode == installs.RAPIDE:
+                        plan = await loop.run_in_executor(None, installs.describe_pip)
+                        if plan.get("what"):
+                            steps.append("Rapide — installe : " + ", ".join(plan["what"]) + " — licences acceptées : "
+                                         + ", ".join(plan["licences"]))
+                    r = await loop.run_in_executor(None, selfupdate.pip_install, CHAIN_ROOT)
+                    print(f"Mettre à jour le cockpit — {' '.join(r['command'])} : {'fait' if r['ok'] else r['message']}",
+                          flush=True)
+                    if not r["ok"]:
+                        return refuse(r["message"], step="pip")
+                    steps.append("pip install --user -r tools/cockpit/requirements.txt — fait")
             if not port:
                 return refuse("le port de ce serveur est inconnu : redémarrer le cockpit à la main")
-            # The restart: the new server on a trial port first.
-            updating["restarting"] = True
-            announce(CHAIN_ROOT, book.peek(CHAIN_ROOT))
-            trial = selfupdate.free_port(HOST)
-            try:
-                proc = SPAWN_SERVER(port, trial, list(LAUNCH_ARGS), rn.log_dir)
-            except OSError as e:
-                return refuse(f"le nouveau serveur n'a pas pu démarrer : {e}", step="restart")
-            print(f"Mettre à jour le cockpit — nouveau serveur lancé (pid {getattr(proc, 'pid', '?')}), "
-                  f"port d'essai {trial}.", flush=True)
-            t0 = loop.time()
-            got = await loop.run_in_executor(None, selfupdate.wait_answer, proc, trial, os.getpid(),
-                                             selfupdate.RESTART_WAIT)
-            if not got:
-                await loop.run_in_executor(None, selfupdate.give_up, proc)
-                return refuse(selfupdate.why_not(proc, loop.time() - t0, rn.log_dir, trial), step="restart")
+            ok, got = await restart_server(port, "Mettre à jour le cockpit")
+            if not ok:
+                return refuse(got, step="restart")
             steps.append(f"nouveau serveur prêt — cockpit {got.get('version')}, pid {got.get('pid')}")
-            print(f"Mettre à jour le cockpit — le nouveau serveur répond (pid {got.get('pid')}) : "
-                  "celui-ci s'arrête et lui laisse le port.", flush=True)
-            if on_quit:
-                loop.call_later(0.3, on_quit)
             return web.json_response({"ok": True, "restarting": True, "steps": steps, "old_pid": os.getpid(),
                                       "new_pid": got.get("pid"), "version": got.get("version")})
         except Exception as e:
             return refuse(f"mise à jour interrompue : {e}")
+
+    async def restart_server(port, why, env=None):
+        """1.14's restart: a new server on a trial port first; once it
+        answers there, this one exits and lets it take the port. (True, its
+        ping) or (False, why not) — then this one keeps running. 1.16: with
+        `env`, the new server gets that environment — PATH as Windows has it
+        now, after an install."""
+        loop = asyncio.get_running_loop()
+        updating["restarting"] = True
+        announce(CHAIN_ROOT, book.peek(CHAIN_ROOT))
+        trial = selfupdate.free_port(HOST)
+        try:
+            proc = SPAWN_SERVER(port, trial, list(LAUNCH_ARGS), rn.log_dir, **({"env": env} if env else {}))
+        except OSError as e:
+            updating["restarting"] = False
+            return False, f"le nouveau serveur n'a pas pu démarrer : {e}"
+        print(f"{why} — nouveau serveur lancé (pid {getattr(proc, 'pid', '?')}), port d'essai {trial}.", flush=True)
+        t0 = loop.time()
+        got = await loop.run_in_executor(None, selfupdate.wait_answer, proc, trial, os.getpid(),
+                                         selfupdate.RESTART_WAIT)
+        if not got:
+            await loop.run_in_executor(None, selfupdate.give_up, proc)
+            updating["restarting"] = False
+            return False, selfupdate.why_not(proc, loop.time() - t0, rn.log_dir, trial)
+        # The new server answers: every page waits for it, then reloads.
+        broadcast("cockpit_restarting", {"why": why, "pid": os.getpid(), "version": got.get("version")})
+        print(f"{why} — le nouveau serveur répond (pid {got.get('pid')}) : celui-ci s'arrête et lui laisse le port.",
+              flush=True)
+        if on_quit:
+            loop.call_later(0.3, on_quit)
+        return True, got
+
+    def restart_busy():
+        """Why the server may not restart now: a run, an install, a deploy,
+        a creation, an update — or a repair of this computer going."""
+        why = update_busy()
+        return why.replace("le cockpit se met à jour après sa fin", "le cockpit redémarre après sa fin") if why else None
+
+    async def cockpit_restart(request):
+        """« Redémarrer le cockpit » (1.16), and lancer.bat when the server
+        that answers is older than the code on disk: 1.14's restart, without
+        pulling anything."""
+        why = restart_busy()
+        if why:
+            return web.json_response({"error": why, "busy": True}, status=409)
+        sock = request.transport.get_extra_info("sockname") if request.transport else None
+        port = port_box["port"] or (sock[1] if sock else None)
+        if not port:
+            return web.json_response({"error": "le port de ce serveur est inconnu"}, status=409)
+        ok, got = await restart_server(port, "Redémarrer le cockpit", env=installs.fresh_env())
+        if not ok:
+            restart_box["error"] = got
+            await machine_refresh(["cockpit"])
+            return web.json_response({"error": got}, status=409)
+        return web.json_response({"ok": True, "restarting": True, "old_pid": os.getpid(), "new_pid": got.get("pid"),
+                                  "version": got.get("version")})
+
+    # ------------------------------------------- « État de l'ordinateur » (1.16)
+    def machine_ctx(heavy=True):
+        """What the checks are given: what this server already knows. Light
+        (`heavy` False) before an action: no family it checks reads each
+        application's chain or build report."""
+        apps = []
+        for x in state.apps():
+            f = x["folder"]
+            row = {"name": x["name"], "folder": f, "sync": book.peek(f), "chain": None, "build": None,
+                   "conventions": None}
+            if heavy and os.path.isdir(f):
+                try:
+                    row["chain"] = chain_state(f)
+                except Exception as e:
+                    row["chain"] = {"state": None, "summary": f"état de la chaîne inconnu — {e}"}
+                try:
+                    row["build"] = scan_mod.batir_report(f)
+                    row["conventions"] = conventions_commit(f)
+                except Exception:
+                    pass
+            apps.append(row)
+        x = rn.going()
+        why = restart_busy()
+        return {"chain_root": CHAIN_ROOT, "started": started, "head": gitref.head(CHAIN_ROOT), "apps": apps,
+                "chain_sync": chain_sync.get("sync") or book.peek(CHAIN_ROOT), "diagnostic": state.diagnostic(),
+                "app_name": state.app_name, "restart": restart_box, "pip": pip_box,
+                "busy": f"la fin de {x.prompt}" if x else ("la fin de ce qui est en cours" if why else None)}
+
+    def machine_payload():
+        return {"machine": mach.report(), "session": inst.public(), "install_mode": state.install_mode}
+
+    told_machine = {"sig": None}
+
+    def machine_told():
+        """To every page — when what needs her changed: the badge's
+        summary, the items that block or need her. All in order from the
+        start, nothing is said: the page reads it when it opens."""
+        p = machine_payload()
+        sm = p["machine"]["summary"]
+        sig = (sm["level"], tuple((x["id"], x["status"], x["detail"]) for x in p["machine"]["items"]
+                                  if x["status"] in machine.NEEDS))
+        before, told_machine["sig"] = told_machine["sig"], sig
+        if sig == before or (before is None and sm["level"] == "ok"):
+            return
+        broadcast("machine", p)
+
+    async def machine_full():
+        loop = asyncio.get_running_loop()
+        ctx = await loop.run_in_executor(None, machine_ctx)
+        await loop.run_in_executor(None, mach.full, ctx)
+        machine_told()
+        await machine_after()
+        return mach.report()
+
+    async def machine_refresh(families):
+        loop = asyncio.get_running_loop()
+        ctx = await loop.run_in_executor(None, machine_ctx, "apps" in families)
+        await loop.run_in_executor(None, mach.refresh, families, ctx)
+        machine_told()
+
+    async def machine_block(action, app_folder=None):
+        """§2 — before an action, what blocks it, checked again: None, or the
+        refusal, with what to repair."""
+        loop = asyncio.get_running_loop()
+        ctx = await loop.run_in_executor(None, machine_ctx, False)
+        blockers = await loop.run_in_executor(None, mach.before, action, ctx, app_folder)
+        machine_told()
+        if not blockers:
+            return None
+        print(f"État de l'ordinateur — {machine.ACTION_TEXT.get(action, action)} refusé : "
+              + "; ".join(f"{b['label']} ({b['detail']})" for b in blockers), flush=True)
+        return web.json_response(machine.refusal(blockers), status=409)
+
+    async def machine_after():
+        """What a check finds that fixes itself: the Python dependencies,
+        installed when Paramètres says « Rapide »; the restart, when the
+        code on disk is newer."""
+        miss = next((x for x in mach.items() if x["id"] == "python" and x["status"] == machine.WARN), None)
+        if (miss and state.install_mode == installs.RAPIDE and not inst.going() and not pip_box["going"]
+                and not pip_box["error"]):
+            start_pip(installs.RAPIDE)
+        await maybe_restart()
+
+    def from_thread(coro_fn):
+        """A coroutine of this server's loop, from a session's thread."""
+        loop = loop_box["loop"]
+        if loop is not None:
+            asyncio.run_coroutine_threadsafe(coro_fn(), loop)
+
+    def after_session(sess):
+        if sess.kind == "pip":
+            pip_box.update(going=False, error="" if sess.outcome in ("installé", "rien à installer") else sess.message,
+                           restart=bool(sess.restart))
+        if sess.restart:
+            restart_box["wanted"] = True
+        from_thread(machine_full)
+
+    def start_pip(mode):
+        pip_box.update(going=True, error="")
+        return inst.start("pip", "Dépendances Python", installs.pip_install(mode), mode=mode, after=after_session)
+
+    async def maybe_restart():
+        """1.16 — the rule « fixes itself when idle »: the server older than
+        the code on disk (agent-chain moved on), or an install that asked
+        for it (PATH, the dependencies), and nothing going — restarted, once
+        per reason."""
+        if not AUTO_RESTART:
+            return
+        head = gitref.head(CHAIN_ROOT)
+        older = bool(head and started and head != started)
+        if not (older or restart_box["wanted"]) or updating["restarting"] or restart_busy():
+            return
+        token = (head, restart_box["wanted"])
+        port = port_box["port"]
+        if restart_box["tried"] == token or not port:
+            return
+        restart_box["tried"] = token
+        ok, got = await restart_server(port, "Redémarrage de lui-même — " + (
+            "le code sur le disque est plus récent" if older else "une installation l'a demandé"),
+            env=installs.fresh_env())
+        if not ok:
+            restart_box["error"] = got
+            await machine_refresh(["cockpit"])
+
+    async def restart_watch():
+        while True:
+            await asyncio.sleep(RESTART_POLL)
+            try:
+                await maybe_restart()
+            except Exception as e:      # said, never raised into the loop
+                print(f"Redémarrage de lui-même non abouti : {e}", flush=True)
+
+    async def machine_get(request):
+        return web.json_response(machine_payload())
+
+    async def machine_check(request):
+        """When the screen opens, and « Vérifier maintenant »: every family —
+        the button (`diagnostic`) runs the open application's diagnostic
+        with them; the screen opening keeps the one stored."""
+        data = await body(request)
+        a = state.app_folder
+        if data.get("diagnostic") and a and os.path.isdir(a) and not diag_running(a):
+            try:
+                await diagnose(a)
+            except Exception as e:
+                print(f"Diagnostic non abouti ({a}) : {e}", flush=True)
+        await machine_full()
+        return web.json_response(machine_payload())
+
+    def resolve_mode(data):
+        m = data.get("mode") or state.install_mode
+        return m if m in installs.MODES else None
+
+    async def machine_describe(request):
+        """What an install would do — shown before its question: what it
+        installs, the licences « Rapide » would accept, what no mode skips."""
+        data = await body(request)
+        kind = data.get("kind")
+        loop = asyncio.get_running_loop()
+        if kind == "pip":
+            d = await loop.run_in_executor(None, installs.describe_pip)
+        elif kind == "claude_code":
+            cli, _ = machine.SDK_CLI()
+            d = {"what": ["Claude Code — " + ("claude update" if cli else "l'installateur officiel d'Anthropic")],
+                 "licences": [], "unskippable": [installs.BROWSER_SIGNIN + " ensuite, si Claude Code n'est pas connecté"]}
+        elif kind == "tool":
+            d = installs.describe_tool(data.get("tool"))
+        else:
+            return web.json_response({"error": f"rien à décrire : {kind}"}, status=400)
+        if d.get("error"):
+            return web.json_response(d, status=409)
+        return web.json_response({**d, "kind": kind, "tool": data.get("tool"), "install_mode": state.install_mode})
+
+    def repair_busy():
+        x = rn.going()
+        if x:
+            return f"une commande tourne : {x.prompt} — après sa fin"
+        if inst.going():
+            return f"« {inst.going().title} » est en cours"
+        if updating["going"] or updating["restarting"]:
+            return "le cockpit se met à jour"
+        return None
+
+    def tool_verify(tool):
+        def verify():
+            ctx = machine_ctx(False)
+            fam = ["identity", "github"] if tool == "git" else ["android"]
+            mach.refresh(fam, ctx)
+            want = {"git", "gcm"} if tool == "git" else {"android_sdk", "sdkmanager"} if tool == "android_sdk" else {tool}
+            hit = [x for x in mach.items() if x["id"] in want]
+            bad = [x for x in hit if x["status"] not in (machine.OK, machine.FIXED)]
+            return (bool(hit) and not bad), ("; ".join(f"{x['label']} : {x['detail']}" for x in hit) or "rien à vérifier")
+        return verify
+
+    async def machine_repair(request):
+        """One click, one repair (§3)."""
+        data = await body(request)
+        rid = data.get("id")
+        args = data.get("args") or {}
+        loop = asyncio.get_running_loop()
+        if rid == "longpaths":
+            folder = args.get("folder") or ""
+            known = [x["folder"] for x in state.apps()] + [CHAIN_ROOT]
+            if not any(machine.key(folder) == machine.key(k) for k in known):
+                return web.json_response({"error": "ce dossier n'est pas dans la liste"}, status=400)
+            try:
+                await loop.run_in_executor(None, sync_mod.set_long_paths, folder)
+            except sync_mod.SyncError as e:
+                return web.json_response({"error": str(e)}, status=409)
+            await machine_refresh(["longpaths"])
+            return web.json_response({"ok": True, **machine_payload()})
+        if rid == "identity":
+            name, mail = (args.get("name") or "").strip(), (args.get("email") or "").strip()
+            if not name or not mail or "@" not in mail or "\n" in name + mail:
+                return web.json_response({"error": "un nom et une adresse e-mail"}, status=400)
+            for k, v in (("user.name", name), ("user.email", mail)):
+                r = await loop.run_in_executor(None, lambda k=k, v=v: sync_mod.git(CHAIN_ROOT, "config", "--global", k, v))
+                if not r.ok:
+                    return web.json_response({"error": f"git config --global {k} : {r.text}"}, status=409)
+            print(f"État de l'ordinateur — identité git réglée : {name} <{mail}>", flush=True)
+            await machine_refresh(["identity"])
+            return web.json_response({"ok": True, **machine_payload()})
+        if rid == "restart":
+            return await cockpit_restart(request)
+        busy = repair_busy()
+        if busy:
+            return web.json_response({"error": f"Pas maintenant : {busy}.", "busy": True}, status=409)
+        cli, _ = machine.SDK_CLI()
+        if rid == "claude_login":
+            if not cli:
+                return web.json_response({"error": "Claude Code d'abord : il n'est pas sur cet ordinateur"}, status=409)
+
+            def verify():
+                c, t, _ = machine._try([cli, "auth", "status"], env=machine.claude_env())
+                return c == 0, ("connecté" if c == 0 else f"pas connecté (claude auth status : code {c})")
+            inst.start("claude_login", "Se connecter à Claude",
+                       installs.claude_login(cli, machine.claude_env(), verify), after=after_session)
+            return web.json_response({"ok": True, **machine_payload()})
+        if rid == "github_login":
+            def verify():
+                c, t, _ = machine.git_run(CHAIN_ROOT, "push", "--dry-run", "--porcelain", timeout=machine.PUSH_TIMEOUT)
+                ok = c == 0 or bool(sync_mod._REJECTED.search(t or ""))
+                return ok, ("GitHub accepte les identifiants de cet ordinateur" if ok else sync_mod.explain(t))
+            inst.start("github_login", "Se connecter à GitHub", installs.github_login(verify), after=after_session)
+            return web.json_response({"ok": True, **machine_payload()})
+        if rid not in ("pip", "claude_code", "tool"):
+            return web.json_response({"error": f"réparation inconnue : {rid}"}, status=400)
+        tool = args.get("tool")
+        if rid == "tool":
+            if tool not in installs.TOOLS:
+                return web.json_response({"error": f"outil inconnu : {tool}"}, status=400)
+            # Order enforced: no Claude login, no Claude install.
+            refused = await machine_block(machine.TOOL_INSTALL)
+            if refused:
+                return refused
+        mode = resolve_mode(data)
+        if mode is None:
+            return web.json_response({"error": "Rapide ou Pas à pas ?", "ask": True}, status=409)
+        if rid == "pip":
+            start_pip(mode)
+        elif rid == "claude_code":
+            def verify():
+                c2, _m = machine.SDK_CLI()
+                if not c2:
+                    return False, "Claude Code reste introuvable"
+                c, t, _ = machine._try([c2, "--version"])
+                return c == 0, (machine.first_line(t) if c == 0 else f"{c2} ne répond pas")
+            inst.start("claude_code", "Claude Code", installs.claude_code(mode, cli, verify), mode=mode,
+                       after=after_session)
+        else:
+            t = installs.TOOLS[tool]
+            stamp = datetime.now().strftime("%Y-%m-%d-%H%M%S")
+            work = os.path.join(rn.log_dir, "installations", tool)
+            log = os.path.join(rn.log_dir, f"{stamp}-installer-{tool}.jsonl")
+            inst.start("tool", f"Installer {t['label']}", installs.with_claude(tool, mode, work, log, tool_verify(tool)),
+                       mode=mode, target=tool, after=after_session)
+        return web.json_response({"ok": True, **machine_payload()})
+
+    async def session_answer(request):
+        data = await body(request)
+        s = inst.going()
+        if not s or not s.answer(data.get("card"), bool(data.get("accept"))):
+            return web.json_response({"error": "cette carte n'attend plus"}, status=409)
+        return web.json_response({"ok": True})
+
+    async def session_code(request):
+        data = await body(request)
+        s = inst.going()
+        code = (data.get("code") or "").strip()
+        if not s or s.kind != "claude_login" or not code or "\n" in code:
+            return web.json_response({"error": "aucune connexion n'attend de code"}, status=409)
+        ok = await asyncio.get_running_loop().run_in_executor(None, installs.send_code, s, code)
+        return web.json_response({"ok": ok}, status=200 if ok else 409)
+
+    async def session_cancel(request):
+        s = inst.going()
+        if not s:
+            return web.json_response({"error": "rien n'est en cours"}, status=409)
+        s.cancel()
+        return web.json_response({"ok": True})
+
+    async def install_mode_set(request):
+        data = await body(request)
+        try:
+            state.set_install_mode(data.get("mode"))
+        except ValueError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        return web.json_response({"install_mode": state.install_mode})
 
     async def reveal_log(request):
         """1.9.1: a log's path is a link — its folder opens on this computer,
@@ -2488,7 +2957,7 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     async def ping(request):
         """What a second start asks before starting a server of its own."""
-        return web.json_response({"cockpit": True, "version": VERSION, "pid": os.getpid(),
+        return web.json_response({"cockpit": True, "version": VERSION, "pid": os.getpid(), "started": started,
                                   "restarting": updating["restarting"], "error": updating["error"]})
 
     async def shutdown(request):
@@ -2599,6 +3068,15 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_get("/api/cockpit", cockpit_get)
     r.add_post("/api/cockpit/update", cockpit_update)
     r.add_post("/api/longpaths", longpaths_set)
+    r.add_post("/api/cockpit/restart", cockpit_restart)
+    r.add_get("/api/machine", machine_get)
+    r.add_post("/api/machine/check", machine_check)
+    r.add_post("/api/machine/describe", machine_describe)
+    r.add_post("/api/machine/repair", machine_repair)
+    r.add_post("/api/machine/session/answer", session_answer)
+    r.add_post("/api/machine/session/code", session_code)
+    r.add_post("/api/machine/session/cancel", session_cancel)
+    r.add_post("/api/install-mode", install_mode_set)
     app.on_startup.append(opening)
     app.on_cleanup.append(deploy_cleanup)
     app.on_cleanup.append(push_cleanup)
@@ -2702,6 +3180,8 @@ async def serve(app, port, url, ouvrir, quit_box, relay=None):
     started answers there first, then takes the cockpit's port once the old
     server has exited, and closes the trial one."""
     quit_box["event"] = asyncio.Event()
+    if PORT_KEY in app:
+        app[PORT_KEY]["port"] = port
     runner = web.AppRunner(app, shutdown_timeout=2)
     await runner.setup()
     try:
@@ -2726,6 +3206,32 @@ async def serve(app, port, url, ouvrir, quit_box, relay=None):
     finally:
         print("Le cockpit s'arrête.", flush=True)
         await runner.cleanup()
+
+
+# 1.16 — how long lancer.bat waits for a restarted cockpit before opening
+# the page anyway.
+LANCER_WAIT = 75.0
+
+
+def older_server(other, port):
+    """1.16 — lancer.bat while a cockpit answers: the commit it started from
+    against the code on disk; older, it is asked to restart — refused while
+    something goes there, and the page then says so —, and the browser waits
+    for the new one. True when it restarted."""
+    head = gitref.head(CHAIN_ROOT)
+    was = other.get("started")
+    if not was or not head or was == head:
+        return False
+    print(f"Ce cockpit tourne sur {was[:7]}, le code sur le disque est à {head[:7]} : il est prié de redémarrer.",
+          flush=True)
+    r = startup.ask_restart(port)
+    if not r.get("ok"):
+        print(f"Redémarrage refusé : {r.get('error')} — la page s'ouvre sur l'ancien.", flush=True)
+        return False
+    got = startup.wait_new_server(port, other.get("pid"), LANCER_WAIT)
+    print("Le nouveau serveur répond." if got else "Le nouveau serveur ne répond pas encore : la page s'ouvre quand même.",
+          flush=True)
+    return bool(got)
 
 
 def main(argv=None):
@@ -2757,6 +3263,7 @@ def main(argv=None):
     if other:
         print(f"Un cockpit répond déjà sur {url} (pid {other.get('pid')}) : la page s'ouvre sur lui, "
               "aucun second serveur.", flush=True)
+        older_server(other, args.port)
         if args.ouvrir:
             OPEN_BROWSER(url)
         return 0

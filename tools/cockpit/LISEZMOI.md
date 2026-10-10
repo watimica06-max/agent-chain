@@ -328,7 +328,7 @@ ici, tant que le diagnostic ne l'a pas lu.
 **Paramètres** (1.9) — ce qui appartient au cockpit lui-même, dans cet
 ordre : l'apparence (1.11), puis, chacun avec sa ligne d'explication, le
 mode de permission, les notifications, l'accès depuis le téléphone
-(1.15), les dossiers ignorés, « Outils sur cet ordinateur », « Version du cockpit » (1.14), « Arrêter le cockpit ». La version de la chaîne est sous
+(1.15), les dossiers ignorés, « État de l'ordinateur » (1.16), « Version du cockpit » (1.14), « Arrêter le cockpit ». La version de la chaîne est sous
 « Chaîne → Version », le profil de déploiement sous « Déploiement →
 Profil », la feature dans la barre du haut, l'application sur l'accueil.
 
@@ -403,17 +403,105 @@ moitié fait. `socle.py` le règle aussi à la création.
 Les fichiers propres à l'application — son `/deploie` — ne sont jamais
 touchés.
 
-**Outils sur cet ordinateur** (le diagnostic) — il vérifie que les outils
-dont les builds et les commandes de l'application ont besoin — Java,
-Gradle ou Flutter, adb, Claude Code, git — sont installés et répondent. Un
-par application, chacune sa pile (Gradle pour l'une, Flutter pour
-l'autre) : quand l'application ouverte n'en a pas, le cockpit le lance une
-fois de lui-même et garde le résultat. Le tableau de bord ne l'affiche que
-s'il a un ✗ ; Paramètres → Outils sur cet ordinateur le relance à la
-demande. Il dit aussi (1.8) si scrcpy et l'émulateur Android sont là, ✓ ou
-« non trouvé » : tous deux facultatifs, jamais une alerte. 1.12 :
-**Chemins longs de git** — `core.longpaths` dans la configuration git de
-chaque application, ✓ ou ✗, et « Régler » le met à `true`.
+**État de l'ordinateur** (1.16 ; « Outils sur cet ordinateur » jusqu'à la
+1.15) — tout ce qui doit être présent et à jour pour que la chaîne tourne
+bien sur cet ordinateur, une ligne par point : son état, **sa règle**, quand
+il a été vérifié, et sa réparation, d'un clic — jamais dans PowerShell.
+
+- **Le cockpit** : le serveur face au code sur le disque, agent-chain face
+  à GitHub, les dépendances Python.
+- **Claude Code** : le programme que le SDK lance vraiment (celui livré
+  avec le SDK d'abord, sinon `claude.exe`), sa version face au minimum du
+  SDK ; connecté ou non (`claude auth status`, avec ce même programme).
+- **git et GitHub** : git, l'identité des commits, Git Credential Manager,
+  les identifiants GitHub (`git credential-manager github list`, puis
+  `git push --dry-run --porcelain` sur agent-chain), GitHub joignable,
+  `core.longpaths` d'agent-chain.
+- **Android et builds** : Java, Gradle ou Flutter (le diagnostic de
+  l'application ouverte, quand elle en a), adb, sdkmanager, le SDK
+  Android (ANDROID_HOME), l'émulateur et scrcpy (facultatifs).
+- **Chaque application** : GitHub, la chaîne installée, `BUILD_REPORT`
+  face aux conventions, `core.longpaths`.
+
+Les règles :
+
+| Point | Règle | Ce qu'un blocage arrête |
+|---|---|---|
+| Claude Code pas connecté | bloque | chaque lancement, « Installer avec Claude » |
+| Le Claude Code du SDK absent ou sous son minimum | bloque | les lancements |
+| Dépendances Python manquantes | se répare seul (pip au démarrage), signale un échec | — |
+| Serveur plus ancien que le code sur le disque | se répare seul quand rien ne tourne (redémarrage), signale pendant un run | — |
+| agent-chain en retard sur GitHub | se répare seul (récupéré), signale « pas encore en service » | — |
+| La chaîne d'une application en retard | signale, demandé au lancement | — |
+| Application « divergé » | bloque | lancement, installation, « Enregistrer » |
+| Identifiants GitHub absents | bloque ce qui pousse, signale pour un lancement | push, installation, « Envoyer » |
+| Commits non envoyés | signale, toujours visible, jamais en vert | — |
+| GitHub injoignable | signale ; bloque l'installation de la chaîne tant qu'il dure | installations |
+| Identité git absente | bloque | tout ce qui commite |
+| core.longpaths | se répare seul, agent-chain compris | — |
+| Java, Gradle, adb, sdkmanager, SDK | signale ; bloque « Bâtir » et l'écran Déploiement | ces deux-là |
+| émulateur, scrcpy | facultatif | — |
+| BUILD_REPORT plus ancien que les conventions | signale (« Bâtir » proposé à nouveau) | — |
+
+Une identité que git **devine** (sans `user.name` ni `user.email`) est
+signalée, jamais bloquante : git commite avec elle ; « Régler » la fixe.
+
+**Quand c'est vérifié** : au démarrage du cockpit, à l'ouverture de
+l'écran, après chaque réparation, et juste avant une action pour ce qui la
+bloque (Claude Code avant un lancement, les identifiants GitHub avant un
+push — revérifiés s'ils datent de plus de cinq minutes). Chaque ligne dit
+quand elle l'a été. « Vérifier maintenant » relance tout, le diagnostic de
+l'application ouverte compris.
+
+**Le badge** : sur l'accueil et dans la barre du haut, « Ordinateur :
+bloqué » ou « à voir » quand un point bloque ou attend quelque chose de
+vous ; l'accueil montre ces points avec leur réparation. Le téléphone
+montre le même résumé et dit « Réparer sur l'ordinateur » : aucune
+réparation ne se fait depuis lui.
+
+**Les réparations** :
+
+- **« Se connecter à Claude »** : `claude auth login` avec le programme
+  du SDK, sans fenêtre — il n'en a pas besoin. La page de connexion
+  s'ouvre dans le navigateur ; si elle affiche un code, il se colle dans
+  le cockpit, qui le transmet. Puis `claude auth status`.
+- **« Se connecter à GitHub »** : `git credential-manager github login
+  --browser`, sans fenêtre, puis le push à blanc sur agent-chain.
+- **« Régler »** : `core.longpaths`, et l'identité git (un nom, un
+  e-mail, dans la configuration globale).
+- **« Redémarrer le cockpit »** : le redémarrage de la 1.14, sans rien
+  récupérer, avec le PATH tel que Windows l'a maintenant. `lancer.bat`,
+  quand un cockpit répond déjà, compare le commit dont il est parti au
+  code sur le disque ; plus ancien, il lui demande de redémarrer avant
+  d'ouvrir la page.
+- **« Installer avec Claude »**, pour un outil absent : une session
+  Claude avec la consigne de cet outil — l'installer, puis prouver qu'il
+  répond —, puis la vérification, et un redémarrage du cockpit si le PATH a
+  changé. Jamais sans Claude Code connecté.
+- **« Installer les dépendances »**, **« Installer / Mettre à jour Claude
+  Code »**.
+
+Les sessions de connexion et d'installation sont refusées pendant un run.
+
+**Deux façons d'installer** (décidé le 10 octobre). Toute installation que
+le cockpit mène commence par une question :
+
+- **Rapide** — vous acceptez d'avance les étapes et les licences ; le
+  cockpit fait tout sans redemander. Avant le départ, une ligne nomme ce
+  qui sera installé et les licences acceptées ; une licence que cette
+  ligne ne nommait pas est refusée, et l'installation s'arrête. Après, le
+  compte rendu liste ce qui a été installé et chaque licence acceptée.
+- **Pas à pas** — une carte pour chaque étape et chaque licence, montrée
+  en entier : vous acceptez ou refusez. Une licence refusée arrête
+  l'installation.
+
+Le choix par défaut : Paramètres → État de l'ordinateur →
+« Installations : Demander à chaque fois / Rapide / Pas à pas »
+(« Demander » au départ). Aucun des deux modes ne passe outre la fenêtre
+d'administrateur de Windows (UAC), ni une connexion dans le navigateur
+(Claude, GitHub) : le cockpit le dit avant de commencer. Chaque
+installation reste dans `logs/installations.jsonl` — le mode, ce qui a été
+installé, chaque licence acceptée.
 
 **GitHub — toujours d'accord** (1.12). Le Product Owner travaille sur les
 mêmes applications depuis deux ordinateurs, jamais en même temps. Le
@@ -719,7 +807,12 @@ suite ; `tailscale serve reset` retire le service de Tailscale.
 - Après chaque écriture, il relit le fichier avec le test de la commande ;
   si la commande le lirait encore comme sans réponse, il annule l'écriture
   et vous le dit.
-- Il n'accorde aucune autorisation tout seul.
+- Il n'accorde aucune autorisation tout seul, et n'accepte aucune licence
+  sans votre accord — donné d'avance (« Rapide ») ou une par une (« Pas à
+  pas ») (1.16).
+- Il ne vous déconnecte jamais de Claude Code ni de GitHub ; « État de
+  l'ordinateur » ne fait que lire, sauf `core.longpaths`, qu'il règle, et
+  ce que vous réparez d'un clic (1.16).
 - Il n'écoute que sur cette machine (`127.0.0.1`). Le téléphone (1.15)
   passe par Tailscale, à l'adresse et avec le code que vous avez choisis ;
   rien n'est ouvert sur internet.

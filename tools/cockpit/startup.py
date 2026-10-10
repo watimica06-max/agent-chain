@@ -98,6 +98,37 @@ def ping(port, host="127.0.0.1", timeout=PING_TIMEOUT):
     return data if isinstance(data, dict) and data.get("cockpit") else None
 
 
+def ask_restart(port, host="127.0.0.1", timeout=5.0):
+    """1.16 — lancer.bat, a cockpit answering that runs older code than the
+    disk holds: it is asked to restart (« Redémarrer le cockpit »). Its
+    answer, or {"error"}."""
+    req = urllib.request.Request(f"http://{host}:{port}/api/cockpit/restart", data=b"{}", method="POST",
+                                 headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        try:
+            return json.loads(e.read().decode("utf-8"))
+        except (ValueError, OSError):
+            return {"error": f"HTTP {e.code}"}
+    except (urllib.error.URLError, OSError, ValueError) as e:
+        return {"error": str(e)}
+
+
+def wait_new_server(port, old_pid, timeout, poll=0.3):
+    """Until a cockpit other than `old_pid` answers on the port: its ping,
+    or None after `timeout`."""
+    import time
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        got = ping(port, timeout=1.0)
+        if got and got.get("pid") != old_pid:
+            return got
+        time.sleep(poll)
+    return None
+
+
 def error_box(text, title="Cockpit"):
     """A message box when there is no console to read the error in."""
     if os.name != "nt" or not windowless():

@@ -57,7 +57,15 @@ def gradle_wrapper(app):
     return None
 
 
-def plan(app, env=None):
+def _found(find, tool):
+    """Where `find` says the tool is — None when it cannot say."""
+    try:
+        return find(tool)
+    except Exception:
+        return None
+
+
+def plan(app, env=None, find=None):
     """The checks for this folder: (id, label, argv or None, timeout)."""
     wrapper = gradle_wrapper(app)
     has_pubspec = os.path.isfile(os.path.join(app, "pubspec.yaml"))
@@ -66,7 +74,10 @@ def plan(app, env=None):
         ("java", f"Java ({where})", java, DEFAULT_TIMEOUT),
         ("gradle", "Gradle", [wrapper, "--version"] if wrapper else None, GRADLE_TIMEOUT),
         ("flutter", "Flutter", ["flutter", "--version"] if has_pubspec else None, DEFAULT_TIMEOUT),
-        ("adb", "adb", ["adb", "version"], DEFAULT_TIMEOUT),
+        # 1.16: adb where the deploy adapter finds it — the PATH, else the SDK's
+        # platform-tools —, as the emulator below; « adb » on the PATH when
+        # neither has it, which then says « introuvable ».
+        ("adb", "adb", [*(_found(find or FIND, "adb") or ["adb"]), "version"], DEFAULT_TIMEOUT),
         ("claude", "Claude Code", ["claude", "--version"], DEFAULT_TIMEOUT),
         ("git", "Git", ["git", "--version"], DEFAULT_TIMEOUT),
     ]
@@ -78,9 +89,10 @@ OPTIONAL = [("scrcpy", "scrcpy — afficher l'écran d'un appareil", "--version"
 
 
 def find_tool(tool):
-    """Where an optional tool is — the deploy adapter's own lookup — or None."""
+    """Where a tool is — the deploy adapter's own lookup — or None: scrcpy,
+    the emulator, and 1.16 adb."""
     from adapters import android
-    return android.scrcpy_argv() if tool == "scrcpy" else android.emulator_argv()
+    return {"scrcpy": android.scrcpy_argv, "adb": android.adb_argv}.get(tool, android.emulator_argv)()
 
 
 # What finds them; the tests put a fake here.
@@ -121,7 +133,7 @@ def first_line(text):
 def run_diagnostic(app, exec_fn=system_exec, now=None, env=None, find=None):
     results = []
     _, where, home, nothing = java_of(env)
-    for cid, label, argv, timeout in plan(app, env):
+    for cid, label, argv, timeout in plan(app, env, find):
         if argv is None:
             results.append({"id": cid, "label": label, "status": "skip", "detail": "non concerné"})
             continue

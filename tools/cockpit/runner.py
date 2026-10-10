@@ -33,6 +33,17 @@ MAX_EVENTS = 5000
 # kept in memory and merged by time with the log's when a page opens (1.5).
 CONTROL_EVENTS = {"run_started", "status", "permission", "permission_resolved", "stopping",
                   "error", "idle_wait", "limits", "limits_unavailable", "run_ended"}
+# 1.16 — what an assistant message's `error` means (the SDK's
+# AssistantMessageError): a run that ends on one says it, never « success ».
+API_ERRORS = {
+    "authentication_failed": "Claude Code n'est pas connecté sur cet ordinateur",
+    "billing_error": "Claude refuse : un problème de facturation sur le compte",
+    "rate_limit": "Limite d'usage de Claude atteinte",
+    "invalid_request": "Requête refusée par Claude (invalid_request)",
+    "server_error": "Erreur du serveur de Claude",
+    "unknown": "Erreur inconnue de Claude",
+}
+AUTH_FAILED = "authentication_failed"
 # A reopened page is given at most this many events: it keeps no more.
 REPLAY_MAX = 3000
 STOP_COMMAND = "8_code"
@@ -155,6 +166,8 @@ class Run:
     # 1.12: where the clone stands against GitHub once the run ended — None
     # while the cockpit fetches.
     sync: dict | None = None
+    # 1.16: the `error` an assistant message carried (authentication_failed…).
+    api_error: str = ""
 
     @property
     def prompt(self):
@@ -198,6 +211,8 @@ class Run:
             "idle": self.idle,
             "usage": self.usage,
             "sync": self.sync,
+            "api_error": self.api_error,
+            "auth_failed": self.api_error == AUTH_FAILED,
             "passes": [p.summary() for p in self.tally.passes.values() if p.ended],
             "can_continue": (self.status == "ended" and bool(self.session_id)
                              and bool(self.next) and self.next.get("kind") == "unknown"),
@@ -512,6 +527,8 @@ class Runner:
             return
         if kind in ("AssistantMessage", "UserMessage"):
             run.turn_ended = False
+        if kind == "AssistantMessage" and body.get("error"):
+            run.api_error = str(body["error"])
         for t, d in run.reader.feed(kind, body, run.tally):
             self._emit(run, t, d, at)
         if kind == "ResultMessage":
@@ -521,7 +538,12 @@ class Runner:
             run.relay = body.get("result") or run.last_text
             if body.get("is_error"):
                 run.outcome = "erreur"
-                run.error = "; ".join(body.get("errors") or []) or (body.get("subtype") or "erreur")
+                # 1.16: the assistant message's error first — the result's
+                # subtype says « success » even then.
+                said = API_ERRORS.get(run.api_error, run.api_error) if run.api_error else ""
+                sub = body.get("subtype") or ""
+                run.error = (said or "; ".join(body.get("errors") or [])
+                             or (sub if sub and sub != "success" else "") or "erreur")
             reason = body.get("terminal_reason") or ""
             if reason.startswith("aborted"):
                 run.outcome = "interrompu"

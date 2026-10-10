@@ -206,14 +206,15 @@ def test_long_paths_and_add_from_github(tmp_path, page, five):
     git(five["Hyrox"], "config", "--local", "core.longpaths", "true")
     with serve_five(tmp_path, five) as s:
         open_app(page, s, "Hyrox")
+        # 1.16: « État de l'ordinateur » — core.longpaths fixes itself, in each application, when the
+        # screen opens: Hyrox already had it, Belivo is set and says so.
         page.goto(s.url + "#settings")
-        page.wait_for_selector("#longpaths li")
-        assert page.locator('#longpaths li[data-folder$="hyrox\\\\A"] button.lp-set').count() == 0
-        belivo = page.locator("#longpaths li", has_text="Belivo")
-        assert "core.longpaths absent" in belivo.inner_text()
-        belivo.locator("button.lp-set").click()
-        page.wait_for_function("[...document.querySelectorAll('#longpaths li')].find(l => l.textContent.includes('Belivo'))"
-                               ".textContent.includes('core.longpaths=true')")
+        line = '#machine-list .mc-group[data-group="Application « {} »"] li[data-id$=":longpaths"]'
+        page.wait_for_selector(line.format("Belivo"))
+        hyrox = page.locator(line.format("Hyrox"))
+        assert hyrox.get_attribute("data-status") == "ok" and hyrox.locator("button").count() == 0
+        belivo = page.locator(line.format("Belivo"))
+        assert belivo.get_attribute("data-status") == "réparé" and "réglé à true" in belivo.inner_text()
         assert sync.long_paths(str(five["Belivo"])) is True
         page.goto(s.url)
         page.locator("#btn-app-clone").click()

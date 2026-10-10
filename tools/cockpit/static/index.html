@@ -707,6 +707,56 @@ details pre { max-height: var(--mh-360); overflow: auto; background: var(--raise
 .themes .sw.light { background: var(--sw-light); }
 .themes .sw.dark { background: var(--sw-dark); }
 #sec-theme .row { gap: var(--sp-14); }
+/* 1.16 — « État de l'ordinateur » */
+.mc-group h3 { margin: var(--sp-14) 0 var(--sp-4); font-size: var(--fs-13); color: var(--soft); text-transform: none; }
+.mc-group ul, .mc-home-list { list-style: none; padding: 0; margin: 0; border: var(--bw) solid var(--line); border-radius: var(--r-10); }
+.mc-line { display: grid; grid-template-columns: var(--sp-20) 1fr auto; gap: var(--sp-10); align-items: start;
+  padding: var(--sp-8) var(--sp-12); border-top: var(--bw) solid var(--line); }
+.mc-line:first-child { border-top: none; }
+.mc-mark { font-weight: 700; text-align: center; }
+.mc-label { display: flex; gap: var(--sp-8); align-items: baseline; flex-wrap: wrap; }
+.mc-state { font-size: var(--fs-12); font-weight: 650; }
+.mc-detail { font-size: var(--fs-13); overflow-wrap: anywhere; }
+.mc-act { display: flex; align-items: center; }
+.mc-act button { min-height: var(--h-28); font-size: var(--fs-12); white-space: nowrap; }
+.mc-line.ok .mc-mark, .mc-line.ok .mc-state { color: var(--ok); }
+.mc-line.warn .mc-mark, .mc-line.warn .mc-state { color: var(--warn); }
+.mc-line.block { background: var(--err-soft); }
+.mc-line.block .mc-mark, .mc-line.block .mc-state { color: var(--err); }
+.mc-line.fixing .mc-mark, .mc-line.fixing .mc-state { color: var(--accent); }
+.mc-line.opt .mc-mark, .mc-line.skip .mc-mark, .mc-line.unknown .mc-mark, .mc-line.opt .mc-state, .mc-line.skip .mc-state { color: var(--soft); }
+.mc-form { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: var(--sp-8); align-items: center; margin-top: var(--sp-6); }
+.mc-mode { margin: var(--sp-10) 0; gap: var(--sp-10); flex-wrap: wrap; }
+.mc-badge { display: inline-flex; gap: var(--sp-4); align-items: center; margin-top: var(--sp-6); border-radius: var(--r-8);
+  padding: var(--sp-2) var(--sp-10); font-size: var(--fs-13); text-align: left; min-height: 0; max-width: 100%; white-space: nowrap;
+  border: var(--bw) solid currentColor; }
+.mc-badge.hidden { display: none; }
+#tb-machine { white-space: nowrap; }
+@media (max-width: 720px) {
+  .mc-line { grid-template-columns: var(--sp-20) 1fr; }
+  .mc-act { grid-column: 2; }
+  .mc-badge { white-space: normal; display: inline-block; }
+  #install-ask .ia-opt { grid-template-columns: 1fr; }
+}
+.mc-badge.warn, #tb-machine.warn { background: var(--warn-soft); color: var(--warn); border-color: var(--warn-line); }
+.mc-badge.block, #tb-machine.block { background: var(--err-soft); color: var(--err); border-color: var(--err); }
+#machine-home h3 { margin: 0 0 var(--sp-8); font-size: var(--fs-15); }
+.mc-session { border: var(--bw) solid var(--line); border-radius: var(--r-10); padding: var(--sp-10) var(--sp-14); margin: var(--sp-10) 0; }
+.mc-session.going { border-color: var(--accent); background: var(--accent-soft); }
+.mc-session.done { border-color: var(--ok); }
+.mc-session.failed { border-color: var(--err); }
+.mc-session .row { gap: var(--sp-8); flex-wrap: wrap; }
+.mc-sess-state { font-size: var(--fs-12); font-weight: 650; }
+.mc-steps { margin: var(--sp-8) 0 0; padding-left: var(--sp-20); font-size: var(--fs-12); max-height: 14em; overflow: auto; }
+.mc-card { border: var(--bw) solid var(--warn-line); background: var(--surface, var(--raised)); border-radius: var(--r-8); padding: var(--sp-8) var(--sp-12); margin-top: var(--sp-8); }
+.mc-card .mc-text { max-height: 22em; overflow: auto; white-space: pre-wrap; font-size: var(--fs-12); margin: var(--sp-6) 0; }
+.mc-signin { margin-top: var(--sp-6); font-size: var(--fs-13); }
+.mc-report { margin-top: var(--sp-8); font-size: var(--fs-13); display: grid; gap: var(--sp-2); }
+#install-ask { position: fixed; inset: 0; background: rgba(0, 0, 0, .35); display: flex; align-items: center; justify-content: center; z-index: 60; padding: var(--sp-16); }
+#install-ask.hidden { display: none; }
+#install-ask .card { max-width: 40em; width: 100%; max-height: 90vh; overflow: auto; }
+#install-ask .ia-opt { display: grid; grid-template-columns: 8em 1fr; gap: var(--sp-10); align-items: start; margin: var(--sp-10) 0; }
+.hc-alert > div.unsent { background: var(--warn-soft); color: var(--warn); }
 .diag li { list-style: none; margin: 0; padding: var(--sp-6) var(--sp-12); border-top: var(--bw) solid var(--line); }
 .diag li:first-child { border-top: none; }
 .diag ul { padding: 0; margin: var(--sp-10) 0; border: var(--bw) solid var(--line); border-radius: var(--r-10); }
@@ -1204,6 +1254,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       <span class="crumb-sep hidden" id="tb-sep2" aria-hidden="true">/</span>
       <span id="tb-page"></span>
       <span class="grow"></span>
+      <button id="tb-machine" class="chip hidden" title="État de l'ordinateur"></button>
       <button id="tb-sync" class="chip hidden" title="Où en est ce dépôt face à GitHub"></button>
       <button id="tb-mode" class="chip hidden" title="Mode de permission">Mode</button>
       <span id="tb-run-wrap"><span id="tb-run" class="chip hidden"></span><button id="tb-stop" class="danger hidden" title="Arrêter maintenant la commande qui tourne">Arrêter</button></span>
@@ -1224,8 +1275,10 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       <div id="start-error" class="notice err hidden"></div>
       <div id="home-notice" class="hidden" role="status"></div>
       <div id="cockpit-update" class="hidden" role="status" aria-label="Nouvelle version du cockpit"></div>
+      <div id="machine-home" class="card hidden" role="status" aria-label="État de l'ordinateur"></div>
       <div class="home-head">
-        <div><h2>Applications</h2><div class="sub" id="apps-count"></div><div class="sub" id="chain-sync-line" aria-label="agent-chain face à GitHub"></div></div>
+        <div><h2>Applications</h2><div class="sub" id="apps-count"></div><div class="sub" id="chain-sync-line" aria-label="agent-chain face à GitHub"></div>
+          <button id="machine-badge" class="mc-badge hidden" title="État de l'ordinateur"></button></div>
         <span class="grow"></span>
         <button id="btn-app-new" class="primary"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Nouvelle application</button>
         <button id="btn-app-add"><svg class="ic" aria-hidden="true"><use href="#i-folder"/></svg>Ajouter une application</button>
@@ -1600,15 +1653,24 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <p class="lead">Les dossiers de <span class="mono">docs/features/</span> que rien ne doit montrer — ceux d'une ancienne chaîne : ni la liste des features, ni « Correction », ni les Statistiques, ni le Code.</p>
         <div id="set-folders"></div>
       </div>
-      <div class="card sec" id="sec-diag">
-        <h2>Outils sur cet ordinateur</h2>
-        <p class="lead">Vérifie que les outils dont les builds et les commandes de l'application ont besoin — Java, Gradle ou Flutter, adb, Claude Code, git — sont installés et répondent. Lancé une fois de lui-même ; le tableau de bord n'alerte que sur un ✗.</p>
-        <div class="row"><button id="btn-diag" class="primary">Vérifier les outils</button>
-          <span id="diag-wait" class="muted small hidden">En cours… jusqu'à 120 secondes : le premier appel de Gradle peut télécharger Gradle.</span></div>
-        <div id="diag-result" class="diag"></div>
-        <h3 style="margin-top:var(--sp-16)">Chemins longs de git</h3>
-        <p class="muted small" style="margin:0">Dans la configuration git de chaque application, <span class="mono">core.longpaths=true</span> : un build dans un worktree écrit des chemins plus longs que la limite de Windows.</p>
-        <ul id="longpaths" aria-label="core.longpaths de chaque application"></ul>
+      <!-- 1.16: « État de l'ordinateur » — replaces « Outils sur cet ordinateur ». -->
+      <div class="card sec" id="sec-machine">
+        <h2>État de l'ordinateur</h2>
+        <p class="lead">Tout ce qui doit être présent et à jour pour que la chaîne tourne bien sur cet ordinateur. Chaque ligne dit son état, sa règle — se répare seul, signale, ou bloque — et quand elle a été vérifiée ; sa réparation se fait d'ici, d'un clic, jamais dans PowerShell. Vérifié au démarrage du cockpit, à l'ouverture de cet écran, après chaque réparation, et avant un lancement pour ce qui le bloque.</p>
+        <div class="row"><button id="btn-machine-check" class="primary">Vérifier maintenant</button>
+          <span id="machine-age" class="muted small"></span></div>
+        <div class="row mc-mode"><label for="set-install-mode">Installations</label>
+          <select id="set-install-mode" aria-label="Mode des installations">
+            <option value="demander">Demander à chaque fois</option>
+            <option value="rapide">Rapide</option>
+            <option value="pas_a_pas">Pas à pas</option>
+          </select>
+          <span class="muted small">Rapide : les étapes et les licences acceptées d'avance, nommées avant le départ. Pas à pas : une carte par étape et par licence, en entier.</span></div>
+        <div class="small" id="machine-msg" role="status"></div>
+        <div id="machine-session" aria-label="La réparation en cours"></div>
+        <div id="machine-list" aria-label="État de l'ordinateur"></div>
+        <details id="diag-details" open><summary>Le détail des outils de l'application ouverte</summary>
+          <div id="diag-result" class="diag"></div></details>
       </div>
       <div class="card sec" id="sec-cockpit">
         <h2>Version du cockpit</h2>
@@ -1627,6 +1689,9 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
   </div>
  </div>
 </div>
+
+<!-- 1.16: the question every install starts with. -->
+<div id="install-ask" class="hidden"></div>
 
 <div id="stopped" class="hidden" role="alertdialog" aria-label="Cockpit arrêté">
   <div class="card"><h2 id="stopped-title">Le cockpit est arrêté</h2>
@@ -1864,7 +1929,8 @@ function route() {
   if (inApp && r === "answer") hint();
   if (inApp && (r === "chaine" || r === "correction")) placeRun();
   if (inApp && r === "stats" && !PHONE) loadStats();
-  if (inApp && r === "settings" && entering) loadLongpaths();
+  // 1.16: « État de l'ordinateur » checked when the screen opens.
+  if (inApp && r === "settings" && entering) checkMachine();
   if (inApp && r === "donnees" && entering) enterDonnees();
   // 1.8: « Déploiement » polls its destinations while it is shown, and only then.
   if (inApp && r === "deploy" && !PHONE) enterDeploy(); else leaveDeploy();
@@ -2135,9 +2201,12 @@ const CHAIN_CLS = {"à jour": "ok", "en retard": "late", "modifiée sur place": 
 // 1.12 — where a clone stands against GitHub (sync.py).
 const SYNC_CLS = {"à jour": "ok", "en retard": "late", "non envoyé": "late", "divergé": "mod", "GitHub injoignable": "abs", "sans GitHub": "abs"};
 const SYNC_CHIP = {"GitHub injoignable": "injoignable", "sans GitHub": "aucun dépôt distant"};
+// 1.16: GitHub unreachable never hides what is not sent: « GitHub injoignable · N non envoyés ».
+const unsentText = (st) => st && st.state === "GitHub injoignable" && st.ahead ? `${st.state} · ${plural(st.ahead, "non envoyé", "non envoyés")}` : "";
 function syncBadge(st) {
   if (!st) return el("span", {class: "muted", text: "vérification…"});
   if (!st.state) return el("span", {class: "muted", title: st.summary || "", text: st.detail || "—"});
+  if (unsentText(st)) return el("span", {class: "cst late unsent", title: st.summary || "", text: unsentText(st)});
   return el("span", {class: "cst " + (SYNC_CLS[st.state] || "abs"), title: st.summary || "", text: st.state});
 }
 // What the row asks of her (1.12): « non envoyé » → « Envoyer », « divergé »
@@ -2147,6 +2216,9 @@ function syncAlerts(r, going) {
   const st = r.sync, stop = (e) => e.stopPropagation();
   const busy = going || anyRun();
   if (st && st.state === "non envoyé") box.append(el("div", {}, el("span", {text: st.summary + "."}),
+    el("button", {class: "small sync-push", text: "Envoyer", disabled: busy || undefined, onclick: (e) => { stop(e); syncPush(r.folder); }})));
+  // 1.16: GitHub unreachable — what is not sent stays said.
+  if (unsentText(st)) box.append(el("div", {class: "unsent"}, el("span", {text: `GitHub injoignable : ${plural(st.ahead, "commit", "commits")} de cet ordinateur pas encore sur GitHub.`}),
     el("button", {class: "small sync-push", text: "Envoyer", disabled: busy || undefined, onclick: (e) => { stop(e); syncPush(r.folder); }})));
   // 1.14: « en retard » — GitHub's version taken now, without launching anything.
   if (st && st.state === "en retard") box.append(el("div", {}, el("span", {text: st.summary + "."}),
@@ -2273,15 +2345,22 @@ function renderCockpitSettings() {
   ul.classList.toggle("hidden", !ul.children.length);
   $("cockpit-set-msg").replaceChildren(...cockpitMsg());
 }
-async function updateCockpit(btn) {
+async function updateCockpit(btn, mode) {
   const btns = [...document.querySelectorAll(".cockpit-update-btn")];
   for (const b of btns) b.disabled = true;
   cockpitNote = {kind: "warn", text: "Mise à jour du cockpit : récupération depuis GitHub, dépendances si elles ont changé, puis redémarrage…"};
   renderCockpitUpdate();
   let r;
-  try { r = await api("/api/cockpit/update", {}); }
+  // 1.16: new Python dependencies are an install — « Rapide » or « Pas à pas » first.
+  try { r = await api("/api/cockpit/update", {asked: true, mode: mode || null}); }
   catch (e) {
     const b = e.body || {};
+    if (b.ask) {
+      for (const x of btns) x.disabled = false;
+      cockpitNote = null; renderCockpitUpdate();
+      installDialog({...(b.describe || {}), what: ((b.describe || {}).what || []).map((w) => "Python : " + w)}, (m) => updateCockpit(btn, m));
+      return;
+    }
     cockpitNote = {kind: "err", title: b.busy ? "Pas maintenant." : "Mise à jour arrêtée.", text: e.message, files: b.files, reconcile: b.reconcile, steps: b.steps};
     if (b.cockpit) { S.chain_sync = {...(S.chain_sync || {}), cockpit: b.cockpit}; if (A) A.chain_sync = S.chain_sync; }
     for (const x of btns) x.disabled = false;
@@ -2397,21 +2476,6 @@ $("btn-clone").onclick = async () => {
   finally { b.disabled = false; }
 };
 
-// « Outils sur cet ordinateur » — core.longpaths of each application (§7).
-async function loadLongpaths() {
-  const ul = $("longpaths");
-  let r;
-  try { r = await api("/api/longpaths"); } catch (e) { ul.replaceChildren(el("li", {class: "muted", text: e.message})); return; }
-  ul.replaceChildren(...r.apps.map((x) => el("li", {"data-folder": x.folder},
-    el("b", {text: x.value ? "✓" : "✗"}), el("span", {text: x.name}),
-    el("span", {class: "muted small mono", text: !x.exists ? "dossier introuvable" : x.value ? "core.longpaths=true" : x.value === false ? "core.longpaths=false" : "core.longpaths absent"}),
-    x.exists && !x.value ? el("button", {class: "small lp-set", text: "Régler", onclick: async (ev) => {
-      ev.target.disabled = true;
-      try { await api("/api/longpaths", {folder: x.folder}); } catch (e) { alert(e.message); }
-      await loadLongpaths();
-    }}) : null)));
-  if (!r.apps.length) ul.append(el("li", {class: "muted", text: "Aucune application dans la liste."}));
-}
 function renderApps() {
   const box = $("apps-list"); box.replaceChildren();
   const rows = (A && A.apps) || [];
@@ -2430,6 +2494,8 @@ function renderApps() {
   renderChainSyncLine();
   renderCockpitUpdate();
   renderReport();
+  renderMachineBadges();
+  renderMachineHome();
 }
 const msgId = (folder) => "app-msg-" + appKey(folder).replace(/[^a-z0-9]/g, "_");
 // One card per application (1.9) — what « Applications » showed (1.6): its
@@ -2588,14 +2654,17 @@ async function installChain(folder) {
   return r.result;
 }
 const installText = (x) => `Installée : ${x.commit} du ${x.date}` +
-  (x.app_commit ? ` — commit ${x.app_commit} « ${x.message} »` + (x.pushed ? ", poussé." : x.push_error ? `, non poussé : ${x.push_error}` : ".") : " — rien n'avait changé.");
+  (x.app_commit ? ` — commit ${x.app_commit} « ${x.message} »` + (x.pushed ? ", poussé." : x.push_error ? `, non poussé : ${x.push_error}` : ", non poussé.") : " — rien n'avait changé.");
+// 1.16: an install whose commit GitHub did not get is never green.
+const installUnpushed = (x) => !!(x && x.app_commit && !x.pushed);
+const installKind = (x) => !x ? "warn" : installUnpushed(x) ? "err" : "ok";
 async function rowInstall(folder) {
   const m = document.getElementById("app-msg-" + appKey(folder).replace(/[^a-z0-9]/g, "_"));
   if (m) m.textContent = "Installation…";
   try {
     const x = await installChain(folder);
     const text = x ? `« ${appName(folder)} » — ${installText(x)}` : `« ${appName(folder)} » — rien n'a été installé.`;
-    appsMsg(text, x ? "ok" : "warn");
+    appsMsg(text, installKind(x));
     await refreshState();
   } catch (e) { if (m) m.textContent = ""; alert(e.message); }
 }
@@ -2627,9 +2696,10 @@ function renderReport() {
   if (!rep) return;
   box.replaceChildren(el("h3", {text: `Tout mettre à jour — ${fmtWhen(new Date(rep.at))}`}));
   for (const x of rep.lines) {
-    const cls = OUTCOME[x.outcome] || "skipped";
+    // 1.16: installed but not pushed — never in the green of « mise à jour ».
+    const cls = x.unpushed ? "failed" : OUTCOME[x.outcome] || "skipped";
     box.append(el("div", {class: "line", "data-folder": x.folder, "data-outcome": cls},
-      el("b", {text: x.name}), el("span", {class: "oc " + cls, text: x.outcome}), el("span", {text: x.text}),
+      el("b", {text: x.name}), el("span", {class: "oc " + cls, text: x.unpushed ? "mise à jour, non poussée" : x.outcome}), el("span", {text: x.text}),
       x.own_install ? el("button", {class: "small", text: "Ouvrir son installation", onclick: () => rowInstall(x.folder)}) : el("span")));
   }
 }
@@ -2753,9 +2823,10 @@ function renderChrome() {
   const sy = S.sync, tbs = $("tb-sync");
   const showSy = isOpen && !!(sy && sy.state && sy.state !== "à jour");
   tbs.classList.toggle("hidden", !showSy);
-  if (showSy) { tbs.className = "chip " + (SYNC_CLS[sy.state] || "abs"); tbs.replaceChildren("GitHub : ", el("b", {text: SYNC_CHIP[sy.state] || sy.state})); tbs.title = sy.summary || ""; }
+  if (showSy) { tbs.className = "chip " + (unsentText(sy) ? "late" : SYNC_CLS[sy.state] || "abs"); tbs.replaceChildren("GitHub : ", el("b", {text: unsentText(sy) ? `injoignable · ${plural(sy.ahead, "non envoyé", "non envoyés")}` : SYNC_CHIP[sy.state] || sy.state})); tbs.title = sy.summary || ""; }
   renderBusyBanner();
   renderSyncBanner();
+  renderMachineBadges();
   updateTitle();
   if (PHONE) phoneRender();
   if (!isOpen) return;
@@ -3034,6 +3105,7 @@ $("btn-chain").onclick = async () => {
     const x = await installChain(null);
     if (!x) { msg.textContent = "Rien n'a été installé."; return; }
     msg.textContent = installText(x);
+    msg.className = installUnpushed(x) ? "notice err small" : "muted small";
     await refreshState();
   } catch (e) { msg.textContent = ""; alert(e.message); }
   finally { b.disabled = running() || !(S.chain && S.chain.state); }
@@ -3880,6 +3952,10 @@ function renderRunEnd() {
   const n = run.next || {kind: "unknown"};
   b.append(el("div", {class: "label muted small", text: "Fin du run"}),
     el("div", {style: "font-size:var(--fs-18);font-weight:600;margin:var(--sp-4) 0 var(--sp-8)", text: n.kind === "unknown" ? "Aucune ligne Next: dans le relais." : n.french}));
+  // 1.16: Claude Code not signed in on this computer — never « erreur : success ».
+  if (run.auth_failed) b.append(el("div", {class: "notice err run-auth"}, el("b", {text: "Claude Code n'est pas connecté sur cet ordinateur. "}),
+    repairsHere() ? el("button", {class: "small primary", text: "Se connecter", onclick: (e) => { go("settings"); doRepair({repair: {id: "claude_login", label: "Se connecter à Claude"}}, e.currentTarget); }})
+      : el("span", {text: "Réparer sur l'ordinateur."})));
   if (run.usage) b.append(el("div", {class: "run-total", id: "run-total"}, el("b", {text: "Total du run — "}), usageText(run.usage)));
   else b.append(el("div", {class: "run-total muted", id: "run-total", text: "Total du run : aucun message de résultat, la consommation n'est pas connue."}));
   for (const p of run.passes || []) b.append(el("div", {class: "muted small", text: `${agentName(p.agent)} — ${usageText(p)}`}));
@@ -4033,6 +4109,15 @@ function onEvent(ev) {
   seen = ev.seq;
   // 1.12: a clone's new state against GitHub, whatever its application.
   if (ev.type === "sync") { onSyncEvent(ev); return; }
+  // 1.16: « État de l'ordinateur », the repair going, the server restarting itself.
+  if (ev.type === "machine") { mergeMachine(d); S.machine_summary = d.machine && d.machine.summary; renderMachineAll(); return; }
+  if (ev.type === "machine_session") {
+    const was = M && M.session && M.session.status;
+    mergeMachine({session: d.session}); renderMachineSession(); renderMachineHome();
+    if (d.session && d.session.status === "ended" && was !== "ended") renderMachine();
+    return;
+  }
+  if (ev.type === "cockpit_restarting") { if (!restarting) waitRestart({old_pid: d.pid, version: d.version || ""}); return; }
   // 1.15: the access from the phone — a lock, a phone connected or not.
   if (ev.type === "phone") { S.phone = d; renderPhoneLock(); if (currentRoute() === "settings") renderPhone(); return; }
   // 1.8: a deploy and a crash, whatever the screen.
@@ -4785,8 +4870,6 @@ function renderAudits() {
 function renderDiag() {
   const box = $("diag-result"); box.replaceChildren();
   const busy = diagBusy || !!S.diagnostic_running;
-  $("btn-diag").disabled = busy;
-  $("diag-wait").classList.toggle("hidden", !busy);
   const d = S.diagnostic;
   if (!d) { box.append(el("p", {class: "muted", text: busy ? "Premier diagnostic en cours, lancé à l'ouverture du cockpit." : "Jamais lancé."})); return; }
   box.append(el("div", {class: "muted small", text: "Dernier résultat : " + d.at.replace("T", " ")}));
@@ -4805,12 +4888,259 @@ function renderDiag() {
   for (const h of d.hints || []) box.append(el("div", {class: "notice warn", text: h}));
 }
 
-$("btn-diag").onclick = async () => {
-  diagBusy = true; renderDiag();
-  try { S.diagnostic = await api("/api/diagnostic", {}); }
+// ============================================ « État de l'ordinateur » (1.16)
+// Everything that must be current or present for the chain to run right on
+// this computer: one line per item, its state, its rule, the last check, its
+// repair. The phone shows the same, and says « Réparer sur l'ordinateur ».
+let M = null;                  // /api/machine: {machine, session, install_mode}
+let machineChecking = false;
+let identityOpen = false;
+const MC_MARK = {"ok": ["✓", "ok"], "à voir": ["!", "warn"], "bloque": ["✗", "block"], "réparé": ["✓", "ok"],
+  "se répare": ["↻", "fixing"], "facultatif": ["○", "opt"], "non concerné": ["—", "skip"], "inconnu": ["?", "unknown"]};
+const repairsHere = () => !(PHONE || ON_PHONE_ADDRESS);
+const machineItems = () => (M && M.machine && M.machine.items) || [];
+function machineSummary() {
+  return (M && M.machine && M.machine.summary) || S.machine_summary || (A && A.machine_summary) || null;
+}
+function sinceShort(iso) {
+  if (!iso) return "jamais";
+  const s = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000));
+  return s < 60 ? "à l'instant" : s < 3600 ? `il y a ${Math.round(s / 60)} min` : s < 86400 ? `il y a ${Math.round(s / 3600)} h` : `le ${iso.slice(0, 10)} à ${iso.slice(11, 16)}`;
+}
+// A payload read by a request may be older than the session the stream
+// already told: the newest session is kept.
+function mergeMachine(next) {
+  const cur = M && M.session, nx = next && next.session;
+  M = {...(M || {}), ...next};
+  if (cur && (nx ? nx.id === cur.id && (nx.seq || 0) < (cur.seq || 0) : cur.status !== "ended")) M.session = cur;
+}
+async function loadMachine() {
+  try { mergeMachine(await api("/api/machine")); } catch (e) { return; }
+  renderMachineAll();
+}
+// When the screen opens, and « Vérifier maintenant »: every item again, the
+// open application's tools with them.
+async function checkMachine(diagnostic) {
+  if (machineChecking) return;
+  machineChecking = true; renderMachine();
+  try {
+    mergeMachine(await api("/api/machine/check", {diagnostic: !!diagnostic}));
+    const st = await api("/api/state"); S.diagnostic = st.diagnostic; S.machine_summary = st.machine_summary;
+  } catch (e) { if (e.status !== 401) $("machine-msg").textContent = e.message; }
+  finally { machineChecking = false; renderMachineAll(); renderDiag(); }
+}
+function renderMachineAll() { renderMachine(); renderMachineBadges(); renderMachineHome(); renderMachineSession(); }
+
+function machineLine(x) {
+  const [mark, cls] = MC_MARK[x.status] || ["?", "unknown"];
+  const li = el("li", {class: "mc-line " + cls, "data-id": x.id, "data-status": x.status},
+    el("span", {class: "mc-mark", "aria-hidden": "true", text: mark}),
+    el("div", {class: "mc-main"},
+      el("div", {class: "mc-label"}, el("b", {text: x.label}), el("span", {class: "mc-state", text: x.status})),
+      el("div", {class: "mc-detail", text: x.detail || ""}),
+      el("div", {class: "mc-rule muted small"}, el("span", {text: "Règle : " + (x.rule_text || x.rule)}),
+        el("span", {class: "mc-age", title: x.checked_at || "", text: " · vérifié " + sinceShort(x.checked_at)}))),
+    el("div", {class: "mc-act"}, repairNode(x)));
+  if (x.id === "git_identity" && identityOpen && repairsHere()) li.append(identityForm());
+  return li;
+}
+function repairNode(x) {
+  if (!x.repair || ["ok", "réparé", "non concerné"].includes(x.status)) return null;
+  if (!repairsHere()) return el("span", {class: "mc-there muted small", text: "Réparer sur l'ordinateur"});
+  const going = !!(M && M.session && M.session.status !== "ended");
+  const b = el("button", {class: "small mc-repair" + (x.status === "bloque" ? " primary" : ""), "data-repair": x.repair.id,
+    text: x.repair.label, disabled: (going && ["claude_login", "github_login", "pip", "claude_code", "tool"].includes(x.repair.id)) || undefined});
+  b.onclick = () => doRepair(x, b);
+  return b;
+}
+const idDraft = {name: "", email: ""};       // what she typed, kept across a re-render
+function identityForm() {
+  const name = el("input", {type: "text", id: "id-name", placeholder: "Prénom Nom", "aria-label": "Nom pour git", autocomplete: "name", value: idDraft.name,
+    oninput: (e) => { idDraft.name = e.target.value; }});
+  const mail = el("input", {type: "email", id: "id-email", placeholder: "vous@exemple.fr", "aria-label": "E-mail pour git", autocomplete: "email", value: idDraft.email,
+    oninput: (e) => { idDraft.email = e.target.value; }});
+  const msg = el("span", {class: "small", id: "id-msg"});
+  const save = el("button", {class: "primary small", text: "Enregistrer", onclick: async () => {
+    save.disabled = true;
+    try { mergeMachine(await api("/api/machine/repair", {id: "identity", args: {name: name.value, email: mail.value}})); identityOpen = false; renderMachineAll(); }
+    catch (e) { msg.textContent = e.message; save.disabled = false; }
+  }});
+  return el("div", {class: "mc-form"}, el("span", {class: "muted small", text: "Dans la configuration globale de git (user.name, user.email) :"}), name, mail, save,
+    el("button", {class: "small", text: "Annuler", onclick: () => { identityOpen = false; renderMachine(); }}), msg);
+}
+function renderMachine() {
+  const box = $("machine-list"); if (!box) return;
+  const m = M && M.machine;
+  $("btn-machine-check").disabled = machineChecking || !!(m && m.running);
+  $("machine-age").textContent = machineChecking || (m && m.running) ? "Vérification en cours…"
+    : m && m.at ? "Dernière vérification complète : " + sinceShort(m.at) + "." : "Pas encore vérifié depuis le démarrage du cockpit.";
+  const sel = $("set-install-mode");
+  if (sel && M) sel.value = M.install_mode || "demander";
+  if (sel) sel.disabled = !repairsHere() || undefined;
+  box.replaceChildren();
+  const items = machineItems();
+  if (!items.length) { box.append(el("p", {class: "muted", text: machineChecking ? "Vérification…" : "Rien encore."})); return; }
+  // The groups in their order, then one per application.
+  const order = (m && m.groups) || [];
+  const groups = [...new Set([...order.filter((g) => items.some((x) => !x.app && x.group === g)),
+    ...items.filter((x) => !x.app).map((x) => x.group), ...items.filter((x) => x.app).map((x) => "app:" + x.group)])];
+  for (const g of groups) {
+    const rows = items.filter((x) => (x.app ? "app:" + x.group : x.group) === g);
+    const title = g.startsWith("app:") ? `Application « ${g.slice(4)} »` : g;
+    box.append(el("div", {class: "mc-group", "data-group": title}, el("h3", {text: title}), el("ul", {}, rows.map(machineLine))));
+  }
+  if (!repairsHere()) box.prepend(el("div", {class: "notice warn", text: "Réparer sur l'ordinateur : les réparations se font depuis le cockpit de l'ordinateur, pas d'ici."}));
+}
+// The badge — on the home screen and in the top bar — when an item blocks
+// or needs her.
+function renderMachineBadges() {
+  const sm = machineSummary();
+  const show = !!(sm && sm.level !== "ok");
+  for (const id of ["tb-machine", "machine-badge"]) {
+    const b = $(id); if (!b) continue;
+    b.classList.toggle("hidden", !show);
+    if (!show) continue;
+    b.className = (id === "tb-machine" ? "chip " : "mc-badge ") + (sm.level === "block" ? "block" : "warn");
+    b.replaceChildren(el("b", {text: sm.level === "block" ? "Ordinateur : bloqué" : "Ordinateur : à voir"}), ` · ${sm.count}`,
+      id === "machine-badge" && !repairsHere() ? el("span", {class: "mc-there", text: " · Réparer sur l'ordinateur"}) : "");
+    b.title = sm.text + (repairsHere() ? "" : " — Réparer sur l'ordinateur");
+  }
+}
+function openMachine() {
+  if (S.open) { go("settings"); setTimeout(() => { const s = $("sec-machine"); if (s) s.scrollIntoView({block: "start"}); }, 50); }
+  else { const h = $("machine-home"); if (h) h.scrollIntoView({block: "start"}); }
+}
+// On the home screen: what blocks or needs her, with each repair — Paramètres
+// belongs to an open application.
+function renderMachineHome() {
+  const box = $("machine-home"); if (!box) return;
+  const bad = machineItems().filter((x) => x.status === "bloque" || x.status === "à voir");
+  const s = M && M.session;
+  const show = bad.length > 0 || !!(s && s.status !== "ended");
+  box.classList.toggle("hidden", !show);
+  if (!show) { box.replaceChildren(); return; }
+  box.replaceChildren(...[el("h3", {text: "État de l'ordinateur"}),
+    el("ul", {class: "mc-home-list"}, bad.slice(0, 6).map(machineLine)),
+    bad.length > 6 ? el("div", {class: "muted small", text: `et ${bad.length - 6} de plus — Paramètres → État de l'ordinateur`}) : null,
+    el("div", {id: "machine-session-home"})].filter(Boolean));
+  renderMachineSession();
+}
+
+async function doRepair(x, btn) {
+  const r = x.repair, a = r.args || {};
+  const msg = $("machine-msg");
+  if (msg) msg.textContent = "";
+  try {
+    if (r.id === "identity") { identityOpen = true; renderMachine(); return; }
+    if (r.id === "push") { await syncPush(a.folder || null, !!a.chain); return loadMachine(); }
+    if (r.id === "reconcile") { await syncReconcile(a.folder || null, !!a.chain); return loadMachine(); }
+    if (r.id === "pull") { await syncPull(a.folder, btn); return loadMachine(); }
+    if (r.id === "chain_install") { await rowInstall(a.folder); return loadMachine(); }
+    if (r.id === "cockpit_update") { await updateCockpit(btn); return; }
+    if (["pip", "claude_code", "tool"].includes(r.id)) { await askInstall(r.id, a); return; }
+    if (btn) btn.disabled = true;
+    const out = await api("/api/machine/repair", {id: r.id, args: a});
+    if (r.id === "restart") { waitRestart(out); return; }
+    mergeMachine(out); renderMachineAll();
+  } catch (e) {
+    if (btn) btn.disabled = false;
+    if (msg) msg.textContent = e.message; else alert(e.message);
+    if (e.body && e.body.machine) loadMachine();
+  }
+}
+
+// Every install the cockpit drives starts with one question — unless
+// Paramètres says « Rapide » or « Pas à pas » for all of them.
+async function askInstall(id, args) {
+  const mode = (M && M.install_mode) || S.install_mode || "demander";
+  if (mode !== "demander") return startInstall(id, args, mode);
+  const d = await api("/api/machine/describe", {kind: id, tool: args.tool});
+  installDialog(d, (choice) => startInstall(id, args, choice));
+}
+function installDialog(d, choose) {
+  const box = $("install-ask");
+  const close = () => box.classList.add("hidden");
+  const lic = d.licences && d.licences.length ? d.licences.join(", ") : "aucune";
+  const never = ["la fenêtre d'administrateur de Windows (UAC)", "une connexion dans le navigateur (Claude, GitHub)"];
+  box.replaceChildren(el("div", {class: "card", role: "dialog", "aria-modal": "true", "aria-labelledby": "ia-title"},
+    el("h2", {id: "ia-title", text: "Comment installer ?"}),
+    el("div", {class: "ia-what"}, el("b", {text: "Ce qui sera installé : "}), (d.what || []).join(" ; ") || "—"),
+    el("div", {class: "ia-opt"}, el("button", {class: "primary", id: "ia-rapide", text: "Rapide", onclick: () => { close(); choose("rapide"); }}),
+      el("div", {class: "small"}, "Vous acceptez d'avance les étapes et les licences ; le cockpit fait tout sans redemander. ",
+        el("b", {text: "Licences acceptées : " + lic + "."}), " Le compte rendu liste ce qui a été installé et chaque licence acceptée ; il reste dans les journaux.")),
+    el("div", {class: "ia-opt"}, el("button", {id: "ia-pas", text: "Pas à pas", onclick: () => { close(); choose("pas_a_pas"); }}),
+      el("div", {class: "small", text: "Une carte pour chaque étape, et chaque licence montrée en entier : vous acceptez ou refusez. Une licence refusée arrête l'installation."})),
+    el("div", {class: "notice warn small ia-never"}, "Aucun des deux modes ne peut passer outre : " + never.join(", et ") + "."
+      + ((d.unskippable || []).length ? " Ici : " + d.unskippable.join(" ; ") + "." : "")),
+    el("div", {class: "row"}, el("button", {class: "small", text: "Annuler", onclick: close}),
+      el("span", {class: "muted small", text: "Le choix par défaut se règle dans Paramètres → État de l'ordinateur."}))));
+  box.classList.remove("hidden");
+  $("ia-rapide").focus();
+}
+async function startInstall(id, args, mode) {
+  try { mergeMachine(await api("/api/machine/repair", {id, args, mode})); renderMachineAll(); }
   catch (e) { alert(e.message); }
-  finally { diagBusy = false; renderDiag(); renderAlerts(); }
-};
+}
+
+// The repair going — a sign-in, an install: its steps, the card that waits
+// on her, the sign-in page and its code; at its end, what was installed and
+// every licence accepted.
+function renderMachineSession() {
+  const s = M && M.session;
+  for (const id of ["machine-session", "machine-session-home"]) {
+    const box = $(id); if (!box) continue;
+    box.replaceChildren();
+    if (!s) continue;
+    const ended = s.status === "ended";
+    const card = el("div", {class: "mc-session " + (ended ? (["installé", "connecté", "rien à installer"].includes(s.outcome) ? "done" : "failed") : "going"), "data-kind": s.kind},
+      el("div", {class: "row"}, el("b", {text: s.title}),
+        s.mode ? el("span", {class: "badge plain", text: s.mode === "rapide" ? "Rapide" : "Pas à pas"}) : null,
+        el("span", {class: "mc-sess-state", text: ended ? s.outcome : s.status === "waiting" ? "vous attend" : "en cours…"}),
+        !ended && repairsHere() ? el("button", {class: "small danger", text: "Arrêter", onclick: async () => { try { await api("/api/machine/session/cancel", {}); } catch (e) { alert(e.message); } }}) : null));
+    if (s.url && !ended) card.append(el("div", {class: "mc-signin"},
+      el("div", {}, "La page de connexion s'est ouverte dans le navigateur. Sinon : ", el("a", {href: s.url, target: "_blank", rel: "noopener", text: "l'ouvrir"}), "."),
+      s.code_wanted && repairsHere() ? signinCode() : null));
+    if (s.card && !ended) card.append(decisionCard(s.card));
+    const steps = s.steps || [];
+    if (steps.length) card.append(el("ol", {class: "mc-steps"}, steps.slice(-12).map((x) => el("li", {text: x.text}))));
+    if (ended) {
+      card.append(el("div", {class: "mc-report"},
+        el("div", {}, el("b", {text: "Résultat : "}), s.outcome + (s.message ? " — " + s.message : "")),
+        s.installed && s.installed.length ? el("div", {}, el("b", {text: "Installé : "}), s.installed.join(", ")) : null,
+        s.mode ? el("div", {}, el("b", {text: "Licences acceptées : "}), (s.licences || []).length ? s.licences.map((l) => l.name + (l.package ? ` (${l.package})` : "")).join(", ") : "aucune") : null,
+        s.log_path ? el("div", {class: "muted small"}, "Journal : ", logLink(s.log_path)) : el("div", {class: "muted small", text: "Gardé dans logs\\installations.jsonl."})));
+    }
+    box.append(card);
+  }
+}
+function signinCode() {
+  const inp = el("input", {type: "text", class: "signin-code", placeholder: "Le code que la page affiche", "aria-label": "Code de connexion", autocomplete: "off"});
+  const b = el("button", {class: "primary small", text: "Envoyer le code", onclick: async () => {
+    b.disabled = true;
+    try { await api("/api/machine/session/code", {code: inp.value}); inp.value = ""; } catch (e) { alert(e.message); } finally { b.disabled = false; }
+  }});
+  return el("div", {class: "row mc-code"}, el("span", {class: "small", text: "Si la page affiche un code :"}), inp, b);
+}
+function decisionCard(c) {
+  const answer = async (accept) => {
+    try { await api("/api/machine/session/answer", {card: c.id, accept}); } catch (e) { alert(e.message); }
+  };
+  return el("div", {class: "mc-card " + (c.kind === "licence" ? "licence" : "step"), "data-card": c.id, role: "group", "aria-label": c.title},
+    el("div", {class: "row"}, el("span", {class: "badge " + (c.kind === "licence" ? "warn" : "plain"), text: c.kind === "licence" ? "Licence" : "Étape"}), el("b", {text: c.title})),
+    el("pre", {class: "mc-text", text: c.text || ""}),
+    repairsHere() ? el("div", {class: "row"},
+      el("button", {class: "primary small mc-accept", text: c.kind === "licence" ? "J'accepte cette licence" : "Autoriser", onclick: () => answer(true)}),
+      el("button", {class: "small danger mc-refuse", text: "Refuser", onclick: () => answer(false)}))
+      : el("div", {class: "muted small", text: "Réparer sur l'ordinateur : la réponse se donne depuis le cockpit de l'ordinateur."}));
+}
+$("btn-machine-check").onclick = () => checkMachine(true);
+$("set-install-mode").addEventListener("change", async (e) => {
+  try { const r = await api("/api/install-mode", {mode: e.target.value}); M = {...(M || {}), install_mode: r.install_mode}; S.install_mode = r.install_mode; }
+  catch (err) { alert(err.message); }
+  renderMachine();
+});
+$("tb-machine").onclick = openMachine;
+$("machine-badge").onclick = openMachine;
 
 // ====================================================== Déploiement (1.8)
 // Build the active application and put it where it runs, then watch it run
@@ -6209,6 +6539,8 @@ if (PHONE) phoneBuild();
 // 1.15: opened by a notification tapped — its screen, once the state is read.
 const pushOpen = pushFromAddress();
 refreshState().then(() => pushOpen && openFromPush(pushOpen)).catch((e) => showStart(e.message));
+// 1.16: « État de l'ordinateur » as the server last checked it — the badge.
+loadMachine();
 </script>
 </body>
 </html>

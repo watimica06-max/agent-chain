@@ -43,6 +43,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PATH = os.path.join(HERE, "config.json")
 MAX_RECENT = 8
 MAX_HISTORY = 30
+INSTALL_MODES = ("rapide", "pas_a_pas", "demander")
 MODES = ("auto", "manuel")
 
 
@@ -342,6 +343,23 @@ class State:
             raise ValueError(f"mode inconnu : {mode}")
         with self._lock:
             self.data["mode"] = mode
+            self._save()
+
+    # ------------------------------------------------- installs (1.16)
+
+    @property
+    def install_mode(self):
+        """How an install the cockpit drives goes, unless she says otherwise
+        at its start: « rapide », « pas_a_pas », or « demander » — the
+        question asked each time (the default)."""
+        m = self.data.get("install_mode")
+        return m if m in INSTALL_MODES else "demander"
+
+    def set_install_mode(self, mode: str):
+        if mode not in INSTALL_MODES:
+            raise ValueError(f"mode d'installation inconnu : {mode}")
+        with self._lock:
+            self.data["install_mode"] = mode
             self._save()
 
     # --------------------------------------------------------- diagnostic

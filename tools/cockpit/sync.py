@@ -136,10 +136,27 @@ def summary(st):
         return (f"Divergé : {n('ahead', 'commit', 'commits')} ici que GitHub n'a pas, "
                 f"{n('behind', 'commit', 'commits')} sur GitHub qu'ici on n'a pas")
     if s == OFFLINE:
-        return "GitHub injoignable — l'état n'est pas vérifié" + (f" ({st['detail']})" if st.get("detail") else "")
+        return ("GitHub injoignable" + (f" · {n('ahead', 'non envoyé', 'non envoyés')}" if st.get("ahead") else "")
+                + " — l'état n'est pas vérifié" + (f" ({st['detail']})" if st.get("detail") else ""))
     if s == NO_REMOTE:
         return "Sans GitHub — ce dépôt n'a pas de dépôt distant"
     return st.get("detail") or "état inconnu"
+
+
+def _unsent(folder, branch, remote):
+    """The commits of HEAD the tracking branch lacks — without a fetch: what
+    is not on GitHub as far as this clone last knew. 0 when it cannot say."""
+    up = git(folder, "rev-parse", "-q", "--verify", "--symbolic-full-name", f"{branch}@{{upstream}}")
+    ref = up.out.strip() if up.ok and up.out.strip() else f"refs/remotes/{remote}/{branch}"
+    if not git(folder, "rev-parse", "-q", "--verify", ref).ok:
+        ref = None
+    if not git(folder, "rev-parse", "-q", "--verify", "HEAD").ok:
+        return 0
+    r = git(folder, "rev-list", "--count", f"{ref}..HEAD" if ref else "HEAD")
+    try:
+        return int(r.out.strip() or 0) if r.ok else 0
+    except ValueError:
+        return 0
 
 
 def compute(folder, fetch=True):
@@ -174,6 +191,10 @@ def compute(folder, fetch=True):
         f = git(folder, "fetch", "-q", remote, timeout=FETCH_TIMEOUT)
         if not f.ok:
             st.update(state=OFFLINE, credentials=credentials(f.text), detail=explain(f.text))
+            # 1.16: the commits not yet sent are still counted — against the
+            # tracking branch, as the last fetch left it: never hidden while
+            # GitHub cannot be reached.
+            st["ahead"] = _unsent(folder, branch, remote)
             st["summary"] = summary(st)
             return st
         st["fetched"] = True

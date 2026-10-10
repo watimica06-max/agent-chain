@@ -156,6 +156,21 @@ def _creations_in_tmp(tmp_path_factory, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def fake_machine(monkeypatch):
+    """1.16: « État de l'ordinateur » never probes this computer in a test —
+    every probe sees the all-good fake computer (machinefakes.py), which a
+    test changes for its case. No check at start, no restart of its own, no
+    registry read."""
+    import installs
+    import machinefakes
+    import server
+    monkeypatch.setattr(server, "MACHINE_AT_START", False)
+    monkeypatch.setattr(server, "AUTO_RESTART", False)
+    monkeypatch.setattr(installs, "REGISTRY", lambda: {})
+    return machinefakes.install(monkeypatch)
+
+
+@pytest.fixture(autouse=True)
 def _no_real_diagnostic(monkeypatch):
     """1.4.5: the cockpit runs the diagnostic on its own when none is stored.
     In a test it is always a fake, all ✓, unless the test passes its own."""

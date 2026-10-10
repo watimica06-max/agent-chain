@@ -172,10 +172,11 @@ def _sweep_logs(log_dir):
                 pass
 
 
-def spawn(port, trial, extra=(), log_dir=None):
+def spawn(port, trial, extra=(), log_dir=None, env=None):
     """Starts the new server, detached: it outlives the old one. What it
     writes to stderr goes to <logs>/relais-<trial>.log — what is said when
-    it does not answer. Returns the process."""
+    it does not answer. Returns the process. 1.16: `env`, the environment it
+    gets — PATH as Windows has it now, after an install changed it."""
     cmd, console = server_command(port, trial, extra)
     log_dir = log_dir or os.path.join(HERE, "logs")
     os.makedirs(log_dir, exist_ok=True)
@@ -187,7 +188,7 @@ def spawn(port, trial, extra=(), log_dir=None):
                                                        else subprocess.DETACHED_PROCESS)
     try:
         return subprocess.Popen(cmd, cwd=HERE, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=err,
-                                creationflags=flags, close_fds=True,
+                                creationflags=flags, close_fds=True, env=env,
                                 **({} if os.name == "nt" else {"start_new_session": True}))
     finally:
         err.close()
