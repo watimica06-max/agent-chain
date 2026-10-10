@@ -121,6 +121,12 @@ WRITES = [
     ("Bash", {"command": "echo x > README.md"}),
     ("WebFetch", {"url": "https://example.com", "prompt": "x"}),
     ("WebSearch", {"query": "x"}),
+    # Claude Code on Windows: PowerShell, under the same rule.
+    ("PowerShell", {"command": "Remove-Item -Recurse docs"}),
+    ("PowerShell", {"command": "git commit -am x"}),
+    ("PowerShell", {"command": "git push"}),
+    ("PowerShell", {"command": "Set-Content README.md x"}),
+    ("PowerShell", {"command": "Invoke-WebRequest https://example.com"}),
 ]
 READS = [
     ("Read", {"file_path": "README.md"}),
@@ -128,4 +134,6 @@ READS = [
     ("Glob", {"pattern": "**/*.md"}),
     ("Bash", {"command": "git log --oneline -5"}),
     ("Bash", {"command": "ls docs"}),
+    ("PowerShell", {"command": "git log --oneline -5"}),
+    ("PowerShell", {"command": "Get-Content README.md | Select-Object -First 5"}),
 ]

@@ -117,7 +117,7 @@ def test_anything_else_is_refused(command):
 
 
 @pytest.mark.parametrize("tool", ["Write", "Edit", "MultiEdit", "NotebookEdit", "WebFetch", "WebSearch", "Agent",
-                                  "Task", "PowerShell", "TodoWrite", "mcp__cockpit__licence", "Skill"])
+                                  "Task", "TodoWrite", "mcp__cockpit__licence", "Skill", "KillShell"])
 def test_every_tool_but_reading_is_refused(tool):
     assert "n'est pas permis" in enquete.gate(tool, {"file_path": "x"})
 
@@ -125,6 +125,56 @@ def test_every_tool_but_reading_is_refused(tool):
 @pytest.mark.parametrize("tool", ["Read", "Grep", "Glob"])
 def test_the_reading_tools_pass(tool):
     assert enquete.gate(tool, {"file_path": "x", "pattern": "x"}) is None
+
+
+PS_ALLOWED = [
+    "git log --oneline -20",
+    "git show HEAD~1:tools/cockpit/journal.py 2>$null",
+    "git -C C:\\Dev\\hyrox log -3",
+    "Get-Content tools/cockpit/journal.py | Select-Object -First 40",
+    "gc C:\\Dev\\chaine\\README.md",
+    "Get-ChildItem -Recurse -Filter *.md docs",
+    "gci docs; ls; dir",
+    "Select-String -Path tools/cockpit/*.py -Pattern 'computer_label'",
+    "sls -Pattern \"Next:\" -Path .claude/commands/*.md | Measure-Object",
+    "Get-Item README.md | Format-List",
+    "Test-Path docs/enquetes",
+    "Resolve-Path .",
+    "Get-Location",
+    "Set-Location tools/cockpit; git log -3",
+    "Get-ChildItem | Sort-Object Length | Select-Object -Last 5 | Format-Table",
+    "findstr /s /n computer *.py",
+    "git status 2>&1",
+]
+
+PS_REFUSED = [
+    "Remove-Item README.md", "rm README.md", "del README.md", "ri x", "rmdir docs",
+    "Set-Content a.md x", "Add-Content a.md x", "Out-File x", "New-Item x", "ni x", "mkdir x",
+    "Copy-Item a b", "Move-Item a b", "Rename-Item a b",
+    "Get-Content a > b", "Get-Content a >> b", "Get-Content a *> b", "Get-Content a | Out-File b",
+    "Get-Content a | Set-Content b",
+    "git commit -am x", "git push", "git reset --hard", "git checkout -- a",
+    "Invoke-WebRequest https://example.com", "iwr https://example.com", "Invoke-RestMethod https://x",
+    "curl https://example.com", "Start-Process notepad", "Invoke-Expression 'rm x'", "iex 'rm x'",
+    "Get-Content $(Remove-Item x)", "Get-Content \"$env:USERPROFILE\"", "$x = 1", "(Remove-Item x)",
+    "& rm x", "Get-ChildItem | ForEach-Object { Remove-Item $_ }", "Get-Content @('a')",
+    "Get-Content a -Wait", "gc a -wait", "Get-Content `", "ls\nrm x", "cmd /c del x", "python -c 1",
+    "[IO.File]::Delete('a')",
+]
+
+
+@pytest.mark.parametrize("command", PS_ALLOWED)
+def test_powershell_reading_commands_pass(command):
+    """Claude Code on Windows gives PowerShell — Bash only where Git Bash is
+    set up: the same rule, PowerShell's names."""
+    assert enquete.check_powershell(command) is None
+    assert enquete.gate("PowerShell", {"command": command}) is None
+
+
+@pytest.mark.parametrize("command", PS_REFUSED)
+def test_powershell_anything_else_is_refused(command):
+    why = enquete.gate("PowerShell", {"command": command})
+    assert why and why.startswith("lecture seule — ")
 
 
 def test_the_list_of_reading_commands_is_the_one_the_gate_applies():
@@ -161,11 +211,12 @@ def test_the_hook_and_the_permission_callback_refuse_alike():
     asyncio.run(go())
 
 
-def test_the_options_give_reading_tools_only_whatever_the_settings():
+def test_the_options_give_reading_tools_only_whatever_the_settings(tmp_path, monkeypatch):
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path))
     can, hook, _, _ = callbacks()
     o = enquete.build_options("C:/x", "", can, hook)
-    assert o.tools == ["Read", "Grep", "Glob", "Bash"]
-    assert {"Write", "Edit", "NotebookEdit", "WebFetch", "WebSearch", "Agent", "PowerShell"} <= set(o.disallowed_tools)
+    assert o.tools == ["Read", "Grep", "Glob", "Bash", "PowerShell"]
+    assert {"Write", "Edit", "NotebookEdit", "WebFetch", "WebSearch", "Agent"} <= set(o.disallowed_tools)
     assert o.allowed_tools == [] and o.setting_sources == [] and o.mcp_servers == {} and o.strict_mcp_config
     assert o.permission_mode == "default" and o.can_use_tool is can
     # The hook stands before every tool — its matcher none: the CLI runs it in
@@ -173,7 +224,7 @@ def test_the_options_give_reading_tools_only_whatever_the_settings():
     (m,) = o.hooks["PreToolUse"]
     assert m.matcher is None and m.hooks == [hook]
     assert o.system_prompt["append"] == enquete.INSTRUCTION
-    assert o.model is None                      # the chain's commands' model: none passed
+    assert o.model is None                      # no setting names one: the CLI's
     assert enquete.build_options("C:/x", "opus", can, hook).model == "opus"
     second = enquete.build_options("C:/x", "", can, hook, system_prompt="s", tools=[], max_turns=1)
     assert second.tools == [] and second.max_turns == 1
@@ -306,12 +357,26 @@ def test_the_bug_entry_in_the_diagnostiqueurs_format():
     assert enquete.append_gap("", "G01 z.") == "G01 z.\n"
 
 
-def test_default_model_is_read_from_claude_codes_settings(tmp_path, monkeypatch):
-    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path))
-    assert enquete.default_model() is None
-    (tmp_path / "settings.json").write_text('{"model": "sonnet"}', encoding="utf-8")
-    assert enquete.default_model() == "sonnet"
-    os.remove(tmp_path / "settings.json")
+def test_the_default_model_is_the_chain_commands_one_and_is_passed(tmp_path, monkeypatch):
+    """The chain's commands load Claude Code's settings; an investigation
+    loads none — so the model they name is passed to it. Without that it ran
+    on the CLI's own default (opus), not the commands' (sonnet): seen on the
+    first real investigation of 1.21."""
+    user, project = tmp_path / "user", tmp_path / "project"
+    (project / ".claude").mkdir(parents=True)
+    user.mkdir()
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(user))
+    assert enquete.default_model(str(project)) is None
+    (user / "settings.json").write_text('{"model": "sonnet"}', encoding="utf-8")
+    assert enquete.default_model() == "sonnet" and enquete.default_model(str(project)) == "sonnet"
+    (project / ".claude" / "settings.json").write_text('{"model": "haiku"}', encoding="utf-8")
+    assert enquete.default_model(str(project)) == "haiku"
+    (project / ".claude" / "settings.local.json").write_text('{"model": "opus"}', encoding="utf-8")
+    assert enquete.default_model(str(project)) == "opus"
+    can, hook, _, _ = callbacks()
+    assert enquete.build_options(str(project), "", can, hook).model == "opus"
+    assert enquete.build_options(str(user), "", can, hook).model == "sonnet"
+    assert enquete.build_options(str(project), "haiku", can, hook).model == "haiku"
 
 
 def test_her_text_is_printed_whatever_the_consoles_code_page(monkeypatch):

@@ -94,6 +94,15 @@ def subject(repo, ref="HEAD"):
     return git(repo, "log", "-1", "--format=%s", ref).strip()
 
 
+@pytest.fixture(autouse=True)
+def _never_the_real_chain(tmp_path, monkeypatch):
+    """agent-chain's reports are never this computer's: an empty scratch
+    folder, unless the test builds its own scratch clone (chain_root)."""
+    d = tmp_path / "pas-d-agent-chain"
+    d.mkdir()
+    monkeypatch.setattr(server, "CHAIN_ROOT", str(d))
+
+
 @pytest.fixture
 def chain_root(tmp_path, monkeypatch):
     """agent-chain: a scratch clone on a bare GitHub, never this computer's."""

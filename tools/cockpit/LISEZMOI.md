@@ -560,8 +560,11 @@ une lectrice qui n'est pas technicienne.
 - **« Nouvelle enquête »** : la question ; la cible — **l'application**
   ouverte (son dossier) ou **la chaîne et le cockpit** (le dossier
   d'agent-chain, `C:\Dev\chaine`) — ; le modèle — par défaut celui des
-  commandes de la chaîne (aucun n'est passé : celui des réglages de Claude
-  Code, que le formulaire nomme), ou un autre pour cette enquête. Elle a sa
+  commandes de la chaîne — celui que nomment les réglages de Claude Code
+  (le projet, puis l'utilisateur), que le formulaire dit, et que le cockpit
+  passe à l'enquête : elle ne charge aucun réglage, et sans lui elle
+  tournerait sur le modèle par défaut de Claude Code —, ou un autre pour
+  cette enquête. Elle a sa
   route à elle (`/api/enquetes/start`, pas `/api/run`), comme les
   installations de 1.16. **Une à la fois, comme tout run** : refusée tant
   qu'une commande tourne, et une commande, une mise à jour du cockpit,
@@ -569,13 +572,15 @@ une lectrice qui n'est pas technicienne.
   même » noté dans `consommation.log`) ; le pilote automatique n'en lance
   jamais — un programme attend la fin d'une enquête en cours.
 - **Lecture seule, imposée par le cockpit** — pas demandée au modèle.
-  L'enquête n'a que quatre outils : Read, Grep, Glob et Bash — ni Write,
+  L'enquête n'a que des outils de lecture : Read, Grep, Glob, et un shell —
+  PowerShell sur Windows, que Claude Code y donne, ou Bash là où Git Bash
+  est réglé pour lui —, ni Write,
   ni Edit, ni NotebookEdit, ni outil du web, ni agent, ni serveur MCP, ni
   réglage chargé. Chaque appel d'outil passe deux fois par la même règle
   (`enquete.gate`) : le crochet PreToolUse, que Claude Code exécute avant
   tout outil quel que soit le mode de permission, et la fonction de
   permission. Une commande shell ne passe que si chacune de ses commandes
-  est une de celles-ci :
+  est une de celles-ci — dans Bash :
 
   | Commande | Pour |
   |---|---|
@@ -586,10 +591,22 @@ une lectrice qui n'est pas technicienne.
   | `sort`, `uniq`, `cut` | ranger ce qu'une autre lit — `sort` sans `-o`, `uniq` sans fichier de sortie |
   | `pwd`, `cd`, `basename`, `dirname`, `realpath` | se repérer |
 
-  Reliées par `|`, `&&`, `||` ou `;` ; `2>/dev/null` et `2>&1` permis.
+  Dans PowerShell, la même règle, sous ses noms :
+
+  | Commande | Pour |
+  |---|---|
+  | `git log`, `git show`, `git diff`, `git status`, `git blame`, `git grep` | lire l'historique, comme ci-dessus |
+  | `Get-ChildItem` (`gci`, `ls`, `dir`), `Get-Item` (`gi`), `Test-Path` | lister |
+  | `Get-Content` (`gc`, `cat`, `type`) | lire un fichier — sans `-Wait` |
+  | `Select-String` (`sls`), `findstr` | chercher |
+  | `Measure-Object`, `Sort-Object`, `Select-Object`, `Format-List`, `Format-Table`, `Out-String` | compter, ranger, mettre en forme |
+  | `Get-Location` (`pwd`), `Set-Location` (`cd`), `Resolve-Path`, `Split-Path` | se repérer |
+
+  Reliées par `|`, `&&`, `||` ou `;` ; `2>/dev/null` (`2>$null` dans
+  PowerShell) et `2>&1` permis.
   Refusé : toute autre commande, une substitution (`$(…)`, `` ` ``, `$`
   hors apostrophes), une redirection vers un fichier, `&`, une variable
-  posée, plusieurs lignes. Une commande refusée l'est avec sa raison ;
+  posée, un bloc (`{ … }`, `( … )`, `@( … )`), plusieurs lignes. Une commande refusée l'est avec sa raison ;
   l'écran la montre en rouge, et le rapport les liste.
 - **Ce qu'on demande au modèle** : répondre en français, pour une lectrice
   qui n'est pas technicienne ; citer `fichier:ligne` pour chaque

@@ -56,24 +56,38 @@ STEPS_KEPT = 40
 SCRATCH = os.path.join(tempfile.gettempdir(), "cockpit-enquete")
 
 
-def default_model():
-    """The model the chain's commands run with when none is passed: the one
-    Claude Code's user settings name — said on the form, never passed."""
-    base = os.environ.get("CLAUDE_CONFIG_DIR") or os.path.join(os.path.expanduser("~"), ".claude")
+def _settings_model(path):
     try:
-        with open(os.path.join(base, "settings.json"), encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             m = json.load(f).get("model")
-        return m if isinstance(m, str) and m.strip() else None
+        return m.strip() if isinstance(m, str) and m.strip() else None
     except (OSError, ValueError, AttributeError):
         return None
+
+
+def default_model(cwd=None):
+    """The model the chain's commands run with: theirs load Claude Code's
+    settings — the project's `.claude/settings.local.json`, then its
+    `settings.json`, then the user's. An investigation loads none (§1): this
+    one is passed to it, so that it runs on the same model. None: the CLI's."""
+    base = os.environ.get("CLAUDE_CONFIG_DIR") or os.path.join(os.path.expanduser("~"), ".claude")
+    places = [os.path.join(cwd, ".claude", n) for n in ("settings.local.json", "settings.json")] if cwd else []
+    for path in places + [os.path.join(base, "settings.json")]:
+        m = _settings_model(path)
+        if m:
+            return m
+    return None
 
 # ------------------------------------------------------------------ §1 read-only
 
 READ_TOOLS = ("Read", "Grep", "Glob")
-SHELL = "Bash"
-TOOLS = [*READ_TOOLS, SHELL]
+# The shells: Claude Code on Windows offers PowerShell — Bash only where Git
+# Bash is set up for it. Whichever it gives, the same rule (§1).
+SHELL, POWERSHELL = "Bash", "PowerShell"
+SHELLS = (SHELL, POWERSHELL)
+TOOLS = [*READ_TOOLS, *SHELLS]
 # Named as well, so that no setting and no default can bring one back.
-NEVER = ["Write", "Edit", "MultiEdit", "NotebookEdit", "WebFetch", "WebSearch", "Agent", "Task", "PowerShell",
+NEVER = ["Write", "Edit", "MultiEdit", "NotebookEdit", "WebFetch", "WebSearch", "Agent", "Task",
          "TodoWrite", "KillShell", "BashOutput", "SlashCommand", "Skill"]
 
 # The shell commands allowed — the list the Product Owner reads (LISEZMOI).
@@ -95,21 +109,39 @@ READ_COMMANDS = {
     "pwd": "le dossier courant", "cd": "changer de dossier",
     "basename": "le nom d'un chemin", "dirname": "le dossier d'un chemin", "realpath": "le chemin complet",
 }
+# PowerShell's, by the names it knows them by — case does not count. The
+# description, for the list LISEZMOI gives; an alias has none of its own.
+PS_COMMANDS = {
+    "git": "git log, git show, git diff, git status, git blame, git grep — lire l'historique",
+    "get-childitem": "lister (gci, ls, dir)", "gci": "", "ls": "", "dir": "",
+    "get-content": "lire un fichier, sans -Wait (gc, cat, type)", "gc": "", "cat": "", "type": "",
+    "select-string": "chercher dans les fichiers (sls)", "sls": "", "findstr": "chercher dans les fichiers",
+    "get-item": "un fichier, sa taille, sa date (gi)", "gi": "", "test-path": "un chemin existe-t-il",
+    "resolve-path": "le chemin complet", "split-path": "le nom ou le dossier d'un chemin",
+    "get-location": "le dossier courant (pwd, gl)", "pwd": "", "gl": "",
+    "set-location": "changer de dossier (cd, sl)", "cd": "", "sl": "",
+    "measure-object": "compter (measure)", "measure": "", "sort-object": "trier (sort)", "sort": "",
+    "select-object": "garder une partie (select)", "select": "",
+    "format-list": "mettre en forme", "format-table": "mettre en forme", "out-string": "mettre en texte",
+}
 # Between simple commands: a pipe, and the three ways to chain them.
 SEPARATORS = ("|", "||", "&&", ";")
 # The only redirections: an error output thrown away, or joined to the output.
 _REDIR = re.compile(r"(?:2>&1|[12]?>\s*/dev/null)(?=\s|$|[|;&])")
+_PS_REDIR = re.compile(r"(?:2>&1|[12*]?>\s*\$null)(?=\s|$|[|;&])", re.I)
 
 
 class Refused(Exception):
     """A tool call the gate refuses — its reason, in French."""
 
 
-def _words(command):
+def _words(command, ps=False):
     """The shell line as simple commands: [[word, ...], ...]. Refused: what
     substitutes a command or a variable, a redirection to a file, a
-    background job, a subshell, several lines."""
+    background job, a subshell, several lines. `ps`: PowerShell's — its
+    escape is the backtick, refused; a backslash is a path's."""
     out, cur, word, i, n = [], [], None, 0, len(command)
+    redir = _PS_REDIR if ps else _REDIR
 
     def flush():
         nonlocal word
@@ -125,7 +157,7 @@ def _words(command):
             i += 1
             continue
         if word is None:
-            m = _REDIR.match(command, i)
+            m = redir.match(command, i)
             if m:
                 i = m.end()
                 continue
@@ -141,7 +173,7 @@ def _words(command):
             while j < n and command[j] != '"':
                 if command[j] in "$`":
                     raise Refused("une substitution ($ ou `) : rien n'est lancé à l'intérieur d'une autre commande")
-                if command[j] == "\\" and j + 1 < n:
+                if command[j] == "\\" and j + 1 < n and not ps:
                     buf += command[j + 1]
                     j += 2
                     continue
@@ -154,15 +186,17 @@ def _words(command):
             continue
         if c in "$`":
             raise Refused("une substitution ($ ou `) : rien n'est lancé à l'intérieur d'une autre commande")
-        if c == "\\":
+        if c == "\\" and not ps:
             word = (word or "") + (command[i + 1] if i + 1 < n else "")
             i += 2
             continue
+        if ps and c == "@":
+            raise Refused("« @ » : ni tableau ni table construits")
         if c in "|&;":
             flush()
             op = command[i:i + 2] if command[i:i + 2] in ("||", "&&") else c
             if op == "&":
-                raise Refused("une commande en arrière-plan (&)")
+                raise Refused("« & » : ni commande en arrière-plan, ni appel d'un programme")
             if not cur:
                 raise Refused(f"« {op} » sans commande avant")
             out.append(cur)
@@ -252,19 +286,44 @@ def check_shell(command):
     return None
 
 
+def _check_ps_simple(words):
+    name, args = words[0].lower(), words[1:]
+    if name.endswith(".exe"):
+        name = name[:-4]
+    if name not in PS_COMMANDS:
+        raise Refused(f"« {words[0]} » n'est pas une commande de lecture")
+    if name == "git":
+        _check_git(args)
+    elif name in ("get-content", "gc", "cat", "type") and any(w.lower().startswith("-wai") for w in args):
+        raise Refused("Get-Content -Wait attend sans fin")
+
+
+def check_powershell(command):
+    """PowerShell's line: None when it only reads; else Refused's reason."""
+    try:
+        for words in _words(command or "", ps=True):
+            _check_ps_simple(words)
+    except Refused as e:
+        return str(e)
+    return None
+
+
+SHELL_CHECKS = {SHELL: check_shell, POWERSHELL: check_powershell}
+
+
 def gate(name, data):
     """§1 — None when the tool call only reads; else why it is refused."""
     if name in READ_TOOLS:
         return None
-    if name == SHELL:
-        why = check_shell((data or {}).get("command") or "")
+    if name in SHELL_CHECKS:
+        why = SHELL_CHECKS[name]((data or {}).get("command") or "")
         return f"lecture seule — {why}" if why else None
     return f"lecture seule — l'outil {name} n'est pas permis à une enquête"
 
 
 def _tool_text(name, data):
     data = data or {}
-    if name == SHELL:
+    if name in SHELLS:
         return data.get("command") or ""
     if name == "Read":
         return data.get("file_path") or ""
@@ -280,7 +339,7 @@ def _tool_text(name, data):
 
 INSTRUCTION = """Tu mènes une enquête pour la Product Owner d'une chaîne d'agents qui écrit des applications. Elle n'est pas technicienne.
 
-Tu lis, tu ne changes rien. Le cockpit ne te donne que des outils de lecture : lire un fichier, chercher, lister, lire l'historique git. Toute autre commande est refusée par le cockpit lui-même : n'insiste pas, cherche autrement, et dis-le si cela t'empêche d'établir un point.
+Tu lis, tu ne changes rien. Le cockpit ne te donne que des outils de lecture : lire un fichier, chercher, et un shell pour lire l'historique git (`git log`, `git show`, `git diff`, `git blame`, `git grep`, `git status`) et lister ou lire des fichiers. Toute autre commande est refusée par le cockpit lui-même : n'insiste pas, cherche autrement, et dis-le si cela t'empêche d'établir un point.
 
 Comment tu réponds :
 - En français de tous les jours, pour une lectrice qui n'est pas technicienne. Un mot technique, explique-le en quelques mots la première fois.
@@ -312,6 +371,7 @@ def build_options(cwd, model, can_use_tool, hook, system_prompt=None, tools=None
     tool at all, one turn."""
     from claude_agent_sdk import ClaudeAgentOptions, HookMatcher
     kw = {}
+    model = model or default_model(cwd)
     if model:
         kw["model"] = model
     if max_turns:
