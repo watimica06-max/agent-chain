@@ -24,11 +24,12 @@ pytest.importorskip("playwright")
 import selfupdate  # noqa: E402
 import server  # noqa: E402
 import startup  # noqa: E402
+from copies import built_once  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
 from selfupdateworld import chain_world, fakes, is_alive  # noqa: E402,F401
 from syncworld import app_world, bare, change, clone_of, head  # noqa: E402
 from test_chain import commit, git, init  # noqa: E402
-from test_page import browser, page  # noqa: E402,F401
+from test_page import page  # noqa: E402,F401
 from test_runner import script_until_interrupted  # noqa: E402
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -175,7 +176,12 @@ IGNORE = shutil.ignore_patterns("tests", "logs", "__pycache__", "*.pyc", "stats.
 
 def scratch_agent_chain(tmp_path):
     """This cockpit's code, as it is on disk, in a scratch agent-chain on a
-    bare GitHub: `here` runs it, `other` moves it on."""
+    bare GitHub: `here` runs it, `other` moves it on. Built once per run,
+    copied here (copies.py)."""
+    return built_once("scratch-agent-chain", tmp_path, _scratch_agent_chain)
+
+
+def _scratch_agent_chain(tmp_path):
     remote = bare(tmp_path / "github" / "agent-chain.git")
     seed = tmp_path / "seed"
     init(seed)
@@ -243,10 +249,19 @@ def test_the_page_reloads_after_a_real_restart(tmp_path, page):
         page.wait_for_selector("#cockpit-update:not(.hidden) li", timeout=30000)
         assert page.locator("#cockpit-update li").inner_text().endswith("cockpit : la relève")
         shot(page, "8-relance-avant")
-        page.evaluate("window.__old_page = true")
-        page.locator("#btn-cockpit-update-home").click()
-        page.wait_for_selector("#stopped.restart:not(.hidden)", timeout=90000)
-        assert page.locator("#stopped-title").inner_text() == "Redémarrage du cockpit…"
+        # The restart card shows for well under a second before the page reloads: the page itself
+        # says when it appears, and what it reads — a selector polled from here can miss it.
+        page.evaluate("""() => {
+            window.__old_page = true;
+            const st = document.getElementById("stopped");
+            new MutationObserver(() => {
+                if (st.classList.contains("restart") && !st.classList.contains("hidden"))
+                    console.log("carte-relance:" + document.getElementById("stopped-title").textContent);
+            }).observe(st, {attributes: true, attributeFilter: ["class"]});
+        }""")
+        with page.expect_console_message(lambda m: m.text.startswith("carte-relance:"), timeout=90000) as card:
+            page.locator("#btn-cockpit-update-home").click()
+        assert card.value.text == "carte-relance:Redémarrage du cockpit…"
         shot(page, "9-relance-en-cours")
         # The old server exits; the page reloads on its own, on the new one.
         assert old.wait(30) == 0

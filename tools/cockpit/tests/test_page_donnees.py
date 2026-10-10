@@ -13,7 +13,7 @@ from cmdtests import unanswered_questions  # noqa: E402
 from donneesworld import RELEVE, data_world, png  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
 from test_chain import git  # noqa: E402
-from test_page import browser, no_real_errors, page, stop_run  # noqa: E402,F401
+from test_page import no_real_errors, page, stop_run  # noqa: E402,F401
 
 F = "docs/features/f/donnees"
 

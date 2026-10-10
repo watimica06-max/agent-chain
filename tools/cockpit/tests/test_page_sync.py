@@ -12,11 +12,12 @@ pytest.importorskip("playwright")
 import server  # noqa: E402
 import sync  # noqa: E402
 from claude_agent_sdk import AssistantMessage, TextBlock  # noqa: E402
+from copies import built_once  # noqa: E402
 from donneesworld import data_world  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
 from syncworld import app_world, change, head, offline  # noqa: E402
 from test_chain import commit, git  # noqa: E402
-from test_page import browser, page  # noqa: E402,F401
+from test_page import page, settled  # noqa: E402,F401
 from test_runner import result  # noqa: E402
 
 Q = "docs/features/f/questions-lexicographe-01.md"
@@ -30,7 +31,12 @@ def answer(repo, text="oui"):
 @pytest.fixture
 def five(tmp_path):
     """One application per state: à jour, en retard, non envoyé with an
-    answer not committed, divergé on one same file, injoignable."""
+    answer not committed, divergé on one same file, injoignable. Built once
+    per run, copied here (copies.py)."""
+    return built_once("five", tmp_path, _five)
+
+
+def _five(tmp_path):
     apps = {}
     _, apps["Hyrox"], apps["hyrox_b"] = app_world(tmp_path, "hyrox")
     _, apps["Belivo"], b = app_world(tmp_path, "belivo")
@@ -98,7 +104,7 @@ def test_home_rows_top_bar_and_alerts(tmp_path, page, five):
             assert row(page, n).locator(".hc-alert > div").count() == 0, n
         # The top bar: hidden « à jour », said otherwise.
         open_app(page, s, "Hyrox")
-        page.wait_for_timeout(800)
+        settled(page)
         assert not page.locator("#tb-sync").is_visible()
         open_app(page, s, "Budget")
         page.wait_for_function("document.getElementById('tb-sync').textContent.includes('divergé')")

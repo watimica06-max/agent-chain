@@ -65,6 +65,7 @@ def shot(pg, name):
     out = os.environ.get("COCKPIT_SHOTS")
     if out:
         os.makedirs(out, exist_ok=True)
+        pg.evaluate("() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))")
         pg.screenshot(path=os.path.join(out, name + ".png"))
 
 
@@ -102,7 +103,6 @@ def test_code_page_then_the_dashboard_then_a_permission_over_the_stream(tmp_path
             (ck,) = [c for c in pg.context.cookies() if c["name"] == phone_mod.COOKIE]
             assert ck["httpOnly"] and ck["secure"] and ck["sameSite"] == "Lax" and ck["expires"] > 0
             assert pg.evaluate("document.cookie") == ""             # HttpOnly: no script reads it
-            pg.wait_for_timeout(300)
             shot(pg, "3-telephone-tableau")
             # Every request went through the proxy, under the tailnet name.
             assert ts.forwarded and all(host.startswith(HOST) for _, _, host, _ in ts.forwarded)
@@ -200,7 +200,10 @@ def test_the_computer_sets_the_access_and_shows_five_wrong_codes(tmp_path, phone
             shot(desk, "8-ordinateur-telephone-bloque")
             # The right code is refused all the same.
             code(pg, CODE)
-            pg.wait_for_timeout(300)
+            # The page has its answer: refused, the field emptied, the button back.
+            pg.wait_for_function("document.getElementById('code').value === '' && "
+                                 "!document.getElementById('code-err').classList.contains('hidden') && "
+                                 "!document.getElementById('code-go').disabled")
             assert pg.locator("#code-form").is_visible()
             # « Déconnecter le téléphone » is there, and no phone is connected.
             desk.evaluate("location.hash = '#settings'")

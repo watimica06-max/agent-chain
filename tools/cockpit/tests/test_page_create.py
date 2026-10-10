@@ -13,7 +13,7 @@ import create  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
 from test_chain import write  # noqa: E402
 from test_create import IDEA, chain_root, idea  # noqa: E402,F401
-from test_page import browser, no_real_errors, page  # noqa: E402,F401
+from test_page import no_real_errors, page, settled  # noqa: E402,F401
 
 pytestmark = pytest.mark.real_chain
 
@@ -152,7 +152,7 @@ def test_a_typed_parent_is_kept_when_the_default_comes_back(tmp_path, page, chai
         holding["on"] = False
         for r in held:
             r.continue_()
-        page.wait_for_timeout(500)
+        settled(page)
         assert page.locator("#nf-parent").input_value() == typed
         # A fresh page, the field untouched: the default.
         page.goto("about:blank")

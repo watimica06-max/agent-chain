@@ -8,6 +8,7 @@ import pytest
 
 import chain
 import server
+from copies import built_once
 from test_runner import script_until_interrupted
 from test_server import open_pair, post, with_client
 
@@ -65,6 +66,15 @@ INSTALLED = [".claude/CLAUDE.md", ".claude/agents/a.md", ".claude/agents/b.md", 
 
 @pytest.fixture
 def repos(tmp_path):
+    """The chain's repository, and an application pushed to its bare
+    GitHub — built once per run, copied here (copies.py)."""
+    root, app, remote = built_once("chain-repos", tmp_path, _repos)
+    chain._chain_cache.clear()
+    chain._behind_cache.clear()
+    return root, app, remote
+
+
+def _repos(tmp_path):
     root = tmp_path / "chain"
     init(root)
     for rel, text in CHAIN_FILES.items():
@@ -79,8 +89,6 @@ def repos(tmp_path):
     commit(app, "app")
     git(app, "remote", "add", "origin", str(remote))
     git(app, "push", "-q", "-u", "origin", "master")
-    chain._chain_cache.clear()
-    chain._behind_cache.clear()
     return root, app, remote
 
 

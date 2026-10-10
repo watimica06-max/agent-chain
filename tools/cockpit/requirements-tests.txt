@@ -1,3 +1,4 @@
 -r requirements.txt
 pytest>=8
 playwright>=1.40      # page tests drive the installed Microsoft Edge; skipped without it
+pytest-xdist>=3.6     # the suite in parallel: python -m pytest -n 8 (LISEZMOI.md, « Tests »)

@@ -10,7 +10,7 @@ pytest.importorskip("playwright")
 import batirworld as bw  # noqa: E402
 import server  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
-from test_page import browser, no_real_errors, page  # noqa: E402,F401
+from test_page import no_real_errors, page  # noqa: E402,F401
 
 
 @pytest.fixture(autouse=True)

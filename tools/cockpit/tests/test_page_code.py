@@ -10,10 +10,10 @@ import pytest
 
 pytest.importorskip("playwright")
 from claude_agent_sdk import AssistantMessage, TextBlock, ToolUseBlock, ToolResultBlock, UserMessage  # noqa: E402
-from playwright.sync_api import sync_playwright  # noqa: E402
 
 import stats  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
+from test_page import settled, until, watch_requests  # noqa: E402
 from test_codelots import hand_folder, verdict  # noqa: E402
 from test_runner import result, script_quick, script_with_permission  # noqa: E402
 
@@ -31,22 +31,11 @@ window.Notification = FakeNotification;
 """
 
 
-@pytest.fixture(scope="module")
-def browser():
-    with sync_playwright() as p:
-        try:
-            b = p.chromium.launch(channel="msedge")
-        except Exception as e:
-            pytest.skip(f"Edge indisponible : {e}")
-        yield b
-        b.close()
-
-
 @pytest.fixture
 def page(browser):
     ctx = browser.new_context(viewport={"width": 1280, "height": 800})
     ctx.add_init_script(FAKE_NOTIFICATION)
-    pg = ctx.new_page()
+    pg = watch_requests(ctx.new_page())
     pg.js_errors = []
     pg.on("pageerror", lambda e: pg.js_errors.append(str(e)))
     yield pg
@@ -244,7 +233,8 @@ def test_stopping_the_cockpit_during_a_run_asks_first(tmp_path, page):
             d.dismiss() if len(asked) == 1 else d.accept()
         page.on("dialog", answer)
         page.locator("#btn-quit").click()
-        page.wait_for_timeout(500)
+        until(page, lambda: asked)
+        settled(page)
         assert "/8_code f" in asked[0] and "l'arrête maintenant" in asked[0]
         assert s.rn.is_running(str(s.app_root))               # dismissed: nothing stopped
         # 1.9.1: the order that made the screen vanish, forced — the refresh
@@ -262,7 +252,7 @@ def test_stopping_the_cockpit_during_a_run_asks_first(tmp_path, page):
         holding["on"] = False
         for r in held:
             r.continue_()
-        page.wait_for_timeout(1000)
+        settled(page)
         assert page.locator("#stopped").is_visible()
         assert page.locator("#stopped-title").inner_text() == "Le cockpit est arrêté"
         assert "arrêté" in page.locator("#stopped").inner_text()
@@ -340,6 +330,7 @@ def test_lots_a_coder_beside_the_step_and_in_the_code_tab(tmp_path, page):
         page.locator("#lots-n-main").press("Tab")
         page.locator("#tab-main-code").click()
         page.wait_for_selector("#code-lots-n-main")
+        settled(page)                                  # drawn by the load the click started
         assert page.locator("#code-lots-n-main").input_value() == "3"
         page.get_by_role("button", name="Lancer /8_code").click()
         assert wait_until(page, lambda: len(launched(s)) == 2)

@@ -58,20 +58,8 @@ def test_a_long_run_is_cut_to_what_the_page_keeps(tmp_path, monkeypatch):
 # ------------------------------------------------------- in a headless browser
 
 pytest.importorskip("playwright")
-from playwright.sync_api import sync_playwright  # noqa: E402
 
 from fakeapp import FakeServer  # noqa: E402
-
-
-@pytest.fixture(scope="module")
-def browser():
-    with sync_playwright() as p:
-        try:
-            b = p.chromium.launch(channel="msedge")
-        except Exception as e:
-            pytest.skip(f"Edge indisponible : {e}")
-        yield b
-        b.close()
 
 
 def test_a_page_opened_during_a_run_shows_its_stream_its_agent_and_the_waiting_card(tmp_path, browser):

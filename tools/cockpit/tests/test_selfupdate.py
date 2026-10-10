@@ -31,6 +31,7 @@ from syncworld import app_world, change, head
 from test_chain import git, write
 from test_runner import FakeClient, script_quick, script_until_interrupted
 from test_server import post
+from test_sync_server import wait_for
 
 
 def listed(tmp_path, *folders):
@@ -125,7 +126,7 @@ def test_pulled_at_start_then_the_update_restarts_without_pulling(tmp_path, monk
         code, r = await update(c)
         assert code == 200 and r["restarting"], r
         assert not any("git pull" in x for x in r["steps"])
-        await asyncio.sleep(0.6)
+        await wait_for(lambda: quit)
         assert len(quit) == 1
     serve(tmp_path, body)
 
@@ -149,7 +150,7 @@ def test_update_pulls_then_restarts_and_the_old_server_exits(tmp_path, monkeypat
         assert sp["port"] == port and sp["trial"] != port and sp["extra"] == ["--config", "c.json"]
         assert fakes.server_calls()[0][:4] == ["--port", str(port), "--relais", str(sp["trial"])]
         # The old one exits once the new one answered — and nothing launches meanwhile.
-        await asyncio.sleep(0.6)
+        await wait_for(lambda: quit)
         assert len(quit) == 1
         r2 = await post(c, "/api/run", {"command": "1_lexique", "args": "f"})
         assert r2.status == 409 and "le cockpit se met à jour" in (await r2.json())["error"]

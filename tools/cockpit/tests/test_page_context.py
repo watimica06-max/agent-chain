@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 import pytest
 
 pytest.importorskip("playwright")
-from playwright.sync_api import sync_playwright  # noqa: E402
 
 import stats  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
@@ -67,17 +66,6 @@ Options:
 - Deux significations.
 Answer:
 """
-
-
-@pytest.fixture(scope="module")
-def browser():
-    with sync_playwright() as p:
-        try:
-            b = p.chromium.launch(channel="msedge")
-        except Exception as e:                      # no Edge on this machine
-            pytest.skip(f"Edge indisponible : {e}")
-        yield b
-        b.close()
 
 
 @pytest.fixture
@@ -336,7 +324,8 @@ def test_scrolling_the_document_keeps_the_question(tmp_path, page, width):
         assert st["win"] == 0 and st["main"] == 0 and st["left"] == before["left"] and st["cardSeen"]
         # Down to its end: the page still does not move.
         page.mouse.wheel(0, 60000)
-        page.wait_for_timeout(400)
+        page.wait_for_function("(d => d.scrollTop >= d.scrollHeight - d.clientHeight - 1)(document.getElementById('ctx-doc'))")
+        page.evaluate("() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))")
         st = page.evaluate(SCROLLS)
         assert st["win"] == 0 and st["main"] == 0 and st["left"] == before["left"] and st["cardSeen"]
         # The left pane scrolls on its own too, the right one stays. (In its

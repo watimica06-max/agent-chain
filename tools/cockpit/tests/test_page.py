@@ -2,10 +2,11 @@
 Playwright), served by the real cockpit server over a fake application
 folder and a fake SDK client. Skipped when Playwright or Edge is missing.
 No chain command runs."""
+import time
+
 import pytest
 
 pytest.importorskip("playwright")
-from playwright.sync_api import sync_playwright  # noqa: E402
 
 import diagnostic  # noqa: E402
 import nextline  # noqa: E402
@@ -19,25 +20,66 @@ SCREENS = [("Tableau de bord", "scr-dashboard"), ("À répondre", "scr-answer"),
            ("Statistiques", "scr-stats"), ("Paramètres", "scr-settings")]
 
 
-@pytest.fixture(scope="module")
-def browser():
-    with sync_playwright() as p:
-        try:
-            b = p.chromium.launch(channel="msedge")
-        except Exception as e:                      # no Edge on this machine
-            pytest.skip(f"Edge indisponible : {e}")
-        yield b
-        b.close()
-
-
 @pytest.fixture
 def page(browser):
-    pg = browser.new_page(viewport={"width": 1280, "height": 800})
+    pg = watch_requests(browser.new_page(viewport={"width": 1280, "height": 800}))
     pg.js_errors = []
     pg.on("pageerror", lambda e: pg.js_errors.append(str(e)))
     pg.on("console", lambda m: pg.js_errors.append(m.text) if m.type == "error" else None)
     yield pg
     pg.close()
+
+
+def watch_requests(pg):
+    """The page's requests still going, for `settled` — its event stream
+    aside, which never ends. A request of a document a navigation replaced
+    never says it ended: once the new document has loaded, those started
+    before its own request are dropped."""
+    pg.going, seq = {}, {"n": 0, "nav": 0}
+
+    def start(r):
+        seq["n"] += 1
+        if r.is_navigation_request() and r.frame == pg.main_frame:
+            seq["nav"] = seq["n"]
+        elif "/api/events" not in r.url:
+            pg.going[r] = seq["n"]
+
+    def new_document(_):
+        for r in [r for r, n in pg.going.items() if n < seq["nav"]]:
+            del pg.going[r]
+    pg.on("request", start)
+    pg.on("requestfinished", lambda r: pg.going.pop(r, None))
+    pg.on("requestfailed", lambda r: pg.going.pop(r, None))
+    pg.on("domcontentloaded", new_document)
+    return pg
+
+
+def frames(page):
+    """Two frames rendered: what a scroll or a click changed is laid out."""
+    page.evaluate("() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))")
+
+
+def until(page, cond, timeout=10.0):
+    """Waits for `cond()` — Playwright hands the page's events (a dialog,
+    a request) to Python only while it waits."""
+    end = time.monotonic() + timeout
+    while not cond():
+        assert time.monotonic() < end, "condition jamais remplie"
+        page.wait_for_timeout(20)
+
+
+def settled(page, timeout=30.0):
+    """The page has handled what it asked: no request going, then two
+    frames rendered, and still none going. What it would have done — a
+    launch, a render — is done before a test says it did not happen."""
+    end = time.monotonic() + timeout
+    while True:
+        while page.going:
+            assert time.monotonic() < end, f"la page ne se pose pas : {[r.url for r in page.going]}"
+            page.wait_for_timeout(20)
+        frames(page)
+        if not page.going:
+            return
 
 
 def relay_of(text):
@@ -160,7 +202,7 @@ def test_save_bar_stays_visible_while_the_form_scrolls(tmp_path, page):
         assert main.evaluate("e => e.scrollHeight > e.clientHeight + 400")        # the form does scroll
         for top in (0, 600, 100000):
             main.evaluate(f"e => e.scrollTo(0, {top})")
-            page.wait_for_timeout(100)
+            frames(page)
             box = page.locator("#save-bar").bounding_box()
             assert box and box["y"] >= 0 and box["y"] + box["height"] <= 800 + 1, (top, box)
             assert page.get_by_role("button", name="Enregistrer").is_visible()
@@ -362,7 +404,8 @@ def test_a_command_the_relay_did_not_name_asks_for_confirmation(tmp_path, page):
 
         page.on("dialog", on_dialog)
         page.locator("#audits").get_by_role("button", name="/10_x").click()
-        page.wait_for_timeout(300)
+        until(page, lambda: asked)
+        settled(page)
         assert len(asked) == 1 and "n'est pas l'étape" in asked[0] and "/10_x f" in asked[0]
         assert s.clients == []                                         # dismissed: nothing ran
 

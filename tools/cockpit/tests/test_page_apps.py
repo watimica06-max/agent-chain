@@ -15,7 +15,7 @@ import chain  # noqa: E402
 import server  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
 from test_apps import second_app  # noqa: E402
-from test_page import SCREENS, browser, go, no_real_errors, page  # noqa: E402,F401
+from test_page import SCREENS, go, no_real_errors, page, settled  # noqa: E402,F401
 from test_runner import script_until_interrupted  # noqa: E402
 
 STATES = {"app": chain.UP_TO_DATE, "belivo": chain.ABSENT, "tardive": chain.BEHIND, "bricolee": chain.MODIFIED}
@@ -190,7 +190,7 @@ def test_leaving_with_a_run_going(tmp_path, page, per_app_chain):
         # Back home again: the notice is not shown a second time for the same run.
         page.locator("#tb-home").click()
         page.wait_for_selector(".home-card .hc-running")
-        page.wait_for_timeout(300)
+        settled(page)
         assert not page.locator("#home-notice").is_visible()
         assert s.rn.is_running(str(s.app_root))
         # The card's « Arrêter » stops it, asking first.

@@ -22,7 +22,7 @@ from fakeapp import FakeServer  # noqa: E402
 from syncworld import app_world, change, head  # noqa: E402
 from test_chain import git  # noqa: E402
 from test_flow import add_turn_feature  # noqa: E402
-from test_page import _wait, browser, no_real_errors, start_run  # noqa: E402,F401
+from test_page import _wait, no_real_errors, start_run  # noqa: E402,F401
 from test_page_code import launched, with_lots  # noqa: E402
 from test_scan import build_chain, split  # noqa: E402
 from claude_agent_sdk import AssistantMessage, TextBlock, ToolResultBlock, ToolUseBlock, UserMessage  # noqa: E402

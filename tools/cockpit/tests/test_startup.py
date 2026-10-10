@@ -22,6 +22,7 @@ import startup
 from state import State
 from test_runner import FakeClient, script_until_interrupted
 from test_server import build_app_folder, open_pair, post
+from test_sync_server import wait_for
 
 COCKPIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -139,7 +140,7 @@ def test_stopping_the_cockpit_without_a_run(tmp_path):
     async def body(c, rn, app_root, quits):
         r = await post(c, "/api/shutdown", {})
         assert r.status == 200 and (await r.json()) == {"ok": True, "stopped": []}
-        await asyncio.sleep(0.5)
+        await wait_for(lambda: quits)
         assert quits == [1]
     quit_client(tmp_path, body)
 
@@ -148,7 +149,7 @@ def test_stopping_the_cockpit_with_a_run_asks_then_stops_the_run(tmp_path):
     async def body(c, rn, app_root, quits):
         r = await post(c, "/api/run", {"command": "8_code", "args": "f"})
         assert r.status == 200
-        await asyncio.sleep(0.2)
+        await wait_for(lambda: rn.current(str(app_root)).client is not None)
         r = await post(c, "/api/shutdown", {})
         assert r.status == 409 and (await r.json()) == {"running": True, "prompt": "/8_code f"}
         await asyncio.sleep(0.5)
@@ -159,7 +160,7 @@ def test_stopping_the_cockpit_with_a_run_asks_then_stops_the_run(tmp_path):
         assert got["stopped"] == [{"prompt": "/8_code f", "ended": True}]
         run = rn.current(str(app_root))
         assert run.status == "ended" and run.outcome == "interrompu"
-        await asyncio.sleep(0.5)
+        await wait_for(lambda: quits)
         assert quits == [1]
     quit_client(tmp_path, body)
 

@@ -10,7 +10,7 @@ pytest.importorskip("playwright")
 import nextline  # noqa: E402
 from claude_agent_sdk import AssistantMessage, TextBlock  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
-from test_page import browser, page, no_real_errors, stop_run  # noqa: E402,F401
+from test_page import page, no_real_errors, settled, stop_run, until  # noqa: E402,F401
 from test_runner import result, script_until_interrupted  # noqa: E402
 
 
@@ -127,15 +127,18 @@ def test_a_step_off_the_proposal_or_flagged_asks_first(tmp_path, page):
         asked, off = dialogs(page, accept=False)
         # Neither named nor proposed: asks, and dismissed, nothing runs.
         page.locator("#step-main-3b_nature").get_by_role("button", name="Lancer").click()
-        page.wait_for_timeout(200)
+        until(page, lambda: len(asked) >= 1)
+        settled(page)
         assert len(asked) == 1 and "ni l'étape que la chaîne a nommée, ni celle que le dossier propose" in asked[0]
         # Flagged by §1.2: always asks, with the reason.
         page.locator("#step-main-9_controle").get_by_role("button", name="Lancer").click()
-        page.wait_for_timeout(200)
+        until(page, lambda: len(asked) >= 2)
+        settled(page)
         assert "demande toujours confirmation" in asked[1] and "9_controle.md:104" in asked[1]
         # /7_lots now tests before it acts: off the proposal it asks, but not as flagged.
         page.locator("#step-main-7_lots").get_by_role("button", name="Lancer").click()
-        page.wait_for_timeout(200)
+        until(page, lambda: len(asked) >= 3)
+        settled(page)
         assert "demande toujours confirmation" not in asked[2]
         assert s.clients == []
         off()

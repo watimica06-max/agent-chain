@@ -730,4 +730,28 @@ toujours depuis Claude Code, et les fichiers sont les mêmes.
 ## Tests
 
     pip install -r requirements-tests.txt
-    python -m pytest
+
+Deux façons de les lancer, depuis `tools/cockpit/` :
+
+- **La suite rapide** — tout, sauf les tests qui pilotent le navigateur
+  sans fenêtre (Edge par Playwright). Pendant un changement, après
+  chaque étape :
+
+      python -m pytest -n 8 --dist worksteal -m "not navigateur"
+
+- **La suite complète** — tout, navigateur compris. À la fin d'une
+  version, avant de la livrer :
+
+      python -m pytest -n 8 --dist worksteal
+
+`-n 8` lance huit processus de test à la fois (pytest-xdist) : sur cet
+ordinateur, c'est le meilleur réglage mesuré — à 4 la suite prend plus
+longtemps, à 12 aussi, chaque test attendant alors ses processus git.
+Chaque test garde son propre dossier temporaire et ses propres ports ;
+aucun n'attend la fin d'un autre. Un test qui pilote le navigateur porte
+la marque `navigateur`, posée d'elle-même (`tests/conftest.py`).
+
+Les dépôts git de test (« GitHub » et les deux ordinateurs) sont construits
+une fois par lancement, puis copiés pour chaque test (`tests/copies.py`) :
+un test pousse vers sa propre copie, jamais vers le modèle, et la suite
+échoue si un modèle a changé.

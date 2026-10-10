@@ -15,7 +15,7 @@ from deployworld import hyrox_targets, use_fake_adb, write_profile  # noqa: E402
 from fakeadb import APP_ID, HYROX_PHONE, threadtime  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
 from test_chain import commit, git, init  # noqa: E402
-from test_page import browser, no_real_errors, page, stop_run  # noqa: E402,F401
+from test_page import no_real_errors, page, stop_run, until  # noqa: E402,F401
 from test_runner import script_until_interrupted  # noqa: E402
 
 PY = f'"{sys.executable}"'
@@ -142,7 +142,7 @@ def test_a_deploys_progress(tmp_path, page, fa, revealed):
         # 1.9.1: « Sortie complète » is a link — its folder opens, the file selected.
         out = job.locator("a.loglink")
         out.click()
-        page.wait_for_timeout(300)
+        until(page, lambda: revealed)
         assert revealed == [(os.path.normpath(out.inner_text()), True)]
         # A failure shows the end of its output.
         fa.update(lambda st: st.update(install_fails=[HYROX_PHONE]))

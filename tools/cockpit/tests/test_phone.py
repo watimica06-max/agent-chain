@@ -415,7 +415,7 @@ def test_push_on_each_of_the_three_moments_and_a_dead_subscription_removed(tmp_p
             assert "/4_grille f — terminé" in m["body"]
             # Stopped, then failed: each said.
             run = await rn.start(str(app_root), "f", "f", "8_code", "f")
-            await asyncio.sleep(0.1)
+            await until(lambda: run.client is not None)
             await rn.stop_now(str(app_root))
             await run.task
             await until(lambda: len(svc.to("telephone")) == 4)
@@ -434,10 +434,11 @@ def test_push_on_each_of_the_three_moments_and_a_dead_subscription_removed(tmp_p
             assert state.phone()["subscriptions"] == []
             n = len(svc.got)
             run = await rn.start(str(app_root), "f", "f", "1_lexique", "f")
-            await asyncio.sleep(0.3)
+            await until(lambda: run.permissions)                # where a push would go
             await rn.stop_now(str(app_root))
             await run.task
-            await asyncio.sleep(0.3)
+            # Every event of the run handled by the push watcher: none is still on its way.
+            await until(lambda: all(q.empty() for q in rn.watchers))
             assert len(svc.got) == n
         finally:
             await fake.close()

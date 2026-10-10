@@ -9,7 +9,7 @@ pytest.importorskip("playwright")
 import chain  # noqa: E402
 import server  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
-from test_page import browser, page  # noqa: E402,F401
+from test_page import page, settled, until  # noqa: E402,F401
 
 BEHIND = {"state": "en retard", "summary": "Chaîne en retard de 2 commits — installée : abc1234 du 2026-10-01",
           "commit": "abc1234", "date": "2026-10-01", "chain_commit": "def5678", "chain_date": "2026-10-06",
@@ -39,7 +39,8 @@ def test_not_up_to_date_shows_and_asks(tmp_path, page, monkeypatch):
             d.accept() if "Lancer quand même" not in d.message or len(asked) > 2 else d.dismiss()
         page.on("dialog", answer)
         page.locator("#audits button", has_text="/10_x").click()
-        page.wait_for_timeout(500)
+        until(page, lambda: any(BEHIND["summary"] in m for m in asked))
+        settled(page)
         assert any(BEHIND["summary"] in m for m in asked)
         assert not s.rn.is_running(str(s.app_root))
         page.locator("#audits button", has_text="/10_x").click()

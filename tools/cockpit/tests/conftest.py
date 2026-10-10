@@ -26,6 +26,53 @@ def place(tmp_path):
     return _place
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _templates(tmp_path_factory):
+    """The scratch repositories built once per run (copies.py): built in
+    this worker's temporary folder, published in the run's. None may
+    change: each test starts from a clean copy."""
+    import copies
+    copies.ROOT = str(tmp_path_factory.mktemp("modeles"))
+    # Under xdist each worker's basetemp is <the run's basetemp>/popen-gwN: the run's own folder is shared.
+    base = tmp_path_factory.getbasetemp()
+    shared = (base.parent if os.environ.get("PYTEST_XDIST_WORKER") else base) / "modeles-partages"
+    shared.mkdir(exist_ok=True)
+    copies.SHARED = str(shared)
+    yield
+    changed = copies.changed()
+    assert not changed, f"un modèle a été modifié par un test — il ne se copie plus propre : {changed}"
+
+
+@pytest.fixture(scope="module")
+def browser():
+    """Microsoft Edge, headless, through Playwright: one per test file.
+    Each test opens its own context — no cookie, storage or service worker
+    carried from one test to the next. Skipped when Playwright or Edge is
+    missing. Not one per session: while it is open, Playwright's sync API
+    holds an event loop on this thread, and the next file's
+    `asyncio.run()` would refuse to start."""
+    pytest.importorskip("playwright")
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        try:
+            b = p.chromium.launch(channel="msedge")
+        except Exception as e:                      # no Edge on this machine
+            pytest.skip(f"Edge indisponible : {e}")
+        yield b
+        b.close()
+
+
+BROWSER_FIXTURES = {"browser", "edge"}
+
+
+def pytest_collection_modifyitems(config, items):
+    """A test that drives the headless browser is marked `navigateur`: the
+    quick suite leaves it out (`-m "not navigateur"`)."""
+    for item in items:
+        if BROWSER_FIXTURES & set(getattr(item, "fixturenames", ())):
+            item.add_marker(pytest.mark.navigateur)
+
+
 @pytest.fixture(autouse=True)
 def _logs_in_tmp(tmp_path_factory, monkeypatch):
     """The raw run logs of a test never land in tools/cockpit/logs/."""
@@ -54,6 +101,7 @@ def _no_java_home(monkeypatch):
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "real_chain: the chain's state is computed, not stubbed « à jour »")
+    config.addinivalue_line("markers", "navigateur: drives the headless browser — left out of the quick suite")
 
 
 @pytest.fixture(autouse=True)

@@ -4,6 +4,7 @@ reaches the real GitHub."""
 import os
 import subprocess
 
+from copies import built_once
 from test_chain import commit, git, init, write
 
 
@@ -24,11 +25,17 @@ def clone_of(remote, dest):
 
 def world(tmp_path, files=None):
     """GitHub (`remote`), and computers A and B, both « à jour » on one
-    first commit."""
+    first commit. Built once per run for the same files, copied into
+    `tmp_path` (copies.py)."""
+    files = files or {"README.md": "app\n", "docs/features/f/idees.md": "# Idées\n"}
+    return built_once(("world", tuple(files.items())), tmp_path, lambda root: _world(root, files))
+
+
+def _world(tmp_path, files):
     remote = bare(tmp_path / "github" / "app.git")
     seed = tmp_path / "seed"
     init(seed)
-    for rel, text in (files or {"README.md": "app\n", "docs/features/f/idees.md": "# Idées\n"}).items():
+    for rel, text in files.items():
         write(seed, rel, text)
     commit(seed, "first")
     git(seed, "remote", "add", "origin", str(remote))

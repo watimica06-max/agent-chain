@@ -12,7 +12,7 @@ import diagnostic  # noqa: E402
 import stats  # noqa: E402
 from fakeapp import FakeServer  # noqa: E402
 from test_mode_diagnostic import ALL_GOOD, fake_exec  # noqa: E402
-from test_page import browser, go, no_real_errors, page  # noqa: E402,F401
+from test_page import go, no_real_errors, page, settled  # noqa: E402,F401
 from test_statistics import R1_LOG, fixture_store  # noqa: E402
 
 
@@ -120,7 +120,7 @@ def test_the_side_menu_closes_and_its_dot(tmp_path, page):
         s.state.open_pair(str(s.app_root), "vide")
         page.reload()
         page.wait_for_function("document.getElementById('tb-folder').textContent.startsWith('vide')")
-        page.wait_for_timeout(300)
+        settled(page)
         assert page.locator("#tb-menu-dot").is_hidden()
         page.get_by_role("button", name="Ouvrir le menu").click()
         assert page.locator("#side").is_visible()
@@ -134,7 +134,8 @@ def test_the_menu_dot_while_a_run_goes(tmp_path, page):
         page.goto(s.url + "#dashboard")
         page.wait_for_selector("#tb-menu", state="visible")
         page.get_by_role("button", name="Fermer le menu").click()
-        page.wait_for_timeout(200)
+        page.wait_for_selector("#side", state="hidden")
+        settled(page)
         assert page.locator("#tb-menu-dot").is_hidden()
         s.call(s.rn.start(str(s.app_root), "vide", "vide", "1_lexique", "vide"))
         page.wait_for_selector("#tb-menu-dot", state="visible", timeout=8000)
@@ -149,6 +150,7 @@ def test_where_button_sits_on_chaine(tmp_path, page):
         assert page.locator("#topbar").get_by_role("button", name="Où on en est ?").count() == 0
         go(page, "Chaîne")
         btn = page.locator("#scr-chaine").get_by_role("button", name="Où on en est ?")
+        btn.wait_for(state="visible")                  # the screen switched
         assert btn.is_visible()
         assert btn.bounding_box()["y"] < page.locator("#flow-main").bounding_box()["y"]   # at the top
         btn.click()
@@ -173,7 +175,7 @@ def test_no_diagnostic_stored_it_runs_once_and_the_alert_waits_for_a_failure(tmp
         assert s.state.diagnostic()["ok"]
         page.reload()
         page.wait_for_selector("#cnt-q")
-        page.wait_for_timeout(300)
+        settled(page)
         assert "diagnostic" not in page.locator("#alerts").inner_text()
         go(page, "Paramètres")
         assert "✓ Git" in page.locator("#diag-result").inner_text()
