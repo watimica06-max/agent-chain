@@ -50,6 +50,9 @@ Dans une console, pour voir ce qu'il écrit : `python server.py --ouvrir`
   la chaîne récupérée — « Mettre à jour le cockpit » la met en service. »,
   avec ce bouton (1.14). Chaque application de la liste est récupérée
   aussi, en arrière-plan.
+- **La consommation** (1.17) : mesurée au démarrage, en arrière-plan —
+  voir « Consommation » plus bas. L'écran d'accueil la mesure de nouveau
+  quand la dernière mesure a plus de 15 minutes.
 
 ## Les écrans
 
@@ -327,7 +330,7 @@ ici, tant que le diagnostic ne l'a pas lu.
 
 **Paramètres** (1.9) — ce qui appartient au cockpit lui-même, dans cet
 ordre : l'apparence (1.11), puis, chacun avec sa ligne d'explication, le
-mode de permission, les notifications, l'accès depuis le téléphone
+mode de permission, la consommation (1.17), les notifications, l'accès depuis le téléphone
 (1.15), les dossiers ignorés, « État de l'ordinateur » (1.16), « Version du cockpit » (1.14), « Arrêter le cockpit ». La version de la chaîne est sous
 « Chaîne → Version », le profil de déploiement sous « Déploiement →
 Profil », la feature dans la barre du haut, l'application sur l'accueil.
@@ -351,13 +354,53 @@ concerné. Chacune nomme son application (« Belivo — /1_lexique x —
 terminé »). Le titre de l'onglet compte ce qui vous attend et nomme
 l'application active : « (2) Belivo — Cockpit ».
 
-**Usage de l'abonnement** — sur le tableau de bord, deux jauges : la
-fenêtre de 5 heures et la semaine. Pour chacune : le pourcentage utilisé,
-ce qui reste, l'heure de réinitialisation et **quand la mesure a été
-prise** (« mesuré il y a 12 min »). Elles se mettent à jour à la fin de
-chaque run (le cockpit demande `/usage` à la session, sans appel au
-modèle). Une mesure dont la fenêtre s'est réinitialisée depuis le dit :
+**Usage de l'abonnement** — sur le tableau de bord et sur l'écran
+d'accueil (1.17), deux jauges : la fenêtre de 5 heures et la semaine. Pour
+chacune : le pourcentage utilisé, ce qui reste, l'heure de
+réinitialisation et **quand la mesure a été prise** (« mesuré il y a
+12 min ») et d'où elle vient — pendant un run, en fin de run (le cockpit
+demande `/usage` à la session, sans appel au modèle), ou mesure du
+cockpit. Une mesure dont la fenêtre s'est réinitialisée depuis le dit :
 ce n'est plus le chiffre du moment.
+
+**Consommation** (1.17) — la consommation, mesurée et bornée :
+
+- **La mesure.** Au démarrage du cockpit, à l'ouverture de l'écran
+  d'accueil si la dernière mesure a plus de 15 minutes, avant un
+  lancement dans le même cas, et sur « Mesurer maintenant » : le plus
+  petit appel qui fasse dire à Claude Code où en sont les deux fenêtres —
+  une phrase courte, le modèle le plus léger (`haiku`), un seul tour, sans
+  outil, sans réglage, sans serveur MCP, dans un dossier temporaire à lui
+  (`%TEMP%\cockpit-mesure`), jamais celui d'une application. Claude Code
+  répond par un `RateLimitEvent` qui donne les deux fenêtres et leur
+  réinitialisation ; s'il ne le donnait pas, `/usage` est demandé dans la
+  même session. Son coût est enregistré dans `stats.sqlite` comme celui
+  d'un run, marqué `kind = 'mesure'` — « (mesure d'usage) » dans les
+  Statistiques —, son journal est `logs/<date>-mesure.jsonl`. Sous les
+  jauges : la dernière mesure, son âge et ce qu'elle a coûté — ou, si
+  elle a échoué (Claude Code pas connecté, hors ligne), pourquoi. Une
+  mesure qui échoue ne bloque jamais rien : les jauges gardent la
+  précédente, avec son âge.
+- **Les seuils.** Paramètres → Consommation : un seuil d'**alerte** et un
+  seuil de **blocage**, pour la fenêtre de 5 heures et pour la semaine —
+  quatre nombres, 90 % chacun par défaut, gardés dans `config.json`
+  (`"usage_thresholds"`). L'alerte atteinte : un bandeau fort sur chaque
+  écran, téléphone compris, avec la fenêtre, son niveau et sa
+  réinitialisation. Le blocage atteint : le bandeau passe au rouge, et
+  aucune commande ne se lance — « Lancer » (et « Continuer la session »)
+  demande alors une confirmation qui nomme le niveau ; « Lancer quand
+  même » passe outre, et c'est noté dans le journal du cockpit
+  (`logs/server.log`) et dans `logs/consommation.log`. Le niveau est la
+  dernière mesure ; avant un lancement, une mesure de plus de 15 minutes
+  est refaite d'abord. Une fenêtre réinitialisée depuis sa mesure
+  n'alerte ni ne bloque.
+- **Ce qu'une commande coûtera.** À côté de chaque bouton « Lancer » :
+  « ≈ 4 % de la fenêtre · ≈ 1 % de la semaine » — la médiane de ce que
+  ses runs passés ont pris (le même calcul que les Statistiques : la
+  première mesure du run et son `/usage` de fin, jamais à travers une
+  réinitialisation) ; ceux de l'application quand elle en a trois, sinon
+  ceux de toutes les applications ; « coût : inconnu » en dessous de
+  trois. La bulle dit sur combien de runs.
 
 **Statistiques** — ce que `stats.sqlite` garde, lu en détail : par
 application (l'active, ou toutes — chaque run garde la sienne ; ceux
@@ -766,7 +809,9 @@ suite ; `tailscale serve reset` retire le service de Tailscale.
 
 ## Ce que le cockpit ne fait jamais
 
-- Il ne lance aucune commande que vous n'avez pas cliquée.
+- Il ne lance aucune commande que vous n'avez pas cliquée. Son seul appel
+  à Claude de lui-même est la mesure de la consommation (1.17) : une
+  phrase, le modèle le plus léger, sans outil, dans un dossier à lui.
 - Il ne remplace la ligne `Next:` que quand les fichiers la contredisent,
   et il le dit ; sa proposition porte toujours « déduite du dossier ».
   Il ne saute jamais une étape bloquée ou inconnue.

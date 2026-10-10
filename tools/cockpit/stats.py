@@ -419,8 +419,9 @@ CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 # 1.5: the columns a 1.4 store lacks, added in place.
 NEW_PASS_COLUMNS = ("lot", "block", "folder")
 # 1.6: the application of each run, its folder; the runs stored before are
-# given theirs at the server's start (backfill_apps).
-NEW_RUN_COLUMNS = ("app",)
+# given theirs at the server's start (backfill_apps). 1.17: `kind`, « mesure »
+# for the usage measure (usage.py) — never a command's run.
+NEW_RUN_COLUMNS = ("app", "kind")
 
 
 class Store:
@@ -466,7 +467,7 @@ class Store:
              m.get("resets_at"), m.get("status"), int(backfilled))))
 
     def record_run(self, *, run_id, feature, work, command, mode, started_at, ended_at, tally,
-                   next_line, outcome, log_path, resumed=False, backfilled=False, app=None):
+                   next_line, outcome, log_path, resumed=False, backfilled=False, app=None, kind=None):
         totals = dict(tally.totals) if tally.totals else None
 
         def go(db):
@@ -485,11 +486,11 @@ class Store:
             db.execute("INSERT OR REPLACE INTO runs (id, feature, work, command, permission_mode,"
                        " session_id, started_at, ended_at, duration_s, input_tokens,"
                        " cache_read_tokens, cache_creation_tokens, output_tokens, next_line, outcome,"
-                       " log_path, resumed, backfilled, app) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                       " log_path, resumed, backfilled, app, kind) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                        (run_id, feature, work, command, mode, tally.session_id, started_at, ended_at,
                         dur, t.get("input_tokens"), t.get("cache_read_tokens"),
                         t.get("cache_creation_tokens"), t.get("output_tokens"), next_line, outcome,
-                        log_path or None, int(resumed), int(backfilled), app))
+                        log_path or None, int(resumed), int(backfilled), app, kind))
             db.execute("DELETE FROM agent_passes WHERE run_id=?", (run_id,))
             for p in tally.passes.values():
                 db.execute("INSERT INTO agent_passes (run_id, tool_use_id, parent_tool_use_id, agent,"
@@ -645,7 +646,8 @@ class Store:
         is given the run (its log path and its log's working directory) and
         returns its folder. Returns how many were given one."""
         rows = self._exec(lambda db: [dict(r) for r in db.execute(
-            "SELECT id, log_path, feature FROM runs WHERE app IS NULL OR app = ''")])
+            "SELECT id, log_path, feature FROM runs WHERE (app IS NULL OR app = '')"
+            " AND (kind IS NULL OR kind <> 'mesure')")])
         done = 0
         for r in rows:
             app = resolve({**r, "cwd": log_cwd(r.get("log_path"))})

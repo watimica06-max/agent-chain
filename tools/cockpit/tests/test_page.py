@@ -344,11 +344,12 @@ def test_settings_mode_diagnostic_commands(tmp_path, page):
         heads = page.locator("#scr-settings .sec > h2").all_inner_texts()
         # 1.15: « Accès depuis le téléphone » after the notifications.
         # 1.16: « État de l'ordinateur » replaces « Outils sur cet ordinateur », at its place.
-        assert heads == ["Apparence", "Mode de permission", "Notifications", "Accès depuis le téléphone", "Dossiers ignorés",
-                         "État de l'ordinateur", "Version du cockpit", "Arrêter le cockpit"]
+        # 1.17: « Consommation » after the mode — its thresholds.
+        assert heads == ["Apparence", "Mode de permission", "Consommation", "Notifications", "Accès depuis le téléphone",
+                         "Dossiers ignorés", "État de l'ordinateur", "Version du cockpit", "Arrêter le cockpit"]
         leads = page.locator("#scr-settings .sec > .lead").all_inner_texts()
-        assert len(leads) == 7 and all(t.strip() for t in leads)
-        assert "se répare seul, signale, ou bloque" in leads[4]
+        assert len(leads) == 8 and all(t.strip() for t in leads)
+        assert "se répare seul, signale, ou bloque" in leads[5]
         # « Vérifier maintenant » — the open application's diagnostic with the rest: ✓ / ✗ / non concerné, the
         # Java hint, kept with its date; Java's ✗ on its line, which stops « Bâtir » and the deploy screen.
         page.get_by_role("button", name="Vérifier maintenant").click()

@@ -50,6 +50,7 @@ import stats as stats_mod  # noqa: E402
 import statsview  # noqa: E402
 import sync as sync_mod  # noqa: E402
 import textfile   # noqa: E402
+import usage as usage_mod  # noqa: E402
 import webpush   # noqa: E402
 import writer     # noqa: E402
 from state import State  # noqa: E402
@@ -61,7 +62,7 @@ STATE_KEY = web.AppKey("state", State)
 PORT_KEY = web.AppKey("port", dict)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.16"
+VERSION = "1.17"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -105,6 +106,11 @@ OPEN_BROWSER = webbrowser.open
 MACHINE_AT_START = True
 AUTO_RESTART = True
 RESTART_POLL = 15.0
+# 1.17 — the usage measure (usage.py): when the cockpit starts, when its home
+# screen opens on a measure older than usage.STALE_S, and before a launch on
+# one as old. The tests put False here, or a fake client in MEASURE_CLIENT.
+MEASURE_USAGE = True
+MEASURE_CLIENT = None
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
 # `.claude/CLAUDE.md`'s table: upstream cycle, downstream cycle, bug-fix entry,
 # merge, and what is run by hand outside the chain. A command not listed is a tool.
@@ -487,7 +493,9 @@ LOCAL_NAMES = phone_mod.LOCAL_NAMES
 PHONE_LOCAL_ONLY = {"/api/phone/settings", "/api/phone/disconnect",
                     # 1.16: a repair of this computer is made on this computer.
                     "/api/machine/repair", "/api/machine/session/answer", "/api/machine/session/code",
-                    "/api/machine/session/cancel", "/api/cockpit/restart", "/api/install-mode"}
+                    "/api/machine/session/cancel", "/api/cockpit/restart", "/api/install-mode",
+                    # 1.17: Paramètres → Consommation.
+                    "/api/usage/thresholds"}
 
 
 def phone_open(path):
@@ -568,7 +576,8 @@ def default_export_folder():
 
 
 def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
-             diag_runner=None, export_picker=ask_export_folder, on_quit=None, file_picker=ask_idea_file):
+             diag_runner=None, export_picker=ask_export_folder, on_quit=None, file_picker=ask_idea_file,
+             measurer=None):
     store = rn.stats
     diag_runner = diag_runner or DIAG_RUNNER
     # The diagnostic run in the background (1.4.5): once, at the opening,
@@ -661,6 +670,64 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     pip_box = {"going": False, "error": "", "restart": False}
     port_box = app[PORT_KEY] = {"port": None}
     watch_box = {"task": None}
+    # 1.17 — the usage measure, the thresholds, the estimate (usage.py).
+    meas = measurer or usage_mod.Measurer(store, rn.log_dir, client_factory=MEASURE_CLIENT)
+
+    def usage_payload():
+        limits = _limits(store)
+        th = state.usage_thresholds
+        return {"limits": limits, "thresholds": th, "levels": usage_mod.levels(limits, th),
+                "measure": meas.public(), "stale_after_s": usage_mod.STALE_S, "auto": MEASURE_USAGE}
+
+    def measured(_task):
+        broadcast("usage", usage_payload())
+
+    def measure_now(why):
+        """In the background; the page is told when it starts and ends."""
+        going = meas.task is not None and not meas.task.done()
+        t = meas.start(why)
+        if not going:
+            t.add_done_callback(measured)
+        broadcast("usage", usage_payload())
+        return t
+
+    def measure_if_stale(why):
+        if MEASURE_USAGE and not rn.going() and meas.stale():
+            measure_now(why)
+
+    def override_line(text):
+        """A launch past the blocking threshold: the server's log, and
+        consommation.log beside the run logs."""
+        line = f"{datetime.now().isoformat(timespec='seconds')} · {text}"
+        print("Consommation : " + text, flush=True)
+        try:
+            os.makedirs(rn.log_dir, exist_ok=True)
+            with open(os.path.join(rn.log_dir, usage_mod.OVERRIDE_LOG), "a", encoding="utf-8") as f:
+                f.write(line + "\n")
+        except OSError:
+            pass
+
+    async def usage_gate(data, what, a):
+        """§2 — before a launch: a measure older than usage.STALE_S
+        refreshed first (one that fails leaves the latest one); a window at
+        its blocking threshold refuses, unless the launch says `usage_ok` —
+        « Lancer quand même », confirmed on the page, and logged."""
+        if MEASURE_USAGE and meas.stale():
+            try:
+                await asyncio.shield(measure_now(f"avant de lancer {what}"))
+            except Exception as e:
+                print(f"Consommation : mesure avant lancement non aboutie ({e})", flush=True)
+        lv = usage_mod.levels(_limits(store), state.usage_thresholds)
+        blocked = usage_mod.blocking(lv)
+        if not blocked:
+            return None
+        text = usage_mod.block_text(blocked)
+        if data.get("usage_ok"):
+            override_line(f"seuil de blocage passé outre — « Lancer quand même » : {what} dans "
+                          f"« {state.name_of(a)} » — {text}")
+            return None
+        return web.json_response({"error": f"Seuil de blocage atteint : {text}. Rien n'a été lancé.",
+                                  "usage_block": {"windows": blocked, "text": text}}, status=409)
 
     # 1.12 §3: after every run, where the clone stands — a run whose final
     # push GitHub refused says so in its end panel.
@@ -1037,7 +1104,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                "diagnostic_running": diag_running(state.app_folder),
                "logs_dir": rn.log_dir, "groups": GROUPS,
                # The two usage windows, each with when it was measured (§13.3).
-               "limits": _limits(store), "now": datetime.now().isoformat(timespec="seconds")}
+               "limits": _limits(store), "now": datetime.now().isoformat(timespec="seconds"),
+               # 1.17: the thresholds, each window's level, the last measure.
+               "usage": usage_payload()}
         out["ignored"] = state.ignored
         out["creating"] = making["current"].path if making["current"] else None
         # 1.12: where the open application's clone stands against GitHub —
@@ -1081,6 +1150,8 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                 "recette": recette(a, feature),
                 # 1.12 §5: what the next command's own commit would take.
                 "answers_pending": sync_mod.answers_pending(a, feature),
+                # 1.17 §3: what each command will cost, from its past runs.
+                "estimates": usage_mod.estimates(store.path if store else None, a),
             })
         return out
 
@@ -1197,11 +1268,13 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                 and (updating["home_at"] is None or loop.time() - updating["home_at"] > CHAIN_HOME_EVERY)):
             updating["home_at"] = loop.time()
             refresh_later(CHAIN_ROOT)
+        # 1.17: a measure older than 15 minutes, taken again — in the background.
+        measure_if_stale("à l'ouverture de l'écran d'accueil")
         # 1.12: one application's fetch never waits for another's.
         rows = await asyncio.gather(*(loop.run_in_executor(None, app_row, x) for x in state.apps()))
         return web.json_response({"apps": list(rows), "busy": busy_payload(), "bulk_going": bulk["going"],
                                   "report": bulk["report"], "chain_sync": chain_sync,
-                                  "machine_summary": mach.report()["summary"]})
+                                  "machine_summary": mach.report()["summary"], "usage": usage_payload()})
 
     async def apps_add(request):
         """« Ajouter une application »: the folder picked or pasted joins the
@@ -1515,6 +1588,10 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             await machine_block(machine.BATIR, a) if cmd == "batir" else None)
         if refused:
             return refused
+        # 1.17 §2: the usage, measured again when old; its blocking threshold.
+        refused = await usage_gate(data, f"/{cmd} {args}".rstrip(), a)
+        if refused:
+            return refused
         # 1.12 §2: GitHub first — what the other computer pushed is pulled
         # before anything reads the files, the chain's version included.
         refused, synced = await synced_first(a)
@@ -1635,6 +1712,28 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             print(f"Tout mettre à jour — {x['name']} : {x['outcome']} — {x['text']}", flush=True)
         return web.json_response(bulk["report"])
 
+    async def usage_get(request):
+        return web.json_response(usage_payload())
+
+    async def usage_thresholds(request):
+        """Paramètres → Consommation: the four thresholds."""
+        data = await body(request)
+        try:
+            state.set_usage_thresholds(data.get("thresholds"))
+        except ValueError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        out = usage_payload()
+        broadcast("usage", out)
+        return web.json_response(out)
+
+    async def usage_measure(request):
+        """« Mesurer maintenant »: the measure, waited for."""
+        if rn.going():
+            return web.json_response({"error": "une commande tourne : ses propres mesures tiennent les jauges à jour"},
+                                     status=409)
+        await asyncio.shield(measure_now("à la demande"))
+        return web.json_response(usage_payload())
+
     async def set_mode(request):
         data = await body(request)
         try:
@@ -1715,6 +1814,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             loop.create_task(first_check())
         if AUTO_RESTART:
             watch_box["task"] = loop.create_task(restart_watch())
+        # 1.17: the usage, measured when the cockpit starts.
+        if MEASURE_USAGE:
+            measure_now("au démarrage du cockpit")
         if SYNC_APPS_AT_START:
             for x in state.apps():
                 refresh_later(x["folder"])
@@ -1857,6 +1959,11 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
 
     async def continue_session(request):
         a, _ = need_pair()
+        data = await body(request)
+        old = rn.current(a)
+        refused = await usage_gate(data, f"la suite de {old.prompt}" if old and old.id else "la suite", a)
+        if refused:
+            return refused
         try:
             r = await rn.continue_session(a)
         except runner_mod.NotRunning as e:
@@ -3015,6 +3122,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_post("/api/run", run)
     r.add_post("/api/stop-now", stop_now)
     r.add_post("/api/mode", set_mode)
+    r.add_get("/api/usage", usage_get)
+    r.add_post("/api/usage/thresholds", usage_thresholds)
+    r.add_post("/api/usage/measure", usage_measure)
     r.add_post("/api/chain/install", chain_install)
     r.add_post("/api/chain/install-all", chain_install_all)
     r.add_get("/api/apps", apps_get)

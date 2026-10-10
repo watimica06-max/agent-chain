@@ -186,8 +186,9 @@ def _run_view(r, limits_of, names):
     out = {k: r.get(k) for k in ("id", "app", "feature", "work", "command", "permission_mode", "session_id",
                                  "started_at", "ended_at", "duration_s", "input_tokens",
                                  "cache_read_tokens", "cache_creation_tokens", "output_tokens",
-                                 "next_line", "outcome", "log_path", "resumed", "backfilled")}
-    out["cmd"] = command_of(r.get("command"))
+                                 "next_line", "outcome", "log_path", "resumed", "backfilled", "kind")}
+    # 1.17: the usage measure is no command — named as itself, whole.
+    out["cmd"] = r.get("command") if r.get("kind") == "mesure" else command_of(r.get("command"))
     out["app_name"] = names.get(app_key(r.get("app"))) or (os.path.basename(r["app"]) if r.get("app") else None)
     out["read_tokens"] = _read(r)
     ms = limits_of.get(r["id"], [])
@@ -283,7 +284,8 @@ def build(path, feature=None, period="tout", now=None, ignored=(), app=None, ign
     if feature is None:
         # « Toutes » the applications: a feature is named with its application's.
         for (an, feat), g in _by(runs, lambda r: (r["app_name"] if akey is None else None,
-                                                   r["feature"] or "(inconnue)")).items():
+                                                   r["feature"] or ("(mesures d'usage)" if r.get("kind") == "mesure"
+                                                                    else "(inconnue)"))).items():
             by_feature.append({**_totals(g), "feature": feat, "app_name": an,
                                "label": f"{an or '(application inconnue)'} · {feat}" if akey is None else feat})
 
@@ -333,7 +335,7 @@ RUN_COLUMNS = [
     ("≈ % de la fenêtre 5 h", ("five_hour", "delta")),
     ("semaine au début (%)", ("seven_day", "start")), ("semaine à la fin (%)", ("seven_day", "end")),
     ("≈ % de la semaine", ("seven_day", "delta")),
-    ("inhabituel", "unusual"), ("fin du run", "outcome"), ("Next:", "next_line"), ("repris", "resumed"),
+    ("inhabituel", "unusual"), ("mesure d'usage", "kind"), ("fin du run", "outcome"), ("Next:", "next_line"), ("repris", "resumed"),
     ("rechargé d'un journal", "backfilled"), ("journal", "log_path"), ("id", "id"),
 ]
 PASS_COLUMNS = [

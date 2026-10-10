@@ -362,6 +362,26 @@ class State:
             self.data["install_mode"] = mode
             self._save()
 
+    # ------------------------------------------------ consommation (1.17)
+
+    @property
+    def usage_thresholds(self):
+        """Paramètres → Consommation: the warning and blocking thresholds of
+        each window, in percent — 90 by default."""
+        import usage
+        try:
+            return usage.clean_thresholds(self.data.get("usage_thresholds"))
+        except ValueError:
+            return usage.clean_thresholds(None)
+
+    def set_usage_thresholds(self, raw):
+        import usage
+        clean = usage.clean_thresholds(raw)
+        with self._lock:
+            self.data["usage_thresholds"] = clean
+            self._save()
+        return clean
+
     # --------------------------------------------------------- diagnostic
 
     def diagnostic(self, app=None):

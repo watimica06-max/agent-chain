@@ -270,6 +270,23 @@ body.at-home .screen { margin: 0 auto; }
 #tb-run .where { font-weight: 650; }
 #busy-banner { border-top: var(--bw) solid var(--warn-line); background: var(--warn-soft); color: var(--warn); padding: var(--sp-8) var(--sp-20); }
 #busy-banner button { margin-left: var(--sp-8); }
+/* 1.17 — a usage threshold reached: on every screen, the phone's too. */
+#usage-banner { border-top: var(--bw) solid var(--warn); border-bottom: var(--sp-2) solid var(--warn); background: var(--warn-soft);
+  color: var(--warn); padding: var(--sp-10) var(--sp-20); display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-14); align-items: baseline; }
+#usage-banner[data-level="block"] { border-color: var(--err); background: var(--err-soft); color: var(--err); }
+#usage-banner[data-level="measuring"] { border-color: var(--line); background: var(--raised); color: var(--soft); }
+#usage-banner > b { font-size: var(--fs-14); }
+#usage-banner .ub-w { font-weight: 600; color: var(--ink); }
+.gauge.block .ring { background: conic-gradient(var(--err) calc(var(--p, 0) * 1%), var(--idle-soft) 0); }
+.usage-measure { margin-top: var(--sp-10); display: flex; flex-wrap: wrap; gap: var(--sp-6) var(--sp-10); align-items: center; font-size: var(--fs-12); color: var(--soft); }
+.usage-measure.err { color: var(--err); }
+#home-usage { margin-bottom: var(--sp-16); }
+/* 1.17 §3 — what a command will cost, beside its launch button. */
+.est { font-size: var(--fs-12); color: var(--soft); white-space: nowrap; }
+.est.unknown { font-style: italic; }
+.th-grid { display: grid; grid-template-columns: max-content repeat(2, minmax(0, var(--w-120, 8rem))); gap: var(--sp-8) var(--sp-14); align-items: center; }
+.th-grid input { width: 100%; }
+.th-grid .h { font-size: var(--fs-12); color: var(--soft); font-weight: 600; }
 .home-head { display: flex; gap: var(--sp-10); align-items: flex-end; flex-wrap: wrap; margin-bottom: var(--sp-18); }
 .home-head h2 { margin: 0; font-size: var(--fs-20); }
 .home-head .sub { color: var(--soft); margin-top: var(--sp-2); }
@@ -1058,7 +1075,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
   #tb-run { display: block; max-width: 44vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: calc(var(--tap) - 2px);
     border-radius: var(--r-pill); padding: 0 var(--sp-12); }
   #tb-run::before { display: inline-block; vertical-align: middle; margin-right: var(--sp-6); }
-  #chain-banner, #busy-banner, #sync-banner { padding: var(--sp-8) var(--sp-16); }
+  #chain-banner, #busy-banner, #sync-banner, #usage-banner { padding: var(--sp-8) var(--sp-16); }
   /* no stacking of its own: its menu and the permission sheet rise above the tabs */
   #chrome { z-index: auto; }
   #main { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); }
@@ -1263,6 +1280,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
     <div id="perm-banner" class="hidden" role="alert" aria-label="Autorisation demandée"></div>
     <div id="chain-banner" class="hidden" role="status" aria-label="État de la chaîne"></div>
     <div id="busy-banner" class="hidden" role="status" aria-label="Commande dans une autre application"></div>
+    <div id="usage-banner" class="hidden" role="alert" aria-label="Consommation"></div>
     <div id="sync-banner" class="hidden" role="status" aria-label="GitHub"></div>
     <div id="phone-lock" class="hidden" role="alert" aria-label="Accès depuis le téléphone bloqué"></div>
   </div>
@@ -1276,6 +1294,11 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       <div id="home-notice" class="hidden" role="status"></div>
       <div id="cockpit-update" class="hidden" role="status" aria-label="Nouvelle version du cockpit"></div>
       <div id="machine-home" class="card hidden" role="status" aria-label="État de l'ordinateur"></div>
+      <div class="card" id="home-usage">
+        <div class="kicker">Consommation</div>
+        <div class="gauges" id="home-gauges" aria-label="Usage de l'abonnement"></div>
+        <div class="usage-measure" id="home-usage-measure"></div>
+      </div>
       <div class="home-head">
         <div><h2>Applications</h2><div class="sub" id="apps-count"></div><div class="sub" id="chain-sync-line" aria-label="agent-chain face à GitHub"></div>
           <button id="machine-badge" class="mc-badge hidden" title="État de l'ordinateur"></button></div>
@@ -1392,6 +1415,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <div class="card" id="dash-use">
           <div class="kicker">Consommation</div>
           <div class="gauges" id="gauges" aria-label="Usage de l'abonnement"></div>
+          <div class="usage-measure" id="usage-measure"></div>
         </div>
       </div>
       <div class="dash-grid dash-low">
@@ -1634,6 +1658,23 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <div class="modes" id="set-mode"></div>
         <p class="muted small" id="mode-note"></p>
       </div>
+      <!-- 1.17: the usage thresholds — a warning, a block, per window. -->
+      <div class="card sec" id="sec-usage">
+        <h2>Consommation</h2>
+        <p class="lead">Deux seuils par fenêtre, en pourcentage de l'abonnement utilisé. L'alerte met un bandeau sur chaque écran, téléphone compris ; le blocage empêche tout lancement — « Lancer quand même » le passe, après confirmation, et c'est noté dans le journal du cockpit. Le niveau est la dernière mesure ; plus vieille que 15 minutes, elle est refaite avant un lancement.</p>
+        <div class="th-grid" id="set-thresholds">
+          <span></span><span class="h">Alerte</span><span class="h">Blocage</span>
+          <label for="th-five_hour-warn">Fenêtre de 5 heures</label>
+          <input type="number" id="th-five_hour-warn" min="1" max="100" step="1" aria-label="Fenêtre de 5 heures : seuil d'alerte (%)">
+          <input type="number" id="th-five_hour-block" min="1" max="100" step="1" aria-label="Fenêtre de 5 heures : seuil de blocage (%)">
+          <label for="th-seven_day-warn">Semaine</label>
+          <input type="number" id="th-seven_day-warn" min="1" max="100" step="1" aria-label="Semaine : seuil d'alerte (%)">
+          <input type="number" id="th-seven_day-block" min="1" max="100" step="1" aria-label="Semaine : seuil de blocage (%)">
+        </div>
+        <div class="row" style="margin-top:var(--sp-12)"><button id="btn-thresholds" class="primary">Enregistrer</button>
+          <span class="muted small">En pourcentage, de 1 à 100. Par défaut : 90 partout.</span>
+          <span id="thresholds-msg" class="small" role="status"></span></div>
+      </div>
       <div class="card sec phone-keep" id="sec-notes">
         <h2>Notifications</h2>
         <p class="lead desk-only">Quand l'onglet du cockpit n'est pas devant : le navigateur montre une notification ; un clic ramène l'onglet sur l'écran concerné. Devant, la page le montre déjà.</p>
@@ -1810,35 +1851,164 @@ function fmtWhen(d) {
 }
 // Two gauges: the 5-hour window and the week. Each says when it was
 // measured; a measure the window's reset has passed is never shown as current.
+// 1.17: on the dashboard and on the home screen, coloured by the thresholds,
+// with the last measure of the cockpit under them.
+const WIN_NAME = {five_hour: "Fenêtre de 5 heures", seven_day: "Semaine"};
+const SOURCE_NAME = {usage: " (fin de run, /usage)", mesure: " (mesure du cockpit)"};
+const fmtP = (p) => `${Number.isInteger(p) ? p : String(Math.round(p * 10) / 10).replace(".", ",")} %`;
+function usageThresholds() {
+  const t = S.usage && S.usage.thresholds;
+  return t || {five_hour: {warn: 90, block: 90}, seven_day: {warn: 90, block: 90}};
+}
+// Each window's level, as the server reads it (usage.py levels): ok, warn,
+// block — or reset, when its reset has passed since its measure.
+function usageLevels() {
+  const th = usageThresholds(), L = S.limits || {}, out = {};
+  for (const w of ["five_hour", "seven_day"]) {
+    const m = L[w], t = th[w];
+    const x = {window: w, name: WIN_NAME[w], warn: t.warn, block: t.block, pct: null, level: "inconnu", resets_at: null};
+    if (m && m.utilization !== null && m.utilization !== undefined) {
+      x.pct = Math.round(m.utilization * 1000) / 10;
+      x.resets_at = m.resets_at || null;
+      x.level = x.resets_at && x.resets_at * 1000 <= Date.now() ? "reset"
+        : x.pct >= t.block ? "block" : x.pct >= t.warn ? "warn" : "ok";
+    }
+    out[w] = x;
+  }
+  return out;
+}
 function renderGauges() {
-  const box = $("gauges"); if (!box) return;
+  for (const [boxId, prefix, lineId] of [["gauges", "gauge-", "usage-measure"], ["home-gauges", "hgauge-", "home-usage-measure"]]) {
+    const box = $(boxId); if (!box) continue;
+    fillGauges(box, prefix);
+    renderMeasureLine($(lineId));
+  }
+  renderUsageBanner();
+}
+function fillGauges(box, prefix) {
   box.replaceChildren();
-  const L = S.limits || {};
-  for (const [w, title] of [["five_hour", "Fenêtre de 5 heures"], ["seven_day", "Semaine"]]) {
-    const m = L[w];
-    const g = el("div", {class: "gauge", id: "gauge-" + w, "data-window": w});
+  const L = S.limits || {}, lv = usageLevels();
+  for (const w of ["five_hour", "seven_day"]) {
+    const m = L[w], title = WIN_NAME[w];
+    const g = el("div", {class: "gauge", id: prefix + w, "data-window": w});
     const txt = el("div", {class: "gtxt"}, el("div", {class: "gt", text: title}));
     if (!m) {
       g.append(el("div", {class: "ring"}, el("div", {class: "gp muted", text: "—"})), txt);
-      txt.append(el("div", {class: "gm", text: "Aucune mesure encore : la première arrive avec le prochain run."}));
+      txt.append(el("div", {class: "gm", text: "Aucune mesure encore : la première arrive avec la prochaine mesure ou le prochain run."}));
       box.append(g); continue;
     }
     const pct = Math.round(m.utilization * 100);
     const reset = m.resets_at ? new Date(m.resets_at * 1000) : null;
     const stale = reset && reset.getTime() <= Date.now();
     const age = ageText(m.measured_at);
+    const level = lv[w].level;
+    g.dataset.level = level;
     g.classList.toggle("stale", !!stale);
-    g.classList.toggle("high", pct >= 80);
+    g.classList.toggle("high", level === "warn");
+    g.classList.toggle("block", level === "block");
     g.style.setProperty("--p", Math.min(100, pct));
     g.append(el("div", {class: "ring"}, el("div", {class: "gp", text: `${pct} %`})), txt);
     txt.append(el("div", {class: "gm", text: stale ? `La fenêtre s'est réinitialisée ${fmtWhen(reset)} : ce chiffre date d'avant.`
         : `Reste ${Math.max(0, 100 - pct)} %` + (reset ? ` · réinitialisation ${fmtWhen(reset)}` : "")}),
       el("div", {class: "gage" + (age.old || stale ? " old" : ""), title: m.measured_at,
-        text: age.text + (m.source === "usage" ? " (fin de run, /usage)" : " (pendant un run)")}));
+        text: age.text + (SOURCE_NAME[m.source] || " (pendant un run)")}));
     box.append(g);
   }
 }
-setInterval(() => { if (S.open) renderGauges(); }, 30000);
+// The cockpit's own measure (1.17 §1): going, done with its cost, or failed
+// with why — never in the way. « Mesurer maintenant » takes one at once.
+function renderMeasureLine(box) {
+  if (!box) return;
+  box.replaceChildren();
+  const m = S.usage && S.usage.measure;
+  box.classList.remove("err");
+  if (m && m.going) box.append(el("span", {text: "Mesure de la consommation en cours…"}));
+  else if (m && m.at && !m.ok) {
+    box.classList.add("err");
+    box.append(el("span", {class: "measure-err", text: `Mesure non faite (${ageText(m.at).text.replace("mesuré ", "")}) : ${m.error}. Les jauges gardent la dernière, avec son âge.`}));
+  } else if (m && m.at) {
+    const c = m.cost;
+    box.append(el("span", {text: `Dernière mesure du cockpit : ${ageText(m.at).text.replace("mesuré ", "")}`
+      + (c ? ` — elle a coûté ${frInt(c.read_tokens)} tokens lus, ${c.output_tokens === null || c.output_tokens === undefined ? "?" : frInt(c.output_tokens)} écrits` : "") + "."}));
+  }
+  box.append(el("button", {class: "small link measure-now", text: "Mesurer maintenant", disabled: (m && m.going) || anyRun() || undefined,
+    title: anyRun() ? "Une commande tourne : ses propres mesures tiennent les jauges à jour" : "Un appel minuscule : un mot, le modèle le plus léger",
+    onclick: measureNow}));
+}
+const frInt = (n) => n === null || n === undefined ? "?" : Number(n).toLocaleString("fr-FR");
+async function measureNow() {
+  try { const u = await api("/api/usage/measure", {}); setUsage(u); }
+  catch (e) { alert(e.message); }
+}
+function setUsage(u) {
+  if (!u) return;
+  S.usage = u;
+  if (u.limits) S.limits = u.limits;
+  renderGauges();
+  if (currentRoute() === "settings") renderThresholds();
+}
+// §2 — a threshold reached: a strong banner on every screen, the phone's
+// too, with the window, its level and when it resets.
+let launchingMeasure = false;
+function renderUsageBanner() {
+  const b = $("usage-banner"); if (!b) return;
+  const hit = Object.values(usageLevels()).filter((x) => x.level === "warn" || x.level === "block");
+  const measuring = launchingMeasure && S.usage && S.usage.measure && S.usage.measure.going;
+  b.classList.toggle("hidden", !hit.length && !measuring);
+  if (!hit.length) {
+    b.dataset.level = measuring ? "measuring" : "";
+    b.replaceChildren(...(measuring ? [el("b", {text: "Mesure de la consommation avant de lancer…"}),
+      el("span", {text: "La dernière date de plus de 15 minutes : un appel minuscule la refait."})] : []));
+    return;
+  }
+  const block = hit.some((x) => x.level === "block");
+  b.dataset.level = block ? "block" : "warn";
+  b.replaceChildren(el("b", {text: block ? "Seuil de blocage atteint : aucune commande ne se lance." : "Seuil d'alerte de consommation atteint."}),
+    ...hit.map((x) => el("span", {class: "ub-w", "data-window": x.window},
+      `${x.name} : ${fmtP(x.pct)} — seuil ${x.level === "block" ? "de blocage" : "d'alerte"} ${x.level === "block" ? x.block : x.warn} %`
+      + (x.resets_at ? `, réinitialisation ${fmtWhen(new Date(x.resets_at * 1000))}` : ""))),
+    ...(block ? [el("span", {class: "small", text: "« Lancer » demande alors de confirmer pour passer outre."})] : []));
+}
+function usageQuestion(ub) {
+  const lines = (ub.windows || []).map((x) => `· ${x.name} : ${fmtP(x.pct)} utilisés — seuil de blocage ${x.block} %`
+    + (x.resets_at ? `, réinitialisation ${fmtWhen(new Date(x.resets_at * 1000))}` : ""));
+  return `Seuil de blocage de la consommation atteint :\n${lines.join("\n")}\n\nLancer quand même ? Ce sera noté dans le journal du cockpit.`;
+}
+// §3 — what a command will cost: the median share of each window its past
+// runs took, « inconnu » under three measured runs.
+function estimate(cmd) {
+  const e = (S.estimates || {})["/" + cmd] || {};
+  const f = e.five_hour || {}, w = e.seven_day || {};
+  const known = (x) => x.median !== null && x.median !== undefined;
+  const where = (x) => x.scope === "app" ? "de cette application" : "de toutes les applications";
+  if (!known(f) && !known(w)) {
+    const n = Math.max(f.n || 0, w.n || 0);
+    return el("span", {class: "est unknown", "data-command": cmd, text: "coût : inconnu",
+      title: `Moins de trois runs de /${cmd} mesurés (${n}) : pas encore d'estimation.`});
+  }
+  const parts = [];
+  if (known(f)) parts.push(`≈ ${fmtP(f.median)} de la fenêtre`);
+  if (known(w)) parts.push(`≈ ${fmtP(w.median)} de la semaine`);
+  const x = known(f) ? f : w;
+  return el("span", {class: "est", "data-command": cmd, text: parts.join(" · "),
+    title: `Médiane de ${x.n} runs de /${cmd} ${where(x)}, d'après les Statistiques.`});
+}
+// Paramètres → Consommation: the four thresholds.
+function renderThresholds() {
+  const th = usageThresholds();
+  for (const w of ["five_hour", "seven_day"]) for (const k of ["warn", "block"]) {
+    const i = $(`th-${w}-${k}`);
+    if (i && document.activeElement !== i) i.value = th[w][k];
+  }
+}
+$("btn-thresholds").onclick = async () => {
+  const t = {};
+  for (const w of ["five_hour", "seven_day"]) t[w] = {warn: $(`th-${w}-warn`).value, block: $(`th-${w}-block`).value};
+  const msg = $("thresholds-msg");
+  try { const u = await api("/api/usage/thresholds", {thresholds: t}); setUsage(u); msg.className = "small ok"; msg.textContent = "Enregistré."; }
+  catch (e) { msg.className = "small err"; msg.textContent = e.message; }
+};
+setInterval(() => { if (S) renderGauges(); }, 30000);
 
 async function api(path, data) {
   const opts = data === undefined ? {} : {
@@ -2195,6 +2365,8 @@ async function loadApps() {
   try { r = await api("/api/apps"); } catch (e) { if (tok === appsToken) appsMsg(e.message); return; }
   if (tok !== appsToken) return;
   A = r;
+  // 1.17: the usage, measured again in the background when old.
+  if (r.usage) { S.usage = r.usage; S.limits = r.usage.limits; renderGauges(); }
   renderApps();
 }
 const CHAIN_CLS = {"à jour": "ok", "en retard": "late", "modifiée sur place": "mod", "absente": "abs", "plus récente": "mod"};
@@ -2826,6 +2998,7 @@ function renderChrome() {
   if (showSy) { tbs.className = "chip " + (unsentText(sy) ? "late" : SYNC_CLS[sy.state] || "abs"); tbs.replaceChildren("GitHub : ", el("b", {text: unsentText(sy) ? `injoignable · ${plural(sy.ahead, "non envoyé", "non envoyés")}` : SYNC_CHIP[sy.state] || sy.state})); tbs.title = sy.summary || ""; }
   renderBusyBanner();
   renderSyncBanner();
+  renderUsageBanner();
   renderMachineBadges();
   updateTitle();
   if (PHONE) phoneRender();
@@ -2963,7 +3136,7 @@ function renderDashboard() {
       disabled: elsewhere() || undefined, title: elsewhere() ? busyNote() : undefined, onclick: () => launchNext(d)});
     // 1.13: on the phone, « Lots à coder » rides on the proposed /8_code — Chaîne's own field is the computer's.
     if (PHONE && n.command === "8_code") detail.append(nextLotsField(d, go8));
-    detail.append(go8);
+    detail.append(go8, estimate(n.command));
     if (elsewhere()) detail.append(el("span", {class: "muted", text: busyNote()}));
   } else if (n.kind === "answer") {
     // The folder's proposal is one step's answers; a chain's Next: names
@@ -3176,17 +3349,31 @@ function chainQuestion(c) {
 }
 async function postRun(name, args) {
   if (chainOff(S.chain) && !confirm(chainQuestion(S.chain))) return false;
-  let r;
+  const flags = {chain_ok: chainOff(S.chain)};
+  let r = null;
+  // 1.17: a measure older than 15 minutes is refreshed first — said while it goes.
+  launchingMeasure = true;
+  const said = setTimeout(renderUsageBanner, 400);
   try {
-    r = await api("/api/run", {command: name, args: args || "", chain_ok: chainOff(S.chain)});
-  } catch (e) {
-    if (syncRefused(e)) return false;
-    if (!(e.status === 409 && e.body && e.body.chain)) throw e;
-    if (e.body.sync && e.body.sync.notice) showSync({kind: "warn", text: e.body.sync.notice});
-    if (!confirm(chainQuestion(e.body.chain))) return false;
-    try { r = await api("/api/run", {command: name, args: args || "", chain_ok: true}); }
-    catch (e2) { if (syncRefused(e2)) return false; throw e2; }
-  }
+    for (let i = 0; i < 3 && !r; i++) {
+      try { r = await api("/api/run", {command: name, args: args || "", ...flags}); }
+      catch (e) {
+        if (syncRefused(e)) return false;
+        const b = e.status === 409 && e.body;
+        // §2: the blocking threshold — « Lancer quand même », after a confirmation that names the level.
+        if (b && b.usage_block && !flags.usage_ok) {
+          launchingMeasure = false; renderUsageBanner();
+          if (!confirm(usageQuestion(b.usage_block))) return false;
+          flags.usage_ok = true; continue;
+        }
+        if (!(b && b.chain) || flags.chain_ok) throw e;
+        if (b.sync && b.sync.notice) showSync({kind: "warn", text: b.sync.notice});
+        if (!confirm(chainQuestion(b.chain))) return false;
+        flags.chain_ok = true;
+      }
+    }
+  } finally { clearTimeout(said); launchingMeasure = false; renderUsageBanner(); }
+  if (!r) return false;
   if (r && r.sync && r.sync.notice) showSync({kind: /injoignable|sans envoyer|identifiant/.test(r.sync.notice) ? "warn" : "ok", text: r.sync.notice});
   return true;
 }
@@ -3249,7 +3436,7 @@ function renderFlow(box, steps, chain, launchable, offNote) {
       text: `Répondre (${waiting})`, onclick: () => openAnswers(s.id, chain)}));
     if (s.command === "8_code") acts.append(deskOnly(lotsField(chain, `lots-n-${chain}`, !launchable || anyRun())));
     if (s.command || s.id === "test") acts.append(...phoneDesk());
-    if (s.command && s.id !== "test") acts.append(el("button", {class: (isNext && d.next && d.next.kind === "run" ? "primary" : "") + " desk-only",
+    if (s.command && s.id !== "test") acts.append(deskOnly(estimate(s.command)), el("button", {class: (isNext && d.next && d.next.kind === "run" ? "primary" : "") + " desk-only",
       disabled: !launchable || anyRun() || undefined, title: elsewhere() ? busyNote() : launchable ? `/${s.command}` : offNote,
       onclick: () => launchStep(s, chain)}, icon("play", "sm"), "Lancer"));
     if (s.id === "test") acts.append(el("button", {class: (isNext ? "primary" : "") + " desk-only",
@@ -3991,7 +4178,15 @@ function renderIdle(idle) {
 
 async function continueWait() { try { await api("/api/continue-wait", {}); await refreshState(); } catch (e) { alert(e.message); } }
 async function continueSession() {
-  try { const r = await api("/api/continue-session", {}); S.run = r.run; await refreshState();
+  try {
+    let r;
+    try { r = await api("/api/continue-session", {}); }
+    catch (e) {
+      if (!(e.status === 409 && e.body && e.body.usage_block)) throw e;
+      if (!confirm(usageQuestion(e.body.usage_block))) return;
+      r = await api("/api/continue-session", {usage_ok: true});
+    }
+    S.run = r.run; await refreshState();
         goStep((S.run_place && S.run_place.chain) || "main", S.run_place && S.run_place.step); }
   catch (e) { alert(e.message); }
 }
@@ -4120,6 +4315,8 @@ function onEvent(ev) {
   if (ev.type === "cockpit_restarting") { if (!restarting) waitRestart({old_pid: d.pid, version: d.version || ""}); return; }
   // 1.15: the access from the phone — a lock, a phone connected or not.
   if (ev.type === "phone") { S.phone = d; renderPhoneLock(); if (currentRoute() === "settings") renderPhone(); return; }
+  // 1.17: a measure started or ended, thresholds changed.
+  if (ev.type === "usage") { setUsage(d); return; }
   // 1.8: a deploy and a crash, whatever the screen.
   if ((ev.type || "").startsWith("deploy_")) { onDeployEvent(ev); return; }
   // 1.6: every run's events arrive; another application's run is not this
@@ -4793,6 +4990,7 @@ function renderSettings() {
     m.append(el("label", {class: S.mode === k ? "on" : ""}, el("div", {class: "row"}, input, el("b", {text: title})), el("div", {class: "muted small", text: text})));
   }
   $("mode-note").textContent = "Le mode choisi vaut pour le prochain run ; un run en cours garde le sien. Même en Auto, une demande renvoyée vers toi devient un bandeau.";
+  renderThresholds();
 
   renderNotes();
   // 1.15: the phone — its access, its notifications.
@@ -5969,7 +6167,7 @@ function renderStMeasures(ms) {
     txt("at", "Mesurée", (p) => p.measured_at, (p) => fmtDate(p.measured_at)),
     txt("w", "Fenêtre", (p) => p.window, (p) => name[p.window] || p.window),
     num("u", "Utilisation", (p) => p.utilization, (p) => `${Math.round(p.utilization * 100)} %`),
-    txt("src", "Source", (p) => p.source, (p) => p.source === "usage" ? "fin de run, /usage" : "pendant un run"),
+    txt("src", "Source", (p) => p.source, (p) => p.source === "usage" ? "fin de run, /usage" : p.source === "mesure" ? "mesure du cockpit" : "pendant un run"),
     txt("reset", "Réinitialisation", (p) => p.resets_at, (p) => p.resets_at ? fmtDate(new Date(p.resets_at * 1000).toISOString()) : "inconnue"),
     txt("run", "Run", (p) => { const r = runById(p.run_id); return r ? r.command : null; }, (p) => { const r = runById(p.run_id); return r ? r.command : "—"; }, "mono"),
   ], ms, {sort: {key: "at", dir: "desc"}, empty: "Aucune mesure sur cette période."}));
