@@ -281,6 +281,36 @@ body.at-home .screen { margin: 0 auto; }
 .usage-measure { margin-top: var(--sp-10); display: flex; flex-wrap: wrap; gap: var(--sp-6) var(--sp-10); align-items: center; font-size: var(--fs-12); color: var(--soft); }
 .usage-measure.err { color: var(--err); }
 #home-usage { margin-bottom: var(--sp-16); }
+/* 1.18 — le pilote automatique. */
+#pilot-card { margin-bottom: var(--sp-16); }
+#pilot-card .pl-head { display: flex; flex-wrap: wrap; gap: var(--sp-8) var(--sp-12); align-items: center; }
+#pilot-card .pl-head h3 { margin: 0; font-size: var(--fs-16); }
+.pl-badge { border-radius: var(--r-pill); padding: var(--sp-2) var(--sp-10); font-size: var(--fs-12); font-weight: 650;
+  background: var(--accent-soft); color: var(--accent); border: var(--bw) solid var(--accent); }
+.pl-badge[data-status="attend"], .pl-badge[data-status="pause"], .pl-badge[data-status="programmé"] {
+  background: var(--warn-soft); color: var(--warn); border-color: var(--warn-line); }
+.pl-doing { font-size: var(--fs-16); font-weight: 600; margin: var(--sp-10) 0 var(--sp-4); }
+.pl-bound { color: var(--ink); }
+.pl-counts { color: var(--soft); font-size: var(--fs-13); margin-top: var(--sp-4); }
+.pl-acts { display: flex; flex-wrap: wrap; gap: var(--sp-8); margin-top: var(--sp-12); }
+.pl-presets { display: flex; flex-wrap: wrap; gap: var(--sp-8); margin: var(--sp-10) 0; }
+.pl-saved { list-style: none; margin: var(--sp-8) 0 0; padding: 0; display: grid; gap: var(--sp-6); }
+.pl-saved li { display: flex; flex-wrap: wrap; gap: var(--sp-6) var(--sp-10); align-items: center; font-size: var(--fs-13); }
+.pl-saved li .txt { color: var(--soft); flex: 1 1 var(--w-220); min-width: 0; }
+.pl-last { margin-top: var(--sp-12); font-size: var(--fs-13); color: var(--soft); border-top: var(--bw) solid var(--line); padding-top: var(--sp-10); }
+.pl-last b { color: var(--ink); }
+.pl-form { display: grid; gap: var(--sp-10); margin-top: var(--sp-12); border-top: var(--bw) solid var(--line); padding-top: var(--sp-12); }
+.pl-form fieldset { border: var(--bw) solid var(--line); border-radius: var(--r-8); padding: var(--sp-10) var(--sp-12); margin: 0; min-width: 0; }
+.pl-form legend { font-weight: 650; font-size: var(--fs-13); padding: 0 var(--sp-4); }
+.pl-form .pl-row { display: flex; flex-wrap: wrap; gap: var(--sp-6) var(--sp-10); align-items: center; margin: var(--sp-4) 0; }
+.pl-form .pl-row > label:first-child { min-width: var(--w-180, 11rem); }
+.pl-form input[type=number] { width: 6.5rem; }
+.pl-form input[type=time] { width: 7.5rem; }
+.pl-form select { width: auto; max-width: 100%; }
+.pl-form .hint { font-size: var(--fs-12); color: var(--soft); }
+#tb-pilot { font-weight: 600; }
+#tb-pilot[data-status="en cours"] { border-color: var(--accent); color: var(--accent); }
+#tb-pilot[data-status="attend"], #tb-pilot[data-status="pause"], #tb-pilot[data-status="programmé"] { border-color: var(--warn-line); color: var(--warn); }
 /* 1.17 §3 — what a command will cost, beside its launch button. */
 .est { font-size: var(--fs-12); color: var(--soft); white-space: nowrap; }
 .est.unknown { font-style: italic; }
@@ -1273,6 +1303,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
       <span class="grow"></span>
       <button id="tb-machine" class="chip hidden" title="État de l'ordinateur"></button>
       <button id="tb-sync" class="chip hidden" title="Où en est ce dépôt face à GitHub"></button>
+      <button id="tb-pilot" class="chip hidden" title="Le pilote automatique : son programme"></button>
       <button id="tb-mode" class="chip hidden" title="Mode de permission">Mode</button>
       <span id="tb-run-wrap"><span id="tb-run" class="chip hidden"></span><button id="tb-stop" class="danger hidden" title="Arrêter maintenant la commande qui tourne">Arrêter</button></span>
       <button id="perm-badge" class="hidden">Autorisation demandée</button>
@@ -1403,6 +1434,8 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         </div>
         <div id="next-why" class="hidden"></div>
       </div>
+      <!-- 1.18: the automatic mode — a programme, its bounds, its stops. -->
+      <div class="card" id="pilot-card" aria-label="Pilote automatique"></div>
       <div class="dash-grid">
         <div class="card" id="dash-wait">
           <div class="kicker">Vous attend</div>
@@ -1628,6 +1661,7 @@ a.btn:hover { border-color: var(--accent); } a.btn.primary { background: var(--a
         <div class="sub">Par tokens lus. « inhabituel » : plus de deux fois la médiane de sa commande (un run) ou de son agent (un passage), sur toute la base.</div>
         <div class="st-pair"><div><h4>Runs</h4><div id="st-costly-runs"></div></div><div><h4>Passages d'agent</h4><div id="st-costly-passes"></div></div></div>
       </div>
+      <div class="st-sec" id="st-prog"><h3>Programmes du pilote automatique</h3><div id="st-prog-table"></div></div>
       <div class="st-sec" id="st-history"><h3>Historique des runs</h3>
         <div class="sub">Le plus récent d'abord. Un clic ouvre ses passages d'agent et le chemin de son journal.</div>
         <div id="st-history-table"></div></div>
@@ -2999,6 +3033,7 @@ function renderChrome() {
   renderBusyBanner();
   renderSyncBanner();
   renderUsageBanner();
+  renderPilotChip();
   renderMachineBadges();
   updateTitle();
   if (PHONE) phoneRender();
@@ -3115,6 +3150,7 @@ function openCountFor(step, chain) {
 }
 
 function renderDashboard() {
+  renderPilot();
   const d = S.decision;
   const detail = $("next-detail"); detail.replaceChildren();
   $("relay-box").classList.add("hidden");
@@ -3283,6 +3319,189 @@ $("btn-chain").onclick = async () => {
   } catch (e) { msg.textContent = ""; alert(e.message); }
   finally { b.disabled = running() || !(S.chain && S.chain.state); }
 };
+
+// ===================================================== pilote automatique (1.18)
+// A programme runs the step the cockpit proposes, command after command,
+// until something needs her or a bound is reached. Three ready settings, the
+// saved programmes, a full form; while it goes: what it does, what it waits
+// for, its bounds in words, and its two stops.
+const PL_STATUS = {"programmé": "Programmé", "en cours": "En cours", "pause": "En pause", "attend": "Attend", "arrêté": "Arrêté"};
+const pilotOn = () => !!(S.pilot && S.pilot.status !== "arrêté");
+const capF = (t) => t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
+function renderPilot() {
+  const card = $("pilot-card"); if (!card) return;
+  card.replaceChildren();
+  const p = S.pilot;
+  if (pilotOn()) card.append(pilotRunning(p));
+  else {
+    card.append(el("div", {class: "pl-head"}, el("h3", {text: "Pilote automatique"}),
+      el("span", {class: "muted small", text: "Enchaîne les étapes proposées tant que personne n'est nécessaire — en mode de permission Auto."})));
+    card.append(el("div", {class: "pl-presets"}, ...(S.pilot_presets || []).map((x) =>
+      el("button", {class: "pl-preset", "data-preset": x.id, text: x.name, disabled: anyRun() || undefined,
+        title: anyRun() ? busyNote() : "", onclick: () => startPilot({preset: x.id}, x.name)})),
+      el("button", {class: "link", id: "pl-form-toggle", "aria-expanded": String(pilotFormOpen),
+        text: pilotFormOpen ? "Fermer le programme complet" : "Programme complet…",
+        onclick: () => { pilotFormOpen = !pilotFormOpen; renderPilot(); }})));
+    const saved = S.pilot_saved || [];
+    if (saved.length) card.append(el("div", {class: "small muted", text: "Programmes enregistrés"}),
+      el("ul", {class: "pl-saved"}, ...saved.map((x) => el("li", {"data-name": x.name}, el("b", {text: x.name}),
+        el("span", {class: "txt", text: x.text}),
+        el("button", {class: "small", text: "Lancer", disabled: anyRun() || undefined, onclick: () => startPilot({saved: x.name}, x.name)}),
+        el("button", {class: "small link", text: "Retirer", onclick: () => forgetPilot(x.name)})))));
+    if (pilotFormOpen) card.append(pilotForm());
+  }
+  if (S.pilot_last && !(p && p.status !== "arrêté")) card.append(pilotLast(S.pilot_last));
+  renderPilotChip();
+}
+function pilotRunning(p) {
+  const box = el("div", {id: "pilot-live", "data-status": p.status});
+  const here = sameApp(p.app, S.app_folder);
+  box.append(el("div", {class: "pl-head"}, el("h3", {text: "Pilote automatique"}),
+    el("span", {class: "pl-badge", "data-status": p.status, text: PL_STATUS[p.status] || p.status}),
+    el("span", {class: "muted small", text: (p.name ? `« ${p.name} »` : "Programme") + (here ? "" : ` — dans « ${p.app_name} »`) + ` · ${p.feature}`})));
+  box.append(el("div", {class: "pl-doing", id: "pilot-doing", text: p.doing || "—"}));
+  if (p.notice) box.append(el("div", {class: "notice warn small", id: "pilot-notice", text: p.notice}));
+  box.append(el("div", {class: "pl-bound", id: "pilot-bound", text: capF(p.bounds_text) + "."}));
+  const since = p.started_at ? ` · depuis ${p.started_at.slice(11, 16)}` : ` · démarre ${fmtWhen(new Date(p.start_at))}`;
+  box.append(el("div", {class: "pl-counts", id: "pilot-counts",
+    text: `${plural(p.commands, "commande", "commandes")} · ${plural(p.lots, "lot codé", "lots codés")}${since}`}));
+  const acts = el("div", {class: "pl-acts"});
+  if (p.stop_after) acts.append(el("span", {class: "notice warn small", text: "Arrêt demandé : après la commande en cours."}));
+  const lot = p.run && p.run.command === "8_code";
+  if (p.status === "en cours" && p.run) {
+    acts.append(el("button", {id: "pilot-stop-after", text: lot ? "Arrêter après le lot en cours" : "Arrêter après la commande en cours",
+      disabled: p.stop_after || undefined, onclick: () => stopPilot("apres")}));
+    acts.append(el("button", {class: "danger", id: "pilot-stop-now", text: "Arrêter maintenant", onclick: () => stopPilot("maintenant")}));
+  } else {
+    acts.append(el("button", {class: "danger", id: "pilot-cancel", text: p.status === "programmé" ? "Annuler le programme" : "Arrêter le programme",
+      onclick: () => stopPilot("apres")}));
+  }
+  box.append(acts);
+  return box;
+}
+function pilotLast(x) {
+  const u = x.usage || {};
+  const spent = [["five_hour", "de la fenêtre"], ["seven_day", "de la semaine"]].filter(([w]) => u[w] && u[w].spent !== null && u[w].spent !== undefined)
+    .map(([w, n]) => `≈ ${fmtP(u[w].spent)} ${n}`);
+  const at = x.ended_at ? fmtWhen(new Date(x.ended_at)) : "";
+  return el("div", {class: "pl-last", id: "pilot-last"},
+    el("div", {}, el("b", {text: "Dernier programme"}), ` ${x.name ? `« ${x.name} »` : ""} — arrêté ${at} : `, el("span", {class: "pl-reason", text: x.reason || "—"})),
+    el("div", {text: `${plural(x.commands || 0, "commande", "commandes")}, ${plural(x.lots || 0, "lot codé", "lots codés")}`
+      + (spent.length ? `, ${spent.join(" et ")}` : ", consommation non mesurée") + "."}),
+    (x.prompts || []).length ? el("details", {}, el("summary", {text: "Les commandes"}), el("div", {class: "mono small", text: x.prompts.join(" · ")})) : null);
+}
+function renderPilotChip() {
+  const c = $("tb-pilot"); if (!c) return;
+  const p = S.pilot, on = pilotOn();
+  c.classList.toggle("hidden", !on);
+  if (!on) return;
+  c.dataset.status = p.status;
+  c.textContent = `Pilote : ${(PL_STATUS[p.status] || p.status).toLowerCase()}`;
+  c.title = `${p.doing || ""} ${capF(p.bounds_text)}.`;
+}
+$("tb-pilot").onclick = () => {
+  const p = S.pilot; if (!p) return;
+  if (!sameApp(p.app, S.app_folder)) activateApp(p.app, false); else go("dashboard");
+};
+async function startPilot(what, name) {
+  if (anyRun()) { alert(busyNote()); return; }
+  if (!confirm(`Lancer le pilote automatique « ${name} » sur ${S.feature} ?\n\nIl enchaîne les étapes proposées, en mode Auto, et s'arrête dès qu'on a besoin de vous ou qu'une borne est atteinte.`)) return;
+  try {
+    const r = await api("/api/pilot/start", what);
+    S.pilot = r.pilot; S.pilot_saved = r.pilot_saved; S.pilot_last = r.pilot_last;
+    pilotFormOpen = false; renderPilot();
+    if (r.created && r.created.notice) alert(`Démarre ${fmtWhen(new Date(r.created.start_at))}.\n\n${r.created.notice}`);
+  } catch (e) { alert(e.message); }
+}
+async function stopPilot(how) {
+  const p = S.pilot; if (!p) return;
+  const q = how === "maintenant" ? `Arrêter maintenant ? ${p.run ? p.run.prompt + " s'arrête inachevée." : ""}`
+    : p.status === "programmé" ? "Annuler ce programme avant son démarrage ?"
+    : p.run ? (p.run.command === "8_code" ? "Arrêter après le lot en cours ? stop.md est posé pour /8_code, et retiré à sa fin." : "Arrêter après la commande en cours ?")
+    : "Arrêter le programme ?";
+  if (!confirm(q)) return;
+  try { const r = await api("/api/pilot/stop", {how}); S.pilot = r.pilot; S.pilot_last = r.pilot_last; renderPilot(); }
+  catch (e) { alert(e.message); }
+}
+async function forgetPilot(name) {
+  if (!confirm(`Retirer le programme « ${name} » ?`)) return;
+  try { const r = await api("/api/pilot/forget", {name}); S.pilot_saved = r.pilot_saved; renderPilot(); } catch (e) { alert(e.message); }
+}
+// The full form: built once, kept across re-renders — what she typed stays.
+let pilotFormOpen = false, pilotFormNode = null;
+function pilotForm() {
+  if (pilotFormNode) { pilotSteps(); return pilotFormNode; }
+  const num = (id, min, max, label) => el("input", {type: "number", id, min, max, step: 1, "aria-label": label});
+  const radio = (v, label, checked) => el("label", {}, el("input", {type: "radio", name: "pl-start", value: v, checked: checked || undefined}), " " + label);
+  const row = (label, ...xs) => el("div", {class: "pl-row"}, el("label", {text: label}), ...xs);
+  pilotFormNode = el("div", {class: "pl-form", id: "pilot-form"},
+    el("fieldset", {}, el("legend", {text: "Démarrage"}),
+      el("div", {class: "pl-row"}, radio("now", "Maintenant", true)),
+      el("div", {class: "pl-row"}, radio("at", "À une heure"), el("input", {type: "time", id: "pl-at", "aria-label": "Heure de démarrage"})),
+      el("div", {class: "pl-row"}, radio("slot", "Dans un créneau, de"), el("input", {type: "time", id: "pl-from", "aria-label": "Début du créneau"}),
+        "à", el("input", {type: "time", id: "pl-to", "aria-label": "Fin du créneau"})),
+      el("div", {class: "hint", text: "Un créneau démarre à son début — tout de suite si on y est déjà —, et sa fin est une borne."})),
+    el("fieldset", {}, el("legend", {text: "Bornes — la première atteinte arrête le programme"}),
+      el("div", {class: "hint", text: "Vide : pas de borne. Il s'arrête toujours quand on a besoin de vous, sur une erreur, au seuil de blocage de la consommation, sur un blocage de l'ordinateur ou un dépôt divergé."}),
+      row("Heure de fin", el("input", {type: "time", id: "pl-until", "aria-label": "Heure de fin"})),
+      row("Durée", num("pl-minutes", 1, 10080, "Durée en minutes"), "min"),
+      row("Nombre de lots codés", num("pl-lots", 1, 999, "Nombre de lots")),
+      row("Nombre de commandes", num("pl-commands", 1, 999, "Nombre de commandes")),
+      row("Fenêtre de 5 heures", num("pl-five", 1, 100, "Niveau de la fenêtre de 5 heures"), "%"),
+      row("Semaine", num("pl-week", 1, 100, "Niveau de la semaine"), "%"),
+      row("Étape à atteindre",
+        el("select", {id: "pl-step-when", "aria-label": "Avant ou après l'étape"},
+          el("option", {value: "before", text: "S'arrêter avant"}), el("option", {value: "after", text: "S'arrêter une fois faite"})),
+        el("select", {id: "pl-step", "aria-label": "L'étape à atteindre"}))),
+    el("fieldset", {}, el("legend", {text: "Réglages"}),
+      row("Pause entre deux commandes", num("pl-spacing", 0, 1440, "Pause en minutes"), "min"),
+      el("div", {class: "pl-row"}, el("label", {}, el("input", {type: "checkbox", id: "pl-confirmed"}),
+        " Laisser tourner /9_controle et /diagnostique sans s'arrêter pour demander"))),
+    el("div", {class: "pl-row"}, el("label", {for: "pl-name", text: "Nom"}), el("input", {type: "text", id: "pl-name", maxlength: 80, placeholder: "Ma nuit de code"}),
+      el("label", {}, el("input", {type: "checkbox", id: "pl-save"}), " L'enregistrer")),
+    el("div", {class: "pl-row"}, el("button", {class: "primary", id: "pl-go", text: "Lancer le programme", onclick: () => submitPilot(false)}),
+      el("button", {id: "pl-save-only", text: "Enregistrer sans lancer", onclick: () => submitPilot(true)}),
+      el("span", {class: "small", id: "pl-msg", role: "status"})));
+  pilotSteps();
+  return pilotFormNode;
+}
+// « Étape à atteindre »: the steps of the flow, in its order — the main
+// chain's, then the open correction's.
+function pilotSteps() {
+  const sel = pilotFormNode && pilotFormNode.querySelector("#pl-step"); if (!sel) return;
+  const keep = sel.value;
+  sel.replaceChildren(el("option", {value: "", text: "— aucune —"}));
+  const main = (S.scan && S.scan.main) || [];
+  sel.append(el("optgroup", {label: "Chaîne principale"}, ...main.map((x, i) => el("option", {value: `main:${x.id}`,
+    text: `${i + 1}. ${x.name}${x.command ? ` (/${x.command})` : ""}`}))));
+  const hb = S.scan && (S.scan.corrections || []).find((c) => c.highest);
+  if (hb) sel.append(el("optgroup", {label: `Correction ${hb.name}`}, ...hb.steps.map((x, i) => el("option", {value: `correction:${x.id}`,
+    text: `${i + 1}. ${x.name}${x.command ? ` (/${x.command})` : ""}`}))));
+  sel.value = keep;
+}
+function pilotSpec() {
+  const v = (id) => ($(id).value || "").trim();
+  const mode = (pilotFormNode.querySelector("input[name=pl-start]:checked") || {}).value || "now";
+  const start = {mode};
+  if (mode === "at") start.at = v("pl-at");
+  if (mode === "slot") { start.from = v("pl-from"); start.to = v("pl-to"); }
+  const bounds = {until: v("pl-until") || null, minutes: v("pl-minutes") || null, lots: v("pl-lots") || null,
+    commands: v("pl-commands") || null, five_hour: v("pl-five") || null, seven_day: v("pl-week") || null};
+  const st = v("pl-step");
+  if (st) { const [chain, id] = st.split(":"); bounds.step = {chain, id, when: v("pl-step-when")}; }
+  return {name: v("pl-name"), start, bounds, spacing_min: v("pl-spacing") || 0, run_confirmed: $("pl-confirmed").checked};
+}
+async function submitPilot(saveOnly) {
+  const msg = $("pl-msg"); msg.textContent = ""; msg.className = "small";
+  const spec = pilotSpec();
+  try {
+    if (saveOnly) { const r = await api("/api/pilot/save", {spec}); S.pilot_saved = r.pilot_saved; msg.className = "small ok"; msg.textContent = "Enregistré."; renderPilot(); return; }
+    if (!confirm(`Lancer ce programme sur ${S.feature} ?`)) return;
+    const r = await api("/api/pilot/start", {spec, save: $("pl-save").checked});
+    S.pilot = r.pilot; S.pilot_saved = r.pilot_saved; pilotFormOpen = false; renderPilot();
+    if (r.created && r.created.notice) alert(`Démarre ${fmtWhen(new Date(r.created.start_at))}.\n\n${r.created.notice}`);
+  } catch (e) { msg.className = "small err"; msg.textContent = e.message; }
+}
 
 // ------------------------------------------------------------ launch
 // One click for the step the chain named or the folder proposes; a
@@ -4317,6 +4536,12 @@ function onEvent(ev) {
   if (ev.type === "phone") { S.phone = d; renderPhoneLock(); if (currentRoute() === "settings") renderPhone(); return; }
   // 1.17: a measure started or ended, thresholds changed.
   if (ev.type === "usage") { setUsage(d); return; }
+  // 1.18: the programme moved — its card and its chip.
+  if (ev.type === "pilot") {
+    Object.assign(S, {pilot: d.pilot, pilot_last: d.pilot_last, pilot_presets: d.pilot_presets, pilot_saved: d.pilot_saved});
+    renderPilot(); return;
+  }
+  if (ev.type === "pilot_push") return;
   // 1.8: a deploy and a crash, whatever the screen.
   if ((ev.type || "").startsWith("deploy_")) { onDeployEvent(ev); return; }
   // 1.6: every run's events arrive; another application's run is not this
@@ -6006,10 +6231,24 @@ function renderStats() {
   renderStTiles();
   renderStChart();
   renderStTables();
+  renderStProgrammes();
   $("st-logs-dir").textContent = S.logs_dir || "";
 }
 $("st-logs-open").onclick = async () => { try { await api("/api/open-logs", {}); } catch (e) { alert(e.message); } };
 
+// 1.18 — each programme's summary, kept in stats.sqlite.
+function renderStProgrammes() {
+  const box = $("st-prog-table"); box.replaceChildren();
+  const rows = ST.programmes || [];
+  if (!rows.length) { box.append(el("p", {class: "muted small", text: "Aucun programme du pilote automatique pour ces filtres."})); return; }
+  const pct = (x) => x && x.spent !== null && x.spent !== undefined ? `≈ ${fmtP(x.spent)}` + (x.unknown ? ` (${x.unknown} sans mesure)` : "") : "—";
+  box.append(el("div", {class: "st-table-wrap", id: "tbl-programmes"}, el("table", {class: "st"}, el("thead", {}, el("tr", {}, ...["Début", "Fin", "Programme", "Fonctionnalité", "Commandes", "Lots", "≈ % 5 h", "≈ % semaine", "Pourquoi il s'est arrêté"].map((t) => el("th", {text: t})))),
+    el("tbody", {}, ...rows.map((r) => el("tr", {}, el("td", {text: (r.started_at || r.created_at || "").replace("T", " ").slice(0, 16)}),
+      el("td", {text: (r.ended_at || "").replace("T", " ").slice(0, 16)}), el("td", {text: r.name || r.id}), el("td", {text: r.feature || ""}),
+      el("td", {text: String(r.commands || 0), title: (r.prompts || []).join(" · ")}), el("td", {text: String(r.lots || 0)}),
+      el("td", {text: pct(r.usage && r.usage.five_hour)}), el("td", {text: pct(r.usage && r.usage.seven_day)}),
+      el("td", {text: r.reason || ""})))))));
+}
 function tile(label, value, ...sub) {
   return el("div", {class: "tile"}, el("div", {class: "tl", text: label}), el("div", {class: "tv", text: value}),
     ...sub.filter(Boolean).map((t) => el("div", {class: "ts", text: t})));

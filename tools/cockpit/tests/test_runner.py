@@ -196,8 +196,10 @@ def test_stop_at_next_lot_writes_stop_md_for_8_code_only(tmp_path):
         run = await rn.start(str(tmp_path), "f/bugfix-02", "f", "8_code", "f")
         await next_event(q, "text")
         path = rn.stop_at_next_lot(str(tmp_path))
+        written = os.path.exists(path)
         await rn.stop_now(str(tmp_path))
         await run.task
+        assert written
         run2 = await rn.start(str(tmp_path), "f", "f", "7_lots", "f")
         await next_event(q, "text")
         with pytest.raises(runner_mod.NotRunning):
@@ -208,7 +210,12 @@ def test_stop_at_next_lot_writes_stop_md_for_8_code_only(tmp_path):
 
     path = asyncio.run(go())
     # At the feature folder's root, even when the working folder is a bugfix.
-    assert path == str(feature / "stop.md") and os.path.exists(path)
+    assert path == str(feature / "stop.md")
+    # 1.18: read by the run, then disarmed by the cockpit once it ended — she
+    # never handles it.
+    assert not os.path.exists(path) and os.path.exists(feature / "stop1.md")
+    # One she put there herself is still disarmed on demand.
+    (feature / "stop.md").write_text("arrêt", encoding="utf-8")
     target = runner_mod.Runner.disarm_stop_file(str(tmp_path), "f")
     assert target == str(feature / "stop1.md") and not os.path.exists(path)
 

@@ -382,6 +382,40 @@ class State:
             self._save()
         return clean
 
+    # --------------------------------------- pilote automatique (1.18)
+
+    @property
+    def pilot_active(self):
+        """The programme going, scheduled or waiting — kept so that a
+        cockpit that stops finds it again."""
+        p = self.data.get("pilot_active")
+        return json.loads(json.dumps(p)) if isinstance(p, dict) else None
+
+    def set_pilot_active(self, record):
+        with self._lock:
+            if record:
+                self.data["pilot_active"] = record
+            else:
+                self.data.pop("pilot_active", None)
+            self._save()
+
+    def programmes(self):
+        """The programmes she saved: [{name, spec}]."""
+        p = self.data.get("programmes")
+        return [dict(x) for x in p if isinstance(x, dict) and x.get("name")] if isinstance(p, list) else []
+
+    def save_programme(self, name, spec):
+        with self._lock:
+            lst = [x for x in self.programmes() if x["name"] != name]
+            lst.append({"name": name, "spec": spec})
+            self.data["programmes"] = lst
+            self._save()
+
+    def forget_programme(self, name):
+        with self._lock:
+            self.data["programmes"] = [x for x in self.programmes() if x["name"] != name]
+            self._save()
+
     # --------------------------------------------------------- diagnostic
 
     def diagnostic(self, app=None):

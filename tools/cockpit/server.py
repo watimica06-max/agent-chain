@@ -27,6 +27,7 @@ import aiohttp  # noqa: E402,F811
 from aiohttp import web  # noqa: E402,F811
 
 import apps as apps_mod  # noqa: E402
+import autopilot as pilot_mod  # noqa: E402
 import blocking   # noqa: E402
 import chain as chain_mod  # noqa: E402
 import codelots   # noqa: E402
@@ -62,7 +63,7 @@ STATE_KEY = web.AppKey("state", State)
 PORT_KEY = web.AppKey("port", dict)
 DEPLOY_KEY = web.AppKey("deploy", deploy_mod.Deployer)
 DEFAULT_PORT = 8765
-VERSION = "1.17"
+VERSION = "1.18"
 # « Arrêter le cockpit » with a run going: how long the run is given to end
 # once it was told to stop now, before the server goes all the same.
 STOP_GRACE = 30.0
@@ -111,6 +112,8 @@ RESTART_POLL = 15.0
 # one as old. The tests put False here, or a fake client in MEASURE_CLIENT.
 MEASURE_USAGE = True
 MEASURE_CLIENT = None
+# 1.18 — the automatic mode's clock: the real one; the tests put a fake here.
+PILOT_CLOCK = None
 GROUPS = ["Amont", "Aval", "Correction", "Fusion", "Outils"]
 # `.claude/CLAUDE.md`'s table: upstream cycle, downstream cycle, bug-fix entry,
 # merge, and what is run by hand outside the chain. A command not listed is a tool.
@@ -577,7 +580,7 @@ def default_export_folder():
 
 def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
              diag_runner=None, export_picker=ask_export_folder, on_quit=None, file_picker=ask_idea_file,
-             measurer=None):
+             measurer=None, pilot_clock=None):
     store = rn.stats
     diag_runner = diag_runner or DIAG_RUNNER
     # The diagnostic run in the background (1.4.5): once, at the opening,
@@ -905,7 +908,23 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             # here on the loop: what it leaves is what was not there yet.
             push_box["before"][ev["run"]] = entries_of(a, d.get("work") or "")
             return
+        if kind == "pilot_push":
+            subs = ph.subscriptions()
+            if not subs:
+                return
+            msg = {"kind": "pilote", "title": d.get("title") or "Pilote automatique", "body": d.get("body") or "",
+                   "app": a or "", "work": (pilot.p or {}).get("feature") or "", "screen": "dashboard",
+                   "tag": f"cockpit-pilote-{d.get('event')}-{ev.get('seq')}"}
+            sent = await push_to(subs, msg)
+            print(f"Téléphone : notification « {msg['title']} » — {sent}/{len(subs)} envoyée{'s' if sent > 1 else ''}.",
+                  flush=True)
+            return
         if kind not in ("permission", "run_ended"):
+            return
+        # 1.18: a programme's run says nothing at its end — the programme
+        # says when it stops, and why.
+        if kind == "run_ended" and d.get("programme"):
+            push_box["before"].pop(ev["run"], None)
             return
         before = push_box["before"].pop(ev["run"], None) if kind == "run_ended" else None
         subs = ph.subscriptions()
@@ -955,6 +974,14 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             rn.unwatch(q)
 
     async def push_cleanup(_app):
+        # 1.18: a programme scheduled survives the cockpit's stop — kept in
+        # config.json; one running is summed up as interrupted.
+        if pilot.task and not pilot.task.done():
+            keep = dict(pilot.p) if pilot.p and pilot.p["status"] == pilot_mod.PROGRAMME else None
+            pilot.task.cancel()
+            await asyncio.gather(pilot.task, return_exceptions=True)
+            if keep:
+                state.set_pilot_active(keep)
         for t in (push_box["task"], watch_box["task"]):
             if t and not t.done():
                 t.cancel()
@@ -1106,7 +1133,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
                # The two usage windows, each with when it was measured (§13.3).
                "limits": _limits(store), "now": datetime.now().isoformat(timespec="seconds"),
                # 1.17: the thresholds, each window's level, the last measure.
-               "usage": usage_payload()}
+               "usage": usage_payload(),
+               # 1.18: the programme going, if any, and the last one's summary.
+               **pilot_light()}
         out["ignored"] = state.ignored
         out["creating"] = making["current"].path if making["current"] else None
         # 1.12: where the open application's clone stands against GitHub —
@@ -1566,47 +1595,230 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return web.json_response({"error": f"commande inconnue : /{cmd}"}, status=400)
         if "\n" in args or "\r" in args:
             return web.json_response({"error": "l'argument tient sur une ligne"}, status=400)
-        if bulk["going"]:
-            return web.json_response({"error": "« Tout mettre à jour » installe la chaîne : lancer après"}, status=409)
-        if updating["going"]:
-            return web.json_response({"error": "le cockpit se met à jour : lancer après son redémarrage"}, status=409)
-        # One run at a time, whatever the application (1.6): said with where it goes.
-        busy = busy_payload()
-        if busy:
-            return web.json_response({"error": busy_text(busy), "busy": busy}, status=409)
-        # A deploy building in this application (1.8): its build and the run's
-        # merge would race.
-        if dep.going_in(a):
-            return web.json_response({"error": "un déploiement construit dans cette application : lancer après sa fin"},
-                                     status=409)
-        if inst.going():
-            return web.json_response({"error": f"« {inst.going().title} » est en cours : lancer après sa fin"},
-                                     status=409)
-        # 1.16 §2: what blocks a launch — Claude Code, its login, git's
-        # identity —, checked again now; « Bâtir », Java and the Android tools.
-        refused = await machine_block(machine.LAUNCH, a) or (
-            await machine_block(machine.BATIR, a) if cmd == "batir" else None)
+        refused, synced = await launch_checks(a, cmd, args, data)
         if refused:
             return refused
-        # 1.17 §2: the usage, measured again when old; its blocking threshold.
-        refused = await usage_gate(data, f"/{cmd} {args}".rstrip(), a)
-        if refused:
-            return refused
-        # 1.12 §2: GitHub first — what the other computer pushed is pulled
-        # before anything reads the files, the chain's version included.
-        refused, synced = await synced_first(a)
-        if refused:
-            return refused
-        # A chain not « à jour » (§20): the launch asks first.
-        ch = chain_state(a)
-        if ch.get("state") != chain_mod.UP_TO_DATE and not data.get("chain_ok"):
-            return web.json_response({"error": ch["summary"], "chain": ch, "sync": synced}, status=409)
         try:
             r = await rn.start(a, w, feature_of(w), cmd, args)
         except runner_mod.Busy as e:
             b = busy_payload()
             return web.json_response({"error": busy_text(b) if b else str(e), "busy": b}, status=409)
         return web.json_response({"run": r.snapshot(), "sync": synced})
+
+    async def launch_checks(a, cmd, args, data):
+        """What refuses a launch, in this order — a click's and a
+        programme's alike (1.18): (refusal response or None, the sync's
+        result). A programme passes no `usage_ok` and no `chain_ok`."""
+        if bulk["going"]:
+            return web.json_response({"error": "« Tout mettre à jour » installe la chaîne : lancer après"}, status=409), None
+        if updating["going"]:
+            return web.json_response({"error": "le cockpit se met à jour : lancer après son redémarrage"}, status=409), None
+        # One run at a time, whatever the application (1.6): said with where it goes.
+        busy = busy_payload()
+        if busy:
+            return web.json_response({"error": busy_text(busy), "busy": busy}, status=409), None
+        # A deploy building in this application (1.8): its build and the run's
+        # merge would race.
+        if dep.going_in(a):
+            return web.json_response({"error": "un déploiement construit dans cette application : lancer après sa fin"},
+                                     status=409), None
+        if inst.going():
+            return web.json_response({"error": f"« {inst.going().title} » est en cours : lancer après sa fin"},
+                                     status=409), None
+        # 1.16 §2: what blocks a launch — Claude Code, its login, git's
+        # identity —, checked again now; « Bâtir », Java and the Android tools.
+        refused = await machine_block(machine.LAUNCH, a) or (
+            await machine_block(machine.BATIR, a) if cmd == "batir" else None)
+        if refused:
+            return refused, None
+        # 1.17 §2: the usage, measured again when old; its blocking threshold.
+        refused = await usage_gate(data, f"/{cmd} {args}".rstrip(), a)
+        if refused:
+            return refused, None
+        # 1.12 §2: GitHub first — what the other computer pushed is pulled
+        # before anything reads the files, the chain's version included.
+        refused, synced = await synced_first(a)
+        if refused:
+            return refused, synced
+        # A chain not « à jour » (§20): the launch asks first.
+        ch = chain_state(a)
+        if ch.get("state") != chain_mod.UP_TO_DATE and not data.get("chain_ok"):
+            return web.json_response({"error": ch["summary"], "chain": ch, "sync": synced}, status=409), synced
+        return None, synced
+
+    # ---------------------------------------- pilote automatique (1.18)
+    class PilotHost:
+        """What the programme asks of the server (autopilot.py)."""
+
+        def decide(self, a, feature):
+            return where(state, rn, a, feature)
+
+        def busy(self):
+            x = rn.going()
+            return x.prompt if x and not x.programme else None
+
+        async def wait_idle(self):
+            x = rn.going()
+            if x and x.task:
+                await asyncio.gather(asyncio.shield(x.task), return_exceptions=True)
+
+        async def refresh_usage(self, force):
+            if MEASURE_USAGE and (force or meas.stale()):
+                try:
+                    await asyncio.shield(measure_now("pilote automatique"))
+                except Exception as e:
+                    print(f"Pilote automatique : mesure non aboutie ({e})", flush=True)
+
+        def levels(self):
+            return usage_mod.levels(_limits(store), state.usage_thresholds)
+
+        def thresholds(self):
+            return state.usage_thresholds
+
+        def estimate(self, cmd):
+            p = pilot.p or {}
+            return usage_mod.estimates(store.path if store else None, p.get("app")).get("/" + cmd)
+
+        async def launch(self, a, feature, cmd, args, pid):
+            if cmd not in {c["name"] for c in list_commands(a)}:
+                return None, (pilot_mod.CHAIN, f"/{cmd} n'est pas une commande de l'application.")
+            refused, _ = await launch_checks(a, cmd, args, {})
+            if refused:
+                return None, refusal_kind(refused)
+            try:
+                r = await rn.start(a, feature, feature, cmd, args, mode="auto", programme=pid)
+            except runner_mod.Busy as e:
+                return None, (pilot_mod.BUSY, str(e))
+            return r, None
+
+        async def wait_run(self, r):
+            if r.task:
+                await asyncio.gather(asyncio.shield(r.task), return_exceptions=True)
+            return r.snapshot()
+
+        async def stop_run_now(self, a):
+            try:
+                await rn.stop_now(a)
+            except runner_mod.NotRunning:
+                pass
+
+        def write_stop(self, a):
+            return rn.stop_at_next_lot(a)
+
+        def changed(self, public):
+            broadcast("pilot", pilot_light())
+
+        def push(self, event, title, text):
+            broadcast("pilot_push", {"event": event, "title": title, "body": text,
+                                     "app": (pilot.p or {}).get("app") or state.app_folder})
+
+        def record(self, summary):
+            if store:
+                store.record_programme(summary)
+
+        def spent(self, pid):
+            return store.spent(pid) if store else {}
+
+        def save(self, record):
+            state.set_pilot_active(record)
+
+    def refusal_kind(resp):
+        try:
+            b = json.loads(resp.text)
+        except (TypeError, ValueError):
+            b = {}
+        text = b.get("error") or "lancement refusé"
+        if b.get("usage_block"):
+            return pilot_mod.USAGE, text + " Un programme ne passe jamais outre."
+        if b.get("sync_refused"):
+            return pilot_mod.GITHUB, "GitHub : " + text
+        if b.get("machine"):
+            return pilot_mod.MACHINE, "État de l'ordinateur : " + text
+        if b.get("chain"):
+            return pilot_mod.CHAIN, text + " — un programme ne lance rien sur une chaîne pas à jour."
+        return pilot_mod.BUSY, text[:1].upper() + text[1:] + "."
+
+    pilot = pilot_mod.Pilot(PilotHost(), clock=pilot_clock or PILOT_CLOCK)
+
+    def pilot_light():
+        """What the page shows of the automatic mode: the programme, the last
+        summary, the ready settings and the saved programmes."""
+        last = pilot.last
+        if last is None and store:
+            try:
+                got = store.programmes(1)
+                last = got[0] if got else None
+            except Exception:
+                last = None
+        return {"pilot": pilot.public(), "pilot_last": last, "pilot_presets": pilot_mod.PRESETS,
+                "pilot_saved": [{**x, "text": pilot_mod.spec_text(x["spec"])} for x in state.programmes()]}
+
+    def pilot_payload():
+        a, w = pair()
+        light = pilot_light()
+        last = light["pilot_last"]
+        steps = None
+        if a:
+            try:
+                sc = scan_of(a, feature_of(w))
+                steps = {"main": [{"id": x["id"], "name": x["name"], "command": x.get("command")} for x in sc["main"]],
+                         "correction": next(({"name": c["name"], "steps": [{"id": x["id"], "name": x["name"]}
+                                                                            for x in c["steps"]]}
+                                             for c in sc["corrections"] if c["highest"]), None)}
+            except Exception:
+                steps = None
+        return {**light, "last": last, "steps": steps}
+
+    async def pilot_get(request):
+        return web.json_response(pilot_payload())
+
+    async def pilot_start(request):
+        """« Lancer le programme »: a ready setting, a saved one or the
+        full form — on the application and the feature open."""
+        a, w = need_pair()
+        data = await body(request)
+        spec = data.get("spec")
+        if data.get("preset"):
+            spec = next((x["spec"] for x in pilot_mod.PRESETS if x["id"] == data["preset"]), None)
+            spec = {**spec, "name": next(x["name"] for x in pilot_mod.PRESETS if x["id"] == data["preset"])} if spec else None
+        elif data.get("saved"):
+            spec = next((x["spec"] for x in state.programmes() if x["name"] == data["saved"]), None)
+        if not isinstance(spec, dict):
+            return web.json_response({"error": "aucun programme"}, status=400)
+        try:
+            clean = pilot_mod.clean_spec(spec)
+            if data.get("save"):
+                if not clean["name"]:
+                    return web.json_response({"error": "un nom, pour l'enregistrer"}, status=400)
+                state.save_programme(clean["name"], clean)
+            out = pilot.create(clean, a, feature_of(w), state.name_of(a))
+        except (ValueError, pilot_mod.Refused) as e:
+            return web.json_response({"error": str(e)}, status=409 if isinstance(e, pilot_mod.Refused) else 400)
+        return web.json_response({**pilot_payload(), "created": out})
+
+    async def pilot_stop(request):
+        data = await body(request)
+        try:
+            await pilot.stop("maintenant" if data.get("how") == "maintenant" else "apres")
+        except pilot_mod.Refused as e:
+            return web.json_response({"error": str(e)}, status=409)
+        return web.json_response(pilot_payload())
+
+    async def pilot_save(request):
+        data = await body(request)
+        try:
+            clean = pilot_mod.clean_spec(data.get("spec"))
+        except ValueError as e:
+            return web.json_response({"error": str(e)}, status=400)
+        if not clean["name"]:
+            return web.json_response({"error": "un nom, pour l'enregistrer"}, status=400)
+        state.save_programme(clean["name"], clean)
+        return web.json_response(pilot_payload())
+
+    async def pilot_forget(request):
+        data = await body(request)
+        state.forget_programme(str(data.get("name") or ""))
+        return web.json_response(pilot_payload())
 
     def busy_text(b):
         return (f"une commande tourne déjà : {b['prompt']}" if b["active"]
@@ -1817,6 +2029,14 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         # 1.17: the usage, measured when the cockpit starts.
         if MEASURE_USAGE:
             measure_now("au démarrage du cockpit")
+        # 1.18: a programme kept when the cockpit stopped.
+        kept = state.pilot_active
+        if kept:
+            try:
+                pilot.restore(kept)
+            except Exception as e:
+                state.set_pilot_active(None)
+                print(f"Pilote automatique : programme gardé non repris ({e})", flush=True)
         if SYNC_APPS_AT_START:
             for x in state.apps():
                 refresh_later(x["folder"])
@@ -1850,6 +2070,16 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
         out = statsview.build(store.path if store else None, feature, period, app=app,
                               ignored_by_app=state.ignored_by_app(), names=names)
         out["apps"] = [{"name": x["name"], "folder": x["folder"]} for x in state.apps()]
+        # 1.18: the automatic mode's programmes, for the same application and feature.
+        progs = []
+        if store:
+            try:
+                progs = store.programmes(200)
+            except Exception:
+                progs = []
+        akey = statsview.app_key(app) if app else None
+        out["programmes"] = [x for x in progs if (akey is None or statsview.app_key(x.get("app")) == akey)
+                             and (feature is None or x.get("feature") == feature)]
         return out
 
     async def stats_get(request):
@@ -2569,6 +2799,9 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
             return "la mise à jour du cockpit est déjà en cours"
         if inst.going():
             return f"« {inst.going().title} » est en cours : le cockpit se met à jour après sa fin"
+        if pilot.active():
+            return (f"le pilote automatique a un programme actif ({pilot.p['status']}) : le cockpit se met à jour "
+                    "après sa fin")
         return None
 
     async def cockpit_get(request):
@@ -3125,6 +3358,11 @@ def make_app(state: State, rn: runner_mod.Runner, picker=ask_directory,
     r.add_get("/api/usage", usage_get)
     r.add_post("/api/usage/thresholds", usage_thresholds)
     r.add_post("/api/usage/measure", usage_measure)
+    r.add_get("/api/pilot", pilot_get)
+    r.add_post("/api/pilot/start", pilot_start)
+    r.add_post("/api/pilot/stop", pilot_stop)
+    r.add_post("/api/pilot/save", pilot_save)
+    r.add_post("/api/pilot/forget", pilot_forget)
     r.add_post("/api/chain/install", chain_install)
     r.add_post("/api/chain/install-all", chain_install_all)
     r.add_get("/api/apps", apps_get)

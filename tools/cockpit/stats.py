@@ -415,13 +415,17 @@ CREATE TABLE IF NOT EXISTS rate_limits (
 CREATE INDEX IF NOT EXISTS agent_passes_run ON agent_passes(run_id);
 CREATE INDEX IF NOT EXISTS rate_limits_window ON rate_limits(window, measured_at);
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
+CREATE TABLE IF NOT EXISTS programmes (
+  id TEXT PRIMARY KEY, app TEXT, feature TEXT, name TEXT, spec TEXT, created_at TEXT, started_at TEXT,
+  ended_at TEXT, commands INTEGER, lots INTEGER, prompts TEXT, five_hour REAL, five_hour_unknown INTEGER,
+  seven_day REAL, seven_day_unknown INTEGER, reason TEXT, reason_kind TEXT);
 """
 # 1.5: the columns a 1.4 store lacks, added in place.
 NEW_PASS_COLUMNS = ("lot", "block", "folder")
 # 1.6: the application of each run, its folder; the runs stored before are
 # given theirs at the server's start (backfill_apps). 1.17: `kind`, « mesure »
 # for the usage measure (usage.py) — never a command's run.
-NEW_RUN_COLUMNS = ("app", "kind")
+NEW_RUN_COLUMNS = ("app", "kind", "programme")
 
 
 class Store:
@@ -467,7 +471,8 @@ class Store:
              m.get("resets_at"), m.get("status"), int(backfilled))))
 
     def record_run(self, *, run_id, feature, work, command, mode, started_at, ended_at, tally,
-                   next_line, outcome, log_path, resumed=False, backfilled=False, app=None, kind=None):
+                   next_line, outcome, log_path, resumed=False, backfilled=False, app=None, kind=None,
+                   programme=None):
         totals = dict(tally.totals) if tally.totals else None
 
         def go(db):
@@ -486,11 +491,12 @@ class Store:
             db.execute("INSERT OR REPLACE INTO runs (id, feature, work, command, permission_mode,"
                        " session_id, started_at, ended_at, duration_s, input_tokens,"
                        " cache_read_tokens, cache_creation_tokens, output_tokens, next_line, outcome,"
-                       " log_path, resumed, backfilled, app, kind) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                       " log_path, resumed, backfilled, app, kind, programme)"
+                       " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                        (run_id, feature, work, command, mode, tally.session_id, started_at, ended_at,
                         dur, t.get("input_tokens"), t.get("cache_read_tokens"),
                         t.get("cache_creation_tokens"), t.get("output_tokens"), next_line, outcome,
-                        log_path or None, int(resumed), int(backfilled), app, kind))
+                        log_path or None, int(resumed), int(backfilled), app, kind, programme))
             db.execute("DELETE FROM agent_passes WHERE run_id=?", (run_id,))
             for p in tally.passes.values():
                 db.execute("INSERT INTO agent_passes (run_id, tool_use_id, parent_tool_use_id, agent,"
@@ -502,6 +508,56 @@ class Store:
                             p.cache_read_tokens, p.cache_creation_tokens, p.output_tokens, p.tool_calls,
                             int(backfilled), p.lot, p.block, p.folder))
             return totals_summary(totals, dur)
+        return self._exec(go)
+
+    def record_programme(self, s):
+        """1.18 — a programme's end summary."""
+        u = s.get("usage") or {}
+        f, w = u.get("five_hour") or {}, u.get("seven_day") or {}
+        self._exec(lambda db: db.execute(
+            "INSERT OR REPLACE INTO programmes (id, app, feature, name, spec, created_at, started_at, ended_at,"
+            " commands, lots, prompts, five_hour, five_hour_unknown, seven_day, seven_day_unknown, reason,"
+            " reason_kind) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (s["id"], s.get("app"), s.get("feature"), s.get("name"), json.dumps(s.get("spec"), ensure_ascii=False),
+             s.get("created_at"), s.get("started_at"), s.get("ended_at"), s.get("commands"), s.get("lots"),
+             json.dumps(s.get("prompts") or [], ensure_ascii=False), f.get("spent"), f.get("unknown"),
+             w.get("spent"), w.get("unknown"), s.get("reason"), s.get("reason_kind"))))
+
+    def programmes(self, limit=20):
+        def go(db):
+            out = []
+            for r in db.execute("SELECT * FROM programmes ORDER BY ended_at DESC LIMIT ?", (limit,)):
+                d = dict(r)
+                for k in ("spec", "prompts"):
+                    try:
+                        d[k] = json.loads(d[k]) if d[k] else None
+                    except ValueError:
+                        d[k] = None
+                d["usage"] = {"five_hour": {"spent": d.pop("five_hour"), "unknown": d.pop("five_hour_unknown")},
+                              "seven_day": {"spent": d.pop("seven_day"), "unknown": d.pop("seven_day_unknown")}}
+                out.append(d)
+            return out
+        return self._exec(go)
+
+    def spent(self, programme):
+        """1.18 — what a programme's runs took from each window: the sum of
+        each run's share (statsview.limit_delta), and how many runs it left
+        out for want of a measure."""
+        import statsview
+
+        def go(db):
+            ids = [r["id"] for r in db.execute("SELECT id FROM runs WHERE programme=?", (programme,))]
+            if not ids:
+                return {}
+            q = "SELECT * FROM rate_limits WHERE run_id IN (%s) ORDER BY measured_at, id" % ",".join("?" * len(ids))
+            ms = [dict(r) for r in db.execute(q, ids)]
+            out = {}
+            for w in WINDOWS:
+                ds = [statsview.limit_delta([m for m in ms if m["run_id"] == i and m["window"] == w])["delta"]
+                      for i in ids]
+                known = [d for d in ds if d is not None]
+                out[w] = {"spent": round(sum(known), 1) if known else None, "unknown": len(ds) - len(known)}
+            return out
         return self._exec(go)
 
     # --------------------------------------------------------------- read

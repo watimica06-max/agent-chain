@@ -168,6 +168,10 @@ class Run:
     sync: dict | None = None
     # 1.16: the `error` an assistant message carried (authentication_failed…).
     api_error: str = ""
+    # 1.18: the programme of the automatic mode that launched it, if any; and
+    # the stop.md the cockpit wrote for it — disarmed once the run ended.
+    programme: str = ""
+    stop_written: str = ""
 
     @property
     def prompt(self):
@@ -213,6 +217,7 @@ class Run:
             "sync": self.sync,
             "api_error": self.api_error,
             "auth_failed": self.api_error == AUTH_FAILED,
+            "programme": self.programme,
             "passes": [p.summary() for p in self.tally.passes.values() if p.ended],
             "can_continue": (self.status == "ended" and bool(self.session_id)
                              and bool(self.next) and self.next.get("kind") == "unknown"),
@@ -252,7 +257,8 @@ class Runner:
     # -------------------------------------------------------------- start
 
     async def start(self, repo: str, work: str, feature: str, command: str, args: str,
-                    resume: str | None = None, message: str | None = None) -> Run:
+                    resume: str | None = None, message: str | None = None, mode: str | None = None,
+                    programme: str = "") -> Run:
         key = repo_key(repo)
         # Check and claim with no await in between: the lock is this line.
         # One run at a time, whatever the application (1.6).
@@ -265,7 +271,10 @@ class Runner:
                   started_at=datetime.now().isoformat(timespec="seconds"),
                   resume=resume)
         run.message = message or run.prompt
-        run.mode = self.mode_getter() if self.mode_getter() in PERMISSION_MODES else "auto"
+        # 1.18: a programme's runs are always in « auto », whatever Paramètres says.
+        wanted = mode or self.mode_getter()
+        run.mode = wanted if wanted in PERMISSION_MODES else "auto"
+        run.programme = programme or ""
         old = self.runs.get(key)
         if old:
             run.subscribers = old.subscribers
@@ -412,6 +421,14 @@ class Runner:
         run.next = nextline.parse(run.relay).to_dict()
         run.ended_at = _now()
         self._record(run)
+        # 1.18: the stop.md the cockpit wrote has been read — disarmed, so
+        # that the Product Owner never handles it.
+        if run.stop_written:
+            try:
+                if os.path.exists(run.stop_written):
+                    self.disarm_stop_file(run.repo, run.feature)
+            except OSError as e:
+                self._emit(run, "error", {"message": f"stop.md non retiré : {e}"})
         run.worktrees_left = list_worktrees(run.repo)
         run.status = "ended"
         run.client = None
@@ -512,7 +529,8 @@ class Runner:
                 run_id=run.id, feature=run.feature, work=run.work, command=run.prompt,
                 mode=run.mode, started_at=run.started_at, ended_at=run.ended_at,
                 tally=run.tally, next_line=(run.next or {}).get("raw") or None,
-                outcome=run.outcome, log_path=run.log_path, resumed=bool(run.resume), app=run.repo)
+                outcome=run.outcome, log_path=run.log_path, resumed=bool(run.resume), app=run.repo,
+                programme=run.programme or None)
         except Exception as e:
             self._emit(run, "error", {"message": f"consommation non enregistrée : {e}"})
 
@@ -618,6 +636,7 @@ class Runner:
         with open(path, "w", encoding="utf-8") as f:
             f.write(f"Arrêt au prochain lot demandé depuis le cockpit, "
                     f"{datetime.now().isoformat(timespec='seconds')}.\n")
+        run.stop_written = path
         self._emit(run, "stopping", {"how": "prochain lot", "file": path})
         return path
 

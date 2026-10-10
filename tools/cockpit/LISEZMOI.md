@@ -402,6 +402,68 @@ ce n'est plus le chiffre du moment.
   ceux de toutes les applications ; « coût : inconnu » en dessous de
   trois. La bulle dit sur combien de runs.
 
+**Pilote automatique** (1.18) — sur le tableau de bord, ordinateur et
+téléphone. Un **programme** lance l'étape que le cockpit propose, commande
+après commande, tant que personne n'est nécessaire, en mode de permission
+Auto quel que soit le réglage de Paramètres. Un seul programme à la fois,
+dans une application, sur cet ordinateur ; il agit sur la feature ouverte
+quand il a été créé.
+
+- **Le lancer.** Trois réglages prêts — « Maintenant, jusqu'à ce qu'on ait
+  besoin de moi », « Cette nuit, 1 h – 7 h », « Pendant 2 heures » —,
+  les programmes enregistrés, et « Programme complet… », le formulaire
+  entier. Démarrage : maintenant, à une heure, ou dans un créneau (il
+  démarre à son début — tout de suite si on y est déjà — et sa fin est une
+  borne). Un démarrage plus tard dit « L'ordinateur doit rester allumé et
+  réveillé jusque-là. » ; un programme pas encore démarré survit à un
+  redémarrage du cockpit (gardé dans `config.json`).
+- **Les bornes**, chacune facultative, combinées librement — **la
+  première atteinte l'arrête** : une heure de fin, une durée, un nombre de
+  lots codés, un nombre de commandes, un niveau de la fenêtre de 5 heures
+  ou de la semaine, et une **étape à atteindre** : « S'arrêter avant » une
+  étape du flux, ou « S'arrêter une fois faite » — une liste des étapes,
+  dans l'ordre du flux, celles de la correction ouverte comprises. Les
+  bornes sont regardées avant chaque commande : une commande commencée va
+  à son terme.
+- **Il s'arrête toujours** sur : des questions ou un blocage pour vous ;
+  une étape pour une personne (les réponses, la bug-list, le test final, la
+  recette) ; une erreur ou une commande interrompue ; le seuil de blocage
+  de 1.17 (jamais de « Lancer quand même » dans un programme) ; un blocage
+  de « État de l'ordinateur » ; une application « divergé » ; une chaîne
+  pas à jour ; et avant `/9_controle` et `/diagnostique`, sauf si
+  « Laisser tourner /9_controle et /diagnostique » est coché. Aucune étape
+  de test intermédiaire : il s'arrête à l'étape de test finale, et ne
+  lance jamais `/deploie` ni `/fusion`. Chaque commande passe par les
+  mêmes vérifications qu'un clic (GitHub d'abord, 1.12).
+- **Le code.** `/8_code` est lancé pour **un lot à la fois** ; entre deux
+  lots, le programme regarde ses bornes, la consommation et un arrêt
+  demandé. « Nombre de lots codés » est la borne qui remplace « Lots à
+  coder » (qui reste pour un lancement à la main).
+- **Attendre une réinitialisation.** Avant chaque commande : si son
+  estimation (1.17) ferait passer la fenêtre de 5 heures au-delà du seuil
+  de blocage, et que la fenêtre se réinitialise dans les bornes du
+  programme, il attend la réinitialisation — il le dit, avec l'heure —,
+  mesure de nouveau et continue. Réinitialisation au-delà des bornes, ou
+  inconnue : il s'arrête et dit pourquoi. Pour la semaine, il s'arrête.
+- **L'arrêter.** « Arrêter après la commande en cours » (« après le lot en
+  cours » pour `/8_code` : le cockpit pose `stop.md` là où la commande le
+  lit, et le retire à la fin du run) ; « Arrêter maintenant », comme
+  aujourd'hui ; « Annuler le programme » avant son démarrage. Depuis
+  l'ordinateur ou le téléphone. Le bouton « Pilote : … » de la barre du
+  haut, sur chaque écran, ramène au panneau.
+- **Ce qu'il dit.** Pendant qu'il tourne ou attend : ce qu'il fait, ce
+  qu'il attend, ses bornes en mots (« S'arrête à 7 h ou après 4 lots
+  encore. »). Une notification au téléphone (1.15) quand il démarre, quand
+  il se met à attendre une réinitialisation, et quand il s'arrête — avec
+  la raison ; aucune à la fin de chacune de ses commandes. À la fin, un
+  résumé : commandes lancées, lots codés, consommation prise (la somme de
+  ce que chaque run a pris), pourquoi il s'est arrêté — gardé dans
+  `stats.sqlite` (table `programmes`, et chaque run porte son programme),
+  montré sous le panneau et dans Statistiques → « Programmes du pilote
+  automatique ».
+- Tant qu'un programme est actif, « Mettre à jour le cockpit » et le
+  redémarrage de lui-même attendent sa fin.
+
 **Statistiques** — ce que `stats.sqlite` garde, lu en détail : par
 application (l'active, ou toutes — chaque run garde la sienne ; ceux
 d'avant 1.6 ont retrouvé la leur au démarrage), par
@@ -670,7 +732,8 @@ d'autorisation apparaît en bandeau sur tous les écrans : « Autoriser » ou
 « Refuser » ; la commande attend votre clic — que la page se rafraîchisse
 pendant le clic ne le perd plus (1.12.2). « Arrêter maintenant »
 interrompt le tour en cours. « Arrêter au prochain lot » (sur `/8_code`
-seulement) écrit `stop.md` ; « Retirer stop.md » le renomme `stop1.md`.
+seulement) écrit `stop.md`, et le cockpit le renomme `stop1.md` à la fin du
+run (1.18) ; « Retirer stop.md » reste pour un `stop.md` posé à la main.
 
 **Lots à coder** (1.9.1) — à côté du bouton de l'étape « Coder les lots »,
 et dans « Chaîne → Code » : combien de lots `/8_code` code d'affilée, 1 par
@@ -809,7 +872,9 @@ suite ; `tailscale serve reset` retire le service de Tailscale.
 
 ## Ce que le cockpit ne fait jamais
 
-- Il ne lance aucune commande que vous n'avez pas cliquée. Son seul appel
+- Il ne lance aucune commande que vous n'avez pas cliquée — un programme
+  du pilote automatique (1.18) compte pour un clic : il lance les étapes
+  proposées, dans ses bornes, et s'arrête dès qu'on a besoin de vous. Son seul appel
   à Claude de lui-même est la mesure de la consommation (1.17) : une
   phrase, le modèle le plus léger, sans outil, dans un dossier à lui.
 - Il ne remplace la ligne `Next:` que quand les fichiers la contredisent,
